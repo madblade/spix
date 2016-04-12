@@ -22,20 +22,6 @@ class App {
         return this._connector;
     }
 
-    start() {
-        console.log("Application running.");
-        this.jobId = setInterval(() => {
-            console.log("Loop.");
-        }, 200);
-    }
-
-    stop() {
-        console.log("Application stopping.");
-        if (this.jobId !== undefined) {
-            clearInterval(this.jobId);
-        }
-    }
-
 }
 
 export default App;

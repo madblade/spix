@@ -4,39 +4,24 @@
 
 'use strict';
 
+import DB from '../db';
+
 class Connector {
 
     constructor(app) {
         this._app = app;
-        this._clients = [];
-    }
-
-    addClient(client) {
-        var clients = this._clients;
-        var app = this._app;
-        clients.push(client);
-        if (clients.length === 1) {
-            app.start();
-        }
-    }
-
-    removeClient(client) {
-        var clients = this._clients;
-        var app = this._app;
-        clients.splice(clients.indexOf(client), 1);
-        if (clients.length < 1) {
-            app.stop();
-        }
+        this._db = new DB();
     }
 
     // When the user disconnects, perform this
     onDisconnect(socket) {
-        this.removeClient(socket);
+        this._db.removeUser(socket);
     }
 
     // When the user connects, perform this
     onConnect(socket) {
-        this.addClient(socket);
+        // Add user to app DB
+        this._db.registerUser(socket);
 
         // When the client emits 'info', this listens and executes
         socket.on('info', data => {
@@ -48,31 +33,33 @@ class Connector {
             this.onDisconnect(socket);
             socket.log('DISCONNECTED');
         });
-
-        // Insert sockets below
-        socket.on('move', (data) => {
-            socket.emit('moved', 'got ' + data);
-        });
     }
 
+    /**
+     * Configure socket connections.
+     *
+     * socket.io (v1.x.x) is powered by debug.
+     *
+     * In order to see all the debug output, set DEBUG
+     * (in server/config/local.env.js) to including the desired scope.
+     * (don't forget to import config from './environment' ;)
+     * ex: DEBUG: "http*,socket.io:socket"
+     *
+     * We can authenticate socket.io users and access their token through socket.decoded_token
+     * 1. You will need to send the token in `client/components/socket/socket.service.js`
+     * 2. Require authentication here:
+     *      socketio.use(require('socketio-jwt').authorize({
+     *          secret: config.secrets.session,
+     *          handshake: true
+     *      }));
+     *
+     * @param socketio
+     */
     configure(socketio) {
-        // socket.io (v1.x.x) is powered by debug.
-        // In order to see all the debug output, set DEBUG (in server/config/local.env.js) to including the desired scope.
-        // (don't forget to import config from './environment' ;)
-        //
-        // ex: DEBUG: "http*,socket.io:socket"
-
-        // We can authenticate socket.io users and access their token through socket.decoded_token
-        //
-        // 1. You will need to send the token in `client/components/socket/socket.service.js`
-        //
-        // 2. Require authentication here:
-        // socketio.use(require('socketio-jwt').authorize({
-        //   secret: config.secrets.session,
-        //   handshake: true
-        // }));
 
         socketio.on('connection', socket => {
+
+            // Define default functions and attributes
             socket.address = socket.request.connection.remoteAddress +
                 ':' + socket.request.connection.remotePort;
 
@@ -82,7 +69,7 @@ class Connector {
                 console.log(`SocketIO ${socket.nsp.name} [${socket.address}]`, ...data);
             };
 
-            // Call onConnect.
+            // Define default functions and attributes
             this.onConnect(socket);
             socket.log('CONNECTED');
         });

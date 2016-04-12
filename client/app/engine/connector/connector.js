@@ -9,7 +9,7 @@ App.Engine.Connection = function(app) {
     this.socket = {};
 };
 
-App.Engine.Connection.prototype.init = function(autoconfig) {
+App.Engine.Connection.prototype.setup = function(autoconfig) {
     var socketAddress = '';
 
     if (!autoconfig && location.hostname !== 'localhost') {

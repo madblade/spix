@@ -33,7 +33,7 @@
 
 <!-- Add your site or application content here -->
 <noscript>JS off</noscript>
-<p>Hello world</p>
+<div id="container"></div>
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
 <script>
@@ -58,17 +58,25 @@
 <![endif]-->
 <!-- build:js({client,node_modules}) app/vendor.js -->
 <!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/lodash/dist/lodash.compat.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-socket-io/socket.js"></script>
+<script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="bower_components/Hyphenator/Hyphenator.js"></script>
 <!-- endbower -->
 <script src="socket.io-client/socket.io.js"></script>
 <!-- endbuild -->
 <!-- build:js({.tmp,client}) app/server.js -->
 <script src="app/app.js"></script>
 <!-- injector:js -->
-<script src="app/engine/connector/app.engine.connector.js"></script>
-<script src="app/engine/graphics/app.engine.graphics.js"></script>
-<script src="app/engine/sound/app.engine.sound.js"></script>
-<script src="app/engine/ui/app.engine.ui.js"></script>
-<script src="app/modules/app.modules.js"></script>
+<script src="app/engine/connector/connector.js"></script>
+<script src="app/engine/graphics/graphics.factory.js"></script>
+<script src="app/engine/graphics/graphics.js"></script>
+<script src="app/engine/sound/sound.js"></script>
+<script src="app/engine/ui/ui.js"></script>
+<script src="app/modules/modules.js"></script>
+<script src="app/states/states.js"></script>
 <!-- endinjector -->
 <!-- endbuild -->
 

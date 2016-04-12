@@ -25,5 +25,5 @@ App.Core.prototype.run = function() {
     console.info("Application started locally.");
 
     // Run modules
-    this.connectionEngine.init();
+    this.connectionEngine.setup();
 };
