@@ -35,11 +35,10 @@ class Engine {
                 break;
             default:
                 // Do not add game.
-                console.err("Invalid game kind @ engine.addGame");
+                console.err("Invalid game kind @ engine.addGame"); // TODO Exceptions
                 return;
         }
 
-        game.kind = kind;
         this._hub.addGame(game);
     }
 

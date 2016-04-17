@@ -12,7 +12,12 @@ class Game {
         this._players = [];
         this._connector = connector;
 
+        this._kind = null;
         this._refreshRate = 200;
+    }
+
+    get kind() {
+        return this._kind;
     }
 
     get gameId() {
@@ -33,7 +38,7 @@ class Game {
      * @param player
      */
     addPlayer(player) {
-        // Join gamen channel.
+        // Join channel.
         player.socket.join(this._gameId);
 
         // Add player to model.
@@ -56,7 +61,7 @@ class Game {
      * Start game loop.
      */
     start() {
-        console.log("Application running.");
+        console.log("Game running.");
         this._jobId = setInterval(() => {
             this.update();
         }, this._refreshRate);
@@ -66,7 +71,7 @@ class Game {
      * Stop game loop.
      */
     stop() {
-        console.log("Application stopping.");
+        console.log("Game stopping.");
         if (this._jobId !== undefined) clearInterval(this._jobId);
     }
 }

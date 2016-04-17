@@ -10,9 +10,13 @@ class Connector {
 
     constructor(app) {
         this._app = app;
-        this._db = new DB();
+        this._db = new DB(this);
         this._io = null;
         this._debug = true;
+    }
+
+    get GE() {
+        return this._app.engine;
     }
 
     get io() {

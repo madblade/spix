@@ -12,12 +12,13 @@ class Hub {
         this._games = {};
     }
 
-    endGame() {
-
+    endGame(game) {
+        //delete this._games[game.gameId];
     }
 
     addGame(game) {
         var kind = game.kind;
+        if (!kind) return; // TODO Exception
 
         // Init list of games of this kind
         if (!this._games[kind]) this._games[kind] = {};

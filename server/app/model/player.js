@@ -4,11 +4,14 @@
 
 'use strict';
 
+import PlayerConnection from '../connector/playercon';
+
 class Player {
 
     constructor(user, game) {
         this._user = user;
         this._game = game;
+        this._playercon = new PlayerConnection(user.connection.socket);
     }
 
     get game() {
@@ -19,12 +22,8 @@ class Player {
         return this._user;
     }
 
-    get socket() {
-        return this._user.socket;
-    }
-
     send(kind, data) {
-        this._user.socket.emit(kind, data);
+        this._playercon.send(kind, data);
     }
 
     leave() {

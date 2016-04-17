@@ -8,7 +8,8 @@ import User from './user';
 import CollectionUtils from '../math/collections/util';
 
 class DB {
-    constructor() {
+    constructor(connector) {
+        this._connector = connector;
         this._users = {};
     }
 
@@ -24,7 +25,8 @@ class DB {
     registerUser(socket) {
         var nick = "";
         var id = CollectionUtils.generateId(this._users);
-        var user = new User(socket, nick, id);
+        var GE = this._connector.GE;
+        var user = new User(GE, socket, nick, id);
 
         this._users[id] = user;
         return user;

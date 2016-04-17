@@ -1,29 +1,31 @@
 /**
- * DB user.
+ * User model.
  */
 
 'use strict';
 
 import Player from './player'
+import UserConnection from '../connector/usercon';
 
 class User {
 
-    constructor(socket, nick, id) {
-        //
-        this._socket = socket;
+    constructor(GE, socket, nick, id) {
+        // Util
+        this._GE = GE;
+        this._usercon = new UserConnection(this, socket);
         this._nick = nick;
         this._id = id;
 
-        // Game
+        // States
         this._ingame = false;
         this._player = null;
     }
 
-    // Util
-    get socket() {
-        return this._socket;
+    get GE() {
+        return this._GE;
     }
 
+    // Model
     get nick() {
         return this._nick;
     }
@@ -44,6 +46,15 @@ class User {
         if (value) this._ingame = value;
     }
 
+    // Connection
+    get connection() {
+        return this._usercon;
+    }
+
+    send(kind, data) {
+        this._usercon.send(kind, data);
+    }
+
     /**
      * Join a specific game.
      * @param game
@@ -58,6 +69,7 @@ class User {
      * Leave all games (current game).
      */
     leave() {
+        this._ingame = false;
         var player = this._player;
         if (player) player.leave();
     }
@@ -66,7 +78,7 @@ class User {
      * Disconnect from socket.
      */
     disconnect() {
-        this._socket.emit('info', 'Disconnecting');
+        this.send('info', 'Disconnecting');
     }
 }
 
