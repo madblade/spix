@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Player from '../engine/model/player'
+import Player from './player'
 
 class User {
 
@@ -16,7 +16,7 @@ class User {
 
         // Game
         this._ingame = false;
-        this._player = undefined;
+        this._player = null;
     }
 
     // Util
@@ -26,6 +26,10 @@ class User {
 
     get nick() {
         return this._nick;
+    }
+
+    set nick(nick) {
+        this._nick = nick;
     }
 
     get id() {
@@ -47,7 +51,7 @@ class User {
     join(game) {
         this._ingame = true;
         var player = new Player(this, game);
-        game.spawn(player);
+        game.addPlayer(player);
     }
 
     /**
@@ -56,6 +60,13 @@ class User {
     leave() {
         var player = this._player;
         if (player) player.leave();
+    }
+
+    /**
+     * Disconnect from socket.
+     */
+    disconnect() {
+        this._socket.emit('info', 'Disconnecting');
     }
 }
 

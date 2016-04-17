@@ -4,24 +4,40 @@
 
 'use strict';
 
-import DB from '../db';
+import DB from '../model/db';
 
 class Connector {
 
     constructor(app) {
         this._app = app;
         this._db = new DB();
+        this._io = null;
+        this._debug = true;
+    }
+
+    get io() {
+        return this._io;
     }
 
     // When the user disconnects, perform this
     onDisconnect(socket) {
-        this._db.removeUser(socket);
+        var user = socket.user;
+        if (user === undefined) return;
+
+        // Leave from any running game
+        user.leave();
+        user.disconnect();
+
+        this._db.removeUser(user);
     }
 
     // When the user connects, perform this
     onConnect(socket) {
         // Add user to app DB
-        this._db.registerUser(socket);
+        var user = this._db.registerUser(socket);
+
+        // A user knows its socket and reciprocally
+        socket.user = user;
 
         // When the client emits 'info', this listens and executes
         socket.on('info', data => {
@@ -31,8 +47,21 @@ class Connector {
         // Call onDisconnect.
         socket.on('disconnect', () => {
             this.onDisconnect(socket);
-            socket.log('DISCONNECTED');
+            if (this._debug) socket.log('DISCONNECTED');
         });
+    }
+
+    setupDebug(socket) {
+        this._debug = true;
+
+        socket.address = socket.request.connection.remoteAddress +
+            ':' + socket.request.connection.remotePort;
+
+        socket.connectedAt = new Date();
+
+        socket.log = function(...data) {
+            console.log(`SocketIO ${socket.nsp.name} [${socket.address}]`, ...data);
+        };
     }
 
     /**
@@ -57,21 +86,16 @@ class Connector {
      */
     configure(socketio) {
 
+        this._io = socketio;
+
         socketio.on('connection', socket => {
-
-            // Define default functions and attributes
-            socket.address = socket.request.connection.remoteAddress +
-                ':' + socket.request.connection.remotePort;
-
-            socket.connectedAt = new Date();
-
-            socket.log = function(...data) {
-                console.log(`SocketIO ${socket.nsp.name} [${socket.address}]`, ...data);
-            };
+            // Define debug functions and attributes
+            this.setupDebug(socket);
 
             // Define default functions and attributes
             this.onConnect(socket);
-            socket.log('CONNECTED');
+
+            if (this._debug) socket.log('CONNECTED');
         });
     }
 

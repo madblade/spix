@@ -27,3 +27,7 @@ App.Core.prototype.run = function() {
     // Run modules
     this.connectionEngine.setup();
 };
+
+App.Core.prototype.updateWorld = function() {
+
+};

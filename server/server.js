@@ -18,7 +18,7 @@ var socketio = require('socket.io')(httpServer, {
 });
 var app = new App();
 
-app.connector.configure(socketio);
+app.connect(socketio);
 require('./config/express').default(server);
 require('./config/routes').default(server);
 

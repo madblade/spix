@@ -22,6 +22,9 @@ class App {
         return this._connector;
     }
 
+    connect(socketio) {
+        this._connector.configure(socketio);
+    }
 }
 
 export default App;

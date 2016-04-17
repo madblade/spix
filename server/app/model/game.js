@@ -6,14 +6,22 @@
 
 class Game {
 
-    constructor(gameId) {
+    constructor(gameId, connector) {
         this._gameId = gameId;
         this._jobId = undefined;
         this._players = [];
+        this._connector = connector;
+
+        this._refreshRate = 200;
     }
 
     get gameId() {
         return this._gameId;
+    }
+
+    broadcast(kind, data) {
+        // TODO optimize dynamic subchans
+        this.connector.io.to(this._gameId).emit(kind, data);
     }
 
     update() {
@@ -24,7 +32,11 @@ class Game {
      * Add player.
      * @param player
      */
-    spawn(player) {
+    addPlayer(player) {
+        // Join gamen channel.
+        player.socket.join(this._gameId);
+
+        // Add player to model.
         this._players.push(player);
     }
 
@@ -32,7 +44,11 @@ class Game {
      * Remove player
      * @param player
      */
-    forget(player) {
+    removePlayer(player) {
+        // Leave channel.
+        player.socket.leave(this.gameId);
+
+        // Remove from model.
         this._players.slice(Array.indexOf(player, this._players), 1);
     }
 
@@ -43,7 +59,7 @@ class Game {
         console.log("Application running.");
         this._jobId = setInterval(() => {
             this.update();
-        }, 200);
+        }, this._refreshRate);
     }
 
     /**

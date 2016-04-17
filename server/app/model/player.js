@@ -23,8 +23,12 @@ class Player {
         return this._user.socket;
     }
 
+    send(kind, data) {
+        this._user.socket.emit(kind, data);
+    }
+
     leave() {
-        this._game.forget(this);
+        this._game.removePlayer(this);
     }
 
 }

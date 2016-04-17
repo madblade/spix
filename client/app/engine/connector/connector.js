@@ -33,6 +33,10 @@ App.Engine.Connection.prototype.registerSocket = function(socket) {
        console.log('server: moved ' + data);
     });
 
+    socket.on('stamp', function(data) {
+        app.updateWorld(data);
+    });
+
     this.socket = socket;
 };
 

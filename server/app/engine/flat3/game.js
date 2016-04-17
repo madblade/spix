@@ -8,8 +8,8 @@ import Game from '../model/game';
 
 class Flat3 extends Game {
 
-    constructor(gameId) {
-        super(gameId);
+    constructor(gameId, connector) {
+        super(gameId, connector);
 
         this._terrain = [];
     }
@@ -17,7 +17,7 @@ class Flat3 extends Game {
     update() {
         console.log("Flat3 te dit coucou");
         this._players.forEach((p) => {
-            p.socket.emit('stamp', this._terrain);
+            p.send('stamp', this._terrain);
         });
     }
 

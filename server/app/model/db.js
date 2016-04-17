@@ -16,24 +16,26 @@ class DB {
         return user.id in this._users;
     }
 
+    /**
+     * Injects a socket into the user model.
+     * Registers the user (a socket knows its user since the connection).
+     * @param socket
+     */
     registerUser(socket) {
         var nick = "";
         var id = CollectionUtils.generateId(this._users);
         var user = new User(socket, nick, id);
 
-        // Register user (a user knows its socket and reciprocally)
-        socket.user = user;
         this._users[id] = user;
+        return user;
     }
 
     getUser(id) {
         return this._users[id];
     }
 
-    removeUser(socket) {
-        var user = socket.user;
-        if (user === undefined) return;
-        user.leave();
+    removeUser(user) {
+        // Remove references to this user
         delete this._users[user.id];
         delete socket.user;
     }
