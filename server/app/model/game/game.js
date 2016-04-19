@@ -22,6 +22,8 @@ class Game {
     get kind() { return this._kind; }
     get gameId() { return this._gameId; }
 
+    /* ### Manage connection ### */
+
     /**
      * Send a message to ALL connected users.
      * N.B. encouraged to create custom subchannels within implementations.
@@ -32,6 +34,8 @@ class Game {
         // TODO optimize dynamic subchans
         this.connector.io.to(this._gameId).emit(kind, data);
     }
+
+    /* ### Manage loop ### */
 
     /**
      * Server-render update function (looped).
@@ -58,6 +62,8 @@ class Game {
         if (this._jobId !== undefined) clearInterval(this._jobId);
     }
 
+    /* ### Manage players ### */
+
     /**
      * Add a player.
      * @param player
@@ -70,10 +76,9 @@ class Game {
         this._players.push(player);
 
         // Start game if need be.
-        if (!this._isRunning) {
-            this._isRunning = true; // TODO Check threads?
-            this.start();
-        }
+        if (this._isRunning) return;
+        this._isRunning = true;
+        this.start();
     }
 
     /**
@@ -85,10 +90,9 @@ class Game {
         this._players.splice(this._players.indexOf(player), 1);
 
         // Stop game if need be.
-        if (this._isRunning && this._players.length < 1) {
-            this._isRunning = false;
-            this.stop();
-        }
+        if (this._players.length > 0 || !this._isRunning) return;
+        this._isRunning = false;
+        this.stop();
     }
 }
 

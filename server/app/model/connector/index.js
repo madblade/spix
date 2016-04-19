@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Factory from '../model/factory';
+import Factory from '../factory';
 
 class Connector {
 
@@ -83,8 +83,7 @@ class Connector {
      * @param socketio
      */
     configure(socketio) {
-
-        if (this._io) throw "Trying to configure a running app.";
+        if (this._io) throw new Error("Trying to configure a running app.");
 
         this._io = socketio;
 

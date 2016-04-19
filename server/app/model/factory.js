@@ -11,10 +11,10 @@ import Game from './game/game';
 import Player from './user/player';
 
 import Connector from './connector';
-import UserCon from 'connector/usercon';
-import PlayerCon from 'connector/playercon';
+import UserCon from './connector/usercon';
+import PlayerCon from './connector/playercon';
 
-import GameFactory from 'engine/game.factory';
+import GameFactory from '../engine/game.factory';
 
 class Factory {
 

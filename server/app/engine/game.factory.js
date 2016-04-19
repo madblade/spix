@@ -4,23 +4,24 @@
 
 'use strict';
 
+import Flat3 from './flat3/game';
+
 class GameFactory {
 
     // TODO instantiate games according to kind.
-    static createGame(kind) {
+    static createGame(kind, gameId, connector) {
         var game;
         switch (kind) {
             case 'flat2':
                 break;
             case 'flat3':
-                game = new Flat3(gid, this._app.connector);
+                game = new Flat3(gameId, connector);
                 break;
             case 'free3':
                 break;
             case 'free4':
                 break;
-            default: // Do not add game.
-                throw "Unknown game kind requested @ GameFactory";
+            default: console.log("Unknown game kind requested @ GameFactory");
         }
 
         return game;

@@ -18,13 +18,17 @@ class CollectionUtils {
         }
 
         else if (collection instanceof Object) { // Object <-> Map
-            id = Object.keys(collection).length;
+            id = CollectionUtils.numberOfProperties(collection);
 
             // Unicity mandatory check
             while (id in collection) ++id;
         }
 
         return id;
+    }
+
+    static numberOfProperties(object) {
+        return Object.keys(object).length;
     }
 
 }

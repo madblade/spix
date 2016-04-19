@@ -5,7 +5,6 @@
 'use strict';
 
 import CollectionUtils from '../../math/collections/util';
-import Flat3 from '../../engine/flat3/game';
 import Factory from '../factory';
 
 class Hub {
@@ -17,21 +16,33 @@ class Hub {
 
     validateUser(user) {
         // Do validation
-        return user !== null;
+        var res = user !== null;
+        if (!res) console.log('Invalid user requested new game.');
+        return res;
     }
 
     validateKind(kind) {
+        var res = false;
         switch (kind) {
             case 'flat2': case 'flat3': case 'free3': case 'free4':
-                return true;
-            default:
-                return false;
+                res = true;
         }
+        if (!res) console.log('Invalid game kind requested.');
+        return res;
+    }
+
+    validateRequest() {
+        // TODO think of different criteria
+        var res = (CollectionUtils.numberOfProperties(this._games) < 1);
+        if (!res) console.log('Invalid game creation request.');
+        return res;
     }
 
     requestNewGame(user, kind) {
-        if (!this.validateUser(user)) throw 'Invalid user requested new game.';
-        if (!this.validateKind(kind)) throw 'Invalid game kind requested.';
+        if (!this.validateUser(user)) return;
+        if (!this.validateKind(kind)) return;
+        if (!this.validateRequest()) return;
+
         return this.addGame(kind);
     }
 

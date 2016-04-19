@@ -16,6 +16,7 @@ class Flat3 extends Game {
         this._terrain = [];
     }
 
+    //^
     update() {
         console.log("Flat3 sez hy " + this._players.length);
         //this._players.forEach((p) => {
