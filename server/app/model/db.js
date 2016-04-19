@@ -25,8 +25,8 @@ class DB {
     registerUser(socket) {
         var nick = "";
         var id = CollectionUtils.generateId(this._users);
-        var GE = this._connector.GE;
-        var user = new User(GE, socket, nick, id);
+        var hub = this._connector.hub;
+        var user = new User(hub, socket, nick, id);
 
         this._users[id] = user;
         return user;
@@ -39,7 +39,7 @@ class DB {
     removeUser(user) {
         // Remove references to this user
         delete this._users[user.id];
-        delete socket.user;
+        user.destroy();
     }
 }
 

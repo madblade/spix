@@ -4,18 +4,18 @@
 
 'use strict';
 
-import Engine from './engine/';
+import Hub from './model/hub';
 import Connector from './connector';
 
 class App {
 
     constructor() {
-        this._engine = new Engine(this);
+        this._hub = new Hub(this);
         this._connector = new Connector(this);
     }
 
-    get engine() {
-        return this._engine;
+    get hub() {
+        return this._hub;
     }
 
     get connector() {

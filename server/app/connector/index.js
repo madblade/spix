@@ -15,8 +15,8 @@ class Connector {
         this._debug = true;
     }
 
-    get GE() {
-        return this._app.engine;
+    get hub() {
+        return this._app.hub;
     }
 
     get io() {
@@ -29,8 +29,8 @@ class Connector {
         if (user === undefined) return;
 
         // Leave from any running game
-        user.leave();
         user.disconnect();
+        user.leave();
 
         this._db.removeUser(user);
     }

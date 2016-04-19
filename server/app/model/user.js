@@ -9,9 +9,9 @@ import UserConnection from '../connector/usercon';
 
 class User {
 
-    constructor(GE, socket, nick, id) {
+    constructor(hub, socket, nick, id) {
         // Util
-        this._GE = GE;
+        this._hub = hub;
         this._usercon = new UserConnection(this, socket);
         this._nick = nick;
         this._id = id;
@@ -21,8 +21,8 @@ class User {
         this._player = null;
     }
 
-    get GE() {
-        return this._GE;
+    get hub() {
+        return this._hub;
     }
 
     // Model
@@ -55,6 +55,11 @@ class User {
         this._usercon.send(kind, data);
     }
 
+    //
+    requestNewGame(data) {
+        return this._hub.requestNewGame(this, data);
+    }
+
     /**
      * Join a specific game.
      * @param game
@@ -62,6 +67,7 @@ class User {
     join(game) {
         this._ingame = true;
         var player = new Player(this, game);
+        this._player = player;
         game.addPlayer(player);
     }
 
@@ -78,7 +84,13 @@ class User {
      * Disconnect from socket.
      */
     disconnect() {
+        var player = this._player;
+        if (player) player.disconnect();
         this.send('info', 'Disconnecting');
+    }
+
+    destroy() {
+        this._usercon.user = null;
     }
 }
 

@@ -25,6 +25,7 @@ App.Engine.Connection.prototype.setup = function(autoconfig) {
     this.registerSocket(socket);
 
     socket.emit('info', 'Eye connected');
+    socket.emit('createGame', 'flat3');
 };
 
 App.Engine.Connection.prototype.registerSocket = function(socket) {

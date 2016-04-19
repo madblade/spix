@@ -14,6 +14,7 @@ class Game {
 
         this._kind = null;
         this._refreshRate = 200;
+        this._isRunning = false;
     }
 
     get kind() {
@@ -39,10 +40,16 @@ class Game {
      */
     addPlayer(player) {
         // Join channel.
-        player.socket.join(this._gameId);
+        player.join(this.gameId);
 
         // Add player to model.
         this._players.push(player);
+
+        // Start game if need be.
+        if (!this._isRunning) {
+            this._isRunning = true; // TODO Check threads?
+            this.start();
+        }
     }
 
     /**
@@ -50,11 +57,14 @@ class Game {
      * @param player
      */
     removePlayer(player) {
-        // Leave channel.
-        player.socket.leave(this.gameId);
-
         // Remove from model.
-        this._players.slice(Array.indexOf(player, this._players), 1);
+        this._players.splice(this._players.indexOf(player), 1);
+
+        // Stop game if need be.
+        if (this._isRunning && this._players.length < 1) {
+            this._isRunning = false;
+            this.stop();
+        }
     }
 
     /**

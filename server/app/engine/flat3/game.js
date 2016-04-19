@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Game from '../model/game';
+import Game from '../../model/game';
 
 class Flat3 extends Game {
 
@@ -17,10 +17,10 @@ class Flat3 extends Game {
     }
 
     update() {
-        console.log("Flat3 sez hy");
-        this._players.forEach((p) => {
-            p.send('stamp', this._terrain);
-        });
+        console.log("Flat3 sez hy " + this._players.length);
+        //this._players.forEach((p) => {
+        //    p.send('stamp', this._terrain);
+        //});
     }
 
 }

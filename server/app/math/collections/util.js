@@ -18,7 +18,7 @@ class CollectionUtils {
         }
 
         else if (collection instanceof Object) { // Object <-> Map
-            id = Object.keys(collection).size();
+            id = Object.keys(collection).length;
 
             // Unicity mandatory check
             while (id in collection) ++id;

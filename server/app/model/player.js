@@ -22,12 +22,24 @@ class Player {
         return this._user;
     }
 
+    /**
+     * Join a socket room.
+     * @param room Socket subset of users.
+     */
+    join(room) {
+        this._playercon.join(room);
+    }
+
     send(kind, data) {
         this._playercon.send(kind, data);
     }
 
     leave() {
         this._game.removePlayer(this);
+    }
+
+    disconnect() {
+        this._playercon.leaveAll();
     }
 
 }

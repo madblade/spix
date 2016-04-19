@@ -13,6 +13,10 @@ class UserConnection {
         this.configure(socket);
     }
 
+    set user(user) {
+        return this._user = user;
+    }
+
     get socket() {
         return this._socket;
     }
@@ -23,13 +27,11 @@ class UserConnection {
 
     configure(socket) {
         socket.on('createGame', (data) => {
-
+            var game = this._user.requestNewGame(data);
+            if (game) this._user.join(game);
         });
 
         socket.on('joinGame', (data) => {
-            var GE = this._user.GE;
-            var newGame = GE.addGame(data.kind);
-            user.join(newGame);
         });
     }
 }
