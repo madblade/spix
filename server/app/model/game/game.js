@@ -6,6 +6,7 @@
 
 class Game {
 
+    // TODO refactor
     constructor(gameId, connector) {
         this._gameId = gameId;
         this._jobId = undefined;
@@ -17,25 +18,48 @@ class Game {
         this._isRunning = false;
     }
 
-    get kind() {
-        return this._kind;
-    }
+    // Model
+    get kind() { return this._kind; }
+    get gameId() { return this._gameId; }
 
-    get gameId() {
-        return this._gameId;
-    }
-
+    /**
+     * Send a message to ALL connected users.
+     * N.B. encouraged to create custom subchannels within implementations.
+     * @param kind
+     * @param data
+     */
     broadcast(kind, data) {
         // TODO optimize dynamic subchans
         this.connector.io.to(this._gameId).emit(kind, data);
     }
 
+    /**
+     * Server-render update function (looped).
+     */
     update() {
         console.log("Loop.");
     }
 
     /**
-     * Add player.
+     * Start game loop.
+     */
+    start() {
+        console.log("Game running.");
+        this._jobId = setInterval(() => {
+            this.update();
+        }, this._refreshRate);
+    }
+
+    /**
+     * Stop game loop.
+     */
+    stop() {
+        console.log("Game stopping.");
+        if (this._jobId !== undefined) clearInterval(this._jobId);
+    }
+
+    /**
+     * Add a player.
      * @param player
      */
     addPlayer(player) {
@@ -65,24 +89,6 @@ class Game {
             this._isRunning = false;
             this.stop();
         }
-    }
-
-    /**
-     * Start game loop.
-     */
-    start() {
-        console.log("Game running.");
-        this._jobId = setInterval(() => {
-            this.update();
-        }, this._refreshRate);
-    }
-
-    /**
-     * Stop game loop.
-     */
-    stop() {
-        console.log("Game stopping.");
-        if (this._jobId !== undefined) clearInterval(this._jobId);
     }
 }
 

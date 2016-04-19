@@ -4,19 +4,21 @@
 
 'use strict';
 
-import DB from './db';
-import Hub from './hub';
-import User from './user';
-import Game from './game';
-import Player from './player';
+import DB from './collections/db';
+import Hub from './collections/hub';
+import User from './user/user';
+import Game from './game/game';
+import Player from './user/player';
 
-import Connector from '../connector';
-import UserCon from '../connector/usercon';
-import PlayerCon from '../connector/playercon';
+import Connector from './connector';
+import UserCon from 'connector/usercon';
+import PlayerCon from 'connector/playercon';
+
+import GameFactory from 'engine/game.factory';
 
 class Factory {
 
-    // High level classes
+    // App-level classes
 
     static createDB(connector) {
         return new DB(connector);
@@ -32,10 +34,11 @@ class Factory {
 
     // Gaming classes
 
-    static createGame() { // TODO think
-        return new Game();
+    static createGame(kind, gameId, connector) {
+        return GameFactory.createGame(kind, gameId, connector);
     }
 
+    // TODO instantiate players according to game kind? Think about it.
     static createPlayer(user, game) {
         return new Player(user, game);
     }

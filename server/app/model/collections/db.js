@@ -4,10 +4,11 @@
 
 'use strict';
 
-import Factory from './factory';
-import CollectionUtils from '../math/collections/util';
+import Factory from './../factory';
+import CollectionUtils from '../../math/collections/util';
 
 class DB {
+
     constructor(connector) {
         this._connector = connector;
         this._users = {};

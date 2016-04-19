@@ -13,13 +13,9 @@ class UserConnection {
         this.configure(socket);
     }
 
-    set user(user) {
-        return this._user = user;
-    }
-
-    get socket() {
-        return this._socket;
-    }
+    // Model
+    set user(user) { return this._user = user; }
+    get socket() { return this._socket; }
 
     send(kind, data) {
         this._socket.emit(kind, data);

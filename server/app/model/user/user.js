@@ -4,12 +4,12 @@
 
 'use strict';
 
-import Factory from './factory';
+import Factory from './../factory';
 
 class User {
 
     constructor(hub, socket, nick, id) {
-        // Util
+        // Model
         this._hub = hub;
         this._usercon = Factory.createUserCon(this, socket);
         this._nick = nick;
@@ -20,41 +20,30 @@ class User {
         this._player = null;
     }
 
-    get hub() {
-        return this._hub;
-    }
-
     // Model
-    get nick() {
-        return this._nick;
-    }
+    get hub() { return this._hub; }
+    get id() { return this._id; }
+    get connection() { return this._usercon; }
 
-    set nick(nick) {
-        this._nick = nick;
-    }
+    get nick() { return this._nick; }
+    set nick(nick) { this._nick = nick; }
+    get ingame() { return this._ingame; }
+    set ingame(value) { if (value) this._ingame = value; }
 
-    get id() {
-        return this._id;
-    }
-
-    get ingame() {
-        return this._ingame;
-    }
-
-    set ingame(value) {
-        if (value) this._ingame = value;
-    }
-
-    // Connection
-    get connection() {
-        return this._usercon;
-    }
-
+    /**
+     * Send a message to this user through its UserCon.
+     * @param kind
+     * @param data
+     */
     send(kind, data) {
         this._usercon.send(kind, data);
     }
 
-    //
+    /**
+     * Requests the hub to create a new gaming pool.
+     * @param data
+     * @returns {*}
+     */
     requestNewGame(data) {
         return this._hub.requestNewGame(this, data);
     }
@@ -75,19 +64,20 @@ class User {
      */
     leave() {
         this._ingame = false;
-        var player = this._player;
-        if (player) player.leave();
+        if (this._player) this._player.leave();
     }
 
     /**
      * Disconnect from socket.
      */
     disconnect() {
-        var player = this._player;
-        if (player) player.disconnect();
+        if (this._player) this._player.disconnect();
         this.send('info', 'Disconnecting');
     }
 
+    /**
+     * Cleans references to this user (in its members).
+     */
     destroy() {
         this._usercon.user = null;
     }

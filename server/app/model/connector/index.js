@@ -15,13 +15,9 @@ class Connector {
         this._debug = true;
     }
 
-    get hub() {
-        return this._app.hub;
-    }
-
-    get io() {
-        return this._io;
-    }
+    // Model
+    get hub() { return this._app.hub; }
+    get io() { return this._io; }
 
     // When the user connects, register him
     setupUser(socket) {

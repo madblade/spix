@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Factory from './factory';
+import Factory from './../factory';
 
 class Player {
 
@@ -14,13 +14,9 @@ class Player {
         this._playercon = Factory.createPlayerCon(user.connection.socket);
     }
 
-    get game() {
-        return this._game;
-    }
-
-    get user() {
-        return this._user;
-    }
+    // Model
+    get game() { return this._game; }
+    get user() { return this._user; }
 
     /**
      * Join a socket room.
@@ -30,6 +26,11 @@ class Player {
         this._playercon.join(room);
     }
 
+    /**
+     * Send a message to this user.
+     * @param kind
+     * @param data
+     */
     send(kind, data) {
         this._playercon.send(kind, data);
     }

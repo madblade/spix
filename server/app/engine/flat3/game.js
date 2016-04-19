@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Game from '../../model/game';
+import Game from '../../model/game/game';
 
 class Flat3 extends Game {
 

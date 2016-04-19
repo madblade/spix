@@ -13,13 +13,9 @@ class App {
         this._connector = Factory.createConnector(this);
     }
 
-    get hub() {
-        return this._hub;
-    }
-
-    get connector() {
-        return this._connector;
-    }
+    // Model
+    get hub() { return this._hub; }
+    get connector() { return this._connector; }
 
     connect(socketio) {
         this._connector.configure(socketio);
