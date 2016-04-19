@@ -4,13 +4,13 @@
 
 'use strict';
 
-import DB from '../model/db';
+import Factory from '../model/factory';
 
 class Connector {
 
     constructor(app) {
         this._app = app;
-        this._db = new DB(this);
+        this._db = Factory.createDB(this);
         this._io = null;
         this._debug = true;
     }
@@ -23,34 +23,27 @@ class Connector {
         return this._io;
     }
 
-    // When the user disconnects, perform this
-    onDisconnect(socket) {
-        var user = socket.user;
-        if (user === undefined) return;
-
-        // Leave from any running game
-        user.disconnect();
-        user.leave();
-
-        this._db.removeUser(user);
-    }
-
-    // When the user connects, perform this
-    onConnect(socket) {
+    // When the user connects, register him
+    setupUser(socket) {
         // Add user to app DB
         var user = this._db.registerUser(socket);
 
         // A user knows its socket and reciprocally
         socket.user = user;
+    }
 
-        // When the client emits 'info', this listens and executes
-        socket.on('info', data => {
-            socket.log(JSON.stringify(data, null, 2));
-        });
-
+    setupDisconnect(socket) {
         // Call onDisconnect.
         socket.on('disconnect', () => {
-            this.onDisconnect(socket);
+            var user = socket.user;
+            if (user === undefined) return;
+
+            // Leave from any running game
+            user.disconnect();
+            user.leave();
+
+            this._db.removeUser(user);
+
             if (this._debug) socket.log('DISCONNECTED');
         });
     }
@@ -66,6 +59,11 @@ class Connector {
         socket.log = function(...data) {
             console.log(`SocketIO ${socket.nsp.name} [${socket.address}]`, ...data);
         };
+
+        // When the client emits 'info', this listens and executes
+        socket.on('info', data => {
+            socket.log(JSON.stringify(data, null, 2));
+        });
     }
 
     /**
@@ -90,14 +88,19 @@ class Connector {
      */
     configure(socketio) {
 
+        if (this._io) throw "Trying to configure a running app.";
+
         this._io = socketio;
 
         socketio.on('connection', socket => {
             // Define debug functions and attributes
             this.setupDebug(socket);
 
-            // Define default functions and attributes
-            this.onConnect(socket);
+            // Define disconnect behaviour
+            this.setupDisconnect(socket);
+
+            // Register user
+            this.setupUser(socket);
 
             if (this._debug) socket.log('CONNECTED');
         });

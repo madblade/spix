@@ -9,6 +9,8 @@ class PlayerConnection {
     constructor(socket) {
         this._socket = socket;
         this._rooms = [];
+
+        this.configure(socket);
     }
 
     send(kind, data) {
@@ -28,6 +30,11 @@ class PlayerConnection {
 
     leaveAll() {
         this._rooms.forEach((room) => this._socket.leave(room));
+        this._rooms = [];
+    }
+
+    configure(socket) {
+        // Insert here custom behaviours
     }
 }
 

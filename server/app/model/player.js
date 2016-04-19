@@ -4,14 +4,14 @@
 
 'use strict';
 
-import PlayerConnection from '../connector/playercon';
+import Factory from './factory';
 
 class Player {
 
     constructor(user, game) {
         this._user = user;
         this._game = game;
-        this._playercon = new PlayerConnection(user.connection.socket);
+        this._playercon = Factory.createPlayerCon(user.connection.socket);
     }
 
     get game() {

@@ -5,8 +5,8 @@
 'use strict';
 
 import express from 'express';
-import config from './config/environment';
 import http from 'http';
+import config from './config/environment';
 import App from './app';
 
 // Setup server

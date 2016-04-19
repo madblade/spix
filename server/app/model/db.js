@@ -4,7 +4,7 @@
 
 'use strict';
 
-import User from './user';
+import Factory from './factory';
 import CollectionUtils from '../math/collections/util';
 
 class DB {
@@ -26,7 +26,7 @@ class DB {
         var nick = "";
         var id = CollectionUtils.generateId(this._users);
         var hub = this._connector.hub;
-        var user = new User(hub, socket, nick, id);
+        var user = Factory.createUser(hub, socket, nick, id);
 
         this._users[id] = user;
         return user;

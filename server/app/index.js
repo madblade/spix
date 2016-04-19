@@ -4,14 +4,13 @@
 
 'use strict';
 
-import Hub from './model/hub';
-import Connector from './connector';
+import Factory from './model/factory';
 
 class App {
 
     constructor() {
-        this._hub = new Hub(this);
-        this._connector = new Connector(this);
+        this._hub = Factory.createHub(this);
+        this._connector = Factory.createConnector(this);
     }
 
     get hub() {

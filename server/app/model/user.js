@@ -4,15 +4,14 @@
 
 'use strict';
 
-import Player from './player'
-import UserConnection from '../connector/usercon';
+import Factory from './factory';
 
 class User {
 
     constructor(hub, socket, nick, id) {
         // Util
         this._hub = hub;
-        this._usercon = new UserConnection(this, socket);
+        this._usercon = Factory.createUserCon(this, socket);
         this._nick = nick;
         this._id = id;
 
@@ -66,7 +65,7 @@ class User {
      */
     join(game) {
         this._ingame = true;
-        var player = new Player(this, game);
+        var player = Factory.createPlayer(this, game);
         this._player = player;
         game.addPlayer(player);
     }
