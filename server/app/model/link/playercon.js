@@ -9,8 +9,6 @@ class PlayerConnection {
     constructor(socket) {
         this._socket = socket;
         this._rooms = [];
-
-        this.configure(socket);
     }
 
     send(kind, data) {
@@ -33,8 +31,14 @@ class PlayerConnection {
         this._rooms = [];
     }
 
-    configure(socket) {
-        // Insert here custom behaviours
+    /**
+     * Register custom socket behaviour.
+     * @param message
+     * @param behaviour
+     */
+    on(message, behaviour) {
+        if (typeof behaviour !== "function") console.log("WARN: invalid socket definition");
+        this._socket.on(message, behaviour);
     }
 }
 

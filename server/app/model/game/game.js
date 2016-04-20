@@ -4,18 +4,24 @@
 
 'use strict';
 
+import Factory from '../factory';
+
 class Game {
 
-    // TODO refactor
     constructor(gameId, connector) {
+        // Utility parameters.
         this._gameId = gameId;
         this._jobId = undefined;
-        this._players = [];
         this._connector = connector;
 
+        //
         this._kind = null;
         this._refreshRate = 200;
         this._isRunning = false;
+
+        //
+        this._playerman = Factory.createPlayerManager();
+        // TODO handle user interaction directly from here
     }
 
     // Model
@@ -73,7 +79,7 @@ class Game {
         player.join(this.gameId);
 
         // Add player to model.
-        this._players.push(player);
+        this._playerman.addPlayer(player);
 
         // Start game if need be.
         if (this._isRunning) return;
@@ -87,10 +93,10 @@ class Game {
      */
     removePlayer(player) {
         // Remove from model.
-        this._players.splice(this._players.indexOf(player), 1);
+        this._playerman.removePlayer(player);
 
         // Stop game if need be.
-        if (this._players.length > 0 || !this._isRunning) return;
+        if (this._playerman.nbPlayers > 0 || !this._isRunning) return;
         this._isRunning = false;
         this.stop();
     }

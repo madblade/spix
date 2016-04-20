@@ -43,6 +43,15 @@ class Player {
         this._playercon.leaveAll();
     }
 
+    /**
+     * Define custom interactions (see PlayerCon).
+     * @param message
+     * @param behaviour
+     */
+    on(message, behaviour) {
+        this._playercon.on(message, behaviour);
+    }
+
 }
 
 export default Player;

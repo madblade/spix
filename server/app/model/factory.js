@@ -4,15 +4,16 @@
 
 'use strict';
 
-import DB from './collections/db';
-import Hub from './collections/hub';
-import User from './user/user';
+import DB from './appwide/db';
+import Hub from './appwide/hub';
+import User from './avatar/user';
 import Game from './game/game';
-import Player from './user/player';
+import Player from './avatar/player';
+import PlayerManager from './avatar/playerman';
 
-import Connector from './connector';
-import UserCon from './connector/usercon';
-import PlayerCon from './connector/playercon';
+import Connector from './link';
+import UserCon from './link/usercon';
+import PlayerCon from './link/playercon';
 
 import GameFactory from '../engine/game.factory';
 
@@ -41,6 +42,10 @@ class Factory {
     // TODO instantiate players according to game kind? Think about it.
     static createPlayer(user, game) {
         return new Player(user, game);
+    }
+
+    static createPlayerManager() {
+        return new PlayerManager();
     }
 
     // Connection classes
