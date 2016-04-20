@@ -35,8 +35,8 @@ App.Engine.Connection.prototype.registerSocket = function(socket) {
     });
 
     socket.on('stamp', function(data) {
-        app.updateWorld(data);
-    });
+        this.app.updateWorld(data);
+    }.bind(this));
 
     this.socket = socket;
 };

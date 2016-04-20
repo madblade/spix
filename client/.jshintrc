@@ -37,6 +37,8 @@
     "expect": true,
     "browser": true,
     "element": true,
-    "by": true
+    "by": true,
+    "App": true,
+    "io": true
   }
 }

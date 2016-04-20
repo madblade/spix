@@ -39,7 +39,6 @@ class Factory {
         return GameFactory.createGame(kind, gameId, connector);
     }
 
-    // TODO instantiate players according to game kind? Think about it.
     static createPlayer(user, game) {
         return new Player(user, game);
     }

@@ -14,7 +14,8 @@ class UserConnection {
     }
 
     // Model
-    set user(user) { return this._user = user; }
+    get user() { return this._user; }
+    set user(user) { this._user = user; }
     get socket() { return this._socket; }
 
     send(kind, data) {

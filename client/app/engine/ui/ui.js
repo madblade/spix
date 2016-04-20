@@ -14,7 +14,7 @@ App.Engine.UI.prototype.init = function() {
 
     // Register keyboard behaviour
     $(window).keydown(function(event) {
-        if (!event.keyCode) return;
+        if (!event.keyCode) { return; }
 
         switch (event.keyCode) {
             case 38: // Up

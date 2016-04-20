@@ -29,7 +29,7 @@ var all = {
 
     // Secret for session, you will want to change this and make it an environment variable
     secrets: {
-        session: 'app-secret' // TODO gen secret
+        session: 'app-secret' // Must gen secret
     }
 };
 

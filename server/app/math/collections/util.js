@@ -14,7 +14,8 @@ class CollectionUtils {
             id = collection.length;
 
             // Unicity mandatory check
-            while (collection.filter((e) => e.id === id).length > 0) ++id;
+            var f = ((e) => e.id === id);
+            while (collection.filter(f).length > 0) ++id;
         }
 
         else if (collection instanceof Object) { // Object <-> Map

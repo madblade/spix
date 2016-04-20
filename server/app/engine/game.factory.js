@@ -8,7 +8,6 @@ import Flat3 from './flat3/game';
 
 class GameFactory {
 
-    // TODO instantiate games according to kind.
     static createGame(kind, gameId, connector) {
         var game;
         switch (kind) {
@@ -27,10 +26,6 @@ class GameFactory {
         return game;
     }
 
-    // TODO use custom player models
-    static createPlayer(user, game) {
-
-    }
 }
 
 export default GameFactory;

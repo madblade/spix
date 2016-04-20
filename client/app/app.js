@@ -22,7 +22,7 @@ App.Core = function() {
 };
 
 App.Core.prototype.run = function() {
-    console.info("Application started locally.");
+    console.info('Application started locally.');
 
     // Run modules
     this.connectionEngine.setup();
