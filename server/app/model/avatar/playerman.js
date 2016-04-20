@@ -32,6 +32,14 @@ class PlayerManager {
         if (typeof f === "function") this._handleRemovePlayer = f;
     }
 
+    /**
+     * Iterator on players.
+     * @param callback
+     */
+    forEach(callback) {
+        this._players.forEach((p) => callback(p));
+    }
+
 }
 
 export default PlayerManager;

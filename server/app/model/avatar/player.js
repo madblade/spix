@@ -52,6 +52,13 @@ class Player {
         this._playercon.on(message, behaviour);
     }
 
+    /**
+     * Stop listening for a specified input type.
+     * @param message
+     */
+    off(message) {
+        this._playercon.off(message);
+    }
 }
 
 export default Player;

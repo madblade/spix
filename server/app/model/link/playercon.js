@@ -40,6 +40,10 @@ class PlayerConnection {
         if (typeof behaviour !== "function") console.log("WARN: invalid socket definition");
         this._socket.on(message, behaviour);
     }
+
+    off(message) {
+        this._socket.off(message);
+    }
 }
 
 export default PlayerConnection;

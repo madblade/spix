@@ -21,7 +21,8 @@ class Game {
 
         //
         this._playerman = Factory.createPlayerManager();
-        // TODO handle user interaction directly from here
+        console.log("Playerman created");
+        // TODO handle user interaction (I/O) directly from here
     }
 
     // Model
@@ -37,8 +38,8 @@ class Game {
      * @param data
      */
     broadcast(kind, data) {
-        // TODO optimize dynamic subchans
-        this.connector.io.to(this._gameId).emit(kind, data);
+        // TODO optimize with dynamic subchans
+        this._connector.io.to(this._gameId).emit(kind, data);
     }
 
     /* ### Manage loop ### */
@@ -47,7 +48,7 @@ class Game {
      * Server-render update function (looped).
      */
     update() {
-        console.log("Loop.");
+        console.log("Abstract loop.");
     }
 
     /**

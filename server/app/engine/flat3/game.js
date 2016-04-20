@@ -17,21 +17,23 @@ class Flat3 extends Game {
         this._refreshRate = 100;
 
         // Setup managers
+        this._inputman = Flat3Factory.createUserInput();
+        this._outputman = Flat3Factory.createUserOutput(this, this._playerman);
         this._physics = Flat3Factory.createPhysics();
-        this._input = Flat3Factory.createUserInput();
         this._ai = Flat3Factory.createAI();
         this._objectman = Flat3Factory.createObjectManager();
+        // super:_playerman
 
         // Setup behaviours
         this.configurePlayerManager();
     }
 
     configurePlayerManager() {
-        this._playerman.setAddPlayerBehaviour((p)=> {
+        this._playerman.setAddPlayerBehaviour((p) => {
 
         });
 
-        this._playerman.setRemovePlayerBehaviour((p)=> {
+        this._playerman.setRemovePlayerBehaviour((p) => {
 
         });
     }
@@ -41,16 +43,15 @@ class Flat3 extends Game {
 
     //^
     update() {
-        // First, update inputs
-        this._input.update();
-        this._ai.update();
-        this._physics.update();
-        this._objectman.update();
+        this._inputman.update();    // First, update inputs
+        this._physics.update();     // Update physical simulation
+        this._objectman.update();   // Update board objects
+        this._ai.update();          // Update perceptions, intents
 
-        console.log("There are " + this._playerman.nbPlayers + " players connected.");
-        //this._players.forEach((p) => {
-        //    p.send('stamp', this._terrain);
-        //});
+        this._outputman.update();   // Send updates
+
+        var n = this._playerman.nbPlayers;
+        console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
     }
 
 }
