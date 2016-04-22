@@ -50,13 +50,24 @@ class User {
 
     /**
      * Join a specific game.
-     * @param game
      */
-    join(game) {
+    join(kind, gameId) {
         this._ingame = true;
+        var game = this._hub.getGame(kind, gameId);
+        if (!game) return;
+
+        // Stop listening for general game management events...
+        // Prevents the user from joining multiple games.
+        this._usercon.idle();
+
+        // Create a player associated to this game and spawn it
         var player = Factory.createPlayer(this, game);
         this._player = player;
         game.addPlayer(player);
+    }
+
+    fetchHubState() {
+        this._usercon.send('hub', this._hub.listGames());
     }
 
     /**

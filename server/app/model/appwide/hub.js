@@ -46,6 +46,25 @@ class Hub {
         return this.addGame(kind);
     }
 
+    getGame(kind, gameId) {
+        return this._games[kind][gameId];
+    }
+
+    /**
+     * Lists all games with minimal information.
+     * @returns {{}} Object: 1 id = 1 game kind; 1 element = 1 array of game ids.
+     */
+    listGames() {
+        var games = {};
+        var f = (kind) => (g) => games[kind].push(g.gameId);
+        for (var kind in this._games) {
+            if (!this._games.hasOwnProperty(kind)) continue;
+            games[kind] = [];
+            this._games[kind].forEach(f(kind));
+        }
+        return games;
+    }
+
     /**
      * Not param-safe: use 'requestNewGame' to ensure kind validity.
      * @param kind
@@ -62,7 +81,7 @@ class Hub {
         // Add to games.
         if (game) this._games[kind][gid] = game;
 
-        return game;
+        return game.gameId;
     }
 
     endGame(game) {

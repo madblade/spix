@@ -10,7 +10,7 @@ class UserConnection {
         this._user = user;
         this._socket = socket;
 
-        this.configure(socket);
+        this.listen();
     }
 
     // Model
@@ -22,15 +22,34 @@ class UserConnection {
         this._socket.emit(kind, data);
     }
 
-    configure(socket) {
-        socket.on('createGame', (data) => {
-            var game = this._user.requestNewGame(data);
-            if (game) this._user.join(game);
+    /**
+     * Game & hub management
+     */
+    listen() {
+        // A user can ask the hub for a new game to be created.
+        this._socket.on('createGame', (kind) => {
+            var gameId = this._user.requestNewGame(kind);
+            if (gameId) this._user.join(kind, gameId);
         });
 
-        socket.on('joinGame', (data) => {
+        // A user can join a specific game (given a kind and id).
+        this._socket.on('joinGame', (data) => {
+            if (!data.kind || !data.gameId) return;
+            this._user.join(data.kind, data.gameId);
         });
+
+        // A user can ask for the list of all available games.
+        this._socket.on('hub', () => {
+            this._user.fetchHubState();
+        })
     }
+
+    idle() {
+        this._socket.off('createGame');
+        this._socket.off('joinGame');
+        this._socket.off('hub');
+    }
+
 }
 
 export default UserConnection;

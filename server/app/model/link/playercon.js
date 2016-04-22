@@ -4,31 +4,18 @@
 
 'use strict';
 
+import CollectionUtils from '../../math/collections/util';
+
 class PlayerConnection {
 
     constructor(socket) {
         this._socket = socket;
         this._rooms = [];
+        this._listeners = [];
     }
 
     send(kind, data) {
         this._socket.emit(kind, data);
-    }
-
-    join(room) {
-        this._socket.join(room);
-        this._rooms.push(room);
-    }
-
-    leave(room) {
-        this._socket.leave(room);
-        var roomId = this._rooms.indexOf(room);
-        if (roomId > -1) this._rooms.splice(roomId, 1);
-    }
-
-    leaveAll() {
-        this._rooms.forEach((room) => this._socket.leave(room));
-        this._rooms = [];
     }
 
     /**
@@ -38,12 +25,61 @@ class PlayerConnection {
      */
     on(message, behaviour) {
         if (typeof behaviour !== "function") console.log("WARN: invalid socket definition");
+        this._listeners.push(message);
         this._socket.on(message, behaviour);
     }
 
+    /**
+     * Stop listening for a specific message.
+     * @param message
+     */
     off(message) {
         this._socket.off(message);
+        CollectionUtils.removeFromArray(this._listeners, message);
     }
+
+    /**
+     * Remove all listeners.
+     */
+    offAll() {
+        this._listeners.forEach((message) => this._socket.off(message));
+        this._listeners = [];
+    }
+
+    /**
+     * Join a specific chan.
+     * @param room
+     */
+    join(room) {
+        this._socket.join(room);
+        this._rooms.push(room);
+    }
+
+    /**
+     * Leave a specific chan.
+     * @param room
+     */
+    leave(room) {
+        this._socket.leave(room);
+        CollectionUtils.removeFromArray(this._rooms, room);
+    }
+
+    /**
+     * Leave all chans this player was connected to.
+     */
+    leaveAll() {
+        this._rooms.forEach((room) => this._socket.leave(room));
+        this._rooms = [];
+    }
+
+    /**
+     * Close connection: removes all listeners.
+     */
+    close() {
+        leaveAll();
+        offAll();
+    }
+
 }
 
 export default PlayerConnection;

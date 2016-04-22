@@ -37,7 +37,7 @@ class PlayerManager {
      * @param callback
      */
     forEach(callback) {
-        this._players.forEach((p) => callback(p));
+        return this._players.forEach((p) => callback(p));
     }
 
 }

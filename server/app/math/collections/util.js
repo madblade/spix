@@ -32,6 +32,11 @@ class CollectionUtils {
         return Object.keys(object).length;
     }
 
+    static removeFromArray(array, object) {
+        var objectId = array.indexOf(object);
+        if (objectId > -1) array.splice(objectId, 1);
+    }
+
 }
 
 export default CollectionUtils;
