@@ -35,8 +35,8 @@ class Factory {
 
     // Gaming classes
 
-    static createGame(kind, gameId, connector) {
-        return GameFactory.createGame(kind, gameId, connector);
+    static createGame(hub, kind, gameId, connector) {
+        return GameFactory.createGame(hub, kind, gameId, connector);
     }
 
     static createPlayer(user, game) {

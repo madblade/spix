@@ -79,8 +79,8 @@ class PlayerConnection {
      * Close connection: removes all listeners.
      */
     close() {
-        leaveAll();
-        offAll();
+        this.leaveAll();
+        this.offAll();
     }
 
     // Make the object eligible for garbage collection.

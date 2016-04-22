@@ -76,7 +76,7 @@ class Hub {
         var gid = CollectionUtils.generateId(this._games[kind]);
 
         // Create matching game
-        var game = Factory.createGame(kind, gid, this._app.connector);
+        var game = Factory.createGame(this, kind, gid, this._app.connector);
 
         // Add to games.
         if (game) this._games[kind][gid] = game;

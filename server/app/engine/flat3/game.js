@@ -9,8 +9,8 @@ import Flat3Factory from './factory';
 
 class Flat3 extends Game {
 
-    constructor(gameId, connector) {
-        super(gameId, connector);
+    constructor(hub, gameId, connector) {
+        super(hub, gameId, connector);
 
         // Utility parameters
         this._kind = 'flat3';

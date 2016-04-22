@@ -8,10 +8,12 @@ import Factory from '../factory';
 
 class Game {
 
-    constructor(gameId, connector) {
+    constructor(hub, gameId, connector) {
         // Utility parameters.
+        this._hub = hub;
         this._gameId = gameId;
-        this._jobId = undefined;
+        this._jobId = null;
+        this._timeIdleId = null;
         this._connector = connector;
 
         //
@@ -54,6 +56,10 @@ class Game {
      * Start game loop.
      */
     start() {
+        // Stop waiting for idle threshold.
+        clearTimeout(this._timeIdleId);
+
+        // Launch
         this._isRunning = true;
         console.log("Game running.");
         this._jobId = setInterval(() => {
@@ -64,10 +70,13 @@ class Game {
     /**
      * Stop game loop.
      */
-    stop() {
+    stop(doTimeout) {
         console.log("Game stopping.");
         if (this._jobId !== undefined) clearInterval(this._jobId);
         this._isRunning = false;
+
+        // Set idle time limit before despawning this game.
+        if (doTimeout) this._timeIdleId = setTimeout(() => this.suicide(), 50000);
     }
 
     /* ### Manage players ### */
@@ -90,7 +99,7 @@ class Game {
     }
 
     /**
-     * Remove player
+     * Remove a player.
      * @param player
      */
     removePlayer(player) {
@@ -99,18 +108,24 @@ class Game {
 
         // Stop game if need be.
         if (this._playerman.nbPlayers > 0 || !this._isRunning) return;
-        this.stop();
+        this.stop(true); // Stop with idle timeout.
     }
 
     removeAllPlayers() {
         this._playerman.removeAllPlayers();
-        this.stop();
+        this.stop(true); // Stop with idle timeout.
+    }
+
+    // Auto-destruction for being idle for too long.
+    suicide() {
+        this._hub.endGame(this);
     }
 
     /**
      * To be triggered from Hub only.
      */
     destroy() {
+        if (this._isRunning) this.stop(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
         this._playerman.destroy();
         delete this._gameId;
