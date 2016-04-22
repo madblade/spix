@@ -86,11 +86,17 @@ class User {
         this.send('info', 'Disconnecting');
     }
 
-    /**
-     * Cleans references to this user (in its members).
-     */
+    // Clean references.
     destroy() {
-        this._usercon.user = null;
+        this._usercon.destroy();
+        if (this._player) this._player.destroy();
+
+        delete this._usercon;
+        delete this._player;
+        delete this._hub;
+        delete this._nick;
+        delete this._id;
+        delete this._ingame;
     }
 }
 

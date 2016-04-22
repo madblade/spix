@@ -21,13 +21,12 @@ class Game {
 
         //
         this._playerman = Factory.createPlayerManager();
-        console.log("Playerman created");
-        // TODO handle user interaction (I/O) directly from here
     }
 
     // Model
     get kind() { return this._kind; }
     get gameId() { return this._gameId; }
+    get isRunning() { return this._isRunning; }
 
     /* ### Manage connection ### */
 
@@ -55,6 +54,7 @@ class Game {
      * Start game loop.
      */
     start() {
+        this._isRunning = true;
         console.log("Game running.");
         this._jobId = setInterval(() => {
             this.update();
@@ -67,6 +67,7 @@ class Game {
     stop() {
         console.log("Game stopping.");
         if (this._jobId !== undefined) clearInterval(this._jobId);
+        this._isRunning = false;
     }
 
     /* ### Manage players ### */
@@ -84,7 +85,7 @@ class Game {
 
         // Start game if need be.
         if (this._isRunning) return;
-        this._isRunning = true;
+        this._isRunning = true; // Double check
         this.start();
     }
 
@@ -98,9 +99,28 @@ class Game {
 
         // Stop game if need be.
         if (this._playerman.nbPlayers > 0 || !this._isRunning) return;
-        this._isRunning = false;
         this.stop();
     }
+
+    removeAllPlayers() {
+        this._playerman.removeAllPlayers();
+        this.stop();
+    }
+
+    /**
+     * To be triggered from Hub only.
+     */
+    destroy() {
+        this.removeAllPlayers();
+        this._playerman.destroy();
+        delete this._gameId;
+        delete this._jobId;
+        delete this._connector;
+        delete this._kind;
+        delete this._refreshRate;
+        delete this._isRunning;
+    }
+
 }
 
 export default Game;

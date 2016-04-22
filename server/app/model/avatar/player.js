@@ -59,6 +59,15 @@ class Player {
     off(message) {
         this._playercon.off(message);
     }
+
+    // Clean references.
+    destroy() {
+        this._playercon.destroy(); // Destroy playercon which is a single child of this object.
+        delete this._playercon;
+        delete this._game;
+        delete this._user;
+    }
+
 }
 
 export default Player;

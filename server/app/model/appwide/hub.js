@@ -85,7 +85,15 @@ class Hub {
     }
 
     endGame(game) {
-        //delete this._games[game.gameId];
+        if (game.isRunning()) {
+            console.log("WARN! Trying to end a running game. Abort.");
+            return;
+        }
+
+        var gid = game.gameId;
+        var kind = game.kind;
+        game.destroy();
+        delete this._games[kind][gid];
     }
 }
 

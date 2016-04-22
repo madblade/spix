@@ -50,6 +50,13 @@ class UserConnection {
         this._socket.off('hub');
     }
 
+    // Clean references.
+    destroy() {
+        this.idle();
+        delete this._user;
+        delete this._socket;
+    }
+
 }
 
 export default UserConnection;

@@ -24,9 +24,12 @@ class PlayerConnection {
      * @param behaviour
      */
     on(message, behaviour) {
-        if (typeof behaviour !== "function") console.log("WARN: invalid socket definition");
-        this._listeners.push(message);
-        this._socket.on(message, behaviour);
+        if (typeof behaviour !== "function")
+            console.log("WARN: invalid socket definition");
+        else {
+            this._listeners.push(message);
+            this._socket.on(message, behaviour);
+        }
     }
 
     /**
@@ -78,6 +81,14 @@ class PlayerConnection {
     close() {
         leaveAll();
         offAll();
+    }
+
+    // Make the object eligible for garbage collection.
+    destroy() {
+        this.close();
+        delete this._socket;
+        delete this._rooms;
+        delete this._listeners;
     }
 
 }
