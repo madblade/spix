@@ -18,7 +18,7 @@ App.Core = function() {
     this.soundEngine = new App.Engine.Sound(this);
 
     // Run application
-    this.connect().then(() => this.run());
+    this.connect().then(function() {this.run()}.bind(this));
 };
 
 App.Core.prototype.connect = function() {
