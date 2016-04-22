@@ -18,14 +18,18 @@ App.Core = function() {
     this.soundEngine = new App.Engine.Sound(this);
 
     // Run application
-    this.run();
+    this.connect().then(() => this.run());
+};
+
+App.Core.prototype.connect = function() {
+    this.connectionEngine.setup();
+    return this.connectionEngine.connectionPromise();
 };
 
 App.Core.prototype.run = function() {
     console.info('Application started locally.');
 
     // Run modules
-    this.connectionEngine.setup();
 };
 
 App.Core.prototype.updateWorld = function() {

@@ -71,19 +71,26 @@ class User {
     }
 
     /**
-     * Leave all games (current game).
+     * Leave all games (current game). Stay idle.
      */
     leave() {
         this._ingame = false;
-        if (this._player) this._player.leave();
+        if (this._player) {
+            this._player.leave();
+            this._player.destroy(); // OK given player.leave() was called
+            // So player does not belong to its game model.
+            this._player = null;
+        }
+        this._usercon.listen();
     }
 
     /**
-     * Disconnect from socket.
+     * Disconnect from ingame socket. Stay inside game model.
+     * Maybe the connection will come back.
      */
     disconnect() {
+        // Do not destroy player (account for unexpected disconnections)
         if (this._player) this._player.disconnect();
-        this.send('info', 'Disconnecting');
     }
 
     // Clean references.
@@ -98,6 +105,7 @@ class User {
         delete this._id;
         delete this._ingame;
     }
+
 }
 
 export default User;

@@ -24,6 +24,7 @@ App.Engine.Connection.prototype.setup = function(autoconfig) {
 
     this.registerSocket(socket);
 
+    // TODO put that somewhere else
     socket.emit('info', 'Eye connected');
     socket.emit('createGame', 'flat3');
 };
@@ -41,6 +42,18 @@ App.Engine.Connection.prototype.registerSocket = function(socket) {
     this.socket = socket;
 };
 
+App.Engine.Connection.prototype.connectionPromise = function() {
+    return new Promise(function(resolve) { // TODO manage reject
+
+        // Makes me think of quines.
+        var f = function() {
+            this.socket.removeListener('connected', f);
+            resolve();
+        }.bind(this);
+
+        this.socket.on('connected', f);
+    }.bind(this));
+};
 
 App.Engine.Connection.prototype.move = function(direction) {
     this.socket.emit('move', direction);

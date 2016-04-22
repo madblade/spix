@@ -27,27 +27,33 @@ class UserConnection {
      */
     listen() {
         // A user can ask the hub for a new game to be created.
-        this._socket.on('createGame', (kind) => {
-            var gameId = this._user.requestNewGame(kind);
-            if (gameId) this._user.join(kind, gameId);
-        });
+        this._socket.on('createGame', this.onCreateGame.bind(this));
 
         // A user can join a specific game (given a kind and id).
-        this._socket.on('joinGame', (data) => {
-            if (!data.kind || !data.gameId) return;
-            this._user.join(data.kind, data.gameId);
-        });
+        this._socket.on('joinGame', this.onJoinGame.bind(this));
 
         // A user can ask for the list of all available games.
-        this._socket.on('hub', () => {
-            this._user.fetchHubState();
-        })
+        this._socket.on('hub', this.onHub.bind(this));
+    }
+
+    onCreateGame(kind) {
+        var gameId = this._user.requestNewGame(kind);
+        if (gameId) this._user.join(kind, gameId);
+    }
+
+    onJoinGame(data) {
+        if (!data.kind || !data.gameId) return;
+        this._user.join(data.kind, data.gameId);
+    }
+
+    onHub() {
+        this._user.fetchHubState();
     }
 
     idle() {
-        this._socket.off('createGame');
-        this._socket.off('joinGame');
-        this._socket.off('hub');
+        this._socket.off('createGame', this.onCreateGame.bind(this));
+        this._socket.off('joinGame', this.onJoinGame.bind(this));
+        this._socket.off('hub', this.onHub.bind(this));
     }
 
     // Clean references.

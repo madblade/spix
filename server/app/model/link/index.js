@@ -26,18 +26,24 @@ class Connector {
 
         // A user knows its socket and reciprocally
         socket.user = user;
+
+        // Inform the user that its connection is established
+        socket.emit('connected', '');
     }
 
     setupDisconnect(socket) {
+        // Setup off util function
+        socket.off = socket.removeListener;
+
         // Call onDisconnect.
         socket.on('disconnect', () => {
             var user = socket.user;
             if (user === undefined) return;
 
-            // Leave from any running game
-            user.disconnect();
-            user.leave();
+            // Leave from any running game.
+            user.leave(); // First disconnects then makes the game forget.
 
+            // Destroy user.
             this._db.removeUser(user);
 
             if (this._debug) socket.log('DISCONNECTED');

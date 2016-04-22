@@ -35,12 +35,15 @@ class Player {
         this._playercon.send(kind, data);
     }
 
+    // Leave game and make the game forget.
     leave() {
+        this.disconnect();
         this._game.removePlayer(this);
     }
 
+    // Close player connection.
     disconnect() {
-        this._playercon.leaveAll();
+        this._playercon.close();
     }
 
     /**
@@ -60,7 +63,7 @@ class Player {
         this._playercon.off(message);
     }
 
-    // Clean references.
+    // Clean references. Only use from a Game instance.
     destroy() {
         this._playercon.destroy(); // Destroy playercon which is a single child of this object.
         delete this._playercon;

@@ -95,6 +95,7 @@ class Hub {
         game.destroy();
         delete this._games[kind][gid];
     }
+
 }
 
 export default Hub;

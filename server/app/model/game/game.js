@@ -63,6 +63,7 @@ class Game {
         this._isRunning = true;
         console.log("Game running.");
         this._jobId = setInterval(() => {
+            console.log("Running");
             this.update();
         }, this._refreshRate);
     }
@@ -116,7 +117,7 @@ class Game {
         this.stop(true); // Stop with idle timeout.
     }
 
-    // Auto-destruction for being idle for too long.
+    // Auto-destruction for being idle for too long. Internal use.
     suicide() {
         this._hub.endGame(this);
     }
@@ -128,6 +129,8 @@ class Game {
         if (this._isRunning) this.stop(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
         this._playerman.destroy();
+        delete this._hub;
+        delete this._timeIdleId;
         delete this._gameId;
         delete this._jobId;
         delete this._connector;
