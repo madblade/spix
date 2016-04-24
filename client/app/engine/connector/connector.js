@@ -10,27 +10,43 @@ App.Engine.Connection = function(app) {
 };
 
 App.Engine.Connection.prototype.setup = function(autoconfig) {
+    // Create socket.
+    var promise = this.registerSocketDefault(autoconfig);
+
+    // Define custom listeners on this socket.
+    this.registerSocketCustom(this.socket);
+
+    // This promise waits for the server to confirm connection.
+    return promise;
+};
+
+App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
     var socketAddress = '';
 
     if (!autoconfig && location.hostname !== 'localhost') {
         socketAddress = 'ws://' + location.hostname + ':8000';
     }
 
-    var socket = io(socketAddress, {
+    this.socket = io(socketAddress, {
         // Send auth token on connection, you will need to DI the Auth service above
         // 'query': 'token=' + Auth.getToken()
         path: '/socket.io-client'
     });
 
-    this.registerSocket(socket);
+    return new Promise(function(resolve) {
+        // Validate when 'connected' message is received.
+        var f = function() {
+            // Un-register listener to avoid performance leak.
+            this.socket.removeListener('connected', f);
+            resolve();
+        }.bind(this);
 
-    // TODO put that somewhere else
-    socket.emit('info', 'Eye connected');
-    socket.emit('createGame', 'flat3');
+        // Listen for connection.
+        this.socket.on('connected', f);
+    }.bind(this));
 };
 
-App.Engine.Connection.prototype.registerSocket = function(socket) {
-    // Register socket behaviour
+App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
     socket.on('moved', function(data) {
        console.log('server: moved ' + data);
     });
@@ -38,21 +54,10 @@ App.Engine.Connection.prototype.registerSocket = function(socket) {
     socket.on('stamp', function(data) {
         this.app.updateWorld(data);
     }.bind(this));
-
-    this.socket = socket;
 };
 
-App.Engine.Connection.prototype.connectionPromise = function() {
-    return new Promise(function(resolve) { // TODO manage reject
-
-        // Makes me think of quines.
-        var f = function() {
-            this.socket.removeListener('connected', f);
-            resolve();
-        }.bind(this);
-
-        this.socket.on('connected', f);
-    }.bind(this));
+App.Engine.Connection.prototype.send = function(message, content) {
+    this.socket.emit(message, content);
 };
 
 App.Engine.Connection.prototype.move = function(direction) {

@@ -96,7 +96,9 @@ class User {
     // Clean references.
     destroy() {
         this._usercon.destroy();
-        if (this._player) this._player.destroy();
+        // Do not destroy player before its game ends.
+        // Useful for user reconnection...
+        // if (this._player) this._player.destroy();
 
         delete this._usercon;
         delete this._player;
