@@ -6,11 +6,9 @@
 
 App.Engine.UI = function(app) {
     this.app = app;
-
-    this.init();
 };
 
-App.Engine.UI.prototype.init = function() {
+App.Engine.UI.prototype.run = function() {
 
     // Register keyboard behaviour
     $(window).keydown(function(event) {
@@ -32,4 +30,9 @@ App.Engine.UI.prototype.init = function() {
             default:
         }
     }.bind(this));
+
+    $(window).resize(
+        this.app.graphicsEngine.resize
+            .bind(this.app.graphicsEngine)
+    );
 };

@@ -11,9 +11,9 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <base href="/">
-    <title></title>
+    <title>Voxels pre-α</title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(client) app/vendor.css -->
     <!-- bower:css -->
@@ -59,23 +59,22 @@
 <!-- build:js({client,node_modules}) app/vendor.js -->
 <!-- bower:js -->
 <script src="bower_components/jquery/dist/jquery.js"></script>
-<script src="bower_components/lodash/dist/lodash.compat.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-socket-io/socket.js"></script>
-<script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
 <script src="bower_components/Hyphenator/Hyphenator.js"></script>
+<script src="bower_components/three.js/three.min.js"></script>
 <!-- endbower -->
 <script src="socket.io-client/socket.io.js"></script>
 <!-- endbuild -->
 <!-- build:js({.tmp,client}) app/server.js -->
 <script src="app/app.js"></script>
 <!-- injector:js -->
+<script src="app/engine/connector/connector.module.js"></script>
+<script src="app/engine/game/game.module.js"></script>
 <script src="app/engine/graphics/graphics.module.js"></script>
-<script src="app/engine/connector/connector.js"></script>
+<script src="app/engine/sound/sound.module.js"></script>
+<script src="app/engine/ui/ui.module.js"></script>
 <script src="app/engine/graphics/graphics.factory.js"></script>
-<script src="app/engine/sound/sound.js"></script>
-<script src="app/engine/ui/ui.js"></script>
-<script src="app/modules/modules.js"></script>
 <script src="app/states/states.js"></script>
 <!-- endinjector -->
 <!-- endbuild -->

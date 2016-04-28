@@ -13,11 +13,10 @@ module.exports = function (config) {
         files: [
             // bower:js
             'client/bower_components/jquery/dist/jquery.js',
-            'client/bower_components/lodash/dist/lodash.compat.js',
             'client/bower_components/angular/angular.js',
             'client/bower_components/angular-socket-io/socket.js',
-            'client/bower_components/jquery-mousewheel/jquery.mousewheel.js',
             'client/bower_components/Hyphenator/Hyphenator.js',
+            'client/bower_components/three.js/three.min.js',
             // endbower
             'node_modules/socket.io-client/socket.io.js',
             'client/!(bower_components)/**/*.js',
