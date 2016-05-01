@@ -21,7 +21,7 @@ App.Core = function() {
     // TODO initialize states
 
     // Run application.
-    this.connect().then(function() {this.run()}.bind(this));
+    this.connect().then(function() {this.run();}.bind(this));
 };
 
 App.Core.prototype.connect = function() {
