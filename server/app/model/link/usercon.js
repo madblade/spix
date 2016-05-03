@@ -26,34 +26,49 @@ class UserConnection {
      * Game & hub management
      */
     listen() {
-        // A user can ask the hub for a new game to be created.
-        this._socket.on('createGame', this.onCreateGame.bind(this));
-
-        // A user can join a specific game (given a kind and id).
-        this._socket.on('joinGame', this.onJoinGame.bind(this));
-
-        // A user can ask for the list of all available games.
-        this._socket.on('hub', this.onHub.bind(this));
+        // Use a unique channel for util functions
+        // Actions are specified within the data
+        this._socket.on('util', this.onUserRequest.bind(this));
     }
 
-    onCreateGame(kind) {
+    // Drawback: switch potentially evaluates all statements
+    // Advantage: does not loads the socket with many listeners
+    onUserRequest(data) {
+        switch (data.request) {
+
+            // A user can ask the hub for a new game to be created.
+            case 'createGame':
+                if (data.hasOwnProperty('gameType')) this.handleCreateGame(data.gameType);
+                break;
+
+            // A user can join a specific game (given a kind and id).
+            case 'joinGame':
+                if (data.hasOwnProperty('gameId')) this.handleJoinGame(data.gameId);
+                break;
+
+            // A user can ask for the list of all available games.
+            case 'hub':
+                this.handleGetHubState();
+                break;
+        }
+    }
+
+    handleCreateGame(kind) {
         var gameId = this._user.requestNewGame(kind);
         if (gameId) this._user.join(kind, gameId);
     }
 
-    onJoinGame(data) {
+    handleJoinGame(data) {
         if (!data.kind || !data.gameId) return;
         this._user.join(data.kind, data.gameId);
     }
 
-    onHub() {
+    handleGetHubState() {
         this._user.fetchHubState();
     }
 
     idle() {
-        this._socket.off('createGame', this.onCreateGame.bind(this));
-        this._socket.off('joinGame', this.onJoinGame.bind(this));
-        this._socket.off('hub', this.onHub.bind(this));
+        this._socket.off('util', this.onUserRequest.bind(this));
     }
 
     // Clean references.

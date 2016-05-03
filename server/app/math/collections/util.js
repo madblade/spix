@@ -32,6 +32,14 @@ class CollectionUtils {
         return Object.keys(object).length;
     }
 
+    static numberOfNestedProperties(object) {
+        var result = 0;
+        for (var property in object)
+            if (object.hasOwnProperty(property))
+                result+=Object.keys(object[property]).length;
+        return result;
+    }
+
     static removeFromArray(array, object) {
         var objectId = array.indexOf(object);
         if (objectId > -1) array.splice(objectId, 1);

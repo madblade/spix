@@ -6,26 +6,37 @@
 
 App.Engine.UI = function(app) {
     this.app = app;
+
+    this.keyMapper = null;
+    this.mouseMapper = null;
+    this.touchMapper = null;
+
+    this.actions = []; // Array of game-specific actions
 };
 
 App.Engine.UI.prototype.run = function() {
+    this.setupActions();
+    this.setupKeyboard();
+    this.setupMouse();
+    this.setupTouch();
 
     // Register keyboard behaviour
     $(window).keydown(function(event) {
         if (!event.keyCode) { return; }
+        var ce = this.app.connectionEngine;
 
         switch (event.keyCode) {
             case 38: // Up
-                this.app.connectionEngine.move('forward');
+                ce.move('forward');
                 break;
             case 39: // Right
-                this.app.connectionEngine.move('right');
+                ce.move('right');
                 break;
             case 37: // Left
-                this.app.connectionEngine.move('left');
+                ce.move('left');
                 break;
             case 40: // Down
-                this.app.connectionEngine.move('down');
+                ce.move('down');
                 break;
             default:
         }
@@ -36,3 +47,8 @@ App.Engine.UI.prototype.run = function() {
             .bind(this.app.graphicsEngine)
     );
 };
+
+App.Engine.UI.prototype.setupActions = function() {};
+App.Engine.UI.prototype.setupKeyboard = function() {};
+App.Engine.UI.prototype.setupMouse = function() {};
+App.Engine.UI.prototype.setupTouch = function() {};

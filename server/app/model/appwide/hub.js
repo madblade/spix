@@ -33,7 +33,9 @@ class Hub {
 
     validateRequest() {
         // TODO think of different criteria
-        var res = (CollectionUtils.numberOfProperties(this._games) < 1);
+        var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
+        var res = nbGames < 1;
+        console.log(nbGames + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
         if (!res) console.log('Invalid game creation request.');
         return res;
     }

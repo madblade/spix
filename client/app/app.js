@@ -32,8 +32,8 @@ App.Core.prototype.connect = function() {
 App.Core.prototype.run = function() {
     console.info('Application started locally.');
 
-    this.connectionEngine.send('info', 'Eye connected');
-    this.connectionEngine.send('createGame', 'flat3');
+    //this.connectionEngine.send('info', 'Eye connected');
+    this.connectionEngine.send('util', {request: 'createGame', gameType: 'flat3'});
 
     // Run modules.
     this.uiEngine.run();

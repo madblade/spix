@@ -25,6 +25,7 @@
   "globals": {
     "jQuery": true,
     "angular": true,
+    "THREE": true,
     "console": true,
     "$": true,
     "_": true,

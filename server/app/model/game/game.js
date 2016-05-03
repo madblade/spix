@@ -77,7 +77,7 @@ class Game {
         this._isRunning = false;
 
         // Set idle time limit before despawning this game.
-        if (doTimeout) this._timeIdleId = setTimeout(() => this.suicide(), 50000);
+        if (doTimeout) this._timeIdleId = setTimeout(() => this.suicide(), 5000);
     }
 
     /* ### Manage players ### */
@@ -87,6 +87,8 @@ class Game {
      * @param player
      */
     addPlayer(player) {
+        console.log('A player joined.');
+
         // Join channel.
         player.join(this.gameId);
 
@@ -104,6 +106,8 @@ class Game {
      * @param player
      */
     removePlayer(player) {
+        console.log('A player left.');
+
         // Remove from model.
         this._playerman.removePlayer(player);
 
@@ -120,6 +124,7 @@ class Game {
     // Auto-destruction for being idle for too long. Internal use.
     suicide() {
         this._hub.endGame(this);
+        console.log("Game " + this._gameId + " ended for being idle for too long.");
     }
 
     /**
