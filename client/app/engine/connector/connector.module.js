@@ -46,14 +46,23 @@ App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
     }.bind(this));
 };
 
-App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
-    socket.on('moved', function(data) {
-       console.log('server: moved ' + data);
-    });
+App.Engine.Connection.prototype.addCustomListener = function(message, func) {
+    this.socket.on(message, func);
+};
 
-    socket.on('stamp', function(data) {
-        this.app.updateWorld(data);
-    }.bind(this));
+App.Engine.Connection.prototype.removeCustomListener = function(message, func) {
+    this.socket.removeListener(message, func);
+};
+
+// Do not register all sockets here anymore
+App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
+    //socket.on('moved', function(data) {
+    //   console.log('server: moved ' + data);
+    //});
+    //
+    //socket.on('stamp', function(data) {
+    //    this.app.updateWorld(data);
+    //}.bind(this));
 };
 
 App.Engine.Connection.prototype.send = function(message, content) {

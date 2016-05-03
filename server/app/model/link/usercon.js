@@ -55,7 +55,7 @@ class UserConnection {
 
     handleCreateGame(kind) {
         var gameId = this._user.requestNewGame(kind);
-        if (gameId) this._user.join(kind, gameId);
+        //if (gameId) this._user.join(kind, gameId);
     }
 
     handleJoinGame(data) {

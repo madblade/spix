@@ -25,7 +25,6 @@ App.Engine.Graphics.prototype.run = function() {
 
 App.Engine.Graphics.prototype.render = function() {
     this.renderer.render(this.scene, this.camera);
-    console.log('render');
 };
 
 App.Engine.Graphics.prototype.animate = function() {

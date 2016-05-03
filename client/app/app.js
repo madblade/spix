@@ -36,6 +36,13 @@ App.Core.prototype.run = function() {
 
     //this.connectionEngine.send('info', 'Eye connected');
     this.connectionEngine.send('util', {request: 'createGame', gameType: 'flat3'});
+    var onHubFetched = function(data) {
+        this.connectionEngine.removeCustomListener('hub', onHubFetched);
+        console.log(data);
+    }.bind(this);
+    this.connectionEngine.addCustomListener('hub', onHubFetched);
+
+    this.connectionEngine.send('util', {request: 'hub'});
 
     // Run modules.
     this.uiEngine.run();

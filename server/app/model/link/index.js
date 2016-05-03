@@ -29,7 +29,7 @@ class Connector {
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
-        setTimeout(() => socket.emit('connected', ''), 1500);
+        setTimeout(() => socket.emit('connected', ''), 2500);
     }
 
     setupDisconnect(socket) {
