@@ -15,7 +15,7 @@ App.Engine.Graphics.prototype.getRenderer = function() {
         alpha: true
     });
 
-    renderer.setClearColor(0xff00ff, 1);
+    renderer.setClearColor(0x1abc9c, 1);
     renderer.setSize(window.innerWidth, window.innerHeight);
     return renderer;
 };

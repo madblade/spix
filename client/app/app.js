@@ -11,6 +11,10 @@ var App = App || {
 };
 
 App.Core = function() {
+    // Initialize states and set as loading.
+    this.stateManager = new App.Engine.StateManager(this);
+    this.stateManager.setState('loading');
+
     // Initialize modules
     this.connectionEngine = new App.Engine.Connection(this);
     this.graphicsEngine = new App.Engine.Graphics(this);
@@ -18,9 +22,7 @@ App.Core = function() {
     this.soundEngine = new App.Engine.Sound(this);
     this.gameEngine = new App.Engine.Game(this);
 
-    // TODO initialize states
-
-    // Run application.
+    // Run application when connection is confirmed.
     this.connect().then(function() {this.run();}.bind(this));
 };
 
@@ -38,6 +40,9 @@ App.Core.prototype.run = function() {
     // Run modules.
     this.uiEngine.run();
     this.graphicsEngine.run();
+
+    // Change state.
+    this.stateManager.setState('idle');
 };
 
 App.Core.prototype.updateWorld = function() {
