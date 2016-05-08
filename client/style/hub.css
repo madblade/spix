@@ -1,0 +1,9 @@
+.hub {
+    margin: 20px auto;
+    width: 25%;
+    height: 25%;
+    bottom: 40px;
+
+    text-align: center;
+    color: lightgray;
+}

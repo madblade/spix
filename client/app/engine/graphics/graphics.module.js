@@ -4,9 +4,7 @@
 
 'use strict';
 
-App.Engine.Graphics = function(app) {
-    this.app = app;
-
+App.Engine.Graphics = function() {
     // Rendering
     this.renderer = this.getRenderer();
     this.scene = this.getScene(); // TODO states

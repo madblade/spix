@@ -4,8 +4,7 @@
 
 'use strict';
 
-App.Engine.Connection = function(app) {
-    this.app = app;
+App.Engine.Connection = function() {
     this.socket = {};
 };
 
@@ -61,7 +60,7 @@ App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
     //});
     //
     //socket.on('stamp', function(data) {
-    //    this.app.updateWorld(data);
+    //    app.updateWorld(data);
     //}.bind(this));
 };
 
@@ -71,4 +70,27 @@ App.Engine.Connection.prototype.send = function(message, content) {
 
 App.Engine.Connection.prototype.move = function(direction) {
     this.socket.emit('move', direction);
+};
+
+App.Engine.Connection.prototype.join = function(gameType, gid) {
+    return new Promise(function(resolve, reject) {
+        // Validate when 'joined' message is received.
+        var f = function() {
+            this.socket.removeListener('joined', f);
+            this.socket.removeListener('cantjoin', g);
+            resolve();
+        }.bind(this);
+
+        // Reject
+        var g = function() {
+            this.socket.removeListener('joined', f);
+            this.socket.removeListener('cantjoin', g);
+            reject();
+        }.bind(this);
+
+        // Listen for connection.
+        this.socket.on('joined', f);
+        this.socket.on('cantjoin', g);
+        this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
+    }.bind(this));
 };

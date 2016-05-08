@@ -118,13 +118,13 @@ class Game {
 
     removeAllPlayers() {
         this._playerman.removeAllPlayers();
-        this.stop(true); // Stop with idle timeout.
+        if (this._isRunning) this.stop(true); // Stop with idle timeout.
     }
 
     // Auto-destruction for being idle for too long. Internal use.
     suicide() {
-        this._hub.endGame(this);
         console.log("Game " + this._gameId + " ended for being idle for too long.");
+        this._hub.endGame(this);
     }
 
     /**

@@ -316,7 +316,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: yeoman.client,
                 dest: '.tmp/',
-                src: ['{app,components}/**/*.css']
+                src: ['style/**/*.css']
             }
         },
 
@@ -527,7 +527,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     [yeoman.client + '/index.html']: [
-                        yeoman.client + '/{app,components}/**/*.css'
+                        yeoman.client + '/style/**/*.css'
                     ]
                 }
             }

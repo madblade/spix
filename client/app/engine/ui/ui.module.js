@@ -4,9 +4,7 @@
 
 'use strict';
 
-App.Engine.UI = function(app) {
-    this.app = app;
-
+App.Engine.UI = function() {
     this.keyMapper = null;
     this.mouseMapper = null;
     this.touchMapper = null;
@@ -23,7 +21,7 @@ App.Engine.UI.prototype.run = function() {
     // Register keyboard behaviour
     $(window).keydown(function(event) {
         if (!event.keyCode) { return; }
-        var ce = this.app.connectionEngine;
+        var ce = app.connectionEngine;
 
         switch (event.keyCode) {
             case 38: // Up
@@ -43,8 +41,8 @@ App.Engine.UI.prototype.run = function() {
     }.bind(this));
 
     $(window).resize(
-        this.app.graphicsEngine.resize
-            .bind(this.app.graphicsEngine)
+        app.graphicsEngine.resize
+            .bind(app.graphicsEngine)
     );
 };
 

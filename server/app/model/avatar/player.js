@@ -65,7 +65,8 @@ class Player {
 
     // Clean references. Only use from a Game instance.
     destroy() {
-        this._playercon.destroy(); // Destroy playercon which is a single child of this object.
+        // Destroy playercon which is a single child of this object.
+        if (this._playercon) this._playercon.destroy();
         delete this._playercon;
         delete this._game;
         delete this._user;

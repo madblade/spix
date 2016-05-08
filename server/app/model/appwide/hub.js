@@ -14,14 +14,14 @@ class Hub {
         this._games = {};
     }
 
-    validateUser(user) {
+    static validateUser(user) {
         // Do validation
         var res = user !== null;
         if (!res) console.log('Invalid user requested new game.');
         return res;
     }
 
-    validateKind(kind) {
+    static validateKind(kind) {
         var res = false;
         switch (kind) {
             case 'flat2': case 'flat3': case 'free3': case 'free4':
@@ -34,18 +34,19 @@ class Hub {
     validateRequest() {
         // TODO think of different criteria
         var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
-        var res = nbGames < 1;
+        var res = nbGames < 5;
         console.log(nbGames + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
         if (!res) console.log('Invalid game creation request.');
         return res;
     }
 
     requestNewGame(user, kind) {
-        if (!this.validateUser(user)) return;
-        if (!this.validateKind(kind)) return;
-        if (!this.validateRequest()) return;
+        if (!Hub.validateUser(user)) return false;
+        if (!Hub.validateKind(kind)) return false;
+        if (!this.validateRequest()) return false;
 
-        return this.addGame(kind);
+        this.addGame(kind);
+        return true;
     }
 
     getGame(kind, gameId) {
@@ -87,7 +88,7 @@ class Hub {
     }
 
     endGame(game) {
-        if (game.isRunning()) {
+        if (game.isRunning) {
             console.log("WARN! Trying to end a running game. Abort.");
             return;
         }

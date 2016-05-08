@@ -12,7 +12,7 @@ class Connector {
         this._app = app;
         this._db = Factory.createDB(this);
         this._io = null;
-        this._debug = true;
+        this._debug = false;
     }
 
     // Model

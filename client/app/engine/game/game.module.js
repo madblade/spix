@@ -4,6 +4,5 @@
 
 'use strict';
 
-App.Engine.Game = function(app) {
-    this.app = app;
+App.Engine.Game = function() {
 };

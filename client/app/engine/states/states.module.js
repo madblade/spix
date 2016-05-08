@@ -4,9 +4,8 @@
 
 'use strict';
 
-App.Engine.StateManager = function(app) {
+App.Engine.StateManager = function() {
     // States
-    this.app = app;
     this.previousState = '';
     this.state = '';
 
@@ -27,15 +26,23 @@ App.Engine.StateManager.prototype.getState = function() {
 };
 
 // Low-level setState must handle every kind of state modification
-App.Engine.StateManager.prototype.setState = function(state) {
+App.Engine.StateManager.prototype.setState = function(state, opt) {
     this.previousState = this.state;
     this.state = state;
 
-    if (this.states.hasOwnProperty(this.previousState)) {
-        this.states[this.previousState].end();
+    if (!this.states.hasOwnProperty(this.state)) {
+        console.log("The specified state does not exist.");
+        return;
     }
 
-    if (this.states.hasOwnProperty(this.state)) {
+    if (!this.states.hasOwnProperty(this.previousState)) {
+        // Not defined at startup (for loading)
         this.states[this.state].start();
+    }
+
+    else {
+        this.states[this.previousState].end().then(function () {
+            this.states[this.state].start(opt);
+        }.bind(this));
     }
 };

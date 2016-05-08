@@ -43,7 +43,10 @@ class UserConnection {
 
             // A user can join a specific game (given a kind and id).
             case 'joinGame':
-                if (data.hasOwnProperty('gameId')) this.handleJoinGame(data.gameId);
+                console.log('he tries to join');
+                if (!data.hasOwnProperty('gameId') || !data.hasOwnProperty('gameType')
+                    || !data.gameId || !data.gameType || !this.handleJoinGame(data))
+                    this.send('cantjoin', 'foo');
                 break;
 
             // A user can ask for the list of all available games.
@@ -54,13 +57,13 @@ class UserConnection {
     }
 
     handleCreateGame(kind) {
-        var gameId = this._user.requestNewGame(kind);
-        //if (gameId) this._user.join(kind, gameId);
+        return this._user.requestNewGame(kind);
     }
 
     handleJoinGame(data) {
-        if (!data.kind || !data.gameId) return;
-        this._user.join(data.kind, data.gameId);
+        var joined = this._user.join(data.gameType, data.gameId);
+        if (joined) this.send('joined', 'foo');
+        return joined;
     }
 
     handleGetHubState() {

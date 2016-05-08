@@ -5,7 +5,7 @@
 'use strict';
 
 App.Engine.StateManager.prototype.startLoading = function () {
-    $('#loader')
+    $('#announce')
         .addClass('sk-folding-cube')
         .append(
         '<div class="sk-cube1 sk-cube"></div>' +
@@ -16,8 +16,11 @@ App.Engine.StateManager.prototype.startLoading = function () {
 };
 
 App.Engine.StateManager.prototype.endLoading = function () {
-    var loader = $('#loader');
-    loader.fadeOut(200, function() {
-        loader.empty().removeClass('sk-folding-cube');
+    return new Promise(function(resolve) {
+        var loader = $('#announce');
+        loader.fadeOut(200, function() {
+            loader.empty().removeClass('sk-folding-cube');
+            resolve();
+        });
     });
 };
