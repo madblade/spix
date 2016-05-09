@@ -14,7 +14,6 @@ class UserInput {
         // Process incoming actions
         // TODO manage spam spam spam spam spaaam, lovely spaaam, wonderful spam.
         this._incoming.forEach(function(e) {
-            console.log(e);
             if (e.action !== 'move' ||
                 !e.avatar || e.avatar === 'undefined' ||
                 typeof e.meta !== "string")
@@ -31,8 +30,6 @@ class UserInput {
                     break;
                 default:
             }
-
-            console.log(e.avatar.position);
         });
 
         // Flush incoming actions.
@@ -41,7 +38,6 @@ class UserInput {
 
     push(kind, avatar) {
         return ((data) => {
-            console.log('Movement');
             this._incoming.push({action:kind, avatar:avatar, meta:data});
         });
     }

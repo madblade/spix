@@ -59,17 +59,13 @@ App.Engine.UI.prototype.registerKeyUp = function() {
         var ak = this.activeKeys;
 
         switch (event.keyCode) {
-            case k.forward:
-                ak.forward = false;
+            case k.forward: ak.forward = false;
                 break;
-            case k.right:
-                ak.right = false;
+            case k.right: ak.right = false;
                 break;
-            case k.left:
-                ak.left = false;
+            case k.left: ak.left = false;
                 break;
-            case k.backwards:
-                ak.backwards = false;
+            case k.backwards: ak.backwards = false;
                 break;
             default:
         }

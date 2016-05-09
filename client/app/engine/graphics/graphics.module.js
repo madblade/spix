@@ -16,6 +16,9 @@ App.Engine.Graphics = function(app) {
     // Initialize DOM element
     this.container = document.getElementById('container');
     this.container.appendChild(this.renderer.domElement);
+
+    // Graphic objects
+    this.blocks = [];
 };
 
 App.Engine.Graphics.prototype.run = function() {

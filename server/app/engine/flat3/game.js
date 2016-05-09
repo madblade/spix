@@ -21,6 +21,8 @@ class Flat3 extends Game {
         this._outputman = Flat3Factory.createUserOutput(this, this._playerman);
         this._physics = Flat3Factory.createPhysics();
         this._ai = Flat3Factory.createAI();
+
+        // TODO put in a special location for performance.
         this._objectman = Flat3Factory.createObjectManager();
         // super:_playerman
 

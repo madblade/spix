@@ -17,7 +17,7 @@ App.Core = function() {
 
     // Initialize modules
     this.connectionEngine = new App.Engine.Connection(this);
-    this.gameEngine = new App.Engine.Game();
+    this.gameEngine = new App.Engine.Game(this);
     this.graphicsEngine = new App.Engine.Graphics(this);
     this.uiEngine = new App.Engine.UI(this);
     this.soundEngine = new App.Engine.Sound();

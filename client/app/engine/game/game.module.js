@@ -4,7 +4,9 @@
 
 'use strict';
 
-App.Engine.Game = function() {
+App.Engine.Game = function(app) {
+    this.app = app;
+
     this.chunks = [];
     this.blocks = [];
     this.entities = [];
@@ -19,9 +21,15 @@ App.Engine.Game.prototype.run = function() {
 
 App.Engine.Game.prototype.update = function(data) {
     if (this.isRunning) {
+        console.log(data);
         this.chunks = data[0];
         this.blocks = data[1];
         this.entities = data[2];
-        console.log('updated world');
+
+        this.updateGraphics(this.chunks, this.blocks, this.entities);
     }
+};
+
+App.Engine.Game.prototype.updateGraphics = function(c, b, e) {
+    this.app.graphicsEngine.update(c, b, e);
 };
