@@ -53,8 +53,6 @@ class User {
      */
     join(kind, gameId) {
         this._ingame = true;
-        console.log(kind);
-        console.log('gid' + gameId);
         var game = this._hub.getGame(kind, gameId);
         if (!game) return false;
 

@@ -45,8 +45,9 @@ class UserConnection {
             case 'joinGame':
                 console.log('he tries to join');
                 if (!data.hasOwnProperty('gameId') || !data.hasOwnProperty('gameType')
-                    || !data.gameId || !data.gameType || !this.handleJoinGame(data))
+                    || !data.gameId || !data.gameType || !this.handleJoinGame(data)) {
                     this.send('cantjoin', 'foo');
+                }
                 break;
 
             // A user can ask for the list of all available games.
@@ -57,7 +58,10 @@ class UserConnection {
     }
 
     handleCreateGame(kind) {
-        return this._user.requestNewGame(kind);
+        var created = this._user.requestNewGame(kind);
+        if (created) console.log('created new game');
+        // TODO broadcast to those who are in hub, dynamically update hub (hhhh....)
+        return created;
     }
 
     handleJoinGame(data) {

@@ -17,10 +17,10 @@ App.Core = function() {
 
     // Initialize modules
     this.connectionEngine = new App.Engine.Connection();
+    this.gameEngine = new App.Engine.Game();
     this.graphicsEngine = new App.Engine.Graphics();
     this.uiEngine = new App.Engine.UI();
     this.soundEngine = new App.Engine.Sound();
-    this.gameEngine = new App.Engine.Game();
 
     // Run application when connection is confirmed.
     this.connect().then(function() {this.run();}.bind(this));
@@ -45,27 +45,41 @@ App.Core.prototype.run = function() {
     }.bind(this);
     this.connectionEngine.addCustomListener('hub', onHubFetched);
 
-    // Run modules.
-    //this.uiEngine.run();
-    //this.graphicsEngine.run();
-
     // Change state.
     this.connectionEngine.send('util', {request: 'hub'});
 };
 
 App.Core.prototype.join = function(gameType, gid) {
-    console.log('Et alors2');
+    console.log('Joining...');
     // Try to join specified game.
     this.connectionEngine.join(gameType, gid)
+        .then(
+            // Success
+            function() {
+                console.log("Starting game...");
+                this.startGame(gameType, gid);
+            }.bind(this),
 
-    .then(function() {
-        // TODO start game.
-        console.log("YEEEEEAAAAAAHHHH");
-    }.bind(this))
+            // Failure
+            function() {
+                // TODO manage spam-clicking...
+                var err = new Error();
+                console.log(err);
+                console.log("Could not join game @connectionEngine.join(): server refused.");
+            }.bind(this)
+        );
+};
 
-    .catch(function() {
-        // TODO inform user he could not join.
-        // TODO manage spam-clicking...
-        console.log("OOOOHHH...");
-    }.bind(this));
+App.Core.prototype.startGame = function(gameType, gameId) {
+    // Configuration.
+    this.stateManager.setState('ingame');
+    this.connectionEngine.configureGame(gameType, gameId);
+
+    // Start model loop.
+    this.gameEngine.run(gameType);
+
+    // Run modules.
+    this.uiEngine.run();
+    this.graphicsEngine.run();
+    this.soundEngine.run();
 };

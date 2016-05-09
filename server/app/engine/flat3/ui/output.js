@@ -12,12 +12,13 @@ class UserOutput {
     }
 
     update() {
-        this._playerman.forEach(((p) => {
+        this._playerman.forEach((p) => {
             // TODO do something with each p.
-        }));
+            //p.send('stamp', this._game.extractWorld(p));
+        });
 
         // TODO encapsulate within abstract game IO.
-        this._game.broadcast('info', 'data');
+        this._game.broadcast('chat', 'YOUHOUUU');
     }
 
 }

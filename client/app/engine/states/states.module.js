@@ -12,11 +12,11 @@ App.Engine.StateManager = function() {
     // Register actions
     this.states = {
         loading: {start: this.startLoading, end: this.endLoading},
-        hub: {start: this.startHub, end: this.endHub}
+        hub: {start: this.startHub, end: this.endHub},
+        ingame: {start: this.startIngame, end: this.endIngame}
 
         // TODO other states
         //pregame: {start: , end: },
-        //ingame: {start: , end: },
         //postgame: {start: , end: }
     };
 };
@@ -36,8 +36,8 @@ App.Engine.StateManager.prototype.setState = function(state, opt) {
     }
 
     if (!this.states.hasOwnProperty(this.previousState)) {
-        // Not defined at startup (for loading)
-        this.states[this.state].start();
+        // Not defined at startup (for loading, that is)
+        this.states[this.state].start(opt);
     }
 
     else {

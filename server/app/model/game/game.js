@@ -63,7 +63,7 @@ class Game {
         this._isRunning = true;
         console.log("Game running.");
         this._jobId = setInterval(() => {
-            console.log("Running");
+            //console.log("Running");
             this.update();
         }, this._refreshRate);
     }

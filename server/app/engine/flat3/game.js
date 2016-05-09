@@ -15,6 +15,7 @@ class Flat3 extends Game {
         // Utility parameters
         this._kind = 'flat3';
         this._refreshRate = 100;
+        this._world = [];
 
         // Setup managers
         this._inputman = Flat3Factory.createUserInput();
@@ -30,7 +31,7 @@ class Flat3 extends Game {
 
     configurePlayerManager() {
         this._playerman.setAddPlayerBehaviour((p) => {
-
+            //this._objectman.spawnPlayer(p);
         });
 
         this._playerman.setRemovePlayerBehaviour((p) => {
@@ -40,6 +41,7 @@ class Flat3 extends Game {
 
     // Model
     get playerman() { return this._playerman; }
+    get world() { return this._world; }
 
     //^
     update() {
@@ -51,9 +53,12 @@ class Flat3 extends Game {
         this._outputman.update();   // Send updates
 
         var n = this._playerman.nbPlayers;
-        console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
+        //console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
     }
 
+    extractWorld(player) {
+
+    }
 }
 
 export default Flat3;

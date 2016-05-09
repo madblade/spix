@@ -31,7 +31,6 @@ App.Engine.StateManager.prototype.startHub = function (data) {
             return;
         }
 
-        console.log(gameType);
         app.join(gameType, gid);
     });
 };

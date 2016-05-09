@@ -78,6 +78,7 @@ App.Engine.Connection.prototype.join = function(gameType, gid) {
         var f = function() {
             this.socket.removeListener('joined', f);
             this.socket.removeListener('cantjoin', g);
+            console.log('ACCEPTED');
             resolve();
         }.bind(this);
 
@@ -93,4 +94,13 @@ App.Engine.Connection.prototype.join = function(gameType, gid) {
         this.socket.on('cantjoin', g);
         this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
     }.bind(this));
+};
+
+App.Engine.Connection.prototype.configureGame = function(gameType, gid) {
+    switch (gameType) {
+        case 'flat3':
+            this.registerSocketForFlat3();
+            break;
+        default:
+    }
 };
