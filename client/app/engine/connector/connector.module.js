@@ -55,13 +55,6 @@ App.Engine.Connection.prototype.removeCustomListener = function(message, func) {
 
 // Do not register all sockets here anymore
 App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
-    //socket.on('moved', function(data) {
-    //   console.log('server: moved ' + data);
-    //});
-    //
-    //socket.on('stamp', function(data) {
-    //    app.updateWorld(data);
-    //}.bind(this));
 };
 
 App.Engine.Connection.prototype.send = function(message, content) {

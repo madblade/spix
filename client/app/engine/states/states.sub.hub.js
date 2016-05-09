@@ -39,7 +39,12 @@ App.Engine.StateManager.prototype.endHub = function () {
     // Remove jQuery listeners.
     $('tr').off('click');
 
+    // Fade out hub announce.
     return new Promise(function(resolve) {
-       resolve();
+        var hub = $("#announce");
+        hub.fadeOut(200, function() {
+            hub.empty().removeClass('hub');
+            resolve();
+        });
     });
 };
