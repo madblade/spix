@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.StateManager.prototype.startHub = function (data) {
+App.Engine.StateManager.prototype.startHub = function(data) {
     var content = '<table style="width:100%" class="noselect">';
 
     for (var property in data) {
@@ -21,6 +21,7 @@ App.Engine.StateManager.prototype.startHub = function (data) {
     hub.addClass('hub').append(content).fadeIn();
 
     // Add listeners.
+    var application = this.app;
     $('tr').click(function() {
         var gameType = $(this).find('td:first').text();
         var gid = $(this).find('td:last').text();
@@ -31,7 +32,7 @@ App.Engine.StateManager.prototype.startHub = function (data) {
             return;
         }
 
-        app.join(gameType, gid);
+        application.join(gameType, gid);
     });
 };
 

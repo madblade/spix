@@ -13,16 +13,15 @@ class UserOutput {
 
     update(world) {
         this._playerman.forEach((p) => {
-            // TODO do something with each p.
             p.send('stamp', UserOutput.extractWorld(p, world));
         });
 
         // TODO encapsulate within abstract game IO.
-        //this._game.broadcast('chat', 'YOUHOUUU');
+        // this._game.broadcast('chat', 'text');
     }
 
-    // TODO subsample world
     static extractWorld(player, world) {
+        // TODO subsample world
         return world;
     }
 

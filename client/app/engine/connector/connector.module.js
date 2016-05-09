@@ -4,7 +4,8 @@
 
 'use strict';
 
-App.Engine.Connection = function() {
+App.Engine.Connection = function(app) {
+    this.app = app;
     this.socket = {};
 };
 
@@ -59,10 +60,6 @@ App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
 
 App.Engine.Connection.prototype.send = function(message, content) {
     this.socket.emit(message, content);
-};
-
-App.Engine.Connection.prototype.move = function(direction) {
-    this.socket.emit('move', direction);
 };
 
 App.Engine.Connection.prototype.join = function(gameType, gid) {

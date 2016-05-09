@@ -6,22 +6,27 @@
 
 class Entity {
 
-    constructor() {
-        this.position = null;
+    constructor(id) {
+        this._position = null;
+        this._id = id;
     }
 
+    get id() { return this._id; }
+
+    get position() { return this._position; }
+
     spawn() {
-        this.position = [0,0,0];
+        this._position = [0,0,0];
     }
 
     die() {
-        this.position = null;
+        this._position = null;
     }
 
     move(x, y, z) {
-        this.position[0] += x;
-        this.position[1] += y;
-        this.position[2] += z;
+        this._position[0] += x;
+        this._position[1] += y;
+        this._position[2] += z;
     }
 
 }

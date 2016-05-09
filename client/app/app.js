@@ -12,14 +12,14 @@ var App = App || {
 
 App.Core = function() {
     // Initialize states and set as loading.
-    this.stateManager = new App.Engine.StateManager();
+    this.stateManager = new App.Engine.StateManager(this);
     this.stateManager.setState('loading');
 
     // Initialize modules
-    this.connectionEngine = new App.Engine.Connection();
+    this.connectionEngine = new App.Engine.Connection(this);
     this.gameEngine = new App.Engine.Game();
-    this.graphicsEngine = new App.Engine.Graphics();
-    this.uiEngine = new App.Engine.UI();
+    this.graphicsEngine = new App.Engine.Graphics(this);
+    this.uiEngine = new App.Engine.UI(this);
     this.soundEngine = new App.Engine.Sound();
 
     // Run application when connection is confirmed.
@@ -41,7 +41,6 @@ App.Core.prototype.run = function() {
     var onHubFetched = function(data) {
         this.connectionEngine.removeCustomListener('hub', onHubFetched);
         this.stateManager.setState('hub', data);
-        console.log(data);
     }.bind(this);
     this.connectionEngine.addCustomListener('hub', onHubFetched);
 

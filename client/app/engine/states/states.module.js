@@ -4,16 +4,18 @@
 
 'use strict';
 
-App.Engine.StateManager = function() {
+App.Engine.StateManager = function(app) {
+    this.app = app;
+
     // States
     this.previousState = '';
     this.state = '';
 
     // Register actions
     this.states = {
-        loading: {start: this.startLoading, end: this.endLoading},
-        hub: {start: this.startHub, end: this.endHub},
-        ingame: {start: this.startIngame, end: this.endIngame}
+        loading: {start: this.startLoading.bind(this), end: this.endLoading.bind(this)},
+        hub: {start: this.startHub.bind(this), end: this.endHub.bind(this)},
+        ingame: {start: this.startIngame.bind(this), end: this.endIngame.bind(this)}
 
         // TODO other states
         //pregame: {start: , end: },

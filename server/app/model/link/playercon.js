@@ -35,9 +35,10 @@ class PlayerConnection {
     /**
      * Stop listening for a specific message.
      * @param message
+     * @param behaviour the bound function
      */
-    off(message) {
-        this._socket.off(message);
+    off(message, behaviour) {
+        this._socket.off(message, behaviour);
         CollectionUtils.removeFromArray(this._listeners, message);
     }
 
@@ -45,7 +46,7 @@ class PlayerConnection {
      * Remove all listeners.
      */
     offAll() {
-        this._listeners.forEach((message) => this._socket.off(message));
+        this._listeners.forEach((message) => this._socket.removeAllListeners(message));
         this._listeners = [];
     }
 

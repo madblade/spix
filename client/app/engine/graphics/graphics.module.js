@@ -4,7 +4,9 @@
 
 'use strict';
 
-App.Engine.Graphics = function() {
+App.Engine.Graphics = function(app) {
+    this.app = app;
+
     // Rendering
     this.renderer = this.getRenderer();
     this.scene = this.getScene(); // TODO states
@@ -26,8 +28,14 @@ App.Engine.Graphics.prototype.render = function() {
 };
 
 App.Engine.Graphics.prototype.animate = function() {
+    // Request animation frame.
     this.requestId = requestAnimationFrame(this.animate.bind(this));
+
+    // Render.
     this.render();
+
+    // Update controls (done here for efficiency purposes).
+    this.app.uiEngine.update();
 };
 
 App.Engine.Graphics.prototype.stop = function() {

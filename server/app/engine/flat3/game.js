@@ -31,9 +31,11 @@ class Flat3 extends Game {
     configurePlayerManager() {
         this._playerman.setAddPlayerBehaviour((p) => {
             this._objectman.spawnPlayer(p);
+            this._inputman.listenPlayer(p);
         });
 
         this._playerman.setRemovePlayerBehaviour((p) => {
+            this._inputman.removePlayer(p);
             this._objectman.despawnPlayer(p);
         });
     }

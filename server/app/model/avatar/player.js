@@ -58,9 +58,10 @@ class Player {
     /**
      * Stop listening for a specified input type.
      * @param message
+     * @param behaviour
      */
-    off(message) {
-        this._playercon.off(message);
+    off(message, behaviour) {
+        this._playercon.off(message, behaviour);
     }
 
     // Clean references. Only use from a Game instance.

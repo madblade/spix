@@ -7,11 +7,54 @@
 class UserInput {
 
     constructor() {
-
+        this._incoming = [];
     }
 
     update() {
+        // Process incoming actions
+        // TODO manage spam spam spam spam spaaam, lovely spaaam, wonderful spam.
+        this._incoming.forEach(function(e) {
+            console.log(e);
+            if (e.action !== 'move' ||
+                !e.avatar || e.avatar === 'undefined' ||
+                typeof e.meta !== "string")
+                return;
 
+            switch (e.meta) {
+                case 'f' : e.avatar.move(0, 1, 0);
+                    break;
+                case 'r' : e.avatar.move(1, 0, 0);
+                    break;
+                case 'l' : e.avatar.move(-1, 0, 0);
+                    break;
+                case 'b' : e.avatar.move(0, -1, 0);
+                    break;
+                default:
+            }
+
+            console.log(e.avatar.position);
+        });
+
+        // Flush incoming actions.
+        this._incoming = [];
+    }
+
+    push(kind, avatar) {
+        return ((data) => {
+            console.log('Movement');
+            this._incoming.push({action:kind, avatar:avatar, meta:data});
+        });
+    }
+
+    listenPlayer(player) {
+        player.on('move', this.push('move', player.avatar));
+    }
+
+    removePlayer(player) {
+        // Do not modify queue.
+        // Drop inconsistent players when an update is performed.
+        player.off('move', this.push('move', player.avatar));
+        // TODO make a map with push function? I think it is different every time.
     }
 
 }

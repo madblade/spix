@@ -8,8 +8,8 @@ import Avatar from './avatar';
 
 class ObjectFactory {
 
-    static createAvatar() {
-        return new Avatar();
+    static createAvatar(id) {
+        return new Avatar(id);
     }
 
 }

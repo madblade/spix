@@ -8,8 +8,8 @@ import Entity from './entity';
 
 class Avatar extends Entity {
 
-    constructor() {
-        super();
+    constructor(id) {
+        super(id);
     }
 
 }
