@@ -20,15 +20,19 @@ class Game {
         this._kind = null;
         this._refreshRate = 200;
         this._isRunning = false;
+        this._ready = false;
 
         //
         this._playerman = Factory.createPlayerManager();
     }
 
     // Model
+    get ready() { return this._ready; }
     get kind() { return this._kind; }
     get gameId() { return this._gameId; }
     get isRunning() { return this._isRunning; }
+
+    set ready(value) { this._ready = value; }
 
     /* ### Manage connection ### */
 
@@ -63,7 +67,6 @@ class Game {
         this._isRunning = true;
         console.log("Game running.");
         this._jobId = setInterval(() => {
-            //console.log("Running");
             this.update();
         }, this._refreshRate);
     }

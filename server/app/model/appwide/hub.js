@@ -59,7 +59,9 @@ class Hub {
      */
     listGames() {
         var games = {};
-        var f = (kind) => (g) => games[kind].push(g);
+        var f = (kind) => (gid) => {
+            if (this._games[kind][gid].ready) games[kind].push(gid);
+        };
         for (var kind in this._games) {
             if (!this._games.hasOwnProperty(kind)) continue;
             games[kind] = [];

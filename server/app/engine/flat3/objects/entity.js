@@ -24,6 +24,7 @@ class Entity {
     }
 
     move(x, y, z) {
+        console.log('I move');
         this._position[0] += x;
         this._position[1] += y;
         this._position[2] += z;

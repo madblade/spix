@@ -6,23 +6,42 @@
 
 class UserOutput {
 
-    constructor(game, playerman) {
+    constructor(game) {
         this._game = game;
-        this._playerman = playerman;
+    }
+
+    init(player) {
+        console.log('Init a new player on game ' + this._game.gameId + '.');
+        var allChunks = this._game.objectman.allChunks;
+        player.send('stamp', UserOutput.extractConcernedChunks(player, allChunks));
     }
 
     update(world) {
-        this._playerman.forEach((p) => {
-            p.send('stamp', UserOutput.extractWorld(p, world));
+        // Get updates from objects
+        var updatedChunks = this._game.objectman.updatedChunks;
+
+        // Broadcast updates.
+        this._game.playerman.forEach((p) => {
+            if (UserOutput.playerConcerned(p, updatedChunks)) {
+                p.send('stamp', UserOutput.extractConcernedChunks(updatedChunks));
+            }
         });
 
-        // TODO encapsulate within abstract game IO.
+        // Tell object manager we have done update.
+        this._game.objectman.updateTransmitted();
+
+        // TODO manage true broadcast events.
         // this._game.broadcast('chat', 'text');
     }
 
-    static extractWorld(player, world) {
-        // TODO subsample world
-        return world;
+    static playerConcerned(player, chunks) {
+        // TODO check if the user has loaded concerned chunks.
+        return false;
+    }
+
+    static extractConcernedChunks(player, chunks) {
+        // TODO process chunks.
+        return chunks;
     }
 
 }

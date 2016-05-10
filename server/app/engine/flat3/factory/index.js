@@ -8,7 +8,7 @@ import Physics from '../physics';
 import UserInput from '../ui/input';
 import UserOutput from '../ui/output';
 import AI from '../ai';
-import ObjectManager from '../objects';
+import ObjectManager from '../objects/manager';
 
 class Flat3Factory {
 
@@ -20,8 +20,8 @@ class Flat3Factory {
         return new UserInput();
     }
 
-    static createUserOutput(game, playerman) {
-        return new UserOutput(game, playerman);
+    static createUserOutput(game) {
+        return new UserOutput(game);
     }
 
     static createAI() {

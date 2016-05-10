@@ -30,7 +30,7 @@ App.Engine.UI.prototype.setupKeyboard = function() {
  * Keyboard behaviour when a key is pressed.
  */
 App.Engine.UI.prototype.registerKeyDown = function() {
-    $(window).keypress(function(event) {
+    $(window).keydown(function(event) {
         if (!event.keyCode) { return; }
         var k = this.keys;
         var ak = this.activeKeys;
