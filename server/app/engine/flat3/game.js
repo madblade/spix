@@ -14,7 +14,7 @@ class Flat3 extends Game {
 
         // Utility parameters
         this._kind = 'flat3';
-        this._refreshRate = 100;
+        this._refreshRate = 16;
 
         // Setup managers.
         this._inputman = Flat3Factory.createUserInput(this);

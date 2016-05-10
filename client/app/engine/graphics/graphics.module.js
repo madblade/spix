@@ -18,26 +18,41 @@ App.Engine.Graphics = function(app) {
     this.container = document.getElementById('container');
     this.container.appendChild(this.renderer.domElement);
 
+    // Lights
+    this.light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+
     // Materials
-    var blockMaterial = new THREE.MeshBasicMaterial({
-        vertexColors: THREE.FaceColors,
-        overdraw: 0.5
+    var blockMaterial = new THREE.MeshPhongMaterial({
+        specular: 0xffffff,
+        shading: THREE.FlatShading,
+        vertexColors: THREE.VertexColors
     });
 
     // Geometries
     this.avatar = new THREE.Mesh(
-        new THREE.BoxGeometry(200, 200, 200),
+        new THREE.BoxGeometry(5, 5, 5),
         blockMaterial
+    );
+    var temporaryGeometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+    temporaryGeometry.rotateX( - Math.PI / 2 );
+    this.temporaryPlane = new THREE.Mesh(
+        temporaryGeometry,
+        new THREE.MeshBasicMaterial({wireframe:true, color:0x000000})
     );
     this.blocks = [];
     this.entities = [];
 };
 
 App.Engine.Graphics.prototype.run = function() {
-    // Init animation.
-    this.animate();
+    // Init objects.
     this.scene.add(this.controls.getObject());
     this.scene.add(this.avatar);
+    this.light.position.set( 0.5, 1, 0.75 );
+    this.scene.add(this.light);
+    this.scene.add(this.temporaryPlane);
+
+    // Init animation.
+    this.animate();
 };
 
 App.Engine.Graphics.prototype.render = function() {

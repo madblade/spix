@@ -24,7 +24,6 @@ class UserOutput {
 
         // Broadcast updates.
         this._game.playerman.forEach((p) => {
-            console.log(p.avatar);
             if (UserOutput.playerConcerned(p, updatedChunks, updatedEntities)) {
                 p.send('stamp',
                     [

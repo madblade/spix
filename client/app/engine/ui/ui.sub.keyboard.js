@@ -75,10 +75,6 @@ App.Engine.UI.prototype.registerKeyUp = function() {
 };
 
 App.Engine.UI.prototype.updateKeyboard = function() {
-    ++this.tweak;
-    this.tweak %= 5;
-    if (this.tweak !== 0) return;
-
     var ak = this.activeKeys;
     var ce = this.app.connectionEngine;
 
