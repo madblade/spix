@@ -7,7 +7,7 @@
 App.Engine.Game = function(app) {
     this.app = app;
 
-    this.chunks = [];
+    this.position = [];
     this.blocks = [];
     this.entities = [];
 
@@ -21,12 +21,10 @@ App.Engine.Game.prototype.run = function() {
 
 App.Engine.Game.prototype.update = function(data) {
     if (this.isRunning) {
-        console.log(data);
-        this.chunks = data[0];
+        this.position = data[0];
         this.blocks = data[1];
         this.entities = data[2];
-
-        this.updateGraphics(this.chunks, this.blocks, this.entities);
+        this.updateGraphics(this.position, this.blocks, this.entities);
     }
 };
 

@@ -25,3 +25,7 @@ App.Engine.Graphics.prototype.getCamera = function() {
     camera.position.set(0, -30, 50);
     return camera;
 };
+
+App.Engine.Graphics.prototype.getControls = function(camera) {
+    return new THREE.PointerLockControls(camera);
+};

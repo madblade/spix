@@ -16,8 +16,8 @@ class Flat3Factory {
         return new Physics();
     }
 
-    static createUserInput() {
-        return new UserInput();
+    static createUserInput(game) {
+        return new UserInput(game);
     }
 
     static createUserOutput(game) {

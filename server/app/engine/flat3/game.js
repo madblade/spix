@@ -17,7 +17,7 @@ class Flat3 extends Game {
         this._refreshRate = 100;
 
         // Setup managers.
-        this._inputman = Flat3Factory.createUserInput();
+        this._inputman = Flat3Factory.createUserInput(this);
         this._physics = Flat3Factory.createPhysics();
         this._objectman = Flat3Factory.createObjectManager();
         this._ai = Flat3Factory.createAI();

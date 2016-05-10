@@ -6,7 +6,8 @@
 
 class UserInput {
 
-    constructor() {
+    constructor(game) {
+        this._game = game;
         this._incoming = [];
     }
 
@@ -19,6 +20,7 @@ class UserInput {
                 typeof e.meta !== "string")
                 return;
 
+            var hasMoved = true;
             switch (e.meta) {
                 case 'f' : e.avatar.move(0, 1, 0);
                     break;
@@ -29,8 +31,14 @@ class UserInput {
                 case 'b' : e.avatar.move(0, -1, 0);
                     break;
                 default:
+                    hasMoved = false;
             }
-        });
+
+            // Notify an entity was updated.
+            if (hasMoved) {
+                this._game.objectman.entityUpdated(e.avatar.id);
+            }
+        }.bind(this));
 
         // Flush incoming actions.
         this._incoming = [];

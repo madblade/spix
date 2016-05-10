@@ -27,3 +27,8 @@ App.Engine.UI.prototype.run = function() {
             .bind(this.app.graphicsEngine)
     );
 };
+
+App.Engine.UI.prototype.update = function() {
+    this.updateKeyboard();
+    // TODO update other controls.
+};

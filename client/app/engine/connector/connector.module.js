@@ -68,7 +68,6 @@ App.Engine.Connection.prototype.join = function(gameType, gid) {
         var f = function() {
             this.socket.removeListener('joined', f);
             this.socket.removeListener('cantjoin', g);
-            console.log('ACCEPTED');
             resolve();
         }.bind(this);
 

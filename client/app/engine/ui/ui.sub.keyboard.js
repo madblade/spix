@@ -34,6 +34,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
         if (!event.keyCode) { return; }
         var k = this.keys;
         var ak = this.activeKeys;
+        event.preventDefault();
 
         switch (event.keyCode) {
             case k.forward: ak.forward = true;
@@ -57,6 +58,7 @@ App.Engine.UI.prototype.registerKeyUp = function() {
         if (!event.keyCode) { return; }
         var k = this.keys;
         var ak = this.activeKeys;
+        event.preventDefault();
 
         switch (event.keyCode) {
             case k.forward: ak.forward = false;
@@ -72,7 +74,7 @@ App.Engine.UI.prototype.registerKeyUp = function() {
     }.bind(this));
 };
 
-App.Engine.UI.prototype.update = function() {
+App.Engine.UI.prototype.updateKeyboard = function() {
     ++this.tweak;
     this.tweak %= 5;
     if (this.tweak !== 0) return;

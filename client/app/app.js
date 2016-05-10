@@ -50,13 +50,17 @@ App.Core.prototype.run = function() {
 
 App.Core.prototype.join = function(gameType, gid) {
     console.log('Joining...');
+
+    // Start core engine to listen for first packet.
+    this.startGame(gameType, gid);
+
     // Try to join specified game.
     this.connectionEngine.join(gameType, gid)
         .then(
             // Success
             function() {
                 console.log("Starting game...");
-                this.startGame(gameType, gid);
+                this.runGame(); // Run all modules.
             }.bind(this),
 
             // Failure
@@ -76,8 +80,10 @@ App.Core.prototype.startGame = function(gameType, gameId) {
 
     // Start model loop.
     this.gameEngine.run(gameType);
+};
 
-    // Run modules.
+// Run game modules.
+App.Core.prototype.runGame = function() {
     this.uiEngine.run();
     this.graphicsEngine.run();
     this.soundEngine.run();

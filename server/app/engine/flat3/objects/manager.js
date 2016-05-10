@@ -15,11 +15,13 @@ class ObjectManager {
         this._chunks = {};
         this._entities = {};
 
-        // Keep track of modified chunks.
+        // Keep track of modified objects.
         this._updatedChunks = {};
+        this._updatedEntities = {};
     }
 
     get allChunks() { return this._chunks; }
+
     get updatedChunks() {
         var updatedChuks = [];
         for (var id in this._updatedChunks) {
@@ -27,6 +29,10 @@ class ObjectManager {
             updatedChuks[id] = this._chunks[id].blocks;
         }
         return updatedChuks;
+    }
+
+    get updatedEntities() {
+        return this._updatedEntities;
     }
 
     generate() {
@@ -42,6 +48,7 @@ class ObjectManager {
 
     updateTransmitted() {
         this._updatedChunks = {};
+        this._updatedEntities = {};
     }
 
     spawnPlayer(p) {
@@ -55,6 +62,14 @@ class ObjectManager {
         p.avatar.die();
         delete this._entities[p.avatar.id];
         delete p.avatar;
+    }
+
+    chunkUpdated(chunkId) {
+        this._updatedChunks[chunkId] = true;
+    }
+
+    entityUpdated(entityId) {
+        this._updatedEntities[entityId] = true;
     }
 
     addBlock(x, y, z, blockId) {
@@ -76,7 +91,7 @@ class ObjectManager {
         chunk.add(chunkX, chunkY, z, blockId);
 
         // Remember this chunk was touched.
-        this._updatedChunks[chunkId] = true;
+        chunkUpdated(chunkId);
     }
 
     delBlock(x, y, z) {
