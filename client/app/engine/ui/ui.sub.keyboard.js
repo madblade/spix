@@ -79,12 +79,12 @@ App.Engine.UI.prototype.updateKeyboard = function() {
     var ce = this.app.connectionEngine;
 
     if (ak.forward !== ak.backwards) {
-        if (ak.forward) ce.send('move', 'f');
-        else if (ak.backwards) ce.send('move', 'b');
+        if (ak.forward) ce.send('m', 'f');
+        else if (ak.backwards) ce.send('m', 'b');
     }
 
     if (ak.left !== ak.right) {
-        if (ak.left) ce.send('move', 'l');
-        else if (ak.right) ce.send('move', 'r');
+        if (ak.left) ce.send('m', 'l');
+        else if (ak.right) ce.send('m', 'r');
     }
 };

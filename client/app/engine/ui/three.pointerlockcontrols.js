@@ -7,23 +7,24 @@ var pointerModule = (function () {
 
     var element = document.body;
     var hasPointerLock = true;
+    var plc, plwc, plmc;
 
     if ('webkitPointerLockElement' in document) {
         element.requestPointerLock = element.webkitRequestPointerLock;
-        var plc = function(event) {
+        plwc = function(event) {
             app.uiEngine.threeControlsEnabled = document.webkitPointerLockElement === element;
         };
-        document.addEventListener('webkitpointerlockchange', plc, false);
+        document.addEventListener('webkitpointerlockchange', plwc, false);
 
     } else if ('mozPointerLockElement' in document) {
         element.requestPointerLock = element.mozRequestPointerLock;
-        var plc = function(event) {
+        plmc = function(event) {
             app.uiEngine.threeControlsEnabled = document.mozPointerLockElement === element;
         };
-        document.addEventListener('mozpointerlockchange', plc, false);
+        document.addEventListener('mozpointerlockchange', plmc, false);
 
     } else if ('pointerLockElement' in document) {
-        var plc = function(event) {
+        plc = function(event) {
             app.uiEngine.threeControlsEnabled = document.pointerLockElement === element;
         };
         document.addEventListener('pointerlockchange', plc, false);

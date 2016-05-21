@@ -50,6 +50,7 @@ App.Engine.Graphics.prototype.run = function() {
     this.light.position.set( 0.5, 1, 0.75 );
     this.scene.add(this.light);
     this.scene.add(this.temporaryPlane);
+    this.positionCameraBehind(this.controls, [0, 0, 0]);
 
     // Init animation.
     this.animate();

@@ -32,7 +32,6 @@ App.Engine.UI.prototype.run = function() {
 App.Engine.UI.prototype.update = function() {
     this.updateKeyboard();
     this.updateMouse();
-    // TODO update other controls.
 };
 
 // TODO later fullscreen

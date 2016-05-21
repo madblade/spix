@@ -35,6 +35,28 @@ class ObjectManager {
         return this._updatedEntities;
     }
 
+    extractEntities(player) {
+        var entities = [];
+        for (var eid in this._updatedEntities) {
+            if (!this._updatedEntities.hasOwnProperty(eid) ||
+                !this._entities.hasOwnProperty(eid)) continue;
+
+            entities.push(this._entities[eid]);
+        }
+        return entities;
+    }
+
+    extractChunks(player) {
+        var chunks = [];
+        for (var eid in this._updatedChunks) {
+            if (!this._updatedChunks.hasOwnProperty(eid) ||
+                !this._chunks.hasOwnProperty(eid)) continue;
+
+            chunks.push(this._chunks[eid]);
+        }
+        return chunks;
+    }
+
     generate() {
         return new Promise((resolve) => {
             this._chunks = Generator.generateFlatWorld();

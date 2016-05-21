@@ -12,8 +12,7 @@ class UserOutput {
 
     init(player) {
         console.log('Init a new player on game ' + this._game.gameId + '.');
-        var allChunks = this._game.objectman.allChunks;
-        player.send('stamp', UserOutput.extractConcernedChunks(player, allChunks));
+        player.send('stamp', this.extractConcernedChunks(player));
     }
 
     update(world) {
@@ -28,8 +27,9 @@ class UserOutput {
                 p.send('stamp',
                     [
                         p.avatar.position,
-                        UserOutput.extractConcernedChunks(updatedChunks),
-                        updatedEntities
+                        p.avatar.rotation,
+                        this.extractConcernedChunks(p),
+                        this.extractConcernedEntities(p)
                     ]
                 );
             }
@@ -49,9 +49,12 @@ class UserOutput {
         return Object.keys(chunks).length > 0 || Object.keys(entities).length > 0;
     }
 
-    static extractConcernedChunks(player, chunks) {
-        // TODO process chunks.
-        return chunks;
+    extractConcernedEntities(player) {
+        return (this._game.objectman.extractEntities(player));
+    }
+
+    extractConcernedChunks(player) {
+        return (this._game.objectman.extractChunks(player));
     }
 
 }

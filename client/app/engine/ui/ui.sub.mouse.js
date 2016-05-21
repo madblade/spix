@@ -52,6 +52,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
 
     var scope = this;
     var PI_2 = Math.PI / 2;
+    var ce = this.app.connectionEngine;
     return (function() {
         camera.rotation.set(0,0,0);
         var pitchObject = new THREE.Object3D();
@@ -68,6 +69,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             yawObject.rotation.y -= movementX * 0.002;
             pitchObject.rotation.x -= movementY * 0.002;
             pitchObject.rotation.x = Math.max(-PI_2, Math.min(PI_2, pitchObject.rotation.x));
+            ce.send('r', JSON.stringify([yawObject.rotation.y, pitchObject.rotation.x]));
         };
 
         document.addEventListener('mousemove', onMouseMove, false);
