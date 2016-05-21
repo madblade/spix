@@ -11,7 +11,7 @@ App.Engine.Graphics = function(app) {
     this.renderer = this.getRenderer();
     this.scene = this.getScene(); // TODO states
     this.camera = this.getCamera(); // TODO states
-    this.controls = this.getControls(this.camera);
+    this.controls = null;
     this.requestId = null;
 
     // Initialize DOM element
@@ -45,7 +45,7 @@ App.Engine.Graphics = function(app) {
 
 App.Engine.Graphics.prototype.run = function() {
     // Init objects.
-    this.scene.add(this.controls.getObject());
+    this.setControls(this.app.uiEngine.getControls('first-person', this.camera).getObject());
     this.scene.add(this.avatar);
     this.light.position.set( 0.5, 1, 0.75 );
     this.scene.add(this.light);
@@ -80,4 +80,15 @@ App.Engine.Graphics.prototype.resize = function () {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+};
+
+App.Engine.Graphics.prototype.setControls = function(controls) {
+    this.scene.remove(this.scene.getObjectByName("controls"));
+    this.controls = controls;
+    this.controls.name = "controls";
+    this.scene.add(this.controls);
+};
+
+App.Engine.Graphics.prototype.getCamera = function() {
+    return this.camera;
 };

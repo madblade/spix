@@ -15,7 +15,7 @@ App.Engine.Graphics.prototype.update = function(c, b, e) {
         this.avatar.position.z = -c[1];
         this.avatar.position.y = c[2];
 
-        var yaw = this.controls.getObject();
+        var yaw = this.controls;
         yaw.position.x = c[0];
         yaw.position.z = -c[1] + 10;
         yaw.position.y = 5;
