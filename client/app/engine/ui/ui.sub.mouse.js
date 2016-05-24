@@ -15,24 +15,24 @@ App.Engine.UI.prototype.updateMouse = function() {
 };
 
 App.Engine.UI.prototype.setupPointerLock = function() {
-    var hasPointerLock = 'webkitPointerLockElement' in document ||
-        'mozPointerLockElement' in document || 'pointerLockElement' in document;
-    if (hasPointerLock) {
-        var element = document.body;
-        $(document).mousedown( function (event) {
-            event.preventDefault();
-            switch (event.which) {
-                case 1: // Left
-                case 2: // Middle
-                    return;
-                case 3:
-                default: // Right
-            }
+    if (!('webkitPointerLockElement' in document ||
+        'mozPointerLockElement' in document || 'pointerLockElement' in document)) return;
 
-            // Ask the browser to lock the pointer.
-            element.requestPointerLock();
-        });
-    }
+    var element = document.body;
+    $(document).mousedown( function (event) {
+        event.preventDefault();
+        // TODO use different controls
+        switch (event.which) {
+            case 1: // Left
+            case 2: // Middle
+                return;
+            case 3:
+            default: // Right
+        }
+
+        // Ask the browser to lock the pointer.
+        element.requestPointerLock();
+    });
 };
 
 App.Engine.UI.prototype.getControls = function(controlType, camera) {
@@ -41,7 +41,7 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
     if (controlType === 'first-person') {
         controls = this.getFirstPersonControls(camera);
     } else {
-        // TODO handle error
+        // TODO handle no controls
         controls = undefined;
     }
 
@@ -49,7 +49,6 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
 };
 
 App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
-
     var scope = this;
     var PI_2 = Math.PI / 2;
     var ce = this.app.connectionEngine;

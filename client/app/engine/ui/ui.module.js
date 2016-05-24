@@ -23,10 +23,7 @@ App.Engine.UI.prototype.run = function() {
     this.setupMouse();
     this.setupTouch();
 
-    $(window).resize(
-        this.app.graphicsEngine.resize
-            .bind(this.app.graphicsEngine)
-    );
+    $(window).resize(this.app.graphicsEngine.resize.bind(this.app.graphicsEngine));
 };
 
 App.Engine.UI.prototype.update = function() {

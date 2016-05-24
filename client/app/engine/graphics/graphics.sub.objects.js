@@ -11,11 +11,13 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
     //console.log("entities: " + e);
 
     for (var eid in e) {
+        // TODO detect if entity is present in scene graph
         if (!e.hasOwnProperty(eid)) continue;
         console.log(e[eid]);
     }
 
     if (cp !== undefined) {
+        // TODO if camera type excludes player
         this.avatar.position.x = cp[0];
         this.avatar.position.z = -cp[1];
         this.avatar.position.y = cp[2];
@@ -37,4 +39,12 @@ App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vec
     cameraWrapper.position.x = vector[0];
     cameraWrapper.position.z = -vector[1] + 10;
     cameraWrapper.position.y = vector[2] + 5;
+};
+
+App.Engine.Graphics.prototype.removeObjectFromScene = function(object3D) {
+    this.app.scene.remove(object3D);
+    object3D.geometry.dispose();
+    object3D.geometry = null;
+    object3D.material.dispose();
+    object3D.material = null;
 };

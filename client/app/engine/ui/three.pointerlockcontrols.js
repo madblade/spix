@@ -6,31 +6,25 @@
 var pointerModule = (function () {
 
     var element = document.body;
-    var hasPointerLock = true;
-    var plc, plwc, plmc;
 
     if ('webkitPointerLockElement' in document) {
         element.requestPointerLock = element.webkitRequestPointerLock;
-        plwc = function(event) {
+        document.addEventListener('webkitpointerlockchange', function(e) {
             app.uiEngine.threeControlsEnabled = document.webkitPointerLockElement === element;
-        };
-        document.addEventListener('webkitpointerlockchange', plwc, false);
+        }, false);
 
     } else if ('mozPointerLockElement' in document) {
         element.requestPointerLock = element.mozRequestPointerLock;
-        plmc = function(event) {
+        document.addEventListener('mozpointerlockchange', function(e) {
             app.uiEngine.threeControlsEnabled = document.mozPointerLockElement === element;
-        };
-        document.addEventListener('mozpointerlockchange', plmc, false);
+        }, false);
 
     } else if ('pointerLockElement' in document) {
-        plc = function(event) {
+        document.addEventListener('pointerlockchange', function(e) {
             app.uiEngine.threeControlsEnabled = document.pointerLockElement === element;
-        };
-        document.addEventListener('pointerlockchange', plc, false);
+        }, false);
 
     } else {
-        hasPointerLock = false;
         console.log('ERROR: POINTER LOCK NOT SUPPORTED.');
     }
 
