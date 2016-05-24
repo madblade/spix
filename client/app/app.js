@@ -34,9 +34,6 @@ App.Core.prototype.connect = function() {
 App.Core.prototype.run = function() {
     console.info('Application started locally.');
 
-    // TODO somewhere else Request a game creation.
-    this.connectionEngine.send('util', {request: 'createGame', gameType: 'flat3'});
-
     // Get hub state.
     var onHubFetched = function(data) {
         this.connectionEngine.removeCustomListener('hub', onHubFetched);

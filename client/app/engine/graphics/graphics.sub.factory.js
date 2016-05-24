@@ -47,7 +47,9 @@ App.Engine.Graphics.prototype.getMaterial = function(whatMaterial) {
             break;
 
         default: // Block material
-            material = new THREE.MeshBasicMaterial();
+            material = new THREE.MeshBasicMaterial({
+                color:0xff0000
+            });
     }
 
     return material;
@@ -66,7 +68,7 @@ App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
             break;
 
         default:
-            geometry = new THREE.BoxGeometry(10, 10, 10);
+            geometry = new THREE.BoxGeometry(5, 5, 5);
     }
 
     return geometry;

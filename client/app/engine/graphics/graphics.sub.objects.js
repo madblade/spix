@@ -27,8 +27,8 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
         currentEntity.position.z = -updatedEntity._position[1];
         currentEntity.position.y = updatedEntity._position[2];
 
-        currentEntity.rotation.x = updatedEntity._rotation[0];
-        currentEntity.rotation.y = -updatedEntity._rotation[1];
+        currentEntity.rotation.x = updatedEntity._rotation[1];
+        currentEntity.rotation.y = -updatedEntity._rotation[0];
 
     }.bind(this));
 
@@ -38,8 +38,8 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
         this.avatar.position.z = -cp[1];
         this.avatar.position.y = cp[2];
 
-        this.avatar.rotation.x = cr[0];
-        this.avatar.rotation.y = cr[1];
+        this.avatar.rotation.x = cr[1];
+        this.avatar.rotation.y = cr[0];
 
         var camera = this.controls; // Camera wrapper actually
         this.positionCameraBehind(camera, cp);

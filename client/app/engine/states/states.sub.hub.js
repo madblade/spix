@@ -5,7 +5,8 @@
 'use strict';
 
 App.Engine.StateManager.prototype.startHub = function(data) {
-    var content = '<table style="width:100%" class="noselect">';
+    var content = '';
+    content += '<table class="table table-bordered" style="width:100%" class="noselect">';
 
     for (var property in data) {
         if (!data.hasOwnProperty(property)) continue;
@@ -15,6 +16,8 @@ App.Engine.StateManager.prototype.startHub = function(data) {
         }
     }
     content += '</table>';
+    content += '<div><button class="btn btn-default game-creator" style="width:100%">' +
+        'Request FLAT3 game creation</button></div>';
 
     // Add content then fade in.
     var hub = $("#announce");
@@ -34,11 +37,17 @@ App.Engine.StateManager.prototype.startHub = function(data) {
 
         application.join(gameType, gid);
     });
+
+    $('.game-creator').click(function() {
+        application.connectionEngine.send('util', {request: 'createGame', gameType: 'flat3'});
+        location.reload();
+    });
 };
 
 App.Engine.StateManager.prototype.endHub = function () {
     // Remove jQuery listeners.
     $('tr').off('click');
+    $('.game-creator').off('click');
 
     // Fade out hub announce.
     return new Promise(function(resolve) {

@@ -6,5 +6,12 @@
 
     text-align: center;
     color: lightgray;
-    cursor: hand;
+}
+
+tr td {
+    cursor: pointer;
+}
+
+tr:hover {
+    background-color: #894612;
 }
