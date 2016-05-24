@@ -22,7 +22,7 @@ App.Engine.Graphics = function(app) {
     this.light = null; // Only 1 for the moment.
     this.avatar = null;
     this.blocks = [];
-    this.entities = [];
+    this.entities = {};
 
     this.initObjects();
 };

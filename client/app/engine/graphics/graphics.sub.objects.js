@@ -10,11 +10,27 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
     //console.log("blocks: " + b);
     //console.log("entities: " + e);
 
-    for (var eid in e) {
-        // TODO detect if entity is present in scene graph
-        if (!e.hasOwnProperty(eid)) continue;
-        console.log(e[eid]);
-    }
+    if (e !== undefined && e !== null)
+    e.forEach(function(updatedEntity) {
+        var currentEntity;
+
+        if (this.entities.hasOwnProperty(updatedEntity._id)) {
+            // Update mesh
+            currentEntity = this.entities[updatedEntity._id];
+        } else {
+            // Make mesh
+            currentEntity = this.entities[updatedEntity._id] = this.getMesh(this.getGeometry(), this.getMaterial());
+            this.scene.add(currentEntity);
+        }
+
+        currentEntity.position.x = updatedEntity._position[0];
+        currentEntity.position.z = -updatedEntity._position[1];
+        currentEntity.position.y = updatedEntity._position[2];
+
+        currentEntity.rotation.x = updatedEntity._rotation[0];
+        currentEntity.rotation.y = -updatedEntity._rotation[1];
+
+    }.bind(this));
 
     if (cp !== undefined) {
         // TODO if camera type excludes player
@@ -27,11 +43,7 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
 
         var camera = this.controls; // Camera wrapper actually
         this.positionCameraBehind(camera, cp);
-
-        //this.camera.position.x = c[0];
-        //this.camera.position.y = c[1];
     }
-    // this.scene.add();
     // Compare b with this.blocks.
 };
 

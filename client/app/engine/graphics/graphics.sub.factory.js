@@ -58,7 +58,7 @@ App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
 
     switch (whatGeometry) {
         case 'plane':
-            geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+            geometry = new THREE.PlaneGeometry(100, 100, 100, 100);
             break;
 
         case 'box':
@@ -66,7 +66,7 @@ App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
             break;
 
         default:
-            geometry = new THREE.BoxGeometry(1, 1, 1);
+            geometry = new THREE.BoxGeometry(10, 10, 10);
     }
 
     return geometry;

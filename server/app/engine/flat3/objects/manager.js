@@ -35,11 +35,13 @@ class ObjectManager {
         return this._updatedEntities;
     }
 
+    // TODO manage disappearances
     extractEntities(player) {
         var entities = [];
-        for (var eid in this._updatedEntities) {
-            if (!this._updatedEntities.hasOwnProperty(eid) ||
-                !this._entities.hasOwnProperty(eid)) continue;
+        for (var eid in this._entities) {
+            if (!this._entities.hasOwnProperty(eid)) continue;
+
+            if (this._entities[eid]._id === player.avatar._id) continue;
 
             entities.push(this._entities[eid]);
         }
