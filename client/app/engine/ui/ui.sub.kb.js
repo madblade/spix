@@ -5,12 +5,9 @@
 'use strict';
 
 App.Engine.UI.prototype.setupKeyboard = function() {
-    this.keys = {
-        forward: 38,
-        backwards: 40,
-        right: 39,
-        left: 37
-    };
+    this.keys = {};
+
+    this.reconfigure('en'); // TODO detect languages.
 
     this.activeKeys = {
         forward: false,
@@ -24,6 +21,16 @@ App.Engine.UI.prototype.setupKeyboard = function() {
 
     // Tweak for filtering some events...
     this.tweak = 0;
+};
+
+/**
+ * @param layout
+ *  language (en or fr) or set of strokes
+ */
+App.Engine.UI.prototype.reconfigure = function(layout) {
+    if (layout === 'fr') this.setupFR();
+    else if (layout === 'en') this.setupEN();
+    else this.setupCustom(layout);
 };
 
 /**
