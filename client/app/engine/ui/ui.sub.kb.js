@@ -9,6 +9,7 @@ App.Engine.UI.prototype.setupKeyboard = function() {
 
     this.reconfigure('en'); // TODO detect languages.
 
+    // Controls
     this.activeKeys = {
         forward: false,
         backwards: false,

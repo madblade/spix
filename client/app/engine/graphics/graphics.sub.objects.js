@@ -49,7 +49,7 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
     cameraWrapper.position.x = vector[0];
-    cameraWrapper.position.z = -vector[1] + 10;
+    cameraWrapper.position.z = -vector[1]; // + 10;
     cameraWrapper.position.y = vector[2] + 5;
 };
 
