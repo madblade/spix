@@ -16,31 +16,50 @@ App.Engine.StateManager.prototype.startSettings = function() {
 
     var homeHTML = function() {
         return '<table class="table table-bordered" style="width:100%" class="noselect">' +
-            '<tr id="graphics"><td>graphics</td></tr>' +
-            '<tr id="gameplay"><td>gameplay</td></tr>' +
-            '<tr id="sound"><td>sound</td></tr>' +
+            '<tr id="graphics"><td>Graphics</td></tr>' +
+            '<tr id="gameplay"><td>Gameplay</td></tr>' +
+            '<tr id="sound"><td>Sound</td></tr>' +
+            '<tr id="return"><td>Return</td></tr>' +
             '</table>';
     };
     var graphicsHTML = function() {
+        var settings = scope.app.graphicsEngine.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
-        content += '<tr id="return"><td>return</td></tr>';
+        for (var s in settings) {
+            if (!settings.hasOwnProperty(s)) continue;
+            content +='<tr><td>' + settings[s] + '</td></tr>';
+        }
+        content += '<tr id="return"><td>Return</td></tr>';
         content += '</table>';
         return content;
     };
     var gameplayHTML = function() {
-        var gameplaySettings = scope.app.uiEngine.settings;
+        var settings = scope.app.uiEngine.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
-        for (var s in gameplaySettings) {
-            if (!gameplaySettings.hasOwnProperty(s)) continue;
-            content +='<tr id="graphics"><td>' + gameplaySettings[s] + '</td></tr>';
+
+        if (settings.hasOwnProperty('language')) {
+            var language =  '<select id="language" class="form-control">' +
+                '<option value="en-US">en-US</option>' +
+                '<option value="en-GB">en-GB</option>' +
+                '<option value="fr">fr</option>' +
+                '</select>';
+
+            content +='<tr><td>Language</td>' + '<td>' + language + '</td></tr>';
         }
-        content += '<tr id="return"><td>return</td></tr>';
+
+        content += '<tr id="return"><td colspan="2">Return</td></tr>';
         content += '</table>';
+
         return content;
     };
     var soundHTML = function() {
+        var settings = scope.app.soundEngine.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
-        content += '<tr id="return"><td>return</td></tr>';
+        content += '<tr id="return"><td>Return</td></tr>';
+        for (var s in settings) {
+            if (!settings.hasOwnProperty(s)) continue;
+            content +='<tr><td>' + settings[s] + '</td></tr>';
+        }
         content += '</table>';
         return content;
     };
@@ -54,6 +73,12 @@ App.Engine.StateManager.prototype.startSettings = function() {
         unlistenHome();
         $("#announce").empty().append(gameplayHTML());
         listenReturn();
+        var l = $('#language');
+        l.change(function() {
+            var selected = l.find('option:selected').val();
+            scope.app.uiEngine.changeLayout(selected);
+            l.off('change');
+        });
     }.bind(this);
     var goSound = function() {
         unlistenHome();
@@ -73,6 +98,13 @@ App.Engine.StateManager.prototype.startSettings = function() {
         $('#graphics').click(function() { goGraphics(); }.bind(this));
         $('#gameplay').click(function() { goGameplay(); }.bind(this));
         $('#sound').click(function() { goSound(); }.bind(this));
+        $('#return').click(function() {
+            $(document).off('keydown');
+            unlistenHome();
+            scope.setState('ingame');
+            scope.app.uiEngine.requestPointerLock();
+
+        }.bind(this));
     };
     var unlistenHome = function() {
         $('#graphics').off('click');

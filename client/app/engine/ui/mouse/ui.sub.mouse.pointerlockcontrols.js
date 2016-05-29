@@ -32,8 +32,6 @@ App.Engine.UI.prototype.setupPointerLock = function() {
     }
 
     $(document).mousedown(function (event) {
-        event.preventDefault();
-
         if (app.stateManager.getState() !== 'ingame') return;
 
         switch (event.which) {

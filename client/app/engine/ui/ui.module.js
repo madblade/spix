@@ -8,7 +8,9 @@ App.Engine.UI = function(app) {
     this.app = app;
 
     // User customizable settings.
-    this.settings = {};
+    this.settings = {
+        language: ''
+    };
 
     this.threeControlsEnabled = false;
 
