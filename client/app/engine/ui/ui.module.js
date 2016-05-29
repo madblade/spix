@@ -9,9 +9,9 @@ App.Engine.UI = function(app) {
     this.threeControlsEnabled = false;
 
     // Keyboard needs a list of possible keystrokes;
-    this.keys = {};
     // and a list of keys actually pressed.
-    this.activeKeys = {};
+    this.keyControls = {};
+    this.activeKeyControls = {};
 
     // Other input methods.
     this.mouse = {};
