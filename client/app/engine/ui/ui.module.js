@@ -6,6 +6,10 @@
 
 App.Engine.UI = function(app) {
     this.app = app;
+
+    // User customizable settings.
+    this.settings = {};
+
     this.threeControlsEnabled = false;
 
     // Keyboard needs a list of possible keystrokes;

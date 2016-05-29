@@ -7,18 +7,26 @@
 App.Engine.UI.prototype.setupKeyboard = function() {
 
     // Try to detect user language
-    var language = window.navigator.userLanguage || window.navigator.language || "en-US";
+    this.language = window.navigator.userLanguage || window.navigator.language || "en-US";
 
     // Controls
-    this.keyControls = this.getKeyControls(language);
+    this.keyControls = this.getKeyControls(this.language);
     this.activeKeyControls = this.getActiveKeyControls();
 
-    // Event listeners.
-    this.registerKeyDown();
-    this.registerKeyUp();
+    this.startKeyboardListeners();
 
     // Tweak for filtering some events...
     this.tweak = 0;
+};
+
+App.Engine.UI.prototype.startKeyboardListeners = function() {
+    this.registerKeyDown();
+    this.registerKeyUp();
+};
+
+App.Engine.UI.prototype.stopKeyboardListeners = function() {
+    this.unregisterKeyDown();
+    this.unregisterKeyUp();
 };
 
 /**
@@ -29,8 +37,7 @@ App.Engine.UI.prototype.setupKeyboard = function() {
  */
 App.Engine.UI.prototype.changeLayout = function(newLayout, newBinding) {
     // Prevent keys from being fired when configuring.
-    this.unregisterKeyDown();
-    this.unregisterKeyUp();
+    this.stopKeyboardListeners();
 
     this.activeKeyControls = this.getActiveKeyControls();
 
@@ -41,13 +48,13 @@ App.Engine.UI.prototype.changeLayout = function(newLayout, newBinding) {
         case 'en-GB':
             this.keyControls = this.getKeyControls(newLayout);
             break;
+        case 'custom':
         default:
             this.setupCustomLayout(newBinding);
     }
 
     // Restore event listeners.
-    this.registerKeyDown();
-    this.registerKeyUp();
+    this.startKeyboardListeners();
 };
 
 

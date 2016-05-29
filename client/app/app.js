@@ -20,7 +20,7 @@ App.Core = function() {
     this.gameEngine = new App.Engine.Game(this);
     this.graphicsEngine = new App.Engine.Graphics(this);
     this.uiEngine = new App.Engine.UI(this);
-    this.soundEngine = new App.Engine.Sound();
+    this.soundEngine = new App.Engine.Sound(this);
 
     // Run application when connection is confirmed.
     this.connect().then(function() {this.run();}.bind(this));

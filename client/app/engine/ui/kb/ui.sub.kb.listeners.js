@@ -31,6 +31,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
             case k.leftHandDown:
                 ak.backwards = true;
                 break;
+
             default:
         }
     }.bind(this));

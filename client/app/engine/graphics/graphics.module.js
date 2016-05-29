@@ -7,6 +7,9 @@
 App.Engine.Graphics = function(app) {
     this.app = app;
 
+    // User customizable settings.
+    this.settings = {};
+
     // Rendering
     this.renderer = this.getRenderer();
     this.scene = this.getScene(); // TODO states

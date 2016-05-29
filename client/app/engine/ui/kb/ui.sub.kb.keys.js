@@ -23,7 +23,8 @@ App.Engine.UI.prototype.getKeyControls = function(layout) {
             break;
 
         default:
-            console.log('Invalid keyboard layout.');
+            console.log('Invalid keyboard layout. Switching to English as default.');
+            keyControls = this.getQWERTY();
             return;
     }
 

@@ -34,3 +34,7 @@ App.Engine.Game.prototype.update = function(data) {
 App.Engine.Game.prototype.updateGraphics = function(c, r, b, e) {
     this.app.graphicsEngine.update(c, r, b, e);
 };
+
+App.Engine.Game.prototype.endGame = function() {
+
+};

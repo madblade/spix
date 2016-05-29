@@ -15,7 +15,8 @@ App.Engine.StateManager = function(app) {
     this.states = {
         loading: {start: this.startLoading.bind(this), end: this.endLoading.bind(this)},
         hub: {start: this.startHub.bind(this), end: this.endHub.bind(this)},
-        ingame: {start: this.startIngame.bind(this), end: this.endIngame.bind(this)}
+        ingame: {start: this.startIngame.bind(this), end: this.endIngame.bind(this)},
+        settings: {start: this.startSettings.bind(this), end: this.endSettings.bind(this)},
 
         // TODO other states
         //pregame: {start: , end: },

@@ -4,50 +4,6 @@
 
 'use strict';
 
-App.Engine.UI.prototype.setupMouse = function() {
-
-    // Click / move handlers.
-    this.setupPointerLock();
-};
-
-App.Engine.UI.prototype.updateMouse = function() {
-    // Hold-click handlers.
-};
-
-App.Engine.UI.prototype.setupPointerLock = function() {
-    if (!('webkitPointerLockElement' in document ||
-        'mozPointerLockElement' in document || 'pointerLockElement' in document)) return;
-
-    var element = document.body;
-    $(document).mousedown( function (event) {
-        event.preventDefault();
-        // TODO use different controls
-        switch (event.which) {
-            case 1: // Left
-            case 2: // Middle
-                return;
-            case 3:
-            default: // Right
-        }
-
-        // Ask the browser to lock the pointer.
-        element.requestPointerLock();
-    });
-};
-
-App.Engine.UI.prototype.getControls = function(controlType, camera) {
-    var controls;
-
-    if (controlType === 'first-person') {
-        controls = this.getFirstPersonControls(camera);
-    } else {
-        // TODO handle no controls
-        controls = undefined;
-    }
-
-    return controls;
-};
-
 App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
     var scope = this;
     var PI_2 = Math.PI / 2;
