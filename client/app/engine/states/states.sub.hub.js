@@ -4,6 +4,10 @@
 
 'use strict';
 
+App.Engine.StateManager.prototype.registerHub = function() {
+    this.registerState('hub', this.startHub, this.endHub);
+};
+
 App.Engine.StateManager.prototype.startHub = function(data) {
     var content = '';
     content += '<table class="table table-bordered" style="width:100%" class="noselect">';

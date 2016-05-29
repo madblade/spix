@@ -12,16 +12,17 @@ App.Engine.StateManager = function(app) {
     this.state = '';
 
     // Register actions
-    this.states = {
-        loading: {start: this.startLoading.bind(this), end: this.endLoading.bind(this)},
-        hub: {start: this.startHub.bind(this), end: this.endHub.bind(this)},
-        ingame: {start: this.startIngame.bind(this), end: this.endIngame.bind(this)},
-        settings: {start: this.startSettings.bind(this), end: this.endSettings.bind(this)},
+    this.states = {};
 
-        // TODO other states
-        //pregame: {start: , end: },
-        //postgame: {start: , end: }
-    };
+    this.registerLoading();
+    this.registerHub();
+    this.registerIngame();
+    this.registerSettings();
+};
+
+App.Engine.StateManager.prototype.registerState = function(stateId, start, end) {
+    if (!this.states.hasOwnProperty(stateId))
+        this.states[stateId] = {start: start.bind(this), end: end.bind(this)};
 };
 
 App.Engine.StateManager.prototype.getState = function() {

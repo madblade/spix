@@ -4,6 +4,10 @@
 
 'use strict';
 
+App.Engine.StateManager.prototype.registerLoading = function() {
+    this.registerState('loading', this.startLoading, this.endLoading);
+};
+
 App.Engine.StateManager.prototype.startLoading = function () {
     $('#announce')
         .addClass('sk-folding-cube')

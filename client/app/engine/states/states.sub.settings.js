@@ -4,38 +4,95 @@
 
 'use strict';
 
+App.Engine.StateManager.prototype.registerSettings = function() {
+    this.registerState('settings', this.startSettings, this.endSettings);
+};
+
 App.Engine.StateManager.prototype.startSettings = function() {
     this.app.uiEngine.stopKeyboardListeners();
     this.app.graphicsEngine.stop();
 
-    var applicationSettings = {
-        graphics: this.app.gameEngine.settings,
-        gameplay: this.app.uiEngine.settings,
-        sound: this.app.uiEngine.settings
+    var scope = this;
+
+    var homeHTML = function() {
+        return '<table class="table table-bordered" style="width:100%" class="noselect">' +
+            '<tr id="graphics"><td>graphics</td></tr>' +
+            '<tr id="gameplay"><td>gameplay</td></tr>' +
+            '<tr id="sound"><td>sound</td></tr>' +
+            '</table>';
+    };
+    var graphicsHTML = function() {
+        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+        content += '<tr id="return"><td>return</td></tr>';
+        content += '</table>';
+        return content;
+    };
+    var gameplayHTML = function() {
+        var gameplaySettings = scope.app.uiEngine.settings;
+        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+        for (var s in gameplaySettings) {
+            if (!gameplaySettings.hasOwnProperty(s)) continue;
+            content +='<tr id="graphics"><td>' + gameplaySettings[s] + '</td></tr>';
+        }
+        content += '<tr id="return"><td>return</td></tr>';
+        content += '</table>';
+        return content;
+    };
+    var soundHTML = function() {
+        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+        content += '<tr id="return"><td>return</td></tr>';
+        content += '</table>';
+        return content;
     };
 
-    var content = '';
-    content += '<table class="table table-bordered" style="width:100%" class="noselect">';
-    for (var setting in applicationSettings) {
-        if (!applicationSettings.hasOwnProperty(setting)) continue;
-        content += '<tr><td>' + setting + '</td><td>' + applicationSettings[setting] + '</td></tr>';
-    }
-    content += '</table>';
+    var goGraphics = function() {
+        unlistenHome();
+        $("#announce").empty().append(graphicsHTML());
+        listenReturn();
+    };
+    var goGameplay = function() {
+        unlistenHome();
+        $("#announce").empty().append(gameplayHTML());
+        listenReturn();
+    }.bind(this);
+    var goSound = function() {
+        unlistenHome();
+        $("#announce").empty().append(soundHTML());
+        listenReturn();
+    };
+
+    var listenReturn = function() {
+        $('#return').click(function() {
+            $('#return').off('click');
+            var content = homeHTML();
+            $("#announce").empty().append(content);
+            listenHome();
+        });
+    };
+    var listenHome = function() {
+        $('#graphics').click(function() { goGraphics(); }.bind(this));
+        $('#gameplay').click(function() { goGameplay(); }.bind(this));
+        $('#sound').click(function() { goSound(); }.bind(this));
+    };
+    var unlistenHome = function() {
+        $('#graphics').off('click');
+        $('#gameplay').off('click');
+        $('#sound').off('click');
+    };
 
     // Add content then fade in.
-    var settings = $("#announce");
-    settings.addClass('settings').append(content).fadeIn();
+    $("#announce").addClass('settings').append(homeHTML()).fadeIn();
 
     // Add listeners.
-    $(document).keydown(function(event) {
-        if (!event.keyCode) { return; }
-        event.preventDefault();
+    listenHome();
 
-        switch (event.keyCode) {
-            case this.app.uiEngine.keyControls.escape:
-                this.setState('ingame');
-                break;
-            default:
+    $(document).keydown(function(event) {
+        if (!event.keyCode) {return;}
+        event.preventDefault();
+        if (event.keyCode === this.app.uiEngine.keyControls.escape) {
+            $(document).off('keydown');
+            unlistenHome();
+            this.setState('ingame');
         }
     }.bind(this));
 };
