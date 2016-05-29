@@ -10,10 +10,10 @@ App.Engine.StateManager.prototype.registerSettings = function() {
 
 App.Engine.StateManager.prototype.startSettings = function() {
     this.app.uiEngine.stopKeyboardListeners();
-    this.app.graphicsEngine.stop();
 
     var scope = this;
 
+    // HTML menu getters.
     var homeHTML = function() {
         return '<table class="table table-bordered" style="width:100%" class="noselect">' +
             '<tr id="graphics"><td>Graphics</td></tr>' +
@@ -39,12 +39,12 @@ App.Engine.StateManager.prototype.startSettings = function() {
 
         if (settings.hasOwnProperty('language')) {
             var language =  '<select id="language" class="form-control">' +
-                '<option value="en-US">en-US</option>' +
-                '<option value="en-GB">en-GB</option>' +
+                '<option value="default">Choose your layout:</option>' +
+                '<option value="en">en</option>' +
                 '<option value="fr">fr</option>' +
                 '</select>';
 
-            content +='<tr><td>Language</td>' + '<td>' + language + '</td></tr>';
+            content +='<tr><td>Keyboard layout</td>' + '<td>' + language + '</td></tr>';
         }
 
         content += '<tr id="return"><td colspan="2">Return</td></tr>';
@@ -64,6 +64,7 @@ App.Engine.StateManager.prototype.startSettings = function() {
         return content;
     };
 
+    // Menu navigators.
     var goGraphics = function() {
         unlistenHome();
         $("#announce").empty().append(graphicsHTML());
@@ -76,7 +77,7 @@ App.Engine.StateManager.prototype.startSettings = function() {
         var l = $('#language');
         l.change(function() {
             var selected = l.find('option:selected').val();
-            scope.app.uiEngine.changeLayout(selected);
+            scope.app.uiEngine.changeLayout(selected, true); // Don't restart listeners.
             l.off('change');
         });
     }.bind(this);
@@ -86,6 +87,7 @@ App.Engine.StateManager.prototype.startSettings = function() {
         listenReturn();
     };
 
+    // Listeners.
     var listenReturn = function() {
         $('#return').click(function() {
             $('#return').off('click');
@@ -112,16 +114,15 @@ App.Engine.StateManager.prototype.startSettings = function() {
         $('#sound').off('click');
     };
 
-    // Add content then fade in.
+    // Add content, then fade in and add listeners.
     $("#announce").addClass('settings').append(homeHTML()).fadeIn();
-
-    // Add listeners.
     listenHome();
 
     $(document).keydown(function(event) {
-        if (!event.keyCode) {return;}
+        if (!event.keyCode) { return; }
         event.preventDefault();
         if (event.keyCode === this.app.uiEngine.keyControls.escape) {
+            // Remove listeners and get away from the bike.
             $(document).off('keydown');
             unlistenHome();
             this.setState('ingame');
@@ -138,7 +139,6 @@ App.Engine.StateManager.prototype.endSettings = function() {
         settings.fadeOut(200, function() {
             settings.empty().removeClass('settings');
 
-            app.graphicsEngine.animate();
             app.uiEngine.startKeyboardListeners();
 
             resolve();

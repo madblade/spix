@@ -9,6 +9,9 @@ App.Engine.UI.prototype.setupKeyboard = function() {
     // Try to detect user language
     this.settings.language = window.navigator.userLanguage || window.navigator.language || "en-US";
 
+    // TODO remove this (convenient just for me).
+    this.settings.language = "fr";
+
     // Controls
     this.keyControls = this.getKeyControls(this.settings.language);
     this.activeKeyControls = this.getActiveKeyControls();
@@ -32,10 +35,12 @@ App.Engine.UI.prototype.stopKeyboardListeners = function() {
 /**
  * @param newLayout
  *      Layout language (en or fr) to use from now on.
+ * @param dontRestartListeners
+ *      If the method should keep listeners silent.
  * @param newBinding
  *      Optional. For custom layouts, a new [action, key] binding.
  */
-App.Engine.UI.prototype.changeLayout = function(newLayout, newBinding) {
+App.Engine.UI.prototype.changeLayout = function(newLayout, dontRestartListeners, newBinding) {
     // Prevent keys from being fired when configuring.
     this.stopKeyboardListeners();
 
@@ -54,7 +59,7 @@ App.Engine.UI.prototype.changeLayout = function(newLayout, newBinding) {
     }
 
     // Restore event listeners.
-    this.startKeyboardListeners();
+    if (!dontRestartListeners) this.startKeyboardListeners();
 };
 
 
