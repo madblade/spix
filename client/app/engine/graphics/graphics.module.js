@@ -26,6 +26,7 @@ App.Engine.Graphics = function(app) {
     this.avatar = null;
     this.blocks = [];
     this.entities = {};
+    this.displayAvatar = false;
 
     this.initObjects();
 };
@@ -44,7 +45,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
 
     // Terrain
     var temporaryGeometry = this.getGeometry('plane');
-    temporaryGeometry.rotateX(-Math.PI/2);
+    temporaryGeometry.rotateZ(-Math.PI/2);
     this.temporaryPlane = this.getMesh(
         temporaryGeometry,
         this.getMaterial('basic-black')
@@ -54,7 +55,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
 App.Engine.Graphics.prototype.run = function() {
     // Init objects.
     this.setControls(this.app.uiEngine.getControls('first-person', this.camera).getObject());
-    this.scene.add(this.avatar);
+    if (this.displayAvatar) this.scene.add(this.avatar);
     this.scene.add(this.light);
     this.scene.add(this.temporaryPlane);
     this.positionCameraBehind(this.controls, [0, 0, 0]);

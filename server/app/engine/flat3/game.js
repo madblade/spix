@@ -15,6 +15,7 @@ class Flat3 extends Game {
         // Utility parameters
         this._kind = 'flat3';
         this._refreshRate = 16;
+        this._tt = 0;
 
         // Setup managers.
         this._inputman = Flat3Factory.createUserInput(this);
@@ -49,6 +50,8 @@ class Flat3 extends Game {
 
     //^
     update() {
+        let time = process.hrtime();
+
         this._inputman.update();    // First, update inputs
         this._physics.update();     // Update physical simulation
         this._objectman.update();   // Update board objects
@@ -57,6 +60,9 @@ class Flat3 extends Game {
 
         var n = this._playerman.nbPlayers;
         //console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
+
+        this._tt += 1;
+        if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
     }
 
     save() {

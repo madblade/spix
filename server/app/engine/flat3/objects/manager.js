@@ -93,6 +93,8 @@ class ObjectManager {
     }
 
     entityUpdated(entityId) {
+        // var p = this._entities[entityId].position;
+        // console.log(p[0] + " " + p[1] + " " + p[2]);
         this._updatedEntities[entityId] = true;
     }
 

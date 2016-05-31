@@ -6,8 +6,8 @@
 
 App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
     var scope = this;
-    var PI_2 = Math.PI / 2;
     var ce = this.app.connectionEngine;
+
     return (function() {
         camera.rotation.set(0,0,0);
         var pitchObject = new THREE.Object3D();
@@ -21,10 +21,13 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             if (!scope.threeControlsEnabled) return;
             var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-            yawObject.rotation.y -= movementX * 0.002;
+            yawObject.rotation.z -= movementX * 0.002;
             pitchObject.rotation.x -= movementY * 0.002;
-            pitchObject.rotation.x = Math.max(-PI_2, Math.min(PI_2, pitchObject.rotation.x));
-            ce.send('r', JSON.stringify([yawObject.rotation.y, pitchObject.rotation.x]));
+            pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
+            ce.send('r', JSON.stringify([yawObject.rotation.z, pitchObject.rotation.x]));
+
+            // var p = scope.app.graphicsEngine.avatar.position;
+            // console.log(p.x + " " + p.y + " " + p.z);
         };
 
         document.addEventListener('mousemove', onMouseMove, false);
