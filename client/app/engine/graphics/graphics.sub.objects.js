@@ -6,9 +6,15 @@
 
 App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
 
-    //console.log("position: " + c);
-    //console.log("blocks: " + b);
-    //console.log("entities: " + e);
+    console.log("position/rotation: ");
+    console.log(cp);
+    console.log(cr);
+
+    console.log("\nblocks: ");
+    console.log(b);
+
+    console.log("\nentities: ");
+    console.log(e);
 
     if (e !== undefined && e !== null)
     e.forEach(function(updatedEntity) {

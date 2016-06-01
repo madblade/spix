@@ -14,22 +14,38 @@ class Chunk {
         this._capacity = this._xSize * this._ySize * this._zSize;
 
         // Blocks. x, then y, then z.
-        this._blocks = '';
-        this.fillChunk(48, '1');
+        this._blocks = new Uint8Array(this._capacity); // '';
+        this._surfaceBlocks = [new Uint8Array(), new Uint8Array(), new Uint8Array()];
+        this._connectedComponents = [];
+
+        // Events.
+        //this._lastUpdated = process.hrtime();
+
+        this.fillChunk(48, 1);
+        this.computeSurfaceBlocks();
+        this.computeConnectedComponents();
     }
 
     get blocks() { return this._blocks; }
+
+    computeSurfaceBlocks() {
+        // TODO optimize during generation.
+    }
+
+    computeConnectedComponents() {
+        // TODO extract components from surface blocks and push them into connected components.
+    }
 
     // Set all cubes until a given height to a given id.
     fillChunk(toZ, blockId) {
         if (typeof toZ !== "number") return;
         if (typeof blockId !== "string" || blockId.length !== 1) return;
-        var blocks = '';
+
         const numberOfBlocksToFill = this._xSize * this._ySize * toZ;
         const numberOfBlocks = this._capacity;
 
-        for (let i = 0; i < numberOfBlocksToFill; ++i) blocks += blockId;
-        for (let i = numberOfBlocksToFill; i < numberOfBlocks; ++i) blocks += '0';
+        for (let i = 0; i < numberOfBlocksToFill; ++i) blocks[i] = blockId;
+        for (let i = numberOfBlocksToFill; i < numberOfBlocks; ++i) blocks[i] = 0;
 
         this._blocks = blocks;
     }

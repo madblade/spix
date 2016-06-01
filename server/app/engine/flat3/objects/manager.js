@@ -60,6 +60,7 @@ class ObjectManager {
     }
 
     generate() {
+        // TODO chrono and time out.
         return new Promise((resolve) => {
             this._chunks = Generator.generateFlatWorld();
             resolve();
