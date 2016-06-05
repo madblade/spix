@@ -20,19 +20,21 @@ App.Engine.Game.prototype.run = function() {
     console.log('Game effectively started.');
 };
 
-App.Engine.Game.prototype.update = function(data) {
+App.Engine.Game.prototype.updateChunks = function(data) {
     // TODO manage asynch with a flag?
-    if (this.isRunning) {
-        this.position = data[0];
-        this.rotation = data[1];
-        this.blocks = data[2];
-        this.entities = data[3];
-        this.updateGraphics(this.position, this.rotation, this.blocks, this.entities);
-    }
+    if (!this.isRunning) return;
+
+    this.blocks = data;
+    this.app.graphicsEngine.updateGraphicChunks(this.blocks);
 };
 
-App.Engine.Game.prototype.updateGraphics = function(c, r, b, e) {
-    this.app.graphicsEngine.update(c, r, b, e);
+App.Engine.Game.prototype.updateEntities = function(data) {
+    if (!this.isRunning) return;
+
+    this.position = data[0];
+    this.rotation = data[1];
+    this.entities = data[2];
+    this.app.graphicsEngine.updateGraphicEntities(this.position, this.rotation, this.entities);
 };
 
 App.Engine.Game.prototype.endGame = function() {

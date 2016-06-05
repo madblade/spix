@@ -50,6 +50,7 @@ class Flat3 extends Game {
 
     //^
     update() {
+        // TODO maybe split in several loops (purposes).
         let time = process.hrtime();
 
         this._inputman.update();    // First, update inputs

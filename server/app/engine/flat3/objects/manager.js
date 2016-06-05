@@ -76,6 +76,14 @@ class ObjectManager {
         this._updatedEntities = {};
     }
 
+    updateChunksTransmitted() {
+        this._updatedChunks = {};
+    }
+
+    updateEntitiesTransmitted() {
+        this._updatedEntities = {};
+    }
+
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
         p.avatar = ObjectFactory.createAvatar(id);

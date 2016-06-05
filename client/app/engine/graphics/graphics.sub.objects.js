@@ -4,14 +4,11 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
+App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
     console.log("position/rotation: ");
     console.log(cp);
     console.log(cr);
-
-    console.log("\nblocks: ");
-    console.log(b);
 
     console.log("\nentities: ");
     console.log(e);
@@ -33,7 +30,7 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
         currentEntity.position.y = updatedEntity._position[1];
         currentEntity.position.z = updatedEntity._position[2];
 
-        currentEntity.rotation.y = updatedEntity._rotation[0];
+        currentEntity.rotation.z = updatedEntity._rotation[0];
 
     }.bind(this));
 
@@ -43,12 +40,17 @@ App.Engine.Graphics.prototype.update = function(cp, cr, b, e) {
         this.avatar.position.y = cp[1];
         this.avatar.position.z = cp[2];
 
-        this.avatar.rotation.y = cr[0];
+        this.avatar.rotation.z = cr[0];
 
         var camera = this.controls; // Camera wrapper actually
         this.positionCameraBehind(camera, cp);
     }
     // Compare b with this.blocks.
+};
+
+App.Engine.Graphics.prototype.updateGraphicChunks = function(b) {
+    // TODO build surface from blocks.
+    console.log("Updating voxels...");
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {

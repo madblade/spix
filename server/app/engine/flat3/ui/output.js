@@ -15,38 +15,66 @@ class UserOutput {
         player.send('stamp', this.extractConcernedChunks(player));
     }
 
-    update(world) {
-        // Get updates from objects
+    update() {
+        this.updateChunks();
+        this.updateEntities();
+        this.updateMeta();
+
+        // Tell object manager we have done update.
+        this._game.objectman.updateTransmitted();
+
+    }
+
+    updateChunks()  {
         var updatedChunks = this._game.objectman.updatedChunks;
+        if (Object.keys(updatedChunks).length < 1) return;
+
+        // TODO optimize loading
+
+        this._game.playerman.forEach((p) => {
+            if (UserOutput.playerConcernedByChunks(p, updatedChunks)) {
+                p.send('chk', this.extractConcernedChunks(p));
+            }
+        });
+
+        // Tell object manager we have done update.
+        this._game.objectman.updateChunksTransmitted();
+    }
+
+    updateEntities() {
         var updatedEntities = this._game.objectman.updatedEntities;
-        if (Object.keys(updatedChunks).length < 1 && Object.keys(updatedEntities).length < 1) return;
+        if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
         this._game.playerman.forEach((p) => {
-            if (UserOutput.playerConcerned(p, updatedChunks, updatedEntities)) {
-                p.send('stamp',
+            if (UserOutput.playerConcernedByEntities(p, updatedEntities)) {
+                p.send('ent',
                     [
                         p.avatar.position,
                         p.avatar.rotation,
-                        this.extractConcernedChunks(p),
                         this.extractConcernedEntities(p)
                     ]
                 );
             }
         });
 
-        // TODO loading...
-
         // Tell object manager we have done update.
-        this._game.objectman.updateTransmitted();
+        this._game.objectman.updateEntitiesTransmitted();
+    }
 
-        // TODO manage true broadcast events.
+    // TODO manage true broadcast events.
+    updateMeta() {
         // this._game.broadcast('chat', 'text');
     }
 
-    static playerConcerned(player, chunks, entities) {
+    static playerConcernedByChunks(player, chunks) {
+        // TODO extract connected subsurface.
+        return Object.keys(chunks).length > 0;
+    }
+
+    static playerConcernedByEntities(player, entities) {
         // TODO function of player position.
-        return Object.keys(chunks).length > 0 || Object.keys(entities).length > 0;
+        return Object.keys(entities).length > 0;
     }
 
     extractConcernedEntities(player) {
