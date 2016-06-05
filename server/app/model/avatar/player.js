@@ -11,6 +11,8 @@ class Player {
     constructor(user, game) {
         this._user = user;
         this._game = game;
+        // May be given an avatar when logged to a game.
+        this._avatar = undefined;
         this._playercon = Factory.createPlayerCon(user.connection.socket);
     }
 

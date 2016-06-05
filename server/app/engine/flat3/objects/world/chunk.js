@@ -6,12 +6,13 @@
 
 class Chunk {
 
-    constructor() {
+    constructor(xSize, ySize, zSize, chunkId) {
         // Dimensions.
-        this._xSize = 8;
-        this._ySize = 8;
-        this._zSize = 256;
+        this._xSize = xSize;
+        this._ySize = ySize;
+        this._zSize = zSize;
         this._capacity = this._xSize * this._ySize * this._zSize;
+        this._chunkId = chunkId;
 
         // Blocks. x, then y, then z.
         this._blocks = new Uint8Array(this._capacity); // '';
@@ -27,6 +28,7 @@ class Chunk {
     }
 
     get blocks() { return this._blocks; }
+    get chunkId() { return this._chunkId; }
 
     computeSurfaceBlocks() {
         // TODO optimize during generation.
@@ -58,7 +60,7 @@ class Chunk {
 
     what(x, y, z) {
         var id = this._toId(x, y, z);
-        if (id >= this._capacity) return '0';
+        if (id >= this._capacity) return 0;
 
         return this._blocks[id];
     }
@@ -75,7 +77,7 @@ class Chunk {
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
-        this._blocks[id] = '0';
+        this._blocks[id] = 0;
     }
 }
 

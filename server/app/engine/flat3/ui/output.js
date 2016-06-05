@@ -11,8 +11,10 @@ class UserOutput {
     }
 
     init(player) {
+        var p = player;
         console.log('Init a new player on game ' + this._game.gameId + '.');
-        player.send('stamp', this.extractConcernedChunks(player));
+        p.send('chk', this.extractChunksForNewPlayer(p));
+        p.send('ent', [p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]);
     }
 
     update() {
@@ -27,10 +29,9 @@ class UserOutput {
 
         // TODO optimize loading
 
-        this._game.worldman.forEach((p) => {
-            if (UserOutput.playerConcernedByChunks(p, updatedChunks)) {
-                p.send('chk', this.extractConcernedChunks(p));
-            }
+        this._game.playerman.forEach((p) => {
+            if (!UserOutput.playerConcernedByChunks(p, updatedChunks)) return;
+            p.send('chk', this.extractConcernedChunks(p));
         });
 
         // Tell object manager we have done update.
@@ -43,15 +44,8 @@ class UserOutput {
 
         // Broadcast updates.
         this._game.playerman.forEach((p) => {
-            if (UserOutput.playerConcernedByEntities(p, updatedEntities)) {
-                p.send('ent',
-                    [
-                        p.avatar.position,
-                        p.avatar.rotation,
-                        this.extractConcernedEntities(p)
-                    ]
-                );
-            }
+            if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
+            p.send('ent', [p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]);
         });
 
         // Tell object manager we have done update.
@@ -74,11 +68,15 @@ class UserOutput {
     }
 
     extractConcernedEntities(player) {
-        return (this._game.entityman.extractEntities(player));
+        return (this._game.entityman.extractEntitiesInRange(player));
     }
 
     extractConcernedChunks(player) {
-        return (this._game.worldman.extractChunks(player));
+        return (this._game.worldman.extractUpdatedChunks(player));
+    }
+
+    extractChunksForNewPlayer(player) {
+        return (this._game.worldman.extractChunksForNewPlayer(player));
     }
 
 }

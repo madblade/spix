@@ -6,13 +6,6 @@
 
 App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
-    console.log("position/rotation: ");
-    console.log(cp);
-    console.log(cr);
-
-    console.log("\nentities: ");
-    console.log(e);
-
     if (e !== undefined && e !== null)
     e.forEach(function(updatedEntity) {
         var currentEntity;
@@ -28,17 +21,17 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
         currentEntity.position.x = updatedEntity._position[0];
         currentEntity.position.y = updatedEntity._position[1];
-        currentEntity.position.z = updatedEntity._position[2];
+        currentEntity.position.z = updatedEntity._position[2]+0.5;
 
         currentEntity.rotation.z = updatedEntity._rotation[0];
 
     }.bind(this));
 
-    if (cp !== undefined) {
+    if (cp !== undefined && this.controls !== null) {
         // TODO exclude player according to camera type.
         this.avatar.position.x = cp[0];
         this.avatar.position.y = cp[1];
-        this.avatar.position.z = cp[2];
+        this.avatar.position.z = cp[2]+0.5;
 
         this.avatar.rotation.z = cr[0];
 
@@ -50,13 +43,13 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(b) {
     // TODO build surface from blocks.
-    console.log("Updating voxels...");
+    console.log(b);
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
     cameraWrapper.position.x = vector[0];
     cameraWrapper.position.y = vector[1]; // + 10;
-    cameraWrapper.position.z = vector[2] + 5;
+    cameraWrapper.position.z = vector[2] + 1;
 };
 
 App.Engine.Graphics.prototype.removeObjectFromScene = function(object3D) {

@@ -58,7 +58,8 @@ App.Engine.Graphics.prototype.run = function() {
     if (this.displayAvatar) this.scene.add(this.avatar);
     this.scene.add(this.light);
     this.scene.add(this.temporaryPlane);
-    this.positionCameraBehind(this.controls, [0, 0, 0]);
+    this.positionCameraBehind(this.controls,
+        [this.avatar.position.x, this.avatar.position.y, this.avatar.position.z]);
 
     // Init animation.
     this.animate();

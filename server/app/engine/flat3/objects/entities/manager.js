@@ -26,7 +26,7 @@ class EntityManager {
     }
 
     // TODO manage disappearances
-    extractEntities(player) {
+    extractEntitiesInRange(player) {
         var entities = [];
         for (var eid in this._entities) {
             if (!this._entities.hasOwnProperty(eid)) continue;

@@ -22,6 +22,9 @@ class WorldManager {
     }
 
     get allChunks() { return this._chunks; }
+    get chunkDimensionX() { return this._xSize; }
+    get chunkDimensionY() { return this._ySize; }
+    get chunkDimensionZ() { return this._zSize; }
 
     get updatedChunks() {
         var updatedChuks = [];
@@ -32,14 +35,64 @@ class WorldManager {
         return updatedChuks;
     }
 
-    extractChunks(player) {
+    extractUpdatedChunks(player) {
         var chunks = [];
+        // TODO include a distance test.
         for (var eid in this._updatedChunks) {
             if (!this._updatedChunks.hasOwnProperty(eid) ||
-                !this._chunks.hasOwnProperty(eid)) continue;
+                !this._chunks.hasOwnProperty(eid) ||
+                !player.avatar.loadedChunks.hasOwnProperty(eid)) continue;
 
             chunks.push(this._chunks[eid]);
         }
+        return chunks;
+    }
+
+    extractChunksInRange(player) {
+        var chunks = [];
+
+        // From player position, find concerned chunks.
+        var av = player.avatar;
+        const pos = av.position;
+
+        // Belonging chunk coordinates.
+        const x = Math.floor(pos[0]); const i = (x - x % this.chunkDimensionX) / this.chunkDimensionX;
+        const y = Math.floor(pos[1]); const j = (y - y % this.chunkDimensionY) / this.chunkDimensionY;
+        const z = Math.floor(pos[2]); const k = (z - z % this.chunkDimensionZ) / this.chunkDimensionZ;
+        // (Dreaming of cubic chunks)
+
+        var ld = [];
+        for (var eid in av.loadedChunks) {
+            if (!av.loadedChunks.hasOwnProperty(eid) || !this._chunks.hasOwnProperty(eid)) continue;
+            ld.push(eid);
+        }
+        // TODO check which chunks remain to load, and load them.
+        // TODO give a bit more smartness to avatar (knows which chunks to check).
+
+        return chunks;
+    }
+
+    extractChunksForNewPlayer(player) {
+        var chunks = [];
+
+        // From player position, find concerned chunks.
+        var av = player.avatar;
+        const pos = av.position;
+
+        // Belonging chunk coordinates.
+        const x = Math.floor(pos[0]); const i = (x - x % this.chunkDimensionX) / this.chunkDimensionX;
+        const y = Math.floor(pos[1]); const j = (y - y % this.chunkDimensionY) / this.chunkDimensionY;
+        const z = Math.floor(pos[2]); const k = (z - z % this.chunkDimensionZ) / this.chunkDimensionZ;
+
+        var chunkId = i+','+j;
+        if (!this._chunks.hasOwnProperty(chunkId)) {
+            this._chunks[chunkId] = Generator.generateFlatChunk(
+                this.chunkDimensionX, this.chunkDimensionY, this.chunkDimensionZ, chunkId);
+        }
+
+        chunks.push(this._chunks[chunkId]);
+        av.setChunkAsLoaded(chunkId);
+
         return chunks;
     }
 

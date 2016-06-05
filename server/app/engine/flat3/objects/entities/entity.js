@@ -48,9 +48,9 @@ class Entity {
     }
 
     move(x, y, z) {
-        this._position[0] += x;
-        this._position[1] += y;
-        this._position[2] += z;
+        this._position[0] += 0.1 * x;
+        this._position[1] += 0.1 * y;
+        this._position[2] += 0.1 * z;
     }
 
     rotate(p, y) {

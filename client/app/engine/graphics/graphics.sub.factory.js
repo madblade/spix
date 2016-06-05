@@ -21,7 +21,7 @@ App.Engine.Graphics.prototype.getRenderer = function() {
 };
 
 App.Engine.Graphics.prototype.getCamera = function() {
-    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
+    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 100000);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
     return camera;
@@ -60,15 +60,15 @@ App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
 
     switch (whatGeometry) {
         case 'plane':
-            geometry = new THREE.PlaneGeometry(100, 100, 100, 100);
+            geometry = new THREE.PlaneGeometry(32, 32, 32, 32);
             break;
 
         case 'box':
-            geometry = new THREE.BoxGeometry(5, 5, 5);
+            geometry = new THREE.BoxGeometry(0.5, 0.5, 1);
             break;
 
         default:
-            geometry = new THREE.BoxGeometry(5, 5, 5);
+            geometry = new THREE.BoxGeometry(0.5, 0.5, 1);
     }
 
     return geometry;
@@ -83,11 +83,11 @@ App.Engine.Graphics.prototype.getLight = function(whatLight) {
 
     switch (whatLight) {
         case 'hemisphere':
-            light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+            light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
             break;
 
         default:
-            light = new THREE.AmbientLight( 0x404040 );
+            light = new THREE.AmbientLight(0x404040);
     }
 
     return light;
