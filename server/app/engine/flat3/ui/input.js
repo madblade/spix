@@ -35,13 +35,13 @@ class UserInput {
     move(meta, avatar) {
         var hasMoved = true;
         switch (meta) {
-            case 'f' : avatar.move(0, 1, 0);
+            case 'f' : avatar.moveForward();
                 break;
-            case 'r' : avatar.move(1, 0, 0);
+            case 'r' : avatar.moveRight();
                 break;
-            case 'l' : avatar.move(-1, 0, 0);
+            case 'l' : avatar.moveLeft();
                 break;
-            case 'b' : avatar.move(0, -1, 0);
+            case 'b' : avatar.moveBackwards();
                 break;
             default: hasMoved = false;
         }

@@ -27,27 +27,29 @@ class Entity {
         this._position = null;
     }
 
+    moveForward() {
+        const theta = this._rotation[0];
+        this.move(-Math.sin(theta), Math.cos(theta), 0);
+    }
+
+    moveRight() {
+        const theta = this._rotation[0];
+        this.move(Math.cos(theta), Math.sin(theta), 0);
+    }
+
+    moveLeft() {
+        const theta = this._rotation[0];
+        this.move(-Math.cos(theta), -Math.sin(theta), 0);
+    }
+
+    moveBackwards() {
+        const theta = this._rotation[0];
+        this.move(Math.sin(theta), -Math.cos(theta), 0);
+    }
+
     move(x, y, z) {
-        var theta = this._rotation[0];
-        var sx, sy;
-        var tx, ty;
-        var cas = 0;
-
-        if (y===1) {sx = -1; sy = 1;}
-        else if (y===-1) {sx = 1; sy = -1}
-        else if (x===1) {sx = 1; sy = 1; cas=1;}
-        else if (x===-1) {sx = -1; sy = -1; cas=1;}
-
-        if (cas===0) {
-            tx = sx*Math.sin(theta);
-            ty = sy*Math.cos(theta);
-        } else if (cas===1) {
-            tx = sx*Math.cos(theta);
-            ty = sy*Math.sin(theta);
-        }
-
-        this._position[0] += tx;
-        this._position[1] += ty;
+        this._position[0] += x;
+        this._position[1] += y;
         this._position[2] += z;
     }
 
