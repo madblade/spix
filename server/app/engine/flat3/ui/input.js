@@ -47,7 +47,7 @@ class UserInput {
         }
 
         // Notify an entity was updated.
-        if (hasMoved) this._game.objectman.entityUpdated(avatar.id);
+        if (hasMoved) this._game.entityman.entityUpdated(avatar.id);
     };
 
     rotate(meta, avatar) {
@@ -56,7 +56,7 @@ class UserInput {
         var p = parsed[0], y = parsed[1];
         if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
             avatar.rotate(parsed[0], parsed[1]);
-            this._game.objectman.entityUpdated(avatar.id);
+            this._game.entityman.entityUpdated(avatar.id);
         }
     }
 

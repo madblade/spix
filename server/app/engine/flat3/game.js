@@ -20,25 +20,26 @@ class Flat3 extends Game {
         // Setup managers.
         this._inputman = Flat3Factory.createUserInput(this);
         this._physics = Flat3Factory.createPhysics();
-        this._objectman = Flat3Factory.createObjectManager();
+        this._entityman = Flat3Factory.createEntityManager();
+        this._worldman =  Flat3Factory.createWorldManager();
         this._ai = Flat3Factory.createAI();
         this._outputman = Flat3Factory.createUserOutput(this);
         // super:_playerman
 
         // Generate then listen players.
-        this._objectman.generate().then(() => this.configurePlayerManager());
+        this._worldman.generate().then(() => this.configurePlayerManager());
     }
 
     configurePlayerManager() {
         this._playerman.setAddPlayerBehaviour((p) => {
-            this._objectman.spawnPlayer(p);
+            this._entityman.spawnPlayer(p);
             this._inputman.listenPlayer(p);
             this._outputman.init(p);
         });
 
         this._playerman.setRemovePlayerBehaviour((p) => {
             this._inputman.removePlayer(p);
-            this._objectman.despawnPlayer(p);
+            this._entityman.despawnPlayer(p);
         });
 
         this.ready = true;
@@ -46,18 +47,20 @@ class Flat3 extends Game {
 
     // Model
     get playerman() { return this._playerman; }
-    get objectman() { return this._objectman; }
+    get entityman() { return this._entityman; }
+    get worldman() { return this._worldman; }
 
     //^
     update() {
         // TODO maybe split in several loops (purposes).
         let time = process.hrtime();
 
-        this._inputman.update();    // First, update inputs
-        this._physics.update();     // Update physical simulation
-        this._objectman.update();   // Update board objects
-        this._ai.update();          // Update perceptions, intents
-        this._outputman.update();   // Send updates
+        this._inputman.update();    // First, update inputs.
+        this._physics.update();     // Update physical simulation.
+        this._entityman.update();   // Update entities.
+        this._worldman.update();    // Update blocks.
+        this._ai.update();          // Update perceptions, intents.
+        this._outputman.update();   // Send updates.
 
         var n = this._playerman.nbPlayers;
         //console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");

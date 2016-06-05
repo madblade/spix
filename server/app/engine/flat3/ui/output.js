@@ -19,30 +19,26 @@ class UserOutput {
         this.updateChunks();
         this.updateEntities();
         this.updateMeta();
-
-        // Tell object manager we have done update.
-        this._game.objectman.updateTransmitted();
-
     }
 
     updateChunks()  {
-        var updatedChunks = this._game.objectman.updatedChunks;
+        var updatedChunks = this._game.worldman.updatedChunks;
         if (Object.keys(updatedChunks).length < 1) return;
 
         // TODO optimize loading
 
-        this._game.playerman.forEach((p) => {
+        this._game.worldman.forEach((p) => {
             if (UserOutput.playerConcernedByChunks(p, updatedChunks)) {
                 p.send('chk', this.extractConcernedChunks(p));
             }
         });
 
         // Tell object manager we have done update.
-        this._game.objectman.updateChunksTransmitted();
+        this._game.worldman.updateChunksTransmitted();
     }
 
     updateEntities() {
-        var updatedEntities = this._game.objectman.updatedEntities;
+        var updatedEntities = this._game.entityman.updatedEntities;
         if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
@@ -59,7 +55,7 @@ class UserOutput {
         });
 
         // Tell object manager we have done update.
-        this._game.objectman.updateEntitiesTransmitted();
+        this._game.entityman.updateEntitiesTransmitted();
     }
 
     // TODO manage true broadcast events.
@@ -78,11 +74,11 @@ class UserOutput {
     }
 
     extractConcernedEntities(player) {
-        return (this._game.objectman.extractEntities(player));
+        return (this._game.entityman.extractEntities(player));
     }
 
     extractConcernedChunks(player) {
-        return (this._game.objectman.extractChunks(player));
+        return (this._game.worldman.extractChunks(player));
     }
 
 }

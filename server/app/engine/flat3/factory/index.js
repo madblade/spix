@@ -8,7 +8,8 @@ import Physics from '../physics';
 import UserInput from '../ui/input';
 import UserOutput from '../ui/output';
 import AI from '../ai';
-import ObjectManager from '../objects/manager';
+import EntityManager from '../objects/entities/manager';
+import WorldManager from '../objects/world/manager';
 
 class Flat3Factory {
 
@@ -28,8 +29,12 @@ class Flat3Factory {
         return new AI();
     }
 
-    static createObjectManager() {
-        return new ObjectManager();
+    static createEntityManager() {
+        return new EntityManager();
+    }
+
+    static createWorldManager() {
+        return new WorldManager();
     }
 
 }
