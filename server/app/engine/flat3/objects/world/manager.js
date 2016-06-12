@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Generator from '../../ai/generator';
+import Generator from './generator';
 import Factory from '../world/factory';
 
 class WorldManager {

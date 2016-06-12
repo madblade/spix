@@ -8,8 +8,8 @@ import Chunk from './chunk';
 
 class WorldFactory {
 
-    static createChunk() {
-        return new Chunk();
+    static createChunk(x, y, z, id) {
+        return new Chunk(x, y, z, id);
     }
 
 }

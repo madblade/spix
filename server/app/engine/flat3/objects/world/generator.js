@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ObjectFactory from '../objects/world/factory';
+import WorldFactory from './factory';
 
 class Generator {
 
@@ -18,7 +18,7 @@ class Generator {
     }
 
     static generateFlatChunk(x, y, z, i, j) {
-        return ObjectFactory.createChunk(x, y, z, i+','+j);
+        return WorldFactory.createChunk(x, y, z, i+','+j);
     }
 
     static generatePerlinWorld() {

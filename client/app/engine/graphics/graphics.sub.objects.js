@@ -43,7 +43,7 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(b) {
     // TODO build surface from blocks.
-    console.log(b);
+    console.log("Updating chunk.");
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
