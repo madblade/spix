@@ -18,9 +18,9 @@ class Entity {
 
     get rotation() { return this._rotation; }
 
-    spawn() {
-        this._position = [0,0,0];
-        this._rotation = [0,0];
+    spawn(position) {
+        this._position = position;
+        this._rotation = [0, Math.PI/2];
     }
 
     die() {

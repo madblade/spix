@@ -29,6 +29,8 @@ class Chunk {
     }
 
     get blocks() { return this._blocks; }
+    get surfaceBlocks() { return this._surfaceBlocks; }
+    get connectedComponents() { return this._fastConnectedComponents; }
     get chunkId() { return this._chunkId; }
 
     computeSurfaceBlocksFromScratch() {
@@ -209,7 +211,7 @@ class Chunk {
     }
 
     _toId(x, y, z) {
-        var id = x + y * this._xSize + z * this._ySize;
+        var id = x + y * this._xSize + z * this._xSize * this._ySize;
         if (id >= this._capacity) console.log("WARN: invalid request coordinates.");
         return id;
     }
@@ -217,7 +219,6 @@ class Chunk {
     what(x, y, z) {
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return 0;
-
         return this._blocks[id];
     }
 
@@ -225,7 +226,6 @@ class Chunk {
         if (typeof blockId !== "string" || blockId.length !== 1) return;
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
-
         this._blocks[id] = blockId;
     }
 

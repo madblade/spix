@@ -9,7 +9,9 @@ import CollectionUtil from '../../../../math/collections/util';
 
 class EntityManager {
 
-    constructor() {
+    constructor(worldManager) {
+        this._worldManager = worldManager;
+
         // Objects.
         this._entities = {};
 
@@ -30,9 +32,7 @@ class EntityManager {
         var entities = [];
         for (var eid in this._entities) {
             if (!this._entities.hasOwnProperty(eid)) continue;
-
             if (this._entities[eid]._id === player.avatar._id) continue;
-
             entities.push(this._entities[eid]);
         }
         return entities;
@@ -45,7 +45,7 @@ class EntityManager {
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
         p.avatar = EntityFactory.createAvatar(id);
-        p.avatar.spawn();
+        p.avatar.spawn(this._worldManager.getFreePosition());
         this._entities[id] = p.avatar;
     }
 

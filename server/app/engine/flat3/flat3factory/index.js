@@ -29,8 +29,8 @@ class Flat3Factory {
         return new AI();
     }
 
-    static createEntityManager() {
-        return new EntityManager();
+    static createEntityManager(worldManager) {
+        return new EntityManager(worldManager);
     }
 
     static createWorldManager() {
