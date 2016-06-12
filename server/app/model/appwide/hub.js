@@ -34,10 +34,10 @@ class Hub {
     validateRequest() {
         // TODO think of different criteria
         var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
-        var res = nbGames < 5;
-        console.log(nbGames + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
-        if (!res) console.log('Invalid game creation request.');
-        return res;
+        var validation = nbGames < 5;
+        console.log(nbGames>0?nbGames:'No' + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
+        if (!validation) console.log('Invalid game creation request.');
+        return validation;
     }
 
     requestNewGame(user, kind) {

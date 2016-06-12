@@ -59,7 +59,7 @@ class UserConnection {
 
     handleCreateGame(kind) {
         var created = this._user.requestNewGame(kind);
-        if (created) console.log('created new game');
+        if (created) console.log('Created new game.');
         // TODO broadcast to those who are in hub, dynamically update hub (hhhh....)
         return created;
     }
