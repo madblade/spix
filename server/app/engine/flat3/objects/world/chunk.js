@@ -98,9 +98,10 @@ class Chunk {
         }
 
         // Tests diagonal neighbours for non-existence.
+        // TODO check if isNot()
         function free(d, cc, b) {
             let bm = 0;
-            switch(d) {
+            switch (d) {
                 case 0: bm = b-1; // iM
                     return (is(0, cc, b) && (
                         (!is(1, cc, bm) && !is(1, cc, b)) || (!is(4, cc, bm) && !is(4, cc, b)) || // j
@@ -120,6 +121,17 @@ class Chunk {
             }
         }
 
+        // Test diagonal neighbours for linkage.
+        function arc(d, cc, b) {
+            let bm = 0;
+            switch (d) {
+                case 0: return;
+                case 1: return;
+                case 2: return;
+                default: return false;
+            }
+        }
+
         // Compute borders.
         let ccid = 1;
         for (let z in sbs) {
@@ -127,11 +139,13 @@ class Chunk {
             let layer = sbs[z];
             for (let b = 0; b < layer.length; ++b) {
                 let lex = layer[b] + z*ijS;
+                // TODO extract triple faces.
                 connectedComponents[lex] = ccid++;
             }
         }
 
         // PreMerge.
+        // TODO adapt for faces triple array.
         var merger = [];
         for (let z in sbs) {
             if (!sbs.hasOwnProperty(z)) continue;

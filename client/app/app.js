@@ -77,11 +77,11 @@ App.Core.prototype.startGame = function(gameType, gameId) {
 
     // Start model loop.
     this.gameEngine.run(gameType);
+    this.graphicsEngine.run();
 };
 
 // Run game modules.
 App.Core.prototype.runGame = function() {
     this.uiEngine.run();
-    this.graphicsEngine.run();
     this.soundEngine.run();
 };
