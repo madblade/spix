@@ -11,8 +11,6 @@ class GameFactory {
     static createGame(hub, kind, gameId, connector) {
         var game;
         switch (kind) {
-            case 'flat2':
-                break;
             case 'flat3':
                 game = new Flat3(hub, gameId, connector);
                 break;
