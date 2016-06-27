@@ -28,6 +28,9 @@ class Chunk {
         this.fillChunk(48, 1);
         this.computeSurfaceBlocksFromScratch();
         this.computeConnectedComponents();
+
+        console.log("Computed.");
+        //console.log(this._fastConnectedComponents);
     }
 
     // Getters
