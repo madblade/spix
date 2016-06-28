@@ -11,7 +11,8 @@ App.Engine.Graphics.prototype.isChunkLoaded = function(chunkId) {
 App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     this.chunks[chunkId] = {};
     var c = this.chunks[chunkId];
-    c.geometry = new THREE.BufferGeometry();
+    c.geometries = [new THREE.BufferGeometry()];
+    c.whereToFindFace = {};
 
     var currentComponent;
     for (var cid in components) {
@@ -31,9 +32,12 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     var ijS = this.chunkSizeX * this.chunkSizeY;
     var iS = this.chunkSizeX;
     var triangles = 2 * currentComponent.length;
-    var positions = new Float32Array(triangles * 3 * 3);
-    var normals = new Float32Array(triangles * 3 * 3);
-    var colors = new Float32Array(triangles * 3 * 3);
+    var sunCapacity = Math.floor(3/2 * triangles);
+    c.capacities = [sunCapacity];
+    // TODO buffer resize optimization
+    var positions = new Float32Array(sunCapacity * 3 * 3);
+    var normals = new Float32Array(sunCapacity * 3 * 3);
+    var colors = new Float32Array(sunCapacity * 3 * 3);
 
     var pA = new THREE.Vector3();
     var pB = new THREE.Vector3();
@@ -50,6 +54,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     var i = 0;
     for (var f = 0; f < currentComponent.length; ++f) {
         var faceId = Math.abs(currentComponent[f]);
+        c.whereToFindFace[faceId] = 0; // In which geometry a given face is.
         var normal = faceId > 0;
         if (faceId < ijS) {
             ii = faceId % iS;
@@ -206,27 +211,32 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
         i += 18;
     }
 
-    c.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-    c.geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    c.geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-    c.geometry.computeBoundingSphere();
+    c.geometries[0].addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    c.geometries[0].addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    c.geometries[0].addAttribute('color', new THREE.BufferAttribute(colors, 3));
+    c.geometries[0].computeBoundingSphere();
 
     // Make material and mesh.
-    c.material = new THREE.MeshPhongMaterial({
+    c.materials = [new THREE.MeshPhongMaterial({
         color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
         side: THREE.DoubleSide, vertexColors: THREE.VertexColors
-    });
-    c.mesh = new THREE.Mesh(c.geometry, c.material);
+    })];
+    c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 
     // Add to scene.
-    this.scene.add(c.mesh);
-};
-
-// TODO dynamically remove chunks
-App.Engine.Graphics.prototype.removeChunk = function(chunkId) {
-    delete this.chunks[chunkId];
+    this.scene.add(c.meshes[0]);
 };
 
 App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
+};
+
+// TODO dynamically remove chunks with GreyZone
+App.Engine.Graphics.prototype.removeChunk = function(chunkId) {
+    var meshes = this.chunks[chunkId].meshes;
+    for (var meshId in meshes) {
+        if (!meshes.hasOwnProperty(meshId)) continue;
+        this.scene.remove(meshes[meshId]);
+    }
+    delete this.chunks[chunkId];
 };
