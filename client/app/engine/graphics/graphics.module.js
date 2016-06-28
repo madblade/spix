@@ -21,35 +21,7 @@ App.Engine.Graphics = function(app) {
     this.container = document.getElementById('container');
     this.container.appendChild(this.renderer.domElement);
 
-    // Semi-model objects
-    this.light = null; // Only 1 for the moment.
-    this.avatar = null;
-    this.blocks = [];
-    this.entities = {};
-    this.displayAvatar = false;
-
     this.initObjects();
-};
-
-// Setup basic objects (terrain, avatar).
-App.Engine.Graphics.prototype.initObjects = function() {
-    // Lights
-    this.light = this.getLight('hemisphere');
-    this.light.position.set( 0.5, 1, 0.75 );
-
-    // Player
-    this.avatar = this.getMesh(
-        this.getGeometry('box'),
-        this.getMaterial('flat-phong')
-    );
-
-    // Terrain
-    var temporaryGeometry = this.getGeometry('plane');
-    temporaryGeometry.rotateZ(-Math.PI/2);
-    this.temporaryPlane = this.getMesh(
-        temporaryGeometry,
-        this.getMaterial('basic-black')
-    );
 };
 
 App.Engine.Graphics.prototype.run = function() {

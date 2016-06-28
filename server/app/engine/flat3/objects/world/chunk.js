@@ -30,7 +30,8 @@ class Chunk {
         this.computeConnectedComponents();
 
         console.log("Computed.");
-        //console.log(this._fastConnectedComponents);
+        // console.log(this._connectedComponents);
+        // console.log(this._fastConnectedComponents);
     }
 
     // Getters

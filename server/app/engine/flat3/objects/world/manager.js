@@ -92,15 +92,17 @@ class WorldManager {
         // const k = coordinates[2];
 
         var chunkId = i+','+j;
+        const dx = this.chunkDimensionX;
+        const dy = this.chunkDimensionY;
+        const dz = this.chunkDimensionZ;
         console.log(chunkId);
         if (!this._chunks.hasOwnProperty(chunkId)) {
-            let chunk = Generator.generateFlatChunk(
-                this.chunkDimensionX, this.chunkDimensionY, this.chunkDimensionZ, i, j);
+            let chunk = Generator.generateFlatChunk(dx, dy, dz, i, j);
             this._chunks[chunk.chunkId] = chunk;
         }
 
         let currentChunk = this._chunks[chunkId];
-        chunks[chunkId] = currentChunk.surfaceBlocks;
+        chunks[chunkId] = currentChunk.fastComponents;
         av.setChunkAsLoaded(chunkId);
         return chunks;
     }

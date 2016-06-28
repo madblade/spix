@@ -4,44 +4,38 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
+// Setup basic objects (terrain, avatar).
+App.Engine.Graphics.prototype.initObjects = function() {
 
-    console.log(cp);
-    if (e !== undefined && e !== null) {
-        e.forEach(function(updatedEntity) {
-            var currentEntity;
+    // Semi-model objects
+    this.light = null; // Only 1 for the moment.
+    this.avatar = null;
+    this.entities = {};
+    this.chunks = {};
+    this.displayAvatar = false;
 
-            if (this.entities.hasOwnProperty(updatedEntity._id)) { // Update mesh
-                currentEntity = this.entities[updatedEntity._id];
-            } else { // Make mesh
-                currentEntity = this.entities[updatedEntity._id] = this.getMesh(this.getGeometry(), this.getMaterial());
-                this.scene.add(currentEntity);
-            }
+    this.chunkSizeX = 8;
+    this.chunkSizeY = 8;
+    this.chunkSizeZ = 256;
+    this.chunkCapacity = this.chunkSizeX * this.chunkSizeY * this.chunkSizeZ;
 
-            currentEntity.position.x = updatedEntity._position[0];
-            currentEntity.position.y = updatedEntity._position[1];
-            currentEntity.position.z = updatedEntity._position[2]+0.5;
-            currentEntity.rotation.z = updatedEntity._rotation[0];
-        }.bind(this));
-    }
+    // Lights
+    this.light = this.getLight('hemisphere');
+    this.light.position.set( 0.5, 1, 0.75 );
 
-    if (cp !== undefined && this.controls !== null) {
-        // TODO exclude player according to camera type.
-        this.avatar.position.x = cp[0];
-        this.avatar.position.y = cp[1];
-        this.avatar.position.z = cp[2]+0.5;
-        this.avatar.rotation.z = cr[0];
+    // Player
+    this.avatar = this.getMesh(
+        this.getGeometry('box'),
+        this.getMaterial('flat-phong')
+    );
 
-        var camera = this.controls; // Camera wrapper actually
-        this.positionCameraBehind(camera, cp);
-    }
-    // Compare b with this.blocks.
-};
-
-App.Engine.Graphics.prototype.updateGraphicChunks = function(b) {
-    // TODO build surface from blocks.
-    console.log('Got blocks...');
-    console.log(b);
+    // Terrain
+    var temporaryGeometry = this.getGeometry('plane');
+    temporaryGeometry.rotateZ(-Math.PI/2);
+    this.temporaryPlane = this.getMesh(
+        temporaryGeometry,
+        this.getMaterial('basic-black')
+    );
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
