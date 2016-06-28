@@ -28,14 +28,6 @@ App.Engine.Graphics.prototype.initObjects = function() {
         this.getGeometry('box'),
         this.getMaterial('flat-phong')
     );
-
-    // Terrain
-    var temporaryGeometry = this.getGeometry('plane');
-    temporaryGeometry.rotateZ(-Math.PI/2);
-    this.temporaryPlane = this.getMesh(
-        temporaryGeometry,
-        this.getMaterial('basic-black')
-    );
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
