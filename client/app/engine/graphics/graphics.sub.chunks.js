@@ -43,6 +43,8 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     var ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz;
     var ii, jj, kk;
     var nx, ny, nz;
+    var n = 800;
+    var color = new THREE.Color();
     var j;
 
     var i = 0;
@@ -59,11 +61,12 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             cx = ax; cy = ay + 1; cz = az + 1;
             dx = ax; dy = ay + 1; dz = az;
 
+            // Positions H1
             positions[i]   = ax; positions[i+1] = ay; positions[i+2] = az;
             positions[i+3] = normal ? bx : cx; positions[i+4] = normal ? by : cy; positions[i+5] = normal ? bz : cz;
             positions[i+6] = normal ? cx : bx; positions[i+7] = normal ? cy : by; positions[i+8] = normal ? cz : bz;
 
-            // Compute normals.
+            // Normals H1
             pA.set(ax, ay, az);
             normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
             normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
@@ -74,11 +77,16 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+3*j]   = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
 
+            // Colors H1
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
+
+            // Positions H1
             positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
             positions[i+12] = normal ? cx : dx; positions[i+13] = normal ? cy : dy; positions[i+14] = normal ? cz : dz;
             positions[i+15] = normal ? dx : cx; positions[i+16] = normal ? dy : cy; positions[i+17] = normal ? dz : cz;
 
-            // Compute normals.
+            // Normals H2
             pA.set(ax, ay, az);
             normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
             normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
@@ -88,6 +96,10 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             cb.normalize();
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+9+3*j]   = nx; normals[i+9+3*j+1] = ny; normals[i+9+3*j+2] = nz;}
+
+            // Colors H2
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
         } else if (faceId < 2 * ijS) {
             faceId -= ijS;
@@ -104,7 +116,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             positions[i+3] = normal ? bx : cx; positions[i+4] = normal ? by : cy; positions[i+5] = normal ? bz : cz;
             positions[i+6] = normal ? cx : bx; positions[i+7] = normal ? cy : by; positions[i+8] = normal ? cz : bz;
 
-            // Compute normals.
+            // Normals H1
             pA.set(ax, ay, az);
             normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
             normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
@@ -115,11 +127,16 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+3*j]   = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
 
+            // Colors H1
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
+
+            // Positions H2
             positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
             positions[i+12] = normal ? cx : dx; positions[i+13] = normal ? cy : dy; positions[i+14] = normal ? cz : dz;
             positions[i+15] = normal ? dx : cx; positions[i+16] = normal ? dy : cy; positions[i+17] = normal ? dz : cz;
 
-            // Compute normals.
+            // Normals H2
             pA.set(ax, ay, az);
             normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
             normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
@@ -129,6 +146,10 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             cb.normalize();
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+9+3*j]   = nx; normals[i+9+3*j+1] = ny; normals[i+9+3*j+2] = nz;}
+
+            // Colors H2
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
         } else {
             faceId -= (2 * ijkS);
@@ -141,11 +162,12 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             cx = ax + 1; cy = ay + 1; cz = az;
             dx = ax + 1; dy = ay; dz = az;
 
+            // Positions H1
             positions[i]   = ax; positions[i+1] = ay; positions[i+2] = az;
             positions[i+3] = normal ? bx : cx; positions[i+4] = normal ? by : cy; positions[i+5] = normal ? bz : cz;
             positions[i+6] = normal ? cx : bx; positions[i+7] = normal ? cy : by; positions[i+8] = normal ? cz : bz;
 
-            // Compute normals.
+            // Normals H1
             pA.set(ax, ay, az);
             normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
             normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
@@ -156,11 +178,16 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+3*j]   = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
 
+            // Colors H1
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
+
+            // Positions H2
             positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
             positions[i+12] = normal ? cx : dx; positions[i+13] = normal ? cy : dy; positions[i+14] = normal ? cz : dz;
             positions[i+15] = normal ? dx : cx; positions[i+16] = normal ? dy : cy; positions[i+17] = normal ? dz : cz;
 
-            // Compute normals.
+            // Normals H2
             pA.set(ax, ay, az);
             normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
             normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
@@ -170,6 +197,10 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
             cb.normalize();
             nx = cb.x; ny = cb.y; nz = cb.z;
             for (j = 0; j<3; ++j) {normals[i+9+3*j]   = nx; normals[i+9+3*j+1] = ny; normals[i+9+3*j+2] = nz;}
+
+            // Colors H2
+            color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
+            for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
         }
 
         i += 18;
@@ -182,7 +213,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
 
     // Make material and mesh.
     c.material = new THREE.MeshPhongMaterial({
-        color: 0xaaaaaa, specular: 0xffffff, shininess: 250, wireframe: true,
+        color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
         side: THREE.DoubleSide, vertexColors: THREE.VertexColors
     });
     c.mesh = new THREE.Mesh(c.geometry, c.material);
