@@ -43,18 +43,28 @@ class Entity {
         const theta = this._rotation[0];
         const ds = this._directions;
         var desiredSpeed = [0, 0, 0];
-        if (ds[0] && !ds[1] && !ds[2] && !ds[3]) { // forward
-            desiredSpeed[0] = -Math.sin(theta);
-            desiredSpeed[1] = Math.cos(theta);
-        } else if (!ds[0] && ds[1] && !ds[2] && !ds[3]) { // right
+
+        if (ds[0] && !ds[3]) { // forward quarter
+            let theta2 = theta;
+            if (ds[1] && !ds[2]) theta2 -= Math.PI/4; // right
+            else if (ds[2] && !ds[1]) theta2 += Math.PI/4; // left
+            desiredSpeed[0] = -Math.sin(theta2);
+            desiredSpeed[1] = Math.cos(theta2);
+
+        } else if (ds[3] && !ds[0]) { // backward quarter
+            let theta2 = theta;
+            if (ds[1] && !ds[2]) theta2 += Math.PI/4; // right
+            else if (ds[2] && !ds[1]) theta2 -= Math.PI/4; // left
+            desiredSpeed[0] = Math.sin(theta2);
+            desiredSpeed[1] = -Math.cos(theta2);
+
+        } else if (ds[1] && !ds[2]) { // exact right
             desiredSpeed[0] = Math.cos(theta);
             desiredSpeed[1] = Math.sin(theta);
-        } else if (!ds[0] && !ds[1] && ds[2] && !ds[3]) { // left
+
+        } else if (ds[2] && !ds[1]){ // exact left
             desiredSpeed[0] = -Math.cos(theta);
             desiredSpeed[1] = -Math.sin(theta);
-        } else if (!ds[0] && !ds[1] && !ds[2] && ds[3]) { // backwards
-            desiredSpeed[0] = Math.sin(theta);
-            desiredSpeed[1] = -Math.cos(theta);
         }
 
         // Notify an entity was updated.

@@ -35,25 +35,17 @@ class UserInput {
     move(meta, avatar) {
         var hasMoved = true;
         switch (meta) {
-            case 'f' : avatar.goForward();
-                break;
-            case 'r' : avatar.goRight();
-                break;
-            case 'l' : avatar.goLeft();
-                break;
-            case 'b' : avatar.goBackwards();
-                break;
+            case 'f' : avatar.goForward();      break;
+            case 'r' : avatar.goRight();        break;
+            case 'l' : avatar.goLeft();         break;
+            case 'b' : avatar.goBackwards();    break;
 
-            case 'fx' : avatar.stopForward();
-                break;
-            case 'rx' : avatar.stopRight();
-                break;
-            case 'lx' : avatar.stopLeft();
-                break;
-            case 'bx' : avatar.stopBackwards();
-                break;
-            case 'xx' : avatar.stop();
-                break;
+            case 'fx' : avatar.stopForward();   break;
+            case 'rx' : avatar.stopRight();     break;
+            case 'lx' : avatar.stopLeft();      break;
+            case 'bx' : avatar.stopBackwards(); break;
+            case 'xx' : avatar.stop();          break;
+
             default: hasMoved = false;
         }
     };
