@@ -29,7 +29,6 @@ App.Engine.Graphics.prototype.run = function() {
     this.setControls(this.app.uiEngine.getControls('first-person', this.camera).getObject());
     if (this.displayAvatar) this.scene.add(this.avatar);
     this.scene.add(this.light);
-    this.scene.add(this.temporaryPlane);
     this.positionCameraBehind(this.controls,
         [this.avatar.position.x, this.avatar.position.y, this.avatar.position.z]);
 
@@ -47,9 +46,6 @@ App.Engine.Graphics.prototype.animate = function() {
 
     // Render.
     this.render();
-
-    // Update controls (done here for efficiency purposes).
-    this.app.uiEngine.update();
 };
 
 App.Engine.Graphics.prototype.stop = function() {

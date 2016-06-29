@@ -19,6 +19,14 @@ class EntityManager {
         this._updatedEntities = {};
     }
 
+    forEach(callback) {
+        let entities = this._entities;
+        for (let entityId in entities) {
+            if (!entities.hasOwnProperty(entityId)) continue;
+            callback(entities[entityId]);
+        }
+    }
+
     update() {
         // Update entities.
     }

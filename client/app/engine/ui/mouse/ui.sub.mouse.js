@@ -10,10 +10,6 @@ App.Engine.UI.prototype.setupMouse = function() {
     this.setupPointerLock();
 };
 
-App.Engine.UI.prototype.updateMouse = function() {
-    // Hold-click handlers.
-};
-
 App.Engine.UI.prototype.getControls = function(controlType, camera) {
     var controls;
 

@@ -61,19 +61,3 @@ App.Engine.UI.prototype.changeLayout = function(newLayout, dontRestartListeners,
     // Restore event listeners.
     if (!dontRestartListeners) this.startKeyboardListeners();
 };
-
-
-App.Engine.UI.prototype.updateKeyboard = function() {
-    var ak = this.activeKeyControls;
-    var ce = this.app.connectionEngine;
-
-    if (ak.forward !== ak.backwards) {
-        if (ak.forward) ce.send('m', 'f');
-        else if (ak.backwards) ce.send('m', 'b');
-    }
-
-    if (ak.left !== ak.right) {
-        if (ak.left) ce.send('m', 'l');
-        else if (ak.right) ce.send('m', 'r');
-    }
-};

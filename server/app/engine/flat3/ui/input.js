@@ -35,19 +35,27 @@ class UserInput {
     move(meta, avatar) {
         var hasMoved = true;
         switch (meta) {
-            case 'f' : avatar.moveForward();
+            case 'f' : avatar.goForward();
                 break;
-            case 'r' : avatar.moveRight();
+            case 'r' : avatar.goRight();
                 break;
-            case 'l' : avatar.moveLeft();
+            case 'l' : avatar.goLeft();
                 break;
-            case 'b' : avatar.moveBackwards();
+            case 'b' : avatar.goBackwards();
+                break;
+
+            case 'fx' : avatar.stopForward();
+                break;
+            case 'rx' : avatar.stopRight();
+                break;
+            case 'lx' : avatar.stopLeft();
+                break;
+            case 'bx' : avatar.stopBackwards();
+                break;
+            case 'xx' : avatar.stop();
                 break;
             default: hasMoved = false;
         }
-
-        // Notify an entity was updated.
-        if (hasMoved) this._game.entityman.entityUpdated(avatar.id);
     };
 
     rotate(meta, avatar) {

@@ -17,9 +17,13 @@ class Chunk {
         this._chunkId = chunkId;
 
         // Blocks. x, then y, then z.
-        this._blocks = new Uint8Array(); // '';
+        /** Flatten array. */
+        this._blocks = new Uint8Array();
+        /** Nested z-array. (each z -> i×j layer, without primary offset) */
         this._surfaceBlocks = {};
+        /** Each face -> index of its connected component. */
         this._connectedComponents = new Uint8Array();
+        /**  Each connected component -> list of face indices. */
         this._fastConnectedComponents = {};
 
         // Events.
@@ -87,7 +91,7 @@ class Chunk {
 
     _toId(x, y, z) {
         var id = x + y * this._xSize + z * this._xSize * this._ySize;
-        if (id >= this._capacity) console.log("WARN: invalid request coordinates.");
+        if (id >= this._capacity) console.log("chunk._toId: invalid request coordinates.");
         return id;
     }
 
@@ -101,7 +105,12 @@ class Chunk {
         if (typeof blockId !== "string" || blockId.length !== 1) return;
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
+        // Update blocks.
         this._blocks[id] = blockId;
+        // TODO Update surface blocks.
+        // TODO Update connected components.
+        // TODO Notify chunk was updated (compute diff, push update into queue).
+        // TODO has it been updated already?
     }
 
     del(x, y, z) {

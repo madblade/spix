@@ -13,8 +13,8 @@ import WorldManager from '../objects/world/manager';
 
 class Flat3Factory {
 
-    static createPhysics() {
-        return new Physics();
+    static createPhysics(entityManager, worldManager) {
+        return new Physics(entityManager, worldManager);
     }
 
     static createUserInput(game) {
