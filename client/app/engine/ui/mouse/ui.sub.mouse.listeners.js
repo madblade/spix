@@ -14,8 +14,6 @@ App.Engine.UI.prototype.registerMouseDown = function() {
         } else if (event.which === this.buttons.right) {
             this.onRightMouseDown();
         }
-
-        // TODO raycast from middle screen.
     }.bind(this));
 };
 
