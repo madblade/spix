@@ -125,6 +125,10 @@ class WorldManager {
     }
 
     updateChunksTransmitted() {
+        for (let chunkId in this._updatedChunks) {
+            if (this._updatedChunks.hasOwnProperty(chunkId))
+                this._updatedChunks[chunkId].flushUpdates();
+        }
         this._updatedChunks = {};
     }
 

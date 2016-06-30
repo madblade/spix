@@ -69,6 +69,7 @@ class EntityManager {
         this._updatedEntities[entityId] = true;
     }
 
+    // TODO optimize with LACKS structure.
     anEntityIsPresentOn(x, y, z) {
         let entities = this._entities;
         for (let entityId in entities) {

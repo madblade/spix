@@ -29,6 +29,7 @@ class Chunk {
 
         // Events.
         this._lastUpdated = process.hrtime();
+        this._updates = {};
 
         // Generation.
         this.fillChunk(48, 1);
@@ -48,12 +49,14 @@ class Chunk {
     get surfaceBlocks() { return this._surfaceBlocks; }
     get fastComponents() { return this._fastConnectedComponents; }
     get connectedComponents() { return this._connectedComponents; }
+    get updates() { return this._updates; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
     set surfaceBlocks(newSurfaceBlocks) { this._surfaceBlocks = newSurfaceBlocks; }
     set fastComponents(newFastComponents) { this._fastConnectedComponents = newFastComponents; }
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
+    set updates(newUpdates) { this._updates = newUpdates; }
 
     /**
      * Detect boundary blocks.
@@ -135,6 +138,10 @@ class Chunk {
 
         // TODO notify chunk was updated
         // TODO has it been updated already?
+    }
+
+    flushUpdates() {
+        this._updates = {};
     }
 }
 

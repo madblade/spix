@@ -35,6 +35,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     var triangles = 2 * currentComponent.length;
     var sunCapacity = Math.floor(3/2 * triangles);
     c.capacities = [sunCapacity];
+    c.sizes = [triangles];
     // TODO buffer resize optimization
     var positions = new Float32Array(sunCapacity * 3 * 3);
     var normals = new Float32Array(sunCapacity * 3 * 3);

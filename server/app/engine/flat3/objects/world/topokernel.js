@@ -157,14 +157,37 @@ class TopoKernel {
 
     // The difficulty is to determine which surface faces belong to which component after an addition.
     static divideAfterAddition(chunk, id, x, y, z) {
-        if (!detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) return;
-
         let blocks = chunk.blocks;
         let connectedComponents = chunk.connectedComponents;
         let fastComponents = chunk.fastComponents;
-        // TODO recurse on faces and separate effectively disconnected components
 
-        // TODO if chunk was updated after the last IO call, stack modifications in a chunk variable.
+        /** updates: Component id -> nature (deleted, added, modified), [meta]
+         * meta = deleted -> []
+         * meta = added -> [face ids]
+         * meta = modified -> [[face id, newId (0=removed, any other=new)]]
+         * connected components do not have to have their faces sorted.
+         *
+         * Caution: it might already exist.
+         */
+        var updates = chunk.updates;
+
+        // Compute new surface faces and remove old ones.
+
+        if (!detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) return;
+        // TODO recurse on faces and separate effectively disconnected components
+        /**
+         * Idea: breadth-first search.
+         * 1 face -> 4 candidates (3 per edge). recurse clockwise.
+         * for each candidate (begin with the face aligned with its normal), validate first, push into 'mapped faces'
+         * if not already in it, recurse next.
+         * Mark each component with an index. If any of the new initial block faces is encountered during the search,
+         * no need to begin a new breadth search from it.
+         * Continue breadth searches until all initial faces are taken care of. The mapper may be reinit after each
+         * search (and in the meanwhile the corresponding connected components must be updated, and given to the update
+         * variable).
+         */
+
+        // TODO if chunk was updated after the last IO call, stack modifications in the chunk update variable.
     }
 
     static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z) {
@@ -177,8 +200,8 @@ class TopoKernel {
     }
 
     static mergeAfterDeletion(chunk, id, x, y, z) {
-        if (!detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
         // TODO deletion version (easier)
+        if (!detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
     }
 
 }
