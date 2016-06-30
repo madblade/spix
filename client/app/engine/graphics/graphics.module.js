@@ -12,8 +12,8 @@ App.Engine.Graphics = function(app) {
 
     // Rendering
     this.renderer = this.getRenderer();
-    this.scene = this.getScene(); // TODO states
-    this.camera = this.getCamera(); // TODO states
+    this.scene = this.getScene();
+    this.camera = this.getCamera();
     this.controls = null;
     this.requestId = null;
 

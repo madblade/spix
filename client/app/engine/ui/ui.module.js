@@ -33,11 +33,6 @@ App.Engine.UI.prototype.run = function() {
     $(window).resize(this.app.graphicsEngine.resize.bind(this.app.graphicsEngine));
 };
 
-App.Engine.UI.prototype.update = function() {
-    this.updateKeyboard();
-    this.updateMouse();
-};
-
 // TODO later fullscreen
 /*if (/Firefox/i.test(navigator.userAgent)) {
  var fullscreenchange = function (event) {

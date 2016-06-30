@@ -6,6 +6,24 @@
 
 class CollectionUtils {
 
+    // O(log(n))
+    static _locationOf(element, array, start, end) {
+        start = start || 0;
+        end = end || array.length;
+        var pivot = parseInt(start + (end - start) / 2, 10);
+        if (end-start <= 1 || array[pivot] === element) return pivot;
+        if (array[pivot] < element) {
+            return CollectionUtils._locationOf(element, array, pivot, end);
+        } else {
+            return CollectionUtils._locationOf(element, array, start, pivot);
+        }
+    }
+
+    static insert(element, array) {
+        array.splice(CollectionUtils._locationOf(element, array) + 1, 0, element);
+        return array;
+    }
+
     static generateId(collection) {
         var random = () => Math.floor(Math.random() * 1000000);
         var id = random();

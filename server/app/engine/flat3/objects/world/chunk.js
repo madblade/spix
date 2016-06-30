@@ -5,6 +5,7 @@
 'use strict';
 
 import ChunkSurfaceExtractor from './chunksurfextractor';
+import TopoKernel from './topokernel';
 
 class Chunk {
 
@@ -16,8 +17,8 @@ class Chunk {
         this._capacity = this._xSize * this._ySize * this._zSize;
         this._chunkId = chunkId;
 
-        // Blocks. x, then y, then z.
-        /** Flatten array. */
+        // Blocks.
+        /** Flatten array. x, then y, then z. */
         this._blocks = new Uint8Array();
         /** Nested z-array. (each z -> i×j layer, without primary offset) */
         this._surfaceBlocks = {};
@@ -29,6 +30,7 @@ class Chunk {
         // Events.
         this._lastUpdated = process.hrtime();
 
+        // Generation.
         this.fillChunk(48, 1);
         this.computeSurfaceBlocksFromScratch();
         this.computeConnectedComponents();
@@ -101,14 +103,21 @@ class Chunk {
         return this._blocks[id];
     }
 
+    contains(x, y, z) {
+        return this.what(x, y, z) !== 0;
+    }
+
     add(x, y, z, blockId) {
         if (typeof blockId !== "string" || blockId.length !== 1) return;
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
-        // Update blocks.
-        this._blocks[id] = blockId;
-        // TODO Update surface blocks.
+
+        this._blocks[id] = blockId; // Update blocks.
+        TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
+
         // TODO Update connected components.
+        TopoKernel.divideAfterAddition(this, id, x, y, z);
+
         // TODO Notify chunk was updated (compute diff, push update into queue).
         // TODO has it been updated already?
     }
@@ -118,6 +127,14 @@ class Chunk {
         if (id >= this._capacity) return;
 
         this._blocks[id] = 0;
+        // TODO update surface blocks
+        TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
+
+        // TODO update connected components
+        TopoKernel.mergeAfterDeletion(this, id, x, y, z);
+
+        // TODO notify chunk was updated
+        // TODO has it been updated already?
     }
 }
 
