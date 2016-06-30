@@ -22,8 +22,11 @@ class UserInput {
                     // TODO compute means or filter some events.
                     this.move(e.meta, avatar);
 
-                else if (e.action === 'rotate' && typeof e.meta === 'string')
+                else if (e.action === 'rotate')
                     this.rotate(e.meta, avatar);
+
+                else if (e.action === 'block')
+                    this.block(e.meta, avatar);
             });
         });
 
@@ -51,13 +54,22 @@ class UserInput {
     };
 
     rotate(meta, avatar) {
-        var parsed = JSON.parse(meta);
-
-        var p = parsed[0], y = parsed[1];
+        if (!(meta instanceof Array)) return;
+        var p = meta[0], y = meta[1];
         if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
-            avatar.rotate(parsed[0], parsed[1]);
+            avatar.rotate(p, y);
             this._game.entityman.entityUpdated(avatar.id);
         }
+    }
+
+    block(meta, avatar) {
+        if (!(meta instanceof Array)) return;
+        var action = meta[0];
+        var x = meta[1];
+        var y = meta[2];
+        var z = meta[3];
+        // TODO check distance and add.
+        console.log(x + ' ' + y + ' ' + z);
     }
 
     push(kind, avatar) {
@@ -73,7 +85,8 @@ class UserInput {
 
     listenPlayer(player) {
         player.on('m', this.push('move', player.avatar));
-        player.on('r', this.push('rotate', player.avatar))
+        player.on('r', this.push('rotate', player.avatar));
+        player.on('b', this.push('block', player.avatar));
     }
 
     removePlayer(player) {
@@ -81,6 +94,7 @@ class UserInput {
         // Drop inconsistent players when an update is performed.
         player.off('m', this.push('move', player.avatar));
         player.off('r', this.push('rotate', player.avatar));
+        player.off('b', this.push('block', player.avatar));
         // TODO make a map with push function? I think it is different every time.
     }
 

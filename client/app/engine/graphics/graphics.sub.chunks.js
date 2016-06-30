@@ -17,6 +17,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     var currentComponent;
     for (var cid in components) {
         // TODO several components
+        // TODO COMMUNICATE FACE IDS (attach them in chunk.js)
         if (!components.hasOwnProperty(cid)) continue;
         currentComponent = components[cid];
         break;
@@ -219,7 +220,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
     // Make material and mesh.
     c.materials = [new THREE.MeshPhongMaterial({
         color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+        side: THREE.BackSide, vertexColors: THREE.VertexColors
     })];
     c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 

@@ -27,6 +27,10 @@ App.Engine.Graphics.prototype.getCamera = function() {
     return camera;
 };
 
+App.Engine.Graphics.prototype.getRaycaster = function() {
+    return new THREE.Raycaster();
+};
+
 App.Engine.Graphics.prototype.getMaterial = function(whatMaterial) {
     var material;
 

@@ -7,9 +7,10 @@
 /**
  * Keyboard behaviour when a key is pressed.
  */
-// TODO spamopt
 App.Engine.UI.prototype.registerKeyDown = function() {
     $(window).keydown(function(event) {
+        if (this.app.stateManager.state !== 'ingame') return;
+
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;
@@ -54,6 +55,8 @@ App.Engine.UI.prototype.registerKeyDown = function() {
  */
 App.Engine.UI.prototype.registerKeyUp = function() {
     $(window).keyup(function(event) {
+        if (this.app.stateManager.state !== 'ingame') return;
+
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;

@@ -10,10 +10,15 @@ App.Engine.Graphics = function(app) {
     // User customizable settings.
     this.settings = {};
 
-    // Rendering
+    // Properties.
+    this.windowHalfX = window.innerWidth / 2;
+    this.windowHalfY = window.innerHeight / 2;
+
+    // Rendering.
     this.renderer = this.getRenderer();
     this.scene = this.getScene();
     this.camera = this.getCamera();
+    this.raycaster = this.getRaycaster();
     this.controls = null;
     this.requestId = null;
 
@@ -67,6 +72,15 @@ App.Engine.Graphics.prototype.setControls = function(controls) {
     this.scene.add(this.controls);
 };
 
-App.Engine.Graphics.prototype.getCamera = function() {
-    return this.camera;
+App.Engine.Graphics.prototype.getCloseTerrain = function() {
+    var meshes = [];
+    var chks = this.chunks;
+    for (var cid in chks) {
+        // TODO extract on 4 closest chunks.
+        if (!chks.hasOwnProperty(cid)) continue;
+        var currentChunk = chks[cid];
+        if (!currentChunk.hasOwnProperty('meshes')) continue;
+        currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
+    }
+    return meshes;
 };

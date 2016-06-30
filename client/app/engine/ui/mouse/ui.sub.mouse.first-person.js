@@ -24,10 +24,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             yawObject.rotation.z -= movementX * 0.002;
             pitchObject.rotation.x -= movementY * 0.002;
             pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
-            ce.send('r', JSON.stringify([yawObject.rotation.z, pitchObject.rotation.x]));
-
-            // var p = scope.app.graphicsEngine.avatar.position;
-            // console.log(p.x + " " + p.y + " " + p.z);
+            ce.send('r', [yawObject.rotation.z, pitchObject.rotation.x]);
         };
 
         document.addEventListener('mousemove', onMouseMove, false);

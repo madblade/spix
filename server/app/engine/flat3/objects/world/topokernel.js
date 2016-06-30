@@ -5,6 +5,7 @@
 'use strict';
 
 import CollectionUtils from '../../../../math/collections/util';
+import TopoIterator from './topoiterator';
 
 class TopoKernel {
 
@@ -84,14 +85,16 @@ class TopoKernel {
         if (!(xm && ym && xp && yp && zm && zp)) TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z);
     }
 
-    static detectTopologyChangeAfterAddition(chunk, id, x, y, z) {
-        // TODO
+    static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
+        let dimensions = chunk.dimensions;
+
+        // TODO
     }
 
-    // The difficulty is to determine which surface faces belong to which component after aan addition.
+    // The difficulty is to determine which surface faces belong to which component after an addition.
     static divideAfterAddition(chunk, id, x, y, z) {
-        if (!detectTopologyChangeAfterAddition(chunk, id, x, y, z)) return;
+        if (!detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) return;
 
         let blocks = chunk.blocks;
         let connectedComponents = chunk.connectedComponents;
@@ -103,13 +106,13 @@ class TopoKernel {
 
     }
 
-    static detectTopologyChangeAfterDeletion(chunk, id, x, y, z) {
+    static detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z) {
+        // Criterion: pre-existing faces belonged to separate connected components.
         // TODO
-        // Criterion: at least 2 surface faces that DID not link on the cube to be removed.
     }
 
     static mergeAfterDeletion(chunk, id, x, y, z) {
-        if (!detectTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
+        if (!detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
     }
 
 }

@@ -6,8 +6,11 @@
 
 App.Engine.UI.prototype.setupMouse = function() {
 
+    this.buttons = {left: 1, middle: 2, right: 3};
+
     // Click / move handlers.
     this.setupPointerLock();
+    this.registerMouseDown();
 };
 
 App.Engine.UI.prototype.getControls = function(controlType, camera) {
@@ -22,4 +25,12 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
     }
 
     return controls;
+};
+
+App.Engine.UI.prototype.startMouseListeners = function() {
+    this.registerMouseDown();
+};
+
+App.Engine.UI.prototype.stopMouseListeners = function() {
+    this.unregisterMouseDown();
 };
