@@ -65,11 +65,10 @@ class UserInput {
     block(meta, avatar) {
         if (!(meta instanceof Array)) return;
         var action = meta[0];
-        var x = meta[1];
-        var y = meta[2];
-        var z = meta[3];
-        // TODO check distance and add.
-        console.log(x + ' ' + y + ' ' + z);
+        // Manage block addition.
+        if (action === "add") {
+            this._game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
+        }
     }
 
     push(kind, avatar) {

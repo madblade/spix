@@ -20,7 +20,12 @@ class WorldManager {
         this._xSize = 8;
         this._ySize = 8;
         this._zSize = 256;
+
+        // Entity bus
+        this._entityman = null;
     }
+
+    set entityman(entityman) { this._entityman = entityman; }
 
     update() {
         // Update world.
@@ -140,7 +145,25 @@ class WorldManager {
         return [i,j,k];
     }
 
-    addBlock(x, y, z, blockId) {
+    static distance3(v1, v2) {
+        let x = v1[0]-v2[0]; x*=x;
+        let y = v1[1]-v2[1]; y*=y;
+        let z = v1[2]-v2[2]; z*=z;
+        return Math.sqrt(x+y+z);
+    }
+
+    addBlock(originEntity, x, y, z, blockId) {
+        console.log(x + ' ' + y + ' ' + z);
+
+        // 4 blocks maximum range for block editing.
+        if (WorldManager.distance3(originEntity.position, [x, y, z]) > 4) return;
+        const fx = Math.floor(x);
+        const fy = Math.floor(y);
+        const fz = Math.floor(z);
+
+        // Validate update.
+        if (this._entityman.anEntityIsPresentOn(fx, fy, fz)) return;
+
         // Find chunk (i,j) & block coordinates within chunk.
         let coordinates = this.getChunkCoordinates(x, y, z);
         const i = coordinates[0];
@@ -148,10 +171,10 @@ class WorldManager {
         const chunkX = x - i * this.chunkDimensionX;
         const chunkY = y - j * this.chunkDimensionY;
 
-        const chunkId = i+'x'+j;
+        const chunkId = i+','+j;
         var chunk = this._chunks[chunkId];
         if (!chunk || chunk === undefined) {
-            console.log('Could not find chunk.');
+            console.log('Could not find chunk ' + chunkId);
             return;
         }
 

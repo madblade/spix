@@ -21,6 +21,7 @@ class Flat3 extends Game {
         this._inputman = Flat3Factory.createUserInput(this);
         this._worldman =  Flat3Factory.createWorldManager();
         this._entityman = Flat3Factory.createEntityManager(this._worldman);
+        this._worldman.entityman = this._entityman;
         this._physics = Flat3Factory.createPhysics(this._entityman, this._worldman);
         this._ai = Flat3Factory.createAI();
         this._outputman = Flat3Factory.createUserOutput(this);

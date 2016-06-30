@@ -162,20 +162,23 @@ class TopoKernel {
         let blocks = chunk.blocks;
         let connectedComponents = chunk.connectedComponents;
         let fastComponents = chunk.fastComponents;
-        // TODO
+        // TODO recurse on faces and separate effectively disconnected components
+
+        // TODO if chunk was updated after the last IO call, stack modifications in a chunk variable.
     }
 
     static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z) {
-
+        // TODO deletion version (equivalent)
     }
 
     static detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z) {
         // Criterion: pre-existing faces belonged to separate connected components.
-        // TODO
+        // TODO deletion version (easier)
     }
 
     static mergeAfterDeletion(chunk, id, x, y, z) {
         if (!detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
+        // TODO deletion version (easier)
     }
 
 }

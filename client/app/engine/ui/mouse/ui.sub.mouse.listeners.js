@@ -28,7 +28,8 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
     if (intersects.length <= 0) return;
 
     var point = intersects[0].point;
-    ce.send('b', ['add', point.x, point.y, point.z]);
+    var newBlockType = 1; // TODO user selection for block type.
+    ce.send('b', ['add', point.x, point.y, point.z, newBlockType]);
 };
 
 App.Engine.UI.prototype.onMiddleMouseDown = function() {

@@ -69,6 +69,15 @@ class EntityManager {
         this._updatedEntities[entityId] = true;
     }
 
+    anEntityIsPresentOn(x, y, z) {
+        let entities = this._entities;
+        for (let entityId in entities) {
+            if (!entities.hasOwnProperty(entityId)) continue;
+            let p = entities[entityId].position;
+            if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1) return true;
+        }
+        return false;
+    }
 }
 
 export default EntityManager;
