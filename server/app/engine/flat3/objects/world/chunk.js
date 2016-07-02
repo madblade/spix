@@ -119,10 +119,7 @@ class Chunk {
         TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
 
         // TODO Update connected components.
-        TopoKernel.divideAfterAddition(this, id, x, y, z);
-
-        // TODO Notify chunk was updated (compute diff, push update into queue).
-        // TODO has it been updated already?
+        TopoKernel.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
 
     del(x, y, z) {
@@ -134,10 +131,7 @@ class Chunk {
         TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
 
         // TODO update connected components
-        TopoKernel.mergeAfterDeletion(this, id, x, y, z);
-
-        // TODO notify chunk was updated
-        // TODO has it been updated already?
+        TopoKernel.mergeComponents(this, id, x, y, z);
     }
 
     flushUpdates() {

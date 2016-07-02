@@ -156,12 +156,9 @@ class TopoKernel {
     }
 
     // The difficulty is to determine which surface faces belong to which component after an addition.
-    static divideAfterAddition(chunk, id, x, y, z) {
-        let blocks = chunk.blocks;
-        let connectedComponents = chunk.connectedComponents;
-        let fastComponents = chunk.fastComponents;
-
-        /** updates: Component id -> nature (deleted, added, modified), [meta]
+    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z) {
+        /**
+         * updates: Component id -> nature (deleted, added, modified), [meta]
          * meta = deleted -> []
          * meta = added -> [face ids]
          * meta = modified -> [[face id, newId (0=removed, any other=new)]]
@@ -169,14 +166,24 @@ class TopoKernel {
          *
          * Caution: it might already exist.
          */
-        var updates = chunk.updates;
+        let updates = chunk.updates;
+        TopoKernel.rawUpdateAfterAddition(chunk, id, x, y, z, updates);
 
-        // Compute new surface faces and remove old ones.
+        if (TopoKernel.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) {
+            TopoKernel.divideConnectedComponents(chunk, id, x, y, z, updates);
+        }
+    }
 
-        if (!detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) return;
-        // TODO recurse on faces and separate effectively disconnected components
+    static rawUpdateAfterAddition(chunk, id, x, y, z, updates) {
+        const updatesNotEmpty = (CollectionUtils.numberOfProperties(updates) > 0);
+        // TODO Compute new surface faces and remove old ones.
+        // TODO if chunk was updated after the last IO call, stack modifications in the chunk update variable.
+    }
+
+    static divideConnectedComponents(chunk, id, x, y, z, updates) {
+        const updatesNotEmpty = (CollectionUtils.numberOfProperties(updates) > 0);
         /**
-         * Idea: breadth-first search.
+         * Idea: breadth-first search. (breadth for early detection of neighbour faces)
          * 1 face -> 4 candidates (3 per edge). recurse clockwise.
          * for each candidate (begin with the face aligned with its normal), validate first, push into 'mapped faces'
          * if not already in it, recurse next.
@@ -186,12 +193,20 @@ class TopoKernel {
          * search (and in the meanwhile the corresponding connected components must be updated, and given to the update
          * variable).
          */
-
+        // TODO recurse on faces and separate effectively disconnected components.
         // TODO if chunk was updated after the last IO call, stack modifications in the chunk update variable.
     }
 
     static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z) {
-        // TODO deletion version (equivalent)
+        let updates = chunk.updates;
+        TopoKernel.rawUpdateAfterDeletion(chunk, id, x, y, z, updates);
+        if (TopoKernel.detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) {
+            TopoKernel.mergeComponents(chunk, id, x, y, z, updates);
+        }
+    }
+
+    static rawUpdateAfterDeletion(chunk, id, x, y, z, updates) {
+        // TODO delete.
     }
 
     static detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z) {
@@ -199,9 +214,8 @@ class TopoKernel {
         // TODO deletion version (easier)
     }
 
-    static mergeAfterDeletion(chunk, id, x, y, z) {
+    static mergeComponents(chunk, id, x, y, z, updates) {
         // TODO deletion version (easier)
-        if (!detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) return;
     }
 
 }
