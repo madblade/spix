@@ -85,26 +85,9 @@ class TopoKernel {
         if (!(xm && ym && xp && yp && zm && zp)) TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z);
     }
 
-    static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z) {
+    static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, faces) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
         // i.e. if blocking edges form a cycle.
-        let dimensions = chunk.dimensions;
-
-        // Compute concerned faces.
-        let faces = [
-            false, // x-
-            false, // x+
-            false, // y-
-            false, // y+
-            false, // z-
-            false  // z+
-        ];
-        if (x > 0 && !chunk.contains(x-1, y, z)) faces[0] = true;
-        if (x < dimensions[0]-1 && !chunk.contains(x+1, y, z)) faces[1] = true;
-        if (y > 0 && !chunk.contains(x, y-1, z)) faces[2] = true;
-        if (y < dimensions[1]-1 && !chunk.contains(x, y+1, z)) faces[3] = true;
-        if (z > 0 && !chunk.contains(x, y, z-1)) faces[4] = true;
-        if (z < dimensions[2]-1 && !chunk.contains(x, y, z+1)) faces[5] = true;
 
         // Compute blocking edges.
         let blockingEdges = [];
@@ -155,33 +138,145 @@ class TopoKernel {
         return false;
     }
 
+    // BLOCK ADDITION
     // The difficulty is to determine which surface faces belong to which component after an addition.
     static updateSurfaceFacesAfterAddition(chunk, id, x, y, z) {
-        /**
-         * updates: Component id -> nature (deleted, added, modified), [meta]
-         * meta = deleted -> []
-         * meta = added -> [face ids]
-         * meta = modified -> [[face id, newId (0=removed, any other=new)]]
-         * connected components do not have to have their faces sorted.
-         *
-         * Caution: it might already exist.
-         */
-        let updates = chunk.updates;
-        TopoKernel.rawUpdateAfterAddition(chunk, id, x, y, z, updates);
+        let dimensions = chunk.dimensions;
 
-        if (TopoKernel.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z)) {
-            TopoKernel.divideConnectedComponents(chunk, id, x, y, z, updates);
+        // Compute concerned faces.
+        let addedFaces = [
+            false, // x-
+            false, // x+
+            false, // y-
+            false, // y+
+            false, // z-
+            false  // z+
+        ];
+        if (x > 0 && !chunk.contains(x-1, y, z)) addedFaces[0] = true;
+        if (x < dimensions[0] && !chunk.contains(x+1, y, z)) addedFaces[1] = true;
+        if (y > 0 && !chunk.contains(x, y-1, z)) addedFaces[2] = true;
+        if (y < dimensions[1] && !chunk.contains(x, y+1, z)) addedFaces[3] = true;
+        if (z > 0 && !chunk.contains(x, y, z-1)) addedFaces[4] = true;
+        if (z < dimensions[2] && !chunk.contains(x, y, z+1)) addedFaces[5] = true;
+
+        TopoKernel.rawUpdateAfterAddition(chunk, id, x, y, z, addedFaces);
+
+        if (TopoKernel.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
+            TopoKernel.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
+    }
+
+    /**
+     * Gets the id of a face taken from a block.
+     * @param id block id
+     * @param normal which of the 6 faces (+/- x/y/z)
+     * 0 -> x-, 1 -> x+, 2 -> y-, 3 -> y+, 4 -> z-, 5 -> z+.
+     * @param dimensions chunk size
+     */
+    static getFaceIdFromCoordinatesAndNormal(id, normal, dimensions) {
+        let ddd = dimensions[0]*dimensions[1]*dimensions[2];
+        switch (normal) { // TODO boundary management...
+            case 0: return id - 1;
+            case 2: return ddd + id - dimensions[0];
+            case 4: return 2*ddd + id - dimensions[0]*dimensions[1];
+
+            case 1: return id;
+            case 3: return ddd + id;
+            case 5: return 2*ddd + id;
+            default:
         }
     }
 
-    static rawUpdateAfterAddition(chunk, id, x, y, z, updates) {
-        const updatesNotEmpty = (CollectionUtils.numberOfProperties(updates) > 0);
-        // TODO Compute new surface faces and remove old ones.
-        // TODO if chunk was updated after the last IO call, stack modifications in the chunk update variable.
+    static rawUpdateAfterAddition(chunk, id, x, y, z, addedFaces) {
+        // Compute updated faces.
+        let dimensions = chunk.dimensions;
+        let removedFaces = [
+           !addedFaces[0] && x > 0,             // x-
+           !addedFaces[1] && x < dimensions[0], // x+
+           !addedFaces[2] && y > 0,             // y-
+           !addedFaces[3] && y < dimensions[1], // y+
+           !addedFaces[4] && z > 0,             // z-
+           !addedFaces[5] && z < dimensions[2]  // z+
+            // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
+        ];
+        let removedFaceIds = [];
+        let addedFaceIds = [];
+        for (let normal = 0; normal < removedFaces.length; ++normal) {
+            if (!removedFaces[normal] && !addedFaces[normal]) continue;
+            let faceId = TopoKernel.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
+
+            if (removedFaces[normal]) removedFaceIds.push(faceId);
+            if (addedFaces[normal]) addedFaceIds.push(faceId);
+        }
+
+        console.log('UPDATING COMPONENTS');
+        console.log(removedFaceIds);
+        console.log(addedFaceIds);
+
+        // Update components.
+        let connectedComponents = chunk.connectedComponents;
+        let fastComponents = chunk.fastComponents;
+        // Remove
+        let oldComponent = null;
+        for (let i = 0; i<removedFaceIds.length; ++i) {
+            const fid = removedFaceIds[i];
+            const componentId = connectedComponents[fid];
+            console.log('Component id ' + componentId);
+            oldComponent = componentId;
+            let currentComponent = fastComponents[componentId];
+            CollectionUtils.removeFromArray(currentComponent, fid);
+            if (currentComponent.length === 0) delete fastComponents[componentId];
+            connectedComponents[fid] = 0;
+        }
+        // Insert
+        for (let i = 0; i<addedFaceIds.length; ++i) {
+            const fid = addedFaceIds[i];
+            // WARN this stage is not topology-aware. Components are to be recomputed properly in the "divide" stage.
+            const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
+            CollectionUtils.insert(fid, fastComponents[componentId]);
+            connectedComponents[fid] = componentId;
+        }
+
+        // Update updates.
+        /**
+         * UPDATES FORMAT
+         * [ {}, {}, {} ]
+         * {} -> removed (faceIds)
+         * {} -> added (faceIds -> components)
+         * {} -> changedComponents (faceIds -> new components)
+         */
+        let updates = chunk.updates;
+        let removedUpdt = updates[0];
+        let addedUpdt = updates[1];
+        let changedUpdt = updates[2];
+        const updatesEmpty = (
+            CollectionUtils.numberOfProperties(removedUpdt) === 0 &&
+            CollectionUtils.numberOfProperties(addedUpdt) === 0 &&
+            CollectionUtils.numberOfProperties(changedUpdt) === 0
+        );
+        for (let i = 0; i<addedFaceIds.length; ++i) {
+            let fid = addedFaceIds[i];
+            if (!updatesEmpty && removedUpdt.hasOwnProperty(fid)) {
+                delete removedUpdt[fid]; // if it is marked as 'removed', then it exists in the original array
+                changedUpdt[fid] = connectedComponents[fid];
+            } else {
+                addedUpdt[fid] = connectedComponents[fid];
+            }
+        }
+        for (let i = 0; i<removedFaceIds.length; ++i) {
+            let fid = removedFaceIds[i];
+            if (!updatesEmpty && addedUpdt.hasOwnProperty(fid)) {
+                delete addedUpdt[fid]; // if it is marked as 'added', then it does not exist in the original array
+            } else {
+                removedFaces[fid] = null;
+            }
+        }
+
+        console.log('updated raw');
     }
 
-    static divideConnectedComponents(chunk, id, x, y, z, updates) {
-        const updatesNotEmpty = (CollectionUtils.numberOfProperties(updates) > 0);
+    static divideConnectedComponents(chunk, id, x, y, z, addedFaces) {
+        var nbp = CollectionUtils.numberOfProperties;
+        const updatesEmpty = (nbp(updates[0]) === 0 && nbp(updates[1]) === 0 && nbp(updates[2]) === 0);
         /**
          * Idea: breadth-first search. (breadth for early detection of neighbour faces)
          * 1 face -> 4 candidates (3 per edge). recurse clockwise.
@@ -197,15 +292,15 @@ class TopoKernel {
         // TODO if chunk was updated after the last IO call, stack modifications in the chunk update variable.
     }
 
+    // BLOCK DELETION
     static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z) {
-        let updates = chunk.updates;
-        TopoKernel.rawUpdateAfterDeletion(chunk, id, x, y, z, updates);
-        if (TopoKernel.detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z)) {
-            TopoKernel.mergeComponents(chunk, id, x, y, z, updates);
-        }
+        TopoKernel.rawUpdateAfterDeletion(chunk, id, x, y, z);
+
+        if (TopoKernel.detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z))
+            TopoKernel.mergeComponents(chunk, id, x, y, z);
     }
 
-    static rawUpdateAfterDeletion(chunk, id, x, y, z, updates) {
+    static rawUpdateAfterDeletion(chunk, id, x, y, z) {
         // TODO delete.
     }
 
@@ -214,7 +309,7 @@ class TopoKernel {
         // TODO deletion version (easier)
     }
 
-    static mergeComponents(chunk, id, x, y, z, updates) {
+    static mergeComponents(chunk, id, x, y, z) {
         // TODO deletion version (easier)
     }
 

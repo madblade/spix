@@ -127,7 +127,7 @@ class WorldManager {
     updateChunksTransmitted() {
         for (let chunkId in this._updatedChunks) {
             if (this._updatedChunks.hasOwnProperty(chunkId))
-                this._updatedChunks[chunkId].flushUpdates();
+                this._chunks[chunkId].flushUpdates();
         }
         this._updatedChunks = {};
     }
@@ -157,24 +157,19 @@ class WorldManager {
     }
 
     addBlock(originEntity, x, y, z, blockId) {
-        console.log(x + ' ' + y + ' ' + z);
+        console.log(x + ' ' + y + ' ' + z + ' ' + blockId);
 
         // 4 blocks maximum range for block editing.
         if (WorldManager.distance3(originEntity.position, [x, y, z]) > 4) return;
-        const fx = Math.floor(x);
-        const fy = Math.floor(y);
-        const fz = Math.floor(z);
 
-        // Validate update.
-        if (this._entityman.anEntityIsPresentOn(fx, fy, fz)) return;
+        let fx = Math.floor(x);
+        let fy = Math.floor(y);
+        let fz = Math.floor(z);
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = this.getChunkCoordinates(x, y, z);
+        let coordinates = this.getChunkCoordinates(fx, fy, fz);
         const i = coordinates[0];
         const j = coordinates[1];
-        const chunkX = x - i * this.chunkDimensionX;
-        const chunkY = y - j * this.chunkDimensionY;
-
         const chunkId = i+','+j;
         var chunk = this._chunks[chunkId];
         if (!chunk || chunk === undefined) {
@@ -182,8 +177,40 @@ class WorldManager {
             return;
         }
 
+        // Find which block to update.
+        const dx = Math.abs(x-fx);
+        const dy = Math.abs(y-fy);
+        const dz = Math.abs(z-fz);
+        if (dx === 0 && dy !== 0 && dz !== 0) {
+            if (chunk.what(fx-1, fy, fz) === 0) fx = fx-1;
+            else if (chunk.what(fx, fy, fz) !== 0) {
+                console.log('WorldManager.addBlock: Illegal request.');
+                return;
+            }
+        } else if (dx !== 0 && dy === 0 && dz !== 0) {
+            if (chunk.what(fx, fy-1, fz) === 0) fy = fy-1;
+            else if (chunk.what(fx, fy, fz) !== 0) {
+                console.log('WorldManager.addBlock: Illegal request.');
+                return;
+            }
+        } else if (dx !== 0 && dy !== 0 && dz === 0) {
+            if (chunk.what(fx, fy, fz-1) === 0) fz = fz-1;
+            else if (chunk.what(fx, fy, fz) !== 0) {
+                console.log('WorldManager.addBlock: Illegal request.');
+                return;
+            }
+        } else {
+            console.log('Illegal request.');
+            return;
+        }
+
+        // Validate update.
+        if (this._entityman.anEntityIsPresentOn(fx, fy, fz)) return;
+
         // Add block on chunk.
-        chunk.add(chunkX, chunkY, z, blockId);
+        const chunkX = fx - i * this.chunkDimensionX;
+        const chunkY = fy - j * this.chunkDimensionY;
+        chunk.add(chunkX, chunkY, fz, blockId);
 
         // Remember this chunk was touched.
         this.chunkUpdated(chunkId);

@@ -29,7 +29,7 @@ class Chunk {
 
         // Events.
         this._lastUpdated = process.hrtime();
-        this._updates = {};
+        this._updates = [{}, {}, {}];
 
         // Generation.
         this.fillChunk(48, 1);
@@ -111,13 +111,14 @@ class Chunk {
     }
 
     add(x, y, z, blockId) {
-        if (typeof blockId !== "string" || blockId.length !== 1) return;
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
+        console.log("adding block");
         this._blocks[id] = blockId; // Update blocks.
         TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
 
+        console.log("updating updates");
         // TODO Update connected components.
         TopoKernel.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
@@ -135,7 +136,9 @@ class Chunk {
     }
 
     flushUpdates() {
-        this._updates = {};
+        console.log("chunk.flushUpdates: chunk updates were transmitted.");
+        console.log(this._updates);
+        this._updates = [{}, {}, {}];
     }
 }
 
