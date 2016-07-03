@@ -186,6 +186,34 @@ class TopoKernel {
         }
     }
 
+    // ADDITION ONLY
+    static getFaceColorFromIdAndNormal(chunk, x, y, z, direction) {
+        let _this = chunk.what(x, y, z);
+        let checkOther = (_this === 0);
+        let dimensions = chunk.dimensions;
+        switch (direction) {
+            case 0:
+                if (checkOther && x > 0) return chunk.what(x-1, y, z);
+                else return _this;
+            case 1:
+                if (checkOther && x+1 < dimensions[0]) return chunk.what(x+1, y, z);
+                else return _this;
+            case 2:
+                if (checkOther && y > 0) return chunk.what(x, y-1, z);
+                else return _this;
+            case 3:
+                if (checkOther && y+1 < dimensions[1]) return chunk.what(x, y+1, z);
+                else return _this;
+            case 4:
+                if (checkOther && z > 0) return chunk.what(x, y, z-1);
+                else return _this;
+            case 5:
+                if (checkOther && z+1 < dimensions[2]) return chunk.what(x, y, z+1);
+                else return _this;
+            default:
+        }
+    }
+
     static rawUpdateAfterAddition(chunk, id, x, y, z, addedFaces) {
         // Compute updated faces.
         let dimensions = chunk.dimensions;
@@ -215,6 +243,7 @@ class TopoKernel {
         // Update components.
         let connectedComponents = chunk.connectedComponents;
         let fastComponents = chunk.fastComponents;
+        let fastComponentsIds = chunk.fastComponentsIds;
         // Remove
         let oldComponent = null;
         for (let i = 0; i<removedFaceIds.length; ++i) {
@@ -222,17 +251,29 @@ class TopoKernel {
             const componentId = connectedComponents[fid];
             console.log('Component id ' + componentId);
             oldComponent = componentId;
+
             let currentComponent = fastComponents[componentId];
             CollectionUtils.removeFromArray(currentComponent, fid);
             if (currentComponent.length === 0) delete fastComponents[componentId];
+
+            let currentComponentsIds = fastComponentsIds[componentId];
+            CollectionUtils.removeFromArray(currentComponentsIds, fid);
+            if (currentComponentsIds.length === 0) delete fastComponentsIds[componentId];
+
             connectedComponents[fid] = 0;
         }
         // Insert
+        let newColor = {};
         for (let i = 0; i<addedFaceIds.length; ++i) {
             const fid = addedFaceIds[i];
-            // WARN this stage is not topology-aware. Components are to be recomputed properly in the "divide" stage.
+            // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
-            CollectionUtils.insert(fid, fastComponents[componentId]);
+            const location = CollectionUtils.insert(fid, fastComponents[componentId]);
+            var fastIds = fastComponentsIds[componentId];
+
+            let faceColor = TopoKernel.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
+            newColor[i] = faceColor;
+            fastIds.splice(location, 0, faceColor);
             connectedComponents[fid] = componentId;
         }
 
@@ -257,26 +298,23 @@ class TopoKernel {
             let fid = addedFaceIds[i];
             if (!updatesEmpty && removedUpdt.hasOwnProperty(fid)) {
                 delete removedUpdt[fid]; // if it is marked as 'removed', then it exists in the original array
-                changedUpdt[fid] = connectedComponents[fid];
+                changedUpdt[fid] = newColor[i]; //connectedComponents[fid];
             } else {
-                addedUpdt[fid] = connectedComponents[fid];
+                addedUpdt[fid] = newColor[i]; // connectedComponents[fid];
             }
         }
         for (let i = 0; i<removedFaceIds.length; ++i) {
-            let fid = removedFaceIds[i];
+            let fid = Math.abs(removedFaceIds[i]);
             if (!updatesEmpty && addedUpdt.hasOwnProperty(fid)) {
                 delete addedUpdt[fid]; // if it is marked as 'added', then it does not exist in the original array
             } else {
-                removedFaces[fid] = null;
+                removedUpdt[fid] = null;
             }
         }
-
-        console.log('updated raw');
     }
 
     static divideConnectedComponents(chunk, id, x, y, z, addedFaces) {
         var nbp = CollectionUtils.numberOfProperties;
-        const updatesEmpty = (nbp(updates[0]) === 0 && nbp(updates[1]) === 0 && nbp(updates[2]) === 0);
         /**
          * Idea: breadth-first search. (breadth for early detection of neighbour faces)
          * 1 face -> 4 candidates (3 per edge). recurse clockwise.

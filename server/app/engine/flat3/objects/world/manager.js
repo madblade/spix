@@ -49,12 +49,17 @@ class WorldManager {
         var chunks = {};
         // TODO include a distance test.
         for (let eid in this._updatedChunks) {
+            console.log(this._updatedChunks.hasOwnProperty(eid));
+            console.log(this._chunks.hasOwnProperty(eid));
+            console.log(player.avatar.loadedChunks.hasOwnProperty(eid));
+
             if (!this._updatedChunks.hasOwnProperty(eid) ||
                 !this._chunks.hasOwnProperty(eid) ||
                 !player.avatar.loadedChunks.hasOwnProperty(eid)) continue;
 
             let currentChunk = this._chunks[eid];
-            chunks[currentChunk.chunkId] = currentChunk.surfaceBlocks;
+            console.log(currentChunk.updates);
+            chunks[currentChunk.chunkId] = currentChunk.updates;
         }
         return chunks;
     }
@@ -107,8 +112,7 @@ class WorldManager {
         }
 
         let currentChunk = this._chunks[chunkId];
-        chunks[chunkId] = currentChunk.fastComponents;
-        av.setChunkAsLoaded(chunkId);
+        chunks[chunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
         return chunks;
     }
 

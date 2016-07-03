@@ -20,8 +20,9 @@ class CollectionUtils {
     }
 
     static insert(element, array) {
-        array.splice(CollectionUtils._locationOf(element, array) + 1, 0, element);
-        return array;
+        var location = CollectionUtils._locationOf(element, array) + 1;
+        array.splice(location, 0, element);
+        return location;
     }
 
     static generateId(collection) {

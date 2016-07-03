@@ -4,7 +4,6 @@
 
 'use strict';
 
-
 App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
     // console.log(cp);
     // TODO ignore self.camerarotation
@@ -40,17 +39,17 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
     // Compare b with this.blocks.
 };
 
-App.Engine.Graphics.prototype.updateGraphicChunks = function(chunks) {
+App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
     // TODO build surface from blocks.
     console.log('Got blocks...');
-    console.log(chunks);
-    for (var chunkId in chunks) {
-        if (!chunks.hasOwnProperty(chunkId)) continue;
+    console.log(updates);
+    for (var chunkId in updates) {
+        if (!updates.hasOwnProperty(chunkId)) continue;
 
         if (this.isChunkLoaded(chunkId)) {
-            this.updateChunk(chunkId, chunks[chunkId]);
+            this.updateChunk(chunkId, updates[chunkId]);
         } else {
-            this.initChunk(chunkId, chunks[chunkId]);
+            this.initChunk(chunkId, updates[chunkId]);
         }
     }
 };

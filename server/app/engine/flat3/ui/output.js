@@ -13,8 +13,14 @@ class UserOutput {
     init(player) {
         var p = player;
         console.log('Init a new player on game ' + this._game.gameId + '.');
-        p.send('chk', this.extractChunksForNewPlayer(p));
+        let extractedChunks = this.extractChunksForNewPlayer(p);
+        p.send('chk', extractedChunks);
         p.send('ent', [p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]);
+        for (let cid in extractedChunks) {
+            if (!extractedChunks.hasOwnProperty(cid)) continue;
+            let cs = this._game.worldman.allChunks;
+            if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
+        }
     }
 
     update() {
@@ -26,8 +32,6 @@ class UserOutput {
     updateChunks()  {
         var updatedChunks = this._game.worldman.updatedChunks;
         if (Object.keys(updatedChunks).length < 1) return;
-
-        // TODO optimize loading
 
         this._game.playerman.forEach((p) => {
             if (!UserOutput.playerConcernedByChunks(p, updatedChunks)) return;

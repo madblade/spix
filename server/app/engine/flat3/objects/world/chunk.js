@@ -26,6 +26,7 @@ class Chunk {
         this._connectedComponents = new Uint8Array();
         /**  Each connected component -> list of face indices. */
         this._fastConnectedComponents = {};
+        this._fastConnectedComponentsIds = {};
 
         // Events.
         this._lastUpdated = process.hrtime();
@@ -48,6 +49,7 @@ class Chunk {
     get blocks() { return this._blocks; }
     get surfaceBlocks() { return this._surfaceBlocks; }
     get fastComponents() { return this._fastConnectedComponents; }
+    get fastComponentsIds() { return this._fastConnectedComponentsIds; }
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
 
@@ -55,6 +57,7 @@ class Chunk {
     set blocks(newBlocks) { this._blocks = newBlocks; }
     set surfaceBlocks(newSurfaceBlocks) { this._surfaceBlocks = newSurfaceBlocks; }
     set fastComponents(newFastComponents) { this._fastConnectedComponents = newFastComponents; }
+    set fastComponentsIds(newFastComponentsIds) { this._fastConnectedComponentsIds = newFastComponentsIds; }
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
 

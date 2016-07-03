@@ -9,7 +9,6 @@ App.Engine.Game = function(app) {
 
     this.position = [];
     this.rotation = [];
-    this.blocks = [];
     this.entities = [];
 
     this.isRunning = false;
@@ -24,8 +23,7 @@ App.Engine.Game.prototype.updateChunks = function(data) {
     // TODO manage asynch with a flag?
     if (!this.isRunning) return;
 
-    this.blocks = data;
-    this.app.graphicsEngine.updateGraphicChunks(this.blocks);
+    this.app.graphicsEngine.updateGraphicChunks(data);
 };
 
 App.Engine.Game.prototype.updateEntities = function(data) {

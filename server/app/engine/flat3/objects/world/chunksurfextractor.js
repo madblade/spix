@@ -366,8 +366,22 @@ class ChunkSurfaceExtractor {
             }
         }
 
+        // Induce Ids.
+        var fastCCIds = {};
+        for (let cccid in fastCC) {
+            if (!fastCC.hasOwnProperty(cccid)) continue;
+            fastCCIds[cccid] = [];
+            let tcur = fastCCIds[cccid];
+            for (let i in fastCC) {
+                let orientation = i < capacity ? 0 : i < 2*capacity ? 1 : 2;
+                let realId = i % capacity;
+                tcur.push(faces[orientation][realId]);
+            }
+        }
+
         // Assign
         chunk.fastComponents = fastCC;
+        chunk.fastComponentsIds = fastCCIds;
         chunk.connectedComponents = connectedComponents;
     }
 

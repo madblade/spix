@@ -8,11 +8,14 @@ App.Engine.Graphics.prototype.isChunkLoaded = function(chunkId) {
     return this.chunks.hasOwnProperty(chunkId);
 };
 
-App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
+App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     this.chunks[chunkId] = {};
     var c = this.chunks[chunkId];
     c.geometries = [new THREE.BufferGeometry()];
     c.whereToFindFace = {};
+
+    var components = all[0];
+    var colors = all[1];
 
     var currentComponent;
     for (var cid in components) {
@@ -230,7 +233,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, components) {
 };
 
 App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
-
+    console.log('updating chunk...');
 };
 
 // TODO dynamically remove chunks with GreyZone
