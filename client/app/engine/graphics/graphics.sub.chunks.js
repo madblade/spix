@@ -14,13 +14,13 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     c.geometries = [new THREE.BufferGeometry()];
     c.whereToFindFace = {};
 
+    // TODO don't discriminate components
     var components = all[0];
-    var colors = all[1];
+    var natures = all[1];
 
     var currentComponent;
     for (var cid in components) {
-        // TODO several components
-        // TODO COMMUNICATE FACE IDS (attach them in chunk.js)
+        // TODO use face ids
         if (!components.hasOwnProperty(cid)) continue;
         currentComponent = components[cid];
         break;
@@ -59,7 +59,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var i = 0;
     for (var f = 0; f < currentComponent.length; ++f) {
         var faceId = Math.abs(currentComponent[f]);
-        c.whereToFindFace[faceId] = 0; // In which geometry a given face is.
+        c.whereToFindFace[faceId] = [0, f]; // [In which geometry a given face is, at which position]
         var normal = faceId > 0;
         if (faceId < ijS) {
             ii = faceId % iS;
@@ -234,6 +234,60 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
 
 App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     console.log('updating chunk...');
+
+    var c = this.chunks[chunkId];
+
+    var geometries = c.geometries;
+    var whereToFindFace = c.whereToFindFace;
+    var meshes = c.meshes;
+    var materials = c.materials;
+    var capacities = c.capacities;
+    var sizes = c.sizes;
+
+    var removed = components[0];
+    for (var rid in removed) {
+        // Get graphic data
+        if (!removed.hasOwnProperty(rid)) continue;
+        if (!whereToFindFace.hasOwnProperty(rid)) {
+            console.log("Trying to remove a face that is not present in chunk.");
+            continue;
+        }
+
+        var meshId = whereToFindFace[rid][0];
+        var position = whereToFindFace[rid][1];
+
+        var vertices = geometries[meshId].attributes.position.array;
+        var colors = geometries[meshId].attributes.color.array;
+        var normals = geometries[meshId].attributes.normal.array;
+        var lastPosition = sizes[meshId] - 1;
+
+        // Update
+        for (var i = 0; i<18; ++i) {
+            var p = 18 * position + i;
+            var lp = 18 * lastPosition + i;
+            // Swap current with last
+            vertices[p] = vertices[lp];
+            normals[p] = normals[lp];
+            colors[p] = colors[lp];
+            // Delete last
+            vertices[lp] = normals[lp] = colors[lp] = 0;
+        }
+
+        // Notify object
+        geometries[meshId].attributes.position.needsUpdate = true;
+        geometries[meshId].attributes.color.needsUpdate = true;
+        geometries[meshId].attributes.normal.needsUpdate = true;
+    }
+
+    var added = components[1];
+    for (var aid in added) {
+        // check
+    }
+
+    var updated = components[2];
+    for (var uid in updated) {
+        // change
+    }
 };
 
 // TODO dynamically remove chunks with GreyZone
