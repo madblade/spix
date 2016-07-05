@@ -140,7 +140,6 @@ class Chunk {
 
     flushUpdates() {
         console.log("chunk.flushUpdates: chunk updates were transmitted.");
-        console.log(this._updates);
         this._updates = [{}, {}, {}];
     }
 }

@@ -13,6 +13,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var c = this.chunks[chunkId];
     c.geometries = [new THREE.BufferGeometry()];
     c.whereToFindFace = {};
+    c.whichFaceIs = {};
 
     // TODO don't discriminate components
     var components = all[0];
@@ -60,6 +61,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     for (var f = 0; f < currentComponent.length; ++f) {
         var faceId = Math.abs(currentComponent[f]);
         c.whereToFindFace[faceId] = [0, f]; // [In which geometry a given face is, at which position]
+        c.whichFaceIs[f] = faceId;
         var normal = faceId > 0;
         if (faceId < ijS) {
             ii = faceId % iS;
@@ -239,11 +241,13 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
     var geometries = c.geometries;
     var whereToFindFace = c.whereToFindFace;
+    var whichFaceIs = c.whichFaceIs;
     var meshes = c.meshes;
     var materials = c.materials;
     var capacities = c.capacities;
     var sizes = c.sizes;
 
+    var meshId = 0;
     var removed = components[0];
     for (var rid in removed) {
         // Get graphic data
@@ -253,25 +257,39 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             continue;
         }
 
-        var meshId = whereToFindFace[rid][0];
+        meshId = whereToFindFace[rid][0];
         var position = whereToFindFace[rid][1];
 
         var vertices = geometries[meshId].attributes.position.array;
         var colors = geometries[meshId].attributes.color.array;
         var normals = geometries[meshId].attributes.normal.array;
         var lastPosition = sizes[meshId] - 1;
+        var isLast = lastPosition === position;
 
         // Update
         for (var i = 0; i<18; ++i) {
             var p = 18 * position + i;
-            var lp = 18 * lastPosition + i;
-            // Swap current with last
-            vertices[p] = vertices[lp];
-            normals[p] = normals[lp];
-            colors[p] = colors[lp];
-            // Delete last
-            vertices[lp] = normals[lp] = colors[lp] = 0;
+            if (isLast) {
+                // Delete current
+                vertices[p] = normals[p] = colors[p] = 0;
+            } else {
+                // Swap current with last
+                var lp = 18 * lastPosition + i;
+                vertices[p] = vertices[lp];
+                normals[p] = normals[lp];
+                colors[p] = colors[lp];
+                // Delete last
+                vertices[lp] = normals[lp] = colors[lp] = 0;
+            }
         }
+
+        // Update helpers (swap last if applicable).
+        if (!isLast) {
+            whereToFindFace[whichFaceIs[lastPosition]] = [meshId, position];
+            whichFaceIs[position] = whichFaceIs[lastPosition];
+        }
+        delete whichFaceIs[lastPosition];
+        delete whereToFindFace[rid];
 
         // Notify object
         geometries[meshId].attributes.position.needsUpdate = true;
@@ -281,7 +299,28 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
     var added = components[1];
     for (var aid in added) {
-        // check
+        // Get graphic data
+        if (!removed.hasOwnProperty(rid)) continue;
+        if (whereToFindFace.hasOwnProperty(rid)) {
+            console.log("Trying to add a face that is already present in chunk.");
+            continue;
+        }
+
+        // Compute mesh id
+        meshId = 0;
+        var meshHasToBeAdded = false;
+        while (sizes[meshId] !== undefined && sizes[meshId] === capacities[meshId]) ++meshId;
+        if (sizes[meshId] === undefined) {
+            // Create geometry
+            geometries[meshId] = new THREE.Geometry();
+            materials[meshId] = new THREE.Material();
+            sizes[meshId] = 1;
+            capacities[meshId] = 10;
+            meshes[meshId] = new THREE.Mesh(geometries[meshId], materials[meshId]);
+            meshHasToBeAdded = true;
+        }
+
+        // if (meshHasToBeAdded) this.scene.add(meshes[meshId]);
     }
 
     var updated = components[2];

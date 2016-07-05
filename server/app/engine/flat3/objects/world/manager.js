@@ -49,16 +49,11 @@ class WorldManager {
         var chunks = {};
         // TODO include a distance test.
         for (let eid in this._updatedChunks) {
-            console.log(this._updatedChunks.hasOwnProperty(eid));
-            console.log(this._chunks.hasOwnProperty(eid));
-            console.log(player.avatar.loadedChunks.hasOwnProperty(eid));
-
             if (!this._updatedChunks.hasOwnProperty(eid) ||
                 !this._chunks.hasOwnProperty(eid) ||
                 !player.avatar.loadedChunks.hasOwnProperty(eid)) continue;
 
             let currentChunk = this._chunks[eid];
-            console.log(currentChunk.updates);
             chunks[currentChunk.chunkId] = currentChunk.updates;
         }
         return chunks;
@@ -163,12 +158,14 @@ class WorldManager {
     addBlock(originEntity, x, y, z, blockId) {
         console.log(x + ' ' + y + ' ' + z + ' ' + blockId);
 
-        // 4 blocks maximum range for block editing.
-        if (WorldManager.distance3(originEntity.position, [x, y, z]) > 4) return;
-
         let fx = Math.floor(x);
         let fy = Math.floor(y);
         let fz = Math.floor(z);
+
+        // 4 blocks maximum range for block editing.
+        const d3 = WorldManager.distance3(originEntity.position, [x, y, z]);
+        console.log(d3 + " DISTANCE");
+        if (d3 > 4) return;
 
         // Find chunk (i,j) & block coordinates within chunk.
         let coordinates = this.getChunkCoordinates(fx, fy, fz);
