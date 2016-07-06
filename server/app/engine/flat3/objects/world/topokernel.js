@@ -276,6 +276,7 @@ class TopoKernel {
             var fastIds = fastComponentsIds[componentId];
 
             let faceColor = TopoKernel.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
+            if (!(i%2)) faceColor *= -1;
             newColor[i] = faceColor;
             fastIds.splice(location, 0, faceColor);
             connectedComponents[fid] = componentId;
@@ -286,8 +287,8 @@ class TopoKernel {
          * UPDATES FORMAT
          * [ {}, {}, {} ]
          * {} -> removed (faceIds)
-         * {} -> added (faceIds -> components)
-         * {} -> changedComponents (faceIds -> new components)
+         * {} -> added (faceId -> nature)
+         * {} -> changedComponents (faceId -> new nature)
          */
         let updates = chunk.updates;
         let removedUpdt = updates[0];

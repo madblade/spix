@@ -5,7 +5,7 @@
 'use strict';
 
 App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
-                                                 positions, normals, colors, natures,
+                                                 positions, normals, colors, nature,
                                                  iChunkOffset, jChunkOffset,
                                                  pA, pB, pC, cb, ab,
                                                  normal, color, n) {
@@ -15,10 +15,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
     var ii, jj, kk;
     var nx, ny, nz;
 
-    if (faceId < ijS) {
+    if (faceId < ijkS) {
         ii = faceId % iS;
-        jj = (faceId - ii) / iS;
-        kk = (faceId - ii - jj*iS) / ijS;
+        jj = ((faceId - ii) % ijS) / iS;
+        kk = Math.floor(faceId / ijS);
 
         ax = iChunkOffset + 1 + ii; ay = jChunkOffset + jj; az = kk;
         bx = ax; by = ay; bz = az + 1;
@@ -65,15 +65,15 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-    } else if (faceId < 2 * ijS) {
-        faceId -= ijS;
+    } else if (faceId < 2 * ijkS) {
+        faceId -= ijkS;
         ii = faceId % iS;
-        jj = (faceId - ii) / iS;
-        kk = (faceId - ii - jj*iS) / ijS;
+        jj = ((faceId - ii) % ijS) / iS;
+        kk = Math.floor(faceId / ijS);
 
         ax = iChunkOffset + ii; ay = jChunkOffset + 1 + jj; az = kk;
         bx = ax + 1; by = ay; bz = az;
-        cx = ax + 1; cy = ay; cz = az;
+        cx = ax + 1; cy = ay; cz = az + 1; // TODO check this
         dx = ax; dy = ay; dz = az + 1;
 
         positions[i]   = ax; positions[i+1] = ay; positions[i+2] = az;

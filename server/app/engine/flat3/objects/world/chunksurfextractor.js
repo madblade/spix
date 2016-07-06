@@ -97,7 +97,7 @@ class ChunkSurfaceExtractor {
 
             // Set faces
             faces[d][blockId] = blocks[blockId]; // Face nature
-            faces[d][blockId] *= (d < 3 ? -1 : 1); // Face normal (-1 => towards minus)
+            faces[d][blockId] *= (d%2 === 0 ? 1 : -1); // Face normal (-1 => towards minus)
 
             // Set connected component
             const faceId = d*capacity + blockId;
@@ -372,9 +372,12 @@ class ChunkSurfaceExtractor {
             if (!fastCC.hasOwnProperty(cccid)) continue;
             fastCCIds[cccid] = [];
             let tcur = fastCCIds[cccid];
-            for (let i in fastCC) {
-                let orientation = i < capacity ? 0 : i < 2*capacity ? 1 : 2;
-                let realId = i % capacity;
+            let fcc = fastCC[cccid];
+            for (let i in fcc) {
+                if (!fcc.hasOwnProperty(i)) continue;
+                let j = fcc[i];
+                let orientation = j < capacity ? 0 : j < 2*capacity ? 1 : 2;
+                let realId = j % capacity;
                 tcur.push(faces[orientation][realId]);
             }
         }

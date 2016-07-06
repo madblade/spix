@@ -15,7 +15,7 @@ class UserOutput {
         console.log('Init a new player on game ' + this._game.gameId + '.');
         let extractedChunks = this.extractChunksForNewPlayer(p);
         p.send('chk', extractedChunks);
-        p.send('ent', [p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]);
+        p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
         for (let cid in extractedChunks) {
             if (!extractedChunks.hasOwnProperty(cid)) continue;
             let cs = this._game.worldman.allChunks;
@@ -49,9 +49,7 @@ class UserOutput {
         // Broadcast updates.
         this._game.playerman.forEach((p) => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
-            let time = process.hrtime();
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
-            console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
         });
 
         // Tell object manager we have done update.

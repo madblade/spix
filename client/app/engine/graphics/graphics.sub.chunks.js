@@ -20,10 +20,11 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var natures = all[1];
 
     var currentComponent;
+    var currentNatures;
     for (var cid in components) {
-        // TODO use face ids
         if (!components.hasOwnProperty(cid)) continue;
         currentComponent = components[cid];
+        currentNatures = natures[cid];
         break;
     }
 
@@ -38,8 +39,9 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var iS = this.chunkSizeX;
     var triangles = 2 * currentComponent.length;
     var sunCapacity = Math.floor(3/2 * triangles);
-    c.capacities = [sunCapacity];
-    c.sizes = [triangles];
+    sunCapacity += (sunCapacity%2); // Make it pair
+    c.capacities = [sunCapacity/2];
+    c.sizes = [triangles/2];
 
     var positions = new Float32Array(sunCapacity * 3 * 3);
     var normals = new Float32Array(sunCapacity * 3 * 3);
@@ -58,10 +60,10 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
         var faceId = Math.abs(currentComponent[f]);
         c.whereToFindFace[faceId] = [0, f]; // [In which geometry a given face is, at which position]
         c.whichFaceIs[f] = faceId;
-        var normal = faceId > 0;
+        var normal = currentNatures[f] > 0;
 
         this.addFace(faceId, i, iS, ijS, ijkS,
-            positions, normals, colors, natures,
+            positions, normals, colors, currentNatures[f],
             iChunkOffset, jChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);
@@ -98,7 +100,18 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var capacities = c.capacities;
     var sizes = c.sizes;
 
-    var meshId = 0;
+    var vertices, colors, normals;
+    var ijkS = this.chunkCapacity;
+    var ijS = this.chunkSizeX * this.chunkSizeY;
+    var iS = this.chunkSizeX;
+    var chunkIndices = chunkId.split(',');
+    var chunkI = parseInt(chunkIndices[0]);
+    var chunkJ = parseInt(chunkIndices[1]);
+    var iChunkOffset = chunkI * this.chunkSizeX;
+    var jChunkOffset = chunkJ * this.chunkSizeY;
+    console.log('offset: ' + iChunkOffset + ',' + jChunkOffset);
+
+    var meshId;
     var removed = components[0];
     for (var rid in removed) {
         // Get graphic data
@@ -111,9 +124,9 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         meshId = whereToFindFace[rid][0];
         var position = whereToFindFace[rid][1];
 
-        var vertices = geometries[meshId].attributes.position.array;
-        var colors = geometries[meshId].attributes.color.array;
-        var normals = geometries[meshId].attributes.normal.array;
+        vertices = geometries[meshId].attributes.position.array;
+        colors = geometries[meshId].attributes.color.array;
+        normals = geometries[meshId].attributes.normal.array;
         var lastPosition = sizes[meshId] - 1;
         var isLast = lastPosition === position;
 
@@ -141,6 +154,19 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         }
         delete whichFaceIs[lastPosition];
         delete whereToFindFace[rid];
+        sizes[meshId] -= 1;
+
+        // Delete geometry if applicable.
+        if (sizes[meshId] === 0) {
+            // Remove mesh from scene.
+            this.scene.remove(meshes[meshId]);
+            delete sizes[meshId];
+            delete geometries[meshId];
+            delete meshes[meshId];
+            delete materials[meshId];
+            delete capacities[meshId];
+            delete sizes[meshId];
+        }
 
         // Notify object
         geometries[meshId].attributes.position.needsUpdate = true;
@@ -151,31 +177,70 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var added = components[1];
     for (var aid in added) {
         // Get graphic data
-        if (!removed.hasOwnProperty(rid)) continue;
-        if (whereToFindFace.hasOwnProperty(rid)) {
+        if (!added.hasOwnProperty(aid)) continue;
+        if (whereToFindFace.hasOwnProperty(aid)) {
             console.log("Trying to add a face that is already present in chunk.");
             continue;
         }
 
-        // Compute mesh id
+        // Compute mesh id.
         meshId = 0;
         var meshHasToBeAdded = false;
         while (sizes[meshId] !== undefined && sizes[meshId] === capacities[meshId]) ++meshId;
-        if (sizes[meshId] === undefined) {
-            // Create geometry
+
+        // Add new mesh if necessary.
+        meshHasToBeAdded = sizes[meshId] === undefined;
+        if (meshHasToBeAdded) {
+            // Create geometry.
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
                 color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
                 side: THREE.BackSide, vertexColors: THREE.VertexColors
             });
             sizes[meshId] = 1;
-            capacities[meshId] = 10;
-            meshHasToBeAdded = true;
+
+            var triangles = 2 * 64; // TODO externalize newMesh size variable
+            var sunCapacity = Math.floor(3/2 * triangles);
+            capacities[meshId] = sunCapacity;
+
+            vertices = new Float32Array(sunCapacity * 3 * 3);
+            normals = new Float32Array(sunCapacity * 3 * 3);
+            colors = new Float32Array(sunCapacity * 3 * 3);
+        } else {
+            sizes[meshId] += 1;
+            vertices = geometries[meshId].attributes.position.array;
+            colors = geometries[meshId].attributes.color.array;
+            normals = geometries[meshId].attributes.normal.array;
         }
 
-        // TODO add other faces...
+        // Add face.
+        var pA = new THREE.Vector3();
+        var pB = new THREE.Vector3();
+        var pC = new THREE.Vector3();
+        var cb = new THREE.Vector3();
+        var ab = new THREE.Vector3();
+        var n = 800;
+        var color = new THREE.Color();
+        var faceId = Math.abs(aid);
+        var pos = sizes[meshId] - 1;
+
+        var nature = added[aid]; // Corresponds to block id.
+        var normal = nature > 0;
+        whereToFindFace[faceId] = [meshId, pos];
+        whichFaceIs[pos] = faceId;
+
+        this.addFace(faceId, pos * 18, iS, ijS, ijkS,
+            vertices, normals, colors, nature,
+            iChunkOffset, jChunkOffset,
+            pA, pB, pC, cb, ab,
+            normal, color, n);
 
         if (meshHasToBeAdded) {
+            geometries[meshId].addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometries[meshId].addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+            geometries[meshId].addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometries[meshId].computeBoundingSphere();
+
             meshes[meshId] = new THREE.Mesh(geometries[meshId], materials[meshId]);
             this.scene.add(meshes[meshId]);
         }
