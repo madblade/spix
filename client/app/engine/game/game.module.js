@@ -29,6 +29,7 @@ App.Engine.Game.prototype.updateChunks = function(data) {
 App.Engine.Game.prototype.updateEntities = function(data) {
     if (!this.isRunning) return;
 
+    data = JSON.parse(data);
     this.position = data[0];
     this.rotation = data[1];
     this.entities = data[2];

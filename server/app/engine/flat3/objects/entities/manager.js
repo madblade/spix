@@ -41,7 +41,8 @@ class EntityManager {
         for (var eid in this._entities) {
             if (!this._entities.hasOwnProperty(eid)) continue;
             if (this._entities[eid]._id === player.avatar._id) continue;
-            entities.push(this._entities[eid]);
+            let currentEntity = this._entities[eid];
+            entities.push({_position:currentEntity.position,_rotation:currentEntity.rotation});
         }
         return entities;
     }
