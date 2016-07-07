@@ -246,6 +246,8 @@ class TopoKernel {
         let fastComponentsIds = chunk.fastComponentsIds;
         // Remove
         let oldComponent = null;
+        let blocks = chunk.blocks;
+        let capacity = chunk.capacity;
         for (let i = 0; i<removedFaceIds.length; ++i) {
             const fid = removedFaceIds[i];
             const componentId = connectedComponents[fid];
@@ -261,7 +263,7 @@ class TopoKernel {
             if (currentComponent.length === 0) delete fastComponents[componentId];
 
             let currentComponentsIds = fastComponentsIds[componentId];
-            CollectionUtils.removeFromArray(currentComponentsIds, fid);
+            CollectionUtils.removeFromArray(currentComponentsIds, blocks[Math.abs(fid)%capacity]);
             if (currentComponentsIds.length === 0) delete fastComponentsIds[componentId];
 
             connectedComponents[fid] = 0;
