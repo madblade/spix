@@ -189,29 +189,28 @@ class TopoKernel {
     // ADDITION ONLY
     static getFaceColorFromIdAndNormal(chunk, x, y, z, direction) {
         let _this = chunk.what(x, y, z);
-        let checkOther = (_this === 0);
+        let thisEmpty = (_this === 0);
         let dimensions = chunk.dimensions;
-        switch (direction) {
-            case 0:
-                if (checkOther && x > 0) return chunk.what(x-1, y, z);
-                else return _this;
-            case 1:
-                if (checkOther && x+1 < dimensions[0]) return chunk.what(x+1, y, z);
-                else return _this;
-            case 2:
-                if (checkOther && y > 0) return chunk.what(x, y-1, z);
-                else return _this;
-            case 3:
-                if (checkOther && y+1 < dimensions[1]) return chunk.what(x, y+1, z);
-                else return _this;
-            case 4:
-                if (checkOther && z > 0) return chunk.what(x, y, z-1);
-                else return _this;
-            case 5:
-                if (checkOther && z+1 < dimensions[2]) return chunk.what(x, y, z+1);
-                else return _this;
-            default:
+        if (thisEmpty) {
+            switch (direction) {
+                case 0: if (x > 0) return chunk.what(x-1, y, z);
+                    break;
+                case 1: if (x+1 < dimensions[0]) return chunk.what(x+1, y, z);
+                    break;
+                case 2: if (y > 0) return chunk.what(x, y-1, z);
+                    break;
+                case 3: if (y+1 < dimensions[1]) return chunk.what(x, y+1, z);
+                    break;
+                case 4: if (z > 0) return chunk.what(x, y, z-1);
+                    break;
+                case 5: if (z+1 < dimensions[2]) return chunk.what(x, y, z+1);
+                    break;
+                default:
+            }
+        } else {
+            return _this;
         }
+        return 0;
     }
 
     static rawUpdateAfterAddition(chunk, id, x, y, z, addedFaces) {
@@ -226,14 +225,14 @@ class TopoKernel {
            !addedFaces[5] && z < dimensions[2]  // z+
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
-        let removedFaceIds = [];
-        let addedFaceIds = [];
+        let removedFaceIds = new Uint32Array(removedFaces.length);
+        let addedFaceIds = new Uint32Array(addedFaces.length);
         for (let normal = 0; normal < removedFaces.length; ++normal) {
             if (!removedFaces[normal] && !addedFaces[normal]) continue;
             let faceId = TopoKernel.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
 
-            if (removedFaces[normal]) removedFaceIds.push(faceId);
-            if (addedFaces[normal]) addedFaceIds.push(faceId);
+            if (removedFaces[normal]) removedFaceIds[normal] = (faceId);
+            if (addedFaces[normal]) addedFaceIds[normal] = (faceId);
         }
 
         console.log('UPDATING COMPONENTS');
@@ -250,6 +249,8 @@ class TopoKernel {
         let capacity = chunk.capacity;
         for (let i = 0; i<removedFaceIds.length; ++i) {
             const fid = removedFaceIds[i];
+            if (fid === 0) continue;
+
             const componentId = connectedComponents[fid];
             console.log('Component id ' + componentId);
             if (componentId < 1) {
@@ -303,6 +304,7 @@ class TopoKernel {
         );
         for (let i = 0; i<addedFaceIds.length; ++i) {
             let fid = addedFaceIds[i];
+            if (fid === 0) continue;
             if (!updatesEmpty && removedUpdt.hasOwnProperty(fid)) {
                 delete removedUpdt[fid]; // if it is marked as 'removed', then it exists in the original array
                 changedUpdt[fid] = newColor[i]; //connectedComponents[fid];
