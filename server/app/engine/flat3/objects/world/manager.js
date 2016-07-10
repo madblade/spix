@@ -163,7 +163,7 @@ class WorldManager {
         return (d3 < 4);
     }
 
-    validateBlockAddition(originEntity, x, y, z, floors, chunk) {
+    translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk) {
         function failure() { console.log("Request denied."); }
 
         if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
@@ -171,11 +171,14 @@ class WorldManager {
             return false;
         }
 
-        // Find which block to update.
-        const dx = Math.abs(x-floors[0]);
-        const dy = Math.abs(y-floors[1]);
-        const dz = Math.abs(z-floors[2]);
+        /**
+         * Find block coordinates given a position on a face.
+         * Beware! One cannot add a floating block.
+         */
+        const dx = Math.abs(x-floors[0]); const dy = Math.abs(y-floors[1]); const dz = Math.abs(z-floors[2]);
+
         if (dx === 0 && dy !== 0 && dz !== 0) {
+            // Which side of the face is empty...
             if (chunk.what(floors[0]-1, floors[1], floors[2]) === 0) floors[0] = floors[0]-1;
             else if (chunk.what(floors[0], floors[1], floors[2]) !== 0) {
                 failure();
@@ -207,6 +210,49 @@ class WorldManager {
         return true;
     }
 
+    translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk) {
+        function failure() { console.log("Request denied."); }
+
+        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
+            failure();
+            return false;
+        }
+
+        // Find which block to update.
+        const dx = Math.abs(x-floors[0]); const dy = Math.abs(y-floors[1]); const dz = Math.abs(z-floors[2]);
+
+        if (dx === 0 && dy !== 0 && dz !== 0) {
+            if (chunk.what(floors[0]-1, floors[1], floors[2]) !== 0) floors[0] = floors[0]-1;
+            else if (chunk.what(floors[0], floors[1], floors[2]) === 0) {
+                failure();
+                return false;
+            }
+        } else if (dx !== 0 && dy === 0 && dz !== 0) {
+            if (chunk.what(floors[0], floors[1]-1, floors[2]) !== 0) floors[1] = floors[1]-1;
+            else if (chunk.what(floors[0], floors[1], floors[2]) === 0) {
+                failure();
+                return false;
+            }
+        } else if (dx !== 0 && dy !== 0 && dz === 0) {
+            if (chunk.what(floors[0], floors[1], floors[2]-1) !== 0) floors[2] = floors[2]-1;
+            else if (chunk.what(floors[0], floors[1], floors[2]) === 0) {
+                failure();
+                return false;
+            }
+        } else {
+            failure();
+            return false;
+        }
+
+        // Validate update.
+        if (this._entityman.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
+            failure();
+            return false;
+        }
+
+        return true;
+    }
+
     addBlock(originEntity, x, y, z, blockId) {
         console.log(x + ' ' + y + ' ' + z + ' ' + blockId);
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
@@ -215,17 +261,20 @@ class WorldManager {
         let coordinates = this.getChunkCoordinates(floors[0], floors[1], floors[2]);
         const i = coordinates[0];
         const j = coordinates[1];
+        const k = coordinates[2];
         const chunkId = i+','+j;
         var chunk = this._chunks[chunkId];
         if (!chunk || chunk === undefined) { console.log('Could not find chunk ' + chunkId); return; }
 
         // Validate request.
-        if (!this.validateBlockAddition(originEntity, x, y, z, floors, chunk)) return;
+        if (!this.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk)) return;
 
         // Add block on chunk.
         const chunkX = floors[0] - i * this.chunkDimensionX;
         const chunkY = floors[1] - j * this.chunkDimensionY;
-        chunk.add(chunkX, chunkY, floors[2], blockId);
+        const chunkZ = floors[2] - k * this.chunkDimensionZ;
+        console.log('ADDING BLOCK ' + chunkX + " " + chunkY + " " + chunkZ);
+        chunk.add(chunkX, chunkY, chunkZ, blockId);
 
         // Remember this chunk was touched.
         this.chunkUpdated(chunkId);
@@ -239,17 +288,19 @@ class WorldManager {
         let coordinates = this.getChunkCoordinates(floors[0], floors[1], floors[2]);
         const i = coordinates[0];
         const j = coordinates[1];
+        const k = coordinates[2];
         const chunkId = i+','+j;
         var chunk = this._chunks[chunkId];
         if (!chunk || chunk === undefined) { console.log('Could not find chunk ' + chunkId); return; }
 
         // Validate request.
-        if (!this.validateBlockAddition(originEntity, x, y, z, floors, chunk)) return;
+        if (!this.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk)) return;
 
         // Add block on chunk.
         const chunkX = floors[0] - i * this.chunkDimensionX;
         const chunkY = floors[1] - j * this.chunkDimensionY;
-        chunk.del(chunkX, chunkY, floors[2]);
+        const chunkZ = floors[2] - k * this.chunkDimensionZ;
+        chunk.del(chunkX, chunkY, chunkZ);
 
         // Remember this chunk was touched.
         this.chunkUpdated(chunkId);

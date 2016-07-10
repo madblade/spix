@@ -254,7 +254,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
     var updated = components[2];
     for (var uid in updated) {
-        // change
+        // TODO manage changes
     }
 };
 

@@ -23,7 +23,7 @@ App.Engine.UI.prototype.rayCast = function() {
 
     raycaster.setFromCamera(cross, this.app.graphicsEngine.camera);
     var terrain = this.app.graphicsEngine.getCloseTerrain();
-    return raycaster.intersectObjects(terrain);
+    return raycaster.intersectObjects(terrain, true);
 };
 
 App.Engine.UI.prototype.onLeftMouseDown = function() {

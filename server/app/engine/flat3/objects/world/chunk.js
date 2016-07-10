@@ -26,7 +26,7 @@ class Chunk {
         this._connectedComponents = new Uint8Array();
         /**  Each connected component -> list of face indices. */
         this._fastConnectedComponents = {};
-        this._fastConnectedComponentsIds = {};
+        this._fastConnectedComponentsIds = {}; // Signed.
 
         // Events.
         this._lastUpdated = process.hrtime();
@@ -135,7 +135,7 @@ class Chunk {
         TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
 
         // TODO update connected components
-        TopoKernel.mergeComponents(this, id, x, y, z);
+        TopoKernel.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
     }
 
     flushUpdates() {

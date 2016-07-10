@@ -21,6 +21,10 @@ class CollectionUtils {
 
     static insert(element, array) {
         var location = CollectionUtils._locationOf(element, array) + 1;
+        if (array[location] === element) {
+        console.log("Util.insert: element already in sorted array.");
+            return location;
+        }
         array.splice(location, 0, element);
         return location;
     }
