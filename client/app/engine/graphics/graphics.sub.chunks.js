@@ -9,6 +9,7 @@ App.Engine.Graphics.prototype.isChunkLoaded = function(chunkId) {
 };
 
 App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
+    console.log(chunkId);
     this.chunks[chunkId] = {};
     var c = this.chunks[chunkId];
     c.geometries = [new THREE.BufferGeometry()];

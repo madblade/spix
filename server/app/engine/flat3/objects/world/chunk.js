@@ -65,7 +65,7 @@ class Chunk {
      * Detect boundary blocks.
      */
     computeSurfaceBlocksFromScratch() {
-        console.log('Extracting surface...');
+        console.log('\tExtracting surface...');
         var extractor = new ChunkSurfaceExtractor(this);
         extractor.extractSurfaceBlocks();
         // TODO optimize during generation.
@@ -75,7 +75,7 @@ class Chunk {
      * Detect connected boundary face components.
      */
     computeConnectedComponents() {
-        console.log("Computing connected components...");
+        console.log("\tComputing connected components...");
         var extractor = new ChunkSurfaceExtractor(this);
         extractor.extractConnectedComponents();
     }
@@ -117,11 +117,9 @@ class Chunk {
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
-        console.log("adding block");
         this._blocks[id] = blockId; // Update blocks.
         TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
 
-        console.log("updating updates");
         // TODO Update connected components.
         TopoKernel.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
@@ -139,7 +137,6 @@ class Chunk {
     }
 
     flushUpdates() {
-        console.log("chunk.flushUpdates: chunk updates were transmitted.");
         this._updates = [{}, {}, {}];
     }
 }

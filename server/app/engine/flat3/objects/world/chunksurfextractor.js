@@ -102,7 +102,6 @@ class ChunkSurfaceExtractor {
             // Set connected component
             const faceId = d*capacity + blockId;
             encounteredFaces[faceId] = connectedComponents[faceId] = ccid++;
-            // console.log(ccid + " fid " + faceId + " dim " + d);
         }
 
         // Compute POST borders.
@@ -321,7 +320,6 @@ class ChunkSurfaceExtractor {
         if (jaysLength > 0) currentBlock = Math.min(currentBlock, jays[jayCurrent]);
         if (kaysLength > 0) currentBlock = Math.min(currentBlock, kays[kayCurrent]);
 
-        console.log("i " + ayesLength + " j " + jaysLength + " k " + kaysLength);
         while ((ayeCurrent < ayesLength || jayCurrent < jaysLength || kayCurrent < kaysLength) && currentBlock < capacity) {
             if (ayes[ayeCurrent] === currentBlock) aye(ayes[ayeCurrent++]);
             if (jays[jayCurrent] === currentBlock) jay(jays[jayCurrent++]);
@@ -331,8 +329,6 @@ class ChunkSurfaceExtractor {
         if (kayCurrent !== kaysLength) console.log("warn. kays not completely recursed");
         if (jayCurrent !== jaysLength) console.log("warn. jays not completely recursed");
         if (ayeCurrent !== ayesLength) console.log("warn. ayes not completely recursed");
-
-        // console.log(merger);
 
         // Compute fast connected components.
         var fastCC = {};

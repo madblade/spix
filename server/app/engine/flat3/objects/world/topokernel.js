@@ -10,7 +10,6 @@ import TopoIterator from './topoiterator';
 class TopoKernel {
 
     static removeSurfaceBlock(surfaceBlocks, chunk, x, y, z) {
-        console.log(x + " " + y + " " + z + " jdjuerfjeorifizieodjzeiodjioerjifodjzeiojdfzeio");
         surfaceBlocks[z].splice(surfaceBlocks[z].indexOf(chunk._toId(x, y, z)));
     }
 
