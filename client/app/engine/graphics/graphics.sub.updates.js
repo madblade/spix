@@ -41,8 +41,6 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
     // TODO build surface from blocks.
-    console.log('Got blocks...');
-    console.log(updates);
     for (var chunkId in updates) {
         if (!updates.hasOwnProperty(chunkId)) continue;
 

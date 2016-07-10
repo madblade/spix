@@ -17,27 +17,34 @@ App.Engine.UI.prototype.registerMouseDown = function() {
     }.bind(this));
 };
 
-App.Engine.UI.prototype.onLeftMouseDown = function() {
-    var ce = this.app.connectionEngine;
+App.Engine.UI.prototype.rayCast = function() {
     var raycaster = this.app.graphicsEngine.raycaster;
     var cross = new THREE.Vector2(0, 0); // Normalized device coordinates
 
     raycaster.setFromCamera(cross, this.app.graphicsEngine.camera);
     var terrain = this.app.graphicsEngine.getCloseTerrain();
-    var intersects = raycaster.intersectObjects(terrain);
-    if (intersects.length <= 0) return;
+    return raycaster.intersectObjects(terrain);
+};
 
+App.Engine.UI.prototype.onLeftMouseDown = function() {
+    var ce = this.app.connectionEngine;
+
+    var intersects = this.rayCast();
+    if (intersects.length <= 0) return;
     var point = intersects[0].point;
     var newBlockType = 1; // TODO user selection for block type.
     ce.send('b', ['add', point.x, point.y, point.z, newBlockType]);
 };
 
-App.Engine.UI.prototype.onMiddleMouseDown = function() {
-
+App.Engine.UI.prototype.onRightMouseDown = function() {
+    var ce = this.app.connectionEngine;
+    var intersects = this.rayCast();
+    if (intersects.length <= 0) return;
+    var point = intersects[0].point;
+    ce.send('b', ['del', point.x, point.y, point.z]);
 };
 
-App.Engine.UI.prototype.onRightMouseDown = function() {
-
+App.Engine.UI.prototype.onMiddleMouseDown = function() {
 };
 
 App.Engine.UI.prototype.unregisterMouseDown = function() {

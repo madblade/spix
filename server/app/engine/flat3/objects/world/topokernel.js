@@ -320,7 +320,7 @@ class TopoKernel {
             }
         }
         for (let i = 0; i<removedFaceIds.length; ++i) {
-            let fid = Math.abs(removedFaceIds[i]);
+            let fid = removedFaceIds[i];
             if (fid === -1) continue;
 
             if (!updatesEmpty && addedUpdt.hasOwnProperty(fid)) {

@@ -68,6 +68,8 @@ class UserInput {
         // Manage block addition.
         if (action === "add") {
             this._game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
+        } else if (action === "del") {
+            this._game.worldman.delBlock(avatar, meta[1], meta[2], meta[3]);
         }
     }
 

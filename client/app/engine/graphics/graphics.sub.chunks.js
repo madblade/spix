@@ -88,8 +88,6 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
 };
 
 App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
-    console.log('updating chunk...');
-
     var c = this.chunks[chunkId];
 
     var geometries = c.geometries;
@@ -158,6 +156,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
         // Delete geometry if applicable.
         if (sizes[meshId] === 0) {
+            console.log("INFO: geometry deletion.");
             // Remove mesh from scene.
             this.scene.remove(meshes[meshId]);
             delete sizes[meshId];
@@ -166,12 +165,13 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             delete materials[meshId];
             delete capacities[meshId];
             delete sizes[meshId];
-        }
 
-        // Notify object
-        geometries[meshId].attributes.position.needsUpdate = true;
-        geometries[meshId].attributes.color.needsUpdate = true;
-        geometries[meshId].attributes.normal.needsUpdate = true;
+        } else {
+            // Notify object
+            geometries[meshId].attributes.position.needsUpdate = true;
+            geometries[meshId].attributes.color.needsUpdate = true;
+            geometries[meshId].attributes.normal.needsUpdate = true;
+        }
     }
 
     var added = components[1];
@@ -191,10 +191,11 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         // Add new mesh if necessary.
         meshHasToBeAdded = sizes[meshId] === undefined;
         if (meshHasToBeAdded) {
+            console.log("INFO: Geometry addition.");
             // Create geometry.
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
-                color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+                color: 0xaaaaaa, specular: 0xffffff, shininess: 250, wireframe: true,
                 side: THREE.BackSide, vertexColors: THREE.VertexColors
             });
             sizes[meshId] = 1;
@@ -244,6 +245,11 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             meshes[meshId] = new THREE.Mesh(geometries[meshId], materials[meshId]);
             this.scene.add(meshes[meshId]);
         }
+
+        // Notify object.
+        geometries[meshId].attributes.position.needsUpdate = true;
+        geometries[meshId].attributes.color.needsUpdate = true;
+        geometries[meshId].attributes.normal.needsUpdate = true;
     }
 
     var updated = components[2];
