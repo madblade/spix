@@ -63,7 +63,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
         var normal = currentNatures[f] > 0;
 
         this.addFace(faceId, i, iS, ijS, ijkS,
-            positions, normals, colors, currentNatures[f],
+            positions, normals, colors, Math.abs(currentNatures[f]),
             iChunkOffset, jChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);
@@ -230,7 +230,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         whichFaceIs[pos] = faceId;
 
         this.addFace(faceId, pos * 18, iS, ijS, ijkS,
-            vertices, normals, colors, nature,
+            vertices, normals, colors, Math.abs(nature),
             iChunkOffset, jChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);

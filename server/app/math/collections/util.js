@@ -58,6 +58,11 @@ class CollectionUtils {
     static removeFromArray(array, object) {
         var objectId = array.indexOf(object);
         if (objectId > -1) array.splice(objectId, 1);
+        return objectId;
+    }
+
+    static removeFromArrayWithId(array, objectId) {
+        if (objectId > -1) array.splice(objectId, 1);
     }
 
     static forEachProperty(object, func) {

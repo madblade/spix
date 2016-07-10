@@ -225,14 +225,19 @@ class TopoKernel {
            !addedFaces[5] && z < dimensions[2]  // z+
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
-        let removedFaceIds = new Uint32Array(removedFaces.length);
-        let addedFaceIds = new Uint32Array(addedFaces.length);
+        let removedFaceIds = new Int32Array(removedFaces.length);
+        let addedFaceIds = new Int32Array(addedFaces.length);
         for (let normal = 0; normal < removedFaces.length; ++normal) {
-            if (!removedFaces[normal] && !addedFaces[normal]) continue;
+            if (!removedFaces[normal] && !addedFaces[normal]) {
+                removedFaceIds[normal] = addedFaceIds[normal] = -1;
+                continue;
+            }
             let faceId = TopoKernel.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
 
             if (removedFaces[normal]) removedFaceIds[normal] = (faceId);
+            else removedFaceIds[normal] = -1;
             if (addedFaces[normal]) addedFaceIds[normal] = (faceId);
+            else addedFaceIds[normal] = -1;
         }
 
         console.log('UPDATING COMPONENTS');
@@ -245,13 +250,12 @@ class TopoKernel {
         let fastComponentsIds = chunk.fastComponentsIds;
         // Remove
         let oldComponent = null;
-        let blocks = chunk.blocks;
-        let capacity = chunk.capacity;
         for (let i = 0; i<removedFaceIds.length; ++i) {
             const fid = removedFaceIds[i];
-            if (fid === 0) continue;
+            if (fid === -1) continue;
 
             const componentId = connectedComponents[fid];
+            if (componentId === undefined) console.log('Face id ' + fid);
             console.log('Component id ' + componentId);
             if (componentId < 1) {
                 console.log("WARNING: TRYING TO REMOVE A FACE THAT IS NOT REGISTERED AS BOUNDARY");
@@ -260,11 +264,11 @@ class TopoKernel {
             oldComponent = componentId;
 
             let currentComponent = fastComponents[componentId];
-            CollectionUtils.removeFromArray(currentComponent, fid);
+            let index = CollectionUtils.removeFromArray(currentComponent, fid);
             if (currentComponent.length === 0) delete fastComponents[componentId];
 
             let currentComponentsIds = fastComponentsIds[componentId];
-            CollectionUtils.removeFromArray(currentComponentsIds, blocks[Math.abs(fid)%capacity]);
+            CollectionUtils.removeFromArrayWithId(currentComponentsIds, index);
             if (currentComponentsIds.length === 0) delete fastComponentsIds[componentId];
 
             connectedComponents[fid] = 0;
@@ -273,6 +277,8 @@ class TopoKernel {
         let newColor = {};
         for (let i = 0; i<addedFaceIds.length; ++i) {
             const fid = addedFaceIds[i];
+            if (fid === -1) continue;
+
             // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
@@ -304,7 +310,8 @@ class TopoKernel {
         );
         for (let i = 0; i<addedFaceIds.length; ++i) {
             let fid = addedFaceIds[i];
-            if (fid === 0) continue;
+            if (fid === -1) continue;
+
             if (!updatesEmpty && removedUpdt.hasOwnProperty(fid)) {
                 delete removedUpdt[fid]; // if it is marked as 'removed', then it exists in the original array
                 changedUpdt[fid] = newColor[i]; //connectedComponents[fid];
@@ -314,6 +321,8 @@ class TopoKernel {
         }
         for (let i = 0; i<removedFaceIds.length; ++i) {
             let fid = Math.abs(removedFaceIds[i]);
+            if (fid === -1) continue;
+
             if (!updatesEmpty && addedUpdt.hasOwnProperty(fid)) {
                 delete addedUpdt[fid]; // if it is marked as 'added', then it does not exist in the original array
             } else {
