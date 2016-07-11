@@ -285,11 +285,16 @@ class TopoKernel {
 
             // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
+            if (fastComponents[componentId] === undefined) {
+                console.log('BLD: invalid component id: ' + componentId + 'for insertion... BLDing.');
+                fastComponents[componentId] = [];
+                fastComponentsIds[componentId] = [];
+            }
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
             var fastIds = fastComponentsIds[componentId];
 
             let faceColor = TopoKernel.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
-            if ((i%2) ^ (isAddition)) faceColor *= -1; // i is pair xor edit mode (aka challenge your mind)
+            if ((i%2) ^ (isAddition)) faceColor *= -1; // i is pair xor edit mode
 
             newColor[i] = faceColor;
             fastIds.splice(location, 0, faceColor);

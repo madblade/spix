@@ -24,7 +24,7 @@ class Chunk {
         this._surfaceBlocks = {};
         /** Each face -> index of its connected component. */
         this._connectedComponents = new Uint8Array();
-        /**  Each connected component -> list of face indices. */
+        /**  Each connected component -> (sorted) list of face indices. */
         this._fastConnectedComponents = {};
         this._fastConnectedComponentsIds = {}; // Signed.
 

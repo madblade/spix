@@ -20,6 +20,10 @@ class CollectionUtils {
     }
 
     static insert(element, array) {
+        if (array === undefined) {
+            console.log("BLD: undefined array.");
+            return -1;
+        }
         var location = CollectionUtils._locationOf(element, array) + 1;
         if (array[location] === element) {
         console.log("Util.insert: element already in sorted array.");
