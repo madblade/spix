@@ -268,6 +268,11 @@ class TopoKernel {
             oldComponent = componentId;
 
             let currentComponent = fastComponents[componentId];
+            if (currentComponent === undefined) {
+                console.log('BLD: skipping removal on component ' + componentId);
+                console.log(fastComponents);
+                continue;
+            }
             let index = CollectionUtils.removeFromArray(currentComponent, fid);
             if (currentComponent.length === 0) delete fastComponents[componentId];
 
@@ -286,7 +291,7 @@ class TopoKernel {
             // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
             if (fastComponents[componentId] === undefined) {
-                console.log('BLD: invalid component id: ' + componentId + 'for insertion... BLDing.');
+                console.log('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');
                 fastComponents[componentId] = [];
                 fastComponentsIds[componentId] = [];
             }

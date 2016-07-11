@@ -64,6 +64,10 @@ class CollectionUtils {
     }
 
     static removeFromArray(array, object) {
+        if (array === undefined) {
+            console.log("BLD: undefined array.");
+            return -1;
+        }
         var objectId = array.indexOf(object);
         if (objectId > -1) array.splice(objectId, 1);
         return objectId;

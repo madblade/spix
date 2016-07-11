@@ -105,7 +105,7 @@ class Chunk {
 
     what(x, y, z) {
         var id = this._toId(x, y, z);
-        if (id >= this._capacity) return 0;
+        if ((id >= this._capacity) || (id < 0)) return 0;
         return this._blocks[id];
     }
 

@@ -173,22 +173,16 @@ class WorldManager {
     static validateBlockEdition(originEntity, x, y, z, floors) {
         let fx = floors[0]; let fy = floors[1]; let fz = floors[2];
         // 4 blocks maximum range for block editing.
-        const d3 = WorldManager.distance3(originEntity.position, [x, y, z]);
-        return (d3 < 4);
+        const d3 = WorldManager.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
+        return (d3 < 10);
     }
 
     translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk) {
         function failure(step) { console.log("Request denied at step " + step); }
 
-        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
-            failure(0);
-            return false;
-        }
+        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) { failure(0); return false; }
 
-        /**
-         * Find block coordinates given a position on a face.
-         * Beware! One cannot add a floating block.
-         */
+        // One cannot add a floating block.
         const dx = Math.abs(Math.abs(x) - Math.abs(floors[0]));
         const dy = Math.abs(Math.abs(y) - Math.abs(floors[1]));
         const dz = Math.abs(Math.abs(z) - Math.abs(floors[2]));
@@ -200,30 +194,34 @@ class WorldManager {
         if (dx === 0 && dy !== 0 && dz !== 0) {
             // Which side of the face is empty...
             if (chunk.what(lx-1, ly, lz) === 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
-            else if (chunk.what(lx, ly, lz) !== 0) {
-                failure(1);
-                return false;
-            }
+
         } else if (dx !== 0 && dy === 0 && dz !== 0) {
             if (chunk.what(lx, ly-1, lz) === 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
-            else if (chunk.what(lx, ly, lz) !== 0) {
-                failure(2);
-                return false;
-            }
+
         } else if (dx !== 0 && dy !== 0 && dz === 0) {
             if (chunk.what(lx, ly, lz-1) === 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
-            else if (chunk.what(lx, ly, lz) !== 0) {
-                failure(3);
-                return false;
-            }
-        } else {
-            failure(4);
+
+        // On-edge request.
+        } else { failure(1); return false; }
+
+        // Designed block must be 0.
+        console.log(blockCoordinatesOnChunk);
+        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0) {
+            failure(2);
             return false;
         }
 
-        // Validate update.
+        // Detect OOB.
+        if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= this.chunkDimensionX ||
+            blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= this.chunkDimensionY ||
+            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= this.chunkDimensionZ) {
+            failure(3);
+            return false;
+        }
+
+        // Detect entities.
         if (this._entityman.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
-            failure(5);
+            failure(4);
             return false;
         }
 
@@ -233,10 +231,7 @@ class WorldManager {
     translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk) {
         function failure(step) { console.log("Request denied at step " + step); }
 
-        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
-            failure(0);
-            return false;
-        }
+        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) { failure(0); return false; }
 
         const dx = Math.abs(Math.abs(x) - Math.abs(floors[0]));
         const dy = Math.abs(Math.abs(y) - Math.abs(floors[1]));
@@ -248,30 +243,34 @@ class WorldManager {
 
         if (dx === 0 && dy !== 0 && dz !== 0) {
             if (chunk.what(lx-1, ly, lz) !== 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
-            else if (chunk.what(lx, ly, lz) === 0) {
-                failure(1);
-                return false;
-            }
+
         } else if (dx !== 0 && dy === 0 && dz !== 0) {
             if (chunk.what(lx, ly-1, lz) !== 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
-            else if (chunk.what(lx, ly, lz) === 0) {
-                failure(2);
-                return false;
-            }
+
         } else if (dx !== 0 && dy !== 0 && dz === 0) {
             if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
-            else if (chunk.what(lx, ly, lz) === 0) {
-                failure(3);
-                return false;
-            }
-        } else {
-            failure(4);
+
+        // On-edge request.
+        } else { failure(1); return false; }
+
+        // Designed block must be 0.
+        console.log(blockCoordinatesOnChunk);
+        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0) {
+            failure(2);
+            return false;
+        }
+
+        // Detect OOB.
+        if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= this.chunkDimensionX ||
+            blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= this.chunkDimensionY ||
+            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= this.chunkDimensionZ) {
+            failure(3);
             return false;
         }
 
         // Validate update.
         if (this._entityman.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
-            failure(5);
+            failure(4);
             return false;
         }
 
