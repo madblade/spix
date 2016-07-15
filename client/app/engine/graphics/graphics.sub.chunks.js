@@ -48,6 +48,8 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var normals = new Float32Array(sunCapacity * 3 * 3);
     var colors = new Float32Array(sunCapacity * 3 * 3);
 
+    console.log('The initial geometry shall be ' + sunCapacity * 3 * 3 + '-capable.');
+
     var pA = new THREE.Vector3();
     var pB = new THREE.Vector3();
     var pC = new THREE.Vector3();
@@ -108,7 +110,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var chunkJ = parseInt(chunkIndices[1]);
     var iChunkOffset = chunkI * this.chunkSizeX;
     var jChunkOffset = chunkJ * this.chunkSizeY;
-    console.log('offset: ' + iChunkOffset + ',' + jChunkOffset);
 
     var meshId;
     var removed = components[0];
@@ -191,8 +192,13 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
         // Add new mesh if necessary.
         meshHasToBeAdded = sizes[meshId] === undefined;
+
+        var progress = Math.floor((sizes[meshId] / capacities[meshId]) * 100);
+        if  (progress % 20 === 0) console.log("INFO: Geometry " + meshId + " at " + progress + "% capacity.");
         if (meshHasToBeAdded) {
-            console.log("INFO: Geometry addition.");
+            console.log("INFO: Geometry addition: " +
+                meshId + (meshId%10===1?"st":meshId%10===2?"nd":meshId%10===3?"rd":"th") + " geometry.");
+
             // Create geometry.
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
@@ -208,6 +214,8 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             vertices = new Float32Array(sunCapacity * 3 * 3);
             normals = new Float32Array(sunCapacity * 3 * 3);
             colors = new Float32Array(sunCapacity * 3 * 3);
+
+            console.log("New capacity will be " + sunCapacity * 3 * 3 + ".");
         } else {
             sizes[meshId] += 1;
             vertices = geometries[meshId].attributes.position.array;

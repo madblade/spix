@@ -166,4 +166,15 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
     }
+
+    for (j = 0; j<18; ++j) {
+        if (isNaN(positions[i+j])) {
+            console.log('Transferred miscalculation on ' + (i+j) + 'th component.');
+            console.log(
+                '\tnormal: ' + normal+'\n'+
+                '\tfaceId: ' + faceId
+            );
+            return;
+        }
+    }
 };

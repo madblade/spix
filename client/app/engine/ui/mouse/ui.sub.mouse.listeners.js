@@ -10,6 +10,13 @@ App.Engine.UI.prototype.registerMouseDown = function() {
         if (scope.app.stateManager.state !== 'ingame') return; // TODO menu state
         switch (event.which) {
             case scope.buttons.left:
+                /*
+                There is a bug with some laptop touch pads that prevents the browser from triggering
+                the LEFT click when a 'keydown' event was fired in the near past (~200ms?).
+                In this case, it will be impossible to move and add a block at the same time with basic controls.
+                Everything works OK with the right and middle click (i.e. both on touch pads), so just
+                make the user reassign the 'left click' control key if he is in such a case.
+                 */
                 scope.onLeftMouseDown();
                break;
             case scope.buttons.middle:
