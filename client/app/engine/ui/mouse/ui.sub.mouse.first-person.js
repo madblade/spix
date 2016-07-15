@@ -14,7 +14,6 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
         pitchObject.add(camera);
 
         var yawObject = new THREE.Object3D();
-        yawObject.position.y = 10;
         yawObject.add(pitchObject);
 
         var onMouseMove = function (event) {
@@ -24,21 +23,33 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             yawObject.rotation.z -= movementX * 0.002;
             pitchObject.rotation.x -= movementY * 0.002;
             pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
-            ce.send('r', [yawObject.rotation.z, pitchObject.rotation.x]);
+
+            // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
+            // camera.quaternion.multiply(tmpQuaternion);
+            // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
+
+            var x = pitchObject.rotation.x;
+            var y = 0;
+            var z = yawObject.rotation.z;
+
+            ce.send('r', [z, x]);
         };
 
         document.addEventListener('mousemove', onMouseMove, false);
 
         return {
             dispose : function () { document.removeEventListener('mousemove', onMouseMove, false); },
-            getObject : function () { return yawObject; },
+            getObject : function () {
+                return yawObject;
+                // return camera;
+            },
             getDirection : function () {
                 // assumes the camera itself is not rotated
                 var direction = new THREE.Vector3(0, 0, -1);
-                var rotation = new THREE.Euler(0, 0, 0, "YXZ");
+                var rotation = new THREE.Euler(0, 0, 0, "XYZ");
 
                 return function (v) {
-                    rotation.set(pitchObject.rotation.x, yawObject.rotation.y, 0);
+                    rotation.set(pitchObject.rotation.x, yawObject.rotation.z, 0);
                     v.copy(direction).applyEuler(rotation);
                     return v;
                 };

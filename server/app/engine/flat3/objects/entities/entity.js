@@ -27,7 +27,10 @@ class Entity {
         this._position = null;
     }
 
-    stop() { this._directions = [false, false, false, false]; }
+    stop() {
+        this._directions = [false, false, false, false];
+        console.log("Entity stopping.");
+    }
 
     goForward()     { this._directions[0] = true; }
     goRight()       { this._directions[1] = true; }
@@ -67,10 +70,13 @@ class Entity {
             desiredSpeed[1] = -Math.sin(theta);
         }
 
-        // Notify an entity was updated.
-        if ((ds[0]!==ds[3]) || (ds[1]!==ds[2])) entityManager.entityUpdated(this._id);
+        if ((ds[0]!==ds[3]) || (ds[1]!==ds[2])) {
+            // Notify an entity was updated.
+            entityManager.entityUpdated(this._id);
 
-        for (let i = 0; i<3; ++i) this._position[i] += 0.1 * desiredSpeed[i];
+            // Update.
+            for (let i = 0; i<3; ++i) this._position[i] += 0.1 * desiredSpeed[i];
+        }
     }
 
     rotate(p, y) {

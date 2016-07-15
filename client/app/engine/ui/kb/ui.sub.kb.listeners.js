@@ -15,7 +15,6 @@ App.Engine.UI.prototype.registerKeyDown = function() {
         var k = this.keyControls;
         var ak = this.activeKeyControls;
         var ce = this.app.connectionEngine;
-        event.preventDefault();
 
         switch (event.keyCode) {
             case k.arrowUp:
@@ -39,15 +38,22 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 ak.backwards = true;
                 break;
 
-            // Manage alt-tab like border effects
             default:
-                ce.send('m', 'xx');
-                ak.forward = false;
-                ak.backwards = false;
-                ak.right = false;
-                ak.left = false;
+                // this.stopKeyboardInteraction();
         }
     }.bind(this));
+};
+
+// Manage alt-tab like border effects
+App.Engine.UI.prototype.stopKeyboardInteraction = function() {
+    var ak = this.activeKeyControls;
+    var ce = this.app.connectionEngine;
+
+    ce.send('m', 'xx');
+    ak.forward = false;
+    ak.backwards = false;
+    ak.right = false;
+    ak.left = false;
 };
 
 /**
@@ -61,7 +67,6 @@ App.Engine.UI.prototype.registerKeyUp = function() {
         var k = this.keyControls;
         var ak = this.activeKeyControls;
         var ce = this.app.connectionEngine;
-        event.preventDefault();
 
         switch (event.keyCode) {
             case k.arrowUp:

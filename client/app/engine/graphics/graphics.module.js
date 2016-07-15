@@ -31,10 +31,11 @@ App.Engine.Graphics = function(app) {
 
 App.Engine.Graphics.prototype.run = function() {
     // Init objects.
-    this.setControls(this.app.uiEngine.getControls('first-person', this.camera).getObject());
+    var controls = this.app.uiEngine.getControls('first-person', this.camera);
+    this.setControls(controls);
     if (this.displayAvatar) this.scene.add(this.avatar);
     this.scene.add(this.light);
-    this.positionCameraBehind(this.controls,
+    this.positionCameraBehind(this.controls.getObject(),
         [this.avatar.position.x, this.avatar.position.y, this.avatar.position.z]);
 
     // Init animation.
@@ -65,11 +66,11 @@ App.Engine.Graphics.prototype.resize = function () {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 };
 
-App.Engine.Graphics.prototype.setControls = function(controls) {
+App.Engine.Graphics.prototype.setControls = function(controls, getDirection) {
     this.scene.remove(this.scene.getObjectByName("controls"));
     this.controls = controls;
     this.controls.name = "controls";
-    this.scene.add(this.controls);
+    this.scene.add(this.controls.getObject());
 };
 
 App.Engine.Graphics.prototype.getCloseTerrain = function() {

@@ -28,6 +28,7 @@ App.Engine.UI.prototype.startKeyboardListeners = function() {
 };
 
 App.Engine.UI.prototype.stopKeyboardListeners = function() {
+    this.stopKeyboardInteraction();
     this.unregisterKeyDown();
     this.unregisterKeyUp();
 };

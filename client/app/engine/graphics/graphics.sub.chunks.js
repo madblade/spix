@@ -80,7 +80,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     // Make material and mesh.
     c.materials = [new THREE.MeshPhongMaterial({
         color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-        side: THREE.BackSide, vertexColors: THREE.VertexColors
+        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
     })];
     c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 
@@ -196,8 +196,8 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             // Create geometry.
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
-                color: 0xaaaaaa, specular: 0xffffff, shininess: 250, wireframe: true,
-                side: THREE.BackSide, vertexColors: THREE.VertexColors
+                color: 0xb8860b, specular: 0xffffff, shininess: 250,
+                side: THREE.DoubleSide // , vertexColors: THREE.VertexColors
             });
             sizes[meshId] = 1;
 
@@ -241,7 +241,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             geometries[meshId].addAttribute('position', new THREE.BufferAttribute(vertices, 3));
             geometries[meshId].addAttribute('normal', new THREE.BufferAttribute(normals, 3));
             geometries[meshId].addAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometries[meshId].computeBoundingSphere();
 
             meshes[meshId] = new THREE.Mesh(geometries[meshId], materials[meshId]);
             this.scene.add(meshes[meshId]);
@@ -251,6 +250,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         geometries[meshId].attributes.position.needsUpdate = true;
         geometries[meshId].attributes.color.needsUpdate = true;
         geometries[meshId].attributes.normal.needsUpdate = true;
+        geometries[meshId].computeBoundingSphere();
     }
 
     var updated = components[2];

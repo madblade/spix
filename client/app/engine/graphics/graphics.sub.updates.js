@@ -33,7 +33,7 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
         this.avatar.position.z = cp[2]+0.5;
         this.avatar.rotation.z = cr[0];
 
-        var camera = this.controls; // Camera wrapper actually
+        var camera = this.controls.getObject(); // Camera wrapper actually
         this.positionCameraBehind(camera, cp);
     }
     // Compare b with this.blocks.
