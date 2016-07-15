@@ -10,7 +10,6 @@ App.Engine.UI.prototype.setupMouse = function() {
 
     // Click / move handlers.
     this.setupPointerLock();
-    this.registerMouseDown();
 };
 
 App.Engine.UI.prototype.getControls = function(controlType, camera) {

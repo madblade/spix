@@ -35,15 +35,16 @@ App.Engine.UI.prototype.setupPointerLock = function() {
         if (app.stateManager.getState() !== 'ingame') return;
 
         switch (event.which) {
-            case 1: // Left
-                break;
             case 2: // Middle
+                break;
+            case 1: // Left
             case 3: // Right
             default:
                 return;
         }
 
         // Ask the browser to lock the pointer.
+        event.preventDefault();
         scope.requestPointerLock();
     });
 };
@@ -51,11 +52,14 @@ App.Engine.UI.prototype.setupPointerLock = function() {
 App.Engine.UI.prototype.requestPointerLock = function() {
     var b = document.body;
     b.requestPointerLock();
+
+    this.app.uiEngine.startKeyboardListeners();
+    this.app.uiEngine.startMouseListeners();
 };
 
 App.Engine.UI.prototype.pointerLockChanged = function(isPointerLocked) {
     this.app.uiEngine.threeControlsEnabled = isPointerLocked;
     if (!isPointerLocked) {
-        app.stateManager.setState('settings');
+        this.app.stateManager.setState('settings');
     }
 };

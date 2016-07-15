@@ -9,6 +9,7 @@
  */
 App.Engine.UI.prototype.registerKeyDown = function() {
     $(window).keydown(function(event) {
+        event.preventDefault();
         if (this.app.stateManager.state !== 'ingame') return;
 
         if (!event.keyCode) { return; }
@@ -61,6 +62,7 @@ App.Engine.UI.prototype.stopKeyboardInteraction = function() {
  */
 App.Engine.UI.prototype.registerKeyUp = function() {
     $(window).keyup(function(event) {
+        event.preventDefault();
         if (this.app.stateManager.state !== 'ingame') return;
 
         if (!event.keyCode) { return; }

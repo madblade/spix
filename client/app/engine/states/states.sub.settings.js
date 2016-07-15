@@ -9,8 +9,6 @@ App.Engine.StateManager.prototype.registerSettings = function() {
 };
 
 App.Engine.StateManager.prototype.startSettings = function() {
-    this.app.uiEngine.stopKeyboardListeners();
-
     var scope = this;
 
     // HTML menu getters.
@@ -104,7 +102,7 @@ App.Engine.StateManager.prototype.startSettings = function() {
             $(document).off('keydown');
             unlistenHome();
             scope.setState('ingame');
-            scope.app.uiEngine.requestPointerLock();
+            app.uiEngine.requestPointerLock();
 
         }.bind(this));
     };
@@ -120,7 +118,6 @@ App.Engine.StateManager.prototype.startSettings = function() {
 
     $(document).keydown(function(event) {
         if (!event.keyCode) { return; }
-        event.preventDefault();
         if (event.keyCode === this.app.uiEngine.keyControls.escape) {
             // Remove listeners and get away from the bike.
             $(document).off('keydown');
@@ -138,9 +135,6 @@ App.Engine.StateManager.prototype.endSettings = function() {
         var settings = $("#announce");
         settings.fadeOut(200, function() {
             settings.empty().removeClass('settings');
-
-            app.uiEngine.startKeyboardListeners();
-
             resolve();
         });
     });

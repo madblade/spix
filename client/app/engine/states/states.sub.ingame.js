@@ -13,6 +13,9 @@ App.Engine.StateManager.prototype.startIngame = function() {
 };
 
 App.Engine.StateManager.prototype.endIngame = function() {
+    app.uiEngine.stopKeyboardListeners();
+    app.uiEngine.stopMouseListeners();
+
     return new Promise(function(resolve) {
         $('#announce').empty().removeClass('reticle-wrapper');
        resolve();
