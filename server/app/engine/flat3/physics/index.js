@@ -13,8 +13,9 @@ class Physics {
 
     update() {
         let entityManager = this._entityman;
+        let worldManager = this._worldman;
         entityManager.forEach(function(entity) {
-           entity.move(entityManager);
+           entity.move(entityManager, worldManager);
         });
     }
 

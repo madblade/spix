@@ -9,13 +9,19 @@ import TopoKernel from './topokernel';
 
 class Chunk {
 
-    constructor(xSize, ySize, zSize, chunkId) {
-        // Dimensions.
+    constructor(xSize, ySize, zSize, chunkId, worldManager) {
+        // App.
+        this._worldManager = worldManager;
+
+        // Dimensions, coordinates
         this._xSize = xSize;
         this._ySize = ySize;
         this._zSize = zSize;
         this._capacity = this._xSize * this._ySize * this._zSize;
         this._chunkId = chunkId;
+        let ij = chunkId.split(',');
+        this._chunkI = parseInt(ij[0]);
+        this._chunkJ = parseInt(ij[1]);
 
         // Blocks.
         /** Flatten array. x, then y, then z. */
@@ -43,6 +49,8 @@ class Chunk {
     }
 
     // Getters
+    get chunkI() { return this._chunkI; }
+    get chunkJ() { return this._chunkJ; }
     get chunkId() { return this._chunkId; }
     get dimensions() { return [this._xSize, this._ySize, this._zSize]; }
     get capacity() { return this._capacity; }
@@ -60,6 +68,48 @@ class Chunk {
     set fastComponentsIds(newFastComponentsIds) { this._fastConnectedComponentsIds = newFastComponentsIds; }
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
+
+    getNeighboringChunk(direction) {
+        let i = this.chunkI;
+        let j = this.chunkJ;
+        let wm = this._worldManager;
+
+        switch (direction) {
+            case 0: // x+
+                return wm.getChunk(i+1, j);
+            case 1: // x-
+                return wm.getChunk(i-1, j);
+            case 2: // y+
+                return wm.getChunk(i, j+1);
+            case 3: // y-
+                return wm.getChunk(i, j-1);
+            case 4: // z+ (to be implemented in non-flat models)
+            case 5: // z- (idem)
+                return null;
+            default:
+        }
+    }
+
+    isNeighboringChunkLoaded(direction) {
+        let i = this.chunkI;
+        let j = this.chunkJ;
+        let wm = this._worldManager;
+
+        switch (direction) {
+            case 0: // x+
+                return wm.isChunkLoaded(i+1, j);
+            case 1: // x-
+                return wm.isChunkLoaded(i-1, j);
+            case 2: // y+
+                return wm.isChunkLoaded(i, j+1);
+            case 3: // y-
+                return wm.isChunkLoaded(i, j-1);
+            case 4: // z+
+            case 5: // z-
+                return false;
+            default:
+        }
+    }
 
     /**
      * Detect boundary blocks.
@@ -92,6 +142,9 @@ class Chunk {
         let blocks = new Uint8Array(numberOfBlocks);
         blocks.fill(blockId, 0, numberOfBlocksToFill);
         blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
+        // for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
+        //    if (Math.random() < 0.01) blocks[i] = blockId;
+        // }
         this._blocks = blocks;
 
         console.log("\t" + this._blocks.length + " blocks generated.");
@@ -129,7 +182,6 @@ class Chunk {
         if (id >= this._capacity) return;
 
         this._blocks[id] = 0;
-        // TODO update surface blocks
         TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
 
         // TODO update connected components

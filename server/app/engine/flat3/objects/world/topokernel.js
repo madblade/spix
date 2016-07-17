@@ -260,9 +260,9 @@ class TopoKernel {
 
             const componentId = connectedComponents[fid];
             if (componentId === undefined) console.log('Face id ' + fid);
-            // console.log('Component id ' + componentId);
             if (componentId < 1) {
-                console.log("WARN: trying to remove a face that is not registered as boundary.");
+                console.log("WARN: trying to remove a face that is not registered as boundary: " +
+                    "component id = " + componentId + ".");
                 continue;
             }
             oldComponent = componentId;

@@ -42,7 +42,7 @@ class Entity {
     stopLeft()      { this._directions[2] = false; }
     stopBackwards() { this._directions[3] = false; }
 
-    move(entityManager) {
+    move(entityManager, worldManager) {
         const theta = this._rotation[0];
         const ds = this._directions;
         var desiredSpeed = [0, 0, 0];
@@ -75,7 +75,13 @@ class Entity {
             entityManager.entityUpdated(this._id);
 
             // Update.
-            for (let i = 0; i<3; ++i) this._position[i] += 0.1 * desiredSpeed[i];
+            let newPosition = [this._position[0], this._position[1], this._position[2]];
+            for (let i = 0; i<3; ++i) newPosition[i] += 0.1 * desiredSpeed[i];
+
+            // Collide.
+            if (worldManager.isEmpty(newPosition)) {
+                this._position = newPosition;
+            }
         }
     }
 

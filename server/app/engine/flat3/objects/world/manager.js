@@ -101,14 +101,14 @@ class WorldManager {
         const dz = this.chunkDimensionZ;
 
         let chunkIds = [];
-        chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
+        chunkIds.push((i+','+j)); //, (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
 
         for (let chunkIdId = 0; chunkIdId<chunkIds.length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
             console.log("We should generate " + currentChunkId + " for the user.");
             console.log(currentChunkId);
             if (!this._chunks.hasOwnProperty(currentChunkId)) {
-                let chunk = Generator.generateFlatChunk(dx, dy, dz, currentChunkId); // virtual polymorphism
+                let chunk = Generator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
                 this._chunks[chunk.chunkId] = chunk;
             }
 
@@ -354,6 +354,21 @@ class WorldManager {
         let z = 48;
         while (this.whatBlock(0, 0, z) !== 0 && z < this._zSize) ++z;
         return [0, 0, z];
+    }
+
+    getChunk(iCoordinate, jCoordinate) {
+        return this._chunks[iCoordinate+','+jCoordinate];
+    }
+
+    isChunkLoaded(iCoordinate, jCoordinate) {
+        let chunk = this.getChunk(iCoordinate, jCoordinate);
+        return chunk === null || chunk === undefined;
+    }
+
+    isEmpty(positionArray) {
+        // TODO collide with blocks.
+        let cs = this._chunks;
+        return true;
     }
 
 }

@@ -110,6 +110,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var chunkJ = parseInt(chunkIndices[1]);
     var iChunkOffset = chunkI * this.chunkSizeX;
     var jChunkOffset = chunkJ * this.chunkSizeY;
+    var defaultGeometrySize = this.defaultGeometrySize;
 
     var meshId;
     var removed = components[0];
@@ -131,12 +132,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         normals = geometries[meshId].attributes.normal.array;
         var lastPosition = sizes[meshId] - 1;
         var isLast = lastPosition === position;
-        if (position > lastPosition) {
-            console.log('ERROR: swapping with something after.');
-            console.log('Removing face ' + position + ', replacing with ' + lastPosition);
-            console.log(whichFaceIs[lastPosition] + ' last; ' + whichFaceIs[position] + ' current.');
-            console.log(whereToFindFace[whichFaceIs[lastPosition]][1] + ' last; ' + whereToFindFace[whichFaceIs[position]][1] + ' current.');
-        }
 
         // Update
         var i, p;
@@ -222,7 +217,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             sizes[meshId] = 1;
             whichFaceIs[meshId] = {};
 
-            var triangles = 2 * 64; // TODO externalize newMesh size variable
+            var triangles = 2 * defaultGeometrySize;
             var sunCapacity = Math.floor(3/2 * triangles);
             capacities[meshId] = sunCapacity / 2;
 
