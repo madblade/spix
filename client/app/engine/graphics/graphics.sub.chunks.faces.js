@@ -169,9 +169,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
     for (j = 0; j<18; ++j) {
         if (isNaN(positions[i+j])) {
-            console.log('Transferred miscalculation on ' + (i+j) + 'th component.');
-            console.log(
-                '\tnormal: ' + normal+'\n'+
+            console.log('Transferred miscalculation on ' + i + 'th component.' +
+                '\tnormal: ' + normal+'\n' +
                 '\tfaceId: ' + faceId
             );
             return;

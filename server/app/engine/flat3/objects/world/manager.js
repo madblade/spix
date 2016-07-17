@@ -300,7 +300,7 @@ class WorldManager {
             return;
 
         // Add block on chunk.
-        console.log(blockCoordinatesOnChunk);
+        // console.log(blockCoordinatesOnChunk);
         chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
 
         // Remember this chunk was touched.
