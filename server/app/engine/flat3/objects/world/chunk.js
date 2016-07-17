@@ -41,6 +41,9 @@ class Chunk {
         // Generation.
         this.fillChunk(48, 1);
         this.computeSurfaceBlocksFromScratch();
+
+        // TODO externalize computeConnectedComponents so that a chunk can access its neighbours blocks before
+        // any component is computed.
         this.computeConnectedComponents();
 
         console.log("Computed.");
@@ -142,9 +145,18 @@ class Chunk {
         let blocks = new Uint8Array(numberOfBlocks);
         blocks.fill(blockId, 0, numberOfBlocksToFill);
         blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
-        // for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
-        //    if (Math.random() < 0.01) blocks[i] = blockId;
-        // }
+
+        /*
+        let numberAdded = 0;
+        for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
+            if (Math.random() < 0.1) {
+               blocks[i] = blockId;
+               if (numberAdded++ == 5) break;
+            }
+        }
+        console.log(numberAdded + " different blocks added.");
+        */
+
         this._blocks = blocks;
 
         console.log("\t" + this._blocks.length + " blocks generated.");

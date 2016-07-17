@@ -21,7 +21,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
 
     // Lights
     this.light = this.getLight('hemisphere');
-    this.light.position.set( 0.5, 1, 0.75 );
+    this.light.position.set(0.5, 1, 0.75);
 
     // Player
     this.avatar = this.getMesh(

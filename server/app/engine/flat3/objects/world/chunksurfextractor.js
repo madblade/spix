@@ -55,7 +55,7 @@ class ChunkSurfaceExtractor {
         const capacity = blocks.length;
 
         var surfaceFaces = {'0':[],'1':[],'2':[]};
-        var faces = [new Int8Array(capacity), new Int8Array(capacity), new Int8Array(capacity)];
+        var faces = [new Int32Array(capacity), new Int32Array(capacity), new Int32Array(capacity)];
 
         var connectedComponents = new Uint8Array(3 * capacity);
         connectedComponents.fill(0);
@@ -89,7 +89,15 @@ class ChunkSurfaceExtractor {
             }
         }
 
-        function setFace(direction, blockId) {
+        function setFace(direction, bid) {
+            let blockId = bid;
+            switch (direction) {
+                case 0: blockId -= 1; break;
+                case 1: blockId -= iS; break;
+                case 2: blockId -= ijS; break;
+                default:
+            }
+
             // Set surface face
             const d = direction%3;
             if (d in surfaceFaces) surfaceFaces[d].push(blockId);
@@ -97,7 +105,7 @@ class ChunkSurfaceExtractor {
 
             // Set faces
             faces[d][blockId] = blocks[blockId]; // Face nature
-            faces[d][blockId] *= (d%2 === 0 ? 1 : -1); // Face normal (-1 => towards minus)
+            if (d<3) faces[d][blockId] *= -1; // Face normal (-1 => towards minus)
 
             // Set connected component
             const faceId = d*capacity + blockId;
@@ -187,6 +195,7 @@ class ChunkSurfaceExtractor {
                 }
             }
         }
+
         function jay(flatFaceId) {
             var cc = connectedComponents;
             var ec = encounteredFaces;
@@ -205,7 +214,7 @@ class ChunkSurfaceExtractor {
                 const stackRight = capacity + right;
                 if (faces[1][right] > 0 && normalP || faces[1][right] < 0 && normalM) {
                     if (cc[stackRight] !== ec[stackRight] && cc[stackRight] !== cc[stackFaceId]) {
-                        merger.push(cc[stackRight], cc[stackFaceId]);
+                        merger.push([cc[stackRight], cc[stackFaceId]]);
                     }
                     cc[stackRight] = cc[stackFaceId];
                 }
@@ -216,7 +225,7 @@ class ChunkSurfaceExtractor {
             const stackTopOrtho = 2*capacity + flatFaceId;
             if (faces[2][flatTopOrtho] > 0 && normalP || faces[2][flatTopOrtho] < 0 && normalM) {
                 if (cc[stackTopOrtho] !== ec[stackTopOrtho] && cc[stackTopOrtho] !== cc[stackFaceId]) {
-                    merger.push(cc[stackTopOrtho], cc[stackFaceId]);
+                    merger.push([cc[stackTopOrtho], cc[stackFaceId]]);
                 }
                 cc[stackTopOrtho] = cc[stackFaceId];
             }
@@ -234,6 +243,7 @@ class ChunkSurfaceExtractor {
                 if (faces[0][flatBackOrthoNext] < 0 && normalP || faces[0][flatBackOrthoNext] > 0 && normalM) cc[stackBackOrthoNext] = cc[stackFaceId];
             }
         }
+
         function kay(flatFaceId) {
             var cc = connectedComponents;
             var ec = encounteredFaces;
@@ -247,7 +257,7 @@ class ChunkSurfaceExtractor {
                 const stackBack = 2 * capacity + back;
                 if (faces[2][back] > 0 && normalP || faces[2][back] < 0 && normalM) {
                     if (cc[stackBack] !== ec[stackBack] && cc[stackBack] !== cc[stackFaceId]) {
-                        merger.push(cc[stackBack], cc[stackFaceId]);
+                        merger.push([cc[stackBack], cc[stackFaceId]]);
                     }
                     cc[stackBack] = cc[stackFaceId];
                 }
@@ -257,7 +267,7 @@ class ChunkSurfaceExtractor {
                 const stackRight = 2 * capacity + right;
                 if (faces[2][right] > 0 && normalP || faces[2][right] < 0 && normalM) {
                     if (cc[stackRight] !== ec[stackRight] && cc[stackRight] !== cc[stackFaceId]) {
-                        merger.push(cc[stackRight], cc[stackFaceId]);
+                        merger.push([cc[stackRight], cc[stackFaceId]]);
                     }
                     cc[stackRight] = cc[stackFaceId];
                 }
@@ -270,7 +280,7 @@ class ChunkSurfaceExtractor {
                 const stackBackOrtho = capacity + flatBackOrthoCurrent;
                 if (faces[1][flatBackOrthoCurrent] < 0 && normalP || faces[1][flatBackOrthoCurrent] > 0 && normalM) {
                     if (cc[stackBackOrtho] !== ec[stackBackOrtho] && cc[stackBackOrtho] !== cc[stackFaceId]) {
-                        merger.push(cc[stackBackOrtho], cc[stackFaceId]);
+                        merger.push([cc[stackBackOrtho], cc[stackFaceId]]);
                     }
                     cc[stackBackOrtho] = cc[stackFaceId];
                 }
@@ -280,7 +290,7 @@ class ChunkSurfaceExtractor {
                 const stackRightOrthoCurrent = flatFaceId + ijS;
                 if (faces[0][flatRightOrthoCurrent] < 0 && normalP || faces[0][flatRightOrthoCurrent] > 0 && normalM) {
                     if (cc[stackRightOrthoCurrent] !== ec[stackRightOrthoCurrent] && cc[stackRightOrthoCurrent]!== cc[stackFaceId]) {
-                        merger.push(cc[stackRightOrthoCurrent], cc[stackFaceId]);
+                        merger.push([cc[stackRightOrthoCurrent], cc[stackFaceId]]);
                     }
                     cc[stackRightOrthoCurrent] = cc[stackFaceId];
                 }
@@ -292,7 +302,7 @@ class ChunkSurfaceExtractor {
                 const stackBackOrthoPrevious = capacity + flatBackOrthoPrevious;
                 if (faces[1][flatBackOrthoPrevious] > 0 && normalP || faces[1][flatBackOrthoPrevious] < 0 && normalM) {
                     if (cc[stackBackOrthoPrevious] !== ec[stackBackOrthoPrevious] && cc[stackBackOrthoPrevious] !== cc[stackFaceId]) {
-                        merger.push(cc[stackBackOrthoPrevious], cc[stackFaceId]);
+                        merger.push([cc[stackBackOrthoPrevious], cc[stackFaceId]]);
                     }
                     cc[stackBackOrthoPrevious] = cc[stackFaceId];
                 }
@@ -302,7 +312,7 @@ class ChunkSurfaceExtractor {
                 const stackRightOrthoPrevious = capacity + flatRightOrthoPrevious;
                 if (faces[0][flatRightOrthoPrevious] > 0 && normalP || faces[0][flatRightOrthoPrevious] < 0 && normalM) {
                     if (cc[stackRightOrthoPrevious] !== ec[stackRightOrthoPrevious] && cc[stackRightOrthoPrevious] !== cc[stackFaceId]) {
-                        merger.push(cc[stackRightOrthoPrevious], cc[stackFaceId]);
+                        merger.push([cc[stackRightOrthoPrevious], cc[stackFaceId]]);
                     }
                     cc[stackRightOrthoPrevious] = cc[stackFaceId];
                 }
@@ -315,6 +325,12 @@ class ChunkSurfaceExtractor {
         let kays = surfaceFaces['2']; let kaysLength = kays.length;
         let ayeCurrent = 0; let jayCurrent = 0; let kayCurrent = 0;
 
+        jays.sort();
+        kays.sort();
+        // console.log(ayes);
+        // console.log(jays);
+        // console.log(kays);
+
         let currentBlock = capacity;
         if (ayesLength > 0) currentBlock = ayes[ayeCurrent];
         if (jaysLength > 0) currentBlock = Math.min(currentBlock, jays[jayCurrent]);
@@ -326,9 +342,11 @@ class ChunkSurfaceExtractor {
             if (kays[kayCurrent] === currentBlock) kay(kays[kayCurrent++]);
             ++currentBlock;
         }
-        if (kayCurrent !== kaysLength) console.log("warn. kays not completely recursed");
-        if (jayCurrent !== jaysLength) console.log("warn. jays not completely recursed");
-        if (ayeCurrent !== ayesLength) console.log("warn. ayes not completely recursed");
+
+        console.log(currentBlock + " " + capacity);
+        if (kayCurrent !== kaysLength) console.log("WARN. kays not recursed: " + kayCurrent + " out of " + kaysLength);
+        if (jayCurrent !== jaysLength) console.log("WARN. jays not recursed: " + jayCurrent + " out of " + jaysLength);
+        if (ayeCurrent !== ayesLength) console.log("WARN. ayes not recursed: " + ayeCurrent + " out of " + ayesLength);
 
         // Compute fast connected components.
         var fastCC = {};
@@ -347,6 +365,7 @@ class ChunkSurfaceExtractor {
             if (!fastMerger.hasOwnProperty(max)) fastMerger[max] = min;
             else if (min < fastMerger[max]) fastMerger[max] = min;
         }
+
         for (let id in fastCC) {
             if (!fastCC.hasOwnProperty(id)) continue;
             let cc = fastCC[id];

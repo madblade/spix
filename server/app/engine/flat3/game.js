@@ -63,11 +63,11 @@ class Flat3 extends Game {
         this._ai.update();          // Update perceptions, intents.
         this._outputman.update();   // Send updates.
 
-        var n = this._playerman.nbPlayers;
-        //console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
+        // var n = this._playerman.nbPlayers;
+        // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
 
-        this._tt += 1;
-        if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
+        // this._tt += 1;
+        // if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
     }
 
     save() {
