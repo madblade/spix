@@ -82,7 +82,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     // Make material and mesh.
     c.materials = [new THREE.MeshPhongMaterial({
         color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+        side: THREE.BackSide, vertexColors: THREE.VertexColors
     })];
     c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 
@@ -212,7 +212,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
                 color: 0xb8860b, specular: 0xffffff, shininess: 250,
-                side: THREE.DoubleSide // , vertexColors: THREE.VertexColors
+                side: THREE.BackSide // , vertexColors: THREE.VertexColors
             });
             sizes[meshId] = 1;
             whichFaceIs[meshId] = {};

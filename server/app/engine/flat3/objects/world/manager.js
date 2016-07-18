@@ -205,7 +205,7 @@ class WorldManager {
         } else { failure(1); return false; }
 
         // Designed block must be 0.
-        console.log(blockCoordinatesOnChunk);
+        // console.log(blockCoordinatesOnChunk);
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0) {
             failure(2);
             return false;
@@ -254,7 +254,7 @@ class WorldManager {
         } else { failure(1); return false; }
 
         // Designed block must be 0.
-        console.log(blockCoordinatesOnChunk);
+        // console.log(blockCoordinatesOnChunk);
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0) {
             failure(2);
             return false;
@@ -330,7 +330,7 @@ class WorldManager {
             return;
 
         // Add block on chunk.
-        console.log(blockCoordinatesOnChunk);
+        // console.log(blockCoordinatesOnChunk);
         chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
 
         // Remember this chunk was touched.
