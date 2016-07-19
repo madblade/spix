@@ -35,10 +35,9 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             ce.send('r', [z, x]);
         };
 
-        document.addEventListener('mousemove', onMouseMove, false);
-
         return {
-            dispose : function () { document.removeEventListener('mousemove', onMouseMove, false); },
+            stopListeners : function () { document.removeEventListener('mousemove', onMouseMove, false); },
+            startListeners : function() { document.addEventListener('mousemove', onMouseMove, false); },
             getObject : function () {
                 return yawObject;
                 // return camera;

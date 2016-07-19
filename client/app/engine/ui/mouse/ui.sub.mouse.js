@@ -28,8 +28,10 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
 
 App.Engine.UI.prototype.startMouseListeners = function() {
     this.registerMouseDown();
+    this.app.graphicsEngine.controls.startListeners();
 };
 
 App.Engine.UI.prototype.stopMouseListeners = function() {
     this.unregisterMouseDown();
+    this.app.graphicsEngine.controls.stopListeners();
 };

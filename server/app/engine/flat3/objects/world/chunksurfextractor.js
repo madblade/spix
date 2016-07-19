@@ -482,6 +482,7 @@ class ChunkSurfaceExtractor {
             fastCCIds[cccid] = [];
             let tcur = fastCCIds[cccid];
             let fcc = fastCC[cccid];
+            fcc.sort();
             for (let i in fcc) {
                 if (!fcc.hasOwnProperty(i)) continue;
                 let j = fcc[i];
