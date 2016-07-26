@@ -62,10 +62,8 @@ App.Core.prototype.join = function(gameType, gid) {
 
             // Failure
             function() {
-                // TODO manage spam-clicking...
-                var err = new Error();
-                console.log(err);
-                console.log("Could not join game @connectionEngine.join(): server refused.");
+                // force F5
+                location.reload();
             }.bind(this)
         );
 };

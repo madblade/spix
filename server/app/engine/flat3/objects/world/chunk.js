@@ -33,6 +33,7 @@ class Chunk {
         /**  Each connected component -> (sorted) list of face indices. */
         this._fastConnectedComponents = {};
         this._fastConnectedComponentsIds = {}; // Signed.
+        this._ready = false;
 
         // Events.
         this._lastUpdated = process.hrtime();
@@ -40,15 +41,13 @@ class Chunk {
 
         // Generation.
         this.fillChunk(48, 1);
+    }
+
+    computeFaces() {
         this.computeSurfaceBlocksFromScratch();
-
-        // TODO externalize computeConnectedComponents so that a chunk can access its neighbours blocks before
-        // any component is computed.
         this.computeConnectedComponents();
-
-        console.log("Computed.");
-        // console.log(this._connectedComponents);
-        // console.log(this._fastConnectedComponents);
+        this._ready = true;
+        console.log("Chunk " + this._chunkId + " ready.");
     }
 
     // Getters
@@ -63,6 +62,8 @@ class Chunk {
     get fastComponentsIds() { return this._fastConnectedComponentsIds; }
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
+    get ready() { return this._ready; }
+    get manager() { return this._worldManager; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
@@ -121,7 +122,6 @@ class Chunk {
         console.log('\tExtracting surface...');
         var extractor = new ChunkSurfaceExtractor(this);
         extractor.extractSurfaceBlocks();
-        // TODO optimize during generation.
     }
 
     /**
@@ -185,7 +185,6 @@ class Chunk {
         this._blocks[id] = blockId; // Update blocks.
         TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
 
-        // TODO Update connected components.
         TopoKernel.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
 
@@ -196,7 +195,6 @@ class Chunk {
         this._blocks[id] = 0;
         TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
 
-        // TODO update connected components
         TopoKernel.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
     }
 

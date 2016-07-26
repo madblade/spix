@@ -7,7 +7,7 @@
 App.Engine.UI.prototype.registerMouseDown = function() {
     var scope = this;
     $(window).mousedown(function(event) {
-        if (scope.app.stateManager.state !== 'ingame') return; // TODO menu state
+        if (scope.app.stateManager.state !== 'ingame') return;
         switch (event.which) {
             case scope.buttons.left:
                 /*

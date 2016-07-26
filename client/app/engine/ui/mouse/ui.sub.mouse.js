@@ -19,7 +19,6 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
         controls = this.getFirstPersonControls(camera);
         controls.type = 'fp';
     } else {
-        // TODO handle no controls
         controls = undefined;
     }
 

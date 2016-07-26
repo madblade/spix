@@ -58,7 +58,6 @@ App.Engine.Connection.prototype.removeCustomListener = function(message, func) {
 App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
 };
 
-// TODO optimize client interaction to avoid overwhelming the server.
 App.Engine.Connection.prototype.send = function(message, content) {
     this.socket.emit(message, content);
 };

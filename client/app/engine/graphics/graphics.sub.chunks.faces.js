@@ -73,7 +73,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         ax = iChunkOffset + ii; ay = jChunkOffset + 1 + jj; az = kk;
         bx = ax + 1; by = ay; bz = az;
-        cx = ax + 1; cy = ay; cz = az + 1; // TODO check this
+        cx = ax + 1; cy = ay; cz = az + 1;
         dx = ax; dy = ay; dz = az + 1;
 
         positions[i]   = ax; positions[i+1] = ay; positions[i+2] = az;

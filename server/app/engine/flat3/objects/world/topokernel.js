@@ -70,7 +70,7 @@ class TopoKernel {
         if (z < dimensions[2] && chunk.contains(x, y, z+1)) {
             zp = true;
             if ((x<0 || chunk.contains(x-1, y, z+1)) && (x>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                (z<0 || chunk.contains(x, y-1, z+1)) && (y>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
+                (y<0 || chunk.contains(x, y-1, z+1)) && (y>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
                 (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
                 TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
         }
@@ -415,7 +415,7 @@ class TopoKernel {
         if (z < dimensions[2] && chunk.contains(x, y, z+1)) {
             zp = true;
             if ((x<0 || chunk.contains(x-1, y, z+1)) && (x>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                (z<0 || chunk.contains(x, y-1, z+1)) && (y>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
+                (y<0 || chunk.contains(x, y-1, z+1)) && (y>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
                 (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
                 TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
         }

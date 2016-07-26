@@ -53,7 +53,7 @@ class EntityManager {
 
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
-        p.avatar = EntityFactory.createAvatar(id);
+        p.avatar = EntityFactory.createAvatar(id, this);
         p.avatar.spawn(this._worldManager.getFreePosition());
         this._entities[id] = p.avatar;
     }

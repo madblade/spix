@@ -5,9 +5,7 @@
 'use strict';
 
 App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
-    // console.log(cp);
     // TODO ignore self.camerarotation
-    // TODO optimize client outputs
     if (e !== undefined && e !== null) {
         e.forEach(function(updatedEntity) {
             var currentEntity;
@@ -40,7 +38,6 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 };
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
-    // TODO build surface from blocks.
     for (var chunkId in updates) {
         if (!updates.hasOwnProperty(chunkId)) continue;
 

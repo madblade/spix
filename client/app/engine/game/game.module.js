@@ -20,7 +20,6 @@ App.Engine.Game.prototype.run = function() {
 };
 
 App.Engine.Game.prototype.updateChunks = function(data) {
-    // TODO manage asynch with a flag?
     if (!this.isRunning) return;
 
     this.app.graphicsEngine.updateGraphicChunks(data);

@@ -8,8 +8,8 @@ import Avatar from './../entities/avatar';
 
 class EntityFactory {
 
-    static createAvatar(id) {
-        return new Avatar(id);
+    static createAvatar(id, entityManager) {
+        return new Avatar(id, entityManager);
     }
 
 }
