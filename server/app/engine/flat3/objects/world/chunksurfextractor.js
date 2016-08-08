@@ -116,7 +116,6 @@ class ChunkSurfaceExtractor {
 
         // Compute POST borders.
         for (let z in surfaceBlocks) {
-            if (!surfaceBlocks.hasOwnProperty(z)) continue;
             let layer = surfaceBlocks[z];
             for (let b = 0; b < layer.length; ++b) {
                 let blockId = layer[b] + z*ijS;
@@ -147,7 +146,7 @@ class ChunkSurfaceExtractor {
 
             // CASE 1: aligned with top and back i (both normals)
             const top = flatFaceId + ijS;
-            if (top < capacity){
+            if (top < capacity) {
                 if (faces[0][top] > 0 && normalP || faces[0][top] < 0 && normalM) {
                     if (debug) console.log("i linked to top i");
                     cc[top] = cc[stackFaceId];
@@ -471,7 +470,6 @@ class ChunkSurfaceExtractor {
 
         // TODO check fastCC...
         for (let i in fastCC) {
-            if (!fastCC.hasOwnProperty(i)) continue;
             for (let faceId = 0; faceId < fastCC[i].length; ++faceId) {
                 if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId) console.log("Detected duplicate face.");
             }
@@ -480,13 +478,11 @@ class ChunkSurfaceExtractor {
         // Induce Ids.
         var fastCCIds = {};
         for (let cccid in fastCC) {
-            if (!fastCC.hasOwnProperty(cccid)) continue;
             fastCCIds[cccid] = [];
             let tcur = fastCCIds[cccid];
             let fcc = fastCC[cccid];
             fcc.sort();
             for (let i in fcc) {
-                if (!fcc.hasOwnProperty(i)) continue;
                 let j = fcc[i];
                 let orientation = j < capacity ? 0 : j < 2*capacity ? 1 : 2;
                 let realId = j % capacity;

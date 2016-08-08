@@ -17,7 +17,6 @@ class UserOutput {
         p.send('chk', extractedChunks);
         p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
         for (let cid in extractedChunks) {
-            if (!extractedChunks.hasOwnProperty(cid)) continue;
             let cs = this._game.worldman.allChunks;
             if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
         }

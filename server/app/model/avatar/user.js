@@ -75,7 +75,6 @@ class User {
         }
 
         for (let kind in games) {
-            if (!games.hasOwnProperty(kind)) continue;
             if (games[kind] instanceof Array && games[kind].length > 0) {
                 this._usercon.send('hub', games);
                 return;

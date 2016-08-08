@@ -17,7 +17,7 @@ App.Engine.UI.prototype.setupCustomLayout = function(newBinding) {
     if (k.hasOwnProperty(action)) {
         // Determine whether key is already used.
         for (var _action in k) {
-            if (!k.hasOwnProperty(_action) || _action === action) continue;
+            if (_action === action) continue;
             if (k[_action] === keyCode) {
                 // Switch.
                 k[_action] = k[action];

@@ -65,7 +65,6 @@ class Hub {
         };
 
         for (let kind in this._games) {
-            if (!this._games.hasOwnProperty(kind)) continue;
             games[kind] = [];
             CollectionUtils.forEachProperty(this._games[kind], f(kind));
         }

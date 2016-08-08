@@ -22,7 +22,6 @@ class EntityManager {
     forEach(callback) {
         let entities = this._entities;
         for (let entityId in entities) {
-            if (!entities.hasOwnProperty(entityId)) continue;
             callback(entities[entityId]);
         }
     }
@@ -39,7 +38,6 @@ class EntityManager {
     extractEntitiesInRange(player) {
         var entities = [];
         for (var eid in this._entities) {
-            if (!this._entities.hasOwnProperty(eid)) continue;
             if (this._entities[eid]._id === player.avatar._id) continue;
             let currentEntity = this._entities[eid];
             entities.push({_position:currentEntity.position,_rotation:currentEntity.rotation});
@@ -74,9 +72,9 @@ class EntityManager {
     anEntityIsPresentOn(x, y, z) {
         let entities = this._entities;
         for (let entityId in entities) {
-            if (!entities.hasOwnProperty(entityId)) continue;
             let p = entities[entityId].position;
-            return (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1);
+            if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)
+                return true;
         }
         return false;
     }

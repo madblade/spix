@@ -43,7 +43,6 @@ class WorldManager {
     get updatedChunks() {
         var updatedChuks = [];
         for (var id in this._updatedChunks) {
-            if (!this._updatedChunks.hasOwnProperty(id)) continue;
             updatedChuks[id] = this._chunks[id].blocks;
         }
         return updatedChuks;
@@ -53,8 +52,7 @@ class WorldManager {
         var chunks = {};
         // TODO include a distance test.
         for (let eid in this._updatedChunks) {
-            if (!this._updatedChunks.hasOwnProperty(eid) ||
-                !this._chunks.hasOwnProperty(eid) ||
+            if (!this._chunks.hasOwnProperty(eid) ||
                 !player.avatar.loadedChunks.hasOwnProperty(eid)) continue;
 
             let currentChunk = this._chunks[eid];
@@ -78,7 +76,7 @@ class WorldManager {
 
         var ld = [];
         for (var eid in av.loadedChunks) {
-            if (!av.loadedChunks.hasOwnProperty(eid) || !this._chunks.hasOwnProperty(eid)) continue;
+            if (!this._chunks.hasOwnProperty(eid)) continue;
             ld.push(eid);
         }
         // TODO check which chunks remain to load, and load them.
@@ -137,8 +135,7 @@ class WorldManager {
 
     updateChunksTransmitted() {
         for (let chunkId in this._updatedChunks) {
-            if (this._updatedChunks.hasOwnProperty(chunkId))
-                this._chunks[chunkId].flushUpdates();
+            this._chunks[chunkId].flushUpdates();
         }
         this._updatedChunks = {};
     }

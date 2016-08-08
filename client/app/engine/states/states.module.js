@@ -21,8 +21,9 @@ App.Engine.StateManager = function(app) {
 };
 
 App.Engine.StateManager.prototype.registerState = function(stateId, start, end) {
-    if (!this.states.hasOwnProperty(stateId))
+    if (!this.states.hasOwnProperty(stateId)) {
         this.states[stateId] = {start: start.bind(this), end: end.bind(this)};
+    }
 };
 
 App.Engine.StateManager.prototype.getState = function() {

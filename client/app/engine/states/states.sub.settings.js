@@ -24,7 +24,6 @@ App.Engine.StateManager.prototype.startSettings = function() {
         var settings = scope.app.graphicsEngine.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         for (var s in settings) {
-            if (!settings.hasOwnProperty(s)) continue;
             content +='<tr><td>' + settings[s] + '</td></tr>';
         }
         content += '<tr id="return"><td>Return</td></tr>';
@@ -55,7 +54,6 @@ App.Engine.StateManager.prototype.startSettings = function() {
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         content += '<tr id="return"><td>Return</td></tr>';
         for (var s in settings) {
-            if (!settings.hasOwnProperty(s)) continue;
             content +='<tr><td>' + settings[s] + '</td></tr>';
         }
         content += '</table>';

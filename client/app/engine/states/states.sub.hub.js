@@ -13,7 +13,6 @@ App.Engine.StateManager.prototype.startHub = function(data) {
     content += '<table class="table table-bordered" style="width:100%" class="noselect">';
 
     for (var property in data) {
-        if (!data.hasOwnProperty(property)) continue;
         var games = data[property];
         for (var id = 0; id < games.length; ++id) {
             content += '<tr><td>' + property + '</td><td>' + games[id] + '</td></tr>';

@@ -22,7 +22,6 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var currentComponent;
     var currentNatures;
     for (var cid in components) {
-        if (!components.hasOwnProperty(cid)) continue;
         currentComponent = components[cid];
         currentNatures = natures[cid];
         break;
@@ -118,7 +117,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
     for (var rid in removed) {
         // Get graphic data
-        if (!removed.hasOwnProperty(rid)) continue;
         if (!whereToFindFace.hasOwnProperty(rid)) {
             console.log("Trying to remove a face that is not present in chunk.");
             continue;
@@ -187,7 +185,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var added = components[1];
     for (var aid in added) {
         // Get graphic data
-        if (!added.hasOwnProperty(aid)) continue;
         faceId = Math.abs(aid);
         if (whereToFindFace.hasOwnProperty(faceId)) {
             console.log("Trying to add a face that is already present in chunk.");
@@ -280,7 +277,6 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 App.Engine.Graphics.prototype.removeChunk = function(chunkId) {
     var meshes = this.chunks[chunkId].meshes;
     for (var meshId in meshes) {
-        if (!meshes.hasOwnProperty(meshId)) continue;
         this.scene.remove(meshes[meshId]);
     }
     delete this.chunks[chunkId];

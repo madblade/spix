@@ -58,8 +58,7 @@ class CollectionUtils {
     static numberOfNestedProperties(object) {
         var result = 0;
         for (var property in object)
-            if (object.hasOwnProperty(property))
-                result+=Object.keys(object[property]).length;
+            result+=Object.keys(object[property]).length;
         return result;
     }
 

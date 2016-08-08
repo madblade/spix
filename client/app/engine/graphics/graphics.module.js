@@ -79,9 +79,7 @@ App.Engine.Graphics.prototype.getCloseTerrain = function() {
     var chks = this.chunks;
     for (var cid in chks) {
         // TODO extract on 4 closest chunks.
-        if (!chks.hasOwnProperty(cid)) continue;
         var currentChunk = chks[cid];
-        if (!currentChunk.hasOwnProperty('meshes')) continue;
         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
     }
     return meshes;
