@@ -4,44 +4,83 @@
 
 'use strict';
 
+import ChunkLoader from './chunkloader';
+
 class ChunkSurfaceExtractor {
 
     constructor(chunk) {
         this._chunk = chunk;
+        this._neighbors = [];
+        this._neighborBlocks = [];
+
+        // Get all six neighbour chunks.
+        for (let i = 0; i<4; ++i) {
+            this._neighbors.push(ChunkLoader.getNeighboringChunk(chunk, i));
+            this._neighborBlocks.push(this._neighbors[i].blocks);
+        }
     }
 
     extractSurfaceBlocks() {
         let chunk = this._chunk;
-        const iS = chunk.dimensions[0];
-        const ijS = chunk.dimensions[0] * chunk.dimensions[1];
+        const iSize = chunk.dimensions[0];
+        const ijSize = chunk.dimensions[0] * chunk.dimensions[1];
 
         var sbs = chunk.surfaceBlocks;
         function addSurfaceBlock(bid) {
-            const ijC = bid % ijS;
-            const z = (bid - ijC) / ijS;
+            const ijC = bid % ijSize;
+            const z = (bid - ijC) / ijSize;
             if (sbs.hasOwnProperty(z)) sbs[z].push((ijC));
             else sbs[z] = [ijC];
         }
 
         // Test neighbourhood.
-        let bs = chunk.blocks;
-        let length = bs.length;
+        let blocks = chunk.blocks;
+        let length = blocks.length;
+        let nBlocks = this._neighborBlocks;
         for (let b = 0; b < length; ++b) {
-            if (bs[b] !== 0) {
-                const iP = b+1;
-                if ((iP % iS !== 0) && (bs[iP] === 0)) {addSurfaceBlock(b); continue;}
-                const iM = b-1;
-                if ((iM % iS !== iS-1) && (bs[iM] === 0)) {addSurfaceBlock(b); continue;}
+            if (blocks[b] !== 0) {
+                const iPlus = b+1;
+                if (iPlus % iSize === 0) {
+                    if (blocks[iPlus] === 0) { addSurfaceBlock(b); continue; }
+                } else { // Access other chunk
+                    if (nBlocks[0][iPlus-iSize] === 0) { addSurfaceBlock(b); continue; }
+                }
 
-                const jP = b+iS;
-                if (((jP-b%iS) % ijS !== 0) && (bs[jP] === 0)) {addSurfaceBlock(b); continue;}
-                const jM = b-iS;
-                if (((jM-b%iS) % ijS !== ijS-1) && (bs[jM] === 0)) {addSurfaceBlock(b); continue;}
+                const iMinus = b-1;
+                if (iMinus % iSize !== iSize-1) {
+                    if (blocks[iMinus] === 0) { addSurfaceBlock(b); continue; }
+                } else { // Access other chunk
+                    if (nBlocks[1][iMinus+iSize]) { addSurfaceBlock(b); continue; }
+                }
 
-                const kP = b+ijS;
-                if (kP < length && bs[kP] === 0) {addSurfaceBlock(b); continue;}
-                const kM = b-ijS;
-                if (kM >= 0 && bs[kM] === 0) {addSurfaceBlock(b);}
+                const jPlus = b+iSize;
+                if ((jPlus-b%iSize) % ijSize !== 0) {
+                    if (blocks[jPlus] === 0) { addSurfaceBlock(b); continue; }
+                } else { // Access other chunk
+
+                }
+
+                const jMinus = b-iSize;
+                if ((jMinus-b%iSize) % ijSize !== ijSize-1) {
+                    if ((blocks[jMinus] === 0)) { addSurfaceBlock(b); continue; }
+                } else { // Access other chunk
+
+                }
+
+                const kPlus = b+ijSize;
+                if (kPlus < length) {
+                    if (blocks[kPlus] === 0) {addSurfaceBlock(b); continue;}
+                } else { // Access other chunk
+
+                }
+
+                const kMinus = b-ijSize;
+                if (kMinus >= 0) {
+                    if (blocks[kMinus] === 0) {addSurfaceBlock(b);}
+                } else { // Access other chunk
+
+                }
+
             }
         }
     }

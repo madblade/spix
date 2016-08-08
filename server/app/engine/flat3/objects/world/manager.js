@@ -121,10 +121,23 @@ class WorldManager {
         return chunks;
     }
 
+    addChunk(id, chunk) {
+        this._chunks[id] = chunk;
+    }
+
     generate() {
         // TODO chrono and time out.
         return new Promise((resolve) => {
+
+            // Generate blocks.
             this._chunks = Generator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
+
+            // Finalize chunks (extract surface faces)
+            for (let cid in this._chunks) {
+                this._chunks[cid].computeFaces();
+            }
+
+            // Notify
             resolve();
         });
     }
@@ -318,6 +331,7 @@ class WorldManager {
         const k = coordinates[2];
         const chunkId = i+','+j;
         var chunk = this._chunks[chunkId];
+
         console.log("Transaction required on " + chunkId);
         if (!chunk || chunk === undefined) { console.log('Could not find chunk ' + chunkId); return; }
 

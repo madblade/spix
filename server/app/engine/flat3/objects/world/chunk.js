@@ -75,48 +75,6 @@ class Chunk {
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
 
-    getNeighboringChunk(direction) {
-        let i = this.chunkI;
-        let j = this.chunkJ;
-        let wm = this._worldManager;
-
-        switch (direction) {
-            case 0: // x+
-                return wm.getChunk(i+1, j);
-            case 1: // x-
-                return wm.getChunk(i-1, j);
-            case 2: // y+
-                return wm.getChunk(i, j+1);
-            case 3: // y-
-                return wm.getChunk(i, j-1);
-            case 4: // z+ (to be implemented in non-flat models)
-            case 5: // z- (idem)
-                return null;
-            default:
-        }
-    }
-
-    isNeighboringChunkLoaded(direction) {
-        let i = this.chunkI;
-        let j = this.chunkJ;
-        let wm = this._worldManager;
-
-        switch (direction) {
-            case 0: // x+
-                return wm.isChunkLoaded(i+1, j);
-            case 1: // x-
-                return wm.isChunkLoaded(i-1, j);
-            case 2: // y+
-                return wm.isChunkLoaded(i, j+1);
-            case 3: // y-
-                return wm.isChunkLoaded(i, j-1);
-            case 4: // z+
-            case 5: // z-
-                return false;
-            default:
-        }
-    }
-
     /**
      * Preload neighbors.
      */
