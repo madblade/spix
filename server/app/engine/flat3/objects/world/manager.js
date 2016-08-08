@@ -11,6 +11,9 @@ class WorldManager {
 
     constructor() {
         // Objects.
+        /**
+         * Chunk id (i+','+j) -> chunk
+         */
         this._chunks = {};
 
         // Keep track of modified objects.
@@ -25,16 +28,17 @@ class WorldManager {
         this._entityman = null;
     }
 
+    get allChunks() { return this._chunks; }
+    get chunkDimensionX() { return this._xSize; }
+    get chunkDimensionY() { return this._ySize; }
+    get chunkDimensionZ() { return this._zSize; }
+
+    set allChunks(newChunks) { this._chunks = newChunks; }
     set entityman(entityman) { this._entityman = entityman; }
 
     update() {
         // Update world.
     }
-
-    get allChunks() { return this._chunks; }
-    get chunkDimensionX() { return this._xSize; }
-    get chunkDimensionY() { return this._ySize; }
-    get chunkDimensionZ() { return this._zSize; }
 
     get updatedChunks() {
         var updatedChuks = [];
@@ -122,7 +126,7 @@ class WorldManager {
     generate() {
         // TODO chrono and time out.
         return new Promise((resolve) => {
-            this._chunks = Generator.generateFlatWorld(this._xSize, this._ySize, this._zSize);
+            this._chunks = Generator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
             resolve();
         });
     }
@@ -357,7 +361,8 @@ class WorldManager {
     }
 
     getChunk(iCoordinate, jCoordinate) {
-        return this._chunks[iCoordinate+','+jCoordinate];
+        let id = iCoordinate+','+jCoordinate;
+        return this._chunks[id];
     }
 
     isChunkLoaded(iCoordinate, jCoordinate) {

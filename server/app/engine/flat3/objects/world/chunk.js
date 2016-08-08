@@ -5,6 +5,7 @@
 'use strict';
 
 import ChunkSurfaceExtractor from './chunksurfextractor';
+import ChunkLoader from './chunkloader';
 import TopoKernel from './topokernel';
 
 class Chunk {
@@ -44,6 +45,7 @@ class Chunk {
     }
 
     computeFaces() {
+        this.preloadNeighborChunks();
         this.computeSurfaceBlocksFromScratch();
         this.computeConnectedComponents();
         this._ready = true;
@@ -113,6 +115,15 @@ class Chunk {
                 return false;
             default:
         }
+    }
+
+    /**
+     * Preload neighbors.
+     */
+    preloadNeighborChunks() {
+        console.log('\tPreloading neighbor chunks...');
+        var loader = new ChunkLoader(this, this._worldManager);
+        loader.preLoadNeighborChunks();
     }
 
     /**

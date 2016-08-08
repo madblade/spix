@@ -18,8 +18,7 @@ class Generator {
     }
 
     static generateFlatChunk(x, y, z, i, j, worldManager) {
-        let id = i;
-        if (typeof j === "number") id += ','+j;
+        let id = i+','+j;
         return WorldFactory.createChunk(x, y, z, id, worldManager);
     }
 

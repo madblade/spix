@@ -5,6 +5,7 @@
 'use strict';
 
 class ChunkSurfaceExtractor {
+
     constructor(chunk) {
         this._chunk = chunk;
     }
