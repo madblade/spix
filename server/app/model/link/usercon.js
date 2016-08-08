@@ -58,14 +58,14 @@ class UserConnection {
     }
 
     handleCreateGame(kind) {
-        var created = this._user.requestNewGame(kind);
+        const created = this._user.requestNewGame(kind);
         if (created) console.log('Created new game.');
         // TODO broadcast to those who are in hub, dynamically update hub (hhhh....)
         return created;
     }
 
     handleJoinGame(data) {
-        var joined = this._user.join(data.gameType, data.gameId);
+        const joined = this._user.join(data.gameType, data.gameId);
         if (joined) this.send('joined', 'foo');
         return joined;
     }

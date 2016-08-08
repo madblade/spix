@@ -28,7 +28,8 @@ class Flat3 extends Game {
         // super:_playerman
 
         // Generate then listen players.
-        this._worldman.generate().then(() => this.configurePlayerManager());
+        this._worldman.generate()
+            .then(() => this.configurePlayerManager());
     }
 
     configurePlayerManager() {
@@ -43,7 +44,7 @@ class Flat3 extends Game {
             this._entityman.despawnPlayer(p);
         });
 
-        this.ready = true;
+        this._ready = true;
     }
 
     // Model

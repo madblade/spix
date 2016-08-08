@@ -68,7 +68,25 @@ class User {
     }
 
     fetchHubState() {
-        this._usercon.send('hub', this._hub.listGames());
+        let games = this._hub.listGames();
+        if (Object.keys(games).length < 1) {
+            this._usercon.send('hub', games);
+            return;
+        }
+
+        for (let kind in games) {
+            if (!games.hasOwnProperty(kind)) continue;
+            if (games[kind] instanceof Array && games[kind].length > 0) {
+                this._usercon.send('hub', games);
+                return;
+            }
+        }
+
+        setTimeout(() => {
+            if (this.hasOwnProperty('_hub')) {
+                this.fetchHubState();
+            }
+        }, 2000);
     }
 
     /**

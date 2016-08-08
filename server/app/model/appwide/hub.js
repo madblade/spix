@@ -58,15 +58,18 @@ class Hub {
      * @returns {{}} Object: 1 id = 1 game kind; 1 element = 1 array of game ids.
      */
     listGames() {
-        var games = {};
+        let games = {};
+
         var f = (kind) => (gid) => {
             if (this._games[kind][gid].ready) games[kind].push(gid);
         };
-        for (var kind in this._games) {
+
+        for (let kind in this._games) {
             if (!this._games.hasOwnProperty(kind)) continue;
             games[kind] = [];
             CollectionUtils.forEachProperty(this._games[kind], f(kind));
         }
+
         return games;
     }
 

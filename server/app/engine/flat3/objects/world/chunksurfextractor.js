@@ -125,6 +125,7 @@ class ChunkSurfaceExtractor {
                             setFace(direction, blockId);
                         }
                     } else {
+                        // let neighbor = chunk.getNeighboringChunk(direction);
                         // TODO access other chunk.
                     }
                 }
