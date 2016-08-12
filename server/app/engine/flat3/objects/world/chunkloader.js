@@ -48,7 +48,7 @@ class ChunkLoader {
                 return wm.isChunkLoaded(i, j+1);
             case 3: // y-
                 return wm.isChunkLoaded(i, j-1);
-            case 4: // z+
+            case 4: // z+ (non-flat models)
             case 5: // z-
                 return false;
             default:

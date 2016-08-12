@@ -4,7 +4,8 @@
 
 'use strict';
 
-import ChunkSurfaceExtractor from './chunksurfextractor';
+import BlockExtractor from './extraction/chunkblockx';
+import FaceExtractor from './extraction/chunkfacex';
 import ChunkLoader from './chunkloader';
 import TopoKernel from './topokernel';
 
@@ -89,7 +90,7 @@ class Chunk {
      */
     computeSurfaceBlocksFromScratch() {
         console.log('\tExtracting surface...');
-        var extractor = new ChunkSurfaceExtractor(this);
+        var extractor = new BlockExtractor(this);
         extractor.extractSurfaceBlocks();
     }
 
@@ -98,7 +99,7 @@ class Chunk {
      */
     computeConnectedComponents() {
         console.log("\tComputing connected components...");
-        var extractor = new ChunkSurfaceExtractor(this);
+        var extractor = new FaceExtractor(this);
         extractor.extractConnectedComponents();
     }
 
@@ -106,7 +107,7 @@ class Chunk {
     fillChunk(toZ, blockId) {
         if (typeof toZ !== "number") return;
         if (typeof blockId !== "number") return;
-        console.log('Generating chunk...');
+        console.log('Generating chunk ' + this._chunkId + '...');
 
         const numberOfBlocksToFill = this._xSize * this._ySize * toZ;
         const numberOfBlocks = this._capacity;

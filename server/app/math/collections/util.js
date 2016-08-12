@@ -67,7 +67,7 @@ class CollectionUtils {
             console.log("BLD: undefined array.");
             return -1;
         }
-        var objectId = array.indexOf(object);
+        const objectId = array.indexOf(object);
         if (objectId > -1) array.splice(objectId, 1);
         return objectId;
     }
