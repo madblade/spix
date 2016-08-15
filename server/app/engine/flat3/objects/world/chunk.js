@@ -124,10 +124,10 @@ class Chunk {
         blocks.fill(blockId, 0, numberOfBlocksToFill);
         blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
 
-        blocks[3122] = 1;
-        blocks[3186] = 1;
+        //blocks[3122] = 1;
+        //blocks[3186] = 1;
 
-        /*
+        ///*
         let numberAdded = 0;
         for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
             if (Math.random() > 0.5) {
@@ -136,7 +136,7 @@ class Chunk {
             }
         }
         console.log(numberAdded + " different block(s) added.");
-        */
+        //*/
 
         this._blocks = blocks;
 

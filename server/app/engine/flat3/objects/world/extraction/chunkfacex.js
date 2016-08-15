@@ -46,7 +46,7 @@ class CSFX {
         }
     }
 
-    static setFace(direction, bid, blocks, faces,
+    static setFace(direction, bid, blockNature, faces,
                    surfaceFaces, encounteredFaces, connectedComponents,
                    capacity, iS, ijS, ccid, dontTranslate)
     {
@@ -67,7 +67,7 @@ class CSFX {
 
         // Set faces
         const factor = direction < 3 ? -1 : 1; // Face normal (-1 => towards minus)
-        faces[d][blockId] = factor * blocks[bid]; // Face nature
+        faces[d][blockId] = factor * blockNature; // Face nature
 
         // Set connected component
         const faceId = d * capacity + blockId;
@@ -92,7 +92,7 @@ class CSFX {
                     if (CSFX.inbounds(direction, blockId, iS, ijS, capacity)) {
                         if (CSFX.empty(direction, blockId, blocks, iS, ijS)) {
 
-                            CSFX.setFace(direction, blockId, blocks, faces,
+                            CSFX.setFace(direction, blockId, blocks[blockId], faces,
                                 surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
 
                             ccid++;
@@ -107,14 +107,15 @@ class CSFX {
         for (let z = 0; z < kS; ++z) {
             for (let y = 0; y < jS; ++y) {
                 const currentId = z*ijS + y*iS + iS-1;
+                const neighbourBlock = nb[currentId - iS + 1];
                 if (blocks[currentId] === 0) {
-                    if (nb[currentId - iS + 1] !== 0) {
-                        CSFX.setFace(0, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                    if (neighbourBlock !== 0) {
+                        CSFX.setFace(0, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
                         ccid++;
                     }
                 } else {
-                    if (nb[currentId - iS + 1] === 0) {
-                        CSFX.setFace(3, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                    if (neighbourBlock === 0) {
+                        CSFX.setFace(3, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
                         ccid++;
                     }
                 }
@@ -125,14 +126,15 @@ class CSFX {
         for (let z = 0; z < kS; ++z) {
             for (let x = 0; x < iS; ++x) {
                 const currentId = z*ijS + ijS-iS + x;
+                const neighbourBlock = nb[currentId - ijS + iS];
                 if (blocks[currentId] === 0) {
-                    if (nb[currentId - ijS + iS] !== 0) {
-                        CSFX.setFace(1, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                    if (neighbourBlock !== 0) {
+                        CSFX.setFace(1, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
                         ccid++;
                     }
                 } else {
-                    if (nb[currentId - ijS + iS] === 0) {
-                        CSFX.setFace(4, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                    if (neighbourBlock === 0) {
+                        CSFX.setFace(4, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
                         ccid++;
                     }
                 }
@@ -145,14 +147,15 @@ class CSFX {
         for (let y = 0; y < jS; ++y) {
             for (let x = 0; x < iS; ++x) {
                 const currentId = capacity - ijS + y*iS + x;
+                const neighbourBlock = nb[currentId%ijS];
                 if (blocks[currentId] === 0) {
-                    if (nb[currentId%ijS] !== 0) {
-                        CSFX.setFace(2, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                    if (neighbourBlock !== 0) {
+                        CSFX.setFace(2, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
                         ccid++;
                     }
                 } else {
-                    if (nb[currentId%ijS] === 0) {
-                        CSFX.setFace(5, currentId, blocks, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                    if (neighbourBlock === 0) {
+                        CSFX.setFace(5, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
                         ccid++;
                     }
                 }
@@ -165,7 +168,10 @@ class CSFX {
         // Working with flat indices (3 arrays of length 'capacity')
         // Working with stacked indices (1 array with [0,capacity[=i, [capacity,2capacity[=j, ...)
         const stackFaceId = flatFaceId;
-        if (!faces[0][flatFaceId]) return;
+        if (!faces[0][flatFaceId]) {
+            console.log("ERROR");
+            return;
+        }
 
         const normalP = faces[0][flatFaceId] > 0;
         const normalM = faces[0][flatFaceId] < 0;
@@ -563,7 +569,6 @@ class CSFX {
 
         // TODO check fastCC...
         for (let i in fastCC) {
-            //fastCC[i].sort();
             for (let faceId = 0; faceId < fastCC[i].length; ++faceId) {
                 if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId) console.log("Detected duplicate face.");
                 let dir = fastCC[i][faceId]<capacity ? 0 : fastCC[i][faceId]<2*capacity ? 1 : 2;

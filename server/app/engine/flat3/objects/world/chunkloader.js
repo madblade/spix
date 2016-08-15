@@ -68,7 +68,7 @@ class ChunkLoader {
             let currentId = neighbourIds[i];
             if (loadedChunks.hasOwnProperty(currentId)) continue;
             let neighbour = WorldFactory.createRawChunk(dims[0], dims[1], dims[2], currentId, this._worldManager);
-            //neighbour.fillChunk(64, 1);
+            neighbour.fillChunk(64, 1);
             this._worldManager.addChunk(currentId, neighbour);
         }
 
