@@ -103,18 +103,22 @@ class WorldManager {
         const dz = this.chunkDimensionZ;
 
         let chunkIds = [];
-        chunkIds.push((i+','+j)); //, (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
+        chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
 
         for (let chunkIdId = 0; chunkIdId<chunkIds.length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
-            console.log("We should generate " + currentChunkId + " for the user.");
-            console.log(currentChunkId);
             if (!this._chunks.hasOwnProperty(currentChunkId)) {
-                let chunk = Generator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
+                console.log("We should generate " + currentChunkId + " for the user.");
+                let chunk = Generator.generateFlatChunk(dx, dy, dz, currentChunkId, this); // virtual polymorphism
                 this._chunks[chunk.chunkId] = chunk;
             }
 
             let currentChunk = this._chunks[currentChunkId];
+            if (!currentChunk.ready) {
+                console.log("We should extract faces from " + currentChunkId + ".");
+                currentChunk.computeFaces();
+            }
+
             chunks[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
         }
 
@@ -385,6 +389,14 @@ class WorldManager {
         // TODO collide with blocks.
         let cs = this._chunks;
         return true;
+    }
+
+    hasPlayerNewChunksInRange(player) {
+        return false;
+    }
+
+    extractNewChunksInRangeFor(player) {
+        return this._chunks;
     }
 
 }

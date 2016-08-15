@@ -49,6 +49,9 @@ class UserOutput {
         this._game.playerman.forEach((p) => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
+
+            if (!this.playerHasNewChunksInRange(p)) return;
+            p.send('chk', this.extractNewChunksInRange(p));
         });
 
         // Tell object manager we have done update.
@@ -77,9 +80,16 @@ class UserOutput {
     extractConcernedChunks(player) {
         return (this._game.worldman.extractUpdatedChunks(player));
     }
-
     extractChunksForNewPlayer(player) {
         return (this._game.worldman.extractChunksForNewPlayer(player));
+    }
+
+    playerHasNewChunksInRange(player) {
+        return (this._game.worldman.hasPlayerNewChunksInRange(player));
+    }
+
+    extractNewChunksInRange(player) {
+        return (this._game.worldman.extractNewChunksInRangeFor(player));
     }
 
 }

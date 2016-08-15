@@ -530,46 +530,46 @@ class TopoKernel {
         if (x === dimensions[0] - 1) {
             let w = chunk.neighbourWhat(x + 1, y, z);
             if (!isAddition) w *= -1;
-            const fid = chunk._toId(x, y, z);
+            let fid = chunk._toId(x, y, z);
             TopoKernel.updateFace(w, fid, chunk, isAddition);
         }
 
         if (y === dimensions[1] - 1) {
             let w = chunk.neighbourWhat(x, y + 1, z);
             if (!isAddition) w *= -1;
-            const fid = capacity + chunk._toId(x, y, z);
+            let fid = capacity + chunk._toId(x, y, z);
             TopoKernel.updateFace(w, fid, chunk, isAddition);
         }
 
         if (z === dimensions[2] - 1) {
             let w = chunk.neighbourContains(x, y, z + 1);
             if (!isAddition) w *= -1;
-            const fid = 2 * capacity + chunk._toId(x, y, z);
+            let fid = 2 * capacity + chunk._toId(x, y, z);
             TopoKernel.updateFace(w, fid, chunk, isAddition);
         }
 
         if (x === 0) {
-            const c = chunk.getNeighbourChunkFromRelativeCoordinates(x - 1, y, z);
-            const newX = chunk.dimensions[0] - 1;
-            const fid = c._toId(newX, y, z);
+            let c = chunk.getNeighbourChunkFromRelativeCoordinates(x - 1, y, z);
+            let newX = chunk.dimensions[0] - 1;
+            let fid = c._toId(newX, y, z);
             let w = c.what(newX, y, z);
             if (isAddition) w *= -1;
             TopoKernel.updateFace(w, fid, c, isAddition);
         }
 
         if (y === 0) {
-            const c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y - 1, z);
-            const newY = chunk.dimensions[1] - 1;
-            const fid = capacity + c._toId(x, newY, z);
+            let c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y - 1, z);
+            let newY = chunk.dimensions[1] - 1;
+            let fid = capacity + c._toId(x, newY, z);
             let w = c.what(x, newY, z);
             if (isAddition) w *= -1;
             TopoKernel.updateFace(w, fid, c, isAddition);
         }
 
         if (z === 0) {
-            const c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y, z - 1);
-            const newZ = chunk.dimensions[2] - 1;
-            const fid = 2 * capacity + c._toId(x, y, newZ);
+            let c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y, z - 1);
+            let newZ = chunk.dimensions[2] - 1;
+            let fid = 2 * capacity + c._toId(x, y, newZ);
             let w = c.what(x, y, newZ);
             if (isAddition) w *= -1;
             TopoKernel.updateFace(w, fid, c, isAddition);
