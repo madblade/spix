@@ -162,6 +162,33 @@ class Chunk {
         return this.what(x, y, z) !== 0;
     }
 
+    getNeighbourChunkFromRelativeCoordinates(x, y, z) {
+        let neighbourChunkI, neighbourChunkJ, neighbourChunkZ;
+
+        if (x < 0)
+            neighbourChunkI = this._chunkI - 1;
+        else if (x >= this._xSize)
+            neighbourChunkI = this._chunkI + 1;
+        else
+            neighbourChunkI = this._chunkI;
+
+        if (y < 0)
+            neighbourChunkJ = this._chunkJ - 1;
+        else if (y >= this._ySize)
+            neighbourChunkJ = this._chunkJ + 1;
+        else
+            neighbourChunkJ = this._chunkJ;
+
+        if (z < 0)
+            neighbourChunkZ = this._chunkK - 1;
+        else if (z >= this._zSize)
+            neighbourChunkZ = this._chunkK + 1;
+        else
+            neighbourChunkZ = this._chunkK;
+
+        return this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ);
+    }
+
     /**
      * Mustn't exceed negative [xyz]Size
      * @param x
@@ -169,43 +196,30 @@ class Chunk {
      * @param z
      */
     neighbourWhat(x, y, z) {
-        let neighbourChunkI, neighbourChunkJ, neighbourChunkZ;
         let localX, localY, localZ;
 
-        if (x < 0) {
+        if (x < 0)
             localX = this._xSize + x;
-            neighbourChunkI = this._chunkI - 1;
-        } else if (x >= this._xSize) {
+        else if (x >= this._xSize)
             localX = x % this._xSize;
-            neighbourChunkI = this._chunkI + 1;
-        } else {
+        else
             localX = x;
-            neighbourChunkI = this._chunkI;
-        }
 
-        if (y < 0) {
+        if (y < 0)
             localY = this._ySize + y;
-            neighbourChunkJ = this._chunkJ - 1;
-        } else if (y >= this._ySize) {
+        else if (y >= this._ySize)
             localY = y % this._ySize;
-            neighbourChunkJ = this._chunkJ + 1;
-        } else {
+        else
             localY = y;
-            neighbourChunkJ = this._chunkJ;
-        }
 
-        if (z < 0) {
+        if (z < 0)
             localZ = this._zSize + z;
-            neighbourChunkZ = this._chunkK - 1;
-        } else if (z >= this._zSize) {
+        else if (z >= this._zSize)
             localZ = z % this._zSize;
-            neighbourChunkZ = this._chunkK + 1;
-        } else {
+        else
             localZ = z;
-            neighbourChunkZ = this._chunkK;
-        }
 
-        const nChunk = this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ);
+        const nChunk = this.getNeighbourChunkFromRelativeCoordinates(x, y, z);
         return nChunk.what(localX, localY, localZ);
     }
 
