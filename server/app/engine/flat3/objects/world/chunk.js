@@ -6,8 +6,11 @@
 
 import BlockExtractor from './extraction/chunkblockx';
 import FaceExtractor from './extraction/chunkfacex';
+
 import ChunkLoader from './chunkloader';
-import TopoKernel from './topokernel';
+
+import BlockUpdater from './update/blockupdater';
+import FaceUpdater from './update/faceupdater';
 
 class Chunk {
 
@@ -232,9 +235,9 @@ class Chunk {
         if (id >= this._capacity) return;
 
         this._blocks[id] = blockId; // Update blocks.
-        TopoKernel.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
+        BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
 
-        TopoKernel.updateSurfaceFacesAfterAddition(this, id, x, y, z);
+        FaceUpdater.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
 
     del(x, y, z) {
@@ -242,9 +245,9 @@ class Chunk {
         if (id >= this._capacity) return;
 
         this._blocks[id] = 0;
-        TopoKernel.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
+        BlockUpdater.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
 
-        TopoKernel.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
+        FaceUpdater.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
     }
 
     flushUpdates() {

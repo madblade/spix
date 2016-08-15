@@ -4,93 +4,9 @@
 
 'use strict';
 
-import CollectionUtils from '../../../../math/collections/util';
-import TopoIterator from './topoiterator';
+import CollectionUtils from '../../../../../math/collections/util';
 
-class TopoKernel {
-
-    static removeSurfaceBlock(surfaceBlocks, chunk, x, y, z) {
-        surfaceBlocks[z].splice(surfaceBlocks[z].indexOf(chunk._toId(x, y, z)));
-    }
-
-    static addSurfaceBlock(surfaceBlocks, chunk, x, y, z) {
-        const id = chunk._toId(x, y, z);
-        if (!surfaceBlocks.hasOwnProperty(z)) surfaceBlocks[z] = [id];
-        else CollectionUtils.insert(id, surfaceBlocks[z]);
-    }
-
-    // The difficulty is to keep layered surfaceBlocks sorted.
-    static updateSurfaceBlocksAfterAddition(chunk, id, x, y, z) {
-        let surfaceBlocks = chunk.surfaceBlocks;
-        let dimensions = chunk.dimensions;
-        let xp = false; let xm = false;
-        let yp = false; let ym = false;
-        let zp = false; let zm = false;
-
-        // Update (x+1, x-1) blocks.
-        if (x > 0) {
-            if (chunk.contains(x-1, y, z)) {
-                xm = true;
-                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x-1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x-1, y, z+1)) &&
-                    (x-2<0 || chunk.contains(x-2, y, z)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x-1, y, z);
-            }
-        }
-
-        if (x < dimensions[0]) {
-            if (chunk.contains(x+1, y, z)) {
-                xp = true;
-                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x+1, y, z+1)) &&
-                    (x+2>=dimensions[0] || chunk.contains(x+2, y, z)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x+1, y, z);
-            }
-        }
-
-        // Update (y+1, y-1) blocks.
-        if (y > 0) {
-            if (chunk.contains(x, y-1, z)) {
-                ym = true;
-                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y-1, z)) &&
-                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y-1, z+1)) &&
-                    (y-2<0 || chunk.contains(x, y-2, z)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y-1, z);
-            }
-        }
-        if (y < dimensions[1]) {
-            if (chunk.contains(x, y+1, z)) {
-                yp = true;
-                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y, z+1)) &&
-                    (y+2>=dimensions[1] || chunk.contains(x, y+2, z)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y+1, z);
-            }
-        }
-
-        // Update (z-1, z+1) blocks.
-        if (z > 0) {
-            if (chunk.contains(x, y, z-1)) {
-                zm = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z-1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z-1)) &&
-                    (z-2<0 || chunk.contains(x, y, z-2)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z-1);
-            }
-        }
-        if (z < dimensions[2]) {
-            if (chunk.contains(x, y, z+1)) {
-                zp = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
-                    (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
-                    TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
-            }
-        }
-
-        // Update current block.
-        if (!(xm && ym && xp && yp && zm && zp)) TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z);
-    }
+class FaceUpdater {
 
     static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, faces) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
@@ -177,14 +93,14 @@ class TopoKernel {
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
 
-        TopoKernel.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true);
+        FaceUpdater.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true);
 
-        if (TopoKernel.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
+        if (FaceUpdater.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
         // N.B. a necessary yet not sufficient condition for effective division of components within the chunk.
-            TopoKernel.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
+            FaceUpdater.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
 
         // Topology-preserving boundary faces edition
-        TopoKernel.updateFacesOnBoundary(chunk, x, y, z, true);
+        FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, true);
     }
 
     /**
@@ -259,7 +175,7 @@ class TopoKernel {
                 removedFaceIds[normal] = addedFaceIds[normal] = -1;
                 continue;
             }
-            let faceId = TopoKernel.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
+            let faceId = FaceUpdater.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
 
             if (removedFaces[normal]) removedFaceIds[normal] = (faceId);
             else removedFaceIds[normal] = -1;
@@ -267,9 +183,9 @@ class TopoKernel {
             else addedFaceIds[normal] = -1;
         }
 
-         //console.log('UPDATING COMPONENTS');
-         //console.log(removedFaceIds);
-         //console.log(addedFaceIds);
+        //console.log('UPDATING COMPONENTS');
+        //console.log(removedFaceIds);
+        //console.log(addedFaceIds);
 
         // Update components.
         let connectedComponents = chunk.connectedComponents;
@@ -294,7 +210,6 @@ class TopoKernel {
             let currentComponent = fastComponents[componentId];
             if (currentComponent === undefined) {
                 console.log('BLD: skipping removal on component ' + componentId);
-                console.log(fastComponents);
                 continue;
             }
             let index = CollectionUtils.removeFromArray(currentComponent, fid);
@@ -323,7 +238,7 @@ class TopoKernel {
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
             var fastIds = fastComponentsIds[componentId];
 
-            let faceColor = TopoKernel.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
+            let faceColor = FaceUpdater.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
             if (faceColor == 0) continue;
 
             if (isAddition) {
@@ -395,79 +310,6 @@ class TopoKernel {
         // Beware of component disappearance in client.
     }
 
-    // BLOCK DELETION
-    static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z) {
-        let surfaceBlocks = chunk.surfaceBlocks;
-        let dimensions = chunk.dimensions;
-        let xp = false; let xm = false;
-        let yp = false; let ym = false;
-        let zp = false; let zm = false;
-
-        // Update (x+1, x-1) blocks.
-        if (x > 0) {
-            if (chunk.contains(x-1, y, z)) {
-                xm = true;
-                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x-1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x-1, y, z+1)) &&
-                    (x-2<0 || chunk.contains(x-2, y, z)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x-1, y, z);
-            }
-        }
-        if (x < dimensions[0]) {
-            if (chunk.contains(x+1, y, z)) {
-                xp = true;
-                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x+1, y, z+1)) &&
-                    (x+2>=dimensions[0] || chunk.contains(x+2, y, z)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x+1, y, z);
-            }
-        }
-
-        // Update (y+1, y-1) blocks.
-        if (y > 0) {
-            if (chunk.contains(x, y-1, z)) {
-                ym = true;
-                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y-1, z)) &&
-                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y-1, z+1)) &&
-                    (y-2<0 || chunk.contains(x, y-2, z)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y-1, z);
-            }
-        }
-        if (y < dimensions[1]) {
-            if (chunk.contains(x, y+1, z)) {
-                yp = true;
-                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y+1, z+1)) &&
-                    (y+2>=dimensions[1] || chunk.contains(x, y+2, z)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y+1, z);
-            }
-        }
-
-        // Update (z-1, z+1) blocks.
-        if (z > 0) {
-            if (chunk.contains(x, y, z-1)) {
-                zm = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z-1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z-1)) &&
-                    (z-2<0 || chunk.contains(x, y, z-2)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z-1);
-            }
-        }
-        if (z < dimensions[2]) {
-            if (chunk.contains(x, y, z+1)) {
-                zp = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
-                    (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
-                    TopoKernel.addSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
-            }
-        }
-
-        // Update current block.
-        if (!(xm && ym && xp && yp && zm && zp)) // Was the current block a surface block?
-            TopoKernel.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z);
-    }
-
     static detectTopologyChangeAfterDeletion(chunk, id, x, y, z) {
         // Criterion: pre-existing faces belonged to separate connected components.
         // N.B. We could have considered this a dual of topology change detection after addition.
@@ -495,30 +337,32 @@ class TopoKernel {
     }
 
     static updateFace(w, fid, chunk, isAddition) {
+        let updates = chunk.updates;
+
         // Adding a block.
         if (isAddition) {
-          if (w !== 0) { // remove face
-              if (fid in chunk.updates[1]) delete chunk.updates[1][fid];
-              else chunk.updates[0] = fid;
-          } else { // add face
-              if (fid in chunk.updates[0]) {
-                  delete chunk.updates[0][fid];
-                  chunk.updates[2][fid] = w;
-              }
-              else chunk.updates[1][fid] = w;
-          }
+            if (w !== 0) { // remove face
+                if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
+                else updates[0][fid] = null;
+            } else { // add face
+                if (updates[0].hasOwnProperty(fid)) {
+                    delete updates[0][fid];
+                    updates[2][fid] = w;
+                }
+                else updates[1][fid] = w;
+            }
 
-        // Removing a block.
+            // Removing a block.
         } else {
             if (w !== 0) { // add face
-                if (fid in chunk.updates[0]) {
-                    delete chunk.updates[0][fid];
-                    chunk.updates[2][fid] = w;
+                if (updates[0].hasOwnProperty(fid)) {
+                    delete updates[0][fid];
+                    updates[2][fid] = w;
                 }
-                else chunk.updates[1][fid] = w;
+                else updates[1][fid] = w;
             } else { // remove face
-                if (fid in chunk.updates[1]) delete chunk.updates[1][fid];
-                else chunk.updates[0] = fid;
+                if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
+                else updates[0][fid] = null;
             }
         }
     }
@@ -531,21 +375,21 @@ class TopoKernel {
             let w = chunk.neighbourWhat(x + 1, y, z);
             if (!isAddition) w *= -1;
             let fid = chunk._toId(x, y, z);
-            TopoKernel.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, fid, chunk, isAddition);
         }
 
         if (y === dimensions[1] - 1) {
             let w = chunk.neighbourWhat(x, y + 1, z);
             if (!isAddition) w *= -1;
             let fid = capacity + chunk._toId(x, y, z);
-            TopoKernel.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, fid, chunk, isAddition);
         }
 
         if (z === dimensions[2] - 1) {
             let w = chunk.neighbourContains(x, y, z + 1);
             if (!isAddition) w *= -1;
             let fid = 2 * capacity + chunk._toId(x, y, z);
-            TopoKernel.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, fid, chunk, isAddition);
         }
 
         if (x === 0) {
@@ -554,7 +398,7 @@ class TopoKernel {
             let fid = c._toId(newX, y, z);
             let w = c.what(newX, y, z);
             if (isAddition) w *= -1;
-            TopoKernel.updateFace(w, fid, c, isAddition);
+            FaceUpdater.updateFace(w, fid, c, isAddition);
         }
 
         if (y === 0) {
@@ -563,7 +407,7 @@ class TopoKernel {
             let fid = capacity + c._toId(x, newY, z);
             let w = c.what(x, newY, z);
             if (isAddition) w *= -1;
-            TopoKernel.updateFace(w, fid, c, isAddition);
+            FaceUpdater.updateFace(w, fid, c, isAddition);
         }
 
         if (z === 0) {
@@ -572,7 +416,7 @@ class TopoKernel {
             let fid = 2 * capacity + c._toId(x, y, newZ);
             let w = c.what(x, y, newZ);
             if (isAddition) w *= -1;
-            TopoKernel.updateFace(w, fid, c, isAddition);
+            FaceUpdater.updateFace(w, fid, c, isAddition);
         }
     }
 
@@ -605,21 +449,21 @@ class TopoKernel {
             !addedFaces[5] && z < dimensions[2]-1  // z+
         ];
 
-        TopoKernel.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
+        FaceUpdater.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
 
-        if (TopoKernel.detectTopologyChangeAfterDeletion(chunk, id, x, y, z))
+        if (FaceUpdater.detectTopologyChangeAfterDeletion(chunk, id, x, y, z))
         // N.B. the provided criterion gives an immediate, exact answer to the topology request.
-            TopoKernel.mergeComponents(chunk, id, x, y, z);
+            FaceUpdater.mergeComponents(chunk, id, x, y, z);
 
         // Boundaries: topology-preserving updates
-        TopoKernel.updateFacesOnBoundary(chunk, x, y, z, false);
+        FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
     static mergeComponents(chunk, id, x, y, z) {
         // TODO deletion version (much easier)
         // Beware of !components in client.
     }
-
+    
 }
 
-export default TopoKernel;
+export default FaceUpdater;
