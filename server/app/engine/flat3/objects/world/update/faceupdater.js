@@ -337,7 +337,7 @@ class FaceUpdater {
         return false;
     }
 
-    static updateFace(w, fid, chunk, isAddition) {
+    static updateFace(w, wOrigin, fid, chunk, isAddition) {
         let updates = chunk.updates;
 
         // Adding a block.
@@ -348,12 +348,12 @@ class FaceUpdater {
             } else { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
-                    updates[2][fid] = w;
+                    updates[2][fid] = wOrigin;
                 }
-                else updates[1][fid] = w;
+                else updates[1][fid] = wOrigin;
             }
 
-            // Removing a block.
+        // Removing a block.
         } else {
             if (w !== 0) { // add face
                 if (updates[0].hasOwnProperty(fid)) {
@@ -374,25 +374,36 @@ class FaceUpdater {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
 
+        let wOrigin = chunk.what(x, y, z);
+
         if (x === dimensions[0] - 1) {
             let w = chunk.neighbourWhat(x + 1, y, z);
-            if (!isAddition) w *= -1;
+            if (!isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
             let fid = chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (y === dimensions[1] - 1) {
             let w = chunk.neighbourWhat(x, y + 1, z);
-            if (!isAddition) w *= -1;
+            if (!isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
             let fid = capacity + chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (z === dimensions[2] - 1) {
             let w = chunk.neighbourContains(x, y, z + 1);
-            if (!isAddition) w *= -1;
+            if (!isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
             let fid = 2 * capacity + chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, fid, chunk, isAddition);
+            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (x === 0) {
@@ -400,8 +411,11 @@ class FaceUpdater {
             let newX = chunk.dimensions[0] - 1;
             let fid = c._toId(newX, y, z);
             let w = c.what(newX, y, z);
-            if (isAddition) w *= -1;
-            FaceUpdater.updateFace(w, fid, c, isAddition);
+            if (isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
+            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
         }
 
         if (y === 0) {
@@ -409,8 +423,11 @@ class FaceUpdater {
             let newY = chunk.dimensions[1] - 1;
             let fid = capacity + c._toId(x, newY, z);
             let w = c.what(x, newY, z);
-            if (isAddition) w *= -1;
-            FaceUpdater.updateFace(w, fid, c, isAddition);
+            if (isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
+            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
         }
 
         if (z === 0) {
@@ -418,8 +435,11 @@ class FaceUpdater {
             let newZ = chunk.dimensions[2] - 1;
             let fid = 2 * capacity + c._toId(x, y, newZ);
             let w = c.what(x, y, newZ);
-            if (isAddition) w *= -1;
-            FaceUpdater.updateFace(w, fid, c, isAddition);
+            if (isAddition) {
+                w *= -1;
+                wOrigin *= -1;
+            }
+            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
         }
     }
 

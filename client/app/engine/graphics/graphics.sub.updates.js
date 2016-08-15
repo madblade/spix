@@ -38,7 +38,8 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 };
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
-    console.log(updates);
+    //console.log(updates);
+
     for (var chunkId in updates) {
         if (this.isChunkLoaded(chunkId)) {
             this.updateChunk(chunkId, updates[chunkId]);

@@ -196,9 +196,12 @@ class WorldManager {
     }
 
     translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk) {
-        function failure(step) { console.log("Request denied at step " + step); }
+        function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) { failure(0); return false; }
+        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
+            failure("distance not validated by world manager.");
+            return false;
+        }
 
         // One cannot add a floating block.
         const dx = Math.abs(Math.abs(x) - Math.abs(floors[0]));
@@ -220,12 +223,15 @@ class WorldManager {
             if (chunk.what(lx, ly, lz-1) === 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
 
         // On-edge request.
-        } else { failure(1); return false; }
+        } else {
+            failure("precision (on-edge request).");
+            return false;
+        }
 
         // Designed block must be 0.
         // console.log(blockCoordinatesOnChunk);
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0) {
-            failure(2);
+            failure("block is not empty.");
             return false;
         }
 
@@ -233,13 +239,13 @@ class WorldManager {
         if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= this.chunkDimensionX ||
             blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= this.chunkDimensionY ||
             blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= this.chunkDimensionZ) {
-            failure(3);
+            failure("block is OOB for its relative chunk.");
             return false;
         }
 
         // Detect entities.
         if (this._entityman.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
-            failure(4);
+            failure("an entity is present on the block.");
             return false;
         }
 
@@ -247,9 +253,12 @@ class WorldManager {
     }
 
     translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk) {
-        function failure(step) { console.log("Request denied at step " + step); }
+        function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) { failure(0); return false; }
+        if (!WorldManager.validateBlockEdition(originEntity, x, y, z, floors)) {
+            failure("distance not validated by world manager.");
+            return false;
+        }
 
         const dx = Math.abs(Math.abs(x) - Math.abs(floors[0]));
         const dy = Math.abs(Math.abs(y) - Math.abs(floors[1]));
@@ -269,12 +278,15 @@ class WorldManager {
             if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
 
         // On-edge request.
-        } else { failure(1); return false; }
+        } else {
+            failure("precision (on-edge request).");
+            return false;
+        }
 
         // Designed block must be 0.
         // console.log(blockCoordinatesOnChunk);
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0) {
-            failure(2);
+            failure("block is already empty.");
             return false;
         }
 
@@ -282,13 +294,13 @@ class WorldManager {
         if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= this.chunkDimensionX ||
             blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= this.chunkDimensionY ||
             blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= this.chunkDimensionZ) {
-            failure(3);
+            failure("block is OOB for its relative chunk.");
             return false;
         }
 
         // Validate update.
         if (this._entityman.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
-            failure(4);
+            failure("an entity is present on the block.");
             return false;
         }
 
