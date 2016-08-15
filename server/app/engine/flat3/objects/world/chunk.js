@@ -117,6 +117,10 @@ class Chunk {
         }
     }
 
+    setDirtyFlag() {
+        this._worldManager.chunkUpdated(this._chunkId);
+    }
+
     // Set all cubes until a given height to a given id.
     fillChunk(toZ, blockId) {
         if (typeof toZ !== "number") return;

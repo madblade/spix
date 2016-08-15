@@ -76,6 +76,7 @@ class FaceUpdater {
             false, // z-
             false  // z+
         ];
+
         if (x > 0 && !chunk.contains(x-1, y, z)) addedFaces[0] = true;
         if (x < dimensions[0]-1 && !chunk.contains(x+1, y, z)) addedFaces[1] = true;
         if (y > 0 && !chunk.contains(x, y-1, z)) addedFaces[2] = true;
@@ -365,6 +366,8 @@ class FaceUpdater {
                 else updates[0][fid] = null;
             }
         }
+
+        chunk.setDirtyFlag();
     }
 
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
