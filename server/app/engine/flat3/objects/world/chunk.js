@@ -19,11 +19,14 @@ class Chunk {
         this._xSize = xSize;
         this._ySize = ySize;
         this._zSize = zSize;
+
         this._capacity = this._xSize * this._ySize * this._zSize;
         this._chunkId = chunkId;
         let ij = chunkId.split(',');
+
         this._chunkI = parseInt(ij[0]);
         this._chunkJ = parseInt(ij[1]);
+        this._chunkK = 0;
 
         // Blocks.
         /** Flatten array. x, then y, then z. */
@@ -127,7 +130,7 @@ class Chunk {
         //blocks[3122] = 1;
         //blocks[3186] = 1;
 
-        ///*
+        /*
         let numberAdded = 0;
         for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
             if (Math.random() > 0.5) {
@@ -136,7 +139,7 @@ class Chunk {
             }
         }
         console.log(numberAdded + " different block(s) added.");
-        //*/
+        */
 
         this._blocks = blocks;
 
@@ -157,6 +160,57 @@ class Chunk {
 
     contains(x, y, z) {
         return this.what(x, y, z) !== 0;
+    }
+
+    /**
+     * Mustn't exceed negative [xyz]Size
+     * @param x
+     * @param y
+     * @param z
+     */
+    neighbourWhat(x, y, z) {
+        let neighbourChunkI, neighbourChunkJ, neighbourChunkZ;
+        let localX, localY, localZ;
+
+        if (x < 0) {
+            localX = this._xSize + x;
+            neighbourChunkI = this._chunkI - 1;
+        } else if (x >= this._xSize) {
+            localX = x % this._xSize;
+            neighbourChunkI = this._chunkI + 1;
+        } else {
+            localX = x;
+            neighbourChunkI = this._chunkI;
+        }
+
+        if (y < 0) {
+            localY = this._ySize + y;
+            neighbourChunkJ = this._chunkJ - 1;
+        } else if (y >= this._ySize) {
+            localY = y % this._ySize;
+            neighbourChunkJ = this._chunkJ + 1;
+        } else {
+            localY = y;
+            neighbourChunkJ = this._chunkJ;
+        }
+
+        if (z < 0) {
+            localZ = this._zSize + z;
+            neighbourChunkZ = this._chunkK - 1;
+        } else if (z >= this._zSize) {
+            localZ = z % this._zSize;
+            neighbourChunkZ = this._chunkK + 1;
+        } else {
+            localZ = z;
+            neighbourChunkZ = this._chunkK;
+        }
+
+        const nChunk = this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ);
+        return nChunk.what(localX, localY, localZ);
+    }
+
+    neighbourContains(x, y, z) {
+        return this.neighbourWhat(x, y, z) !== 0;
     }
 
     add(x, y, z, blockId) {
