@@ -60,13 +60,16 @@ class ChunkLoader {
         let c = this._chunk;
         let i = c.chunkI;
         let j = c.chunkJ;
+        let dims = c.dimensions;
 
-        let neighborIds = [(i+1)+','+j, i+','+(j+1), (i-1)+','+j, i+','+(j-1)];
+        let neighbourIds = [(i+1)+','+j, i+','+(j+1), (i-1)+','+j, i+','+(j-1)];
 
-        for (i = 0; i<neighborIds.length; ++i) {
-            let currentId = neighborIds[i];
+        for (i = 0; i<neighbourIds.length; ++i) {
+            let currentId = neighbourIds[i];
             if (loadedChunks.hasOwnProperty(currentId)) continue;
-            this._worldManager.addChunk(currentId, WorldFactory.createRawChunk(i, j, 0, currentId, this._worldManager));
+            let neighbour = WorldFactory.createRawChunk(dims[0], dims[1], dims[2], currentId, this._worldManager);
+            //neighbour.fillChunk(64, 1);
+            this._worldManager.addChunk(currentId, neighbour);
         }
 
     }

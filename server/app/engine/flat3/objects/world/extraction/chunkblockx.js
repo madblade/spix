@@ -43,27 +43,43 @@ class CSBX {
             if (blocks[b] !== 0) {
                 const iPlus = b+1;
                 if (iPlus % iSize === 0) {
-                    if (blocks[iPlus] === 0 && addSurfaceBlock(b)) continue;
+                    if (blocks[iPlus] === 0 && addSurfaceBlock(b)) {
+                        continue;
+                    }
                 } else // Access other chunk
-                if (nBlocks[0][iPlus-iSize] === 0 && addSurfaceBlock(b)) continue;
+                if (nBlocks[0][iPlus-iSize] === 0 && addSurfaceBlock(b)) {
+                    continue;
+                }
 
                 const iMinus = b-1;
                 if (iMinus % iSize !== iSize-1) {
-                    if (blocks[iMinus] === 0 && addSurfaceBlock(b)) continue;
+                    if (blocks[iMinus] === 0 && addSurfaceBlock(b)) {
+                        continue;
+                    }
                 } else  // Access other chunk
-                if (nBlocks[1][iMinus+iSize] && addSurfaceBlock(b)) continue;
+                if (nBlocks[1][iMinus+iSize] === 0 && addSurfaceBlock(b)) {
+                    continue;
+                }
 
                 const jPlus = b+iSize;
                 if ((jPlus-b%iSize) % ijSize !== 0) {
-                    if (blocks[jPlus] === 0 && addSurfaceBlock(b)) continue;
+                    if (blocks[jPlus] === 0 && addSurfaceBlock(b)) {
+                        continue;
+                    }
                 } else // Access other chunk
-                if (nBlocks[2][jPlus-ijSize] && addSurfaceBlock(b)) continue;
+                if (nBlocks[2][jPlus-ijSize] === 0 && addSurfaceBlock(b)) {
+                    continue;
+                }
 
                 const jMinus = b-iSize;
                 if ((jMinus-b%iSize) % ijSize !== ijSize-1) {
-                    if (blocks[jMinus] === 0 && addSurfaceBlock(b)) continue;
+                    if (blocks[jMinus] === 0 && addSurfaceBlock(b)) {
+                        continue;
+                    }
                 } else // Access other chunk
-                if (nBlocks[2][jMinus+ijSize] && addSurfaceBlock(b)) continue;
+                if (nBlocks[2][jMinus+ijSize] === 0 && addSurfaceBlock(b)) {
+                    continue;
+                }
 
                 // TODO zeefy chunks...
                 const kPlus = b+ijSize;
@@ -82,6 +98,7 @@ class CSBX {
 
             }
         }
+
     }
 
 }

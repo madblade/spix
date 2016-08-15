@@ -90,8 +90,12 @@ class Chunk {
      */
     computeSurfaceBlocksFromScratch() {
         console.log('\tExtracting surface...');
-        var extractor = new BlockExtractor(this);
-        extractor.extractSurfaceBlocks();
+        try {
+            var extractor = new BlockExtractor(this);
+            extractor.extractSurfaceBlocks();
+        } catch(err) {
+            console.log(err.message);
+        }
     }
 
     /**
@@ -99,8 +103,12 @@ class Chunk {
      */
     computeConnectedComponents() {
         console.log("\tComputing connected components...");
-        var extractor = new FaceExtractor(this);
-        extractor.extractConnectedComponents();
+        try {
+            var extractor = new FaceExtractor(this);
+            extractor.extractConnectedComponents();
+        } catch(err) {
+            console.log(err.message);
+        }
     }
 
     // Set all cubes until a given height to a given id.
@@ -115,6 +123,9 @@ class Chunk {
         let blocks = new Uint8Array(numberOfBlocks);
         blocks.fill(blockId, 0, numberOfBlocksToFill);
         blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
+
+        blocks[3122] = 1;
+        blocks[3186] = 1;
 
         /*
         let numberAdded = 0;
