@@ -169,7 +169,7 @@ class CSFX {
         // Working with stacked indices (1 array with [0,capacity[=i, [capacity,2capacity[=j, ...)
         const stackFaceId = flatFaceId;
         if (!faces[0][flatFaceId]) {
-            console.log("ERROR");
+            console.log("WARN. i-* linker was given a faceId which is not present in faces array.");
             return;
         }
 

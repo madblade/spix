@@ -167,19 +167,19 @@ class TopoKernel {
             false  // z+
         ];
         if (x > 0 && !chunk.contains(x-1, y, z)) addedFaces[0] = true;
-        if (x < dimensions[0] && !chunk.contains(x+1, y, z)) addedFaces[1] = true;
+        if (x < dimensions[0]-1 && !chunk.contains(x+1, y, z)) addedFaces[1] = true;
         if (y > 0 && !chunk.contains(x, y-1, z)) addedFaces[2] = true;
-        if (y < dimensions[1] && !chunk.contains(x, y+1, z)) addedFaces[3] = true;
+        if (y < dimensions[1]-1 && !chunk.contains(x, y+1, z)) addedFaces[3] = true;
         if (z > 0 && !chunk.contains(x, y, z-1)) addedFaces[4] = true;
-        if (z < dimensions[2] && !chunk.contains(x, y, z+1)) addedFaces[5] = true;
+        if (z < dimensions[2]-1 && !chunk.contains(x, y, z+1)) addedFaces[5] = true;
 
         let removedFaces = [
             !addedFaces[0] && x > 0,             // x-
-            !addedFaces[1] && x < dimensions[0], // x+
+            !addedFaces[1] && x < dimensions[0]-1, // x+
             !addedFaces[2] && y > 0,             // y-
-            !addedFaces[3] && y < dimensions[1], // y+
+            !addedFaces[3] && y < dimensions[1]-1, // y+
             !addedFaces[4] && z > 0,             // z-
-            !addedFaces[5] && z < dimensions[2]  // z+
+            !addedFaces[5] && z < dimensions[2]-1  // z+
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
 
@@ -516,19 +516,21 @@ class TopoKernel {
             false, // z-
             false  // z+
         ];
+
         if (x > 0 && chunk.contains(x-1, y, z)) addedFaces[0] = true;
-        if (x < dimensions[0] && chunk.contains(x+1, y, z)) addedFaces[1] = true;
+        if (x < dimensions[0]-1 && chunk.contains(x+1, y, z)) addedFaces[1] = true;
         if (y > 0 && chunk.contains(x, y-1, z)) addedFaces[2] = true;
-        if (y < dimensions[1] && chunk.contains(x, y+1, z)) addedFaces[3] = true;
+        if (y < dimensions[1]-1 && chunk.contains(x, y+1, z)) addedFaces[3] = true;
         if (z > 0 && chunk.contains(x, y, z-1)) addedFaces[4] = true;
-        if (z < dimensions[2] && chunk.contains(x, y, z+1)) addedFaces[5] = true;
+        if (z < dimensions[2]-1 && chunk.contains(x, y, z+1)) addedFaces[5] = true;
+
         let removedFaces = [
             !addedFaces[0] && x > 0,             // x-
-            !addedFaces[1] && x < dimensions[0], // x+
+            !addedFaces[1] && x < dimensions[0]-1, // x+
             !addedFaces[2] && y > 0,             // y-
-            !addedFaces[3] && y < dimensions[1], // y+
+            !addedFaces[3] && y < dimensions[1]-1, // y+
             !addedFaces[4] && z > 0,             // z-
-            !addedFaces[5] && z < dimensions[2]  // z+
+            !addedFaces[5] && z < dimensions[2]-1  // z+
         ];
 
         TopoKernel.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
