@@ -26,7 +26,20 @@ class CollectionUtils {
         }
         var location = CollectionUtils._locationOf(element, array) + 1;
         if (array[location] === element) {
-        console.log("Util.insert: element already in sorted array.");
+            console.log("Util.insert: element already in sorted array.");
+            return location;
+        }
+        array.splice(location, 0, element);
+        return location;
+    }
+
+    static insertWithLocation(location, element, array) {
+        if (array === undefined) {
+            console.log("BLD: undefined array.");
+            return -1;
+        }
+        if (array[location] === element) {
+            console.log("Util.insert: element already in sorted array.");
             return location;
         }
         array.splice(location, 0, element);

@@ -337,20 +337,46 @@ class FaceUpdater {
         return false;
     }
 
+    static addFaceToModel(chunk, faceId, kind) {
+        let connectedComponents = chunk.connectedComponents;
+        let fastComponents = chunk.fastComponents;
+        let fastComponentsIds = chunk.fastComponentsIds;
+
+        const cc = 1; // TODO Topology
+        connectedComponents[faceId] = cc;
+        fastComponents[cc].push(faceId);
+        fastComponentsIds[cc].push(kind);
+    }
+
+    static removeFaceFromModel(chunk, faceId) {
+        let connectedComponents = chunk.connectedComponents;
+        let fastComponents = chunk.fastComponents;
+        let fastComponentsIds = chunk.fastComponentsIds;
+
+        let cc = connectedComponents[faceId];
+        const id = CollectionUtils.removeFromArray(fastComponents[cc], faceId);
+        CollectionUtils.removeFromArrayWithId(fastComponentsIds[cc], id);
+        connectedComponents[faceId] = 0;
+    }
+
     static updateFace(w, wOrigin, fid, chunk, isAddition) {
         let updates = chunk.updates;
+        // TODO REMOVE FACES FROM MODEL.
 
         // Adding a block.
         if (isAddition) {
             if (w !== 0) { // remove face
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
+                FaceUpdater.removeFaceFromModel(chunk, fid);
+
             } else { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
                     updates[2][fid] = wOrigin;
                 }
                 else updates[1][fid] = wOrigin;
+                FaceUpdater.addFaceToModel(chunk, fid, wOrigin);
             }
 
         // Removing a block.
@@ -361,16 +387,18 @@ class FaceUpdater {
                     updates[2][fid] = w;
                 }
                 else updates[1][fid] = w;
+                FaceUpdater.addFaceToModel(chunk, fid, w);
+
             } else { // remove face
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
+                FaceUpdater.removeFaceFromModel(chunk, fid);
             }
         }
 
         chunk.setDirtyFlag();
     }
 
-    // TODO check multiple addition on # chunks here.
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
