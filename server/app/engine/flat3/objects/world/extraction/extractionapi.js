@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Generator from '../generation/generator';
+import WorldGenerator from '../generation/worldgenerator';
 
 class ExtractAPI {
 
@@ -37,7 +37,7 @@ class ExtractAPI {
             let currentChunkId = chunkIds[chunkIdId];
             if (!chunksInModel.hasOwnProperty(currentChunkId)) {
                 console.log("We should generate " + currentChunkId + " for the user.");
-                let chunk = Generator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
+                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
                 chunksInModel[chunk.chunkId] = chunk;
             }
 

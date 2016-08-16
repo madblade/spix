@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ChunkLoader from './../chunkloader';
+import ChunkLoader from './../loading/chunkloader';
 
 class CSFX {
 

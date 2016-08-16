@@ -7,7 +7,7 @@
 import BlockExtractor from './extraction/chunkblockx';
 import FaceExtractor from './extraction/chunkfacex';
 
-import ChunkLoader from './chunkloader';
+import ChunkLoader from './loading/chunkloader';
 
 import BlockUpdater from './update/blockupdater';
 import FaceUpdater from './update/faceupdater';
@@ -46,9 +46,6 @@ class Chunk {
         // Events.
         this._lastUpdated = process.hrtime();
         this._updates = [{}, {}, {}];
-
-        // Generation.
-        this.fillChunk(48, 1);
     }
 
     computeFaces() {

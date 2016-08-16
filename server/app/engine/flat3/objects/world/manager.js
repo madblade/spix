@@ -4,8 +4,7 @@
 
 'use strict';
 
-import Generator from './generation/generator';
-import Factory from './factory';
+import WorldGenerator from './generation/worldgenerator';
 import UpdateAPI from './update/updateapi'
 import ExtractionAPI from './extraction/extractionapi'
 
@@ -21,6 +20,9 @@ class WorldManager {
         // Keep track of modified objects.
         this._updatedChunks = {};
 
+        // Keep same generation method
+        this._generationMethod = "flat";
+
         // Constants
         this._xSize = 8;
         this._ySize = 8;
@@ -34,9 +36,11 @@ class WorldManager {
     get chunkDimensionX() { return this._xSize; }
     get chunkDimensionY() { return this._ySize; }
     get chunkDimensionZ() { return this._zSize; }
+    get generationMethod() { return this._generationMethod; }
 
     set allChunks(newChunks) { this._chunks = newChunks; }
     set entityman(entityman) { this._entityman = entityman; }
+    set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     update() {
         // Update world.
@@ -77,7 +81,7 @@ class WorldManager {
         return new Promise(resolve => {
 
             // Generate blocks.
-            this._chunks = Generator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
+            this._chunks = WorldGenerator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
 
             // Finalize chunks (extract surface faces)
             for (let cid in this._chunks) {

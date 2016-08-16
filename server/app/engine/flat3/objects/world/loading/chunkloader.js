@@ -4,7 +4,7 @@
 
 'use strict';
 
-import WorldFactory from './factory';
+import ChunkGenerator from './../generation/chunkgenerator';
 
 class ChunkLoader {
 
@@ -67,7 +67,9 @@ class ChunkLoader {
         for (i = 0; i<neighbourIds.length; ++i) {
             let currentId = neighbourIds[i];
             if (loadedChunks.hasOwnProperty(currentId)) continue;
-            let neighbour = WorldFactory.createRawChunk(dims[0], dims[1], dims[2], currentId, this._worldManager);
+
+            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, this._worldManager);
+
             //neighbour.fillChunk(64, 1);
             this._worldManager.addChunk(currentId, neighbour);
         }
