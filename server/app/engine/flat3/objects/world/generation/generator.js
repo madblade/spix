@@ -4,7 +4,7 @@
 
 'use strict';
 
-import WorldFactory from './factory';
+import WorldFactory from './../factory';
 
 class Generator {
 

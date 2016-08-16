@@ -238,10 +238,9 @@ class Chunk {
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
-        this._blocks[id] = blockId; // Update blocks.
-
-        BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z); // Update surface blocks.
-
+        // Update blocks, surface blocks, then surface faces.
+        this._blocks[id] = blockId;
+        BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z);
         FaceUpdater.updateSurfaceFacesAfterAddition(this, id, x, y, z);
     }
 
@@ -249,10 +248,9 @@ class Chunk {
         var id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
+        // Update blocks, surface blocks, then surface faces.
         this._blocks[id] = 0;
-
         BlockUpdater.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
-
         FaceUpdater.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
     }
 

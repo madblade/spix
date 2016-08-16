@@ -184,7 +184,7 @@ class CSFX {
                 if (CSFX.debug) console.log("i linked to top i " + top + " | " + stackFaceId);
                 cc[top] = cc[stackFaceId];
             }
-        } // TODO check
+        }
 
         const back = flatFaceId + iS;
         if (back % ijS === (flatFaceId % ijS) + iS) {
@@ -192,7 +192,7 @@ class CSFX {
                 if (CSFX.debug) console.log("i linked to back i " + back + " | " + stackFaceId);
                 cc[back] = cc[stackFaceId];
             }
-        } // TODO is it inbounds?
+        }
 
         // CASE 2: orthogonal with CURRENT top and back (j, k)
         const flatTopOrtho = flatFaceId; // k, obviously inbounds POTENTIALLY MERGED
@@ -218,7 +218,7 @@ class CSFX {
         // CASE 3: orthogonal with next top and back (j, k)
         // !!! REVERSE NORMALS !!!
         const flatTopOrthoNext = flatTopOrtho + 1; // k
-        if (flatTopOrthoNext % iS === (flatTopOrtho % iS) + 1) { // TODO is it inbounds?
+        if (flatTopOrthoNext % iS === (flatTopOrtho % iS) + 1) {
             const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
             if (faces[2][flatTopOrthoNext] < 0 && normalP || faces[2][flatTopOrthoNext] > 0 && normalM) {
                 if (CSFX.debug) console.log('i linked to next k ' + stackTopOrthoNext + " | " + stackFaceId);
@@ -227,7 +227,7 @@ class CSFX {
         }
 
         const flatBackOrthoNext = flatBackOrtho + 1; // j
-        if (flatBackOrthoNext % iS === (flatBackOrtho % iS) + 1) { // TODO is it inbounds?
+        if (flatBackOrthoNext % iS === (flatBackOrtho % iS) + 1) {
             const stackBackOrthoNext = capacity + flatBackOrthoNext;
             if (faces[1][flatBackOrthoNext] < 0 && normalP || faces[1][flatBackOrthoNext] > 0 && normalM) {
                 if (CSFX.debug) console.log('i linked to next j ' + stackBackOrthoNext + " | " + stackFaceId);
@@ -237,7 +237,7 @@ class CSFX {
 
         // CASE 4: ortho with previous j on next i, regular orientation
         const flatOrthoIJ = flatBackOrthoNext - iS;
-        if (flatOrthoIJ > 0) { // TODO is it inbounds?
+        if (flatOrthoIJ > 0) {
             const stackOrthoIJ = capacity + flatOrthoIJ;
             if (faces[1][flatOrthoIJ] > 0 && normalP || faces[1][flatOrthoIJ] < 0 && normalM) {
                 if (CSFX.debug) console.log('i linked to previous j ' + stackOrthoIJ + " | " + stackFaceId);
@@ -258,7 +258,7 @@ class CSFX {
 
         // CASE 1: aligned with top and right j
         const top = flatFaceId + ijS; // NOT MERGED YET
-        if (top < capacity) { // TODO is it inbounds?
+        if (top < capacity) {
             const stackTop = capacity + top;
             if (faces[1][top] > 0 && normalP || faces[1][top] < 0 && normalM) {
                 if (CSFX.debug) console.log('j linked to top j ' + stackTop + " | " + stackFaceId);
@@ -267,7 +267,7 @@ class CSFX {
         }
 
         const right = flatFaceId + 1; // POTENTIALLY MERGED
-        if (right % iS === (flatFaceId % iS) + 1) { // TODO is it inbounds?
+        if (right % iS === (flatFaceId % iS) + 1) {
             const stackRight = capacity + right;
             if (faces[1][right] > 0 && normalP || faces[1][right] < 0 && normalM) {
                 if (CSFX.debug) console.log('j linked to back j ' + stackRight + " | " + stackFaceId);
@@ -292,7 +292,7 @@ class CSFX {
         // CASE 3: orthogonal with next k or next i
         // REVERSE ORIENTATION
         const flatTopOrthoNext = flatTopOrtho + iS; // next k, NOT MERGED YET
-        if (flatTopOrthoNext % ijS === (flatTopOrtho % ijS) + iS) { // TODO is it inbounds?
+        if (flatTopOrthoNext % ijS === (flatTopOrtho % ijS) + iS) {
             const stackTopOrthoNext = 2*capacity + flatTopOrthoNext;
             if (faces[2][flatTopOrthoNext] < 0 && normalP || faces[2][flatTopOrthoNext] > 0 && normalM) {
                 if (CSFX.debug) console.log('j linked to next k ' + stackTopOrthoNext + " | " + stackFaceId);
@@ -302,7 +302,7 @@ class CSFX {
 
         const flatBackOrthoNext = flatFaceId + 1; // next i
         if (flatBackOrthoNext % iS === (flatFaceId % iS) + 1) {
-            const stackBackOrthoNext = flatFaceId + 1; // TODO refactor
+            const stackBackOrthoNext = flatFaceId + 1;
             if (faces[0][flatBackOrthoNext] < 0 && normalP || faces[0][flatBackOrthoNext] > 0 && normalM) {
                 if (CSFX.debug) console.log('j linked to next i ' + stackBackOrthoNext + " | " + stackFaceId);
                 cc[stackBackOrthoNext] = cc[stackFaceId];
@@ -319,7 +319,7 @@ class CSFX {
 
         // CASE 1: aligned with back and right k
         const back = flatFaceId + iS;
-        if (back % ijS === (flatFaceId % ijS) + iS) { // TODO is it inbounds?
+        if (back % ijS === (flatFaceId % ijS) + iS) {
             const stackBack = 2 * capacity + back;
             if (faces[2][back] > 0 && normalP || faces[2][back] < 0 && normalM) {
                 if (CSFX.debug) console.log('k linked to right k ' + stackBack + " | " + stackFaceId);
@@ -345,7 +345,7 @@ class CSFX {
         // CASE 2: orthogonal with (upper current and previous) back and right (j, i)
         // Current -> reverse orientation
         const flatBackOrthoCurrent = flatFaceId + ijS; // j
-        if (flatBackOrthoCurrent < capacity) { // TODO is it inbounds?
+        if (flatBackOrthoCurrent < capacity) {
             const stackBackOrtho = capacity + flatBackOrthoCurrent;
             if (faces[1][flatBackOrthoCurrent] < 0 && normalP || faces[1][flatBackOrthoCurrent] > 0 && normalM) {
                 if (CSFX.debug) console.log('k linked to current j ' + stackBackOrtho + " | " + stackFaceId);
@@ -567,7 +567,7 @@ class CSFX {
         // PostMerge.
         CSFX.postMerge(merger, fastCC, connectedComponents);
 
-        // TODO check fastCC...
+        // Debugging fastCC
         for (let i in fastCC) {
             for (let faceId = 0; faceId < fastCC[i].length; ++faceId) {
                 if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId) console.log("Detected duplicate face.");

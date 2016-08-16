@@ -370,13 +370,13 @@ class FaceUpdater {
         chunk.setDirtyFlag();
     }
 
+    // TODO check multiple addition on # chunks here.
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
 
-        let wOrigin = chunk.what(x, y, z);
-
         if (x === dimensions[0] - 1) {
+            let wOrigin = chunk.what(x, y, z);
             let w = chunk.neighbourWhat(x + 1, y, z);
             if (!isAddition) {
                 w *= -1;
@@ -387,6 +387,7 @@ class FaceUpdater {
         }
 
         if (y === dimensions[1] - 1) {
+            let wOrigin = chunk.what(x, y, z);
             let w = chunk.neighbourWhat(x, y + 1, z);
             if (!isAddition) {
                 w *= -1;
@@ -397,6 +398,7 @@ class FaceUpdater {
         }
 
         if (z === dimensions[2] - 1) {
+            let wOrigin = chunk.what(x, y, z);
             let w = chunk.neighbourContains(x, y, z + 1);
             if (!isAddition) {
                 w *= -1;
@@ -410,6 +412,7 @@ class FaceUpdater {
             let c = chunk.getNeighbourChunkFromRelativeCoordinates(x - 1, y, z);
             let newX = chunk.dimensions[0] - 1;
             let fid = c._toId(newX, y, z);
+            let wOrigin = chunk.what(x, y, z);
             let w = c.what(newX, y, z);
             if (isAddition) {
                 w *= -1;
@@ -422,6 +425,7 @@ class FaceUpdater {
             let c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y - 1, z);
             let newY = chunk.dimensions[1] - 1;
             let fid = capacity + c._toId(x, newY, z);
+            let wOrigin = chunk.what(x, y, z);
             let w = c.what(x, newY, z);
             if (isAddition) {
                 w *= -1;
@@ -434,6 +438,7 @@ class FaceUpdater {
             let c = chunk.getNeighbourChunkFromRelativeCoordinates(x, y, z - 1);
             let newZ = chunk.dimensions[2] - 1;
             let fid = 2 * capacity + c._toId(x, y, newZ);
+            let wOrigin = chunk.what(x, y, z);
             let w = c.what(x, y, newZ);
             if (isAddition) {
                 w *= -1;
