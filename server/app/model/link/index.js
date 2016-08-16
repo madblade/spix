@@ -29,7 +29,7 @@ class Connector {
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
-        setTimeout(() => socket.emit('connected', ''), 500);
+        setTimeout(_ => socket.emit('connected', ''), 500);
     }
 
     setupDisconnect(socket) {
@@ -37,7 +37,7 @@ class Connector {
         socket.off = socket.removeListener;
 
         // Call onDisconnect.
-        socket.on('disconnect', () => {
+        socket.on('disconnect', _ => {
             var user = socket.user;
             if (user === undefined) return;
 

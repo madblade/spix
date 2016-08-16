@@ -32,13 +32,13 @@ class UserOutput {
         var updatedChunks = this._game.worldman.updatedChunks;
         if (Object.keys(updatedChunks).length < 1) return;
 
-        this._game.playerman.forEach((p) => {
+        this._game.playerman.forEach(p => {
             if (!UserOutput.playerConcernedByChunks(p, updatedChunks)) return;
-            p.send('chk', this.extractConcernedChunks(p));
+            p.send('chk', this.extractUpdatedChunksForPlayer(p));
         });
 
         // Tell object manager we have done update.
-        this._game.worldman.updateChunksTransmitted();
+        this._game.worldman.chunkUpdatesTransmitted();
     }
 
     updateEntities() {
@@ -46,7 +46,7 @@ class UserOutput {
         if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
-        this._game.playerman.forEach((p) => {
+        this._game.playerman.forEach(p => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
 
@@ -77,9 +77,10 @@ class UserOutput {
         return (this._game.entityman.extractEntitiesInRange(player));
     }
 
-    extractConcernedChunks(player) {
-        return (this._game.worldman.extractUpdatedChunks(player));
+    extractUpdatedChunksForPlayer(player) {
+        return (this._game.worldman.extractUpdatedChunksForPlayer(player));
     }
+
     extractChunksForNewPlayer(player) {
         return (this._game.worldman.extractChunksForNewPlayer(player));
     }
@@ -89,7 +90,7 @@ class UserOutput {
     }
 
     extractNewChunksInRange(player) {
-        return (this._game.worldman.extractNewChunksInRangeFor(player));
+        return (this._game.worldman.extractNewChunksInRangeForPlayer(player));
     }
 
 }

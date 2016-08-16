@@ -32,8 +32,8 @@ class PlayerManager {
     }
 
     removeAllPlayers() {
-        if (this._handleRemovePlayer) this._players.forEach((p) => this._handleRemovePlayer(p));
-        this._players.forEach((p) => p.destroy()); // Clean references from all players
+        if (this._handleRemovePlayer) this._players.forEach(p => this._handleRemovePlayer(p));
+        this._players.forEach(p => p.destroy()); // Clean references from all players
         this._players = [];
     }
 
@@ -50,7 +50,7 @@ class PlayerManager {
      * @param callback
      */
     forEach(callback) {
-        return this._players.forEach((p) => callback(p));
+        return this._players.forEach(p => callback(p));
     }
 
     // Clean all references.

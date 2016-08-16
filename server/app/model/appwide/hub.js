@@ -60,7 +60,7 @@ class Hub {
     listGames() {
         let games = {};
 
-        var f = (kind) => (gid) => {
+        var f = kind => gid => {
             if (this._games[kind][gid].ready) games[kind].push(gid);
         };
 

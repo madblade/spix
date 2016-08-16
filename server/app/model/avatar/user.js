@@ -81,7 +81,7 @@ class User {
             }
         }
 
-        setTimeout(() => {
+        setTimeout(_ => {
             if (this.hasOwnProperty('_hub')) {
                 this.fetchHubState();
             }

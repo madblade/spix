@@ -66,7 +66,7 @@ class Game {
         // Launch
         this._isRunning = true;
         console.log("Game running.");
-        this._jobId = setInterval(() => {
+        this._jobId = setInterval(_ => {
             this.update();
         }, this._refreshRate);
     }
@@ -80,7 +80,7 @@ class Game {
         this._isRunning = false;
 
         // Set idle time limit before despawning this game.
-        if (doTimeout) this._timeIdleId = setTimeout(() => this.suicide(), 5000);
+        if (doTimeout) this._timeIdleId = setTimeout(_ => this.suicide(), 5000);
     }
 
     /* ### Manage players ### */

@@ -34,12 +34,12 @@ class CollectionUtils {
     }
 
     static generateId(collection) {
-        var random = () => Math.floor(Math.random() * 1000000);
+        var random = _ => Math.floor(Math.random() * 1000000);
         var id = random();
 
         if (collection instanceof Array) { // Array
             // Unicity mandatory check
-            var f = ((e) => e.id === id);
+            var f = (e => e.id === id);
             while (collection.filter(f).length > 0) id = random();
         }
 

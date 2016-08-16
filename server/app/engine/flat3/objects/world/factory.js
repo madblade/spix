@@ -5,6 +5,7 @@
 'use strict';
 
 import Chunk from './chunk';
+import ExtractionAPI from './extraction/extractionapi';
 
 class WorldFactory {
 
@@ -14,7 +15,7 @@ class WorldFactory {
 
     static createChunk(x, y, z, id, worldManager) {
         var c = new Chunk(x, y, z, id, worldManager);
-        c.computeFaces();
+        ExtractionAPI.computeChunkFaces(c);
         return c;
     }
 

@@ -74,7 +74,7 @@ class UserInput {
     }
 
     push(kind, avatar) {
-        return ((data) => {
+        return (data => {
             var array = this._incoming.get(avatar);
             if (!array || array === 'undefined') {
                 this._incoming.set(avatar, [{action:kind, meta:data}]);

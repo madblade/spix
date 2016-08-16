@@ -29,17 +29,18 @@ class Flat3 extends Game {
 
         // Generate then listen players.
         this._worldman.generate()
-            .then(() => this.configurePlayerManager());
+            .then(_ => this.configurePlayerManager())
+            .catch(e=>console.log(e));
     }
 
     configurePlayerManager() {
-        this._playerman.setAddPlayerBehaviour((p) => {
+        this._playerman.setAddPlayerBehaviour(p => {
             this._entityman.spawnPlayer(p);
             this._inputman.listenPlayer(p);
             this._outputman.init(p);
         });
 
-        this._playerman.setRemovePlayerBehaviour((p) => {
+        this._playerman.setRemovePlayerBehaviour(p => {
             this._inputman.removePlayer(p);
             this._entityman.despawnPlayer(p);
         });

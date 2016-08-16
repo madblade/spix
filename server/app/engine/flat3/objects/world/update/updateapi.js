@@ -4,7 +4,7 @@
 
 'use strict';
 
-class UpdaterAPI {
+class UpdateAPI {
 
     static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager) {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
@@ -25,7 +25,7 @@ class UpdaterAPI {
             floors[1] - j * worldManager.chunkDimensionY,
             floors[2] - k * worldManager.chunkDimensionZ
         ];
-        if (!UpdaterAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
+        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
         return;
 
         // Add block on chunk.
@@ -55,7 +55,7 @@ class UpdaterAPI {
             floors[1] - j * worldManager.chunkDimensionY,
             floors[2] - k * worldManager.chunkDimensionZ
         ];
-        if (!UpdaterAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
+        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
             return;
 
         // Add block on chunk.
@@ -76,14 +76,14 @@ class UpdaterAPI {
     static validateBlockEdition(originEntity, x, y, z, floors) {
         let fx = floors[0]; let fy = floors[1]; let fz = floors[2];
         // 4 blocks maximum range for block editing.
-        const d3 = UpdaterAPI.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
+        const d3 = UpdateAPI.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
         return (d3 < 10);
     }
 
     static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager) {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdaterAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
+        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
             failure("distance not validated by world manager.");
             return false;
         }
@@ -140,7 +140,7 @@ class UpdaterAPI {
     static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager) {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdaterAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
+        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
             failure("distance not validated by world manager.");
             return false;
         }
@@ -193,4 +193,4 @@ class UpdaterAPI {
 
 }
 
-export default UpdaterAPI;
+export default UpdateAPI;
