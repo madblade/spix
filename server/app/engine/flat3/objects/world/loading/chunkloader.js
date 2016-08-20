@@ -8,11 +8,6 @@ import ChunkGenerator from './../generation/chunkgenerator';
 
 class ChunkLoader {
 
-    constructor(chunk, worldManager) {
-        this._chunk = chunk;
-        this._worldManager = worldManager;
-    }
-
     static getNeighboringChunk(chunk, direction) {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
@@ -55,23 +50,23 @@ class ChunkLoader {
         }
     }
 
-    preLoadNeighborChunks() {
-        let loadedChunks = this._worldManager.allChunks;
-        let c = this._chunk;
-        let i = c.chunkI;
-        let j = c.chunkJ;
+    static preLoadNeighborChunks(chunk, worldManager) {
+        let loadedChunks = worldManager.allChunks;
+        let c = chunk;
+        let ci = c.chunkI;
+        let cj = c.chunkJ;
         let dims = c.dimensions;
 
-        let neighbourIds = [(i+1)+','+j, i+','+(j+1), (i-1)+','+j, i+','+(j-1)];
+        let neighbourIds = [(ci+1)+','+cj, ci+','+(cj+1), (ci-1)+','+cj, ci+','+(cj-1)];
 
-        for (i = 0; i<neighbourIds.length; ++i) {
+        for (let i = 0, length = neighbourIds.length; i < length; ++i) {
             let currentId = neighbourIds[i];
             if (loadedChunks.hasOwnProperty(currentId)) continue;
 
-            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, this._worldManager);
+            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
 
             //neighbour.fillChunk(64, 1);
-            this._worldManager.addChunk(currentId, neighbour);
+            worldManager.addChunk(currentId, neighbour);
         }
 
     }

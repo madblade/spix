@@ -171,7 +171,7 @@ class FaceUpdater {
         let removedFaceIds = new Int32Array(removedFaces.length);
         let addedFaceIds = new Int32Array(addedFaces.length);
 
-        for (let normal = 0; normal < removedFaces.length; ++normal) {
+        for (let normal = 0, l = removedFaces.length; normal < l; ++normal) {
             if (!removedFaces[normal] && !addedFaces[normal]) {
                 removedFaceIds[normal] = addedFaceIds[normal] = -1;
                 continue;
@@ -195,7 +195,7 @@ class FaceUpdater {
 
         // Remove
         let oldComponent = null;
-        for (let i = 0; i < removedFaceIds.length; ++i) {
+        for (let i = 0, l = removedFaceIds.length; i < l; ++i) {
             const fid = removedFaceIds[i];
             if (fid === -1) continue;
 
@@ -225,16 +225,20 @@ class FaceUpdater {
 
         // Insert
         let newColor = {};
-        for (let i = 0; i < addedFaceIds.length; ++i) {
+        for (let i = 0, l = addedFaceIds.length; i < l; ++i) {
             const fid = addedFaceIds[i];
             if (fid === -1) continue;
 
             // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
             if (fastComponents[componentId] === undefined) {
+                // TODO check in divide...
+                // Somehow getting here means that the added block isn't topologically linked to any other
+                // component. So we have to create a new component id.
                 console.log('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');
                 fastComponents[componentId] = [];
                 fastComponentsIds[componentId] = [];
+                oldComponent = componentId;
             }
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
             var fastIds = fastComponentsIds[componentId];
@@ -269,7 +273,7 @@ class FaceUpdater {
         var nbp = CollectionUtils.numberOfProperties;
         const updatesEmpty = nbp(removedUpdt) === 0 && nbp(addedUpdt) === 0 && nbp(changedUpdt) === 0;
 
-        for (let i = 0; i < addedFaceIds.length; ++i) {
+        for (let i = 0, l = addedFaceIds.length; i < l; ++i) {
             let fid = addedFaceIds[i];
             if (fid === -1) continue;
 
@@ -281,7 +285,7 @@ class FaceUpdater {
             }
         }
 
-        for (let i = 0; i < removedFaceIds.length; ++i) {
+        for (let i = 0, l = removedFaceIds.length; i < l; ++i) {
             let fid = removedFaceIds[i];
             if (fid === -1) continue;
 
@@ -344,8 +348,15 @@ class FaceUpdater {
 
         const cc = 1; // TODO Topology
         connectedComponents[faceId] = cc;
-        fastComponents[cc].push(faceId);
-        fastComponentsIds[cc].push(kind);
+        if (fastComponents.hasOwnProperty(cc)) {
+            fastComponents[cc].push(faceId);
+            fastComponentsIds[cc].push(kind);
+        } else {
+            console.log('CRITICAL @addFaceToModel: fastComponents doesnt have a ' + cc + ' component. ' +
+                'face id: ' + faceId + ' kind: ' + kind);
+            fastComponents[cc] = [faceId];
+            fastComponentsIds[cc] = [kind];
+        }
     }
 
     static removeFaceFromModel(chunk, faceId) {

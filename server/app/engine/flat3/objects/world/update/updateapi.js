@@ -6,64 +6,120 @@
 
 class UpdateAPI {
 
+    static isEpsilon(strictlyPositiveNumber) {
+        return (strictlyPositiveNumber < 0.000001);
+    }
+
+    static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ, floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk) {
+        const starterChunkId = chunkI + ',' + chunkJ;
+
+        const fx = floors[0];
+        const fy = floors[1];
+        const fz = floors[2];
+
+        const dimX = worldManager.chunkDimensionX;
+        const dimY = worldManager.chunkDimensionY;
+        const dimZ = worldManager.chunkDimensionZ;
+
+        blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
+        blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
+        blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
+
+        let chunk = worldManager.allChunks[starterChunkId];
+        if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
+            return chunk;
+        }
+
+        if (mustBeEmpty === (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0)) {
+            return chunk;
+        }
+
+        if (isBoundaryX) {
+            const rightChunkId = (chunkI-1) + ',' + chunkJ;
+            blockCoordinatesOnChunk[0] = worldManager.chunkDimensionX-1;
+            return worldManager.allChunks[rightChunkId];
+        }
+
+        if (isBoundaryY) {
+            blockCoordinatesOnChunk[1] = worldManager.chunkDimensionY-1;
+            const rightChunkId = chunkI + ',' + (chunkJ-1);
+            return worldManager.allChunks[rightChunkId];
+        }
+
+        /* TODO zeefication
+        if (deltaZ) {
+            const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
+            return worldManager.allChunks[rightChunkId];
+        }
+        */
+    }
+
     static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager) {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldManager.getChunkCoordinates(floors[0], floors[1], floors[2]);
+        let coordinates = worldManager.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+
         const i = coordinates[0];
         const j = coordinates[1];
         const k = coordinates[2];
-        const chunkId = i+','+j;
-        var chunk = worldManager.allChunks[chunkId];
-        console.log("Transaction required on " + chunkId);
-        if (!chunk || chunk === undefined || !chunk.ready) { console.log('Could not find chunk ' + chunkId); return; }
+
+        const isBoundaryX = coordinates[3];
+        const isBoundaryY = coordinates[4];
+        const isBoundaryZ = coordinates[5];
+
+        let blockCoordinatesOnChunk = [];
+        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ, floors, true, worldManager, blockCoordinatesOnChunk);
+
+        console.log("Transaction required on " + chunk.chunkId);
+        if (!chunk || chunk === undefined || !chunk.ready) {
+            console.log('Could not find chunk ' + chunk.chunkId);
+            return;
+        }
 
         // Validate request.
-        let blockCoordinatesOnChunk = [
-            floors[0] - i * worldManager.chunkDimensionX,
-            floors[1] - j * worldManager.chunkDimensionY,
-            floors[2] - k * worldManager.chunkDimensionZ
-        ];
-        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
+        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
         return;
 
         // Add block on chunk.
         chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
 
         // Remember this chunk was touched.
-        worldManager.chunkUpdated(chunkId);
+        worldManager.chunkUpdated(chunk.chunkId);
     }
 
     static delBlock(originEntity, x, y, z, worldManager, entityManager) {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldManager.getChunkCoordinates(floors[0], floors[1], floors[2]);
+        let coordinates = worldManager.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+
         const i = coordinates[0];
         const j = coordinates[1];
         const k = coordinates[2];
-        const chunkId = i+','+j;
-        var chunk = worldManager.allChunks[chunkId];
 
-        console.log("Transaction required on " + chunkId);
-        if (!chunk || chunk === undefined || !chunk.ready) { console.log('Could not find chunk ' + chunkId); return; }
+        const isBoundaryX = coordinates[3];
+        const isBoundaryY = coordinates[4];
+        const isBoundaryZ = coordinates[5];
+
+        let blockCoordinatesOnChunk = [];
+        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ, floors, false, worldManager, blockCoordinatesOnChunk);
+
+        console.log("Transaction required on " + chunk.chunkId);
+        if (!chunk || chunk === undefined || !chunk.ready) {
+            console.log('Could not find chunk ' + chunk.chunkId);
+            return;
+        }
 
         // Validate request.
-        let blockCoordinatesOnChunk = [
-            floors[0] - i * worldManager.chunkDimensionX,
-            floors[1] - j * worldManager.chunkDimensionY,
-            floors[2] - k * worldManager.chunkDimensionZ
-        ];
-        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager))
+        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
             return;
 
         // Add block on chunk.
-        // console.log(blockCoordinatesOnChunk);
         chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
 
         // Remember this chunk was touched.
-        worldManager.chunkUpdated(chunkId);
+        worldManager.chunkUpdated(chunk.chunkId);
     }
 
     static distance3(v1, v2) {
@@ -80,7 +136,7 @@ class UpdateAPI {
         return (d3 < 10);
     }
 
-    static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager) {
+    static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ) {
         function failure(reason) { console.log("Request denied: " + reason); }
 
         if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
@@ -97,24 +153,32 @@ class UpdateAPI {
         const ly = blockCoordinatesOnChunk[1];
         const lz = blockCoordinatesOnChunk[2];
 
-        if (dx === 0 && dy !== 0 && dz !== 0) {
+        if (UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
             // Which side of the face is empty...
-            if (chunk.what(lx-1, ly, lz) === 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
+            if (!isBoundaryX) {
+                if (chunk.what(lx-1, ly, lz) === 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
+            } else {
+            //    if (chunk.what(lx, ly, lz) !== 0) blockCoordinatesOnChunk[0] = lx === 0 ? chunk.dimensions[0]-1 : 0;
+            }
 
-        } else if (dx !== 0 && dy === 0 && dz !== 0) {
-            if (chunk.what(lx, ly-1, lz) === 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
+        } else if (!UpdateAPI.isEpsilon(dx) && UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
+            if (!isBoundaryY) {
+                if (chunk.what(lx, ly-1, lz) === 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
+            }
 
-        } else if (dx !== 0 && dy !== 0 && dz === 0) {
-            if (chunk.what(lx, ly, lz-1) === 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
+        } else if (!UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && UpdateAPI.isEpsilon(dz)) {
+            if (!isBoundaryZ) {
+                if (chunk.what(lx, ly, lz-1) === 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
+            }
 
             // On-edge request.
         } else {
             failure("precision (on-edge request).");
             return false;
         }
+        console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
-        // console.log(blockCoordinatesOnChunk);
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0) {
             failure("block is not empty.");
             return false;
@@ -137,7 +201,7 @@ class UpdateAPI {
         return true;
     }
 
-    static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager) {
+    static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ) {
         function failure(reason) { console.log("Request denied: " + reason); }
 
         if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
@@ -154,19 +218,26 @@ class UpdateAPI {
         const lz = blockCoordinatesOnChunk[2];
 
         if (dx === 0 && dy !== 0 && dz !== 0) {
-            if (chunk.what(lx-1, ly, lz) !== 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
+            if (!isBoundaryX) {
+                if (chunk.what(lx-1, ly, lz) !== 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
+            }
 
         } else if (dx !== 0 && dy === 0 && dz !== 0) {
-            if (chunk.what(lx, ly-1, lz) !== 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
+            if (!isBoundaryY) {
+                if (chunk.what(lx, ly-1, lz) !== 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
+            }
 
         } else if (dx !== 0 && dy !== 0 && dz === 0) {
-            if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
+            if (!isBoundaryZ) {
+                if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
+            }
 
             // On-edge request.
         } else {
             failure("precision (on-edge request).");
             return false;
         }
+        console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0) {

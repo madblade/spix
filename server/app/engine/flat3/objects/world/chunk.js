@@ -84,8 +84,7 @@ class Chunk {
      */
     preloadNeighborChunks() {
         console.log('\tPreloading neighbor chunks...');
-        var loader = new ChunkLoader(this, this._worldManager);
-        loader.preLoadNeighborChunks();
+        ChunkLoader.preLoadNeighborChunks(this, this._worldManager);
     }
 
     /**
@@ -181,6 +180,7 @@ class Chunk {
         else
             neighbourChunkJ = this._chunkJ;
 
+        // TODO zeefy
         if (z < 0)
             neighbourChunkZ = this._chunkK - 1;
         else if (z >= this._zSize)

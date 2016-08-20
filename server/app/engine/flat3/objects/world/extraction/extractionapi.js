@@ -24,7 +24,8 @@ class ExtractAPI {
         let coordinates = worldManager.getChunkCoordinates(pos[0], pos[1], pos[2]);
         const i = coordinates[0];
         const j = coordinates[1];
-        const k = coordinates[2];
+        // TODO zeefication
+        // const k = coordinates[2];
 
         const dx = worldManager.chunkDimensionX;
         const dy = worldManager.chunkDimensionY;

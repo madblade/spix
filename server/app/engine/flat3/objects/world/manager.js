@@ -104,13 +104,33 @@ class WorldManager {
         this._updatedChunks = {};
     }
 
-    /**
-     * Finds which chunk contains a given block.
-     * @param x
-     * @param y
-     * @param z
-     * @returns {*[]} coordinates of corresponding chunk.
-     */
+    getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
+        const dx = this.chunkDimensionX;
+        const dy = this.chunkDimensionY;
+        const dz = this.chunkDimensionZ;
+
+        const modX = (floorX >= 0 ? floorX : (dx + floorX)) % dx;
+        const deltaX = modX === 0;
+        let i = floorX - modX;
+        i /= dx;
+
+        const modY = (floorY >= 0 ? floorY : (dy + floorY)) % dy;
+        const deltaY = modY === 0;
+        let j = floorY - modY;
+        j /= dy;
+
+        const modZ = (floorZ >= 0 ? floorZ : (dz + floorZ)) % dz;
+        const deltaZ = modZ === 0;
+        let k = floorZ - modZ;
+        k /= dz;
+
+        const Dx = deltaX && UpdateAPI.isEpsilon(Math.abs(Math.abs(x)-Math.abs(floorX)));
+        const Dy = deltaY && UpdateAPI.isEpsilon(Math.abs(Math.abs(y)-Math.abs(floorY)));
+        const Dz = deltaZ && UpdateAPI.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
+
+        return [i, j, k, Dx, Dy, Dz];
+    }
+
     getChunkCoordinates(x, y, z) {
         const dx = this.chunkDimensionX;
         const dy = this.chunkDimensionY;
@@ -128,6 +148,7 @@ class WorldManager {
         return [i,j,k];
     }
 
+
     addBlock(originEntity, x, y, z, blockId) {
         UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this._entityman);
     }
@@ -140,6 +161,8 @@ class WorldManager {
         let coordinates = this.getChunkCoordinates(x, y, z);
         const i = coordinates[0];
         const j = coordinates[1];
+        // TODO zeefication
+        // const k = coordinates[2];
         const chunkX = x - i * this.chunkDimensionX;
         const chunkY = y - j * this.chunkDimensionY;
 

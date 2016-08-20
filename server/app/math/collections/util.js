@@ -21,7 +21,7 @@ class CollectionUtils {
 
     static insert(element, array) {
         if (array === undefined) {
-            console.log("BLD: undefined array.");
+            console.log("BLD @insert: undefined array.");
             return -1;
         }
         var location = CollectionUtils._locationOf(element, array) + 1;
@@ -77,7 +77,7 @@ class CollectionUtils {
 
     static removeFromArray(array, object) {
         if (array === undefined) {
-            console.log("BLD: undefined array.");
+            console.log("BLD @removeFromArray: undefined array.");
             return -1;
         }
         const objectId = array.indexOf(object);
