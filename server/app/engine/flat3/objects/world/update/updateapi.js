@@ -217,17 +217,17 @@ class UpdateAPI {
         const ly = blockCoordinatesOnChunk[1];
         const lz = blockCoordinatesOnChunk[2];
 
-        if (dx === 0 && dy !== 0 && dz !== 0) {
+        if (UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
             if (!isBoundaryX) {
                 if (chunk.what(lx-1, ly, lz) !== 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
             }
 
-        } else if (dx !== 0 && dy === 0 && dz !== 0) {
+        } else if (!UpdateAPI.isEpsilon(dx) && UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
             if (!isBoundaryY) {
                 if (chunk.what(lx, ly-1, lz) !== 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
             }
 
-        } else if (dx !== 0 && dy !== 0 && dz === 0) {
+        } else if (!UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && UpdateAPI.isEpsilon(dz)) {
             if (!isBoundaryZ) {
                 if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
             }
