@@ -17,7 +17,7 @@ class UpdateAPI {
         const chunkId = i+','+j;
         var chunk = worldManager.allChunks[chunkId];
         console.log("Transaction required on " + chunkId);
-        if (!chunk || chunk === undefined) { console.log('Could not find chunk ' + chunkId); return; }
+        if (!chunk || chunk === undefined || !chunk.ready) { console.log('Could not find chunk ' + chunkId); return; }
 
         // Validate request.
         let blockCoordinatesOnChunk = [
@@ -47,7 +47,7 @@ class UpdateAPI {
         var chunk = worldManager.allChunks[chunkId];
 
         console.log("Transaction required on " + chunkId);
-        if (!chunk || chunk === undefined) { console.log('Could not find chunk ' + chunkId); return; }
+        if (!chunk || chunk === undefined || !chunk.ready) { console.log('Could not find chunk ' + chunkId); return; }
 
         // Validate request.
         let blockCoordinatesOnChunk = [

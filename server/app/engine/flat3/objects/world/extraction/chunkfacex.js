@@ -8,18 +8,6 @@ import ChunkLoader from './../loading/chunkloader';
 
 class CSFX {
 
-    constructor(chunk) {
-        this._chunk = chunk;
-        this._neighbors = [];
-        this._neighborBlocks = [];
-
-        // Get all six neighbour chunks.
-        for (let i = 0; i<4; ++i) {
-            this._neighbors.push(ChunkLoader.getNeighboringChunk(chunk, i));
-            this._neighborBlocks.push(this._neighbors[i].blocks);
-        }
-    }
-
     static debug = false;
 
     static inbounds(d, b, iS, ijS, capacity) {
@@ -61,7 +49,7 @@ class CSFX {
         }
 
         // Set surface face
-        const d = direction%3;
+        const d = direction % 3;
         if (d in surfaceFaces) surfaceFaces[d].push(blockId);
         else surfaceFaces[direction%3] = [blockId];
 
@@ -74,7 +62,9 @@ class CSFX {
         encounteredFaces[faceId] = connectedComponents[faceId] = ccid;
     }
 
-    static extractRawFaces(blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces, connectedComponents, dims) {
+    static extractRawFaces(blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces,
+                           connectedComponents, dims)
+    {
         let ccid = 1;
         const iS = dims[0];
         const jS = dims[1];
@@ -103,38 +93,44 @@ class CSFX {
         }
 
         // Extract boundary faces.
-        let nb = neighbourBlocks[1]; // On x+ boundary.
+        let nb = neighbourBlocks[0]; // On x+ boundary.
         for (let z = 0; z < kS; ++z) {
             for (let y = 0; y < jS; ++y) {
                 const currentId = z*ijS + y*iS + iS-1;
                 const neighbourBlock = nb[currentId - iS + 1];
-                if (blocks[currentId] === 0) {
+                const currentBlock = blocks[currentId];
+                if (currentBlock === 0) {
                     if (neighbourBlock !== 0) {
-                        CSFX.setFace(0, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                        CSFX.setFace(0, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces,
+                            connectedComponents, capacity, iS, ijS, ccid, true);
                         ccid++;
                     }
                 } else {
                     if (neighbourBlock === 0) {
-                        CSFX.setFace(3, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                        CSFX.setFace(3, currentId, currentBlock, faces, surfaceFaces, encounteredFaces,
+                            connectedComponents, capacity, iS, ijS, ccid);
                         ccid++;
                     }
                 }
             }
         }
 
-        nb = neighbourBlocks[3]; // On y+ boundary.
+        nb = neighbourBlocks[2]; // On y+ boundary.
         for (let z = 0; z < kS; ++z) {
             for (let x = 0; x < iS; ++x) {
                 const currentId = z*ijS + ijS-iS + x;
                 const neighbourBlock = nb[currentId - ijS + iS];
-                if (blocks[currentId] === 0) {
+                const currentBlock = blocks[currentId];
+                if (currentBlock === 0) {
                     if (neighbourBlock !== 0) {
-                        CSFX.setFace(1, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                        CSFX.setFace(1, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces,
+                            connectedComponents, capacity, iS, ijS, ccid, true);
                         ccid++;
                     }
                 } else {
                     if (neighbourBlock === 0) {
-                        CSFX.setFace(4, currentId, neighbourBlock, faces, surfaceFaces, encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                        CSFX.setFace(4, currentId, currentBlock, faces, surfaceFaces, encounteredFaces,
+                            connectedComponents, capacity, iS, ijS, ccid);
                         ccid++;
                     }
                 }
@@ -143,7 +139,7 @@ class CSFX {
 
         // TODO uncomment for non-flat3 mode.
         /*
-        nb = neighbourBlocks[5]; // z+
+        nb = neighbourBlocks[4]; // z+
         for (let y = 0; y < jS; ++y) {
             for (let x = 0; x < iS; ++x) {
                 const currentId = capacity - ijS + y*iS + x;
@@ -529,12 +525,19 @@ class CSFX {
         }
     }
 
-    extractConnectedComponents() {
+    static extractConnectedComponents(chunk) {
+        let neighbourChunks = [];
+        let neighbourBlocks = [];
+
+        // Get all six neighbour chunks.
+        for (let i = 0; i<4; ++i) {
+            neighbourChunks.push(ChunkLoader.getNeighboringChunk(chunk, i));
+            neighbourBlocks.push(neighbourChunks[i].blocks);
+        }
+
         // Properties
-        const chunk = this._chunk;
-        const surfaceBlocks = chunk.surfaceBlocks;
-        const blocks = chunk.blocks;
-        const neighbourBlocks = this._neighborBlocks;
+        let surfaceBlocks = chunk.surfaceBlocks;
+        let blocks = chunk.blocks;
 
         // Static properties
         const dims = chunk.dimensions;

@@ -94,8 +94,7 @@ class Chunk {
     computeSurfaceBlocksFromScratch() {
         console.log('\tExtracting surface...');
         try {
-            var extractor = new BlockExtractor(this);
-            extractor.extractSurfaceBlocks();
+            BlockExtractor.extractSurfaceBlocks(this);
         } catch(err) {
             console.log(err.message);
         }
@@ -107,8 +106,7 @@ class Chunk {
     computeConnectedComponents() {
         console.log("\tComputing connected components...");
         try {
-            var extractor = new FaceExtractor(this);
-            extractor.extractConnectedComponents();
+            FaceExtractor.extractConnectedComponents(this);
         } catch(err) {
             console.log(err.message);
         }
@@ -122,7 +120,7 @@ class Chunk {
     fillChunk(toZ, blockId) {
         if (typeof toZ !== "number") return;
         if (typeof blockId !== "number") return;
-        console.log('Generating chunk ' + this._chunkId + '...');
+        console.log('Generating chunk ' + this._chunkId + ' to ' + toZ + '...');
 
         const numberOfBlocksToFill = this._xSize * this._ySize * toZ;
         const numberOfBlocks = this._capacity;

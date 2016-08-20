@@ -28,7 +28,7 @@ class ChunkGenerator {
 
         let generationMethod = worldManager.generationMethod;
         if (generationMethod == 'flat') {
-            c.fillChunk(48, 1);
+            c.fillChunk(55, 1);
         } else {
 
         }
