@@ -4,7 +4,7 @@
 
 'use strict';
 
-class TopoIterator {
+class BlockIterator {
 
     constructor(chunk) {
         this._dimensions = chunk.dimensions;
@@ -40,4 +40,4 @@ class TopoIterator {
 
 }
 
-export default TopoIterator;
+export default BlockIterator;

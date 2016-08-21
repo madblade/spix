@@ -58,10 +58,6 @@ class WorldManager {
         return ExtractionAPI.computeUpdatedChunksForPlayer(player, this._chunks, this._updatedChunks);
     }
 
-    hasPlayerNewChunksInRange(player) {
-        return ExtractionAPI.hasPlayerNewChunksInRange(player, this);
-    }
-
     extractNewChunksInRangeForPlayer(player) {
         return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this);
     }

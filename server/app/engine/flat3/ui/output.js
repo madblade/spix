@@ -72,9 +72,9 @@ class UserOutput {
                     this.extractConcernedEntities(p)
                 ]));
 
-            if (!this.playerHasNewChunksInRange(p)) return;
-
             let extractedChunks = this.extractNewChunksInRange(p);
+            if (extractedChunks === null) return;
+
             p.send('chk', extractedChunks);
 
             // Consider player has loaded chunks.
@@ -114,10 +114,6 @@ class UserOutput {
 
     extractChunksForNewPlayer(player) {
         return (this._game.worldman.extractChunksForNewPlayer(player));
-    }
-
-    playerHasNewChunksInRange(player) {
-        return (this._game.worldman.hasPlayerNewChunksInRange(player));
     }
 
     extractNewChunksInRange(player) {

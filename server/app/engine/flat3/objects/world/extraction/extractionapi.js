@@ -5,6 +5,7 @@
 'use strict';
 
 import WorldGenerator from '../generation/worldgenerator';
+import ChunkIterator from '../topology/chunkiterator';
 
 class ExtractAPI {
 
@@ -69,43 +70,34 @@ class ExtractAPI {
         return chunksForPlayer;
     }
 
-    static hasPlayerNewChunksInRange(player, worldManager) {
+    // TODO zeefication
+    static computeNewChunksInRangeForPlayer(player, worldManager) {
         let av = player.avatar;
-        let loadedChunks = av.loadedChunks;
-        let position = av.position;
+        let clientLoadedChunks = av.loadedChunks;
+        let clientPosition = av.position;
+        let modelChunks = worldManager.allChunks;
 
         // Loading circle for server (a bit farther)
 
-
-        // Loading circle for player (nearer)
+        // Loading circle for client (nearer)
 
         // Unloading circle (quite farther)
+        // (i.e. recurse currents and test distance)
 
-        return false;
-    }
+        // return null;
 
-    static computeNewChunksInRangeForPlayer(player, worldManager) {
         var chunksForPlayer = [];
-        let modelChunks = worldManager.allChunks;
 
         // From player position, find concerned chunks.
         let av = player.avatar;
         const pos = av.position;
-
-        // Belonging chunk coordinates.
-        // const dx = worldManager.chunkDimensionX;
-        // const dy = worldManager.chunkDimensionY;
-        // const dz = worldManager.chunkDimensionZ;
-        // const x = Math.floor(pos[0]); const i = (x - x % dx) / dx;
-        // const y = Math.floor(pos[1]); const j = (y - y % dy) / dy;
-        // const z = Math.floor(pos[2]); const k = (z - z % dz) / dz;
-        // (Dreaming of cubic chunks)
 
         var ld = [];
         for (var eid in av.loadedChunks) {
             if (!modelChunks.hasOwnProperty(eid)) continue;
             ld.push(eid);
         }
+
         // TODO check which chunks remain to load, and load them.
 
         console.log('computed new range');
