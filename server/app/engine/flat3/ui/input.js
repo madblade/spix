@@ -34,7 +34,6 @@ class UserInput {
         this._incoming = new Map();
     }
 
-    // TODO moveLeft & such methods.
     move(meta, avatar) {
         var hasMoved = true;
         switch (meta) {

@@ -59,7 +59,7 @@ class WorldManager {
     }
 
     hasPlayerNewChunksInRange(player) {
-        return false;
+        return ExtractionAPI.hasPlayerNewChunksInRange(player, this);
     }
 
     extractNewChunksInRangeForPlayer(player) {

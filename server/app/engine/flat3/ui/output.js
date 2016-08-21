@@ -14,8 +14,19 @@ class UserOutput {
         var p = player;
         console.log('Init a new player on game ' + this._game.gameId + '.');
         let extractedChunks = this.extractChunksForNewPlayer(p);
+
+        // Load chunks.
         p.send('chk', extractedChunks);
-        p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
+
+        // Load entities.
+        p.send('ent', JSON.stringify(
+            [
+                p.avatar.position,
+                p.avatar.rotation,
+                this.extractConcernedEntities(p)
+            ]));
+
+        // Consider player has loaded chunks.
         for (let cid in extractedChunks) {
             let cs = this._game.worldman.allChunks;
             if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
@@ -33,8 +44,12 @@ class UserOutput {
         if (Object.keys(updatedChunks).length < 1) return;
 
         this._game.playerman.forEach(p => {
-            if (!UserOutput.playerConcernedByChunks(p, updatedChunks)) return;
-            p.send('chk', this.extractUpdatedChunksForPlayer(p));
+            // If an update occurred on an existing, loaded chunk
+            if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
+
+            p.send('chk',
+                this.extractUpdatedChunksForPlayer(p)
+            );
         });
 
         // Tell object manager we have done update.
@@ -47,11 +62,27 @@ class UserOutput {
 
         // Broadcast updates.
         this._game.playerman.forEach(p => {
+            // If an entity in range of player p has just updated
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
-            p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, this.extractConcernedEntities(p)]));
+
+            p.send('ent', JSON.stringify(
+                [
+                    p.avatar.position,
+                    p.avatar.rotation,
+                    this.extractConcernedEntities(p)
+                ]));
 
             if (!this.playerHasNewChunksInRange(p)) return;
-            p.send('chk', this.extractNewChunksInRange(p));
+
+            let extractedChunks = this.extractNewChunksInRange(p);
+            p.send('chk', extractedChunks);
+
+            // Consider player has loaded chunks.
+            for (let cid in extractedChunks) {
+                let cs = this._game.worldman.allChunks;
+                if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
+            }
+            // TODO remove old chunks
         });
 
         // Tell object manager we have done update.
@@ -63,7 +94,7 @@ class UserOutput {
         // this._game.broadcast('chat', 'text');
     }
 
-    static playerConcernedByChunks(player, chunks) {
+    static playerConcernedByUpdatedChunks(player, chunks) {
         // TODO extract connected subsurface.
         return Object.keys(chunks).length > 0;
     }

@@ -10,7 +10,9 @@ class UpdateAPI {
         return (strictlyPositiveNumber < 0.000001);
     }
 
-    static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ, floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk) {
+    static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
+                                       floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk)
+    {
         const starterChunkId = chunkI + ',' + chunkJ;
 
         const fx = floors[0];
@@ -30,7 +32,9 @@ class UpdateAPI {
             return chunk;
         }
 
-        if (mustBeEmpty === (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0)) {
+        if (mustBeEmpty ===
+            (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0))
+        {
             return chunk;
         }
 
@@ -54,7 +58,8 @@ class UpdateAPI {
         */
     }
 
-    static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager) {
+    static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager)
+    {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
@@ -69,17 +74,22 @@ class UpdateAPI {
         const isBoundaryZ = coordinates[5];
 
         let blockCoordinatesOnChunk = [];
-        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ, floors, true, worldManager, blockCoordinatesOnChunk);
+        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
+            floors, true, worldManager, blockCoordinatesOnChunk);
 
         console.log("Transaction required on " + chunk.chunkId);
-        if (!chunk || chunk === undefined || !chunk.ready) {
+        if (!chunk || chunk === undefined || !chunk.ready)
+        {
             console.log('Could not find chunk ' + chunk.chunkId);
             return;
         }
 
         // Validate request.
-        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
-        return;
+        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk,
+                blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
+        {
+            return;
+        }
 
         // Add block on chunk.
         chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
@@ -88,7 +98,8 @@ class UpdateAPI {
         worldManager.chunkUpdated(chunk.chunkId);
     }
 
-    static delBlock(originEntity, x, y, z, worldManager, entityManager) {
+    static delBlock(originEntity, x, y, z, worldManager, entityManager)
+    {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
@@ -103,17 +114,22 @@ class UpdateAPI {
         const isBoundaryZ = coordinates[5];
 
         let blockCoordinatesOnChunk = [];
-        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ, floors, false, worldManager, blockCoordinatesOnChunk);
+        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
+            floors, false, worldManager, blockCoordinatesOnChunk);
 
         console.log("Transaction required on " + chunk.chunkId);
-        if (!chunk || chunk === undefined || !chunk.ready) {
+        if (!chunk || chunk === undefined || !chunk.ready)
+        {
             console.log('Could not find chunk ' + chunk.chunkId);
             return;
         }
 
         // Validate request.
-        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
+        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk,
+                blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
+        {
             return;
+        }
 
         // Add block on chunk.
         chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
@@ -136,10 +152,13 @@ class UpdateAPI {
         return (d3 < 10);
     }
 
-    static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ) {
+    static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
+                                             entityManager, isBoundaryX, isBoundaryY, isBoundaryZ)
+    {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
+        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors))
+        {
             failure("distance not validated by world manager.");
             return false;
         }
@@ -179,7 +198,8 @@ class UpdateAPI {
         console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
-        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0) {
+        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0)
+        {
             failure("block is not empty.");
             return false;
         }
@@ -187,13 +207,15 @@ class UpdateAPI {
         // Detect OOB.
         if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= chunk.dimensions[0] ||
             blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= chunk.dimensions[1] ||
-            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= chunk.dimensions[2]) {
+            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= chunk.dimensions[2])
+        {
             failure("block is OOB for its relative chunk.");
             return false;
         }
 
         // Detect entities.
-        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
+        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
+        {
             failure("an entity is present on the block.");
             return false;
         }
@@ -201,10 +223,13 @@ class UpdateAPI {
         return true;
     }
 
-    static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ) {
+    static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
+                                             entityManager, isBoundaryX, isBoundaryY, isBoundaryZ)
+    {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors)) {
+        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors))
+        {
             failure("distance not validated by world manager.");
             return false;
         }
@@ -240,7 +265,8 @@ class UpdateAPI {
         console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
-        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0) {
+        if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0)
+        {
             failure("block is already empty.");
             return false;
         }
@@ -248,13 +274,15 @@ class UpdateAPI {
         // Detect OOB.
         if (blockCoordinatesOnChunk[0] < 0 || blockCoordinatesOnChunk[0] >= chunk.dimensions[0] ||
             blockCoordinatesOnChunk[1] < 0 || blockCoordinatesOnChunk[1] >= chunk.dimensions[1] ||
-            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= chunk.dimensions[2]) {
+            blockCoordinatesOnChunk[2] < 0 || blockCoordinatesOnChunk[2] >= chunk.dimensions[2])
+        {
             failure("block is OOB for its relative chunk.");
             return false;
         }
 
         // Validate update.
-        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2])) {
+        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
+        {
             failure("an entity is present on the block.");
             return false;
         }

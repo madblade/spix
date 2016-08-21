@@ -60,7 +60,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     for (var f = 0; f < currentComponent.length; ++f) {
         var faceId = Math.abs(currentComponent[f]);
         c.whereToFindFace[faceId] = [0, f]; // [In which geometry a given face is, at which position]
-        c.whichFaceIs[0] = {};
+        c.whichFaceIs[0] = c.whichFaceIs[0] || {};
         c.whichFaceIs[0][f] = faceId;
         var normal = currentNatures[f] > 0;
 
@@ -154,6 +154,11 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
         // Update helpers (swap last if applicable).
         if (!isLast) {
+            if (whichFaceIs[meshId][lastPosition] === undefined) {
+                console.log("WARN: swapping");
+                console.log(whichFaceIs[meshId][lastPosition] + " @mesh " + meshId + " @lastposition " + lastPosition + " @position " + position);
+            }
+
             whereToFindFace[whichFaceIs[meshId][lastPosition]] = [meshId, position];
             whichFaceIs[meshId][position] = whichFaceIs[meshId][lastPosition];
         }

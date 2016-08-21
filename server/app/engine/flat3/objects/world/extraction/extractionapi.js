@@ -59,7 +59,8 @@ class ExtractAPI {
         var chunksForPlayer = {};
 
         for (let eid in modelUpdatedChunks) {
-            if (!modelChunks.hasOwnProperty(eid) || !player.avatar.loadedChunks.hasOwnProperty(eid)) continue;
+            if (!modelChunks.hasOwnProperty(eid) || !player.avatar.loadedChunks.hasOwnProperty(eid))
+                continue;
 
             let currentChunk = modelChunks[eid];
             chunksForPlayer[currentChunk.chunkId] = currentChunk.updates;
@@ -68,12 +69,27 @@ class ExtractAPI {
         return chunksForPlayer;
     }
 
+    static hasPlayerNewChunksInRange(player, worldManager) {
+        let av = player.avatar;
+        let loadedChunks = av.loadedChunks;
+        let position = av.position;
+
+        // Loading circle for server (a bit farther)
+
+
+        // Loading circle for player (nearer)
+
+        // Unloading circle (quite farther)
+
+        return false;
+    }
+
     static computeNewChunksInRangeForPlayer(player, worldManager) {
         var chunksForPlayer = [];
         let modelChunks = worldManager.allChunks;
 
         // From player position, find concerned chunks.
-        var av = player.avatar;
+        let av = player.avatar;
         const pos = av.position;
 
         // Belonging chunk coordinates.
@@ -92,6 +108,7 @@ class ExtractAPI {
         }
         // TODO check which chunks remain to load, and load them.
 
+        console.log('computed new range');
         return chunksForPlayer;
     }
 
