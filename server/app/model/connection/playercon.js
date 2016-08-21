@@ -6,7 +6,7 @@
 
 import CollectionUtils from '../../math/collections/util';
 
-class PlayerConnection {
+class PlayerCon {
 
     constructor(socket) {
         this._socket = socket;
@@ -94,4 +94,4 @@ class PlayerConnection {
 
 }
 
-export default PlayerConnection;
+export default PlayerCon;

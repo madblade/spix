@@ -58,8 +58,8 @@ App.Engine.Connection.prototype.removeCustomListener = function(message, func) {
 App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
 };
 
-App.Engine.Connection.prototype.send = function(message, content) {
-    this.socket.emit(message, content);
+App.Engine.Connection.prototype.send = function(kind, message) {
+    this.socket.emit(kind, message);
 };
 
 App.Engine.Connection.prototype.join = function(gameType, gid) {

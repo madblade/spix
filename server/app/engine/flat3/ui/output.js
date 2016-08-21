@@ -72,6 +72,7 @@ class UserOutput {
                     this.extractConcernedEntities(p)
                 ]));
 
+            // TODO check 'player has updated position'
             let extractedChunks = this.extractNewChunksInRange(p);
             if (extractedChunks === null) return;
 
@@ -91,7 +92,7 @@ class UserOutput {
 
     // TODO manage true broadcast events.
     updateMeta() {
-        // this._game.broadcast('chat', 'text');
+        this._game.chat.updateOutput();
     }
 
     static playerConcernedByUpdatedChunks(player, chunks) {

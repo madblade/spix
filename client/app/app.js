@@ -21,6 +21,7 @@ App.Core = function() {
     this.graphicsEngine = new App.Engine.Graphics(this);
     this.uiEngine = new App.Engine.UI(this);
     this.soundEngine = new App.Engine.Sound(this);
+    this.chatEngine = new App.Engine.Chat(this);
 
     // Run application when connection is confirmed.
     this.connect().then(function() {this.run();}.bind(this));

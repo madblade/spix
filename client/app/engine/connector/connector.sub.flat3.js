@@ -10,6 +10,6 @@ App.Engine.Connection.prototype.registerSocketForFlat3 = function() {
 
     this.addCustomListener('ent', this.app.gameEngine.updateEntities.bind(this.app.gameEngine));
 
-    this.addCustomListener('chat', function(data) {console.log(data)});
+    this.addCustomListener('chat', this.app.chatEngine.updateChat.bind(this.app.chatEngine));
 
 };

@@ -39,6 +39,17 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 ak.backwards = true;
                 break;
 
+            case k.enter:
+                /*
+                    TODO for chat:
+                    1. remove keyboard and mouse listeners until the user has finished typing.
+                    2. show AOE-like dialog for chat messages
+                    3. on validate, send message to server via chat module
+                    Maybe a better option: create a new 'chatting' state using stateManager, that takes care of
+                    key, mouse (and other like touch) listeners.
+                 */
+                break;
+
             default:
                 // this.stopKeyboardInteraction();
         }

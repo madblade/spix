@@ -9,6 +9,7 @@ class UserInput {
     constructor(game) {
         this._game = game;
         this._incoming = new Map();
+        this._listeners = {};
     }
 
     update() {
@@ -84,18 +85,34 @@ class UserInput {
     }
 
     listenPlayer(player) {
-        player.on('m', this.push('move', player.avatar));
-        player.on('r', this.push('rotate', player.avatar));
-        player.on('b', this.push('block', player.avatar));
+        let listener = this._listeners[player] = [
+            this.push('move', player.avatar),
+            this.push('rotate', player.avatar),
+            this.push('block', player.avatar),
+            this._game.chat.playerInput(player)
+        ];
+
+        player.on('m', listener[0]);
+        player.on('r', listener[1]);
+        player.on('b', listener[2]);
+        player.on('chat', listener[3]);
     }
 
     removePlayer(player) {
         // Do not modify queue.
         // Drop inconsistent players when an update is performed.
-        player.off('m', this.push('move', player.avatar));
-        player.off('r', this.push('rotate', player.avatar));
-        player.off('b', this.push('block', player.avatar));
-        // TODO make a map with push function? I think it is different every time.
+        let listener = this._listeners[player];
+        if (!listener || listener === null) {
+            console.log('WARN: a player which was not listened to left.');
+            return;
+        }
+
+        player.off('m', listener[0]);
+        player.off('r', listener[1]);
+        player.off('b', listener[2]);
+        player.off('chat', listener[3]);
+
+        delete this._listeners[player];
     }
 
 }

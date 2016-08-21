@@ -31,6 +31,7 @@ class Game {
     get kind() { return this._kind; }
     get gameId() { return this._gameId; }
     get isRunning() { return this._isRunning; }
+    get connector() { return this._connector; }
 
     set ready(value) { this._ready = value; }
 

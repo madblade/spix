@@ -10,6 +10,7 @@ import UserOutput from '../ui/output';
 import AI from '../ai';
 import EntityManager from '../objects/entities/manager';
 import WorldManager from '../objects/world/manager';
+import Chat from '../../../model/connection/chat';
 
 class Flat3Factory {
 
@@ -35,6 +36,10 @@ class Flat3Factory {
 
     static createWorldManager() {
         return new WorldManager();
+    }
+
+    static createChat(game) {
+        return new Chat(game);
     }
 
 }

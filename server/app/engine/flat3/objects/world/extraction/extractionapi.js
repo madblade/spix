@@ -84,12 +84,9 @@ class ExtractAPI {
         // Unloading circle (quite farther)
         // (i.e. recurse currents and test distance)
 
-        // return null;
-
-        var chunksForPlayer = [];
+        var chunksForPlayer = null;
 
         // From player position, find concerned chunks.
-        let av = player.avatar;
         const pos = av.position;
 
         var ld = [];
@@ -100,7 +97,6 @@ class ExtractAPI {
 
         // TODO check which chunks remain to load, and load them.
 
-        console.log('computed new range');
         return chunksForPlayer;
     }
 

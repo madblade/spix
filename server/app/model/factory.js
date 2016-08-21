@@ -11,9 +11,9 @@ import Game from './game/game';
 import Player from './avatar/player';
 import PlayerManager from './avatar/playerman';
 
-import Connector from './link';
-import UserCon from './link/usercon';
-import PlayerCon from './link/playercon';
+import Connector from './connection';
+import UserCon from './connection/usercon';
+import PlayerCon from './connection/playercon';
 
 import GameFactory from '../engine/game.factory';
 
