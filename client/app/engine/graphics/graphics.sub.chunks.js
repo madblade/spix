@@ -286,3 +286,7 @@ App.Engine.Graphics.prototype.removeChunk = function(chunkId) {
     }
     delete this.chunks[chunkId];
 };
+
+App.Engine.Graphics.prototype.unloadChunk = function(chunkId) {
+
+};

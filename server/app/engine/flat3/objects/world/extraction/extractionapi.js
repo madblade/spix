@@ -6,6 +6,7 @@
 
 import WorldGenerator from '../generation/worldgenerator';
 import ChunkIterator from '../topology/chunkiterator';
+import ChunkLoader from '../loading/chunkloader';
 
 class ExtractAPI {
 
@@ -73,29 +74,37 @@ class ExtractAPI {
     // TODO zeefication
     static computeNewChunksInRangeForPlayer(player, worldManager) {
         let av = player.avatar;
-        let clientLoadedChunks = av.loadedChunks;
-        let clientPosition = av.position;
-        let modelChunks = worldManager.allChunks;
+        let p = av.position;
+
+        // Get current chunk.
+        let starterChunk = ChunkIterator.getClosestChunk(p[0], p[1], p[2], worldManager);
 
         // Loading circle for server (a bit farther)
+        ChunkLoader.preLoadNextChunk(player, starterChunk, worldManager);
 
         // Loading circle for client (nearer)
+        // Only load one at a time!
+        var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldManager);
 
         // Unloading circle (quite farther)
         // (i.e. recurse currents and test distance)
+        var chunksToUnload = ChunkLoader.getOOBPlayerChunks(player, starterChunk, worldManager);
 
-        var chunksForPlayer = null;
+        if (!newChunk && chunksToUnload.length === 0) return null;
 
-        // From player position, find concerned chunks.
-        const pos = av.position;
+        var chunksForPlayer = {};
 
-        var ld = [];
-        for (var eid in av.loadedChunks) {
-            if (!modelChunks.hasOwnProperty(eid)) continue;
-            ld.push(eid);
+        if (newChunk) {
+            // Set chunk as added
+            av.setChunkAsLoaded(newChunk);
+            chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
-        // TODO check which chunks remain to load, and load them.
+        for (let i = 0, l = chunksToUnload; i < l; ++i) {
+            let chunkToUnload = chunksToUnload[i];
+            av.setChunkOutOfRange(chunkToUnload);
+            chunksForPlayer[chunkToUnload] = null;
+        }
 
         return chunksForPlayer;
     }

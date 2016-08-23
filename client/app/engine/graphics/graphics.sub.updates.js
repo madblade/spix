@@ -43,7 +43,9 @@ App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
     for (var cid in updates) { if (updates[cid][1][1]!==undefined)nbccc += updates[cid][1][1].length;}
 
     for (var chunkId in updates) {
-        if (this.isChunkLoaded(chunkId)) {
+        if (updates[chunkId] === null) {
+            this.unloadChunk(chunkId);
+        } else if (this.isChunkLoaded(chunkId)) {
             this.updateChunk(chunkId, updates[chunkId]);
         } else {
             this.initChunk(chunkId, updates[chunkId]);

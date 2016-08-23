@@ -36,7 +36,7 @@ class ChunkIterator {
                 return;
             }
 
-            let neighbours = ChunkIterator.get2DNeighbours(current);
+            let neighbours = ChunkIterator.get2DNeighbours(current, worldManager);
             for (let i = 0, l = neighbours.length; i < l; ++i) {
 
                 let neighbour = neighbours[i];
@@ -49,8 +49,30 @@ class ChunkIterator {
         }
     }
 
-    static get2DNeighbours(currentChunk) {
+    static get2DNeighbours(currentChunk, worldManager) {
+        const i = currentChunk.chunkI;
+        const j = currentChunk.chunkJ;
+        let chunks = worldManager.allChunks;
+
+        let neighboursIndices = [
+            (i+1)+','+j,
+            (i+1)+','+(j+1),
+            i+','+(j+1),
+            (i-1)+','+(j+1),
+            (i-1)+','+j,
+            (i-1)+','+(j-1),
+            i+','+(j-1)
+        ];
+
         let neighbours = [];
+
+        for (let id = 0, length = neighboursIndices.length; id < length; ++id) {
+            let chunkId = neighboursIndices[id];
+            let chunk = chunks[chunkId];
+            if (!chunk) console.log('Iterator: chunk ' + chunkId + ' undefined.');
+            else neighbours.push(chunk);
+        }
+
         /*
 
             i 	j	k <- starter
@@ -64,6 +86,7 @@ class ChunkIterator {
 
         */
 
+        return neighbours;
     }
 
     static get3DNeighbours(currentChunk) {
@@ -97,6 +120,11 @@ class ChunkIterator {
             i	j-1	k-1
             i 	j	k-1
         */
+
+    }
+
+    // TODO
+    static getClosestChunk(xPosition, yPosition, zPosition, worldManager) {
 
     }
 

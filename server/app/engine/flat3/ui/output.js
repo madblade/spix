@@ -74,7 +74,7 @@ class UserOutput {
 
             // TODO check 'player has updated position'
             let extractedChunks = this.extractNewChunksInRange(p);
-            if (extractedChunks === null) return;
+            if (extractedChunks === null || Object.keys(extractedChunks).length === 0) return;
 
             p.send('chk', extractedChunks);
 
