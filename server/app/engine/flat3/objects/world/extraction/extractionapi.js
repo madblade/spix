@@ -10,6 +10,8 @@ import ChunkLoader from '../loading/chunkloader';
 
 class ExtractAPI {
 
+    static debug = false;
+
     static computeChunkFaces(chunk) {
         chunk.computeFaces();
     }
@@ -39,14 +41,14 @@ class ExtractAPI {
         for (let chunkIdId = 0, length = chunkIds.length; chunkIdId < length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
             if (!chunksInModel.hasOwnProperty(currentChunkId)) {
-                console.log("We should generate " + currentChunkId + " for the user.");
+                if (ExtractAPI.debug) console.log("We should generate " + currentChunkId + " for the user.");
                 let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
                 chunksInModel[chunk.chunkId] = chunk;
             }
 
             let currentChunk = chunksInModel[currentChunkId];
             if (!currentChunk.ready) {
-                console.log("We should extract faces from " + currentChunkId + ".");
+                if (ExtractAPI.debug) console.log("We should extract faces from " + currentChunkId + ".");
                 ExtractAPI.computeChunkFaces(currentChunk);
             }
 
@@ -78,9 +80,10 @@ class ExtractAPI {
 
         // Get current chunk.
         let starterChunk = ChunkIterator.getClosestChunk(p[0], p[1], p[2], worldManager);
+        if (!starterChunk) return;
 
         // Loading circle for server (a bit farther)
-        ChunkLoader.preLoadNextChunk(player, starterChunk, worldManager);
+        ChunkLoader.preLoadNextChunk(player, starterChunk, worldManager, false);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
@@ -95,6 +98,7 @@ class ExtractAPI {
         var chunksForPlayer = {};
 
         if (newChunk) {
+            console.log(newChunk.chunkId);
             // Set chunk as added
             av.setChunkAsLoaded(newChunk);
             chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];

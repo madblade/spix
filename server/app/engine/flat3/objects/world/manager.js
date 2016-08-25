@@ -100,6 +100,7 @@ class WorldManager {
         this._updatedChunks = {};
     }
 
+    // TODO debug chunks with i lt -1
     getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
         const dx = this.chunkDimensionX;
         const dy = this.chunkDimensionY;

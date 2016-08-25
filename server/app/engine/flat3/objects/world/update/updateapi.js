@@ -6,6 +6,8 @@
 
 class UpdateAPI {
 
+    static debug = false;
+
     static isEpsilon(strictlyPositiveNumber) {
         return (strictlyPositiveNumber < 0.000001);
     }
@@ -77,7 +79,7 @@ class UpdateAPI {
         let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
             floors, true, worldManager, blockCoordinatesOnChunk);
 
-        console.log("Transaction required on " + chunk.chunkId);
+        if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
         {
             console.log('Could not find chunk ' + chunk.chunkId);
@@ -117,7 +119,7 @@ class UpdateAPI {
         let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
             floors, false, worldManager, blockCoordinatesOnChunk);
 
-        console.log("Transaction required on " + chunk.chunkId);
+        if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
         {
             console.log('Could not find chunk ' + chunk.chunkId);
@@ -195,7 +197,8 @@ class UpdateAPI {
             failure("precision (on-edge request).");
             return false;
         }
-        console.log(blockCoordinatesOnChunk);
+
+        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0)
@@ -262,7 +265,8 @@ class UpdateAPI {
             failure("precision (on-edge request).");
             return false;
         }
-        console.log(blockCoordinatesOnChunk);
+
+        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0)

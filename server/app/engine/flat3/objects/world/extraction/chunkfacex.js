@@ -589,7 +589,7 @@ class CSFX {
 
         //console.log(fastCC);
         //console.log(fastCCIds);
-        console.log(Object.keys(fastCC).length + " connected components extracted...");
+        if (CSFX.debug) console.log(Object.keys(fastCC).length + " connected components extracted...");
     }
 
 }

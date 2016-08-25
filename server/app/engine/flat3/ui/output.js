@@ -74,7 +74,7 @@ class UserOutput {
 
             // TODO check 'player has updated position'
             let extractedChunks = this.extractNewChunksInRange(p);
-            if (extractedChunks === null || Object.keys(extractedChunks).length === 0) return;
+            if (!extractedChunks || Object.keys(extractedChunks).length === 0) return;
 
             p.send('chk', extractedChunks);
 
@@ -96,7 +96,7 @@ class UserOutput {
     }
 
     static playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO extract connected subsurface.
+        // TODO extract connected subsurface.6
         return Object.keys(chunks).length > 0;
     }
 

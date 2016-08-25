@@ -38,7 +38,9 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
 };
 
 App.Engine.Graphics.prototype.updateGraphicChunks = function(updates) {
-    console.log(updates);
+    // Most useful client debug...
+    // console.log(updates);
+
     var nbccc = 0;
     for (var cid in updates) { if (updates[cid][1][1]!==undefined)nbccc += updates[cid][1][1].length;}
 

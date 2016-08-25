@@ -14,6 +14,8 @@ import FaceUpdater from './update/faceupdater';
 
 class Chunk {
 
+    static debug = false;
+
     constructor(xSize, ySize, zSize, chunkId, worldManager) {
         // App.
         this._worldManager = worldManager;
@@ -83,7 +85,7 @@ class Chunk {
      * Preload neighbors.
      */
     preloadNeighborChunks() {
-        console.log('\tPreloading neighbor chunks...');
+        if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
         ChunkLoader.preLoadNeighborChunks(this, this._worldManager);
     }
 
@@ -91,7 +93,7 @@ class Chunk {
      * Detect boundary blocks.
      */
     computeSurfaceBlocksFromScratch() {
-        console.log('\tExtracting surface...');
+        if (Chunk.debug) console.log('\tExtracting surface...');
         try {
             BlockExtractor.extractSurfaceBlocks(this);
         } catch(err) {
@@ -103,7 +105,7 @@ class Chunk {
      * Detect connected boundary face components.
      */
     computeConnectedComponents() {
-        console.log("\tComputing connected components...");
+        if (Chunk.debug) console.log("\tComputing connected components...");
         try {
             FaceExtractor.extractConnectedComponents(this);
         } catch(err) {
@@ -119,7 +121,7 @@ class Chunk {
     fillChunk(toZ, blockId) {
         if (typeof toZ !== "number") return;
         if (typeof blockId !== "number") return;
-        console.log('Generating chunk ' + this._chunkId + ' to ' + toZ + '...');
+        if (Chunk.debug) console.log('Generating chunk ' + this._chunkId + ' to ' + toZ + '...');
 
         const numberOfBlocksToFill = this._xSize * this._ySize * toZ;
         const numberOfBlocks = this._capacity;
@@ -144,7 +146,7 @@ class Chunk {
 
         this._blocks = blocks;
 
-        console.log("\t" + this._blocks.length + " blocks generated.");
+        if (Chunk.debug) console.log("\t" + this._blocks.length + " blocks generated.");
     }
 
     _toId(x, y, z) {

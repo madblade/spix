@@ -123,9 +123,27 @@ class ChunkIterator {
 
     }
 
-    // TODO
     static getClosestChunk(xPosition, yPosition, zPosition, worldManager) {
+        let allChunks = worldManager.allChunks;
 
+        const dx = worldManager.chunkDimensionX;
+        const dy = worldManager.chunkDimensionY;
+
+        // TODO zeefy & DRY with manager.getChunkCoordinatesFromFloatingPoint
+        const fx = Math.floor(xPosition);
+        const fy = Math.floor(yPosition);
+
+        let chunkI = (fx - ( (fx >= 0 ? fx : (dx + fx)) %dx)) / dx;
+        let chunkJ = (fy - ( (fy >= 0 ? fy : (dy + fy)) %dy)) / dy;
+
+        const id = chunkI+','+chunkJ;
+
+        let closestChunk = allChunks[id];
+        if (!closestChunk) {
+            console.log('WAIT... Chunk I\'m on is not loaded?');
+        }
+
+        return closestChunk;
     }
 
 }

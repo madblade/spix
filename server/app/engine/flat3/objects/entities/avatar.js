@@ -22,6 +22,10 @@ class Avatar extends Entity {
 
     set renderDistance(renderDistance) { this._renderDistance = renderDistance; }
 
+    isChunkLoaded(id) {
+        return this._loadedChunks.hasOwnProperty(id);
+    }
+
     setChunkAsLoaded(chunk) {
         this._loadedChunks[chunk.chunkId] = chunk;
     }
