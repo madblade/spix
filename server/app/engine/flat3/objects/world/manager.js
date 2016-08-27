@@ -108,22 +108,21 @@ class WorldManager {
 
         const modX = (floorX >= 0 ? floorX : (dx + floorX)) % dx;
         const deltaX = modX === 0;
-        let i = floorX - modX;
-        i /= dx;
 
         const modY = (floorY >= 0 ? floorY : (dy + floorY)) % dy;
         const deltaY = modY === 0;
-        let j = floorY - modY;
-        j /= dy;
 
         const modZ = (floorZ >= 0 ? floorZ : (dz + floorZ)) % dz;
         const deltaZ = modZ === 0;
-        let k = floorZ - modZ;
-        k /= dz;
 
         const Dx = deltaX && UpdateAPI.isEpsilon(Math.abs(Math.abs(x)-Math.abs(floorX)));
         const Dy = deltaY && UpdateAPI.isEpsilon(Math.abs(Math.abs(y)-Math.abs(floorY)));
         const Dz = deltaZ && UpdateAPI.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
+
+        let ijk = this.getChunkCoordinates(x, y, z);
+        const i = ijk[0];
+        const j = ijk[1];
+        const k = ijk[2];
 
         return [i, j, k, Dx, Dy, Dz];
     }
@@ -133,13 +132,13 @@ class WorldManager {
         const dy = this.chunkDimensionY;
         const dz = this.chunkDimensionZ;
 
-        let i = x - ((x >= 0 ? x : (dx + x)) % dx);
+        let i = x >= 0 ? x - (x % dx) : x - (dx - ((-x)%dx));
         i /= dx;
 
-        let j = y - ((y >= 0 ? y : (dy + y)) % dy);
+        let j = y >= 0 ? y - (y % dy) : y - (dy - ((-y)%dy));
         j /= dy;
 
-        let k = z - ((z >= 0 ? z : (dz + z)) % dz);
+        let k = z >= 0 ? z - (z % dz) : z - (dz - ((-z)%dz));
         k /= dz;
 
         return [i,j,k];

@@ -98,7 +98,8 @@ class ExtractAPI {
         var chunksForPlayer = {};
 
         if (newChunk) {
-            console.log(newChunk.chunkId);
+            if (ExtractAPI.debug) console.log("New chunk : " + newChunk.chunkId);
+
             // Set chunk as added
             av.setChunkAsLoaded(newChunk);
             chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];

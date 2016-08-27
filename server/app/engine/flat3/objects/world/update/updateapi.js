@@ -15,7 +15,10 @@ class UpdateAPI {
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
                                        floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk)
     {
-        const starterChunkId = chunkI + ',' + chunkJ;
+
+        let starterChunkI = chunkI >= 0 || !isBoundaryX ? chunkI : chunkI+1;
+        let starterChunkJ = chunkJ >= 0 || !isBoundaryY ? chunkJ : chunkJ+1;
+        const starterChunkId = starterChunkI + ',' + starterChunkJ;
 
         const fx = floors[0];
         const fy = floors[1];
@@ -41,14 +44,14 @@ class UpdateAPI {
         }
 
         if (isBoundaryX) {
-            const rightChunkId = (chunkI-1) + ',' + chunkJ;
-            blockCoordinatesOnChunk[0] = worldManager.chunkDimensionX-1;
+            blockCoordinatesOnChunk[0] = dimX-1;
+            const rightChunkId = (starterChunkI-1) + ',' + starterChunkJ;
             return worldManager.allChunks[rightChunkId];
         }
 
         if (isBoundaryY) {
-            blockCoordinatesOnChunk[1] = worldManager.chunkDimensionY-1;
-            const rightChunkId = chunkI + ',' + (chunkJ-1);
+            blockCoordinatesOnChunk[1] = dimY-1;
+            const rightChunkId = starterChunkI + ',' + (starterChunkJ-1);
             return worldManager.allChunks[rightChunkId];
         }
 
