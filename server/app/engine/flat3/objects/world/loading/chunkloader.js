@@ -11,9 +11,9 @@ class ChunkLoader {
 
     static debug = false;
 
-    static serverLoadingRadius = 9;
+    static serverLoadingRadius = 20;
     static clientLoadingRadius = 2;
-    static clientUnloadingRadius = 5;
+    static clientUnloadingRadius = 20;
 
     static getNeighboringChunk(chunk, direction) {
         let i = chunk.chunkI;
