@@ -80,6 +80,10 @@ App.Engine.Graphics.prototype.getCloseTerrain = function() {
     for (var cid in chks) {
         // TODO extract on 4 closest chunks.
         var currentChunk = chks[cid];
+        if (!currentChunk.meshes) {
+            console.log("Warn: corrupted chunk inside client model " + cid);
+            continue;
+        }
         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
     }
     return meshes;

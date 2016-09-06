@@ -20,6 +20,11 @@ class Avatar extends Entity {
     get loadedChunks() { return this._loadedChunks; }
     get entityManager() { return this._entityManager; }
 
+    get areChunksLoaded() {
+        let side = (1+this._renderDistance*2);
+        return side*side <= Object.keys(this._loadedChunks).length;
+    }
+
     set renderDistance(renderDistance) { this._renderDistance = renderDistance; }
 
     isChunkLoaded(id) {

@@ -42,11 +42,15 @@ class UserInput {
             case 'r' : avatar.goRight();        break;
             case 'l' : avatar.goLeft();         break;
             case 'b' : avatar.goBackwards();    break;
+            case 'u' : avatar.goUp();           break;
+            case 'd' : avatar.goDown();         break;
 
             case 'fx' : avatar.stopForward();   break;
             case 'rx' : avatar.stopRight();     break;
             case 'lx' : avatar.stopLeft();      break;
             case 'bx' : avatar.stopBackwards(); break;
+            case 'ux' : avatar.stopUp();        break;
+            case 'dx' : avatar.stopDown();      break;
             case 'xx' : avatar.stop();          break;
 
             default: hasMoved = false;

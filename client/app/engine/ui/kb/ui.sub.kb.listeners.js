@@ -38,6 +38,14 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 if (!ak.backwards) ce.send('m', 'b');
                 ak.backwards = true;
                 break;
+            case k.shift:
+                if (!ak.down) ce.send('m', 'd');
+                ak.down = true;
+                break;
+            case k.space:
+                if (!ak.up) ce.send('m', 'u');
+                ak.up = true;
+                break;
 
             case k.enter:
                 /*
@@ -101,6 +109,14 @@ App.Engine.UI.prototype.registerKeyUp = function() {
             case k.leftHandDown:
                 ak.backwards = false;
                 ce.send('m', 'bx');
+                break;
+            case k.shift:
+                ak.down = false;
+                ce.send('m', 'dx');
+                break;
+            case k.space:
+                ak.up = false;
+                ce.send('m', 'ux');
                 break;
             default:
         }

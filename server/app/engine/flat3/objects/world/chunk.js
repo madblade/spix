@@ -55,7 +55,7 @@ class Chunk {
         this.computeSurfaceBlocksFromScratch();
         this.computeConnectedComponents();
         this._ready = true;
-        console.log("Chunk " + this._chunkId + " ready.");
+        //console.log("Chunk " + this._chunkId + " ready.");
     }
 
     // Getters
@@ -109,44 +109,13 @@ class Chunk {
         try {
             FaceExtractor.extractConnectedComponents(this);
         } catch(err) {
+            console.log("@ extracting connected components");
             console.log(err.message);
         }
     }
 
     setDirtyFlag() {
         this._worldManager.chunkUpdated(this._chunkId);
-    }
-
-    // Set all cubes until a given height to a given id.
-    fillChunk(toZ, blockId) {
-        if (typeof toZ !== "number") return;
-        if (typeof blockId !== "number") return;
-        if (Chunk.debug) console.log('Generating chunk ' + this._chunkId + ' to ' + toZ + '...');
-
-        const numberOfBlocksToFill = this._xSize * this._ySize * toZ;
-        const numberOfBlocks = this._capacity;
-
-        let blocks = new Uint8Array(numberOfBlocks);
-        blocks.fill(blockId, 0, numberOfBlocksToFill);
-        blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
-
-        //blocks[3122] = 1;
-        //blocks[3186] = 1;
-
-        /*
-        let numberAdded = 0;
-        for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
-            if (Math.random() > 0.5) {
-                blocks[i] = blockId;
-                numberAdded++;
-            }
-        }
-        console.log(numberAdded + " different block(s) added.");
-        */
-
-        this._blocks = blocks;
-
-        if (Chunk.debug) console.log("\t" + this._blocks.length + " blocks generated.");
     }
 
     _toId(x, y, z) {

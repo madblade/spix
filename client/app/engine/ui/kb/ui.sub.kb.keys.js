@@ -39,6 +39,8 @@ App.Engine.UI.prototype.getActiveKeyControls = function() {
         forward: false,
         backwards: false,
         right: false,
-        left: false
+        left: false,
+        up: false,
+        down: false
     };
 };

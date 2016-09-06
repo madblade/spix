@@ -11,8 +11,8 @@ class ChunkLoader {
 
     static debug = false;
 
-    static serverLoadingRadius = 6;
-    static clientLoadingRadius = 4;
+    static serverLoadingRadius = 9;
+    static clientLoadingRadius = 2;
     static clientUnloadingRadius = 5;
 
     static getNeighboringChunk(chunk, direction) {
@@ -85,6 +85,7 @@ class ChunkLoader {
         return chunk;
     }
 
+    // TODO zeefication
     static preLoadNextChunk(player, chunk, worldManager, forPlayer) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
@@ -149,7 +150,6 @@ class ChunkLoader {
             }
         }
 
-        // TODO zeefication
         // 2D check.
 
         // Back case

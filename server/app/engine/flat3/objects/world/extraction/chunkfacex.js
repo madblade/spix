@@ -556,30 +556,41 @@ class CSFX {
         var fastCCIds = {};
 
         // Compute raw faces.
+        console.log('extracting raw faces');
         CSFX.extractRawFaces(blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces, connectedComponents, dims);
 
         // Post merger.
         let merger = [];
 
         // Triple PreMerge.
+        console.log('pre-merging');
         CSFX.preMerge(surfaceFaces, connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
 
         // Compute fast connected components.
+        console.log('precomputing connected components');
         CSFX.precomputeFastConnectedComponents(connectedComponents, fastCC);
 
         // PostMerge.
+        console.log('post merging');
         CSFX.postMerge(merger, fastCC, connectedComponents);
 
         // Debugging fastCC
         for (let i in fastCC) {
             for (let faceId = 0; faceId < fastCC[i].length; ++faceId) {
-                if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId) console.log("Detected duplicate face.");
+
+                if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId)
+                    console.log("Detected duplicate face.");
+
                 let dir = fastCC[i][faceId]<capacity ? 0 : fastCC[i][faceId]<2*capacity ? 1 : 2;
-                if (faces[dir][fastCC[i][faceId] % capacity] == 0) console.log("Face " + fastCC[i][faceId] + " null: " + faces[dir][fastCC[i][faceId] % capacity]);
+
+                if (faces[dir][fastCC[i][faceId] % capacity] == 0)
+                    console.log("Face " + fastCC[i][faceId] + " null: "
+                    + faces[dir][fastCC[i][faceId] % capacity]);
             }
         }
 
         // Induce Ids.
+        console.log('computing fast connected components');
         CSFX.computeFastConnectedComponentIds(fastCC, fastCCIds, capacity, faces);
 
         // Assign

@@ -37,6 +37,7 @@ class WorldManager {
     get chunkDimensionY() { return this._ySize; }
     get chunkDimensionZ() { return this._zSize; }
     get generationMethod() { return this._generationMethod; }
+    get entityman() { return this._entityman; }
 
     set allChunks(newChunks) { this._chunks = newChunks; }
     set entityman(entityman) { this._entityman = entityman; }

@@ -26,6 +26,10 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
         currentNatures = natures[cid];
         break;
     }
+    if (!currentComponent) {
+        console.log('Warn: missed an update');
+        return;
+    }
 
     var chunkIndices = chunkId.split(',');
     var chunkI = parseInt(chunkIndices[0]);

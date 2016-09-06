@@ -20,7 +20,7 @@ class Entity {
     spawn(position) {
         this._position = position;
         this._rotation = [0, Math.PI/2];
-        this._directions = [false, false, false, false];
+        this._directions = [false, false, false, false, false, false];
     }
 
     die() {
@@ -36,16 +36,20 @@ class Entity {
     goRight()       { this._directions[1] = true; }
     goLeft()        { this._directions[2] = true; }
     goBackwards()   { this._directions[3] = true; }
+    goUp()          { this._directions[4] = true; }
+    goDown()        { this._directions[5] = true; }
 
     stopForward()   { this._directions[0] = false; }
     stopRight()     { this._directions[1] = false; }
     stopLeft()      { this._directions[2] = false; }
     stopBackwards() { this._directions[3] = false; }
+    stopUp()        { this._directions[4] = false; }
+    stopDown()      { this._directions[5] = false; }
 
     move(entityManager, worldManager) {
         const theta = this._rotation[0];
         const ds = this._directions;
-        var desiredSpeed = [0, 0, 0];
+        var desiredSpeed = [0, 0, (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0];
 
         if (ds[0] && !ds[3]) { // forward quarter
             let theta2 = theta;
@@ -70,7 +74,7 @@ class Entity {
             desiredSpeed[1] = -Math.sin(theta);
         }
 
-        if ((ds[0]!==ds[3]) || (ds[1]!==ds[2])) {
+        if ((ds[0]!==ds[3]) || (ds[1]!==ds[2]) || ds[4]!==ds[5]) {
             // Notify an entity was updated.
             entityManager.entityUpdated(this._id);
 

@@ -11,6 +11,7 @@ import ChunkLoader from '../loading/chunkloader';
 class ExtractAPI {
 
     static debug = false;
+    static load = true;
 
     static computeChunkFaces(chunk) {
         chunk.computeFaces();
@@ -55,6 +56,11 @@ class ExtractAPI {
             chunksForNewPlayer[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
         }
 
+        // Force update entity to load all chunks
+        //if (!av.areChunksLoaded) {
+        //    worldManager.entityman.entityUpdated(av.id);
+        //}
+
         return chunksForNewPlayer;
     }
 
@@ -75,6 +81,8 @@ class ExtractAPI {
 
     // TODO zeefication
     static computeNewChunksInRangeForPlayer(player, worldManager) {
+        if (!ExtractAPI.load) return;
+
         let av = player.avatar;
         let p = av.position;
 
@@ -110,6 +118,10 @@ class ExtractAPI {
             av.setChunkOutOfRange(chunkToUnload);
             chunksForPlayer[chunkToUnload] = null;
         }
+
+        //if (!av.areChunksLoaded) {
+        //    worldManager.entityman.entityUpdated(av.id);
+        //}
 
         return chunksForPlayer;
     }
