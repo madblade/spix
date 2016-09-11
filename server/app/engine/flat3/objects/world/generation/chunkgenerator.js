@@ -21,7 +21,7 @@ class ChunkGenerator {
 
         // Flat homogeneous.
         //ChunkGenerator.testChunk(c);
-        ChunkGenerator.fillChunk(c, 48, 1);
+        ChunkGenerator.fillChunk(c, 48, 0);
 
         return c;
     }
@@ -31,8 +31,8 @@ class ChunkGenerator {
 
         let generationMethod = worldManager.generationMethod;
         if (generationMethod == 'flat') {
-            //ChunkGenerator.fillChunk(c, 49, 1);
-            ChunkGenerator.waveChunk(c, 40, 48, 1);
+            ChunkGenerator.fillChunk(c, 48, 1);
+            //ChunkGenerator.waveChunk(c, 40, 48, 1);
             //ChunkGenerator.fillChunk(c, 1, 0);
         } else {
 
