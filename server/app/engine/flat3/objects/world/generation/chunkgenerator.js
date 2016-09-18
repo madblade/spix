@@ -17,22 +17,25 @@ class ChunkGenerator {
      * Then, call ExtractionAPI.computeFaces(chunk).
      */
     static createRawChunk(x, y, z, id, worldManager) {
+        console.log('createRawChunk ' + id);
         var c = new Chunk(x, y, z, id, worldManager);
 
         // Flat homogeneous.
         //ChunkGenerator.testChunk(c);
-        ChunkGenerator.fillChunk(c, 48, 0);
+        //ChunkGenerator.fillChunk(c, 25, 1);
+        ChunkGenerator.waveChunk(c, 40, 48, 1);
 
         return c;
     }
 
     static createChunk(x, y, z, id, worldManager) {
+        console.log('createChunk ' + id);
         var c = new Chunk(x, y, z, id, worldManager);
 
         let generationMethod = worldManager.generationMethod;
         if (generationMethod == 'flat') {
-            ChunkGenerator.fillChunk(c, 48, 1);
-            //ChunkGenerator.waveChunk(c, 40, 48, 1);
+            //ChunkGenerator.fillChunk(c, 32, 1);
+            ChunkGenerator.waveChunk(c, 40, 48, 1);
             //ChunkGenerator.fillChunk(c, 1, 0);
         } else {
 

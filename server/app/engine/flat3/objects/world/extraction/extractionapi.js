@@ -37,7 +37,9 @@ class ExtractAPI {
         const dz = worldManager.chunkDimensionZ;
 
         let chunkIds = [];
-        chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
+        chunkIds.push((i+','+j));
+        //chunkIds.push((i+','+j), ((i-1)+','+j), ((i-1)+','+(j-1)));
+        //chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
 
         for (let chunkIdId = 0, length = chunkIds.length; chunkIdId < length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];

@@ -71,14 +71,14 @@ class ChunkLoader {
             let currentId = neighbourIds[i];
             if (loadedChunks.hasOwnProperty(currentId)) continue;
 
+            // Don't compute faces
             let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
-
-            //neighbour.fillChunk(64, 1);
             worldManager.addChunk(currentId, neighbour);
         }
     }
 
     static addChunk(dimX, dimY, dimZ, chunkId, worldManager) {
+        // Do compute faces
         let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, worldManager);
         worldManager.addChunk(chunkId, chunk);
         ExtractAPI.computeChunkFaces(chunk);

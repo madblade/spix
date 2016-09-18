@@ -62,7 +62,7 @@ class CSBX {
                         addSurfaceBlock(b, currentSbs);
                         continue;
                     }
-                } else {// Access other chunk
+                } else { // Access other chunk
                     if (neighbourBlocks[1][iMinus + iSize] === 0) {
                         addSurfaceBlock(b, currentSbs);
                         continue;
@@ -75,7 +75,7 @@ class CSBX {
                         addSurfaceBlock(b, currentSbs);
                         continue;
                     }
-                } else {// Access other chunk
+                } else { // Access other chunk
                     if (neighbourBlocks[2][jPlus - ijSize] === 0) {
                         addSurfaceBlock(b, currentSbs);
                         continue;
@@ -88,7 +88,7 @@ class CSBX {
                         addSurfaceBlock(b, currentSbs);
                         continue;
                     }
-                } else {// Access other chunk
+                } else { // Access other chunk
                     if (neighbourBlocks[3][jMinus + ijSize] === 0) {
                         addSurfaceBlock(b, currentSbs);
                         continue;
@@ -116,16 +116,29 @@ class CSBX {
                     // Not supported in this model.
                 }
 
+            } else { // If the current block is empty, test for neighbour x+/y+/z+
+                const iPlus = b+1;
+                if (iPlus % iSize === 0) {
+                    if (neighbourBlocks[0][iPlus - iSize] !== 0) {
+                        addSurfaceBlock(b, currentSbs);
+                        continue;
+                    }
+                }
+
+                const jPlus = b+iSize;
+                if ((jPlus-b%iSize) % ijSize === 0) {
+                    if (neighbourBlocks[2][jPlus - ijSize] !== 0) {
+                        addSurfaceBlock(b, currentSbs);
+                        continue;
+                    }
+                }
+
+                const kPlus = b+ijSize;
+                if (kPlus === length) {
+                    // TODO zeefy
+                }
             }
         }
-
-        /*for (let i = 0; i<_numberOfNeighbours; ++i) {
-            if (!_neighbours[i].ready) {
-                console.log(nSbs[i]);
-                _neighbours[i].surfaceBlocks = nSbs[i];
-                console.log(_neighbours[i].surfaceBlocks);
-            }
-        }*/
     }
 }
 
