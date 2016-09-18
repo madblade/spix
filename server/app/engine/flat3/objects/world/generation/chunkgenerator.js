@@ -22,7 +22,8 @@ class ChunkGenerator {
 
         // Flat homogeneous.
         //ChunkGenerator.testChunk(c);
-        //ChunkGenerator.fillChunk(c, 25, 1);
+        //ChunkGenerator.testMerge(c);
+        //ChunkGenerator.fillChunk(c, 40, 1);
         ChunkGenerator.waveChunk(c, 40, 48, 1);
 
         return c;
@@ -35,13 +36,50 @@ class ChunkGenerator {
         let generationMethod = worldManager.generationMethod;
         if (generationMethod == 'flat') {
             //ChunkGenerator.fillChunk(c, 32, 1);
-            ChunkGenerator.waveChunk(c, 40, 48, 1);
-            //ChunkGenerator.fillChunk(c, 1, 0);
+            //ChunkGenerator.waveChunk(c, 40, 48, 1);
+            ChunkGenerator.fillChunk(c, 43, 1);
         } else {
 
         }
 
         return c;
+    }
+
+    static testMerge(chunk) {
+        const dx = chunk.dimensions[0];
+        const dy = chunk.dimensions[1];
+        const ijS = dx * dy;
+        const numberOfBlocks = chunk.capacity;
+
+        let blocks = new Uint8Array(numberOfBlocks);
+
+        blocks.fill(1, 0, ijS*40);
+
+        for (let k = 0; k<6; ++k) {
+            for (let i = 0; i<2; ++i) {
+                for (let j = 0; j<2; ++j) {
+                    blocks[ijS*40-10-i-j*dx-k*dx*dy] = 0;
+                }
+            }
+        }
+
+        for (let k = 0; k<6; ++k) {
+            for (let i = 0; i<2; ++i) {
+                for (let j = 0; j<2; ++j) {
+                    blocks[ijS*40-42-i-j*dx-k*dx*dy] = 0;
+                }
+            }
+        }
+
+        for (let k = 0; k<6; ++k) {
+            for (let i = 0; i<2; ++i) {
+                for (let j = 0; j<2; ++j) {
+                    blocks[ijS*40-28-i-j*dx-k*dx*dy] = 0;
+                }
+            }
+        }
+
+        chunk.blocks = blocks;
     }
 
     static testChunk(chunk) {

@@ -8,15 +8,18 @@ import ChunkLoader from './../loading/chunkloader';
 
 class CSFX {
 
+    static forceOneComponentPerChunk = false;
+
     static debug = false;
-    static debugLinks = false;
+    static debugIJKRecursion = false;
+    static debugLinks = true;
     static debugFastCC = false;
     static debugPostMerger = false;
 
     static inbounds(d, b, iS, ijS, capacity) {
         switch (d) {
-            case 0: return (b-1) % iS !== iS-1; // iM
-            case 1: return (b-iS-(b%iS)) % ijS !== ijS-1; // jM
+            case 0: return (b-1) % iS === b%iS-1; // iM
+            case 1: return (b-iS) % ijS === b%ijS-iS; // jM
             case 2: return (b-ijS) >= 0; // kM
             case 3: return (b+1) % iS !== 0; // iP
             case 4: return (b+iS-(b%iS)) % ijS !== 0; // jP
@@ -139,13 +142,11 @@ class CSFX {
     }
 
     static affect(components, id1, id2) {
-        //if (id1 == 18430 || id2 == 18430 || (id1 == 18431 || id2 == 18431))
-        //    console.log(id1 + ":" + components[id1]+", "+id2+":"+components[id2]);
         if (components[id1] === 0) console.log("Error @affect after link: (id1) " + id1 + " has 0 component id.");
         if (components[id2] === 0) console.log("Error @affect after link: (id2) " + id2 + " has 0 component id.");
 
-        //if (35500 === id1) console.log('id1 ' + 35500 + ' ' + components[id1] + ' <- ' + components[id2]);
-        //if (id2 === 35500) console.log('id2 ' + 35500 + ' ' + components[id2] + ' <- ' + components[id1]);
+        if (components[id1] === 5) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
+        if (components[id2] === 5) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
 
         if (components[id1] < components[id2]) {
             components[id2] = components[id1];
@@ -413,7 +414,7 @@ class CSFX {
         jays.sort(function(a, b) {return a-b});
         kays.sort(function(a, b) {return a-b});
 
-        if (CSFX.debug) {
+        if (CSFX.debugIJKRecursion) {
             console.log(ayesLength + " is");
             console.log(jaysLength + " js");
             console.log(kaysLength + " ks");
@@ -426,14 +427,24 @@ class CSFX {
 
         while ((ayeCurrent<ayesLength || jayCurrent<jaysLength || kayCurrent<kaysLength) && currentBlock<capacity) {
 
-            if (ayes[ayeCurrent] === currentBlock)
-                CSFX.linkI(ayes[ayeCurrent++], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+            if (currentBlock === 2813) console.log(ayes[ayeCurrent] + ' ' + jays[jayCurrent] + ' ' + kays[kayCurrent] + ' ');
+            if (ayes[ayeCurrent] === currentBlock) {
+                if (CSFX.debugIJKRecursion) console.log('i ' + ayeCurrent + ' ' + ayes[ayeCurrent]);
+                CSFX.linkI(ayes[ayeCurrent], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+                ayeCurrent++;
+            }
 
-            if (jays[jayCurrent] === currentBlock)
-                CSFX.linkJ(jays[jayCurrent++], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+            if (jays[jayCurrent] === currentBlock){
+                if (CSFX.debugIJKRecursion) console.log('j ' + jayCurrent + ' ' + jays[jayCurrent]);
+                CSFX.linkJ(jays[jayCurrent], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+                jayCurrent++;
+            }
 
-            if (kays[kayCurrent] === currentBlock)
-                CSFX.linkK(kays[kayCurrent++], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+            if (kays[kayCurrent] === currentBlock) {
+                if (CSFX.debugIJKRecursion) console.log('k ' + kayCurrent + ' ' + kays[kayCurrent]);
+                CSFX.linkK(kays[kayCurrent], connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS);
+                kayCurrent++;
+            }
 
             ++currentBlock;
         }
@@ -504,12 +515,19 @@ class CSFX {
         if (CSFX.debugPostMerger) console.log("Initial components:");
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
 
+        if (CSFX.forceOneComponentPerChunk) {
+            fastMerger = [[]];
+            let ks = Object.keys(fastCC);
+            for (let i = 0; i<ks.length; ++i) {
+                fastMerger[0].push(parseInt(ks[i]));
+            }
+        }
+
         for (let k = 0, fmLength = fastMerger.length; k < fmLength; ++k) {
-            fastMerger[k].sort(function(a, b) {return a-b});
+            fastMerger[k].sort(function(a, b) {return b-a});
             let id = fastMerger[k][0];
             if (!fastCC.hasOwnProperty(id)) {
                 console.log('PostMerger failed because of id inconsistency: ' + id);
-                //if (CSFX.debugPostMerger) console.log(fastCC);
                 continue;
             }
             let componentsToMerge = fastMerger[k];
@@ -541,8 +559,6 @@ class CSFX {
 
         if (CSFX.debugPostMerger) console.log("Final components:");
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
-        if (CSFX.debugPostMerger) console.log(fastCC[5]);
-        if (CSFX.debugPostMerger) console.log(fastCC[38]);
     }
 
     static computeFastConnectedComponentIds(fastCC, fastCCIds, capacity, faces) {
