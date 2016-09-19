@@ -11,7 +11,7 @@ import ChunkLoader from '../loading/chunkloader';
 class ExtractAPI {
 
     static debug = false;
-    static load = false;
+    static load = true;
 
     static computeChunkFaces(chunk) {
         chunk.computeFaces();
