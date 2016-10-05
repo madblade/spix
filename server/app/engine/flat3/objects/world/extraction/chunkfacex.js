@@ -9,7 +9,7 @@ import FaceLinker from './facelinker';
 
 class CSFX {
 
-    static forceOneComponentPerChunk = false;
+    static forceOneComponentPerChunk = false; // Lazy, inefficient in terms of i/o
 
     static debug = false;
     static debugIJKRecursion = false;

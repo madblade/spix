@@ -33,7 +33,7 @@ class FaceLinker {
     
     // TODO access neighbours
     /**
-     * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, to be zeefied (4 z+, 5 z-)
+     * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, 4 z+, 5 z-
      */
     static linkI(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
 
@@ -53,10 +53,11 @@ class FaceLinker {
 
         // CASE 1: aligned with top and back i (both normals)
         const top = flatFaceId + ijS;
+        const ftop = faces[0][top];
         if (top < capacity) {
             if (
-                normalP && faces[0][top] > 0 ||
-                normalM && faces[0][top] < 0
+                normalP && ftop > 0 ||
+                normalM && ftop < 0
                 )
             {
                 if (CSFX.debugLinks) console.log(stackFaceId + " i linked to top i " + top);
@@ -70,10 +71,11 @@ class FaceLinker {
         }
 
         const back = flatFaceId + iS;
+        const fback = faces[0][back];
         if (back % ijS === (flatFaceId % ijS) + iS) {
             if (
-                normalP && faces[0][back] > 0 ||
-                normalM && faces[0][back] < 0
+                normalP && fback > 0 ||
+                normalM && fback < 0
                 )
             {
                 if (CSFX.debugLinks) console.log(stackFaceId + " i linked to back i " + back);
@@ -88,9 +90,9 @@ class FaceLinker {
 
         // CASE 2: orthogonal with CURRENT top and back (j, k)
         const flatTopOrtho = flatFaceId; // k, obviously inbounds POTENTIALLY MERGED
-        const stackTopOrtho = 2 * capacity + flatFaceId;
+        const ftopo = faces[2][flatTopOrtho];
         if (
-                normalP && faces[2][flatTopOrtho] > 0 &&
+                normalP && ftopo > 0 &&
                 (
                     FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
                     blocks[flatFaceId+1+ijS] === 0 :
@@ -98,9 +100,10 @@ class FaceLinker {
                     // neighbourBlocks[4][(flatFaceId+1)%ijS] === 0
                 )
                 ||
-                normalM && faces[2][flatTopOrtho] < 0
+                normalM && ftopo < 0
             )
         {
+            const stackTopOrtho = 2 * capacity + flatFaceId;
             if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to current k ' + stackTopOrtho);
             if (ec[stackTopOrtho] !== cc[stackTopOrtho] && cc[stackTopOrtho] !== cc[stackFaceId])
             {
@@ -111,18 +114,19 @@ class FaceLinker {
         }
 
         const flatBackOrtho = flatFaceId; // j, obviously inbounds POTENTIALLY MERGED
-        const stackBackOrtho = capacity + flatFaceId;
+        const fbacko = faces[1][flatBackOrtho];
         if (
-                normalP && faces[1][flatBackOrtho] > 0 &&
+                normalP && fbacko > 0 &&
                 (
                     FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
                     blocks[flatFaceId+1+iS] === 0 :
                     false // TODO zeefy, refine on double edges
                 )
                 ||
-                normalM && faces[1][flatBackOrtho] < 0
+                normalM && fbacko < 0
             )
         {
+            const stackBackOrtho = capacity + flatFaceId;
             if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to current j ' + stackBackOrtho);
             if (ec[stackBackOrtho] !== cc[stackBackOrtho] && cc[stackBackOrtho] !== cc[stackFaceId])
             {
@@ -136,11 +140,11 @@ class FaceLinker {
         // !!! REVERSE NORMALS !!!
         const flatTopOrthoNext = flatTopOrtho + 1; // k
         if (flatTopOrthoNext % iS === (flatTopOrtho % iS) + 1) {
-            const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
+            const ftopon = faces[2][flatTopOrthoNext];
             if (
-                    normalP && faces[2][flatTopOrthoNext] < 0
+                    normalP && ftopon < 0
                     ||
-                    normalM && faces[2][flatTopOrthoNext] > 0 &&
+                    normalM && ftopon > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
                         blocks[flatFaceId+ijS] === 0 :
@@ -148,6 +152,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to next k ' + stackTopOrthoNext);
                 FaceLinker.affect(cc, stackTopOrthoNext, stackFaceId);
             }
@@ -155,11 +160,11 @@ class FaceLinker {
 
         const flatBackOrthoNext = flatBackOrtho + 1; // j
         if (flatBackOrthoNext % iS === (flatBackOrtho % iS) + 1) {
-            const stackBackOrthoNext = capacity + flatBackOrthoNext;
+            const fbackon = faces[1][flatBackOrthoNext];
             if (
-                    normalP && faces[1][flatBackOrthoNext] < 0
+                    normalP && fbackon < 0
                     ||
-                    normalM && faces[1][flatBackOrthoNext] > 0 &&
+                    normalM && fbackon > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
                         blocks[flatFaceId+iS] === 0 :
@@ -167,6 +172,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackBackOrthoNext = capacity + flatBackOrthoNext;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to next j ' + stackBackOrthoNext);
                 FaceLinker.affect(cc, stackBackOrthoNext, stackFaceId);
             }
@@ -175,11 +181,11 @@ class FaceLinker {
         // CASE 4: ortho with previous j on next i, regular orientation
         const flatOrthoIJ = flatBackOrthoNext - iS;
         if (flatOrthoIJ > 0 && flatOrthoIJ % iS === (flatBackOrtho - iS)%iS + 1) {
-            const stackOrthoIJ = capacity + flatOrthoIJ;
+            const foij = faces[1][flatOrthoIJ];
             if (
-                    normalP && faces[1][flatOrthoIJ] > 0
+                    normalP && foij > 0
                     ||
-                    normalM && faces[1][flatOrthoIJ] < 0 &&
+                    normalM && foij < 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
                         blocks[flatFaceId-iS] === 0 :
@@ -187,6 +193,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackOrthoIJ = capacity + flatOrthoIJ;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to previous j ' + stackOrthoIJ);
                 if (ec[stackOrthoIJ] !== cc[stackOrthoIJ] && cc[stackOrthoIJ] !== cc[stackFaceId])
                 {
@@ -215,12 +222,13 @@ class FaceLinker {
         // CASE 1: aligned with top and right j
         const top = flatFaceId + ijS; // NOT MERGED YET
         if (top < capacity) {
-            const stackTop = capacity + top;
+            const ftop = faces[1][top];
             if (
-                normalP && faces[1][top] > 0 ||
-                normalM && faces[1][top] < 0
+                normalP && ftop > 0 ||
+                normalM && ftop < 0
                 )
             {
+                const stackTop = capacity + top;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to top j ' + stackTop);
                 FaceLinker.affect(cc, stackTop, stackFaceId);
             }
@@ -228,12 +236,13 @@ class FaceLinker {
 
         const right = flatFaceId + 1; // POTENTIALLY MERGED
         if (right % iS === (flatFaceId % iS) + 1) {
-            const stackRight = capacity + right;
+            const fright = faces[1][right];
             if (
-                normalP && faces[1][right] > 0 ||
-                normalM && faces[1][right] < 0
+                normalP && fright > 0 ||
+                normalM && fright < 0
                 )
             {
+                const stackRight = capacity + right;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to back j ' + stackRight);
                 if (cc[stackRight] !== ec[stackRight] && cc[stackRight] !== cc[stackFaceId])
                 {
@@ -246,18 +255,19 @@ class FaceLinker {
 
         // CASE 2: orthogonal with top (k)
         const flatTopOrtho = flatFaceId; // k, obviously inbounds, POTENTIALLY MERGED
-        const stackTopOrtho = 2*capacity + flatFaceId;
+        const ftopo = faces[2][flatTopOrtho];
         if (
-                normalP && faces[2][flatTopOrtho] > 0 &&
+                normalP && ftopo > 0 &&
                 (
                     FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
                     blocks[flatFaceId+iS+ijS] === 0 :
                     false // TODO zeefy, refine on double edges
                 )
                 ||
-                normalM && faces[2][flatTopOrtho] < 0
+                normalM && ftopo < 0
             )
         {
+            const stackTopOrtho = 2*capacity + flatFaceId;
             if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to current k ' + stackTopOrtho);
             if (cc[stackTopOrtho] !== ec[stackTopOrtho] && cc[stackTopOrtho] !== cc[stackFaceId])
             {
@@ -271,11 +281,11 @@ class FaceLinker {
         // REVERSE ORIENTATION
         const flatTopOrthoNext = flatTopOrtho + iS; // next k, NOT MERGED YET
         if (flatTopOrthoNext % ijS === (flatTopOrtho % ijS) + iS) {
-            const stackTopOrthoNext = 2*capacity + flatTopOrthoNext;
+            const ftopon = faces[2][flatTopOrthoNext];
             if (
-                    normalP && faces[2][flatTopOrthoNext] < 0
+                    normalP && ftopon < 0
                     ||
-                    normalM && faces[2][flatTopOrthoNext] > 0 &&
+                    normalM && ftopon > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
                         blocks[flatFaceId+ijS] === 0 :
@@ -283,6 +293,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackTopOrthoNext = 2*capacity + flatTopOrthoNext;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to next k ' + stackTopOrthoNext);
                 FaceLinker.affect(cc, stackTopOrthoNext, stackFaceId);
             }
@@ -290,11 +301,11 @@ class FaceLinker {
 
         const flatBackOrthoNext = flatFaceId + iS; // next i
         if (flatBackOrthoNext % ijS === (flatFaceId % ijS) + iS) {
-            const stackBackOrthoNext = flatFaceId + iS;
+            const fbackon = faces[0][flatBackOrthoNext];
             if (
-                    normalP && faces[0][flatBackOrthoNext] < 0
+                    normalP && fbackon < 0
                     ||
-                    normalM && faces[0][flatBackOrthoNext] > 0 &&
+                    normalM && fbackon > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
                         blocks[flatFaceId+1] === 0 :
@@ -302,6 +313,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackBackOrthoNext = flatFaceId + iS;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to next i ' + stackBackOrthoNext);
                 FaceLinker.affect(cc, stackBackOrthoNext, stackFaceId);
             }
@@ -322,17 +334,18 @@ class FaceLinker {
         const normalP = val > 0;
         const normalM = val < 0;
 
-        const stackFaceId = 2*capacity + flatFaceId;
+        const stackFaceId = 2 * capacity + flatFaceId;
 
         // CASE 1: aligned with back and right k
         const right = flatFaceId + 1; // right k
         if (right % iS === (flatFaceId % iS) + 1) { // is it inbounds?
-            const stackRight = 2 * capacity + right;
+            const fright = faces[2][right];
             if (
-                normalP && faces[2][right] > 0 ||
-                normalM && faces[2][right] < 0
+                normalP && fright > 0 ||
+                normalM && fright < 0
                 )
             {
+                const stackRight = 2 * capacity + right;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to right k ' + stackRight);
                 if (cc[stackRight] !== ec[stackRight] && cc[stackRight] !== cc[stackFaceId])
                 {
@@ -345,12 +358,13 @@ class FaceLinker {
 
         const back = flatFaceId + iS; // back k
         if (back % ijS === (flatFaceId % ijS) + iS) {
-            const stackBack = 2 * capacity + back;
+            const fback = faces[2][back] > 0;
             if (
-                normalP && faces[2][back] > 0 ||
-                normalM && faces[2][back] < 0
+                normalP && fback ||
+                normalM && fback < 0
                 )
             {
+                const stackBack = 2 * capacity + back;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to back k ' + stackBack);
                 if (cc[stackBack] !== ec[stackBack] && cc[stackBack] !== cc[stackFaceId])
                 {
@@ -365,11 +379,11 @@ class FaceLinker {
         // Current -> reverse orientation
         const flatBackOrthoCurrent = flatFaceId + ijS; // j
         if (flatBackOrthoCurrent < capacity) {
-            const stackBackOrtho = capacity + flatBackOrthoCurrent;
+            const fbackoc = faces[1][flatBackOrthoCurrent];
             if (
-                    normalP && faces[1][flatBackOrthoCurrent] < 0
+                    normalP && fbackoc < 0
                     ||
-                    normalM && faces[1][flatBackOrthoCurrent] > 0 &&
+                    normalM && fbackoc > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
                         blocks[flatFaceId+iS] === 0 :
@@ -377,6 +391,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackBackOrtho = capacity + flatBackOrthoCurrent;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to current j ' + stackBackOrtho);
                 if (cc[stackBackOrtho] !== ec[stackBackOrtho] && cc[stackBackOrtho] !== cc[stackFaceId])
                 {
@@ -389,11 +404,11 @@ class FaceLinker {
 
         const flatRightOrthoCurrent = flatFaceId + ijS; // i
         if (flatRightOrthoCurrent < capacity) {
-            const stackRightOrthoCurrent = flatRightOrthoCurrent;
+            const frightoc = faces[0][flatRightOrthoCurrent];
             if (
-                    normalP && faces[0][flatRightOrthoCurrent] < 0
+                    normalP && frightoc < 0
                     ||
-                    normalM && faces[0][flatRightOrthoCurrent] > 0 &&
+                    normalM && frightoc > 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
                         blocks[flatFaceId+1] === 0 :
@@ -401,6 +416,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackRightOrthoCurrent = flatRightOrthoCurrent;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to current i ' + stackRightOrthoCurrent);
                 if (cc[stackRightOrthoCurrent] !== ec[stackRightOrthoCurrent] && cc[stackRightOrthoCurrent]!== cc[stackFaceId])
                 {
@@ -414,11 +430,11 @@ class FaceLinker {
         // Previous -> regular orientation
         const flatBackOrthoPrevious = flatBackOrthoCurrent - iS; // j
         if (flatBackOrthoPrevious < capacity && (flatBackOrthoPrevious % ijS === (flatBackOrthoCurrent % ijS) - iS)) {
-            const stackBackOrthoPrevious = capacity + flatBackOrthoPrevious;
+            const fbackop = faces[1][flatBackOrthoPrevious];
             if (
-                    normalP && faces[1][flatBackOrthoPrevious] > 0
+                    normalP && fbackop > 0
                     ||
-                    normalM && faces[1][flatBackOrthoPrevious] < 0 &&
+                    normalM && fbackop < 0 &&
                     (
                         FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
                         blocks[flatFaceId-iS] === 0 :
@@ -426,6 +442,7 @@ class FaceLinker {
                     )
                 )
             {
+                const stackBackOrthoPrevious = capacity + flatBackOrthoPrevious;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to previous j ' + stackBackOrthoPrevious);
                 if (cc[stackBackOrthoPrevious] !== ec[stackBackOrthoPrevious] && cc[stackBackOrthoPrevious] !== cc[stackFaceId])
                 {
@@ -437,12 +454,12 @@ class FaceLinker {
         }
 
         const flatRightOrthoPrevious = flatRightOrthoCurrent - 1; // i
-        const stackRightOrthoPrevious = flatRightOrthoPrevious;
         if (flatRightOrthoPrevious < capacity && (flatRightOrthoPrevious % iS === (flatRightOrthoCurrent % iS) - 1)) {
+            const frightop = faces[0][flatRightOrthoPrevious];
             if (
-                normalP && faces[0][flatRightOrthoPrevious] > 0
+                normalP && frightop > 0
                 ||
-                normalM && faces[0][flatRightOrthoPrevious] < 0 &&
+                normalM && frightop < 0 &&
                 (
                     FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
                     blocks[flatFaceId-1] === 0 :
@@ -450,6 +467,7 @@ class FaceLinker {
                 )
             )
             {
+                const stackRightOrthoPrevious = flatRightOrthoPrevious;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' k linked to previous i ' + stackRightOrthoPrevious);
                 if (cc[stackRightOrthoPrevious] !== ec[stackRightOrthoPrevious] && cc[stackRightOrthoPrevious] !== cc[stackFaceId])
                 {
