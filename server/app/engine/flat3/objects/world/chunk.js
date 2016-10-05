@@ -27,11 +27,11 @@ class Chunk {
 
         this._capacity = this._xSize * this._ySize * this._zSize;
         this._chunkId = chunkId;
-        let ij = chunkId.split(',');
+        let ijk = chunkId.split(',');
 
-        this._chunkI = parseInt(ij[0]);
-        this._chunkJ = parseInt(ij[1]);
-        this._chunkK = 0;
+        this._chunkI = parseInt(ijk[0]);
+        this._chunkJ = parseInt(ijk[1]);
+        this._chunkK = parseInt(ijk[2]);
 
         // Blocks.
         /** Flatten array. x, then y, then z. */
@@ -61,6 +61,7 @@ class Chunk {
     // Getters
     get chunkI() { return this._chunkI; }
     get chunkJ() { return this._chunkJ; }
+    get chunkK() { return this._chunkK; }
     get chunkId() { return this._chunkId; }
     get dimensions() { return [this._xSize, this._ySize, this._zSize]; }
     get capacity() { return this._capacity; }
@@ -135,7 +136,7 @@ class Chunk {
     }
 
     getNeighbourChunkFromRelativeCoordinates(x, y, z) {
-        let neighbourChunkI, neighbourChunkJ, neighbourChunkZ;
+        let neighbourChunkI, neighbourChunkJ, neighbourChunkK;
 
         if (x < 0)
             neighbourChunkI = this._chunkI - 1;
@@ -151,15 +152,14 @@ class Chunk {
         else
             neighbourChunkJ = this._chunkJ;
 
-        // TODO zeefy
         if (z < 0)
-            neighbourChunkZ = this._chunkK - 1;
+            neighbourChunkK = this._chunkK - 1;
         else if (z >= this._zSize)
-            neighbourChunkZ = this._chunkK + 1;
+            neighbourChunkK = this._chunkK + 1;
         else
-            neighbourChunkZ = this._chunkK;
+            neighbourChunkK = this._chunkK;
 
-        return this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ);
+        return this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
     }
 
     /**

@@ -18,7 +18,9 @@ class UpdateAPI {
 
         let starterChunkI = chunkI >= 0 || !isBoundaryX ? chunkI : chunkI+1;
         let starterChunkJ = chunkJ >= 0 || !isBoundaryY ? chunkJ : chunkJ+1;
-        const starterChunkId = starterChunkI + ',' + starterChunkJ;
+        let starterChunkK = chunkK >= 0 || !isBoundaryZ ? chunkK : chunkK+1;
+
+        const starterChunkId = starterChunkI + ',' + starterChunkJ + ',' + starterChunkK;
 
         const fx = floors[0];
         const fy = floors[1];
@@ -43,24 +45,26 @@ class UpdateAPI {
             return chunk;
         }
 
+        // TODO can it be boundary to several chunks at the same time?
+        // If request -> nope (requests aint done on edges for security purposes)
+
         if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
-            const rightChunkId = (starterChunkI-1) + ',' + starterChunkJ;
+            const rightChunkId = (starterChunkI-1) + ',' + starterChunkJ + ',' + starterChunkK;
             return worldManager.allChunks[rightChunkId];
         }
 
         if (isBoundaryY) {
             blockCoordinatesOnChunk[1] = dimY-1;
-            const rightChunkId = starterChunkI + ',' + (starterChunkJ-1);
+            const rightChunkId = starterChunkI + ',' + (starterChunkJ-1) + ',' + starterChunkK;
             return worldManager.allChunks[rightChunkId];
         }
 
-        /* TODO zeefication
-        if (deltaZ) {
-            const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
+        if (isBoundaryZ) {
+            blockCoordinatesOnChunk[2] = dimZ-1;
+            const rightChunkId = starterChunkI + ',' + starterChunkJ + ',' + (starterChunkK-1);
             return worldManager.allChunks[rightChunkId];
         }
-        */
     }
 
     static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager)

@@ -4,13 +4,13 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.setColor = function(iChunkOffset, jChunkOffset, color) {
+App.Engine.Graphics.prototype.setColor = function(iChunkOffset, jChunkOffset, kChunkOffset, color) {
     color.setRGB((iChunkOffset/this.chunkSizeX)%2/2+0.5, (jChunkOffset/this.chunkSizeY)%2/2+0.5, 0.6);
 };
 
 App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
                                                  positions, normals, colors, nature,
-                                                 iChunkOffset, jChunkOffset,
+                                                 iChunkOffset, jChunkOffset, kChunkOffset,
                                                  pA, pB, pC, cb, ab,
                                                  normal, color, n) {
 
@@ -24,7 +24,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         jj = ((faceId - ii) % ijS) / iS;
         kk = Math.floor(faceId / ijS);
 
-        ax = iChunkOffset + 1 + ii; ay = jChunkOffset + jj; az = kk;
+        ax = iChunkOffset + 1 + ii; ay = jChunkOffset + jj; az = kChunkOffset + kk;
         bx = ax; by = ay; bz = az + 1;
         cx = ax; cy = ay + 1; cz = az + 1;
         dx = ax; dy = ay + 1; dz = az;
@@ -47,7 +47,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H1
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // Positions H1
@@ -68,7 +68,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H2
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
     } else if (faceId < 2 * ijkS) {
@@ -77,7 +77,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         jj = ((faceId - ii) % ijS) / iS;
         kk = Math.floor(faceId / ijS);
 
-        ax = iChunkOffset + ii; ay = jChunkOffset + 1 + jj; az = kk;
+        ax = iChunkOffset + ii; ay = jChunkOffset + 1 + jj; az = kChunkOffset + kk;
         bx = ax + 1; by = ay; bz = az;
         cx = ax + 1; cy = ay; cz = az + 1;
         dx = ax; dy = ay; dz = az + 1;
@@ -99,7 +99,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H1
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // Positions H2
@@ -120,7 +120,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H2
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
     } else {
@@ -129,7 +129,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         jj = ((faceId - ii) % ijS) / iS;
         kk = Math.floor(faceId / ijS);
 
-        ax = iChunkOffset + ii; ay = jChunkOffset + jj; az = 1 + kk;
+        ax = iChunkOffset + ii; ay = jChunkOffset + jj; az = kChunkOffset + 1 + kk;
         bx = ax; by = ay + 1; bz = az;
         cx = ax + 1; cy = ay + 1; cz = az;
         dx = ax + 1; dy = ay; dz = az;
@@ -152,7 +152,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H1
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // Positions H2
@@ -173,7 +173,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
         // Colors H2
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
-        this.setColor(iChunkOffset, jChunkOffset, color);
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
     }
 

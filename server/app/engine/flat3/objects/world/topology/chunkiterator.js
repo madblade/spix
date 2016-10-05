@@ -52,16 +52,17 @@ class ChunkIterator {
     static get2DNeighbours(currentChunk, worldManager) {
         const i = currentChunk.chunkI;
         const j = currentChunk.chunkJ;
+        const k = currentChunk.chunkK;
         let chunks = worldManager.allChunks;
 
         let neighboursIndices = [
-            (i+1)+','+j,
-            (i+1)+','+(j+1),
-            i+','+(j+1),
-            (i-1)+','+(j+1),
-            (i-1)+','+j,
-            (i-1)+','+(j-1),
-            i+','+(j-1)
+            (i+1)   +','+j      +','+k,
+            (i+1)   +','+(j+1)  +','+k,
+            i       +','+(j+1)  +','+k,
+            (i-1)   +','+(j+1)  +','+k,
+            (i-1)   +','+j      +','+k,
+            (i-1)   +','+(j-1)  +','+k,
+            i       +','+(j-1)  +','+k
         ];
 
         let neighbours = [];
@@ -128,15 +129,18 @@ class ChunkIterator {
 
         const dx = worldManager.chunkDimensionX;
         const dy = worldManager.chunkDimensionY;
+        const dz = worldManager.chunkDimensionZ;
 
-        // TODO zeefy & DRY with manager.getChunkCoordinatesFromFloatingPoint
+        // TODO DRY with manager.getChunkCoordinatesFromFloatingPoint
         const fx = Math.floor(xPosition);
         const fy = Math.floor(yPosition);
+        const fz = Math.floor(zPosition);
 
         let chunkI = (fx - ( (fx >= 0 ? fx : (dx + fx)) %dx)) / dx;
         let chunkJ = (fy - ( (fy >= 0 ? fy : (dy + fy)) %dy)) / dy;
+        let chunkK = (fz - ( (fz >= 0 ? fz : (dz + fz)) %dz)) / dz;
 
-        const id = chunkI+','+chunkJ;
+        const id = chunkI+','+chunkJ+','+chunkK;
 
         let closestChunk = allChunks[id];
         if (!closestChunk) {

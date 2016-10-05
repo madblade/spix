@@ -16,6 +16,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     c.whichFaceIs = {};
 
     // TODO don't discriminate components
+    // TODO discriminate components server-side
     var components = all[0];
     var natures = all[1];
 
@@ -34,8 +35,11 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var chunkIndices = chunkId.split(',');
     var chunkI = parseInt(chunkIndices[0]);
     var chunkJ = parseInt(chunkIndices[1]);
+    var chunkK = parseInt(chunkIndices[2]);
+
     var iChunkOffset = chunkI * this.chunkSizeX;
     var jChunkOffset = chunkJ * this.chunkSizeY;
+    var kChunkOffset = chunkK * this.chunkSizeZ;
 
     var ijkS = this.chunkCapacity;
     var ijS = this.chunkSizeX * this.chunkSizeY;
@@ -70,7 +74,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
 
         this.addFace(faceId, i, iS, ijS, ijkS,
             positions, normals, colors, Math.abs(currentNatures[f]),
-            iChunkOffset, jChunkOffset,
+            iChunkOffset, jChunkOffset, kChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);
 
@@ -109,10 +113,14 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var ijS = this.chunkSizeX * this.chunkSizeY;
     var iS = this.chunkSizeX;
     var chunkIndices = chunkId.split(',');
+
     var chunkI = parseInt(chunkIndices[0]);
     var chunkJ = parseInt(chunkIndices[1]);
+    var chunkK = parseInt(chunkIndices[2]);
     var iChunkOffset = chunkI * this.chunkSizeX;
     var jChunkOffset = chunkJ * this.chunkSizeY;
+    var kChunkOffset = chunkK * this.chunkSizeZ;
+
     var defaultGeometrySize = this.defaultGeometrySize;
 
     var meshId;
@@ -256,7 +264,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
         this.addFace(faceId, pos * 18, iS, ijS, ijkS,
             vertices, normals, colors, Math.abs(nature),
-            iChunkOffset, jChunkOffset,
+            iChunkOffset, jChunkOffset, kChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);
 

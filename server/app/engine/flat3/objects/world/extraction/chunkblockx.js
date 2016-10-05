@@ -7,16 +7,17 @@
 import ChunkLoader from './../loading/chunkloader';
 
 class CSBX {
+
+    static debug = false;
     
     static extractSurfaceBlocks(chunk) {
 
         let neighbourChunks = [];
         let neighbourBlocks = [];
 
-        const numberOfNeighbours = 4;
+        const numberOfNeighbours = 6;
 
-        // Get all 4 neighbour chunks.
-        // TODO 6 neighbours
+        // Get all neighbour chunks.
         for (let i = 0; i < numberOfNeighbours; ++i) {
             neighbourChunks.push(ChunkLoader.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
@@ -31,7 +32,7 @@ class CSBX {
 
         const iSize = chunk.dimensions[0];
         const ijSize = chunk.dimensions[0] * chunk.dimensions[1];
-        const length = blocks.length;
+        const capacity = blocks.length;
 
         var addSurfaceBlock = function (bid, sbs) {
             const ijC = bid % ijSize;
@@ -41,7 +42,7 @@ class CSBX {
         };
 
         // Test neighbourhood.
-        for (let b = 0; b < length; ++b) {
+        for (let b = 0; b < capacity; ++b) {
             if (blocks[b] !== 0) {
                 const iPlus = b+1;
                 if (iPlus % iSize !== 0) {
@@ -95,26 +96,34 @@ class CSBX {
                     }
                 }
 
-                // TODO zeefy chunks...
+                // TODO check z criteria
                 const kPlus = b+ijSize;
-                if (kPlus < length) {
+                if (kPlus < capacity) {
                     if (blocks[kPlus] === 0) {
                         addSurfaceBlock(b, currentSbs);
                         continue;
                     }
                 } else {
-                    // Not supported in this model.
+                    if (neighbourBlocks[4][kPlus - capacity] === 0) {
+                        addSurfaceBlock(b, currentSbs);
+                        continue;
+                    }
                 }
 
                 const kMinus = b-ijSize;
                 if (kMinus >= 0) {
                     if (blocks[kMinus] === 0) {
                         addSurfaceBlock(b, currentSbs);
-                        //continue;
+                        continue;
                     }
                 } else {
-                    // Not supported in this model.
+                    if (neighbourBlocks[5][kMinus+capacity] === 0) {
+                        addSurfaceBlock(b, currentSbs);
+                        continue;
+                    }
                 }
+
+                if (CSBX.debug) console.log(b + ' is not a neighbour.');
 
             } else { // If the current block is empty, test for neighbour x+/y+/z+
                 const iPlus = b+1;
@@ -133,9 +142,13 @@ class CSBX {
                     }
                 }
 
+                // TODO check z criteria
                 const kPlus = b+ijSize;
-                if (kPlus === length) {
-                    // TODO zeefy
+                if (kPlus === capacity) {
+                    if (neighbourBlocks[4][kPlus - capacity] !== 0) {
+                        addSurfaceBlock(b, currentSbs);
+                        // continue;
+                    }
                 }
             }
         }

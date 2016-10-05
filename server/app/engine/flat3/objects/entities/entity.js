@@ -28,7 +28,7 @@ class Entity {
     }
 
     stop() {
-        this._directions = [false, false, false, false];
+        this._directions = [false, false, false, false, false, false];
         console.log("Entity stopping.");
     }
 

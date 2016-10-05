@@ -18,21 +18,22 @@ class ChunkLoader {
     static getNeighboringChunk(chunk, direction) {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
+        let k = chunk.chunkK;
         let wm = chunk.manager;
 
         switch (direction) {
             case 0: // x+
-                return wm.getChunk(i+1, j);
+                return wm.getChunk(i+1, j, k);
             case 1: // x-
-                return wm.getChunk(i-1, j);
+                return wm.getChunk(i-1, j, k);
             case 2: // y+
-                return wm.getChunk(i, j+1);
+                return wm.getChunk(i, j+1, k);
             case 3: // y-
-                return wm.getChunk(i, j-1);
-            // TODO zeefy (non-flat models)
+                return wm.getChunk(i, j-1, k);
             case 4: // z+
+                return wm.getChunk(i, j, k+1);
             case 5: // z- (idem)
-                return null;
+                return wm.getChunk(i, j, k-1);
             default:
         }
     }
@@ -40,20 +41,22 @@ class ChunkLoader {
     static isNeighboringChunkLoaded(chunk, direction) {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
+        let k = chunk.chunkK;
         let wm = chunk.manager;
 
         switch (direction) {
             case 0: // x+
-                return wm.isChunkLoaded(i+1, j);
+                return wm.isChunkLoaded(i+1, j, k);
             case 1: // x-
-                return wm.isChunkLoaded(i-1, j);
+                return wm.isChunkLoaded(i-1, j, k);
             case 2: // y+
-                return wm.isChunkLoaded(i, j+1);
+                return wm.isChunkLoaded(i, j+1, k);
             case 3: // y-
-                return wm.isChunkLoaded(i, j-1);
+                return wm.isChunkLoaded(i, j-1, k);
             case 4: // z+ (non-flat models)
+                return wm.isChunkLoaded(i, j, k+1);
             case 5: // z-
-                return false;
+                return wm.isChunkLoaded(i, j, k-1);
             default:
         }
     }
@@ -63,9 +66,17 @@ class ChunkLoader {
         let c = chunk;
         let ci = c.chunkI;
         let cj = c.chunkJ;
+        let ck = c.chunkK;
         let dims = c.dimensions;
 
-        let neighbourIds = [(ci+1)+','+cj, ci+','+(cj+1), (ci-1)+','+cj, ci+','+(cj-1)];
+        let neighbourIds = [
+            (ci+1)+','+cj+','+ck,
+            ci+','+(cj+1)+','+ck,
+            ci+','+cj+','+(ck+1),
+            (ci-1)+','+cj+','+ck,
+            ci+','+(cj-1)+','+ck,
+            ci+','+cj+','+(ck-1)
+        ];
 
         for (let i = 0, length = neighbourIds.length; i < length; ++i) {
             let currentId = neighbourIds[i];
@@ -85,7 +96,6 @@ class ChunkLoader {
         return chunk;
     }
 
-    // TODO zeefication
     static preLoadNextChunk(player, chunk, worldManager, forPlayer) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
@@ -99,9 +109,12 @@ class ChunkLoader {
 
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
+        const ck = chunk.chunkK;
 
         let i = ci;
         let j = cj;
+        let k = ck; // TODO algorithmical zeefication
+
         let depth = 0;
         let foundUnloadedChunk = false;
 
@@ -112,10 +125,10 @@ class ChunkLoader {
 
             for (let delta = -depth; delta < depth; ++delta) {
                 if (
-                    !avatar.isChunkLoaded((i+delta)+','+(j+depth)) ||
-                    !avatar.isChunkLoaded((i+delta)+','+(j-depth)) ||
-                    !avatar.isChunkLoaded((i+depth)+','+(j+delta)) ||
-                    !avatar.isChunkLoaded((i-depth)+','+(j+delta))
+                    !avatar.isChunkLoaded((i+delta)+','+(j+depth)+','+k) ||
+                    !avatar.isChunkLoaded((i+delta)+','+(j-depth)+','+k) ||
+                    !avatar.isChunkLoaded((i+depth)+','+(j+delta)+','+k) ||
+                    !avatar.isChunkLoaded((i-depth)+','+(j+delta)+','+k)
                 )
                 {
                     foundUnloadedChunk = true;
@@ -125,15 +138,17 @@ class ChunkLoader {
 
         }
 
+        // TODO check the following 3
         i = ci;
         j = cj;
+        k = ck;
 
         // Check if everything is loaded.
         let res = null;
         if (depth > threshold) return res;
 
-        function chunkIsToBeLoaded(ic, jc) {
-            let currentId = ic+','+jc;
+        function chunkIsToBeLoaded(ic, jc, kc) {
+            let currentId = ic+','+jc+','+kc;
             let currentChunk = allChunks[currentId];
 
             if (!forPlayer) {
@@ -153,7 +168,7 @@ class ChunkLoader {
         // 2D check.
 
         // Back case
-        res = chunkIsToBeLoaded((i-depth), j);
+        res = chunkIsToBeLoaded((i-depth), j, k);
         if (res !== null) {
             if (ChunkLoader.debug) if (forPlayer) console.log("BACK CASE");
             return res;
@@ -161,13 +176,13 @@ class ChunkLoader {
 
         // Back segment
         for (let nj = 1; nj <= depth; ++nj) {
-            res = chunkIsToBeLoaded(i-depth, j+nj);
+            res = chunkIsToBeLoaded(i-depth, j+nj, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("BACK SEG+");
                 return res;
             }
 
-            res = chunkIsToBeLoaded(i-depth, j-nj);
+            res = chunkIsToBeLoaded(i-depth, j-nj, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("BACK SEG-");
                 return res;
@@ -176,12 +191,12 @@ class ChunkLoader {
 
         // Side segments
         for (let ni = -depth; ni <= depth; ++ni) {
-            res = chunkIsToBeLoaded(i+ni, j-depth);
+            res = chunkIsToBeLoaded(i+ni, j-depth, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("SIDE SEG i-");
                 return res;
             }
-            res = chunkIsToBeLoaded(i+ni, j+depth);
+            res = chunkIsToBeLoaded(i+ni, j+depth, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("SIDE SEG i+");
                 return res;
@@ -190,12 +205,12 @@ class ChunkLoader {
 
         // Front segment
         for (let nj = -depth; nj < 0; ++nj) {
-            res = chunkIsToBeLoaded(i+depth, j-nj);
+            res = chunkIsToBeLoaded(i+depth, j-nj, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("FRONT SEG-");
                 return res;
             }
-            res = chunkIsToBeLoaded(i+depth, j+nj);
+            res = chunkIsToBeLoaded(i+depth, j+nj, k);
             if (res !== null) {
                 if (ChunkLoader.debug) if (forPlayer) console.log("FRONT SEG+");
                 return res;
@@ -203,7 +218,7 @@ class ChunkLoader {
         }
 
         // Last case
-        res = chunkIsToBeLoaded((i+depth), j);
+        res = chunkIsToBeLoaded((i+depth), j, k);
         if (res !== null) {
             if (ChunkLoader.debug) if (forPlayer) console.log("CURRENT FINALLY");
             return res;
@@ -218,6 +233,7 @@ class ChunkLoader {
 
     static getOOBPlayerChunks(player, chunk, worldManager) {
         var oobChunks = [];
+        // TODO check implementation
 
         // Recurse on loaded chunks.
 

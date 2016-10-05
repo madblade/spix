@@ -29,15 +29,14 @@ class ExtractAPI {
         let coordinates = worldManager.getChunkCoordinates(pos[0], pos[1], pos[2]);
         const i = coordinates[0];
         const j = coordinates[1];
-        // TODO zeefication
-        // const k = coordinates[2];
+        const k = coordinates[2];
 
         const dx = worldManager.chunkDimensionX;
         const dy = worldManager.chunkDimensionY;
         const dz = worldManager.chunkDimensionZ;
 
         let chunkIds = [];
-        chunkIds.push((i+','+j));
+        chunkIds.push((i+','+j+','+k));
         //chunkIds.push((i+','+j), ((i-1)+','+j), ((i-1)+','+(j-1)));
         //chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
 
@@ -81,7 +80,6 @@ class ExtractAPI {
         return chunksForPlayer;
     }
 
-    // TODO zeefication
     static computeNewChunksInRangeForPlayer(player, worldManager) {
         if (!ExtractAPI.load) return;
 
@@ -97,6 +95,8 @@ class ExtractAPI {
 
         // Loading circle for client (nearer)
         // Only load one at a time!
+        // TODO algorithmical zeefication
+        // TODO enhance to transmit chunks when users are not so much active and so on
         var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldManager);
 
         // Unloading circle (quite farther)

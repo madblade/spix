@@ -7,6 +7,12 @@
 import CSFX from './chunkfacex';
 
 class FaceLinker {
+
+    static notBoundary(iS, ijS, capacity, index) {
+        //return index%iS !== 0 && index%ijS !== 0; && index < capacity && index >= 0;
+        // TODO access other chunks for limit cases
+        return true;
+    }
     
     static affect(components, id1, id2) {
         if (components[id1] === 0) console.log("Error @affect after link: (id1) " + id1 + " has 0 component id.");
@@ -26,18 +32,24 @@ class FaceLinker {
     }
     
     // TODO access neighbours
+    /**
+     * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, to be zeefied (4 z+, 5 z-)
+     */
     static linkI(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
-        // Working with flat indices (3 arrays of length 'capacity')
-        // Working with stacked indices (1 array with [0,capacity[=i, [capacity,2capacity[=j, ...)
-        const stackFaceId = flatFaceId;
-        if (!faces[0][flatFaceId]) {
+
+        // Lazy termination (prevent id calculations).
+        const val = faces[0][flatFaceId];
+        if (!val) {
             console.log("WARN. i-* linker was given a faceId which is not present in faces array.");
             return;
         }
 
-        const normalP = faces[0][flatFaceId] > 0;
-        const normalM = faces[0][flatFaceId] < 0;
+        const normalP = val > 0;
+        const normalM = val < 0;
 
+        // Working with flat indices (3 arrays of length 'capacity')
+        // Working with stacked indices (1 array with [0,capacity[=i, [capacity,2capacity[=j, ...)
+        const stackFaceId = flatFaceId;
 
         // CASE 1: aligned with top and back i (both normals)
         const top = flatFaceId + ijS;
@@ -80,9 +92,10 @@ class FaceLinker {
         if (
                 normalP && faces[2][flatTopOrtho] > 0 &&
                 (
-                    CSFX.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
+                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
                     blocks[flatFaceId+1+ijS] === 0 :
-                    false
+                    false // TODO zeefy, refine on double edges
+                    // neighbourBlocks[4][(flatFaceId+1)%ijS] === 0
                 )
                 ||
                 normalM && faces[2][flatTopOrtho] < 0
@@ -102,9 +115,9 @@ class FaceLinker {
         if (
                 normalP && faces[1][flatBackOrtho] > 0 &&
                 (
-                    CSFX.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
+                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
                     blocks[flatFaceId+1+iS] === 0 :
-                    false
+                    false // TODO zeefy, refine on double edges
                 )
                 ||
                 normalM && faces[1][flatBackOrtho] < 0
@@ -129,9 +142,9 @@ class FaceLinker {
                     ||
                     normalM && faces[2][flatTopOrthoNext] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
                         blocks[flatFaceId+ijS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -148,9 +161,9 @@ class FaceLinker {
                     ||
                     normalM && faces[1][flatBackOrthoNext] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
                         blocks[flatFaceId+iS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -168,9 +181,9 @@ class FaceLinker {
                     ||
                     normalM && faces[1][flatOrthoIJ] < 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
                         blocks[flatFaceId-iS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -186,11 +199,18 @@ class FaceLinker {
     }
 
     static linkJ(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
-        const stackFaceId = capacity + flatFaceId;
-        if (!faces[1][flatFaceId]) return;
 
-        const normalP = faces[1][flatFaceId] > 0;
-        const normalM = faces[1][flatFaceId] < 0;
+        // Lazy termination (prevent id calculations).
+        const val = faces[1][flatFaceId];
+        if (!val) {
+            console.log("WARN. j-* linker was given a faceId which is not present in faces array.");
+            return;
+        }
+
+        const normalP = val > 0;
+        const normalM = val < 0;
+
+        const stackFaceId = capacity + flatFaceId;
 
         // CASE 1: aligned with top and right j
         const top = flatFaceId + ijS; // NOT MERGED YET
@@ -230,9 +250,9 @@ class FaceLinker {
         if (
                 normalP && faces[2][flatTopOrtho] > 0 &&
                 (
-                    CSFX.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
+                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
                     blocks[flatFaceId+iS+ijS] === 0 :
-                    false
+                    false // TODO zeefy, refine on double edges
                 )
                 ||
                 normalM && faces[2][flatTopOrtho] < 0
@@ -257,9 +277,9 @@ class FaceLinker {
                     ||
                     normalM && faces[2][flatTopOrthoNext] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
                         blocks[flatFaceId+ijS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -276,9 +296,9 @@ class FaceLinker {
                     ||
                     normalM && faces[0][flatBackOrthoNext] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
                         blocks[flatFaceId+1] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -289,9 +309,18 @@ class FaceLinker {
     }
 
     static linkK(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
-        const normalP = faces[2][flatFaceId] > 0;
-        const normalM = faces[2][flatFaceId] < 0;
-        if (!faces[2][flatFaceId]) return;
+
+        // Lazy termination (prevent id calculations).
+        const val = faces[2][flatFaceId];
+        if (!val) {
+            console.log("WARN. k-* linker was given a faceId which is not present in faces array.");
+            console.log('\tface id: ' + flatFaceId);
+            console.log('\tvalue: ' + val);
+            return;
+        }
+
+        const normalP = val > 0;
+        const normalM = val < 0;
 
         const stackFaceId = 2*capacity + flatFaceId;
 
@@ -342,9 +371,9 @@ class FaceLinker {
                     ||
                     normalM && faces[1][flatBackOrthoCurrent] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
                         blocks[flatFaceId+iS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -366,9 +395,9 @@ class FaceLinker {
                     ||
                     normalM && faces[0][flatRightOrthoCurrent] > 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
                         blocks[flatFaceId+1] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -391,9 +420,9 @@ class FaceLinker {
                     ||
                     normalM && faces[1][flatBackOrthoPrevious] < 0 &&
                     (
-                        CSFX.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
+                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
                         blocks[flatFaceId-iS] === 0 :
-                        false
+                        false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -415,9 +444,9 @@ class FaceLinker {
                 ||
                 normalM && faces[0][flatRightOrthoPrevious] < 0 &&
                 (
-                    CSFX.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
+                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
                     blocks[flatFaceId-1] === 0 :
-                    false
+                    false // TODO zeefy, refine on double edges
                 )
             )
             {

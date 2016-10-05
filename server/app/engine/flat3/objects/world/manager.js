@@ -33,9 +33,11 @@ class WorldManager {
     }
 
     get allChunks() { return this._chunks; }
+
     get chunkDimensionX() { return this._xSize; }
     get chunkDimensionY() { return this._ySize; }
     get chunkDimensionZ() { return this._zSize; }
+
     get generationMethod() { return this._generationMethod; }
     get entityman() { return this._entityman; }
 
@@ -158,15 +160,16 @@ class WorldManager {
         let coordinates = this.getChunkCoordinates(x, y, z);
         const i = coordinates[0];
         const j = coordinates[1];
-        // TODO zeefication
-        // const k = coordinates[2];
+        const k = coordinates[2];
+
         const chunkX = x - i * this.chunkDimensionX;
         const chunkY = y - j * this.chunkDimensionY;
+        const chunkK = z - k * this.chunkDimensionZ;
 
-        const chunkId = i+','+j;
+        const chunkId = i+','+j+','+k;
         let chunk = this._chunks[chunkId];
-        if (!chunk || chunk === undefined) {console.log('Could not find chunk.'); return;}
-        return chunk.what(chunkX, chunkY, z);
+        if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId); return;}
+        return chunk.what(chunkX, chunkY, chunkK);
     }
 
     getFreePosition() {
@@ -175,8 +178,8 @@ class WorldManager {
         return [0, 0, z];
     }
 
-    getChunk(iCoordinate, jCoordinate) {
-        let id = iCoordinate+','+jCoordinate;
+    getChunk(iCoordinate, jCoordinate, kCoordinate) {
+        let id = iCoordinate+','+jCoordinate+','+kCoordinate;
         return this._chunks[id];
     }
 

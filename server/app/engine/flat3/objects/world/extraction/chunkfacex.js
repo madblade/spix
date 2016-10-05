@@ -82,6 +82,7 @@ class CSFX {
 
         let nbX = neighbourBlocks[0]; // On x+ boundary.
         let nbY = neighbourBlocks[2]; // On y+ boundary.
+        let nbZ = neighbourBlocks[3]; // On z+ boundary.
 
         // Extract faces.
         for (let z in surfaceBlocks) {
@@ -127,7 +128,19 @@ class CSFX {
                                     ccid++;
                                 }
                             }
-                            // TODO z+
+                            // TODO check z
+                            if (direction === 5) { // z+
+                                if (blocks[blockId] !== 0 && nbZ[blockId-capacity+ijS] !== 0) {
+                                    CSFX.setFace(5, blockId, blocks[blockId], faces, surfaceFaces,
+                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                                    ccid++;
+                                }
+                                else if (blocks[blockId] === 0 && nbY[blockId-capacity+ijS] !== 0) {
+                                    CSFX.setFace(2, blockId, nbZ[blockId-ijS+iS], faces, surfaceFaces,
+                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                                    ccid++;
+                                }
+                            }
                         }
                     }
                 }
@@ -140,12 +153,6 @@ class CSFX {
                 surfaceFaces[0].length + ',' + surfaceFaces[1].length + ',' + surfaceFaces[2].length+')');
             //faces
         }
-    }
-
-    static notBoundary(iS, ijS, capacity, index) {
-        //return index%iS !== 0 && index%ijS !== 0; && index < capacity && index >= 0;
-        // TODO access other chunks for limit cases
-        return true;
     }
 
     static preMerge(surfaceFaces, connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
@@ -273,7 +280,7 @@ class CSFX {
             fastMerger = [[]];
             let ks = Object.keys(fastCC);
             for (let i = 0; i<ks.length; ++i) {
-                fastMerger[0].push(parseInt(ks[i])); // TODO remove
+                fastMerger[0].push(parseInt(ks[i]));
             }
         }
 
@@ -335,8 +342,7 @@ class CSFX {
         let neighbourBlocks = [];
 
         // Get all six neighbour chunks.
-        // TODO zeefy
-        for (let i = 0; i<4; ++i) {
+        for (let i = 0; i<6; ++i) {
             neighbourChunks.push(ChunkLoader.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
         }
