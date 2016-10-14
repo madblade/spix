@@ -30,7 +30,7 @@ class ChunkGenerator {
     }
 
     static createChunk(x, y, z, id, worldManager) {
-        console.log('createChunk ' + id);
+        //console.log('createChunk ' + id);
         var c = new Chunk(x, y, z, id, worldManager);
 
         let generationMethod = worldManager.generationMethod;
@@ -165,6 +165,8 @@ class ChunkGenerator {
     static waveChunk(chunk, minZ, maxZ, blockId) {
         if (minZ >= maxZ || maxZ >= chunk.capacity) console.log("Wave generator: invalid parameters");
 
+
+
         const dx = chunk.dimensions[0];
         const dy = chunk.dimensions[1];
         const deltaK = maxZ-minZ;
@@ -185,6 +187,10 @@ class ChunkGenerator {
         });
 
         let blocks = new Uint8Array(numberOfBlocks);
+        if (chunk.chunkK !== 0) {
+            blocks.fill(0, 0, numberOfBlocks);
+            return;
+        }
         blocks.fill(blockId, 0, underneathWave);
 
         blocks.fill(0, underneathWave, overWave);

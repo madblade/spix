@@ -51,7 +51,7 @@ class Chunk {
     }
 
     computeFaces() {
-        this.preloadNeighborChunks();
+        this.preloadNeighbourChunks();
         this.computeSurfaceBlocksFromScratch();
         this.computeConnectedComponents();
         this._ready = true;
@@ -83,11 +83,11 @@ class Chunk {
     set updates(newUpdates) { this._updates = newUpdates; }
 
     /**
-     * Preload neighbors.
+     * Preload neighbours.
      */
-    preloadNeighborChunks() {
+    preloadNeighbourChunks() {
         if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
-        ChunkLoader.preLoadNeighborChunks(this, this._worldManager);
+        ChunkLoader.preloadAllNeighbourChunks(this, this._worldManager);
     }
 
     /**

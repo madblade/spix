@@ -12,9 +12,29 @@ class ChunkLoader {
     static debug = false;
 
     static serverLoadingRadius = 20;
-    static clientLoadingRadius = 2;
+    static clientLoadingRadius = 1;
     static clientUnloadingRadius = 20;
 
+    /** MODEL
+     0	i+1,	j,		k
+     1	i-1,	j,		k
+     2	i,		j+1,	k
+     3	i,		j-1,	k
+     4	i,		j,		k+1
+     5	i,		j,		k-1
+     6	i+1,	j+1,	k
+     7	i-1,	j+1,	k
+     8	i+1,	j-1,	k
+     9	i-1,	j-1,	k
+     10	i+1,	j,		k-1
+     11	i+1,	j,		k+1
+     12	i-1,	j,		k-1
+     13	i-1,	j,		k+1
+     14	i,		j+1,	k+1
+     15	i,		j-1,	k+1
+     16	i,		j+1,	k-1
+     17	i,		j-1,	k-1
+    */
     static getNeighboringChunk(chunk, direction) {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
@@ -34,6 +54,30 @@ class ChunkLoader {
                 return wm.getChunk(i, j, k+1);
             case 5: // z- (idem)
                 return wm.getChunk(i, j, k-1);
+            case 6:
+                return wm.getChunk(i+1, j+1, k);
+            case 7:
+                return wm.getChunk(i-1, j+1, k);
+            case 8:
+                return wm.getChunk(i+1, j-1, k);
+            case 9:
+                return wm.getChunk(i-1, j-1, k);
+            case 10:
+                return wm.getChunk(i+1, j, k-1);
+            case 11:
+                return wm.getChunk(i+1, j, k+1);
+            case 12:
+                return wm.getChunk(i-1, j, k-1);
+            case 13:
+                return wm.getChunk(i-1, j, k+1);
+            case 14:
+                return wm.getChunk(i, j+1, k+1);
+            case 15:
+                return wm.getChunk(i, j-1, k+1);
+            case 16:
+                return wm.getChunk(i, j+1, k-1);
+            case 17:
+                return wm.getChunk(i, j-1, k-1);
             default:
         }
     }
@@ -57,11 +101,74 @@ class ChunkLoader {
                 return wm.isChunkLoaded(i, j, k+1);
             case 5: // z-
                 return wm.isChunkLoaded(i, j, k-1);
+            case 6:
+                return wm.isChunkLoaded(i+1, j+1, k);
+            case 7:
+                return wm.isChunkLoaded(i-1, j+1, k);
+            case 8:
+                return wm.isChunkLoaded(i+1, j-1, k);
+            case 9:
+                return wm.isChunkLoaded(i-1, j-1, k);
+            case 10:
+                return wm.isChunkLoaded(i+1, j, k-1);
+            case 11:
+                return wm.isChunkLoaded(i+1, j, k+1);
+            case 12:
+                return wm.isChunkLoaded(i-1, j, k-1);
+            case 13:
+                return wm.isChunkLoaded(i-1, j, k+1);
+            case 14:
+                return wm.isChunkLoaded(i, j+1, k+1);
+            case 15:
+                return wm.isChunkLoaded(i, j-1, k+1);
+            case 16:
+                return wm.isChunkLoaded(i, j+1, k-1);
+            case 17:
+                return wm.isChunkLoaded(i, j-1, k-1);
             default:
         }
     }
 
-    static preLoadNeighborChunks(chunk, worldManager) {
+    static preloadAllNeighbourChunks(chunk, worldManager) {
+        let loadedChunks = worldManager.allChunks;
+        let c = chunk;
+        let ci = c.chunkI;
+        let cj = c.chunkJ;
+        let ck = c.chunkK;
+        let dims = c.dimensions;
+
+        let neighbourIds = [
+            (ci+1)+','+cj+','+ck,           //  i+1,	j,		k
+            ci+','+(cj+1)+','+ck,           //  i-1,	j,		k
+            ci+','+cj+','+(ck+1),           //  i,		j+1,	k
+            (ci-1)+','+cj+','+ck,           //  i,		j-1,	k
+            ci+','+(cj-1)+','+ck,           //  i,		j,		k+1
+            ci+','+cj+','+(ck-1),           //  i,		j,		k-1
+            (ci+1)+','+(cj+1)+','+(ck),     //  i+1,	j+1,	k
+            (ci-1)+','+(cj+1)+','+(ck),     //  i-1,	j+1,	k
+            (ci+1)+','+(cj-1)+','+(ck),     //  i+1,	j-1,	k
+            (ci-1)+','+(cj-1)+','+(ck),     //  i-1,	j-1,	k
+            (ci+1)+','+(cj)+','+(ck-1),     //  i+1,	j,		k-1
+            (ci+1)+','+(cj)+','+(ck+1),     //  i+1,	j,		k+1
+            (ci-1)+','+(cj)+','+(ck-1),     //  i-1,	j,		k-1
+            (ci-1)+','+(cj)+','+(ck+1),     //  i-1,	j,		k+1
+            (ci)+','+(cj+1)+','+(ck+1),     //  i,		j+1,	k+1
+            (ci)+','+(cj-1)+','+(ck+1),     //  i,		j-1,	k+1
+            (ci)+','+(cj+1)+','+(ck-1),     //  i,		j+1,	k-1
+            (ci)+','+(cj-1)+','+(ck-1)      //  i,		j-1,	k-1
+        ];
+
+        for (let i = 0, length = neighbourIds.length; i < length; ++i) {
+            let currentId = neighbourIds[i];
+            if (loadedChunks.hasOwnProperty(currentId)) continue;
+
+            // Don't compute faces
+            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
+            worldManager.addChunk(currentId, neighbour);
+        }
+    }
+
+    static preloadDirectNeighbourChunks(chunk, worldManager) {
         let loadedChunks = worldManager.allChunks;
         let c = chunk;
         let ci = c.chunkI;

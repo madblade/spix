@@ -13,6 +13,131 @@ class FaceLinker {
         // TODO access other chunks for limit cases
         return true;
     }
+
+    static flatToCoords(flatId, iS, ijS) {
+        const i = flatId % iS;
+        const j = ((flatId-i) % ijS) / iS;
+        const k = (flatId-(flatId%ijS)) / ijS;
+        return (i+','+j+','+k);
+    }
+
+    static findN(ci, cj, ck, ci$, cj$, ck$) {
+        const deltaI = 1 + ci$ - ci;
+        const deltaJ = 1 + cj$ - cj;
+        const deltaK = 1 + ck$ - ck;
+
+        const dd = deltaI + 3*deltaJ + 9*deltaK;
+
+        switch(dd) {
+            //case 0: 	break;
+            case 1:     return 17;
+            //case 2: 	break;
+            case 3:     return 12;
+            case 4:     return 5;
+            case 5:     return 10;
+            //case 6: 	break;
+            case 7:     return 16;
+            //case 8: 	break;
+            case 9:     return 9;
+            case 10:    return 3;
+            case 11:    return 8;
+            case 12:    return 1;
+            //case 13: 	break;
+            case 14:    return 0;
+            case 15:    return 7;
+            case 16:    return 2;
+            case 17:    return 6;
+            //case 18: 	break;
+            case 19:    return 15;
+            case 20:    return 4;
+            case 21:    return 13;
+            //case 22: 	break;
+            case 23:    return 11;
+            //case 24: 	break;
+            case 25:    return 14;
+            //case 26: 	break;
+        }
+    }
+
+    // call linkCriterion(flatId, otherFlatId,
+    //                      -1 0 1, -1 0 1, -1 0 1,
+    //                      chunkI, chunkJ, chunkK capacity, blocks, neighbourBlocks)
+    static linkCriterion(indexS, indexD,
+                         deltaI, deltaJ, deltaK,
+                         ci, cj, ck,
+                         iS, ijS, capacity,
+                         blocks, neighbourBlocks)
+    {
+        const dimI = iS;
+        const dimJ = ijS/iS;
+        const dimK = capacity/ijS;
+
+        // Extract
+        const i = indexS % iS;
+        const j = ((indexS-i) % ijS) / iS;
+        const k = (indexS-(indexS%ijS)) / ijS;
+
+        // Detect and shift
+        let i$ = i;
+        let j$ = j;
+        let k$ = k;
+        let ci$ = ci;
+        let cj$ = cj;
+        let ck$ = ck;
+
+        if (deltaI > 0) {
+            if (indexD % iS === 0) { // T1
+                ci$ = ci+1;
+                i$ = 0;
+            } else i$ = i+1;
+        } else if (deltaI < 0) {
+            if (indexD % iS === iS-1) { // T4
+                ci$ = ci-1;
+                i$ = dimI-1;
+            } else i$ = i-1;
+        }
+
+        if (deltaJ > 0) {
+            if ((indexD-i$)%ijS === 0) { // T2
+                cj$ = cj+1;
+                j$ = 0;
+            } else j$ = j+1;
+        } else if (deltaJ < 0) {
+            if ((indexD-i$)%ijS === ijS-1) { // T5
+                cj$ = cj-1;
+                j$ = dimJ-1;
+            } else j$ = j-1;
+        }
+
+        if (deltaK > 0) {
+            if (indexD >= capacity) { // T3
+                ck$ = ck+1;
+                k$ = 0;
+            } else k$ = k+1;
+        }  else if (deltaK < 0) { // should never be covered
+            if (indexD < 0) { // T6
+                ck$ = ck - 1;
+                k$ = dimK - 1;
+            } else k$ = k-1;
+        }
+
+        // Compute
+        const ijk$ = i$ + j$ * iS + k$ * ijS;
+
+        // Locate
+        let bs;
+        if (ci === ci$ && cj === cj$ && ck === ck$) {
+            bs = blocks[ijk$];
+        }
+        else {
+            const n = FaceLinker.findN(ci, cj, ck, ci$, cj$, ck$);
+            bs = neighbourBlocks[n][ijk$];
+            // console.log(indexS + "|" + indexD + " : " +i$+ "," +j$+ "," +k$+ "  " + ijk$ + " | " + n + " | " + bs);
+        }
+
+        // Criterion
+        return bs === 0;
+    }
     
     static affect(components, id1, id2) {
         if (components[id1] === 0) console.log("Error @affect after link: (id1) " + id1 + " has 0 component id.");
@@ -23,6 +148,11 @@ class FaceLinker {
 
         //if (id1 === 2779) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
         //if (id2 === 2779) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
+
+        //if (id1 === 2743) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
+        //if (id2 === 2743) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
+        //if (id1 === 2807) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
+        //if (id2 === 2807) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
 
         if (components[id1] < components[id2]) {
             components[id2] = components[id1];
@@ -35,7 +165,7 @@ class FaceLinker {
     /**
      * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, 4 z+, 5 z-
      */
-    static linkI(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
+    static linkI(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck) {
 
         // Lazy termination (prevent id calculations).
         const val = faces[0][flatFaceId];
@@ -94,9 +224,10 @@ class FaceLinker {
         if (
                 normalP && ftopo > 0 &&
                 (
-                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
-                    blocks[flatFaceId+1+ijS] === 0 :
-                    false // TODO zeefy, refine on double edges
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+ijS, 1, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
+                    //blocks[flatFaceId+1+ijS] === 0 :
+                    //false // TODO zeefy, refine on double edges
                     // neighbourBlocks[4][(flatFaceId+1)%ijS] === 0
                 )
                 ||
@@ -118,9 +249,10 @@ class FaceLinker {
         if (
                 normalP && fbacko > 0 &&
                 (
-                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
-                    blocks[flatFaceId+1+iS] === 0 :
-                    false // TODO zeefy, refine on double edges
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+iS, 1, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
+                    //blocks[flatFaceId+1+iS] === 0 :
+                    //false // TODO zeefy, refine on double edges
                 )
                 ||
                 normalM && fbacko < 0
@@ -146,9 +278,10 @@ class FaceLinker {
                     ||
                     normalM && ftopon > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
-                        blocks[flatFaceId+ijS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
+                        //blocks[flatFaceId+ijS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -158,7 +291,7 @@ class FaceLinker {
             }
         }
 
-        const flatBackOrthoNext = flatBackOrtho + 1; // j
+        const flatBackOrthoNext = flatBackOrtho + 1; // j, POTENTIALLY MERGED
         if (flatBackOrthoNext % iS === (flatBackOrtho % iS) + 1) {
             const fbackon = faces[1][flatBackOrthoNext];
             if (
@@ -166,14 +299,20 @@ class FaceLinker {
                     ||
                     normalM && fbackon > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
-                        blocks[flatFaceId+iS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
+                        //blocks[flatFaceId+iS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
                 const stackBackOrthoNext = capacity + flatBackOrthoNext;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' i linked to next j ' + stackBackOrthoNext);
+                if (ec[stackBackOrthoNext] !== cc[stackBackOrthoNext] && cc[stackBackOrthoNext] !== cc[stackFaceId])
+                {
+                    if (CSFX.debugPostMerger) console.log('i, previous j: ' + cc[stackBackOrthoNext] + ',' + cc[stackFaceId]);
+                    merger.push([cc[stackBackOrthoNext], cc[stackFaceId]]);
+                }
                 FaceLinker.affect(cc, stackBackOrthoNext, stackFaceId);
             }
         }
@@ -187,9 +326,10 @@ class FaceLinker {
                     ||
                     normalM && foij < 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
-                        blocks[flatFaceId-iS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
+                        //blocks[flatFaceId-iS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -205,7 +345,7 @@ class FaceLinker {
         }
     }
 
-    static linkJ(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
+    static linkJ(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck) {
 
         // Lazy termination (prevent id calculations).
         const val = faces[1][flatFaceId];
@@ -259,9 +399,10 @@ class FaceLinker {
         if (
                 normalP && ftopo > 0 &&
                 (
-                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
-                    blocks[flatFaceId+iS+ijS] === 0 :
-                    false // TODO zeefy, refine on double edges
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS+ijS, 0, 1, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
+                    //blocks[flatFaceId+iS+ijS] === 0 :
+                    //false // TODO zeefy, refine on double edges
                 )
                 ||
                 normalM && ftopo < 0
@@ -287,9 +428,10 @@ class FaceLinker {
                     ||
                     normalM && ftopon > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
-                        blocks[flatFaceId+ijS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
+                        //blocks[flatFaceId+ijS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -299,7 +441,7 @@ class FaceLinker {
             }
         }
 
-        const flatBackOrthoNext = flatFaceId + iS; // next i
+        const flatBackOrthoNext = flatFaceId + iS; // next i, POTENTIALLY MERGED
         if (flatBackOrthoNext % ijS === (flatFaceId % ijS) + iS) {
             const fbackon = faces[0][flatBackOrthoNext];
             if (
@@ -307,20 +449,26 @@ class FaceLinker {
                     ||
                     normalM && fbackon > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
-                        blocks[flatFaceId+1] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
+                        //blocks[flatFaceId+1] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
                 const stackBackOrthoNext = flatFaceId + iS;
                 if (CSFX.debugLinks) console.log(stackFaceId + ' j linked to next i ' + stackBackOrthoNext);
+                if (cc[stackBackOrthoNext] !== ec[stackBackOrthoNext] && cc[stackBackOrthoNext] !== cc[stackFaceId])
+                {
+                    if (CSFX.debugPostMerger) console.log('j, current k ' + cc[stackBackOrthoNext] + ', ' + cc[stackFaceId]);
+                    merger.push([cc[stackBackOrthoNext], cc[stackFaceId]]);
+                }
                 FaceLinker.affect(cc, stackBackOrthoNext, stackFaceId);
             }
         }
     }
 
-    static linkK(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks) {
+    static linkK(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck) {
 
         // Lazy termination (prevent id calculations).
         const val = faces[2][flatFaceId];
@@ -385,9 +533,10 @@ class FaceLinker {
                     ||
                     normalM && fbackoc > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
-                        blocks[flatFaceId+iS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
+                        //blocks[flatFaceId+iS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -410,9 +559,10 @@ class FaceLinker {
                     ||
                     normalM && frightoc > 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
-                        blocks[flatFaceId+1] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
+                        //blocks[flatFaceId+1] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -436,9 +586,10 @@ class FaceLinker {
                     ||
                     normalM && fbackop < 0 &&
                     (
-                        FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
-                        blocks[flatFaceId-iS] === 0 :
-                        false // TODO zeefy, refine on double edges
+                        FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
+                        //blocks[flatFaceId-iS] === 0 :
+                        //false // TODO zeefy, refine on double edges
                     )
                 )
             {
@@ -461,9 +612,10 @@ class FaceLinker {
                 ||
                 normalM && frightop < 0 &&
                 (
-                    FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
-                    blocks[flatFaceId-1] === 0 :
-                    false // TODO zeefy, refine on double edges
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId-1, -1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
+                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
+                    //blocks[flatFaceId-1] === 0 :
+                    //false // TODO zeefy, refine on double edges
                 )
             )
             {
