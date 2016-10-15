@@ -144,7 +144,7 @@ class ChunkIterator {
 
         let closestChunk = allChunks[id];
         if (!closestChunk) {
-            console.log('WAIT... Chunk I\'m on is not loaded?');
+            //console.log('WAIT... Chunk I\'m on is not loaded?');
         }
 
         return closestChunk;

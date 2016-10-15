@@ -37,7 +37,7 @@ class ChunkGenerator {
         if (generationMethod == 'flat') {
             //ChunkGenerator.fillChunk(c, 32, 1);
             ChunkGenerator.waveChunk(c, 40, 48, 1);
-            //ChunkGenerator.fillChunk(c, 43, 1);
+            //ChunkGenerator.fillChunk(c, 256, 0);
         } else {
 
         }

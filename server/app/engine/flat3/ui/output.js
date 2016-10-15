@@ -34,9 +34,17 @@ class UserOutput {
     }
 
     update() {
+        //let time = process.hrtime();
         this.updateChunks();
+        //let t1 = (process.hrtime(time)[1]/1000);
+        //if (t1 > 100) console.log(t1 + " µs to update chks.");
+
         this.updateEntities();
+
+        //let time2 = process.hrtime();
         this.updateMeta();
+        //let t2 = (process.hrtime(time2)[1]/1000);
+        //if (t2 > 1000) console.log(t2 + " µs to update etts.");
     }
 
     updateChunks()  {

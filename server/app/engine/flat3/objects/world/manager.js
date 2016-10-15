@@ -190,7 +190,7 @@ class WorldManager {
 
     isEmpty(positionArray) {
         // TODO collide with blocks.
-        let cs = this._chunks;
+        //let cs = this._chunks;
         return true;
     }
 

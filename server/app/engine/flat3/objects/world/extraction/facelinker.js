@@ -8,12 +8,6 @@ import CSFX from './chunkfacex';
 
 class FaceLinker {
 
-    static notBoundary(iS, ijS, capacity, index) {
-        //return index%iS !== 0 && index%ijS !== 0; && index < capacity && index >= 0;
-        // TODO access other chunks for limit cases
-        return true;
-    }
-
     static flatToCoords(flatId, iS, ijS) {
         const i = flatId % iS;
         const j = ((flatId-i) % ijS) / iS;
@@ -143,25 +137,16 @@ class FaceLinker {
         if (components[id1] === 0) console.log("Error @affect after link: (id1) " + id1 + " has 0 component id.");
         if (components[id2] === 0) console.log("Error @affect after link: (id2) " + id2 + " has 0 component id.");
 
-        //if (components[id1] === 38) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
-        //if (components[id2] === 38) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
-
-        //if (id1 === 2779) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
-        //if (id2 === 2779) console.log('id1 ' + id1 + ' ' + components[id1] + ' <- ' + components[id2] + ' (' + id2 + ')');
-
-        //if (id1 === 2743) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
-        //if (id2 === 2743) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
-        //if (id1 === 2807) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
-        //if (id2 === 2807) {console.log(id1 + ": " +components[id1] + " ; " + id2 + ": " + components[id2])}
-
         if (components[id1] < components[id2]) {
             components[id2] = components[id1];
         } else {
             components[id1] = components[id2];
         }
     }
-    
-    // TODO access neighbours
+
+    // TODO Z cases verification
+    // TODO manage topology
+    // TODO manage topology client-side
     /**
      * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, 4 z+, 5 z-
      */
@@ -223,13 +208,7 @@ class FaceLinker {
         const ftopo = faces[2][flatTopOrtho];
         if (
                 normalP && ftopo > 0 &&
-                (
-                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+ijS, 1, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+ijS) ?
-                    //blocks[flatFaceId+1+ijS] === 0 :
-                    //false // TODO zeefy, refine on double edges
-                    // neighbourBlocks[4][(flatFaceId+1)%ijS] === 0
-                )
+                FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+ijS, 1, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 ||
                 normalM && ftopo < 0
             )
@@ -248,12 +227,7 @@ class FaceLinker {
         const fbacko = faces[1][flatBackOrtho];
         if (
                 normalP && fbacko > 0 &&
-                (
-                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+iS, 1, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1+iS) ?
-                    //blocks[flatFaceId+1+iS] === 0 :
-                    //false // TODO zeefy, refine on double edges
-                )
+                FaceLinker.linkCriterion(flatFaceId, flatFaceId+1+iS, 1, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 ||
                 normalM && fbacko < 0
             )
@@ -277,12 +251,7 @@ class FaceLinker {
                     normalP && ftopon < 0
                     ||
                     normalM && ftopon > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
-                        //blocks[flatFaceId+ijS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
@@ -298,12 +267,7 @@ class FaceLinker {
                     normalP && fbackon < 0
                     ||
                     normalM && fbackon > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
-                        //blocks[flatFaceId+iS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackBackOrthoNext = capacity + flatBackOrthoNext;
@@ -325,12 +289,7 @@ class FaceLinker {
                     normalP && foij > 0
                     ||
                     normalM && foij < 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
-                        //blocks[flatFaceId-iS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackOrthoIJ = capacity + flatOrthoIJ;
@@ -398,12 +357,7 @@ class FaceLinker {
         const ftopo = faces[2][flatTopOrtho];
         if (
                 normalP && ftopo > 0 &&
-                (
-                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS+ijS, 0, 1, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS+ijS) ?
-                    //blocks[flatFaceId+iS+ijS] === 0 :
-                    //false // TODO zeefy, refine on double edges
-                )
+                FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS+ijS, 0, 1, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 ||
                 normalM && ftopo < 0
             )
@@ -427,12 +381,7 @@ class FaceLinker {
                     normalP && ftopon < 0
                     ||
                     normalM && ftopon > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+ijS) ?
-                        //blocks[flatFaceId+ijS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+ijS, 0, 0, 1, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackTopOrthoNext = 2*capacity + flatTopOrthoNext;
@@ -448,12 +397,7 @@ class FaceLinker {
                     normalP && fbackon < 0
                     ||
                     normalM && fbackon > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
-                        //blocks[flatFaceId+1] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackBackOrthoNext = flatFaceId + iS;
@@ -506,9 +450,9 @@ class FaceLinker {
 
         const back = flatFaceId + iS; // back k
         if (back % ijS === (flatFaceId % ijS) + iS) {
-            const fback = faces[2][back] > 0;
+            const fback = faces[2][back];
             if (
-                normalP && fback ||
+                normalP && fback > 0 ||
                 normalM && fback < 0
                 )
             {
@@ -532,12 +476,7 @@ class FaceLinker {
                     normalP && fbackoc < 0
                     ||
                     normalM && fbackoc > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+iS) ?
-                        //blocks[flatFaceId+iS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+iS, 0, 1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackBackOrtho = capacity + flatBackOrthoCurrent;
@@ -558,12 +497,7 @@ class FaceLinker {
                     normalP && frightoc < 0
                     ||
                     normalM && frightoc > 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId+1) ?
-                        //blocks[flatFaceId+1] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId+1, 1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackRightOrthoCurrent = flatRightOrthoCurrent;
@@ -585,12 +519,7 @@ class FaceLinker {
                     normalP && fbackop > 0
                     ||
                     normalM && fbackop < 0 &&
-                    (
-                        FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                        //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-iS) ?
-                        //blocks[flatFaceId-iS] === 0 :
-                        //false // TODO zeefy, refine on double edges
-                    )
+                    FaceLinker.linkCriterion(flatFaceId, flatFaceId-iS, 0, -1, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
                 )
             {
                 const stackBackOrthoPrevious = capacity + flatBackOrthoPrevious;
@@ -611,12 +540,7 @@ class FaceLinker {
                 normalP && frightop > 0
                 ||
                 normalM && frightop < 0 &&
-                (
-                    FaceLinker.linkCriterion(flatFaceId, flatFaceId-1, -1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
-                    //FaceLinker.notBoundary(iS, ijS, capacity, flatFaceId-1) ?
-                    //blocks[flatFaceId-1] === 0 :
-                    //false // TODO zeefy, refine on double edges
-                )
+                FaceLinker.linkCriterion(flatFaceId, flatFaceId-1, -1, 0, 0, ci, cj, ck, iS, ijS, capacity, blocks, neighbourBlocks)
             )
             {
                 const stackRightOrthoPrevious = flatRightOrthoPrevious;

@@ -11,8 +11,8 @@ class ChunkLoader {
 
     static debug = false;
 
-    static serverLoadingRadius = 20;
-    static clientLoadingRadius = 1;
+    static serverLoadingRadius = 10;
+    static clientLoadingRadius = 2;
     static clientUnloadingRadius = 20;
 
     /** MODEL
@@ -168,7 +168,7 @@ class ChunkLoader {
         }
     }
 
-    static preloadDirectNeighbourChunks(chunk, worldManager) {
+    static preloadFlatNeighbourChunks(chunk, worldManager) {
         let loadedChunks = worldManager.allChunks;
         let c = chunk;
         let ci = c.chunkI;
@@ -245,7 +245,6 @@ class ChunkLoader {
 
         }
 
-        // TODO check the following 3
         i = ci;
         j = cj;
         k = ck;

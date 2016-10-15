@@ -12,6 +12,8 @@ class UserInput {
         this._listeners = {};
     }
 
+    // TODO push in map for output simplification.
+
     update() {
         // Process incoming actions
         this._incoming.forEach((array, avatar) => {

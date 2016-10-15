@@ -221,12 +221,6 @@ class CSFX {
             ++currentBlock;
         }
 
-        //if (ci==0&&cj==-1) {
-        //    if (flatFaceId === 2743) {console.log(top);}
-        //    if (flatFaceId === 2743) {console.log(ftop);}
-        //    console.log(FaceLinker.flatToCoords(flatFaceId, iS, ijS) + " " + flatFaceId);
-        //}
-
         if (kayCurrent !== kaysLength) console.log("WARN. kays not recursed: " + kayCurrent + " out of " + kaysLength);
         if (jayCurrent !== jaysLength) console.log("WARN. jays not recursed: " + jayCurrent + " out of " + jaysLength);
         if (ayeCurrent !== ayesLength) console.log("WARN. ayes not recursed: " + ayeCurrent + " out of " + ayesLength);
@@ -382,10 +376,10 @@ class CSFX {
         // Temporary variables
         var surfaceFaces = {'0':[],'1':[],'2':[]};
         var faces = [new Int32Array(capacity), new Int32Array(capacity), new Int32Array(capacity)];
-        var encounteredFaces = new Int32Array(3 * capacity); // initializes all to 0
+        var encounteredFaces = new Uint16Array(3 * capacity); // initializes all to 0
 
         // Results
-        var connectedComponents = new Int32Array(3 * capacity); // ditto
+        var connectedComponents = new Uint16Array(3 * capacity); // ditto
         var fastCC = {};
         var fastCCIds = {};
 
@@ -407,10 +401,6 @@ class CSFX {
         //console.log(merger);
         //for (let i in connectedComponents) {
         //    if (connectedComponents[i] != 0) console.log('\t' + i + ' | ' + connectedComponents[i]);
-        //}
-
-        //if (chunk.chunkI==0&&chunk.chunkJ==-1) {
-        //    console.log(fastCC);
         //}
 
         // Debugging fastCC
@@ -436,8 +426,10 @@ class CSFX {
         chunk.fastComponentsIds = fastCCIds;
         chunk.connectedComponents = connectedComponents;
 
-        //console.log(fastCC);
-        //console.log(fastCCIds);
+        if (CSFX.debugFastCC) {
+            //console.log(fastCC);
+            //console.log(fastCCIds);
+        }
         if (CSFX.debug) console.log(Object.keys(fastCC).length + " connected components extracted...");
     }
 

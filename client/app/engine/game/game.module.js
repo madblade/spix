@@ -21,6 +21,7 @@ App.Engine.Game.prototype.run = function() {
 
 App.Engine.Game.prototype.updateChunks = function(data) {
     if (!this.isRunning) return;
+    //data = JSON.parse(data);
 
     this.app.graphicsEngine.updateGraphicChunks(data);
 };

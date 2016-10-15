@@ -4,44 +4,26 @@
 
 'use strict';
 
+import Newton from './newton/engine';
+
 class Physics {
 
     constructor(entityman, worldman) {
         this._entityman = entityman;
         this._worldman = worldman;
+
+        /* internal */
+        this._stamp = process.hrtime();
     }
 
     update() {
-        let entityManager = this._entityman;
-        let worldManager = this._worldman;
-        entityManager.forEach(function(entity) {
-           entity.move(entityManager, worldManager);
-        });
+        let t1 = this._stamp;
+        let Δt = process.hrtime(t1)[1];
 
-        // Get entities inputs
-        // Compute forces on global fields
-        // Compute forces on local fields
+        Newton.solve(this._entityman, this._worldman, Δt);
 
-        // Solve movements
-        // Compute entity collisions
-        // Compute terrain collisions
-        // Solve again
-
-        // Update positions
-
-        // Effects
-        // Reverse time...
-
-        // Future...
-        // Update orientations
-        // Manage fragmentation
+        this._stamp = process.hrtime();
     }
-
-    // Or:
-    // Sum fields.
-    // Add terrain as field
-    // Add player contribution
-    // retest terrain as limit
 
 }
 
