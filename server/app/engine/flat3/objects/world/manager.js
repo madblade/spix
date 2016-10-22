@@ -46,7 +46,8 @@ class WorldManager {
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     update() {
-        // Update world.
+        // Update world
+        // TODO defer updates when server loops in here.
     }
 
     get updatedChunks() {
@@ -162,20 +163,21 @@ class WorldManager {
         const j = coordinates[1];
         const k = coordinates[2];
 
-        const chunkX = x - i * this.chunkDimensionX;
-        const chunkY = y - j * this.chunkDimensionY;
-        const chunkK = z - k * this.chunkDimensionZ;
+        const chunkX = Math.floor(x) - i * this.chunkDimensionX;
+        const chunkY = Math.floor(y) - j * this.chunkDimensionY;
+        const chunkZ = Math.floor(z) - k * this.chunkDimensionZ;
 
         const chunkId = i+','+j+','+k;
         let chunk = this._chunks[chunkId];
-        if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId); return;}
-        return chunk.what(chunkX, chunkY, chunkK);
+        if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId +
+            ' from ' + x+','+y+','+z); return;}
+        return chunk.what(chunkX, chunkY, chunkZ);
     }
 
     getFreePosition() {
-        let z = 48;
-        while (this.whatBlock(0, 0, z) !== 0 && z < this._zSize) ++z;
-        return [0, 0, z];
+        let z = 150;
+        while (this.whatBlock(4, 4, z) !== 0 && z < this._zSize) ++z;
+        return [4.5, 4.5, z];
     }
 
     getChunk(iCoordinate, jCoordinate, kCoordinate) {
@@ -188,10 +190,8 @@ class WorldManager {
         return chunk === null || chunk === undefined;
     }
 
-    isEmpty(positionArray) {
-        // TODO collide with blocks.
-        //let cs = this._chunks;
-        return true;
+    isFree(p) {
+        return this.whatBlock(p[0], p[1], p[2]) === 0; // && this.whatBlock(p[0], p[1], p[2]+1) === 0;
     }
 
 }

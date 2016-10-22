@@ -7,26 +7,53 @@
 class Entity {
 
     constructor(id) {
-        this._position = null;
-        this._rotation = null;
-        this._directions = null; // for players
+        // Properties
         this._id = id;
+
+        // Inputs
+        this._directions = null;
+
+        // Physics
+        this._rotation = null;
+        this._position = null;
+        this._speed = null;
+        this._acceleration = null;
+        this._mass = 1;
+
+        this._impulseSpeedStamp = null;
     }
 
     get id() { return this._id; }
-    get position() { return this._position; }
-    get rotation() { return this._rotation; }
+
     get directions() { return this._directions; }
+
+    get rotation() { return this._rotation; }
+    get position() { return this._position; }
+    get speed() { return this._speed; }
+    get acceleration() { return this._acceleration; }
+    get mass() { return this._mass; }
+    get _impulseSpeed() { return this._impulseSpeedStamp; }
+
+    set rotation(nr) { this._rotation = nr; }
     set position(np) { this._position = np; }
+    set speed(ns) { this._speed = ns; }
+    set acceleration(na) { this._acceleration = na; }
+    set _impulseSpeed(nis) { this._impulseSpeedStamp = nis; }
 
     spawn(position) {
         this._position = position;
         this._rotation = [0, Math.PI/2];
         this._directions = [false, false, false, false, false, false];
+        this._speed = [0, 0, 0];
+        this._acceleration = [0, 0, 0];
+        this._impulseSpeedStamp = [0, 0, 0];
     }
 
     die() {
         this._position = null;
+        this._rotation = null;
+        this._speed = null;
+        this._directions = null;
     }
 
     stop() {

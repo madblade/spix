@@ -17,8 +17,7 @@ class Physics {
     }
 
     update() {
-        let t1 = this._stamp;
-        let Δt = process.hrtime(t1)[1];
+        let Δt = process.hrtime(this._stamp)[1];
 
         Newton.solve(this._entityman, this._worldman, Δt);
 

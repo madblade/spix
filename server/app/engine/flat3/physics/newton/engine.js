@@ -4,11 +4,18 @@
 
 'use strict';
 
+import Integrator from './integrator';
+
 class Newton {
 
+    static globalTimeDilatation = 20000000;
+
     static solve(EM, WM, Δt) {
+
+        const dt = Δt/Newton.globalTimeDilatation;
+
         EM.forEach(function(entity) {
-            Newton.linearSolve(entity, EM, WM, Δt);
+            Newton.linearSolve(entity, EM, WM, dt);
         });
 
         // Get entities inputs
@@ -30,70 +37,69 @@ class Newton {
         // Manage fragmentation
     }
 
-    // Or:
-    // Sum fields.
-    // Add terrain as field
-    // Add player contribution
-    // retest terrain as limit
-
-    static linearSolve(entity, EM, WM, Δt) {
+    static linearSolve(entity, EM, WM, dt) {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
 
-        const desiredSpeed = Newton.computeDesiredSpeed(theta, ds, Δt);
+        var impulseSpeed = [0, 0, 0];
+        var force = [0, 0, 0];
 
-        Newton.updatePosition(ds, pos, desiredSpeed, entity, EM, WM, false);
+        Newton.computeDesiredSpeed(impulseSpeed, theta, ds, dt);
+
+        Newton.sumGlobalFields(force, pos, entity);
+
+        // Newton.sumLocalFields(force, pos, EM);
+
+        Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
     }
 
-    static quadraticSolve(entity, EM, WM, Δt) {
+    static quadraticSolve(entity, EM, WM, dt) {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
 
-        const desiredSpeed = Newton.computeDesiredSpeed(theta, ds, Δt);
+        var impulseSpeed = [0, 0, 0];
+        var force = [0, 0, 0];
 
-        Newton.updatePosition(ds, pos, desiredSpeed, entity, EM, WM, true);
+        Newton.computeDesiredSpeed(impulseSpeed, theta, ds, dt);
+
+        Newton.sumGlobalFields(force, pos, entity);
+
+        Newton.sumLocalFields(force, pos, EM);
+
+        // TODO manage collisions
+
+        Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
     }
 
-    static updatePosition(ds, pos, desiredSpeed, entity, EM, WM, quadratic) {
-        if ((ds[0] !== ds[3]) || (ds[1] !== ds[2]) || ds[4] !== ds[5]) {
-            // Compute new position.
-            let newPosition = [pos[0], pos[1], pos[2]];
-            for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * desiredSpeed[i];
-
-            if (quadratic) {
-                // Collide world.
-                if (!WM.isEmpty(newPosition)) return;
-                // Collide entities.
-                // TODO 2 passes-solve
-            }
-
-            // Update.
-            entity.position = newPosition;
-
-            // Notify an entity was updated.
-            EM.entityUpdated(entity.id);
-        }
+    static add(result, toAdd) {
+        result[0]+=toAdd[0];
+        result[1]+=toAdd[1];
+        result[2]+=toAdd[2];
     }
 
-    static computeDesiredSpeed(theta, ds, Δt) {
+    static computeDesiredSpeed(speed, theta, ds, dt) {
         var desiredSpeed = [0, 0, (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0];
         const pi4 = Math.PI/4;
 
         if (ds[0] && !ds[3]) // forward quarter
         {
             let theta2 = theta;
-            if (ds[1] && !ds[2]) theta2 -= pi4; // right
-            else if (ds[2] && !ds[1]) theta2 += pi4; // left
+            if (ds[1] && !ds[2]) // right
+                theta2 -= pi4;
+            else if (ds[2] && !ds[1]) // left
+                theta2 += pi4;
             desiredSpeed[0] = -Math.sin(theta2);
             desiredSpeed[1] = Math.cos(theta2);
         }
         else if (ds[3] && !ds[0]) // backward quarter
         {
             let theta2 = theta;
-            if (ds[1] && !ds[2]) theta2 += pi4; // right
-            else if (ds[2] && !ds[1]) theta2 -= pi4; // left
+            if (ds[1] && !ds[2]) // right
+                theta2 += pi4;
+            else if (ds[2] && !ds[1]) // left
+                theta2 -= pi4;
             desiredSpeed[0] = Math.sin(theta2);
             desiredSpeed[1] = -Math.cos(theta2);
 
@@ -110,12 +116,20 @@ class Newton {
             desiredSpeed[1] = -Math.sin(theta);
         }
 
-        const dt = Δt/20000000;
-        desiredSpeed[0] *= dt;
-        desiredSpeed[1] *= dt;
-        desiredSpeed[2] *= dt;
+        Newton.add(speed, desiredSpeed);
+    }
 
-        return desiredSpeed;
+    static sumGlobalFields(force, pos, entity) {
+        // Don't return a vector,
+        // Return an analytic function (as a simplified sum of analytic functions)
+        // to be integrated against constraints.
+        var sum = [0, 0, -0.07*entity.mass];
+        Newton.add(force, sum);
+    }
+
+    static sumLocalFields(force, pos, EM) {
+        var sum = [0, 0, 0];
+        Newton.add(force, sum);
     }
 
 }
