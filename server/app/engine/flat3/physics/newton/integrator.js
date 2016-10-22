@@ -60,7 +60,7 @@ class Integrator {
         for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * speed[i] * dt;
 
         // Update properties, phase 2.
-        TerrainCollider.linearCollide(entity, WM, newPosition);
+        TerrainCollider.linearCollide(entity, WM, position, newPosition);
 
         // Notify an entity was updated.
         EM.entityUpdated(entity.id);
@@ -81,7 +81,7 @@ class Integrator {
         // Detect change in position.
         if (Integrator.areEqual(newPosition, position)) return;
 
-        if (TerrainCollider.linearCollide(entity, WM, newPosition)) {
+        if (TerrainCollider.linearCollide(entity, WM, position, newPosition)) {
             // entity.speed = determined by the collider
             // entity.acceleration = [0, 0, 0];
 

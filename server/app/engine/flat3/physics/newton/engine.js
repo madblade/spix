@@ -45,7 +45,7 @@ class Newton {
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
 
-        Newton.computeDesiredSpeed(impulseSpeed, theta, ds, dt);
+        Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
         Newton.sumGlobalFields(force, pos, entity);
 
@@ -62,7 +62,7 @@ class Newton {
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
 
-        Newton.computeDesiredSpeed(impulseSpeed, theta, ds, dt);
+        Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
         Newton.sumGlobalFields(force, pos, entity);
 
@@ -79,8 +79,8 @@ class Newton {
         result[2]+=toAdd[2];
     }
 
-    static computeDesiredSpeed(speed, theta, ds, dt) {
-        var desiredSpeed = [0, 0, (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0];
+    static computeDesiredSpeed(entity, speed, theta, ds, dt) {
+        var desiredSpeed = [0, 0, 0];
         const pi4 = Math.PI/4;
 
         if (ds[0] && !ds[3]) // forward quarter
@@ -116,14 +116,25 @@ class Newton {
             desiredSpeed[1] = -Math.sin(theta);
         }
 
+        desiredSpeed[0] *= 0.65;
+        desiredSpeed[1] *= 0.65;
+        if (entity.onGround() && (ds[4]&&!ds[5])) {
+            //desiredSpeed[2] = 2;
+            entity.acceleration[2] = 3.3/dt;
+            entity.jump();
+        } else {
+            // desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
+        }
+
         Newton.add(speed, desiredSpeed);
     }
 
     static sumGlobalFields(force, pos, entity) {
-        // Don't return a vector,
-        // Return an analytic function (as a simplified sum of analytic functions)
-        // to be integrated against constraints.
-        var sum = [0, 0, -0.07*entity.mass];
+        // Gravity
+        var sum = [0, 0, -0.11*entity.mass];
+
+        //sum[2] = 0; // ignore grav
+
         Newton.add(force, sum);
     }
 

@@ -19,6 +19,7 @@ class Entity {
         this._speed = null;
         this._acceleration = null;
         this._mass = 1;
+        this._adherence = false;
 
         this._impulseSpeedStamp = null;
     }
@@ -34,11 +35,20 @@ class Entity {
     get mass() { return this._mass; }
     get _impulseSpeed() { return this._impulseSpeedStamp; }
 
+    set adherence(na) { this._adherence = na; }
     set rotation(nr) { this._rotation = nr; }
     set position(np) { this._position = np; }
     set speed(ns) { this._speed = ns; }
     set acceleration(na) { this._acceleration = na; }
     set _impulseSpeed(nis) { this._impulseSpeedStamp = nis; }
+
+    onGround() {
+        return this._adherence;
+    }
+
+    jump() {
+        this._adherence = false;
+    }
 
     spawn(position) {
         this._position = position;
@@ -58,6 +68,7 @@ class Entity {
 
     stop() {
         this._directions = [false, false, false, false, false, false];
+        this._impulseSpeedStamp = [0, 0, 0];
         console.log("Entity stopping.");
     }
 

@@ -292,11 +292,11 @@ class UpdateAPI {
         }
 
         // Validate update.
-        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
+        /*if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
         {
             failure("an entity is present on the block.");
             return false;
-        }
+        }*/
 
         return true;
     }

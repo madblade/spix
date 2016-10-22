@@ -104,7 +104,6 @@ class WorldManager {
         this._updatedChunks = {};
     }
 
-    // TODO debug chunks with i lt -1
     getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
         const dx = this.chunkDimensionX;
         const dy = this.chunkDimensionY;
@@ -170,7 +169,11 @@ class WorldManager {
         const chunkId = i+','+j+','+k;
         let chunk = this._chunks[chunkId];
         if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId +
-            ' from ' + x+','+y+','+z); return;}
+            ' from ' + x+','+y+','+z);
+            // TODO load concerned chunk.
+            // TODO check minus
+            return;
+        }
         return chunk.what(chunkX, chunkY, chunkZ);
     }
 
