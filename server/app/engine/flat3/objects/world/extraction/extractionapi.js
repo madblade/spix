@@ -84,6 +84,7 @@ class ExtractAPI {
         if (!ExtractAPI.load) return;
 
         let av = player.avatar;
+        if (!av) return; // (Asynchronous) Sometimes the avatar is collected just before this static call.
         let p = av.position;
 
         // Get current chunk.

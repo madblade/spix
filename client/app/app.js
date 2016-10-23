@@ -20,7 +20,7 @@ App.Core = function() {
     this.gameEngine = new App.Engine.Game(this);
     this.graphicsEngine = new App.Engine.Graphics(this);
     this.uiEngine = new App.Engine.UI(this);
-    this.soundEngine = new App.Engine.Sound(this);
+    this.audioEngine = new App.Engine.Audio(this);
     this.chatEngine = new App.Engine.Chat(this);
 
     // Run application when connection is confirmed.
@@ -82,5 +82,5 @@ App.Core.prototype.startGame = function(gameType, gameId) {
 // Run game modules.
 App.Core.prototype.runGame = function() {
     this.uiEngine.run();
-    this.soundEngine.run();
+    this.audioEngine.run();
 };

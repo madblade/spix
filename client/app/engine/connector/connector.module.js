@@ -33,7 +33,7 @@ App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
         path: '/socket.io-client'
     });
 
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve) { // (I.E. is not a browser)
         // Validate when 'connected' message is received.
         var f = function() {
             // Un-register listener to avoid performance leak.

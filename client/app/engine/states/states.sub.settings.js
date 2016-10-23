@@ -50,7 +50,7 @@ App.Engine.StateManager.prototype.startSettings = function() {
         return content;
     };
     var soundHTML = function() {
-        var settings = scope.app.soundEngine.settings;
+        var settings = scope.app.audioEngine.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         content += '<tr id="return"><td>Return</td></tr>';
         for (var s in settings) {
