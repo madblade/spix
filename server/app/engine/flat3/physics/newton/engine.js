@@ -116,15 +116,20 @@ class Newton {
             desiredSpeed[1] = -Math.sin(theta);
         }
 
+        let godMode = false;
+        if (godMode) {
+            desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
+        } else {
+            if (entity.onGround() && (ds[4]&&!ds[5])) {
+                //desiredSpeed[2] = 2;
+                entity.acceleration[2] = 3.3/dt;
+                entity.jump();
+            }
+        }
+
         desiredSpeed[0] *= 0.65;
         desiredSpeed[1] *= 0.65;
-        if (entity.onGround() && (ds[4]&&!ds[5])) {
-            //desiredSpeed[2] = 2;
-            entity.acceleration[2] = 3.3/dt;
-            entity.jump();
-        } else {
-            // desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
-        }
+        desiredSpeed[2] *= 0.65;
 
         Newton.add(speed, desiredSpeed);
     }
@@ -133,7 +138,7 @@ class Newton {
         // Gravity
         var sum = [0, 0, -0.11*entity.mass];
 
-        //sum[2] = 0; // ignore grav
+        // sum[2] = 0; // ignore grav
 
         Newton.add(force, sum);
     }
