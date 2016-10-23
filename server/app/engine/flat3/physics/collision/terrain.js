@@ -86,14 +86,15 @@ class TerrainCollider {
                 if (ntx) {
                     const t = tMaxX-tDeltaX-tol;
                     const nx = dx > 0 ? i-tol : i+1+tol;
+                    const ddx = dx < 0 ? 1 : -1;
 
                     // Projections
                     let ny = y1+(y2-y1);
                     let nyt = y1+(y2-y1)*t;
                     let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                     if (dby < 2) {
-                        if (dy < 0 && (dby < 1 || WM.isFree([i, j-1, k]))) { nyt = ny; }
-                        if (dy > 0 && (dby < 1 || WM.isFree([i, j+1, k]))) { nyt = ny; }
+                        if (dy < 0 && (dby < 1 || WM.isFree([i+ddx, j-1, k]))) { nyt = ny; }
+                        if (dy > 0 && (dby < 1 || WM.isFree([i+ddx, j+1, k]))) { nyt = ny; }
                     }
 
                     let nz = z1+(z2-z1);
@@ -110,21 +111,22 @@ class TerrainCollider {
                 } else if (nty) {
                     const t = tMaxY-tDeltaY-tol;
                     const ny = dy > 0 ? j-tol : j+1+tol;
+                    const ddy = dy < 0 ? 1 : -1;
 
                     let nx = x1+(x2-x1);
                     let nxt = x1+(x2-x1)*t;
                     let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                     if (dbx < 2) {
-                        if (dx < 0 && (dbx < 1 || WM.isFree([i-1, j, k]))) { nxt = nx; }
-                        if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j, k]))) { nxt = nx; }
+                        if (dx < 0 && (dbx < 1 || WM.isFree([i-1, j+ddy, k]))) { nxt = nx; }
+                        if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j+ddy, k]))) { nxt = nx; }
                     }
 
                     let nz = z1+(z2-z1);
                     let nzt = z1+(z2-z1)*t;
                     let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
                     if (dbz < 2) {
-                        if (dz < 0 && (dbz < 1 || WM.isFree([i, j, k-1]))) { nzt = nz; }
-                        if (dz > 0 && (dbz < 1 || WM.isFree([i, j, k+1]))) { nzt = nz; }
+                        if (dz < 0 && (dbz < 1 || WM.isFree([i, j+ddy, k-1]))) { nzt = nz; }
+                        if (dz > 0 && (dbz < 1 || WM.isFree([i, j+ddy, k+1]))) { nzt = nz; }
                     }
 
                     // entity.speed = entity._impulseSpeed;
@@ -133,21 +135,22 @@ class TerrainCollider {
                 } else if (ntz) {
                     const t = tMaxZ-tDeltaZ-tol;
                     const nz = dz > 0 ? k-tol : k+1+tol;
+                    const ddz = dz < 0 ? 1 : -1;
 
                     let nx = x1+(x2-x1);
                     let nxt = x1+(x2-x1)*t;
                     let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                     if (dbx < 2) {
-                        if (dx < 0 && (dbx < 1 || WM.isFree([i, j-1, k]))) { nxt = nx; }
-                        if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j, k]))) { nxt = nx; }
+                        if (dx < 0 && (dbx < 1 || WM.isFree([i-1, j, k+ddz]))) { nxt = nx; }
+                        if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j, k+ddz]))) { nxt = nx; }
                     }
 
                     let ny = y1+(y2-y1);
                     let nyt = y1+(y2-y1)*t;
                     let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                     if (dby < 2) {
-                        if (dy < 0 && (dby < 1 || WM.isFree([i, j-1, k]))) { nyt = ny; }
-                        if (dy > 0 && (dby < 1 || WM.isFree([i, j+1, k]))) { nyt = ny; }
+                        if (dy < 0 && (dby < 1 || WM.isFree([i, j-1, k+ddz]))) { nyt = ny; }
+                        if (dy > 0 && (dby < 1 || WM.isFree([i, j+1, k+ddz]))) { nyt = ny; }
                     }
 
                     entity.adherence = true;
