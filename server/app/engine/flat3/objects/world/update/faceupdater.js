@@ -233,6 +233,8 @@ class FaceUpdater {
             const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
             if (fastComponents[componentId] === undefined) {
                 // TODO check in divide...
+                // TODO check borders with this approach
+                // TODO provide non-topo approach
                 // Somehow getting here means that the added block isn't topologically linked to any other
                 // component. So we have to create a new component id.
                 console.log('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');

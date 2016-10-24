@@ -123,11 +123,8 @@ class WorldManager {
         const Dz = deltaZ && UpdateAPI.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
 
         let ijk = this.getChunkCoordinates(x, y, z);
-        const i = ijk[0];
-        const j = ijk[1];
-        const k = ijk[2];
 
-        return [i, j, k, Dx, Dy, Dz];
+        return [ijk[0], ijk[1], ijk[2], Dx, Dy, Dz];
     }
 
     getChunkCoordinates(x, y, z) {
@@ -135,18 +132,13 @@ class WorldManager {
         const dy = this.chunkDimensionY;
         const dz = this.chunkDimensionZ;
 
-        let i = x >= 0 ? x - (x % dx) : x - (dx - ((-x)%dx));
-        i /= dx;
-
-        let j = y >= 0 ? y - (y % dy) : y - (dy - ((-y)%dy));
-        j /= dy;
-
-        let k = z >= 0 ? z - (z % dz) : z - (dz - ((-z)%dz));
-        k /= dz;
+        let f = Math.floor;
+        let i = f(x/dx);
+        let j = f(y/dy);
+        let k = f(z/dz);
 
         return [i,j,k];
     }
-
 
     addBlock(originEntity, x, y, z, blockId) {
         UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this._entityman);
@@ -157,14 +149,18 @@ class WorldManager {
     }
 
     whatBlock(x, y, z) {
+        const dx = this.chunkDimensionX;
+        const dy = this.chunkDimensionY;
+        const dz = this.chunkDimensionZ;
+
         let coordinates = this.getChunkCoordinates(x, y, z);
         const i = coordinates[0];
         const j = coordinates[1];
         const k = coordinates[2];
 
-        const chunkX = Math.floor(x) - i * this.chunkDimensionX;
-        const chunkY = Math.floor(y) - j * this.chunkDimensionY;
-        const chunkZ = Math.floor(z) - k * this.chunkDimensionZ;
+        const chunkX = x - i * dx;
+        const chunkY = y - j * dy;
+        const chunkZ = z - k * dz;
 
         const chunkId = i+','+j+','+k;
         let chunk = this._chunks[chunkId];

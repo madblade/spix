@@ -24,7 +24,9 @@ class ChunkGenerator {
         //ChunkGenerator.testChunk(c);
         //ChunkGenerator.testMerge(c);
         //ChunkGenerator.fillChunk(c, 40, 1);
+
         ChunkGenerator.waveChunk(c, 40, 48, 1);
+        ChunkGenerator.fillChunk(c, 48, 1);
 
         return c;
     }
@@ -36,7 +38,10 @@ class ChunkGenerator {
         let generationMethod = worldManager.generationMethod;
         if (generationMethod == 'flat') {
             //ChunkGenerator.fillChunk(c, 32, 1);
+
             ChunkGenerator.waveChunk(c, 40, 48, 1);
+            ChunkGenerator.fillChunk(c, 48, 1);
+
             //ChunkGenerator.fillChunk(c, 256, 0);
         } else {
 
