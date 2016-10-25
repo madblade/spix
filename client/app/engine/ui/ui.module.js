@@ -25,7 +25,7 @@ App.Engine.UI = function(app) {
 };
 
 App.Engine.UI.prototype.run = function() {
-    // TODO detect device (PC, tablet, smartphone, VR)
+    // TODO detect device (PC, tablet, smartphone, VR <- lol)
     this.setupKeyboard();
     this.setupMouse();
     this.setupTouch();
