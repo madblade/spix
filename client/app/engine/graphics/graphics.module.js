@@ -8,7 +8,9 @@ App.Engine.Graphics = function(app) {
     this.app = app;
 
     // User customizable settings.
-    this.settings = {};
+    this.settings = {
+        debug: false
+    };
 
     // Properties.
     this.windowHalfX = window.innerWidth / 2;

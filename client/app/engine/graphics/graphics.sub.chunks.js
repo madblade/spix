@@ -53,8 +53,18 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     var positions = new Float32Array(sunCapacity * 3 * 3);
     var normals = new Float32Array(sunCapacity * 3 * 3);
     var colors = new Float32Array(sunCapacity * 3 * 3);
+    var uvs = new Float32Array(sunCapacity * 3 * 2);
+    /*var quad_uvs = [
+            0.0, 0.0,
+            0.1, 0.0,
+            0.1, 0.1,
+            0.0, 0.1 ];
+    for (var id = 0; id<sunCapacity; ++id) {
+        uvs[id] = quad_uvs[id%8];
+    }*/
 
-    console.log('On chunk ' + chunkId + ', the initial geometry will be ' + sunCapacity * 3 * 3 + '-capable.');
+    if (this.settings.debug)
+        console.log('On chunk ' + chunkId + ', the initial geometry will be ' + sunCapacity * 3 * 3 + '-capable.');
 
     var pA = new THREE.Vector3();
     var pB = new THREE.Vector3();
@@ -73,7 +83,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
         var normal = currentNatures[f] > 0;
 
         this.addFace(faceId, i, iS, ijS, ijkS,
-            positions, normals, colors, Math.abs(currentNatures[f]),
+            positions, normals, colors, uvs, Math.abs(currentNatures[f]),
             iChunkOffset, jChunkOffset, kChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);
@@ -84,12 +94,15 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     c.geometries[0].addAttribute('position', new THREE.BufferAttribute(positions, 3));
     c.geometries[0].addAttribute('normal', new THREE.BufferAttribute(normals, 3));
     c.geometries[0].addAttribute('color', new THREE.BufferAttribute(colors, 3));
+    c.geometries[0].addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
     c.geometries[0].computeBoundingSphere();
 
     // Make material and mesh.
     c.materials = [new THREE.MeshPhongMaterial({
         color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-        side: THREE.BackSide, vertexColors: THREE.VertexColors
+        side: THREE.BackSide,
+        map: this.texture
+        // vertexColors: THREE.VertexColors
     })];
     c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 
@@ -108,7 +121,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
     var capacities = c.capacities;
     var sizes = c.sizes;
 
-    var vertices, colors, normals;
+    var vertices, colors, normals, uvs;
     var ijkS = this.chunkCapacity;
     var ijS = this.chunkSizeX * this.chunkSizeY;
     var iS = this.chunkSizeX;
@@ -140,6 +153,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         vertices = geometries[meshId].attributes.position.array;
         colors = geometries[meshId].attributes.color.array;
         normals = geometries[meshId].attributes.normal.array;
+        uvs = geometries[meshId].attributes.uv.array;
         var lastPosition = sizes[meshId] - 1;
         var isLast = lastPosition === position;
 
@@ -151,6 +165,9 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
                 // Delete current
                 vertices[p] = normals[p] = colors[p] = 0;
             }
+            for (i = 0; i<12; ++i) {
+                uvs[12 * position + i] = 0;
+            }
         } else {
             for (i = 0; i<18; ++i) {
                 p = 18 * position + i;
@@ -161,6 +178,12 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
                 colors[p] = colors[lp];
                 // Delete last
                 vertices[lp] = normals[lp] = colors[lp] = 0;
+            }
+            for (i = 0; i<12; ++i) {
+                p = 12 * position + i;
+                var lp = 12 * lastPosition + i;
+                uvs[p] = uvs[lp];
+                uvs[lp] = 0;
             }
         }
 
@@ -195,6 +218,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             geometries[meshId].attributes.position.needsUpdate = true;
             geometries[meshId].attributes.color.needsUpdate = true;
             geometries[meshId].attributes.normal.needsUpdate = true;
+            geometries[meshId].attributes.uv.needsUpdate = true;
             geometries[meshId].computeBoundingSphere();
         }
     }
@@ -226,7 +250,9 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             geometries[meshId] = new THREE.BufferGeometry();
             materials[meshId] = new THREE.MeshPhongMaterial({
                 color: 0xb8860b, specular: 0xffffff, shininess: 250,
-                side: THREE.BackSide // , vertexColors: THREE.VertexColors
+                side: THREE.BackSide,
+                // vertexColors: THREE.VertexColors
+                map: this.texture
             });
             sizes[meshId] = 1;
             whichFaceIs[meshId] = {};
@@ -238,6 +264,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             vertices = new Float32Array(sunCapacity * 3 * 3);
             normals = new Float32Array(sunCapacity * 3 * 3);
             colors = new Float32Array(sunCapacity * 3 * 3);
+            uvs = new Float32Array(sunCapacity * 3 * 2);
 
             console.log("New capacity will be " + sunCapacity * 3 * 3 + ".");
         } else {
@@ -245,6 +272,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             vertices = geometries[meshId].attributes.position.array;
             colors = geometries[meshId].attributes.color.array;
             normals = geometries[meshId].attributes.normal.array;
+            uvs = geometries[meshId].attributes.uv.array;
         }
 
         // Add face.
@@ -263,7 +291,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         whichFaceIs[meshId][pos] = aid;
 
         this.addFace(faceId, pos * 18, iS, ijS, ijkS,
-            vertices, normals, colors, Math.abs(nature),
+            vertices, normals, colors, uvs, Math.abs(nature),
             iChunkOffset, jChunkOffset, kChunkOffset,
             pA, pB, pC, cb, ab,
             normal, color, n);

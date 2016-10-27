@@ -23,6 +23,9 @@ App.Engine.Graphics.prototype.initObjects = function() {
     this.light = this.getLight('hemisphere');
     this.light.position.set(0.5, 1, 0.75);
 
+    // Textures
+    this.texture = this.loadTexture();
+
     // Player
     this.avatar = this.getMesh(
         this.getGeometry('box'),

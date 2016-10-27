@@ -8,8 +8,12 @@ App.Engine.Graphics.prototype.setColor = function(iChunkOffset, jChunkOffset, kC
     color.setRGB((iChunkOffset/this.chunkSizeX)%2/2+0.5, (jChunkOffset/this.chunkSizeY)%2/2+0.5, 0.6);
 };
 
+App.Engine.Graphics.prototype.setUV = function(nature, vec2) {
+
+};
+
 App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
-                                                 positions, normals, colors, nature,
+                                                 positions, normals, colors, uvs, nature,
                                                  iChunkOffset, jChunkOffset, kChunkOffset,
                                                  pA, pB, pC, cb, ab,
                                                  normal, color, n) {
@@ -19,7 +23,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
     var ii, jj, kk;
     var nx, ny, nz;
 
-    if (faceId < ijkS) {
+    if (faceId < ijkS)
+    {
         ii = faceId % iS;
         jj = ((faceId - ii) % ijS) / iS;
         kk = Math.floor(faceId / ijS);
@@ -71,7 +76,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-    } else if (faceId < 2 * ijkS) {
+    }
+    else if (faceId < 2 * ijkS)
+    {
         faceId -= ijkS;
         ii = faceId % iS;
         jj = ((faceId - ii) % ijS) / iS;
@@ -123,7 +130,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-    } else {
+    }
+    else
+    {
         faceId -= (2 * ijkS);
         ii = faceId % iS;
         jj = ((faceId - ii) % ijS) / iS;
@@ -148,12 +157,16 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         cb.cross(ab);
         cb.normalize();
         nx = cb.x; ny = cb.y; nz = cb.z;
-        for (j = 0; j<3; ++j) {normals[i+3*j]   = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
+        for (j = 0; j<3; ++j) {normals[i+3*j] = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
 
         // Colors H1
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
+
+        uvs[i] = 0.; uvs[i+1] = 0.;
+        uvs[i+2] = 0.; uvs[i+3] = 0.0625;
+        uvs[i+4] = 0.0625; uvs[i+5] = 0.0625;
 
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -175,6 +188,11 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
+
+        uvs[i+6] = 0.; uvs[i+7] = 0.;
+        uvs[i+8] = 0.0625; uvs[i+9] = 0.0625;
+        uvs[i+10] = 0.0625; uvs[i+11] = 0.;
+
     }
 
     for (j = 0; j<18; ++j) {

@@ -96,3 +96,16 @@ App.Engine.Graphics.prototype.getLight = function(whatLight) {
 
     return light;
 };
+
+App.Engine.Graphics.prototype.loadTexture = function(whatTexture) {
+    var texture = THREE.ImageUtils.loadTexture("app/assets/textures/texture.png");
+
+    texture.anisortopy = this.renderer.getMaxAnisotropy();
+
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.LinearMipMapLinearFilter;
+    //texture.wrapS = THREE.RepeatWrapping;
+    //texture.wrapT = THREE.RepeatWrapping;
+
+    return texture;
+};
