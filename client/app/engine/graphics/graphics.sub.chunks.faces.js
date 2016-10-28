@@ -8,10 +8,6 @@ App.Engine.Graphics.prototype.setColor = function(iChunkOffset, jChunkOffset, kC
     color.setRGB((iChunkOffset/this.chunkSizeX)%2/2+0.5, (jChunkOffset/this.chunkSizeY)%2/2+0.5, 0.6);
 };
 
-App.Engine.Graphics.prototype.setUV = function(nature, vec2) {
-
-};
-
 App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
                                                  positions, normals, colors, uvs, nature,
                                                  iChunkOffset, jChunkOffset, kChunkOffset,
@@ -22,6 +18,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
     var ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz;
     var ii, jj, kk;
     var nx, ny, nz;
+    var uvi = 2*i/3;
 
     if (faceId < ijkS)
     {
@@ -55,6 +52,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
+        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
+        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
+        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
+
         // Positions H1
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
         positions[i+12] = normal ? cx : dx; positions[i+13] = normal ? cy : dy; positions[i+14] = normal ? cz : dz;
@@ -75,6 +76,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
+
+        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
+        uvs[uvi+8] = 0.0625; uvs[uvi+9] = normal ? 0.0625 : 0.;
+        uvs[uvi+10] = 0.0625; uvs[uvi+11] = normal ? 0. : 0.0625;
 
     }
     else if (faceId < 2 * ijkS)
@@ -109,6 +114,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
+        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
+        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
+        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
+
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
         positions[i+12] = normal ? cx : dx; positions[i+13] = normal ? cy : dy; positions[i+14] = normal ? cz : dz;
@@ -129,6 +138,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
+
+        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
+        uvs[uvi+8] = 0.0625; uvs[uvi+9] = normal ? 0.0625 : 0.;
+        uvs[uvi+10] = 0.0625; uvs[uvi+11] = normal ? 0. : 0.0625;
 
     }
     else
@@ -164,9 +177,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
-        uvs[i] = 0.; uvs[i+1] = 0.;
-        uvs[i+2] = 0.; uvs[i+3] = 0.0625;
-        uvs[i+4] = 0.0625; uvs[i+5] = 0.0625;
+        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
+        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
+        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
 
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -189,9 +202,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-        uvs[i+6] = 0.; uvs[i+7] = 0.;
-        uvs[i+8] = 0.0625; uvs[i+9] = 0.0625;
-        uvs[i+10] = 0.0625; uvs[i+11] = 0.;
+        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
+        uvs[uvi+8] = 0.0625; uvs[uvi+9] = 0.0625;
+        uvs[uvi+10] = 0.0625; uvs[uvi+11] = 0.;
 
     }
 

@@ -300,6 +300,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
             geometries[meshId].addAttribute('position', new THREE.BufferAttribute(vertices, 3));
             geometries[meshId].addAttribute('normal', new THREE.BufferAttribute(normals, 3));
             geometries[meshId].addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometries[meshId].addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
             meshes[meshId] = new THREE.Mesh(geometries[meshId], materials[meshId]);
             this.scene.add(meshes[meshId]);
@@ -309,6 +310,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
         geometries[meshId].attributes.position.needsUpdate = true;
         geometries[meshId].attributes.color.needsUpdate = true;
         geometries[meshId].attributes.normal.needsUpdate = true;
+        geometries[meshId].attributes.uv.needsUpdate = true;
         geometries[meshId].computeBoundingSphere();
     }
 
