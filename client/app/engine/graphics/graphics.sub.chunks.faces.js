@@ -8,6 +8,10 @@ App.Engine.Graphics.prototype.setColor = function(iChunkOffset, jChunkOffset, kC
     color.setRGB((iChunkOffset/this.chunkSizeX)%2/2+0.5, (jChunkOffset/this.chunkSizeY)%2/2+0.5, 0.6);
 };
 
+App.Engine.Graphics.prototype.getTexture = function(nature) {
+    return this.textureCoordinates[nature];
+};
+
 App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
                                                  positions, normals, colors, uvs, nature,
                                                  iChunkOffset, jChunkOffset, kChunkOffset,
@@ -18,7 +22,12 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
     var ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz;
     var ii, jj, kk;
     var nx, ny, nz;
+
+    // UVS
     var uvi = 2*i/3;
+    var ɛ=.00001;
+    var txCoords = this.getTexture(nature);
+    var offsetU, offsetV;
 
     if (faceId < ijkS)
     {
@@ -52,9 +61,12 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
-        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
-        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
-        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
+        // UVs H1
+        offsetU = (normal ? txCoords[0][0]:txCoords[3][0])/16;
+        offsetV = (normal ? txCoords[0][1]:txCoords[3][1])/16;
+        uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
+        uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
+        uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
 
         // Positions H1
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -77,9 +89,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
-        uvs[uvi+8] = 0.0625; uvs[uvi+9] = normal ? 0.0625 : 0.;
-        uvs[uvi+10] = 0.0625; uvs[uvi+11] = normal ? 0. : 0.0625;
+        // UVs H2
+        uvs[uvi+6]  = offsetU + 0.+ɛ;     uvs[uvi+7]  = offsetV + 0.+ɛ;
+        uvs[uvi+8]  = offsetU + 0.0625-ɛ; uvs[uvi+9]  = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
+        uvs[uvi+10] = offsetU + 0.0625-ɛ; uvs[uvi+11] = offsetV + (normal ? 0.+ɛ : 0.0625-ɛ);
 
     }
     else if (faceId < 2 * ijkS)
@@ -114,9 +127,12 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
-        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
-        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
-        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
+        // UVs H1
+        offsetU = (normal ? txCoords[1][0]:txCoords[4][0])/16;
+        offsetV = (normal ? txCoords[1][1]:txCoords[4][1])/16;
+        uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
+        uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
+        uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
 
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -139,9 +155,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
-        uvs[uvi+8] = 0.0625; uvs[uvi+9] = normal ? 0.0625 : 0.;
-        uvs[uvi+10] = 0.0625; uvs[uvi+11] = normal ? 0. : 0.0625;
+        // UVs H2
+        uvs[uvi+6]  = offsetU + 0.+ɛ;     uvs[uvi+7]  = offsetV + 0.+ɛ;
+        uvs[uvi+8]  = offsetU + 0.0625-ɛ; uvs[uvi+9]  = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
+        uvs[uvi+10] = offsetU + 0.0625-ɛ; uvs[uvi+11] = offsetV + (normal ? 0. : 0.0625-ɛ);
 
     }
     else
@@ -177,9 +194,12 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
-        uvs[uvi] = 0.; uvs[uvi+1] = 0.;
-        uvs[uvi+2] = normal ? 0. : 0.0625; uvs[uvi+3] = 0.0625;
-        uvs[uvi+4] = normal ? 0.0625 : 0.; uvs[uvi+5] = 0.0625;
+        // UVs H1
+        offsetU = (normal ? txCoords[2][0]:txCoords[5][0])/16;
+        offsetV = (normal ? txCoords[2][1]:txCoords[5][1])/16;
+        uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
+        uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
+        uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
 
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -202,9 +222,10 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
-        uvs[uvi+6] = 0.; uvs[uvi+7] = 0.;
-        uvs[uvi+8] = 0.0625; uvs[uvi+9] = 0.0625;
-        uvs[uvi+10] = 0.0625; uvs[uvi+11] = 0.;
+        // UVs H2
+        uvs[uvi+6]  = offsetU + 0.+ɛ;     uvs[uvi+7]  = offsetV + 0.+ɛ;
+        uvs[uvi+8]  = offsetU + 0.0625-ɛ; uvs[uvi+9]  = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
+        uvs[uvi+10] = offsetU + 0.0625-ɛ; uvs[uvi+11] = offsetV + (normal ? 0.+ɛ : 0.0625-ɛ);
 
     }
 

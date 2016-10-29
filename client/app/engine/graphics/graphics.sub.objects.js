@@ -24,7 +24,8 @@ App.Engine.Graphics.prototype.initObjects = function() {
     this.light.position.set(0.5, 1, 0.75);
 
     // Textures
-    this.texture = this.loadTexture();
+    this.texture = this.loadTexture('texture.png');
+    this.textureCoordinates = this.getTextureCoordinates();
 
     // Player
     this.avatar = this.getMesh(
