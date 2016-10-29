@@ -130,9 +130,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         // UVs H1
         offsetU = (normal ? txCoords[1][0]:txCoords[4][0])/16;
         offsetV = (normal ? txCoords[1][1]:txCoords[4][1])/16;
-        uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
-        uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
-        uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
+        uvs[uvi]    = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+1] = offsetV + (0.+ɛ);
+        uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + (normal ? 0.+ɛ : 0.0625-ɛ);
+        uvs[uvi+4]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+5] = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
 
         // Positions H2
         positions[i+9]  = ax; positions[i+10] = ay; positions[i+11] = az;
@@ -156,9 +156,9 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         for (j = 0; j<3; ++j) {colors[i+9+j*3] = color.r; colors[i+9+j*3+1] = color.g; colors[i+9+j*3+2] = color.b;}
 
         // UVs H2
-        uvs[uvi+6]  = offsetU + 0.+ɛ;     uvs[uvi+7]  = offsetV + 0.+ɛ;
-        uvs[uvi+8]  = offsetU + 0.0625-ɛ; uvs[uvi+9]  = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
-        uvs[uvi+10] = offsetU + 0.0625-ɛ; uvs[uvi+11] = offsetV + (normal ? 0. : 0.0625-ɛ);
+        uvs[uvi+6]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+7]  = offsetV + 0.+ɛ;
+        uvs[uvi+8]  = offsetU + 0.+ɛ;                       uvs[uvi+9]  = offsetV + 0.0625-ɛ;
+        uvs[uvi+10] = offsetU + 0.0625-ɛ;                   uvs[uvi+11] = offsetV + 0.0625-ɛ;
 
     }
     else
