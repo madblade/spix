@@ -34,8 +34,8 @@ class Flat3Factory {
         return new EntityManager(worldManager);
     }
 
-    static createWorldManager() {
-        return new WorldManager();
+    static createWorldManager(gameId) {
+        return new WorldManager(gameId);
     }
 
     static createChat(game) {

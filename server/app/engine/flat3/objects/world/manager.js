@@ -10,7 +10,7 @@ import ExtractionAPI from './extraction/extractionapi'
 
 class WorldManager {
 
-    constructor() {
+    constructor(gameId) {
         // Objects.
         /**
          * Chunk id (i+','+j) -> chunk
@@ -30,8 +30,12 @@ class WorldManager {
 
         // Entity bus
         this._entityman = null;
+
+        // Handle
+        this._handle = gameId;
     }
 
+    get handle() { return this._handle; }
     get allChunks() { return this._chunks; }
 
     get chunkDimensionX() { return this._xSize; }
