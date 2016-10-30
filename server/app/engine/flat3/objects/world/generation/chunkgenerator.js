@@ -11,6 +11,7 @@ import GenTest from './generator.test';
 import GenAnalytic from './generator.analytic';
 import GenSimple from './generator.simple';
 import GenPerlin from './generator.perlin';
+import GenSimplePerlin from './generator.simple-perlin';
 
 class ChunkGenerator {
 
@@ -30,7 +31,8 @@ class ChunkGenerator {
         //GenSimple.fillChunk(c, 40, 1);
         //GenAnalytic.waveChunk(c, 40, 48, 1);
         try {
-            GenPerlin.perlinGeneration(c);
+            // GenPerlin.perlinGeneration(c);
+            GenSimplePerlin.simplePerlinGeneration(c);
         } catch (e) {
             console.log(e.stack);
         }
@@ -45,7 +47,8 @@ class ChunkGenerator {
         //let generationMethod = worldManager.generationMethod;
         //if (generationMethod == 'flat') {
             //GenSimple.fillChunk(c, 32, 1);
-            GenAnalytic.waveChunk(c, 10, 15, 1);
+            //GenAnalytic.waveChunk(c, 10, 15, 1);
+            GenSimplePerlin.simplePerlinGeneration(c);
             //GenSimple.fillChunk(c, 256, 0);
         //} else {
         //}
