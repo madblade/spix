@@ -6,34 +6,36 @@
 
 class UserOutput {
 
+    static debug = false;
+
     constructor(game) {
         this._game = game;
     }
 
     init(player) {
-        var p = player;
-        console.log('Init a new player on game ' + this._game.gameId + '.');
-        let extractedChunks = this.extractChunksForNewPlayer(p);
+        let game = this._game;
+        let p = player;
+        let a = p.avatar;
 
         // Load chunks.
-        p.send('chk', extractedChunks);
+        let chunks = game.worldman.extractChunksForNewPlayer(p);
+        p.send('chk', chunks);
 
         // Load entities.
-        p.send('ent', JSON.stringify(
-            [
-                p.avatar.position,
-                p.avatar.rotation,
-                this.extractConcernedEntities(p)
-            ]));
+        let entities = game.entityman.extractEntitiesInRange(p);
+        p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
 
         // Consider player has loaded chunks.
-        for (let cid in extractedChunks) {
-            let cs = this._game.worldman.allChunks;
-            if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
+        for (let cid in chunks) {
+            let cs = game.worldman.allChunks;
+            if (cs.hasOwnProperty(cid)) a.setChunkAsLoaded(cs[cid]);
         }
+
+        if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
     }
 
     update() {
+        // Idea: defer updates if perf. pb
         //let time = process.hrtime();
         this.updateChunks();
         //let t1 = (process.hrtime(time)[1]/1000);
@@ -48,59 +50,58 @@ class UserOutput {
     }
 
     updateChunks()  {
-        var updatedChunks = this._game.worldman.updatedChunks;
+        let game = this._game;
+        var updatedChunks = game.worldman.updatedChunks;
         if (Object.keys(updatedChunks).length < 1) return;
 
-        this._game.playerman.forEach(p => {
-            // If an update occurred on an existing, loaded chunk
+        game.playerman.forEach(p => {
             if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
 
-            p.send('chk',
-                this.extractUpdatedChunksForPlayer(p)
-            );
+            // If an update occurred on an existing, loaded chunk
+            let chunks = game.worldman.extractUpdatedChunksForPlayer(p);
+            p.send('chk', chunks);
         });
 
         // Tell object manager we have done update.
-        this._game.worldman.chunkUpdatesTransmitted();
+        game.worldman.chunkUpdatesTransmitted();
     }
 
     updateEntities() {
-        var updatedEntities = this._game.entityman.updatedEntities;
+        let game = this._game;
+        var updatedEntities = game.entityman.updatedEntities;
         if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
-        this._game.playerman.forEach(p => {
-            // If an entity in range of player p has just updated
+        game.playerman.forEach(p => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
 
-            p.send('ent', JSON.stringify(
-                [
-                    p.avatar.position,
-                    p.avatar.rotation,
-                    this.extractConcernedEntities(p)
-                ]));
+            // If an entity in range of player p has just updated
+            let entities = game.entityman.extractEntitiesInRange(p);
+
+            p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
 
             // TODO check 'player has updated position'
-            let extractedChunks = this.extractNewChunksInRange(p);
-            if (!extractedChunks || Object.keys(extractedChunks).length === 0) return;
+            let chunks = game.worldman.extractNewChunksInRangeForPlayer(p);
 
-            p.send('chk', extractedChunks);
+            if (!chunks || Object.keys(chunks).length === 0) return;
+
+            p.send('chk', chunks);
 
             // Consider player has loaded chunks.
-            for (let cid in extractedChunks) {
-                let cs = this._game.worldman.allChunks;
+            for (let cid in chunks) {
+                let cs = game.worldman.allChunks;
                 if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
             }
             // TODO remove old chunks
         });
 
         // Tell object manager we have done update.
-        this._game.entityman.updateEntitiesTransmitted();
+        game.entityman.updateEntitiesTransmitted();
     }
 
-    // TODO manage true broadcast events.
     updateMeta() {
-        this._game.chat.updateOutput();
+        let game = this._game;
+        game.chat.updateOutput();
     }
 
     static playerConcernedByUpdatedChunks(player, chunks) {
@@ -111,22 +112,6 @@ class UserOutput {
     static playerConcernedByEntities(player, entities) {
         // TODO function of player position.
         return Object.keys(entities).length > 0;
-    }
-
-    extractConcernedEntities(player) {
-        return (this._game.entityman.extractEntitiesInRange(player));
-    }
-
-    extractUpdatedChunksForPlayer(player) {
-        return (this._game.worldman.extractUpdatedChunksForPlayer(player));
-    }
-
-    extractChunksForNewPlayer(player) {
-        return (this._game.worldman.extractChunksForNewPlayer(player));
-    }
-
-    extractNewChunksInRange(player) {
-        return (this._game.worldman.extractNewChunksInRangeForPlayer(player));
     }
 
 }

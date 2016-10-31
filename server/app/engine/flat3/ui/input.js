@@ -12,8 +12,6 @@ class UserInput {
         this._listeners = {};
     }
 
-    // TODO push in map for output simplification.
-
     update() {
         // Process incoming actions
         this._incoming.forEach((array, avatar) => {
@@ -61,41 +59,48 @@ class UserInput {
 
     rotate(meta, avatar) {
         if (!(meta instanceof Array)) return;
-        var p = meta[0], y = meta[1];
+        let p = meta[0], y = meta[1];
+        let game = this._game;
+
         if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
             avatar.rotate(p, y);
-            this._game.entityman.entityUpdated(avatar.id);
+            game.entityman.entityUpdated(avatar.id);
         }
     }
 
     block(meta, avatar) {
         if (!(meta instanceof Array)) return;
-        var action = meta[0];
+        let action = meta[0];
+        let game = this._game;
+
         // Manage block addition.
         if (action === "add") {
-            this._game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
+            game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
         } else if (action === "del") {
-            this._game.worldman.delBlock(avatar, meta[1], meta[2], meta[3]);
+            game.worldman.delBlock(avatar, meta[1], meta[2], meta[3]);
         }
     }
 
     push(kind, avatar) {
+        let incoming = this._incoming;
+
         return (data => {
-            var array = this._incoming.get(avatar);
+            var array = incoming.get(avatar);
             if (!array || array === 'undefined') {
-                this._incoming.set(avatar, [{action:kind, meta:data}]);
+                incoming.set(avatar, [{action:kind, meta:data}]);
             } else {
-                this._incoming.get(avatar).push({action:kind, meta:data});
+                incoming.get(avatar).push({action:kind, meta:data});
             }
         });
     }
 
     listenPlayer(player) {
+        let game = this._game;
         let listener = this._listeners[player] = [
             this.push('move', player.avatar),
             this.push('rotate', player.avatar),
             this.push('block', player.avatar),
-            this._game.chat.playerInput(player)
+            game.chat.playerInput(player)
         ];
 
         player.on('m', listener[0]);
