@@ -24,7 +24,7 @@ class Hub {
     static validateKind(kind) {
         var res = false;
         switch (kind) {
-            case 'flat2': case 'flat3': case 'free3': case 'free4':
+            case 'game3d': case 'game2d':
                 res = true;
         }
         if (!res) console.log('Invalid game kind requested.');

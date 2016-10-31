@@ -4,19 +4,17 @@
 
 'use strict';
 
-import Flat3 from './flat3/game';
+import Game3D from './game3d/game';
 
 class GameFactory {
 
     static createGame(hub, kind, gameId, connector) {
         var game;
         switch (kind) {
-            case 'flat3':
-                game = new Flat3(hub, gameId, connector);
+            case 'game2d':
                 break;
-            case 'free3':
-                break;
-            case 'free4':
+            case 'game3d':
+                game = new Game3D(hub, gameId, connector);
                 break;
             default: console.log("Unknown game kind requested @ GameFactory");
         }

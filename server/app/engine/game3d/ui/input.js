@@ -60,47 +60,43 @@ class UserInput {
     rotate(meta, avatar) {
         if (!(meta instanceof Array)) return;
         let p = meta[0], y = meta[1];
-        let game = this._game;
 
+        // Manage player rotation
         if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
             avatar.rotate(p, y);
-            game.entityman.entityUpdated(avatar.id);
+            this._game.entityman.entityUpdated(avatar.id);
         }
     }
 
     block(meta, avatar) {
         if (!(meta instanceof Array)) return;
         let action = meta[0];
-        let game = this._game;
 
         // Manage block addition.
         if (action === "add") {
-            game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
+            this._game.worldman.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
         } else if (action === "del") {
-            game.worldman.delBlock(avatar, meta[1], meta[2], meta[3]);
+            this._game.worldman.delBlock(avatar, meta[1], meta[2], meta[3]);
         }
     }
 
     push(kind, avatar) {
-        let incoming = this._incoming;
-
         return (data => {
-            var array = incoming.get(avatar);
+            var array = this._incoming.get(avatar);
             if (!array || array === 'undefined') {
-                incoming.set(avatar, [{action:kind, meta:data}]);
+                this._incoming.set(avatar, [{action:kind, meta:data}]);
             } else {
-                incoming.get(avatar).push({action:kind, meta:data});
+                this._incoming.get(avatar).push({action:kind, meta:data});
             }
         });
     }
 
     listenPlayer(player) {
-        let game = this._game;
         let listener = this._listeners[player] = [
             this.push('move', player.avatar),
             this.push('rotate', player.avatar),
             this.push('block', player.avatar),
-            game.chat.playerInput(player)
+            this._game.chat.playerInput(player)
         ];
 
         player.on('m', listener[0]);

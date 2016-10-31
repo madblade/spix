@@ -5,29 +5,36 @@
 'use strict';
 
 import Game from '../../model/game/game';
-import Flat3Factory from './flat3factory';
 
-class Flat3 extends Game {
+import Physics from './physics';
+import UserInput from './ui/input';
+import UserOutput from './ui/output';
+import AI from './ai';
+import EntityManager from './objects/entities/manager';
+import WorldManager from './objects/world/manager';
+import Chat from './../../model/connection/chat';
+
+class Game3D extends Game {
 
     constructor(hub, gameId, connector) {
         super(hub, gameId, connector);
 
         // Utility parameters
-        this._kind = 'flat3';
+        this._kind = 'game3d';
         this._refreshRate = 16;
         this._tt = 0;
 
         // Setup managers.
-        this._inputman = Flat3Factory.createUserInput(this);
-        this._outputman = Flat3Factory.createUserOutput(this);
+        this._inputman = new UserInput(this);
+        this._outputman = new UserOutput(this);
 
-        this._worldman =  Flat3Factory.createWorldManager(gameId);
-        this._entityman = Flat3Factory.createEntityManager(this._worldman);
+        this._worldman =  new WorldManager(gameId);
+        this._entityman = new EntityManager(this._worldman);
         this._worldman.entityman = this._entityman;
 
-        this._chat = Flat3Factory.createChat(this);
-        this._physics = Flat3Factory.createPhysics(this._entityman, this._worldman);
-        this._ai = Flat3Factory.createAI();
+        this._chat = new Chat(this);
+        this._physics = new Physics(this._entityman, this._worldman);
+        this._ai = new AI();
         // super:_playerman
 
         // Generate then listen players.
@@ -82,4 +89,4 @@ class Flat3 extends Game {
 
 }
 
-export default Flat3;
+export default Game3D;

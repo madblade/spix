@@ -20,7 +20,7 @@ App.Engine.StateManager.prototype.startHub = function(data) {
     }
     content += '</table>';
     content += '<div><button class="btn btn-default game-creator" style="width:100%">' +
-        'Request FLAT3 game creation</button></div>';
+        'Request 3D game creation</button></div>';
 
     // Add content then fade in.
     var hub = $("#announce");
@@ -42,7 +42,7 @@ App.Engine.StateManager.prototype.startHub = function(data) {
     });
 
     $('.game-creator').click(function() {
-        application.connectionEngine.send('util', {request: 'createGame', gameType: 'flat3'});
+        application.connectionEngine.send('util', {request: 'createGame', gameType: 'game3d'});
         location.reload();
     });
 };

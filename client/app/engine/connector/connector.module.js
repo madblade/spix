@@ -87,7 +87,7 @@ App.Engine.Connection.prototype.join = function(gameType, gid) {
 
 App.Engine.Connection.prototype.configureGame = function(gameType, gid) {
     switch (gameType) {
-        case 'flat3':
+        case 'game3d':
             this.registerSocketForFlat3();
             break;
         default:
