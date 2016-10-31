@@ -17,13 +17,13 @@ class Integrator {
     }
 
     static updatePosition(dt, impulseSpeed, force, entity, EM, WM) {
-
         if (Integrator.isNull(entity.acceleration)) {
+            //console.log('Euler');
             Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, WM);
         } else {
+            //console.log('Leapfrog');
             Integrator.integrateLeapfrog(dt, impulseSpeed, force, entity, EM, WM);
         }
-
     }
 
     // First-order integrator
@@ -47,6 +47,14 @@ class Integrator {
         }
         for (let i = 0; i < 3; ++i) newSpeed[i] += dt * newAcceleration[i];
 
+        // Filter, adherence
+        let adherence = entity.adherence;
+        for (let i = 0; i<3; ++i) {
+            if (newSpeed[i] < 0 && adherence[i] || newSpeed[i] > 0 && adherence[3+i]) {
+                newSpeed[i] = 0;
+            }
+        }
+
         // Update properties, phase 1
         entity.speed = newSpeed;
         entity._impulseSpeed = impulseSpeed;
@@ -60,7 +68,7 @@ class Integrator {
         for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * speed[i] * dt;
 
         // Update properties, phase 2.
-        TerrainCollider.linearCollide(entity, WM, position, newPosition);
+        TerrainCollider.linearCollide(entity, WM, position, newPosition, dt);
 
         // Notify an entity was updated.
         EM.entityUpdated(entity.id);
@@ -74,6 +82,11 @@ class Integrator {
         let speed = entity.speed;
         let acceleration = entity.acceleration;
 
+        //let previousImpulseSpeed = entity._impulseSpeed;
+        //if (!Integrator.areEqual(previousImpulseSpeed, impulseSpeed)) {
+        //    for (let i = 0; i < 3; ++i) speed[i] = speed[i] + impulseSpeed[i] - previousImpulseSpeed[i];
+        //}
+
         // Guess new position without constraints.
         let newPosition = [position[0], position[1], position[2]];
         for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * dt * (speed[i]+acceleration[i]*dt*0.5);
@@ -81,9 +94,14 @@ class Integrator {
         // Detect change in position.
         if (Integrator.areEqual(newPosition, position)) return;
 
-        if (TerrainCollider.linearCollide(entity, WM, position, newPosition)) {
+        if (TerrainCollider.linearCollide(entity, WM, position, newPosition, dt)) {
             // entity.speed = determined by the collider
-            // entity.acceleration = [0, 0, 0];
+            // entity.acceleration[2] = -0.11;
+            //let newAcceleration = [0, 0, 0];
+            //if (mass > 0) for (let i = 0; i < 3; ++i) newAcceleration[i] = force[i] / mass;
+            //entity.acceleration = newAcceleration;
+            entity.speed[0] = entity._impulseSpeed[0];
+            entity.speed[1] = entity._impulseSpeed[1];
 
         } else {
 

@@ -120,10 +120,10 @@ class Newton {
         if (godMode) {
             desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
         } else {
-            if (entity.onGround() && (ds[4]&&!ds[5])) {
+            if (entity.adherence[2] && (ds[4]&&!ds[5])) {
                 //desiredSpeed[2] = 2;
                 entity.acceleration[2] = 3.3/dt;
-                entity.jump();
+                entity.jump(2); // In which direction I jump
             }
         }
 

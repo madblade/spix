@@ -19,9 +19,11 @@ class Entity {
         this._speed = null;
         this._acceleration = null;
         this._mass = 1;
-        this._adherence = false;
+        this._adherence = [false, false, false, // Right, Into, Up
+            false, false, false]; // Left, From, Down
 
         this._impulseSpeedStamp = null;
+        this._needsEuler = true;
     }
 
     get id() { return this._id; }
@@ -42,12 +44,12 @@ class Entity {
     set acceleration(na) { this._acceleration = na; }
     set _impulseSpeed(nis) { this._impulseSpeedStamp = nis; }
 
-    onGround() {
+    get adherence() {
         return this._adherence;
     }
 
-    jump() {
-        this._adherence = false;
+    jump(direction) {
+        this._adherence[direction] = false;
     }
 
     spawn(position) {

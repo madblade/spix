@@ -9,7 +9,7 @@ class TerrainCollider {
     /**
      * @returns 'has collided'
      */
-    static linearCollide(entity, WM, position, newPosition) {
+    static linearCollide(entity, WM, position, newPosition, dt) {
 
         // Intersect on first Non-Free Block
         if (TerrainCollider.intersectAmanditesWoo(position, newPosition, WM, entity,
@@ -28,10 +28,13 @@ class TerrainCollider {
             // Collision
             // Damping on first encountered NFB (collision later on)
 
-            const tol = .001;
+            const tol = .00001;
+            const nx0 = dx > 0 ? i-tol : i+1+tol;
+            const ny0 = dy > 0 ? j-tol : j+1+tol;
+            const nz0 = dz > 0 ? k-tol : k+1+tol;
+
             if (ntx) {
-                const t = tMaxX-tDeltaX-tol;
-                const nx = dx > 0 ? i-tol : i+1+tol;
+                const t = tMaxX-tDeltaX;
                 const ddx = dx < 0 ? 1 : -1;
 
                 // Projections
@@ -39,75 +42,97 @@ class TerrainCollider {
                 let nyt = y1+(y2-y1)*t;
                 let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                 if (dby < 2) {
-                    if (dy < 0 && (dby < 1 || WM.isFree([i+ddx, j-1, k]))) { nyt = ny; }
-                    if (dy > 0 && (dby < 1 || WM.isFree([i+ddx, j+1, k]))) { nyt = ny; }
+                    if (dy < 0) if (dby < 1 || WM.isFree([i+ddx, j-1, k])) { nyt = ny; }
+                    //else { nyt = ny0-1; }
+                    if (dy > 0) if (dby < 1 || WM.isFree([i+ddx, j+1, k])) { nyt = ny; }
+                    //else { nyt = ny0+1; }
                 }
 
                 let nz = z1+(z2-z1);
                 let nzt = z1+(z2-z1)*t;
                 let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
                 if (dbz < 2) {
-                    if (dz < 0 && (dbz < 1 || WM.isFree([i, j, k-1]))) { nzt = nz; }
-                    if (dz > 0 && (dbz < 1 || WM.isFree([i, j, k+1]))) { nzt = nz; }
+                    if (dz < 0) if (dbz < 1 || WM.isFree([i+ddx, j, k-1])) { nzt = nz; }
+                    //else { nzt = nz0-1; }
+                    if (dz > 0) if (dbz < 1 || WM.isFree([i+ddx, j, k+1])) { nzt = nz; }
+                    //else { nzt = nz0+1; }
                 }
 
-                // entity.speed = entity._impulseSpeed;
-                entity.position = [nx, nyt, nzt];
+                entity.position = [nx0, nyt, nzt];
+                entity.acceleration[0] = 0;
+                entity.speed[0] = 0;
+                entity.speed[1] = entity._impulseSpeed[1];
+            }
 
-            } else if (nty) {
-                const t = tMaxY-tDeltaY-tol;
-                const ny = dy > 0 ? j-tol : j+1+tol;
+            else if (nty) {
+                const t = tMaxY-tDeltaY;
                 const ddy = dy < 0 ? 1 : -1;
 
                 let nx = x1+(x2-x1);
                 let nxt = x1+(x2-x1)*t;
                 let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                 if (dbx < 2) {
-                    if (dx < 0 && (dbx < 1 || WM.isFree([i-1, j+ddy, k]))) { nxt = nx; }
-                    if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j+ddy, k]))) { nxt = nx; }
+                    if (dx < 0) if (dbx < 1 || WM.isFree([i-1, j+ddy, k])) { nxt = nx; }
+                    //else { nxt = nx0-1; }
+                    if (dx > 0) if (dbx < 1 || WM.isFree([i+1, j+ddy, k])) { nxt = nx; }
+                    //else { nxt = nx0+1; }
                 }
 
                 let nz = z1+(z2-z1);
                 let nzt = z1+(z2-z1)*t;
                 let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
                 if (dbz < 2) {
-                    if (dz < 0 && (dbz < 1 || WM.isFree([i, j+ddy, k-1]))) { nzt = nz; }
-                    if (dz > 0 && (dbz < 1 || WM.isFree([i, j+ddy, k+1]))) { nzt = nz; }
+                    if (dz < 0) if (dbz < 1 || WM.isFree([i, j+ddy, k-1])) { nzt = nz; }
+                    //else { nzt = nz0-1; }
+                    if (dz > 0) if (dbz < 1 || WM.isFree([i, j+ddy, k+1])) { nzt = nz; }
+                    //else { nzt = nz0+1; }
                 }
 
-                // entity.speed = entity._impulseSpeed;
-                entity.position = [nxt, ny, nzt];
+                entity.position = [nxt, ny0, nzt];
+                entity.acceleration[1] = 0;
+                entity.speed[0] = entity._impulseSpeed[0];
+                entity.speed[1] = 0;
+            }
 
-            } else if (ntz) {
-                const t = tMaxZ-tDeltaZ-tol;
-                const nz = dz > 0 ? k-tol : k+1+tol;
+            else if (ntz) {
+                const t = tMaxZ-tDeltaZ;
                 const ddz = dz < 0 ? 1 : -1;
 
                 let nx = x1+(x2-x1);
                 let nxt = x1+(x2-x1)*t;
                 let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                 if (dbx < 2) {
-                    if (dx < 0 && (dbx < 1 || WM.isFree([i-1, j, k+ddz]))) { nxt = nx; }
-                    if (dx > 0 && (dbx < 1 || WM.isFree([i+1, j, k+ddz]))) { nxt = nx; }
+                    if (dx < 0)
+                        if (dbx < 1 || WM.isFree([i-1, j, k+ddz])) { nxt = nx; }
+                        else { nxt = nx0-1; }
+                    if (dx > 0)
+                        if (dbx < 1 || WM.isFree([i+1, j, k+ddz])) { nxt = nx; }
+                        else { nxt = nx0+1; }
                 }
 
                 let ny = y1+(y2-y1);
                 let nyt = y1+(y2-y1)*t;
                 let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                 if (dby < 2) {
-                    if (dy < 0 && (dby < 1 || WM.isFree([i, j-1, k+ddz]))) { nyt = ny; }
-                    if (dy > 0 && (dby < 1 || WM.isFree([i, j+1, k+ddz]))) { nyt = ny; }
+                    if (dy < 0)
+                        if (dby < 1 || WM.isFree([i, j-1, k+ddz])) { nyt = ny; }
+                        else { nyt = ny0-1; }
+                    if (dy > 0)
+                        if (dby < 1 || WM.isFree([i, j+1, k+ddz])) { nyt = ny; }
+                        else { nyt = ny0+1; }
                 }
 
-                entity.adherence = true;
-                entity.speed = entity._impulseSpeed;
-                entity.position = [nxt, nyt, nz];
+                entity.adherence[2] = true; // One impulse allowed
 
+                entity.position = [nxt, nyt, nz0];
+                entity.acceleration[2] = 0;
+                entity.speed = entity._impulseSpeed;
+                entity.speed[2] = 0;
             }
 
             // Bounce
             // entity.speed[2] = -(entity.speed[2]-entity._impulseSpeed[2]);
-            entity.acceleration = [0, 0, 0]; // Use Euler with collisions
+            // entity.acceleration = [0, 0, 0]; // Use Euler with collisions
 
             return true;
 
