@@ -72,6 +72,8 @@ App.Engine.UI.prototype.getQWERTY = function() {
         padSixAlt: 39,
         padSevenAlt: 36,
         padEightAlt: 38,
-        padNineAlt: 33
+        padNineAlt: 33,
+
+        f: 70
     };
 };

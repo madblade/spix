@@ -9,6 +9,7 @@ import Integrator from './integrator';
 class Newton {
 
     static globalTimeDilatation = 20000000;
+    static gravity = [0, 0, -0.11];
 
     static solve(EM, WM, Δt) {
 
@@ -120,10 +121,13 @@ class Newton {
         if (godMode) {
             desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
         } else {
-            if (entity.adherence[2] && (ds[4]&&!ds[5])) {
-                //desiredSpeed[2] = 2;
-                entity.acceleration[2] = 3.3/dt;
-                entity.jump(2); // In which direction I jump
+            if (ds[4]&&!ds[5]) {
+                for (let i = 0; i<3; ++i)
+                    if (entity.adherence[i]) {
+                        //desiredSpeed[2] = 2;
+                        entity.acceleration[i] = 3.3/dt;
+                        entity.jump(i); // In which direction I jump
+                    }
             }
         }
 
@@ -136,7 +140,9 @@ class Newton {
 
     static sumGlobalFields(force, pos, entity) {
         // Gravity
-        var sum = [0, 0, -0.11*entity.mass];
+        let grav = Newton.gravity;
+        let m = entity.mass;
+        var sum = [grav[0]*m, grav[1]*m, grav[2]*m];
 
         // sum[2] = 0; // ignore grav
 

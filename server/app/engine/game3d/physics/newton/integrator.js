@@ -17,6 +17,9 @@ class Integrator {
     }
 
     static updatePosition(dt, impulseSpeed, force, entity, EM, WM) {
+
+        //console.log(entity.adherence);
+        //console.log(entity.acceleration);
         if (Integrator.isNull(entity.acceleration)) {
             //console.log('Euler');
             Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, WM);

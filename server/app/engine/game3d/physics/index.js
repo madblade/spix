@@ -24,6 +24,12 @@ class Physics {
         this._stamp = process.hrtime();
     }
 
+    shuffleGravity() {
+        console.log('shuffle grav');
+        let g = Newton.gravity;
+        Newton.gravity = [g[2], g[0], g[1]];
+    }
+
 }
 
 export default Physics;

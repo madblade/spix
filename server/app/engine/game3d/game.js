@@ -62,6 +62,7 @@ class Game3D extends Game {
     get playerman() { return this._playerman; }
     get entityman() { return this._entityman; }
     get worldman() { return this._worldman; }
+    get physics() { return this._physics; }
     get chat() { return this._chat; }
 
     //^

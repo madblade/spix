@@ -28,6 +28,9 @@ class UserInput {
 
                 else if (e.action === 'block')
                     this.block(e.meta, avatar);
+
+                else if (e.action === 'action' && typeof e.meta === "string")
+                    this.action(e.meta, avatar);
             });
         });
 
@@ -80,6 +83,12 @@ class UserInput {
         }
     }
 
+    action(meta, avatar) {
+        if (meta === "g") {
+            this._game.physics.shuffleGravity();
+        }
+    }
+
     push(kind, avatar) {
         return (data => {
             var array = this._incoming.get(avatar);
@@ -96,13 +105,15 @@ class UserInput {
             this.push('move', player.avatar),
             this.push('rotate', player.avatar),
             this.push('block', player.avatar),
+            this.push('action', player.avatar),
             this._game.chat.playerInput(player)
         ];
 
         player.on('m', listener[0]);
         player.on('r', listener[1]);
         player.on('b', listener[2]);
-        player.on('chat', listener[3]);
+        player.on('a', listener[3]);
+        player.on('chat', listener[4]);
     }
 
     removePlayer(player) {
@@ -117,7 +128,8 @@ class UserInput {
         player.off('m', listener[0]);
         player.off('r', listener[1]);
         player.off('b', listener[2]);
-        player.off('chat', listener[3]);
+        player.off('a', listener[3]);
+        player.off('chat', listener[4]);
 
         delete this._listeners[player];
     }

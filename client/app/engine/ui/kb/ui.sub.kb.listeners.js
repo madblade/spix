@@ -46,6 +46,9 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 if (!ak.up) ce.send('m', 'u');
                 ak.up = true;
                 break;
+            case k.f:
+                ce.send('a', 'g');
+                break;
 
             case k.enter:
                 /*

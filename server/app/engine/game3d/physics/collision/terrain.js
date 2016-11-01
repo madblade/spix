@@ -28,10 +28,13 @@ class TerrainCollider {
             // Collision
             // Damping on first encountered NFB (collision later on)
 
-            const tol = .00001;
+            const tol = .001;
             const nx0 = dx > 0 ? i-tol : i+1+tol;
             const ny0 = dy > 0 ? j-tol : j+1+tol;
             const nz0 = dz > 0 ? k-tol : k+1+tol;
+            let newPosition = [0, 0, 0];
+            let oldAdherence = [false, false, false, false, false, false];
+            for (let ii = 0; ii<6; ++ii) { oldAdherence[ii] = entity.adherence[ii]; }
 
             if (ntx) {
                 const t = tMaxX-tDeltaX;
@@ -42,24 +45,39 @@ class TerrainCollider {
                 let nyt = y1+(y2-y1)*t;
                 let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                 if (dby < 2) {
-                    if (dy < 0) if (dby < 1 || WM.isFree([i+ddx, j-1, k])) { nyt = ny; }
-                    //else { nyt = ny0-1; }
-                    if (dy > 0) if (dby < 1 || WM.isFree([i+ddx, j+1, k])) { nyt = ny; }
-                    //else { nyt = ny0+1; }
+                    if (dy < 0) {
+                        const free = WM.isFree([i+ddx, j-1, k]);
+                        if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; entity.adherence[1] = false; }
+                        else { nyt = ny0-1; if (dby > 0 && !free) entity.adherence[1] = true; }
+                    }
+                    if (dy > 0) {
+                        const free = WM.isFree([i+ddx, j+1, k]);
+                        if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; entity.adherence[4] = false; }
+                        else { nyt = ny0+1; if (dby > 0 && !free) entity.adherence[4] = true; }
+                    }
                 }
 
                 let nz = z1+(z2-z1);
                 let nzt = z1+(z2-z1)*t;
                 let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
                 if (dbz < 2) {
-                    if (dz < 0) if (dbz < 1 || WM.isFree([i+ddx, j, k-1])) { nzt = nz; }
-                    //else { nzt = nz0-1; }
-                    if (dz > 0) if (dbz < 1 || WM.isFree([i+ddx, j, k+1])) { nzt = nz; }
-                    //else { nzt = nz0+1; }
+                    if (dz < 0) {
+                        const free = WM.isFree([i+ddx, j, k-1]);
+                        if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; entity.adherence[2] = false; }
+                        else { nzt = nz0-1; if (dbz > 0 && !free) entity.adherence[2] = true; }
+                    }
+                    if (dz > 0) {
+                        const free = WM.isFree([i+ddx, j, k+1]);
+                        if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; entity.adherence[5] = false; }
+                        else { nzt = nz0+1; if (dbz > 0 && !free) entity.adherence[5] = true; }
+                    }
                 }
 
-                entity.position = [nx0, nyt, nzt];
-                entity.acceleration[0] = 0;
+                if (dx < 0) entity.adherence[0] = true;
+                else if (dx > 0) entity.adherence[3] = true;
+
+                newPosition = [nx0, nyt, nzt];
+                // entity.acceleration[0] = 0;
                 entity.speed[0] = 0;
                 entity.speed[1] = entity._impulseSpeed[1];
             }
@@ -72,24 +90,39 @@ class TerrainCollider {
                 let nxt = x1+(x2-x1)*t;
                 let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                 if (dbx < 2) {
-                    if (dx < 0) if (dbx < 1 || WM.isFree([i-1, j+ddy, k])) { nxt = nx; }
-                    //else { nxt = nx0-1; }
-                    if (dx > 0) if (dbx < 1 || WM.isFree([i+1, j+ddy, k])) { nxt = nx; }
-                    //else { nxt = nx0+1; }
+                    if (dx < 0) {
+                        const free = WM.isFree([i-1, j+ddy, k]);
+                        if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; entity.adherence[0] = false; }
+                        else { nxt = nx0-1; if (dbx > 0 && !free) entity.adherence[0] = true; }
+                    }
+                    if (dx > 0) {
+                        const free = WM.isFree([i+1, j+ddy, k]);
+                        if ((!free && dbx < 1 && nx < nx0+1) || free) { nxt = nx; entity.adherence[3] = false; }
+                        else { nxt = nx0+1; if (dbx > 0 && !free) entity.adherence[3] =  true; }
+                    }
                 }
 
                 let nz = z1+(z2-z1);
                 let nzt = z1+(z2-z1)*t;
                 let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
                 if (dbz < 2) {
-                    if (dz < 0) if (dbz < 1 || WM.isFree([i, j+ddy, k-1])) { nzt = nz; }
-                    //else { nzt = nz0-1; }
-                    if (dz > 0) if (dbz < 1 || WM.isFree([i, j+ddy, k+1])) { nzt = nz; }
-                    //else { nzt = nz0+1; }
+                    if (dz < 0) {
+                        const free = WM.isFree([i, j+ddy, k-1]);
+                        if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; entity.adherence[2] = false;}
+                        else { nzt = nz0-1; if (dbz > 0 && !free) entity.adherence[2] = true; }
+                    }
+                    if (dz > 0) {
+                        const free = WM.isFree([i, j+ddy, k+1]);
+                        if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; entity.adherence[5] = false; }
+                        else { nzt = nz0+1; if (dbz > 0 && !free) entity.adherence[5] = true; }
+                    }
                 }
 
-                entity.position = [nxt, ny0, nzt];
-                entity.acceleration[1] = 0;
+                if (dy < 0) entity.adherence[1] = true;
+                else if (dy > 0) entity.adherence[4] = true;
+
+                newPosition = [nxt, ny0, nzt];
+                // entity.acceleration[1] = 0;
                 entity.speed[0] = entity._impulseSpeed[0];
                 entity.speed[1] = 0;
             }
@@ -102,30 +135,40 @@ class TerrainCollider {
                 let nxt = x1+(x2-x1)*t;
                 let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
                 if (dbx < 2) {
-                    if (dx < 0)
-                        if (dbx < 1 || WM.isFree([i-1, j, k+ddz])) { nxt = nx; }
-                        else { nxt = nx0-1; }
-                    if (dx > 0)
-                        if (dbx < 1 || WM.isFree([i+1, j, k+ddz])) { nxt = nx; }
-                        else { nxt = nx0+1; }
+                    if (dx < 0) {
+                        const free = WM.isFree([i-1, j, k+ddz]);
+                        if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; entity.adherence[0] = false; }
+                        else { nxt = nx0-1; if (dbx > 0 && !free) entity.adherence[0] = true; }
+                    }
+                    if (dx > 0) {
+                        const free = WM.isFree([i+1, j, k+ddz]);
+                        if ((!free && dbx < 1 && nx < nx0+1) || free ) { nxt = nx; entity.adherence[3] = false; }
+                        else { nxt = nx0+1; if (dbx > 0 && !free) entity.adherence[3] = true; }
+                    }
                 }
 
                 let ny = y1+(y2-y1);
                 let nyt = y1+(y2-y1)*t;
                 let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
                 if (dby < 2) {
-                    if (dy < 0)
-                        if (dby < 1 || WM.isFree([i, j-1, k+ddz])) { nyt = ny; }
-                        else { nyt = ny0-1; }
-                    if (dy > 0)
-                        if (dby < 1 || WM.isFree([i, j+1, k+ddz])) { nyt = ny; }
-                        else { nyt = ny0+1; }
+                    if (dy < 0) {
+                        const free = WM.isFree([i, j-1, k+ddz]);
+                        if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; entity.adherence[1] = false; }
+                        else { nyt = ny0-1; if (dby > 0 && !free) entity.adherence[1] = true; }
+                    }
+                    if (dy > 0) {
+                        const free = WM.isFree([i, j+1, k+ddz]);
+                        if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; entity.adherence[4] = false; }
+                        else { nyt = ny0+1; if (dby > 0 && !free) entity.adherence[4] = true; }
+                    }
                 }
 
-                entity.adherence[2] = true; // One impulse allowed
+                // One impulse allowed
+                if (dz < 0) entity.adherence[2] = true;
+                else if (dz > 0) entity.adherence[5] = true;
 
-                entity.position = [nxt, nyt, nz0];
-                entity.acceleration[2] = 0;
+                newPosition = [nxt, nyt, nz0];
+                // entity.acceleration[2] = 0;
                 entity.speed = entity._impulseSpeed;
                 entity.speed[2] = 0;
             }
@@ -133,13 +176,43 @@ class TerrainCollider {
             // Bounce
             // entity.speed[2] = -(entity.speed[2]-entity._impulseSpeed[2]);
             // entity.acceleration = [0, 0, 0]; // Use Euler with collisions
+            for (let ii = 0; ii < 3; ++ii) {
+
+                //if (ltNew && entity.adherence[ii]) {
+                //    entity.position[ii] = Math.floor(entity.position[ii])+tol;
+                //} else if (gtNew && entity.adherence[ii+3]) {
+                //    entity.position[ii] = Math.ceil(entity.position[ii])-tol;
+                //} else {
+                //    entity.position[ii] = newPosition[ii];
+                //}
+
+                //if (entity.adherence[ii] && newPosition[ii] > entity.position[ii]) entity.adherence[ii] = false;
+                //if (entity.adherence[3+ii] && newPosition[ii] < entity.position[ii]) entity.adherence[3+ii] = false;
+                if (newPosition[ii] < entity.position[ii] && oldAdherence[ii]) continue;
+                if (newPosition[ii] > entity.position[ii] && oldAdherence[3+ii]) continue;
+                entity.position[ii] = newPosition[ii];
+
+                //entity.adherence[ii+ (ltNew ? 0 : 3)] = false;
+            }
 
             return true;
 
         })) return true;
 
         // Update entity position.
-        entity.position = newPosition;
+        //entity.position = newPosition;
+        for (let ii = 0; ii < 3; ++ii) {
+            if (entity.adherence[ii] && newPosition[ii] > entity.position[ii]) entity.adherence[ii] = false;
+            if (entity.adherence[3+ii] && newPosition[ii] < entity.position[ii]) entity.adherence[3+ii] = false;
+
+            //if (entity.adherence[ii] && newPosition[ii] < entity.position[ii]) continue;
+            //if (entity.adherence[3+ii] && newPosition[ii] > entity.position[ii]) continue;
+
+            entity.position[ii] = newPosition[ii];
+            //entity.adherence[ii] = false;
+            //entity.adherence[ii+3] = false;
+        }
+
         return false;
     }
 

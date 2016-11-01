@@ -72,6 +72,9 @@ App.Engine.UI.prototype.getAZERTY = function (layout) {
         padSixAlt: 39,
         padSevenAlt: 36,
         padEightAlt: 38,
-        padNineAlt: 33
+        padNineAlt: 33,
+
+        // TODO all other letters
+        f: 70
     };
 };
