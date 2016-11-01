@@ -46,7 +46,7 @@ class ChunkGenerator {
 
         //let generationMethod = worldManager.generationMethod;
         //if (generationMethod == 'flat') {
-            //GenSimple.fillChunk(c, 32, 1);
+        //    GenSimple.fillChunk(c, 41, 1);
             //GenAnalytic.waveChunk(c, 10, 15, 1);
             GenSimplePerlin.simplePerlinGeneration(c);
             //GenSimple.fillChunk(c, 256, 0);

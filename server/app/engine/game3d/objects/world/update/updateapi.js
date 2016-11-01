@@ -15,12 +15,7 @@ class UpdateAPI {
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
                                        floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk)
     {
-
-        let starterChunkI = chunkI >= 0 || !isBoundaryX ? chunkI : chunkI+1;
-        let starterChunkJ = chunkJ >= 0 || !isBoundaryY ? chunkJ : chunkJ+1;
-        let starterChunkK = chunkK >= 0 || !isBoundaryZ ? chunkK : chunkK+1;
-
-        const starterChunkId = starterChunkI + ',' + starterChunkJ + ',' + starterChunkK;
+        const starterChunkId = chunkI + ',' + chunkJ + ',' + chunkK;
 
         const fx = floors[0];
         const fy = floors[1];
@@ -33,6 +28,7 @@ class UpdateAPI {
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
+        console.log(blockCoordinatesOnChunk);
 
         let chunk = worldManager.allChunks[starterChunkId];
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
@@ -48,21 +44,22 @@ class UpdateAPI {
         // TODO can it be boundary to several chunks at the same time?
         // If request -> nope (requests aint done on edges for security purposes)
 
-        if (isBoundaryX) {
+        console.log(starterChunkId);
+        if (isBoundaryX) {console.log("boundary x");
             blockCoordinatesOnChunk[0] = dimX-1;
-            const rightChunkId = (starterChunkI-1) + ',' + starterChunkJ + ',' + starterChunkK;
+            const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
             return worldManager.allChunks[rightChunkId];
         }
 
         if (isBoundaryY) {
             blockCoordinatesOnChunk[1] = dimY-1;
-            const rightChunkId = starterChunkI + ',' + (starterChunkJ-1) + ',' + starterChunkK;
+            const rightChunkId = chunkI + ',' + (chunkJ-1) + ',' + chunkK;
             return worldManager.allChunks[rightChunkId];
         }
 
         if (isBoundaryZ) {
             blockCoordinatesOnChunk[2] = dimZ-1;
-            const rightChunkId = starterChunkI + ',' + starterChunkJ + ',' + (starterChunkK-1);
+            const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
             return worldManager.allChunks[rightChunkId];
         }
     }

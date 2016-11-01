@@ -122,12 +122,18 @@ class Newton {
             desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
         } else {
             if (ds[4]&&!ds[5]) {
-                for (let i = 0; i<3; ++i)
-                    if (entity.adherence[i]) {
-                        //desiredSpeed[2] = 2;
+                for (let i = 0; i<3; ++i) {
+                    if (Newton.gravity[i] < 0 && entity.adherence[i]) {
                         entity.acceleration[i] = 3.3/dt;
                         entity.jump(i); // In which direction I jump
                     }
+                }
+                for (let i = 3; i<6; ++i) {
+                    if (Newton.gravity[i-3] > 0 && entity.adherence[i]) {
+                        entity.acceleration[i-3] = -3.3/dt;
+                        entity.jump(i); // In which direction I jump
+                    }
+                }
             }
         }
 
