@@ -25,7 +25,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
     // UVS
     var uvi = 2*i/3;
-    var ɛ=.00001;
+    var ɛ = .00001;
     var txCoords = this.getTexture(nature);
     var offsetU, offsetV;
 
@@ -62,8 +62,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // UVs H1
-        offsetU = (normal ? txCoords[0][0]:txCoords[3][0])/16;
-        offsetV = (normal ? txCoords[0][1]:txCoords[3][1])/16;
+        offsetU = (normal ? txCoords[0][0]:txCoords[3][0])*0.0625;
+        offsetV = (normal ? txCoords[0][1]:txCoords[3][1])*0.0625;
         uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
         uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
         uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
@@ -128,8 +128,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // UVs H1
-        offsetU = (normal ? txCoords[1][0]:txCoords[4][0])/16;
-        offsetV = (normal ? txCoords[1][1]:txCoords[4][1])/16;
+        offsetU = (normal ? txCoords[1][0]:txCoords[4][0])*0.0625;
+        offsetV = (normal ? txCoords[1][1]:txCoords[4][1])*0.0625;
         uvs[uvi]    = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+1] = offsetV + (0.+ɛ);
         uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + (normal ? 0.+ɛ : 0.0625-ɛ);
         uvs[uvi+4]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+5] = offsetV + (normal ? 0.0625-ɛ : 0.+ɛ);
@@ -187,7 +187,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         cb.cross(ab);
         cb.normalize();
         nx = cb.x; ny = cb.y; nz = cb.z;
-        for (j = 0; j<3; ++j) {normals[i+3*j] = nx; normals[i+3*j+1] = ny; normals[i+3*j+2] = nz;}
+        for (j = 0; j<3; ++j) {normals[i+3*j] = nx; normals[i+3*j+1] = ny;      normals[i+3*j+2] = nz;}
 
         // Colors H1
         //color.setRGB((ax/n)+0.5, (ay/n)+0.5, (az/n)+0.5);
@@ -195,8 +195,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         for (j = 0; j<3; ++j) {colors[i+j*3] = color.r; colors[i+j*3+1] = color.g; colors[i+j*3+2] = color.b;}
 
         // UVs H1
-        offsetU = (normal ? txCoords[2][0]:txCoords[5][0])/16;
-        offsetV = (normal ? txCoords[2][1]:txCoords[5][1])/16;
+        offsetU = (normal ? txCoords[2][0]:txCoords[5][0])*0.0625;
+        offsetV = (normal ? txCoords[2][1]:txCoords[5][1])*0.0625;
         uvs[uvi]    = offsetU + 0.+ɛ;                       uvs[uvi+1] = offsetV + 0.+ɛ;
         uvs[uvi+2]  = offsetU + (normal ? 0.+ɛ : 0.0625-ɛ); uvs[uvi+3] = offsetV + 0.0625-ɛ;
         uvs[uvi+4]  = offsetU + (normal ? 0.0625-ɛ : 0.+ɛ); uvs[uvi+5] = offsetV + 0.0625-ɛ;
