@@ -4,7 +4,7 @@
 
 'use strict';
 
-import CollectionUtils from '../../math/collections/util';
+import CollectionUtils from '../../engine/math/collections/util';
 
 /**
  * Note: every time a user joins a given game, it is given a new Player instance.

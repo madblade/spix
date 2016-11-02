@@ -25,7 +25,6 @@ class Physics {
     }
 
     shuffleGravity() {
-        console.log('shuffle grav');
         let g = Newton.gravity;
         Newton.gravity = [g[2], g[0], g[1]];
     }

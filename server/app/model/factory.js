@@ -6,10 +6,10 @@
 
 import DB from './appwide/db';
 import Hub from './appwide/hub';
-import User from './avatar/user';
+import User from './client/user';
 import Game from './game/game';
-import Player from './avatar/player';
-import PlayerManager from './avatar/playerman';
+import Player from './client/player';
+import PlayerManager from './client/playerman';
 
 import Connector from './connection';
 import UserCon from './connection/usercon';

@@ -80,6 +80,7 @@ class TerrainCollider {
                 // entity.acceleration[0] = 0;
                 entity.speed[0] = 0;
                 entity.speed[1] = entity._impulseSpeed[1];
+                if (entity.acceleration[2] === 0) entity.speed[2] = 0;
             }
 
             else if (nty) {
@@ -125,6 +126,7 @@ class TerrainCollider {
                 // entity.acceleration[1] = 0;
                 entity.speed[0] = entity._impulseSpeed[0];
                 entity.speed[1] = 0;
+                if (entity.acceleration[2] === 0) entity.speed[2] = 0;
             }
 
             else if (ntz) {
