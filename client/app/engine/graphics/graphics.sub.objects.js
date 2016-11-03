@@ -24,7 +24,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
     this.light.position.set(0.5, 1, 0.75);
 
     // Textures
-    this.texture = this.loadTexture('texture.png');
+    this.texture = this.loadTexture('texture_hd.png');
     this.textureCoordinates = this.getTextureCoordinates();
 
     // Player

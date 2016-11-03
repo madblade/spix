@@ -116,8 +116,13 @@ class SimplePerlin {
         for (let x = 0; x < dx; ++x) {
             for (let y = 0; y < dy; ++y) {
                 let h = 16 + getY(x, y);
+                const rock = Math.floor(5*h/6);
                 let xy = x + y*dx;
-                for (let zz = 0; zz < h; ++zz) {
+                for (let zz = 0; zz < rock; ++zz) {
+                    blocks[ijS*zz+xy] = 2;
+                    if (Math.random() > 0.99) blocks[ijS*zz+xy] = 18;
+                }
+                for (let zz = rock; zz < h; ++zz) {
                     blocks[ijS*zz+xy] = 1;
                 }
             }

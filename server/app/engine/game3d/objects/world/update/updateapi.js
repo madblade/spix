@@ -28,7 +28,7 @@ class UpdateAPI {
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
-        console.log(blockCoordinatesOnChunk);
+        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
 
         let chunk = worldManager.allChunks[starterChunkId];
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
@@ -44,7 +44,7 @@ class UpdateAPI {
         // TODO can it be boundary to several chunks at the same time?
         // If request -> nope (requests aint done on edges for security purposes)
 
-        console.log(starterChunkId);
+        if (UpdateAPI.debug) console.log(starterChunkId);
         if (isBoundaryX) {console.log("boundary x");
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
