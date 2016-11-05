@@ -5,12 +5,15 @@
 'use strict';
 
 App.Engine.Graphics.prototype.loadTexture = function(whatTexture) {
-    var texture = THREE.ImageUtils.loadTexture("app/assets/textures/"+whatTexture);
+    var loader = new THREE.TextureLoader();
+    var texture = loader.load("app/assets/textures/"+whatTexture);
 
     texture.anisortopy = this.renderer.getMaxAnisotropy();
+
     texture.magFilter = THREE.NearestFilter;
     texture.minFilter = THREE.LinearMipMapLinearFilter;
 
+    console.log(texture);
     return texture;
 };
 

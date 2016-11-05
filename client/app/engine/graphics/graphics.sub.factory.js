@@ -31,7 +31,7 @@ App.Engine.Graphics.prototype.getRaycaster = function() {
     return new THREE.Raycaster();
 };
 
-App.Engine.Graphics.prototype.getMaterial = function(whatMaterial) {
+App.Engine.Graphics.prototype.getMaterial = function(whatMaterial, meta) {
     var material;
 
     switch (whatMaterial) {
@@ -40,6 +40,16 @@ App.Engine.Graphics.prototype.getMaterial = function(whatMaterial) {
                 specular: 0xffffff,
                 shading: THREE.FlatShading,
                 vertexColors: THREE.VertexColors
+            });
+            break;
+
+        case 'textured-phong':
+            material = new THREE.MeshLambertMaterial({
+                color: 0xffffff, specular: 0xffffff, shininess: 250,
+                //shading: THREE.FlatShading,
+                side: THREE.BackSide,
+                //vertexColors: THREE.VertexColors,
+                map: this.texture
             });
             break;
 

@@ -45,7 +45,7 @@ class UpdateAPI {
         // If request -> nope (requests aint done on edges for security purposes)
 
         if (UpdateAPI.debug) console.log(starterChunkId);
-        if (isBoundaryX) {console.log("boundary x");
+        if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
             return worldManager.allChunks[rightChunkId];

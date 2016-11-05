@@ -25,7 +25,8 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
     // UVS
     var uvi = 2*i/3;
-    var ɛ = .00001;
+    var scalingHD = 2; // depends on texture resolution
+    var ɛ = 0.00390625/scalingHD; // remove 1 pixel (prevent from texture interpolation on edges)
     var txCoords = this.getTexture(nature);
     var offsetU, offsetV;
 
