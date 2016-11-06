@@ -30,7 +30,8 @@ App.Engine.UI.prototype.run = function() {
     this.setupMouse();
     this.setupTouch();
 
-    $(window).resize(this.app.graphicsEngine.resize.bind(this.app.graphicsEngine));
+    // TODO decouple
+    $(window).resize(this.app.engine.graphics.resize.bind(this.app.engine.graphics));
 };
 
 // TODO later fullscreen

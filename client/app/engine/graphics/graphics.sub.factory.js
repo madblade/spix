@@ -45,7 +45,7 @@ App.Engine.Graphics.prototype.getMaterial = function(whatMaterial, meta) {
 
         case 'textured-phong':
             material = new THREE.MeshLambertMaterial({
-                color: 0xffffff, specular: 0xffffff, shininess: 250,
+                //color: 0xffffff, specular: 0xffffff, shininess: 250,
                 //shading: THREE.FlatShading,
                 side: THREE.BackSide,
                 //vertexColors: THREE.VertexColors,

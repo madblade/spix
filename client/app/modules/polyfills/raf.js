@@ -1,5 +1,5 @@
 /**
- * A kind polyfill for requestAnimationFrame compatibility.
+ * A kind for requestAnimationFrame compatibility.
  */
 
 'use strict';

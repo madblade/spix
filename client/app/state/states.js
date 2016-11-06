@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.StateManager = function(app) {
+App.State.StateManager = function(app) {
     this.app = app;
 
     // States
@@ -20,18 +20,18 @@ App.Engine.StateManager = function(app) {
     this.registerSettings();
 };
 
-App.Engine.StateManager.prototype.registerState = function(stateId, start, end) {
+App.State.StateManager.prototype.registerState = function(stateId, start, end) {
     if (!this.states.hasOwnProperty(stateId)) {
         this.states[stateId] = {start: start.bind(this), end: end.bind(this)};
     }
 };
 
-App.Engine.StateManager.prototype.getState = function() {
+App.State.StateManager.prototype.getState = function() {
     return this.state;
 };
 
 // Low-level setState must handle every kind of state modification
-App.Engine.StateManager.prototype.setState = function(state, opt) {
+App.State.StateManager.prototype.setState = function(state, opt) {
     this.previousState = this.state;
     this.state = state;
 

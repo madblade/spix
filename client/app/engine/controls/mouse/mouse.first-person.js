@@ -6,7 +6,7 @@
 
 App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
     var scope = this;
-    var ce = this.app.connectionEngine;
+    var ce = this.app.engine.connection;
 
     return (function() {
         camera.rotation.set(0,0,0);
@@ -32,6 +32,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             var y = 0;
             var z = yawObject.rotation.z;
 
+            // TODO decouple
             ce.send('r', [z, x]);
         };
 

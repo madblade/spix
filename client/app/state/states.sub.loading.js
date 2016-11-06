@@ -4,11 +4,11 @@
 
 'use strict';
 
-App.Engine.StateManager.prototype.registerLoading = function() {
+App.State.StateManager.prototype.registerLoading = function() {
     this.registerState('loading', this.startLoading, this.endLoading);
 };
 
-App.Engine.StateManager.prototype.startLoading = function () {
+App.State.StateManager.prototype.startLoading = function () {
     $('#announce')
         .addClass('sk-folding-cube')
         .append(
@@ -19,7 +19,7 @@ App.Engine.StateManager.prototype.startLoading = function () {
     );
 };
 
-App.Engine.StateManager.prototype.endLoading = function () {
+App.State.StateManager.prototype.endLoading = function () {
     return new Promise(function(resolve) {
         var loader = $('#announce');
         loader.fadeOut(200, function() {

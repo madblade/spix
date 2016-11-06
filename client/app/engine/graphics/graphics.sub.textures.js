@@ -13,7 +13,7 @@ App.Engine.Graphics.prototype.loadTexture = function(whatTexture) {
     texture.magFilter = THREE.NearestFilter;
     texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-    console.log(texture);
+    // TODO fix mipmaps
     return texture;
 };
 

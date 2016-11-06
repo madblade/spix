@@ -9,7 +9,7 @@ App.Engine.Graphics = function(app) {
 
     // User customizable settings.
     this.settings = {
-        debug: false
+        // debug: false
     };
 
     // Properties.
@@ -34,10 +34,15 @@ App.Engine.Graphics = function(app) {
 
 App.Engine.Graphics.prototype.run = function() {
     // Init objects.
-    var controls = this.app.uiEngine.getControls('first-person', this.camera);
+
+    // TODO decouple
+    var controls = this.app.engine.controls.getControls('first-person', this.camera);
     this.setControls(controls);
+
     if (this.displayAvatar) this.scene.add(this.avatar);
+
     this.scene.add(this.light);
+
     this.positionCameraBehind(this.controls.getObject(),
         [this.avatar.position.x, this.avatar.position.y, this.avatar.position.z]);
 

@@ -238,5 +238,3 @@ if (typeof Promise === 'undefined')
         }
 
     }) (window);
-
-// TODO pointerLock

@@ -7,7 +7,7 @@
 App.Engine.UI.prototype.registerMouseDown = function() {
     var scope = this;
     $(window).mousedown(function(event) {
-        if (scope.app.stateManager.state !== 'ingame') return;
+        if (scope.app.state.getState() !== 'ingame') return;
         switch (event.which) {
             case scope.buttons.left:
                 /*
@@ -31,14 +31,14 @@ App.Engine.UI.prototype.registerMouseDown = function() {
 };
 
 App.Engine.UI.prototype.rayCast = function() {
-    var rayCaster = this.app.graphicsEngine.raycaster;
-    rayCaster.setFromCamera(new THREE.Vector2(0, 0), this.app.graphicsEngine.camera);
-    var terrain = this.app.graphicsEngine.getCloseTerrain();
+    var rayCaster = this.app.engine.graphics.raycaster;
+    rayCaster.setFromCamera(new THREE.Vector2(0, 0), this.app.engine.graphics.camera);
+    var terrain = this.app.engine.graphics.getCloseTerrain();
     return rayCaster.intersectObjects(terrain, true);
 };
 
 App.Engine.UI.prototype.onLeftMouseDown = function() {
-    var ce = this.app.connectionEngine;
+    var ce = this.app.engine.connection;
 
     var intersects = this.rayCast();
     if (intersects.length <= 0) {
@@ -52,7 +52,7 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {
-    var ce = this.app.connectionEngine;
+    var ce = this.app.engine.connection;
     var intersects = this.rayCast();
     if (intersects.length <= 0) {
         console.log('Nothing intersected.');

@@ -10,12 +10,12 @@
 App.Engine.UI.prototype.registerKeyDown = function() {
     $(window).keydown(function(event) {
         event.preventDefault();
-        if (this.app.stateManager.state !== 'ingame') return;
+        if (this.app.state.getState() !== 'ingame') return;
 
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;
-        var ce = this.app.connectionEngine;
+        var ce = this.app.engine.connection;
 
         switch (event.keyCode) {
             case k.arrowUp:
@@ -70,7 +70,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
 // Manage alt-tab like border effects
 App.Engine.UI.prototype.stopKeyboardInteraction = function() {
     var ak = this.activeKeyControls;
-    var ce = this.app.connectionEngine;
+    var ce = this.app.engine.connection;
 
     ce.send('m', 'xx');
     ak.forward = false;
@@ -85,12 +85,12 @@ App.Engine.UI.prototype.stopKeyboardInteraction = function() {
 App.Engine.UI.prototype.registerKeyUp = function() {
     $(window).keyup(function(event) {
         event.preventDefault();
-        if (this.app.stateManager.state !== 'ingame') return;
+        if (this.app.state.getState() !== 'ingame') return;
 
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;
-        var ce = this.app.connectionEngine;
+        var ce = this.app.engine.connection;
 
         switch (event.keyCode) {
             case k.arrowUp:

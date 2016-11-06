@@ -4,11 +4,11 @@
 
 'use strict';
 
-App.Engine.StateManager.prototype.registerHub = function() {
+App.State.StateManager.prototype.registerHub = function() {
     this.registerState('hub', this.startHub, this.endHub);
 };
 
-App.Engine.StateManager.prototype.startHub = function(data) {
+App.State.StateManager.prototype.startHub = function(data) {
     var content = '';
     content += '<table class="table table-bordered" style="width:100%" class="noselect">';
 
@@ -42,12 +42,12 @@ App.Engine.StateManager.prototype.startHub = function(data) {
     });
 
     $('.game-creator').click(function() {
-        application.connectionEngine.send('util', {request: 'createGame', gameType: 'game3d'});
+        application.engine.connection.send('util', {request: 'createGame', gameType: 'game3d'});
         location.reload();
     });
 };
 
-App.Engine.StateManager.prototype.endHub = function () {
+App.State.StateManager.prototype.endHub = function () {
     // Remove jQuery listeners.
     $('tr').off('click');
     $('.game-creator').off('click');
