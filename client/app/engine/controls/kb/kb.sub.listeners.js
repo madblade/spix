@@ -10,11 +10,13 @@
 App.Engine.UI.prototype.registerKeyDown = function() {
     $(window).keydown(function(event) {
         event.preventDefault();
+        // TODO decouple
         if (this.app.state.getState() !== 'ingame') return;
 
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;
+        // TODO decouple
         var ce = this.app.engine.connection;
 
         switch (event.keyCode) {
@@ -70,6 +72,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
 // Manage alt-tab like border effects
 App.Engine.UI.prototype.stopKeyboardInteraction = function() {
     var ak = this.activeKeyControls;
+    // TODO decouple
     var ce = this.app.engine.connection;
 
     ce.send('m', 'xx');
@@ -90,6 +93,7 @@ App.Engine.UI.prototype.registerKeyUp = function() {
         if (!event.keyCode) { return; }
         var k = this.keyControls;
         var ak = this.activeKeyControls;
+        // TODO decouple
         var ce = this.app.engine.connection;
 
         switch (event.keyCode) {

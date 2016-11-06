@@ -21,6 +21,7 @@ App.State.StateManager.prototype.startSettings = function() {
             '</table>';
     };
     var graphicsHTML = function() {
+        // TODO decouple
         var settings = scope.app.engine.graphics.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         for (var s in settings) {
@@ -31,6 +32,7 @@ App.State.StateManager.prototype.startSettings = function() {
         return content;
     };
     var gameplayHTML = function() {
+        // TODO decouple
         var settings = scope.app.engine.controls.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
 
@@ -50,6 +52,7 @@ App.State.StateManager.prototype.startSettings = function() {
         return content;
     };
     var soundHTML = function() {
+        // TODO decouple
         var settings = scope.app.engine.audio.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         content += '<tr id="return"><td>Return</td></tr>';
@@ -73,6 +76,7 @@ App.State.StateManager.prototype.startSettings = function() {
         var l = $('#language');
         l.change(function() {
             var selected = l.find('option:selected').val();
+            // TODO decouple
             scope.app.engine.controls.changeLayout(selected, true); // Don't restart listeners.
             l.off('change');
         });
@@ -100,6 +104,7 @@ App.State.StateManager.prototype.startSettings = function() {
             $(document).off('keydown');
             unlistenHome();
             scope.setState('ingame');
+            // TODO decouple
             app.engine.controls.requestPointerLock();
 
         }.bind(this));
@@ -116,6 +121,7 @@ App.State.StateManager.prototype.startSettings = function() {
 
     $(document).keydown(function(event) {
         if (!event.keyCode) { return; }
+        // TODO decouple
         if (event.keyCode === this.app.engine.controls.keyControls.escape) {
             // Remove listeners and get away from the bike.
             $(document).off('keydown');

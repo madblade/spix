@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Model.Game = function(app) {
+App.Model.Server = function(app) {
     this.app = app;
 
     this.position = [];
@@ -14,19 +14,19 @@ App.Model.Game = function(app) {
     this.isRunning = false;
 };
 
-App.Model.Game.prototype.run = function() {
+App.Model.Server.prototype.run = function() {
     this.isRunning = true;
     console.log('Game effectively started.');
 };
 
-App.Model.Game.prototype.updateChunks = function(data) {
+App.Model.Server.prototype.updateChunks = function(data) {
     if (!this.isRunning) return;
     //data = JSON.parse(data);
 
     this.app.engine.graphics.updateGraphicChunks(data);
 };
 
-App.Model.Game.prototype.updateEntities = function(data) {
+App.Model.Server.prototype.updateEntities = function(data) {
     if (!this.isRunning) return;
 
     data = JSON.parse(data);
@@ -38,6 +38,6 @@ App.Model.Game.prototype.updateEntities = function(data) {
     this.app.engine.graphics.updateGraphicEntities(this.position, this.rotation, this.entities);
 };
 
-App.Model.Game.prototype.endGame = function() {
+App.Model.Server.prototype.endGame = function() {
 
 };

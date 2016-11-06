@@ -104,6 +104,7 @@
 <script src="app/engine/graphics/graphics.sub.textures.js"></script>
 <script src="app/engine/graphics/graphics.sub.updates.js"></script>
 <script src="app/engine/settings/settings.js"></script>
+<script src="app/model/client/client.js"></script>
 <script src="app/model/server/server.js"></script>
 <script src="app/modules/chat/chat.js"></script>
 <script src="app/modules/polyfills/promise.js"></script>
@@ -116,7 +117,7 @@
 <!-- endinjector -->
 <!-- endbuild -->
 
-<script>var app = new App.Core();</script>
+<script>var app = new App.Core().start();</script>
 
 </body>
 </html>

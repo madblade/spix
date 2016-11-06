@@ -12,10 +12,16 @@ var App = App || {
     'Modules': {}
 };
 
+// The road to wisdom? Well it's plain & simple to express
+// Err and err and err again, but less and less and less - Piet Hein
 App.Core = function() {
 
+    // The Core is a Mediator between state, engine, model(s) and modules
+
+    // State pattern manages in-game, loading, menus
     this.state =        new App.State.StateManager(this);
 
+    // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {
         'connection':   new App.Engine.Connection(this),
         'graphics':     new App.Engine.Graphics(this),
@@ -24,34 +30,26 @@ App.Core = function() {
         'settings':     new App.Engine.Settings(this)
     };
 
+    // Model buffers server and client objects
     this.model = {
-        'server':       new App.Model.Game(this)
+        'server':       new App.Model.Server(this),
+        'client':       new App.Model.Client(this)
     };
 
+    // Modules can be registered to add custom behaviours
     this.modules = {
         'chat':         new App.Modules.Chat(this)
     };
-
-    // Initialize states and set as loading.
-    //this.stateManager = new App.State.StateManager(this);
-    this.state.setState('loading');
-
-    // Initialize modules
-    //this.connectionEngine = new App.Engine.Connection(this);
-    //this.graphicsEngine = new App.Engine.Graphics(this);
-    //this.uiEngine = new App.Engine.UI(this);
-    //this.audioEngine = new App.Engine.Audio(this);
-    //
-    //this.gameEngine = new App.Model.Game(this);
-    //
-    //this.chatEngine = new App.Modules.Chat(this);
-
-    // Run application when connection is confirmed.
-    this.connect().then(function() {this.run();}.bind(this));
 };
 
-// TODO register modules
-// TODO reload modules
+App.Core.start = function() {
+    // Run application when connection is confirmed.
+    this.state.setState('loading');
+    this.connect().then(function() {this.run();}.bind(this));
+
+    return this;
+};
+
+// TODO register/reload modules
 // TODO error reporting
 // TODO wrapping DOM queries
-

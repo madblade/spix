@@ -7,6 +7,7 @@
 App.Engine.UI.prototype.registerMouseDown = function() {
     var scope = this;
     $(window).mousedown(function(event) {
+        // TODO decouple
         if (scope.app.state.getState() !== 'ingame') return;
         switch (event.which) {
             case scope.buttons.left:
@@ -31,6 +32,7 @@ App.Engine.UI.prototype.registerMouseDown = function() {
 };
 
 App.Engine.UI.prototype.rayCast = function() {
+    // TODO decouple
     var rayCaster = this.app.engine.graphics.raycaster;
     rayCaster.setFromCamera(new THREE.Vector2(0, 0), this.app.engine.graphics.camera);
     var terrain = this.app.engine.graphics.getCloseTerrain();
@@ -38,6 +40,7 @@ App.Engine.UI.prototype.rayCast = function() {
 };
 
 App.Engine.UI.prototype.onLeftMouseDown = function() {
+    // TODO decouple
     var ce = this.app.engine.connection;
 
     var intersects = this.rayCast();
@@ -52,6 +55,7 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {
+    // TODO decouple
     var ce = this.app.engine.connection;
     var intersects = this.rayCast();
     if (intersects.length <= 0) {
