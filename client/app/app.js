@@ -42,7 +42,7 @@ App.Core = function() {
     };
 };
 
-App.Core.start = function() {
+App.Core.prototype.start = function() {
     // Run application when connection is confirmed.
     this.state.setState('loading');
     this.connect().then(function() {this.run();}.bind(this));

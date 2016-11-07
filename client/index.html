@@ -82,18 +82,18 @@
 <script src="app/engine/connector/connection.js"></script>
 <script src="app/engine/connector/connection.sub.game3d.js"></script>
 <script src="app/engine/controls/controls.js"></script>
-<script src="app/engine/controls/kb/kb.azerty.js"></script>
-<script src="app/engine/controls/kb/kb.custom.js"></script>
 <script src="app/engine/controls/kb/kb.js"></script>
-<script src="app/engine/controls/kb/kb.keys.js"></script>
-<script src="app/engine/controls/kb/kb.listeners.js"></script>
-<script src="app/engine/controls/kb/kb.qwerty.js"></script>
-<script src="app/engine/controls/mouse/mouse.first-person.js"></script>
+<script src="app/engine/controls/kb/kb.sub.azerty.js"></script>
+<script src="app/engine/controls/kb/kb.sub.custom.js"></script>
+<script src="app/engine/controls/kb/kb.sub.keys.js"></script>
+<script src="app/engine/controls/kb/kb.sub.listeners.js"></script>
+<script src="app/engine/controls/kb/kb.sub.qwerty.js"></script>
 <script src="app/engine/controls/mouse/mouse.js"></script>
-<script src="app/engine/controls/mouse/mouse.listeners.js"></script>
-<script src="app/engine/controls/mouse/mouse.pointerlockcontrols.js"></script>
+<script src="app/engine/controls/mouse/mouse.sub.first-person.js"></script>
+<script src="app/engine/controls/mouse/mouse.sub.listeners.js"></script>
+<script src="app/engine/controls/mouse/mouse.sub.pointerlockcontrols.js"></script>
 <script src="app/engine/controls/touch/touch.js"></script>
-<script src="app/engine/controls/touch/touch.listeners.js"></script>
+<script src="app/engine/controls/touch/touch.sub.listeners.js"></script>
 <script src="app/core/core.sub.modules.js"></script>
 <script src="app/engine/graphics/graphics.sub.chunks.faces.js"></script>
 <script src="app/engine/graphics/graphics.sub.chunks.js"></script>
@@ -117,7 +117,7 @@
 <!-- endinjector -->
 <!-- endbuild -->
 
-<script>var app = new App.Core().start();</script>
+<script>var app = new App.Core(); app.start();</script>
 
 </body>
 </html>

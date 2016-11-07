@@ -37,12 +37,18 @@ App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
         // Validate when 'connected' message is received.
         var f = function() {
             // Un-register listener to avoid performance leak.
+            console.log('connected');
             this.socket.removeListener('connected', f);
             resolve();
         }.bind(this);
 
         // Listen for connection.
         this.socket.on('connected', f);
+        this.socket.on('connect', function() {console.log('Connecting...')});
+        this.socket.on('disconnect', function() {console.log('Disconected! :(')});
+        this.socket.on('reconnect', function() {console.log('Reconnecting...')});
+        this.socket.on('reconnect_failed', function() {console.log('Could not reconnect after MANY attempts.')});
+        this.socket.on('reconnect_error', function() {console.log('Reconnection failed! :(')});
     }.bind(this));
 };
 
