@@ -1,9 +1,10 @@
 /**
- * Application entry point.
+ * Client application entry point.
  */
 
 'use strict';
 
+// A wrapped class structure
 var App = App || {
     'State': {},
     'Core': {},
@@ -44,6 +45,7 @@ App.Core = function() {
 
 App.Core.prototype.start = function() {
     // Run application when connection is confirmed.
+    this.state.setState('idle');
     this.state.setState('loading');
     this.connect().then(function() {this.run();}.bind(this));
 

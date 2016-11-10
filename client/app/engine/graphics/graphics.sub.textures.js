@@ -8,12 +8,28 @@ App.Engine.Graphics.prototype.loadTexture = function(whatTexture) {
     var loader = new THREE.TextureLoader();
     var texture = loader.load("app/assets/textures/"+whatTexture);
 
-    texture.anisortopy = this.renderer.getMaxAnisotropy();
+    // Mipmapping...
+    // var p = 512;
+    // for (var i = 0; i<10; ++i) {
+    //     console.log(p + " " + i);
+    //     var current = 'atlas_' + p + '.png';
+    //     const j = i;
+    //     loader.load("app/assets/textures/" + current, function(tex) {texture.mipmaps[j] = tex.image;} );
+    //     p/=2;
+    // }
 
+    // Somehow anisotropy enforces linear mipmap interpolation...
+    // texture.anisotropy = this.renderer.getMaxAnisotropy();
+    texture.generateMipmaps = false;
     texture.magFilter = THREE.NearestFilter;
-    texture.minFilter = THREE.LinearMipMapLinearFilter;
+    texture.minFilter = THREE.NearestFilter;
 
-    // TODO fix mipmaps
+    // TODO fix those ugly anisotropic white lines
+    // Idea #1: use THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+    // then, var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+    // Where materials is an [] of materials and the faces use a materialIndex paramater to get appointed the right mat.
+    // Idea #2: shader
+
     return texture;
 };
 
