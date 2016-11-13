@@ -10,17 +10,6 @@ App.Engine.Connection = function(app) {
 };
 
 App.Engine.Connection.prototype.setup = function(autoconfig) {
-    // Create socket.
-    var promise = this.registerSocketDefault(autoconfig);
-
-    // Define custom listeners on this socket.
-    this.registerSocketCustom(this.socket);
-
-    // This promise waits for the server to confirm connection.
-    return promise;
-};
-
-App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
     var socketAddress = '';
 
     if (!autoconfig && location.hostname !== 'localhost') {
@@ -33,23 +22,18 @@ App.Engine.Connection.prototype.registerSocketDefault = function(autoconfig) {
         path: '/socket.io-client'
     });
 
-    return new Promise(function(resolve) { // (I.E. is not a browser)
-        // Validate when 'connected' message is received.
-        var f = function() {
-            // Un-register listener to avoid performance leak.
-            console.log('connected');
-            this.socket.removeListener('connected', f);
-            resolve();
-        }.bind(this);
+    // Custom listeners.
+    this.socket.on('hub', function(data) {console.log("Hub fetched."); this.app.state.setState('hub', data);}.bind(this)); // TODO refactor
+    this.socket.on('joined', function() {console.log("Starting game..."); this.app.runGame();}.bind(this));
+    this.socket.on('cantjoin', function() {location.reload();}.bind(this));
+    this.socket.on('connected', function() {console.log("Connected."); this.send('util', {request: 'hub'})}.bind(this));
 
-        // Listen for connection.
-        this.socket.on('connected', f);
-        this.socket.on('connect', function() {console.log('Connecting...')});
-        this.socket.on('disconnect', function() {console.log('Disconected! :(')});
-        this.socket.on('reconnect', function() {console.log('Reconnecting...')});
-        this.socket.on('reconnect_failed', function() {console.log('Could not reconnect after MANY attempts.')});
-        this.socket.on('reconnect_error', function() {console.log('Reconnection failed! :(')});
-    }.bind(this));
+    // Default listeners
+    this.socket.on('connect', function() {console.log('Connecting...')});
+    this.socket.on('disconnect', function() {console.log('Disconected! :(')});
+    this.socket.on('reconnect', function() {console.log('Reconnecting...')});
+    this.socket.on('reconnect_failed', function() {console.log('Could not reconnect after MANY attempts.')});
+    this.socket.on('reconnect_error', function() {console.log('Reconnection failed! :(')});
 };
 
 App.Engine.Connection.prototype.addCustomListener = function(message, func) {
@@ -60,35 +44,12 @@ App.Engine.Connection.prototype.removeCustomListener = function(message, func) {
     this.socket.removeListener(message, func);
 };
 
-// Do not register all sockets here anymore
-App.Engine.Connection.prototype.registerSocketCustom = function(socket) {
-};
-
 App.Engine.Connection.prototype.send = function(kind, message) {
     this.socket.emit(kind, message);
 };
 
 App.Engine.Connection.prototype.join = function(gameType, gid) {
-    return new Promise(function(resolve, reject) {
-        // Validate when 'joined' message is received.
-        var f = function() {
-            this.socket.removeListener('joined', f);
-            this.socket.removeListener('cantjoin', g);
-            resolve();
-        }.bind(this);
-
-        // Reject
-        var g = function() {
-            this.socket.removeListener('joined', f);
-            this.socket.removeListener('cantjoin', g);
-            reject();
-        }.bind(this);
-
-        // Listen for connection.
-        this.socket.on('joined', f);
-        this.socket.on('cantjoin', g);
-        this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
-    }.bind(this));
+    this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
 };
 
 App.Engine.Connection.prototype.configureGame = function(gameType, gid) {
@@ -97,5 +58,6 @@ App.Engine.Connection.prototype.configureGame = function(gameType, gid) {
             this.registerSocketForGame3D();
             break;
         default:
+            console.log("Unknown game type...");
     }
 };

@@ -9,7 +9,9 @@ App.State.StateManager.prototype.registerHub = function() {
 };
 
 App.State.StateManager.prototype.startHub = function(data) {
+    var app = this.app;
     var content = '';
+
     content += '<table class="table table-bordered" style="width:100%" class="noselect">';
 
     for (var property in data) {
@@ -27,7 +29,6 @@ App.State.StateManager.prototype.startHub = function(data) {
     hub.addClass('hub').append(content).fadeIn();
 
     // Add listeners.
-    var application = this.app;
     $('tr').click(function() {
         var gameType = $(this).find('td:first').text();
         var gid = $(this).find('td:last').text();
@@ -38,12 +39,11 @@ App.State.StateManager.prototype.startHub = function(data) {
             return;
         }
 
-        application.join(gameType, gid);
+        app.join(gameType, gid);
     });
 
     $('.game-creator').click(function() {
-        application.engine.connection.send('util', {request: 'createGame', gameType: 'game3d'});
-        location.reload();
+        app.requestGameCreation('game3d');
     });
 };
 

@@ -495,11 +495,12 @@ module.exports = function (grunt) {
                         return '<script src="' + filePath + '"></script>';
                     },
                     sort: function (a, b) {
-                        var module = /\.module\.(js|ts)$/;
-                        var aMod = module.test(a);
-                        var bMod = module.test(b);
-                        // inject *.module.js first
-                        return (aMod === bMod) ? 0 : (aMod ? -1 : 1);
+                        //var module = /\.sub\.*\.(js|ts)$/;
+                        //var aMod = module.test(a);
+                        //var bMod = module.test(b);
+                        //// inject *.module.*.js first
+                        //return (aMod === bMod) ? a < b : (aMod ? -1 : 1);
+                        return a < b ? -1 : a > b ? 1 : 0;
                     },
                     starttag: '<!-- injector:js -->',
                     endtag: '<!-- endinjector -->'

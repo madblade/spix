@@ -6,11 +6,13 @@
 
 App.Engine.Connection.prototype.registerSocketForGame3D = function() {
 
-    // TODO decouple
-    this.addCustomListener('chk', this.app.model.server.updateChunks.bind(this.app.model.server));
+    var serverModel = this.app.model.server;
+    var chatModel = this.app.modules.chat;
 
-    this.addCustomListener('ent', this.app.model.server.updateEntities.bind(this.app.model.server));
+    this.addCustomListener('chk', serverModel.updateChunks.bind(serverModel));
 
-    this.addCustomListener('chat', this.app.modules.chat.updateChat.bind(this.app.modules.chat));
+    this.addCustomListener('ent', serverModel.updateEntities.bind(serverModel));
+
+    this.addCustomListener('chat', chatModel.updateChat.bind(chatModel));
 
 };

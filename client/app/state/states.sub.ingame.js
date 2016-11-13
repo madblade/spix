@@ -13,8 +13,8 @@ App.State.StateManager.prototype.startIngame = function() {
 };
 
 App.State.StateManager.prototype.endIngame = function() {
-    app.engine.controls.stopKeyboardListeners();
-    app.engine.controls.stopMouseListeners();
+    // TODO decouple
+    app.engine.controls.stopListeners();
 
     return new Promise(function(resolve) {
         $('#announce').empty().removeClass('reticle-wrapper');

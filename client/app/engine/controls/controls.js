@@ -25,13 +25,21 @@ App.Engine.UI = function(app) {
 };
 
 App.Engine.UI.prototype.run = function() {
+    var graphicsEngine = this.app.engine.graphics;
+
     // TODO detect device (PC, tablet, smartphone, VR <- lol)
     this.setupKeyboard();
     this.setupMouse();
     this.setupTouch();
 
-    // TODO decouple
-    $(window).resize(this.app.engine.graphics.resize.bind(this.app.engine.graphics));
+    $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
+};
+
+App.Engine.UI.prototype.stopListeners = function() {
+    this.stopKeyboardListeners();
+    this.stopMouseListeners();
+    this.stopTouchListeners();
+    $(window).off('resize');
 };
 
 // TODO later fullscreen

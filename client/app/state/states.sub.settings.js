@@ -9,7 +9,7 @@ App.State.StateManager.prototype.registerSettings = function() {
 };
 
 App.State.StateManager.prototype.startSettings = function() {
-    var scope = this;
+    var app = this.app;
 
     // HTML menu getters.
     var homeHTML = function() {
@@ -20,9 +20,10 @@ App.State.StateManager.prototype.startSettings = function() {
             '<tr id="return"><td>Return</td></tr>' +
             '</table>';
     };
+
     var graphicsHTML = function() {
         // TODO decouple
-        var settings = scope.app.engine.graphics.settings;
+        var settings = app.engine.graphics.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         for (var s in settings) {
             content +='<tr><td>' + settings[s] + '</td></tr>';
@@ -31,9 +32,10 @@ App.State.StateManager.prototype.startSettings = function() {
         content += '</table>';
         return content;
     };
+
     var gameplayHTML = function() {
         // TODO decouple
-        var settings = scope.app.engine.controls.settings;
+        var settings = app.engine.controls.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
 
         if (settings.hasOwnProperty('language')) {
@@ -51,9 +53,10 @@ App.State.StateManager.prototype.startSettings = function() {
 
         return content;
     };
+
     var soundHTML = function() {
         // TODO decouple
-        var settings = scope.app.engine.audio.settings;
+        var settings = app.engine.audio.settings;
         var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         content += '<tr id="return"><td>Return</td></tr>';
         for (var s in settings) {
@@ -77,7 +80,7 @@ App.State.StateManager.prototype.startSettings = function() {
         l.change(function() {
             var selected = l.find('option:selected').val();
             // TODO decouple
-            scope.app.engine.controls.changeLayout(selected, true); // Don't restart listeners.
+            app.engine.controls.changeLayout(selected, true); // Don't restart listeners.
             l.off('change');
         });
     }.bind(this);
@@ -103,7 +106,7 @@ App.State.StateManager.prototype.startSettings = function() {
         $('#return').click(function() {
             $(document).off('keydown');
             unlistenHome();
-            scope.setState('ingame');
+            app.state.setState('ingame');
             // TODO decouple
             app.engine.controls.requestPointerLock();
 
@@ -122,7 +125,7 @@ App.State.StateManager.prototype.startSettings = function() {
     $(document).keydown(function(event) {
         if (!event.keyCode) { return; }
         // TODO decouple
-        if (event.keyCode === this.app.engine.controls.keyControls.escape) {
+        if (event.keyCode === app.engine.controls.keyControls.escape) {
             // Remove listeners and get away from the bike.
             $(document).off('keydown');
             unlistenHome();
@@ -132,8 +135,6 @@ App.State.StateManager.prototype.startSettings = function() {
 };
 
 App.State.StateManager.prototype.endSettings = function() {
-    var app = this.app;
-
     // Fade out settings menu.
     return new Promise(function(resolve) {
         var settings = $("#announce");

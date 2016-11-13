@@ -20,6 +20,6 @@ App.Engine.UI.prototype.startTouchListeners = function() {
     this.registerTouch();
 };
 
-App.Engine.UI.prototype.stopKeyboardListeners = function() {
+App.Engine.UI.prototype.stopTouchListeners = function() {
     this.unregisterTouch();
 };

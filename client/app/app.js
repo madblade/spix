@@ -17,9 +17,8 @@ var App = App || {
 // Err and err and err again, but less and less and less - Piet Hein
 App.Core = function() {
 
-    // The Core is a Mediator between state, engine, model(s) and modules
-
-    // State pattern manages in-game, loading, menus
+    // State pattern manages in-game, loading, menus.
+    // Also acts as a Mediator between engine, model(s) and modules
     this.state =        new App.State.StateManager(this);
 
     // Engine manages client-side rendering, audio, inputs/outputs
@@ -33,6 +32,7 @@ App.Core = function() {
 
     // Model buffers server and client objects
     this.model = {
+        'hub':          new App.Model.Hub(this),
         'server':       new App.Model.Server(this),
         'client':       new App.Model.Client(this)
     };
@@ -44,12 +44,10 @@ App.Core = function() {
 };
 
 App.Core.prototype.start = function() {
-    // Run application when connection is confirmed.
-    this.state.setState('idle');
-    this.state.setState('loading');
-    this.connect().then(function() {this.run();}.bind(this));
 
-    return this;
+    this.state.setState('loading');
+
+    this.engine.connection.setup();
 };
 
 // TODO register/reload modules
