@@ -13,7 +13,6 @@ App.State.StateManager.prototype.startIngame = function() {
 };
 
 App.State.StateManager.prototype.endIngame = function() {
-    // TODO decouple
     app.engine.controls.stopListeners();
 
     return new Promise(function(resolve) {

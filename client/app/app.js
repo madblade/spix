@@ -44,12 +44,6 @@ App.Core = function() {
 };
 
 App.Core.prototype.start = function() {
-
     this.state.setState('loading');
-
     this.engine.connection.setup();
 };
-
-// TODO register/reload modules
-// TODO error reporting
-// TODO wrapping DOM queries
