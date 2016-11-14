@@ -55,11 +55,14 @@ App.Engine.Graphics.prototype.render = function() {
 };
 
 App.Engine.Graphics.prototype.animate = function() {
+    var clientModel = this.app.model.client;
+
     // Request animation frame.
     this.requestId = requestAnimationFrame(this.animate.bind(this));
 
     // Render.
     this.render();
+    clientModel.refresh();
 };
 
 App.Engine.Graphics.prototype.stop = function() {

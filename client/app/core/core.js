@@ -1,5 +1,5 @@
 /**
- *
+ * Façade for general utility methods.
  */
 
 'use strict';
@@ -8,7 +8,7 @@ App.Core.prototype.join = function(gameType, gameId) {
     console.log('Joining...');
 
     // Configuration.
-    this.state.setState('ingame');
+    this.setState('ingame');
     this.engine.connection.configureGame(gameType, gameId);
 
     // Start model loop.
@@ -26,6 +26,14 @@ App.Core.prototype.runGame = function() {
 };
 
 App.Core.prototype.requestGameCreation = function(gameType) {
-    this.engine.connection.send('util', {request: 'createGame', gameType: gameType});
+    this.engine.connection.requestGameCreation(gameType);
     location.reload();
+};
+
+App.Core.prototype.getState = function() {
+    return this.state.state;
+};
+
+App.Core.prototype.setState = function(state, opt) {
+    this.state.setState(state, opt);
 };

@@ -14,7 +14,6 @@ App.Engine.UI.prototype.setupKeyboard = function() {
 
     // Controls
     this.keyControls = this.getKeyControls(this.settings.language);
-    this.activeKeyControls = this.getActiveKeyControls();
 
     // Tweak for filtering some events...
     this.tweak = 0;

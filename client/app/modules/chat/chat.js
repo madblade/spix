@@ -20,6 +20,5 @@ App.Modules.Chat.prototype.updateChat = function(data) {
  * @param message
  */
 App.Modules.Chat.prototype.sendMessage = function(message) {
-    // TODO decouple
     this.app.engine.connection.send('chat', message);
 };

@@ -8,48 +8,41 @@
  * Keyboard behaviour when a key is pressed.
  */
 App.Engine.UI.prototype.registerKeyDown = function() {
+    var app = this.app;
+
     $(window).keydown(function(event) {
         event.preventDefault();
-        // TODO decouple
-        if (this.app.state.getState() !== 'ingame') return;
-
         if (!event.keyCode) { return; }
+        if (app.getState() !== 'ingame') return;
+
         var k = this.keyControls;
-        var ak = this.activeKeyControls;
-        // TODO decouple
-        var ce = this.app.engine.connection;
+        var clientModel = app.model.client;
 
         switch (event.keyCode) {
             case k.arrowUp:
             case k.leftHandUp:
-                if (!ak.forward) ce.send('m', 'f');
-                ak.forward = true;
+                clientModel.triggerEvent('m', 'f');
                 break;
             case k.arrowRight:
             case k.leftHandRight:
-                if (!ak.right) ce.send('m', 'r');
-                ak.right = true;
+                clientModel.triggerEvent('m', 'r');
                 break;
             case k.arrowLeft:
             case k.leftHandLeft:
-                if (!ak.left) ce.send('m', 'l');
-                ak.left = true;
+                clientModel.triggerEvent('m', 'l');
                 break;
             case k.arrowDown:
             case k.leftHandDown:
-                if (!ak.backwards) ce.send('m', 'b');
-                ak.backwards = true;
+                clientModel.triggerEvent('m', 'b');
                 break;
             case k.shift:
-                if (!ak.down) ce.send('m', 'd');
-                ak.down = true;
+                clientModel.triggerEvent('m', 'd');
                 break;
             case k.space:
-                if (!ak.up) ce.send('m', 'u');
-                ak.up = true;
+                clientModel.triggerEvent('m', 'u');
                 break;
             case k.f:
-                ce.send('a', 'g');
+                clientModel.triggerEvent('a', 'g');
                 break;
 
             case k.enter:
@@ -71,59 +64,46 @@ App.Engine.UI.prototype.registerKeyDown = function() {
 
 // Manage alt-tab like border effects
 App.Engine.UI.prototype.stopKeyboardInteraction = function() {
-    var ak = this.activeKeyControls;
-    // TODO decouple
-    var ce = this.app.engine.connection;
-
-    ce.send('m', 'xx');
-    ak.forward = false;
-    ak.backwards = false;
-    ak.right = false;
-    ak.left = false;
+    var clientModel = this.app.model.client;
+    clientModel.triggerEvent('m', 'xx');
 };
 
 /**
  * Keyboard behaviour when a key is released.
  */
 App.Engine.UI.prototype.registerKeyUp = function() {
+    var app = this.app;
+
     $(window).keyup(function(event) {
         event.preventDefault();
-        if (this.app.state.getState() !== 'ingame') return;
+        if (!event.keyCode) return;
+        if (app.getState() !== 'ingame') return;
 
-        if (!event.keyCode) { return; }
         var k = this.keyControls;
-        var ak = this.activeKeyControls;
-        // TODO decouple
-        var ce = this.app.engine.connection;
+        var clientModel = app.model.client;
 
         switch (event.keyCode) {
             case k.arrowUp:
             case k.leftHandUp:
-                ak.forward = false;
-                ce.send('m', 'fx');
+                clientModel.triggerEvent('m', 'fx');
                 break;
             case k.arrowRight:
             case k.leftHandRight:
-                ak.right = false;
-                ce.send('m', 'rx');
+                clientModel.triggerEvent('m', 'rx');
                 break;
             case k.arrowLeft:
             case k.leftHandLeft:
-                ak.left = false;
-                ce.send('m', 'lx');
+                clientModel.triggerEvent('m', 'lx');
                 break;
             case k.arrowDown:
             case k.leftHandDown:
-                ak.backwards = false;
-                ce.send('m', 'bx');
+                clientModel.triggerEvent('m', 'bx');
                 break;
             case k.shift:
-                ak.down = false;
-                ce.send('m', 'dx');
+                clientModel.triggerEvent('m', 'dx');
                 break;
             case k.space:
-                ak.up = false;
-                ce.send('m', 'ux');
+                clientModel.triggerEvent('m', 'ux');
                 break;
             default:
         }

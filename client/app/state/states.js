@@ -26,10 +26,6 @@ App.State.StateManager.prototype.registerState = function(stateId, start, end) {
     }
 };
 
-App.State.StateManager.prototype.getState = function() {
-    return this.state;
-};
-
 // Low-level setState must handle every kind of state modification
 App.State.StateManager.prototype.setState = function(state, opt) {
     this.previousState = this.state;

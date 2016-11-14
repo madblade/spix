@@ -17,7 +17,6 @@ App.Engine.UI = function(app) {
     // Keyboard needs a list of possible keystrokes;
     // and a list of keys actually pressed.
     this.keyControls = {};
-    this.activeKeyControls = {};
 
     // Other input methods.
     this.mouse = {};

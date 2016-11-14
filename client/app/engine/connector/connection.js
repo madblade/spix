@@ -23,7 +23,7 @@ App.Engine.Connection.prototype.setup = function(autoconfig) {
     });
 
     // Custom listeners.
-    this.socket.on('hub', function(data) {console.log("Hub fetched."); this.app.state.setState('hub', data);}.bind(this)); // TODO refactor
+    this.socket.on('hub', function(data) {console.log("Hub fetched."); this.app.setState('hub', data);}.bind(this)); // TODO refactor
     this.socket.on('joined', function() {console.log("Starting game..."); this.app.runGame();}.bind(this));
     this.socket.on('cantjoin', function() {location.reload();}.bind(this));
     this.socket.on('connected', function() {console.log("Connected."); this.send('util', {request: 'hub'})}.bind(this));
@@ -50,6 +50,10 @@ App.Engine.Connection.prototype.send = function(kind, message) {
 
 App.Engine.Connection.prototype.join = function(gameType, gid) {
     this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
+};
+
+App.Engine.Connection.prototype.requestGameCreation = function(gameType) {
+    this.send('util', {request: 'createGame', gameType: gameType});
 };
 
 App.Engine.Connection.prototype.configureGame = function(gameType, gid) {

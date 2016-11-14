@@ -6,9 +6,10 @@
 
 App.Engine.UI.prototype.registerMouseDown = function() {
     var scope = this;
+    var app = this.app;
+
     $(window).mousedown(function(event) {
-        // TODO decouple
-        if (scope.app.state.getState() !== 'ingame') return;
+        if (app.getState() !== 'ingame') return;
         switch (event.which) {
             case scope.buttons.left:
                 /*
@@ -32,16 +33,19 @@ App.Engine.UI.prototype.registerMouseDown = function() {
 };
 
 App.Engine.UI.prototype.rayCast = function() {
-    // TODO decouple
-    var rayCaster = this.app.engine.graphics.raycaster;
-    rayCaster.setFromCamera(new THREE.Vector2(0, 0), this.app.engine.graphics.camera);
-    var terrain = this.app.engine.graphics.getCloseTerrain();
+    var graphicsEngine = this.app.engine.graphics;
+
+    var rayCaster = graphicsEngine.raycaster;
+    var camera = graphicsEngine.camera;
+
+    rayCaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    var terrain = graphicsEngine.getCloseTerrain();
+
     return rayCaster.intersectObjects(terrain, true);
 };
 
 App.Engine.UI.prototype.onLeftMouseDown = function() {
-    // TODO decouple
-    var ce = this.app.engine.connection;
+    var clientModel = this.app.model.client;
 
     var intersects = this.rayCast();
     if (intersects.length <= 0) {
@@ -51,12 +55,12 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
     intersects.sort(function(a,b) { return a.distance > b.distance; });
     var point = intersects[0].point;
     var newBlockType = 1; // TODO user selection for block type.
-    ce.send('b', ['add', point.x, point.y, point.z, newBlockType]);
+    clientModel.triggerEvent('b', ['add', point.x, point.y, point.z, newBlockType]);
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {
-    // TODO decouple
-    var ce = this.app.engine.connection;
+    var clientModel = this.app.model.client;
+
     var intersects = this.rayCast();
     if (intersects.length <= 0) {
         console.log('Nothing intersected.');
@@ -64,7 +68,7 @@ App.Engine.UI.prototype.onRightMouseDown = function() {
     }
     intersects.sort(function(a,b) { return a.distance > b.distance; });
     var point = intersects[0].point;
-    ce.send('b', ['del', point.x, point.y, point.z]);
+    clientModel.triggerEvent('b', ['del', point.x, point.y, point.z]);
 };
 
 App.Engine.UI.prototype.onMiddleMouseDown = function() {

@@ -27,14 +27,17 @@ App.Engine.Settings.prototype.goControls = function() {
     this.unlistenHome();
     $("#announce").empty().append(this.getControlsHTML(this.controlsSettings));
     this.listenReturn();
+    this.listenControls();
+};
+
+App.Engine.Settings.prototype.listenControls = function() {
     var l = $('#language');
     l.change(function() {
         var selected = l.find('option:selected').val();
         this.controlsEngine.changeLayout(selected, true); // Don't restart listeners.
-        l.off('change');
     }.bind(this));
 };
 
-App.Engine.Settings.prototype.listenControls = function() {
-
+App.Engine.Settings.prototype.unlistenControls = function() {
+    $('#language').off('change');
 };

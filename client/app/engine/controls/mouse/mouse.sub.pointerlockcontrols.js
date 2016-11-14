@@ -32,8 +32,7 @@ App.Engine.UI.prototype.setupPointerLock = function() {
     }
 
     $(document).mousedown(function (event) {
-        // TODO decouple
-        if (app.state.getState() !== 'ingame') return;
+        if (app.getState() !== 'ingame') return;
 
         switch (event.which) {
             case 2: // Middle
@@ -51,18 +50,19 @@ App.Engine.UI.prototype.setupPointerLock = function() {
 };
 
 App.Engine.UI.prototype.requestPointerLock = function() {
+    var controlsEngine = this.app.engine.controls;
     var b = document.body;
     b.requestPointerLock();
 
-    // TODO decouple
-    this.app.engine.controls.startKeyboardListeners();
-    this.app.engine.controls.startMouseListeners();
+    controlsEngine.startKeyboardListeners();
+    controlsEngine.startMouseListeners();
 };
 
 App.Engine.UI.prototype.pointerLockChanged = function(isPointerLocked) {
-    // TODO decouple
-    this.app.engine.controls.threeControlsEnabled = isPointerLocked;
+    var app = this.app;
+    app.engine.controls.threeControlsEnabled = isPointerLocked;
+
     if (!isPointerLocked) {
-        this.app.state.setState('settings');
+        app.setState('settings');
     }
 };

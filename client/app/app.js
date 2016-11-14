@@ -44,6 +44,6 @@ App.Core = function() {
 };
 
 App.Core.prototype.start = function() {
-    this.state.setState('loading');
+    this.setState('loading');
     this.engine.connection.setup();
 };

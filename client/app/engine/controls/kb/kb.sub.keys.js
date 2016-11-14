@@ -30,17 +30,3 @@ App.Engine.UI.prototype.getKeyControls = function(layout) {
 
     return keyControls;
 };
-
-/**
- * Get possible actions (and if corresponding keys are pressed).
- */
-App.Engine.UI.prototype.getActiveKeyControls = function() {
-    return {
-        forward: false,
-        backwards: false,
-        right: false,
-        left: false,
-        up: false,
-        down: false
-    };
-};
