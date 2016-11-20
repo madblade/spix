@@ -18,12 +18,13 @@ App.Engine.Graphics = function(app) {
     this.defaultGeometrySize = 64; // TODO customize newMesh size variable
 
     // Rendering.
-    this.renderer = this.getRenderer();
-    this.scene = this.getScene();
-    this.camera = this.getCamera();
-    this.raycaster = this.getRaycaster();
-    this.controls = null;
-    this.requestId = null;
+    this.renderer =     this.createRenderer();
+    this.controls =     null;
+    this.requestId =    null;
+
+    this.scene =        this.createScene();
+    this.camera =       this.createCamera();
+    this.raycaster =    this.createRaycaster();
 
     // Initialize DOM element
     this.container = document.getElementById('container');
@@ -33,18 +34,16 @@ App.Engine.Graphics = function(app) {
 };
 
 App.Engine.Graphics.prototype.run = function() {
-    // Init objects.
+    var controlsEngine = this.app.engine.controls;
 
-    // TODO decouple
-    var controls = this.app.engine.controls.getControls('first-person', this.camera);
+    var controls = controlsEngine.getControls('first-person', this.camera);
     this.setControls(controls);
 
-    if (this.displayAvatar) this.scene.add(this.avatar);
+    // if (this.displayAvatar) this.scene.add(this.avatar);
+    // this.scene.add(this.light);
 
-    this.scene.add(this.light);
-
-    this.positionCameraBehind(this.controls.getObject(),
-        [this.avatar.position.x, this.avatar.position.y, this.avatar.position.z]);
+    // var p = this.avatar.position;
+    // this.positionCameraBehind(this.controls.getObject(), [p.x, p.y, p.z]);
 
     // Init animation.
     this.animate();
@@ -56,11 +55,13 @@ App.Engine.Graphics.prototype.render = function() {
 
 App.Engine.Graphics.prototype.animate = function() {
     var clientModel = this.app.model.client;
+    var serverModel = this.app.model.server;
 
     // Request animation frame.
     this.requestId = requestAnimationFrame(this.animate.bind(this));
 
     // Render.
+    serverModel.refresh();
     this.render();
     clientModel.refresh();
 };
@@ -84,17 +85,25 @@ App.Engine.Graphics.prototype.setControls = function(controls, getDirection) {
     this.scene.add(this.controls.getObject());
 };
 
-App.Engine.Graphics.prototype.getCloseTerrain = function() {
-    var meshes = [];
-    var chks = this.chunks;
-    for (var cid in chks) {
-        // TODO extract on 4 closest chunks.
-        var currentChunk = chks[cid];
-        if (!currentChunk.meshes) {
-            console.log("Warn: corrupted chunk inside client model " + cid);
-            continue;
-        }
-        currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
-    }
-    return meshes;
+// App.Engine.Graphics.prototype.getCloseTerrain = function() {
+//     var meshes = [];
+//     var chks = this.chunks;
+//     for (var cid in chks) {
+//         // TODO extract on 4 closest chunks.
+//         var currentChunk = chks[cid];
+//         if (!currentChunk.meshes) {
+//             console.log("Warn: corrupted chunk inside client model " + cid);
+//             continue;
+//         }
+//         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
+//     }
+//     return meshes;
+// };
+
+App.Engine.Graphics.prototype.startListeners = function() {
+    this.controls.startListeners();
+};
+
+App.Engine.Graphics.prototype.stopListeners = function() {
+    this.controls.stopListeners();
 };

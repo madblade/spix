@@ -13,7 +13,7 @@ App.Engine.Graphics.prototype.updateGraphicEntities = function(cp, cr, e) {
             if (this.entities.hasOwnProperty(updatedEntity._id)) { // Update mesh
                 currentEntity = this.entities[updatedEntity._id];
             } else { // Make mesh
-                currentEntity = this.entities[updatedEntity._id] = this.getMesh(this.getGeometry(), this.getMaterial());
+                currentEntity = this.entities[updatedEntity._id] = this.createMesh(this.createGeometry(), this.createMaterial());
                 this.scene.add(currentEntity);
             }
 

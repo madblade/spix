@@ -20,7 +20,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
     this.chunkCapacity = this.chunkSizeX * this.chunkSizeY * this.chunkSizeZ;
 
     // Lights
-    this.light = this.getLight('hemisphere');
+    this.light = this.createLight('hemisphere');
     this.light.position.set(0.5, 1, 0.75);
 
     // Textures
@@ -28,9 +28,9 @@ App.Engine.Graphics.prototype.initObjects = function() {
     this.textureCoordinates = this.getTextureCoordinates();
 
     // Player
-    this.avatar = this.getMesh(
-        this.getGeometry('box'),
-        this.getMaterial('flat-phong')
+    this.avatar = this.createMesh(
+        this.createGeometry('box'),
+        this.createMaterial('flat-phong')
     );
 };
 

@@ -12,7 +12,9 @@ App.Core.prototype.join = function(gameType, gameId) {
     this.engine.connection.configureGame(gameType, gameId);
 
     // Start model loop.
-    this.model.server.run(gameType);
+    this.model.client.init(gameType);
+    this.model.server.init(gameType);
+    console.log('Game effectively started.');
 
     // Try to join specified game.
     this.engine.connection.join(gameType, gameId);
@@ -27,6 +29,7 @@ App.Core.prototype.runGame = function() {
 
 App.Core.prototype.requestGameCreation = function(gameType) {
     this.engine.connection.requestGameCreation(gameType);
+    // TODO single-page without reloading every time a new game is asked...
     location.reload();
 };
 

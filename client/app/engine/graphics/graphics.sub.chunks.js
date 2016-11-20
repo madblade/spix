@@ -98,7 +98,7 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all) {
     c.geometries[0].computeBoundingSphere();
 
     // Make material and mesh.
-    c.materials = [this.getMaterial('textured-phong', 0xaaaaaa)];
+    c.materials = [this.createMaterial('textured-phong', 0xaaaaaa)];
     c.meshes = [new THREE.Mesh(c.geometries[0], c.materials[0])];
 
     // Add to scene.
@@ -243,7 +243,7 @@ App.Engine.Graphics.prototype.updateChunk = function(chunkId, components) {
 
             // Create geometry.
             geometries[meshId] = new THREE.BufferGeometry();
-            materials[meshId] = this.getMaterial('textured-phong', 0xb8860b);
+            materials[meshId] = this.createMaterial('textured-phong', 0xb8860b);
             sizes[meshId] = 1;
             whichFaceIs[meshId] = {};
 

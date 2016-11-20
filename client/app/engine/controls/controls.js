@@ -38,5 +38,4 @@ App.Engine.UI.prototype.stopListeners = function() {
     this.stopKeyboardListeners();
     this.stopMouseListeners();
     this.stopTouchListeners();
-    $(window).off('resize');
 };

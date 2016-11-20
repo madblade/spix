@@ -72,11 +72,13 @@ class UserOutput {
         if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
+        // TODO bundle update in one chunk.
         game.playerman.forEach(p => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
 
             // If an entity in range of player p has just updated
             let entities = game.entityman.extractEntitiesInRange(p);
+            // TODO detect change in position since the last time.
 
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
 

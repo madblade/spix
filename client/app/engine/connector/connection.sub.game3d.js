@@ -14,5 +14,4 @@ App.Engine.Connection.prototype.registerSocketForGame3D = function() {
     this.addCustomListener('ent', serverModel.updateEntities.bind(serverModel));
 
     this.addCustomListener('chat', chatModel.updateChat.bind(chatModel));
-
 };

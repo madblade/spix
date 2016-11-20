@@ -7,37 +7,33 @@
 App.Model.Server = function(app) {
     this.app = app;
 
-    this.position = [];
-    this.rotation = [];
-    this.entities = [];
+    this.worldModel =       new App.Model.Server.WorldModel(app);
+    this.selfModel =        new App.Model.Server.SelfModel(app);
+    this.chunkModel =       new App.Model.Server.ChunkModel(app);
+    this.entityModel =      new App.Model.Server.EntityModel(app);
+    this.structureModel =   new App.Model.Server.StructureModel(app);
 
     this.isRunning = false;
 };
 
-App.Model.Server.prototype.run = function() {
+App.Model.Server.prototype.init = function() {
     this.isRunning = true;
-    console.log('Game effectively started.');
+    this.worldModel.init();
+    this.selfModel.init();
+    this.chunkModel.init();
+    this.entityModel.init();
+    this.structureModel.init();
 };
 
-App.Model.Server.prototype.updateChunks = function(data) {
-    if (!this.isRunning) return;
-    //data = JSON.parse(data);
-
-    this.app.engine.graphics.updateGraphicChunks(data);
+App.Model.Server.prototype.stop = function() {
+    this.isRunning = false;
 };
 
-App.Model.Server.prototype.updateEntities = function(data) {
-    if (!this.isRunning) return;
-
-    data = JSON.parse(data);
-    this.position = data[0];
-    this.rotation = data[1];
-    this.entities = data[2];
-
-    // TODO decouple
-    this.app.engine.graphics.updateGraphicEntities(this.position, this.rotation, this.entities);
-};
-
-App.Model.Server.prototype.endGame = function() {
-
+// Update graphics.
+App.Model.Server.prototype.refresh = function() {
+    this.worldModel.refresh();
+    this.selfModel.refresh();
+    this.chunkModel.refresh();
+    this.entityModel.refresh();
+    this.structureModel.refresh();
 };

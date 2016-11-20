@@ -62,6 +62,9 @@ class UserInput {
 
     rotate(meta, avatar) {
         if (!(meta instanceof Array)) return;
+        // TODO manage border effects on entity destructions
+        if (avatar.rotation === null) return;
+
         let p = meta[0], y = meta[1];
 
         // Manage player rotation

@@ -4,11 +4,7 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.getScene = function() {
-    return new THREE.Scene();
-};
-
-App.Engine.Graphics.prototype.getRenderer = function() {
+App.Engine.Graphics.prototype.createRenderer = function() {
     // Configure renderer
     var renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -20,18 +16,22 @@ App.Engine.Graphics.prototype.getRenderer = function() {
     return renderer;
 };
 
-App.Engine.Graphics.prototype.getCamera = function() {
+App.Engine.Graphics.prototype.createScene = function() {
+    return new THREE.Scene();
+};
+
+App.Engine.Graphics.prototype.createCamera = function() {
     var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.0001, 100000);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
     return camera;
 };
 
-App.Engine.Graphics.prototype.getRaycaster = function() {
+App.Engine.Graphics.prototype.createRaycaster = function() {
     return new THREE.Raycaster();
 };
 
-App.Engine.Graphics.prototype.getMaterial = function(whatMaterial, meta) {
+App.Engine.Graphics.prototype.createMaterial = function(whatMaterial, meta) {
     var material;
 
     switch (whatMaterial) {
@@ -69,7 +69,7 @@ App.Engine.Graphics.prototype.getMaterial = function(whatMaterial, meta) {
     return material;
 };
 
-App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
+App.Engine.Graphics.prototype.createGeometry = function(whatGeometry) {
     var geometry;
 
     switch (whatGeometry) {
@@ -88,11 +88,11 @@ App.Engine.Graphics.prototype.getGeometry = function(whatGeometry) {
     return geometry;
 };
 
-App.Engine.Graphics.prototype.getMesh = function(geometry, material) {
+App.Engine.Graphics.prototype.createMesh = function(geometry, material) {
     return new THREE.Mesh(geometry, material);
 };
 
-App.Engine.Graphics.prototype.getLight = function(whatLight) {
+App.Engine.Graphics.prototype.createLight = function(whatLight) {
     var light;
 
     switch (whatLight) {

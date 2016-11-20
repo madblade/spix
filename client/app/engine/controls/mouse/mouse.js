@@ -26,13 +26,13 @@ App.Engine.UI.prototype.getControls = function(controlType, camera) {
 };
 
 App.Engine.UI.prototype.startMouseListeners = function() {
+    var graphicsEngine = this.app.engine.graphics;
+    graphicsEngine.startListeners();
     this.registerMouseDown();
-    // TODO decouple
-    this.app.engine.graphics.controls.startListeners();
 };
 
 App.Engine.UI.prototype.stopMouseListeners = function() {
+    var graphicsEngine = this.app.engine.graphics;
+    graphicsEngine.stopListeners();
     this.unregisterMouseDown();
-    // TODO decouple
-    this.app.engine.graphics.controls.stopListeners();
 };
