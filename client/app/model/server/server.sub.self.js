@@ -38,12 +38,14 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
     var graphics = this.app.engine.graphics;
     var controls = graphics.controls;
     if (p !== null && r !== null && controls !== null) {
+        // TODO exclude player according to camera type.
         this.avatar.position.x = p[0];
         this.avatar.position.y = p[1];
         this.avatar.position.z = p[2] + .5;
 
-        this.avatar.rotation.z = r[0];
-        graphics.positionCameraBehind(controls.getObject(), p)
+        // TODO ignore self.camerarotation
+        // this.avatar.rotation.z = r[0];
+        graphics.positionCameraBehind(controls.getObject(), p); // Camera wrapper actually
     }
 
     this.needsUpdate = false;

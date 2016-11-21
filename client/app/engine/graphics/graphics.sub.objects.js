@@ -7,31 +7,9 @@
 // Setup basic objects (terrain, avatar).
 App.Engine.Graphics.prototype.initObjects = function() {
 
-    // Semi-model objects
-    this.light = null; // Only 1 for the moment.
-    this.avatar = null;
-    this.entities = {};
-    this.chunks = {};
-    this.displayAvatar = false;
-
-    this.chunkSizeX = 8;
-    this.chunkSizeY = 8;
-    this.chunkSizeZ = 256;
-    this.chunkCapacity = this.chunkSizeX * this.chunkSizeY * this.chunkSizeZ;
-
-    // Lights
-    this.light = this.createLight('hemisphere');
-    this.light.position.set(0.5, 1, 0.75);
-
     // Textures
     this.texture = this.loadTexture('atlas_512.png');
     this.textureCoordinates = this.getTextureCoordinates();
-
-    // Player
-    this.avatar = this.createMesh(
-        this.createGeometry('box'),
-        this.createMaterial('flat-phong')
-    );
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {

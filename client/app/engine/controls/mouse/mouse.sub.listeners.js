@@ -34,7 +34,7 @@ App.Engine.UI.prototype.registerMouseDown = function() {
 
 App.Engine.UI.prototype.rayCast = function() {
     var graphicsEngine = this.app.engine.graphics;
-    var chunkModel = this.app.model.server.chunks;
+    var chunkModel = this.app.model.server.chunkModel;
 
     var rayCaster = graphicsEngine.raycaster;
     var camera = graphicsEngine.camera;

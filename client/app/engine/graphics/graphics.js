@@ -8,9 +8,7 @@ App.Engine.Graphics = function(app) {
     this.app = app;
 
     // User customizable settings.
-    this.settings = {
-        // debug: false
-    };
+    this.debug = false;
 
     // Properties.
     this.windowHalfX = window.innerWidth / 2;
@@ -84,21 +82,6 @@ App.Engine.Graphics.prototype.setControls = function(controls, getDirection) {
     this.controls.name = "controls";
     this.scene.add(this.controls.getObject());
 };
-
-// App.Engine.Graphics.prototype.getCloseTerrain = function() {
-//     var meshes = [];
-//     var chks = this.chunks;
-//     for (var cid in chks) {
-//         // TODO extract on 4 closest chunks.
-//         var currentChunk = chks[cid];
-//         if (!currentChunk.meshes) {
-//             console.log("Warn: corrupted chunk inside client model " + cid);
-//             continue;
-//         }
-//         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
-//     }
-//     return meshes;
-// };
 
 App.Engine.Graphics.prototype.startListeners = function() {
     this.controls.startListeners();

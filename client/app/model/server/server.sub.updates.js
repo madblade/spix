@@ -21,5 +21,5 @@ App.Model.Server.prototype.updateChunks = function(data) {
     // data = JSON.parse(data);
     this.chunkModel.updateChunks(data);
 
-    this.app.engine.graphics.updateGraphicChunks(data);
+    // this.app.engine.graphics.updateGraphicChunks(data);
 };

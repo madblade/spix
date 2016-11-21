@@ -87,6 +87,7 @@ class UserOutput {
 
             if (!chunks || Object.keys(chunks).length === 0) return;
 
+            // TODO dynamically remove chunks with GreyZone, serverside
             p.send('chk', chunks);
 
             // Consider player has loaded chunks.

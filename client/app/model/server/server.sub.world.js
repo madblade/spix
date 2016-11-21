@@ -26,8 +26,9 @@ App.Model.Server.WorldModel.prototype.init = function() {
 App.Model.Server.WorldModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
     var graphics = this.app.engine.graphics;
+    this.needsUpdate = false;
 };
 
 App.Model.Server.WorldModel.prototype.updateWorld = function() {
-
+    this.needsUpdate = true;
 };
