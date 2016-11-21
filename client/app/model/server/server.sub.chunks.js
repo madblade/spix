@@ -9,6 +9,7 @@ App.Model.Server.ChunkModel = function(app) {
 
     // Model component
     this.chunks = new Map();
+    this.chunkUpdates = [];
 
     this.chunkSizeX = 8;
     this.chunkSizeY = 8;
@@ -28,7 +29,22 @@ App.Model.Server.ChunkModel.prototype.init = function() {};
 
 App.Model.Server.ChunkModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
-    var graphics = this.app.engine.graphics;
+
+    var chunkUpdates = this.chunkUpdates;
+    for (var cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
+        var updates = chunkUpdates[cu];
+
+        for (var chunkId in updates) {
+            if (updates[chunkId] === null)
+                this.unloadChunk(chunkId);
+            else if (this.isChunkLoaded(chunkId))
+                this.updateChunk(chunkId, updates[chunkId]);
+            else
+                this.initChunk(chunkId, updates[chunkId]);
+        }
+    }
+
+    this.chunkUpdates = [];
     this.needsUpdate = false;
 };
 
@@ -40,15 +56,8 @@ App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
         console.log(nbcc);
     }
 
-    for (var chunkId in updates) {
-        if (updates[chunkId] === null)
-            this.unloadChunk(chunkId);
-        else if (this.isChunkLoaded(chunkId))
-            this.updateChunk(chunkId, updates[chunkId]);
-        else
-            this.initChunk(chunkId, updates[chunkId]);
-    }
-
+    // Stack updates, waiting for collector to refresh model.
+    this.chunkUpdates.push(updates);
     this.needsUpdate = true;
 };
 
@@ -73,6 +82,7 @@ App.Model.Server.ChunkModel.prototype.initChunk = function(chunkId, all) {
 App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components) {
     var graphics = this.app.engine.graphics;
     var chunk = this.chunks.get(chunkId);
+    if (chunk === undefined) return;
 
     // TODO use graphics in refresh
     graphics.updateChunk(chunk, chunkId, components, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ);

@@ -4,11 +4,8 @@
 
 'use strict';
 
-// App.Engine.Graphics.prototype.isChunkLoaded = function(chunkId) {
-//     return this.chunks.hasOwnProperty(chunkId);
-// };
-
-App.Engine.Graphics.prototype.initChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ) {
+App.Engine.Graphics.prototype.initChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
+{
     // TODO don't discriminate components
     // TODO discriminate components server-side
     var components = all[0];
@@ -95,6 +92,30 @@ App.Engine.Graphics.prototype.initChunk = function(chunkId, all, chunkSizeX, chu
         'whereToFindFace':  whereToFindFace,
         'whichFaceIs':      whichFaceIs
     };
+};
+
+
+App.Engine.Graphics.prototype.updateChunk = function(chunk, chunkId, components, chunkSizeX, chunkSizeY, chunkSizeZ)
+{
+
+    var geometries =        chunk.geometries;
+    var materials =         chunk.materials;
+    var meshes =            chunk.meshes;
+    var capacities =        chunk.capacities;
+    var sizes =             chunk.sizes;
+    var whereToFindFace =   chunk.whereToFindFace;
+    var whichFaceIs =       chunk.whichFaceIs;
+
+    var removed =   components[0];
+    var added =     components[1];
+    var updated =   components[2];
+
+    this.removeChunkFaces(removed, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
+
+    this.addChunkFaces(added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
+        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
+
+    this.updateChunkFaces(updated, geometries);
 };
 
 App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
@@ -315,25 +336,4 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
 App.Engine.Graphics.prototype.updateChunkFaces = function(updated, geometries) {
     for (var uid in updated) {
     }
-};
-
-App.Engine.Graphics.prototype.updateChunk = function(chunk, chunkId, components, chunkSizeX, chunkSizeY, chunkSizeZ) {
-    var geometries =        chunk.geometries;
-    var materials =         chunk.materials;
-    var meshes =            chunk.meshes;
-    var capacities =        chunk.capacities;
-    var sizes =             chunk.sizes;
-    var whereToFindFace =   chunk.whereToFindFace;
-    var whichFaceIs =       chunk.whichFaceIs;
-
-    var removed =   components[0];
-    var added =     components[1];
-    var updated =   components[2];
-
-    this.removeChunkFaces(removed, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
-
-    this.addChunkFaces(added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
-        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
-
-    this.updateChunkFaces(updated, geometries);
 };
