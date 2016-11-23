@@ -8,8 +8,9 @@
 App.Engine.Graphics.prototype.initObjects = function() {
 
     // Textures
-    this.texture = this.loadTexture('atlas_512.png');
-    this.textureCoordinates = this.getTextureCoordinates();
+    //this.texture = this.loadTexture('atlas_512.png');
+    this.texture = this.loadTexture('3.png');
+    this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
 };
 
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {

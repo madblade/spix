@@ -139,6 +139,7 @@ App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
         var position = wtffrid[1];
 
         geometry = geometries[meshId];
+
         vertices =  geometry.attributes.position.array;
         colors =    geometry.attributes.color.array;
         normals =   geometry.attributes.normal.array;
@@ -269,7 +270,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
             geometries[meshId] = geometry;
             materials[meshId] = this.createMaterial('textured-phong', 0xb8860b);
             sizes[meshId] = 1;
-            whichFaceIs[meshId] = {};
+            whichFaceIs.set(meshId, new Map());
 
             var triangles = 2 * defaultGeometrySize;
             var sunCapacity = Math.floor(3/2 * triangles);

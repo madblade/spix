@@ -28,12 +28,12 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
 
     // UVS
     var uvi = 2*i/3;
-    var scalingHD = 2; // depends on texture resolution
+    var scalingHD = 8; // depends on texture resolution
     var ɛ = 0.00390625/scalingHD; // remove 1 pixel (prevent from texture interpolation on edges)
     var txCoords = this.getTexture(nature);
     var offsetU, offsetV;
 
-    if (faceId < ijkS)
+    if (faceId < ijkS) // I
     {
         ii = faceId % iS;
         jj = ((faceId - ii) % ijS) / iS;
@@ -97,7 +97,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         uvs[uvi+10] = offsetU + 0.0625-ɛ; uvs[uvi+11] = offsetV + (normal ? 0.+ɛ : 0.0625-ɛ);
 
     }
-    else if (faceId < 2 * ijkS)
+    else if (faceId < 2 * ijkS) // J
     {
         faceId -= ijkS;
         ii = faceId % iS;
@@ -161,7 +161,7 @@ App.Engine.Graphics.prototype.addFace = function(faceId, i, iS, ijS, ijkS,
         uvs[uvi+10] = offsetU + 0.0625-ɛ;                   uvs[uvi+11] = offsetV + 0.0625-ɛ;
 
     }
-    else
+    else // K
     {
         faceId -= (2 * ijkS);
         ii = faceId % iS;
