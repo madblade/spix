@@ -16,7 +16,7 @@ App.Engine.Graphics.prototype.initObjects = function() {
 App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
     cameraWrapper.position.x = vector[0];
     cameraWrapper.position.y = vector[1]; // + 10;
-    cameraWrapper.position.z = vector[2] + 1.2;
+    cameraWrapper.position.z = vector[2] + .6;
 };
 
 App.Engine.Graphics.prototype.removeObjectFromScene = function(object3D) {

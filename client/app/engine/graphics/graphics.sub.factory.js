@@ -106,3 +106,26 @@ App.Engine.Graphics.prototype.createLight = function(whatLight) {
 
     return light;
 };
+
+App.Engine.Graphics.prototype.createFox = function(entityId, callback) {
+    var loader = new THREE.JSONLoader();
+    var mixers = this.mixers;
+
+    loader.load("app/assets/models/fox.json", function(geometry) {
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+            vertexColors: THREE.FaceColors,
+            morphTargets: true
+        }));
+
+        mesh.scale.set(0.02, 0.02, 0.02);
+        mesh.rotation.x = Math.PI/2;
+        mesh.rotation.y = Math.PI;
+
+        var mixer = new THREE.AnimationMixer(mesh);
+        var clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
+        mixer.clipAction(clip).setDuration(1).play();
+        mixers.set(entityId, mixer);
+
+        callback(mesh);
+    });
+};

@@ -10,12 +10,30 @@ App.Model.Server.EntityModel = function(app) {
     // Model component
     this.entityStates = new Map();
     this.entityPushes = new Map();
+    this.entityLoads = new Set();
 
     // Graphical component
     this.needsUpdate = false;
 };
 
 App.Model.Server.EntityModel.prototype.init = function() {};
+
+App.Model.Server.EntityModel.prototype.updateEntity = function(currentEntity, updatedEntity, graphics, entities) {
+    // Update positions and rotation
+    var p = currentEntity.position;
+    var up = updatedEntity._position;
+    var animate = p.x !== up[0] || p.y !== up[1];
+    p.x = up[0];
+    p.y = up[1];
+    p.z = up[2];
+    currentEntity.rotation.y = Math.PI + updatedEntity._rotation[0];
+
+    // Update animation
+    if (animate) graphics.updateAnimation(updatedEntity._id);
+
+    // Update current "live" entities.
+    entities.set(updatedEntity._id, currentEntity);
+};
 
 App.Model.Server.EntityModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
@@ -24,21 +42,25 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
     var entities = this.entityStates;
     var pushes = this.entityPushes;
     pushes.forEach(function(updatedEntity) {
-        var currentEntity = entities.get(updatedEntity._id);
-        if (currentEntity === undefined) {
-            currentEntity = graphics.createMesh(graphics.createGeometry(), graphics.createMaterial());
-            currentEntity.name = currentEntity._id;
-            graphics.scene.add(currentEntity);
+        var id = updatedEntity._id;
+        if (this.entityLoads.has(id)) return;
+
+        var currentEntity = entities.get(id);
+
+        if (!currentEntity || currentEntity === undefined) {
+            this.entityLoads.add(id);
+            graphics.createFox(id, function(createdEntity) {
+                createdEntity._id = id;
+                graphics.scene.add(createdEntity);
+                this.updateEntity(createdEntity, updatedEntity, graphics, entities);
+                this.entityLoads.delete(id);
+            }.bind(this));
+
+        } else {
+            this.updateEntity(currentEntity, updatedEntity, graphics, entities);
         }
 
-        currentEntity.position.x = updatedEntity._position[0];
-        currentEntity.position.y = updatedEntity._position[1];
-        currentEntity.position.z = updatedEntity._position[2]+.5;
-        currentEntity.rotation.z = updatedEntity._rotation[0];
-
-        // Update current "live" entities.
-        entities.set(updatedEntity._id, updatedEntity);
-    });
+    }.bind(this));
 
     // Flush double buffer.
     this.entityPushes = new Map();

@@ -24,6 +24,10 @@ App.Engine.Graphics = function(app) {
     this.camera =       this.createCamera();
     this.raycaster =    this.createRaycaster();
 
+    // Animations
+    this.prevTime = Date.now();
+    this.mixers =       new Map();
+
     // Initialize DOM element
     this.container = document.getElementById('container');
     this.container.appendChild(this.renderer.domElement);
@@ -62,6 +66,15 @@ App.Engine.Graphics.prototype.animate = function() {
     serverModel.refresh();
     this.render();
     clientModel.refresh();
+};
+
+App.Engine.Graphics.prototype.updateAnimation = function(entityId) {
+    var mixer = this.mixers.get(entityId);
+    if (mixer !== undefined) {
+        var time = Date.now();
+        mixer.update( (time - this.prevTime) * 0.001);
+        this.prevTime = time;
+    }
 };
 
 App.Engine.Graphics.prototype.stop = function() {
