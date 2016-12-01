@@ -4,6 +4,12 @@
 
 'use strict';
 
+
+App.Engine.Graphics.prototype.loadTextures = function() {
+    this.texture = this.loadTexture('3.png');
+    this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
+};
+
 App.Engine.Graphics.prototype.loadTexture = function(whatTexture) {
     var loader = new THREE.TextureLoader();
     var texture = loader.load("app/assets/textures/"+whatTexture);

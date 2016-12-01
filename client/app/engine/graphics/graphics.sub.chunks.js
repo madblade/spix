@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.initChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
+App.Engine.Graphics.prototype.initializeChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
 {
     // TODO don't discriminate components
     // TODO discriminate components server-side

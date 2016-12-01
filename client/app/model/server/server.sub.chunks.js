@@ -40,7 +40,7 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
             else if (this.isChunkLoaded(chunkId))
                 this.updateChunk(chunkId, updates[chunkId]);
             else
-                this.initChunk(chunkId, updates[chunkId]);
+                this.initializeChunk(chunkId, updates[chunkId]);
         }
     }
 
@@ -65,11 +65,11 @@ App.Model.Server.ChunkModel.prototype.isChunkLoaded = function(chunkId) {
     return this.chunks.has(chunkId);
 };
 
-App.Model.Server.ChunkModel.prototype.initChunk = function(chunkId, all) {
+App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
     var graphics = this.app.engine.graphics;
 
     // TODO use graphics in refresh
-    var chunk = graphics.initChunk(chunkId, all, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ, this.chunkCapacity);
+    var chunk = graphics.initializeChunk(chunkId, all, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ, this.chunkCapacity);
     this.chunks.set(chunkId, chunk);
 
     // Add to scene.
