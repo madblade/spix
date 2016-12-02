@@ -25,7 +25,7 @@ App.Model.Server.EntityModel.prototype.addEntity = function(updatedEntity, graph
     switch (updatedEntity.k) {
 
         case 'player':
-            this.addPlayer(id, updatedEntity, graphics, entities);
+            this.loadPlayer(id, updatedEntity, graphics, entities);
             break;
 
         default:

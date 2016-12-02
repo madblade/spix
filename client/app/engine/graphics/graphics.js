@@ -23,6 +23,7 @@ App.Engine.Graphics = function(app) {
     this.scene =        this.createScene();
     this.camera =       this.createCamera();
     this.raycaster =    this.createRaycaster();
+    this.interaction =  'FP';
 
     // Initialize DOM element
     this.container = document.getElementById('container');

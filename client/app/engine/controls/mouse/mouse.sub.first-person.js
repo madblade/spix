@@ -6,7 +6,9 @@
 
 App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
     var scope = this;
+
     var clientModel = this.app.model.client;
+    var graphics = this.app.engine.graphics;
 
     return (function() {
         camera.rotation.set(0,0,0);
@@ -20,19 +22,10 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             if (!scope.threeControlsEnabled) return;
             var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-            yawObject.rotation.z -= movementX * 0.002;
-            pitchObject.rotation.x -= movementY * 0.002;
-            pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
 
-            // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
-            // camera.quaternion.multiply(tmpQuaternion);
-            // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
+            graphics.moveCameraFromMouse(movementX, movementY, yawObject, pitchObject);
 
-            var x = pitchObject.rotation.x;
-            var y = 0;
-            var z = yawObject.rotation.z;
-
-            clientModel.triggerEvent('r', [z, x]);
+            clientModel.triggerEvent('r', [yawObject.rotation.z, pitchObject.rotation.x]);
         };
 
         return {

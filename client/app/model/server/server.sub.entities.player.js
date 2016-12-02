@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Model.Server.EntityModel.prototype.addPlayer = function(id, updatedEntity, graphics, entities) {
+App.Model.Server.EntityModel.prototype.loadPlayer = function(id, updatedEntity, graphics, entities) {
 
     graphics.initializeEntity(id, 'steve', function(createdEntity) {
         createdEntity._id = id;

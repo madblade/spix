@@ -17,35 +17,39 @@ App.Model.Server.SelfModel = function(app) {
     this.needsUpdate = false;
     this.displayAvatar = false;
 
-    this.avatar = graphics.createMesh(
-        graphics.createGeometry('box'),
-        graphics.createMaterial('flat-phong')
-    );
+    this.avatar = null;
 };
 
 App.Model.Server.SelfModel.prototype.init = function() {
     var graphics = this.app.engine.graphics;
-
-    if (this.displayAvatar)
-        graphics.scene.add(this.avatar);
+    this.loadSelf(graphics);
 };
 
 App.Model.Server.SelfModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
-    var p = this.position;
+    var up = this.position;
     var r = this.rotation;
 
     var graphics = this.app.engine.graphics;
-    var controls = graphics.controls;
-    if (p !== null && r !== null && controls !== null) {
-        // TODO exclude player according to camera type.
-        this.avatar.position.x = p[0];
-        this.avatar.position.y = p[1];
-        this.avatar.position.z = p[2] + .5;
+    var avatar = this.avatar;
 
-        // TODO ignore self.camerarotation
-        // this.avatar.rotation.z = r[0];
-        graphics.positionCameraBehind(controls.getObject(), p); // Camera wrapper actually
+    if (!(graphics.controls) || !avatar) return;
+    var p = avatar.position;
+
+    if (up !== null && r !== null && p !== null) {
+
+        var animate = p.x !== up[0] || p.y !== up[1];
+        p.x = up[0];
+        p.y = up[1];
+        p.z = up[2];
+
+        avatar.rotation.y = Math.PI + r[0];
+
+        // Update animation.
+        if (animate) graphics.updateAnimation(-1);
+
+        // Update camera.
+        graphics.positionCameraBehind(up); // Camera wrapper actually
     }
 
     this.needsUpdate = false;
@@ -55,4 +59,15 @@ App.Model.Server.SelfModel.prototype.updateSelf = function(p, r) {
     this.position = p;
     this.rotation = r;
     this.needsUpdate = true;
+};
+
+App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
+
+    // Player id '-1' never used by any other entity.
+    graphics.initializeEntity(-1, 'steve', function(createdEntity) {
+        var object3d = graphics.finalizeEntity(createdEntity);
+        this.avatar = object3d;
+        if (this.displayAvatar) graphics.scene.add(object3d);
+    }.bind(this));
+
 };

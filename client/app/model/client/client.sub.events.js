@@ -65,7 +65,6 @@ App.Model.Client.prototype.getEventsOfType = function(type) {
     return result;
 };
 
-
 App.Model.Client.prototype.filterEvents = function() {
     var events = this.eventsToPush;
     var filteredEvents = [];

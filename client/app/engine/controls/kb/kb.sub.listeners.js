@@ -17,6 +17,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
 
         var k = this.keyControls;
         var clientModel = app.model.client;
+        var graphics = app.engine.graphics;
 
         switch (event.keyCode) {
             case k.arrowUp:
@@ -42,6 +43,9 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 clientModel.triggerEvent('m', 'u');
                 break;
             case k.f:
+                graphics.changeInteraction();
+                break;
+            case k.g: // Gravity.
                 clientModel.triggerEvent('a', 'g');
                 break;
 

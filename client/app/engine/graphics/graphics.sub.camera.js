@@ -15,8 +15,28 @@ App.Engine.Graphics.prototype.createRaycaster = function() {
     return new THREE.Raycaster();
 };
 
-App.Engine.Graphics.prototype.positionCameraBehind = function(cameraWrapper, vector) {
-    cameraWrapper.position.x = vector[0];
-    cameraWrapper.position.y = vector[1]; // + 10;
-    cameraWrapper.position.z = vector[2] + 1.6;
+App.Engine.Graphics.prototype.positionCameraBehind = function(vector) {
+    var cameraWrapper = this.controls.getObject();
+    var i = this.interaction;
+
+    if (i === 'FP') {
+        cameraWrapper.position.x = vector[0];
+        cameraWrapper.position.y = vector[1]; // + 10;
+        cameraWrapper.position.z = vector[2] + 1.6;
+
+    } else if (i === 'TP') {
+        cameraWrapper.position.x = vector[0];
+        cameraWrapper.position.y = vector[1]; // + 10;
+        cameraWrapper.position.z = vector[2] + 1.8;
+    }
+};
+
+App.Engine.Graphics.prototype.moveCameraFromMouse = function(movementX, movementY, yawObject, pitchObject) {
+    yawObject.rotation.z -= movementX * 0.002;
+    pitchObject.rotation.x -= movementY * 0.002;
+    pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
+
+    // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
+    // camera.quaternion.multiply(tmpQuaternion);
+    // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
 };
