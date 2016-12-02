@@ -10,6 +10,7 @@ class Avatar extends Entity {
 
     constructor(id, entityManager) {
         super(id);
+        this._kind = 'player';
 
         this._entityManager = entityManager;
         this._loadedChunks = {};

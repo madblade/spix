@@ -9,6 +9,7 @@ class Entity {
     constructor(id) {
         // Properties
         this._id = id;
+        this._kind = 'abstract';
 
         // Inputs
         this._directions = null;
@@ -27,6 +28,7 @@ class Entity {
     }
 
     get id() { return this._id; }
+    get kind() { return this._kind; }
 
     get directions() { return this._directions; }
 

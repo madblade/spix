@@ -15,8 +15,6 @@ App.Engine.Graphics.prototype.initializeEntity = function(entityId, model, callb
         }));
 
         mesh.scale.set(1.0, 1.0, 1.0);
-        mesh.rotation.x = Math.PI/2;
-        mesh.rotation.y = Math.PI;
 
         var mixer = new THREE.AnimationMixer(mesh);
         var clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
@@ -25,4 +23,26 @@ App.Engine.Graphics.prototype.initializeEntity = function(entityId, model, callb
 
         callbackOnMesh(mesh);
     });
+};
+
+// For composite entities, wrap heavy model parts in higher level structure.
+App.Engine.Graphics.prototype.finalizeEntity = function(createdEntity) {
+    // First only manage avatars.
+    var wrapper = new THREE.Object3D();
+    var head = this.createMesh(
+        this.createGeometry('box'),
+        this.createMaterial('flat-phong')
+    );
+
+    wrapper.add(createdEntity); // Body.
+    wrapper.add(head);
+
+    head.position.y = 1.6;
+    wrapper.rotation.x = Math.PI/2;
+    wrapper.rotation.y = Math.PI;
+
+    wrapper._id = createdEntity._id;
+    delete createdEntity._id;
+
+    return wrapper;
 };

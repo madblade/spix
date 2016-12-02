@@ -18,15 +18,32 @@ App.Model.Server.EntityModel = function(app) {
 
 App.Model.Server.EntityModel.prototype.init = function() {};
 
+App.Model.Server.EntityModel.prototype.addEntity = function(updatedEntity, graphics, entities) {
+    var id = updatedEntity._id;
+    this.entitiesLoading.add(id);
+
+    switch (updatedEntity.k) {
+
+        case 'player':
+            this.addPlayer(id, updatedEntity, graphics, entities);
+            break;
+
+        default:
+            console.log('ServerModel::addEntity: Unknown entity type.');
+    }
+
+};
+
 App.Model.Server.EntityModel.prototype.updateEntity = function(currentEntity, updatedEntity, graphics, entities) {
     // Update positions and rotation
     var p = currentEntity.position;
-    var up = updatedEntity._position;
+    var up = updatedEntity.p;
+
     var animate = p.x !== up[0] || p.y !== up[1];
     p.x = up[0];
     p.y = up[1];
     p.z = up[2];
-    currentEntity.rotation.y = Math.PI + updatedEntity._rotation[0];
+    currentEntity.rotation.y = Math.PI + updatedEntity.r[0];
 
     // Update animation
     if (animate) graphics.updateAnimation(updatedEntity._id);
@@ -46,22 +63,12 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
 
         var id = updatedEntity._id;
         if (this.entitiesLoading.has(id)) return;
+
         var currentEntity = entities.get(id);
-
-        if (!currentEntity || currentEntity === undefined) {
-
-            this.entitiesLoading.add(id);
-            graphics.initializeEntity(id, 'steve', function(createdEntity) {
-                createdEntity._id = id;
-                graphics.scene.add(createdEntity);
-                this.updateEntity(createdEntity, updatedEntity, graphics, entities);
-                this.entitiesLoading.delete(id);
-            }.bind(this));
-
-        } else {
-
+        if (!currentEntity)
+            this.addEntity(updatedEntity, graphics, entities);
+        else
             this.updateEntity(currentEntity, updatedEntity, graphics, entities);
-        }
 
     }.bind(this));
 
@@ -74,6 +81,7 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
 
 App.Model.Server.EntityModel.prototype.updateEntities = function(entities) {
     if (entities === undefined || entities === null) return;
+
     var pushes = this.entitiesOutdated;
     entities.forEach(function(currentEntity) {
         pushes.set(currentEntity._id, currentEntity);

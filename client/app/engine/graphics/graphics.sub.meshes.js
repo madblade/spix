@@ -13,7 +13,7 @@ App.Engine.Graphics.prototype.createGeometry = function(whatGeometry) {
             break;
 
         case 'box':
-            geometry = new THREE.BoxGeometry(0.5, 0.5, 1);
+            geometry = new THREE.BoxGeometry(0.45, 0.45, 0.45);
             break;
 
         default:
