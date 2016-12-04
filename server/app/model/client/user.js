@@ -70,16 +70,17 @@ class User {
     fetchHubState() {
         let games = this._hub.listGames();
         if (Object.keys(games).length < 1) {
-            this._usercon.send('hub', games);
+            this._usercon.send('hub', JSON.stringify(games));
             return;
         }
 
         for (let kind in games) {
             if (games[kind] instanceof Array && games[kind].length > 0) {
-                this._usercon.send('hub', games);
+                this._usercon.send('hub', JSON.stringify(games));
                 return;
             }
         }
+
     }
 
     /**

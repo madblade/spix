@@ -8,18 +8,18 @@ App.State.StateManager.prototype.register.push(function(scope) {
     scope.registerState('hub', scope.startHub, scope.endHub);
 });
 
-App.State.StateManager.prototype.startHub = function(data) {
+App.State.StateManager.prototype.startHub = function(map) {
     var app = this.app;
     var content = '';
 
     content += '<table class="table table-bordered" style="width:100%" class="noselect">';
 
-    for (var property in data) {
-        var games = data[property];
-        for (var id = 0; id < games.length; ++id) {
-            content += '<tr><td>' + property + '</td><td>' + games[id] + '</td></tr>';
+    map.forEach(function(value, key) {
+        for (var id = 0; id < value.length; ++id) {
+            content += '<tr><td>' + key + '</td><td>' + value[id] + '</td></tr>';
         }
-    }
+    });
+
     content += '</table>';
     content += '<div><button class="btn btn-default game-creator" style="width:100%">' +
         'Request 3D game creation</button></div>';

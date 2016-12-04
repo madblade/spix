@@ -41,11 +41,15 @@ class Hub {
     }
 
     requestNewGame(user, kind) {
+        // Verify.
         if (!Hub.validateUser(user)) return false;
         if (!Hub.validateKind(kind)) return false;
         if (!this.validateRequest()) return false;
 
-        this.addGame(kind);
+        // Create game and notify users.
+        const id = this.addGame(kind);
+        this._app.connector.db.notifyGameCreation(kind, id);
+
         return true;
     }
 

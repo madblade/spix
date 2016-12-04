@@ -60,7 +60,6 @@ class UserCon {
     handleCreateGame(kind) {
         const created = this._user.requestNewGame(kind);
         if (created) console.log('Created new game.');
-        // TODO broadcast to those who are in hub, dynamically update hub (hhhh....)
         return created;
     }
 

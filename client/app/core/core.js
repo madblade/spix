@@ -34,7 +34,7 @@ App.Core.prototype.requestGameCreation = function(gameType) {
 
     this.engine.connection.requestGameCreation(gameType);
     // TODO single-page without reloading every time a new game is asked...
-    location.reload();
+    //location.reload();
 };
 
 // Called when a 'join' request is emitted from Hub state.

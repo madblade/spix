@@ -18,6 +18,7 @@ class Connector {
     // Model
     get hub() { return this._app.hub; }
     get io() { return this._io; }
+    get db() { return this._db; }
 
     // When the user connects, register him
     setupUser(socket) {

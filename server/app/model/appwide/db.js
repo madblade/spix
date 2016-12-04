@@ -42,6 +42,17 @@ class DB {
         delete this._users[user.id];
         user.destroy();
     }
+
+    notifyGameCreation(kind, id) {
+        var game = {};
+        game[kind] = [id];
+
+        for (let uid in this._users) {
+            var user = this._users[uid];
+            user.send('hub', JSON.stringify(game));
+        }
+    }
+
 }
 
 export default DB;
