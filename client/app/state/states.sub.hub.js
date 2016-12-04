@@ -21,7 +21,7 @@ App.State.StateManager.prototype.startHub = function(map) {
     });
 
     content += '</table>';
-    content += '<div><button class="btn btn-default game-creator" style="width:100%">' +
+    content += '<div><button class="btn btn-default game-creator" style="float:none">' +
         'Request 3D game creation</button></div>';
 
     // Add content then fade in.

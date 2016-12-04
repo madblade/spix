@@ -42,8 +42,6 @@ App.Engine.UI.prototype.changeLayout = function(newLayout, dontRestartListeners,
     // Prevent keys from being fired when configuring.
     this.stopKeyboardListeners();
 
-    this.activeKeyControls = this.getActiveKeyControls();
-
     switch (newLayout) {
         case 'fr':
         case 'en':

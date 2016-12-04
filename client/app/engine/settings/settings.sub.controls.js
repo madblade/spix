@@ -31,11 +31,13 @@ App.Engine.Settings.prototype.goControls = function() {
 };
 
 App.Engine.Settings.prototype.listenControls = function() {
+    var controlsEngine = this.app.engine.controls;
+
     var l = $('#language');
     l.change(function() {
         var selected = l.find('option:selected').val();
-        this.controlsEngine.changeLayout(selected, true); // Don't restart listeners.
-    }.bind(this));
+        controlsEngine.changeLayout(selected, true); // Don't restart listeners.
+    });
 };
 
 App.Engine.Settings.prototype.unlistenControls = function() {

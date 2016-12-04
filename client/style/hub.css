@@ -17,3 +17,14 @@ tr {
 tr:hover {
     background-color: #894612;
 }
+
+.game-creator {
+    white-space: normal;
+    font-size: 16px;
+    color: coral;
+    background: none;
+}
+.game-creator:hover {
+    background-color: #894612;
+    color: coral;
+}
