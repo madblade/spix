@@ -47,3 +47,9 @@ App.Core.prototype.start = function() {
     this.setState('loading');
     this.engine.connection.connect();
 };
+
+App.Core.prototype.stop = function() {
+    this.setState('loading');
+    this.engine.connection.disconnect();
+    this.stopGame();
+};

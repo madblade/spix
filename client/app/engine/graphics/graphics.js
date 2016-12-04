@@ -45,6 +45,10 @@ App.Engine.Graphics.prototype.run = function() {
     this.animate();
 };
 
+App.Engine.Graphics.prototype.stop = function() {
+    cancelAnimationFrame(this.requestId);
+};
+
 /** Main loop. **/
 
 App.Engine.Graphics.prototype.animate = function() {

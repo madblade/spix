@@ -34,6 +34,11 @@ App.Engine.UI.prototype.run = function() {
     $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
 };
 
+App.Engine.UI.prototype.stop = function() {
+    this.stopListeners();
+    $(window).off('resize');
+};
+
 App.Engine.UI.prototype.stopListeners = function() {
     this.stopKeyboardListeners();
     this.stopMouseListeners();

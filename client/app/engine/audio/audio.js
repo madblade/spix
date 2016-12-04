@@ -54,6 +54,10 @@ App.Engine.Audio.prototype.run = function() {
     }
 };
 
+App.Engine.Audio.prototype.stop = function() {
+    this.stopAllSounds();
+};
+
 App.Engine.Audio.prototype.stopAllSounds = function() {
     var sounds = this.sounds;
     sounds.all.forEach(function(sound) {

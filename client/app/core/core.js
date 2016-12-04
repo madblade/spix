@@ -66,3 +66,9 @@ App.Core.prototype.runGame = function() {
     this.engine.controls.run();
     this.engine.audio.run();
 };
+
+App.Core.prototype.stopGame = function() {
+    this.engine.graphics.stop();
+    this.engine.controls.stop();
+    this.engine.audio.stop();
+};
