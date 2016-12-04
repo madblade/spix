@@ -26,7 +26,7 @@ App.State.StateManager.prototype.startHub = function(data) {
 
     // Add content then fade in.
     var hub = $("#announce");
-    hub.addClass('hub').append(content).fadeIn();
+    hub.empty().removeClass().addClass('hub').append(content).center().fadeIn();
 
     // Add listeners.
     $('tr').click(function() {

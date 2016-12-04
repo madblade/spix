@@ -36,7 +36,6 @@ App.Engine.UI.prototype.run = function() {
 
 App.Engine.UI.prototype.stop = function() {
     this.stopListeners();
-    $(window).off('resize');
 };
 
 App.Engine.UI.prototype.stopListeners = function() {

@@ -19,8 +19,12 @@ App.Core.prototype.isLoading = function() {
 // Called when the socket is connected.
 App.Core.prototype.connectionEstablished = function() {
     console.log("Connected.");
+
     // TODO splash screen.
-    this.engine.connection.requestHubState();
+    setTimeout(
+        function() {this.engine.connection.requestHubState()}.bind(this),
+        1500
+    );
 };
 
 // Called when a 'creation' request is emitted from Hub state.

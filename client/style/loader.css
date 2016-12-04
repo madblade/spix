@@ -1,3 +1,13 @@
+/* Text */
+.title {
+    margin: 20px auto;
+
+    color: coral;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 24px;
+    text-align: center;
+}
+
 /* CSS splash animation */
 
 .sk-folding-cube {
@@ -5,8 +15,9 @@
     width: 40px;
     height: 40px;
     bottom: 40px;
-    -webkit-transform: rotateZ(45deg);
+
     transform: rotateZ(45deg);
+    -webkit-transform: rotateZ(45deg);
 }
 
 .sk-folding-cube .sk-cube {
@@ -26,7 +37,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: whitesmoke;
+    background-color: #8f615b;
     -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
     animation: sk-foldCubeAngle 2.4s infinite linear both;
     -webkit-transform-origin: 100% 100%;

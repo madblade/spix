@@ -10,13 +10,13 @@ App.State.StateManager.prototype.register.push(function(scope) {
 
 App.State.StateManager.prototype.startLoading = function () {
     $('#announce')
-        .addClass('sk-folding-cube')
-        .append(
-        '<div class="sk-cube1 sk-cube"></div>' +
-        '<div class="sk-cube2 sk-cube"></div>' +
-        '<div class="sk-cube4 sk-cube"></div>' +
-        '<div class="sk-cube3 sk-cube"></div>'
-    );
+        .append('<div style="" class="title noselect"><p>voxels pre-α<br/>engineering version</p></div>')
+        .append('<div id="cube" class="sk-folding-cube">' +
+            '<div class="sk-cube1 sk-cube"></div>' +
+            '<div class="sk-cube2 sk-cube"></div>' +
+            '<div class="sk-cube4 sk-cube"></div>' +
+            '<div class="sk-cube3 sk-cube"></div>' +
+        '</div>').center();
 };
 
 App.State.StateManager.prototype.endLoading = function () {

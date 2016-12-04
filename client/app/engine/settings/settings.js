@@ -6,6 +6,8 @@
 
 App.Engine.Settings = function(app) {
     this.app = app;
+
+    this.listeners = [];
 };
 
 App.Engine.Settings.prototype.run = function() {
@@ -19,7 +21,7 @@ App.Engine.Settings.prototype.run = function() {
     this.audioSettings =    app.engine.audio.settings;
 
     // Add content, then fade in and add listeners.
-    $("#announce").addClass('settings').append(this.getHomeHTML()).fadeIn();
+    $("#announce").addClass('settings').append(this.getHomeHTML()).center().fadeIn();
     this.listenHome();
 
     $(document).keydown(function(event) {
@@ -42,4 +44,14 @@ App.Engine.Settings.prototype.stop = function() {
             resolve();
         });
     });
+};
+
+App.Engine.Settings.prototype.unlisten = function() {
+    this.listeners.forEach(function(listener) {
+        var element = $('#'+listener);
+        element.off('click');
+        element.off('keydown');
+    });
+
+    this.listeners = [];
 };

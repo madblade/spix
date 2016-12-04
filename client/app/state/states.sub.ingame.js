@@ -9,7 +9,7 @@ App.State.StateManager.prototype.register.push(function(scope) {
 });
 
 App.State.StateManager.prototype.startIngame = function() {
-    $('#announce').addClass('reticle-wrapper').append('<div class="reticle"></div>').show();
+    $('#announce').removeClass().empty().addClass('reticle-wrapper').append('<div class="reticle"></div>').center().show();
 };
 
 App.State.StateManager.prototype.endIngame = function() {

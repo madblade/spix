@@ -1,10 +1,10 @@
 .settings {
-
     margin: 20px auto;
     width: 25%;
     height: 25%;
-    bottom: 40px;
 
+    color: coral;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
     text-align: center;
-    color: whitesmoke;
 }

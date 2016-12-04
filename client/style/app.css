@@ -13,24 +13,12 @@ body {
     height: 100%;
 }
 
-#announce {
-    margin: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-}
-
 .reticle-wrapper {
-    margin: 20px auto;
     width: 32px;
     height: 32px;
-    bottom: 40px;
 }
 
 .reticle {
-    margin: 20px auto;
-
     right: 32px;
     top: 32px;
     width: 32px;

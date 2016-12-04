@@ -42,6 +42,7 @@ App.Engine.Graphics.prototype.run = function() {
     this.initializeControls();
 
     // Init animation.
+    this.resize();
     this.animate();
 };
 
