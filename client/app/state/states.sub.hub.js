@@ -4,9 +4,9 @@
 
 'use strict';
 
-App.State.StateManager.prototype.registerHub = function() {
-    this.registerState('hub', this.startHub, this.endHub);
-};
+App.State.StateManager.prototype.register.push(function(scope) {
+    scope.registerState('hub', scope.startHub, scope.endHub);
+});
 
 App.State.StateManager.prototype.startHub = function(data) {
     var app = this.app;

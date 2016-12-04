@@ -4,9 +4,9 @@
 
 'use strict';
 
-App.State.StateManager.prototype.registerIngame = function() {
-    this.registerState('ingame', this.startIngame, this.endIngame);
-};
+App.State.StateManager.prototype.register.push(function(scope) {
+    scope.registerState('ingame', scope.startIngame, scope.endIngame);
+});
 
 App.State.StateManager.prototype.startIngame = function() {
     $('#announce').addClass('reticle-wrapper').append('<div class="reticle"></div>').show();

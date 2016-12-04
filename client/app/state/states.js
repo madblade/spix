@@ -8,16 +8,12 @@ App.State.StateManager = function(app) {
     this.app = app;
 
     // States
+    this.states = {};
     this.previousState = '';
     this.state = '';
 
     // Register actions
-    this.states = {};
-
-    this.registerLoading();
-    this.registerHub();
-    this.registerIngame();
-    this.registerSettings();
+    this.register.forEach(function(f){f(this)}.bind(this));
 };
 
 App.State.StateManager.prototype.registerState = function(stateId, start, end) {
@@ -47,3 +43,5 @@ App.State.StateManager.prototype.setState = function(state, opt) {
         }.bind(this));
     }
 };
+
+App.State.StateManager.prototype.register = [];

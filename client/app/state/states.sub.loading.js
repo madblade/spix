@@ -4,9 +4,9 @@
 
 'use strict';
 
-App.State.StateManager.prototype.registerLoading = function() {
-    this.registerState('loading', this.startLoading, this.endLoading);
-};
+App.State.StateManager.prototype.register.push(function(scope) {
+    scope.registerState('loading', scope.startLoading, scope.endLoading);
+});
 
 App.State.StateManager.prototype.startLoading = function () {
     $('#announce')
