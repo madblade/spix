@@ -25,7 +25,7 @@ App.Engine.UI.prototype.getAZERTY = function (layout) {
         leftHandEast2: 70,         // F
         leftHandSouthWest: 87,     // W
         leftHandSouth: 88,         // X
-        leftHandSouthEast: 67,      // C
+        leftHandSouthEast: 67,     // C
 
         // Modifiers.
         alt: 18,
@@ -63,7 +63,7 @@ App.Engine.UI.prototype.getAZERTY = function (layout) {
         padSeven: 103,
         padEight: 104,
         padNine: 105,
-        // 2. if verr.num is not activatedpadOne: 97,
+        // 2. if verr.num is not activated
         padOneAlt: 35,
         padTwoAlt: 40,
         padThreeAlt: 34,
@@ -74,7 +74,28 @@ App.Engine.UI.prototype.getAZERTY = function (layout) {
         padEightAlt: 38,
         padNineAlt: 33,
 
-        // TODO all other letters
-        f: 70
+        // All other letters
+        leftHandNorthEast3: 84,     // T
+        leftHandEast3: 71,          // G
+        leftHandSouthEast3: 86,     // V
+
+        rightHandUp: 73,            // I
+        rightHandDown: 75,          // K
+        rightHandLeft: 74,          // J
+        rightHandLeft2: 72,         // H
+        rightHandRight: 76,         // L
+        rightHandRight2: 77,        // M
+        rightHandSouth: 190,        // .
+
+        rightHandNorthWest: 85,     // U
+        rightHandNorthWest2: 89,    // Y
+        rightHandNorthEast: 79,     // O
+        rightHandNorthEast2: 80,    // P
+        rightHandSouthWest: 188,    // ,
+        rightHandSouthWest2: 78,    // N
+        rightHandSouthWest3: 66,    // B
+        rightHandSouthEast: 191,    // /
+        rightHandSouthEast2: 223    // ß
+
     };
 };

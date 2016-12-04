@@ -42,10 +42,10 @@ App.Engine.UI.prototype.registerKeyDown = function() {
             case k.space:
                 clientModel.triggerEvent('m', 'u');
                 break;
-            case k.f:
+            case k.leftHandEast2: // F
                 graphics.changeInteraction();
                 break;
-            case k.g: // Gravity.
+            case k.leftHandEast3: // (G)ravity.
                 clientModel.triggerEvent('a', 'g');
                 break;
 
