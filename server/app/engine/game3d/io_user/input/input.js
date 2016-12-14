@@ -41,12 +41,12 @@ class UserInput {
     move(meta, avatar) {
         var hasMoved = true;
         switch (meta) {
-            case 'f' : avatar.goForward();      break;
-            case 'r' : avatar.goRight();        break;
-            case 'l' : avatar.goLeft();         break;
-            case 'b' : avatar.goBackwards();    break;
-            case 'u' : avatar.goUp();           break;
-            case 'd' : avatar.goDown();         break;
+            case 'f'  : avatar.goForward();     break;
+            case 'r'  : avatar.goRight();       break;
+            case 'l'  : avatar.goLeft();        break;
+            case 'b'  : avatar.goBackwards();   break;
+            case 'u'  : avatar.goUp();          break;
+            case 'd'  : avatar.goDown();        break;
 
             case 'fx' : avatar.stopForward();   break;
             case 'rx' : avatar.stopRight();     break;
@@ -95,7 +95,7 @@ class UserInput {
     push(kind, avatar) {
         return (data => {
             var array = this._incoming.get(avatar);
-            if (!array || array === 'undefined') {
+            if (!array) {
                 this._incoming.set(avatar, [{action:kind, meta:data}]);
             } else {
                 this._incoming.get(avatar).push({action:kind, meta:data});

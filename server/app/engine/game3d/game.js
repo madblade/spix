@@ -34,7 +34,7 @@ class Game3D extends Game {
         // Models.
         this._worldModel =  new WorldModel(gameId);
         this._entityModel = new EntityModel(this._worldModel);
-        this._worldModel.entityman = this._entityModel;
+        this._worldModel.entityModel = this._entityModel;
         this._xModel = new XModel();
 
         // Engines.
@@ -76,9 +76,9 @@ class Game3D extends Game {
         this._topologyEngine.update();  // Update topological model.
 
         // TODO remove from here
-        this._entityModel.update();     // Update entities.
-        this._worldModel.update();      // Update blocks.
-        this._xModel.update();
+        //this._entityModel.update();     // Update entities.
+        //this._worldModel.update();      // Update blocks.
+        //this._xModel.update();
 
         this._externalOutput.update();  // Send updates.
         this._internalOutput.update();  // Update perceptions.

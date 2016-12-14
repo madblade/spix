@@ -64,7 +64,7 @@ class UpdateAPI {
         }
     }
 
-    static addBlock(originEntity, x, y, z, blockId, worldManager, entityManager)
+    static addBlock(originEntity, x, y, z, blockId, worldManager, entityModel)
     {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
@@ -92,7 +92,7 @@ class UpdateAPI {
 
         // Validate request.
         if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk,
-                blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
+                blockCoordinatesOnChunk, entityModel, isBoundaryX, isBoundaryY, isBoundaryZ))
         {
             return;
         }
@@ -159,7 +159,7 @@ class UpdateAPI {
     }
 
     static translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
-                                             entityManager, isBoundaryX, isBoundaryY, isBoundaryZ)
+                                             entityModel, isBoundaryX, isBoundaryY, isBoundaryZ)
     {
         function failure(reason) { console.log("Request denied: " + reason); }
 
@@ -221,7 +221,7 @@ class UpdateAPI {
         }
 
         // Detect entities.
-        if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
+        if (entityModel.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
         {
             failure("an entity is present on the block.");
             return false;

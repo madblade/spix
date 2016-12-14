@@ -26,10 +26,6 @@ class EntityModel {
         }
     }
 
-    update() {
-        // Update entities.
-    }
-
     get updatedEntities() {
         return this._updatedEntities;
     }

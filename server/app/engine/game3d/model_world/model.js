@@ -42,16 +42,11 @@ class WorldModel {
     get chunkDimensionZ() { return this._zSize; }
 
     get generationMethod() { return this._generationMethod; }
-    get entityman() { return this._entityModel; }
+    get entityModel() { return this._entityModel; }
 
     set allChunks(newChunks) { this._chunks = newChunks; }
-    set entityman(entityman) { this._entityModel = entityman; }
+    set entityModel(entityman) { this._entityModel = entityman; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
-
-    update() {
-        // Update world
-        // TODO defer updates when server loops in here.
-    }
 
     get updatedChunks() {
         var updatedChunks = new Map();

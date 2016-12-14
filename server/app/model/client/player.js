@@ -13,7 +13,7 @@ class Player {
         this._game = game;
         // May be given an avatar when logged to a game.
         this._avatar = undefined;
-        this._playercon = Factory.createPlayerConnection(user.connection.socket);
+        this._playerConnection = Factory.createPlayerConnection(user.connection.socket);
     }
 
     // Model
@@ -25,7 +25,7 @@ class Player {
      * @param room Socket subset of users.
      */
     join(room) {
-        this._playercon.join(room);
+        this._playerConnection.join(room);
     }
 
     /**
@@ -34,7 +34,7 @@ class Player {
      * @param data
      */
     send(kind, data) {
-        this._playercon.send(kind, data);
+        this._playerConnection.send(kind, data);
     }
 
     // Leave game and make the game forget.
@@ -45,7 +45,7 @@ class Player {
 
     // Close player connection.
     disconnect() {
-        this._playercon.close();
+        this._playerConnection.close();
     }
 
     /**
@@ -54,7 +54,7 @@ class Player {
      * @param behaviour
      */
     on(message, behaviour) {
-        this._playercon.on(message, behaviour);
+        this._playerConnection.on(message, behaviour);
     }
 
     /**
@@ -63,14 +63,14 @@ class Player {
      * @param behaviour
      */
     off(message, behaviour) {
-        this._playercon.off(message, behaviour);
+        this._playerConnection.off(message, behaviour);
     }
 
     // Clean references. Only use from a Game instance.
     destroy() {
-        // Destroy playercon which is a single child of this object.
-        if (this._playercon) this._playercon.destroy();
-        delete this._playercon;
+        // Destroy player connection which is a single child of this object.
+        if (this._playerConnection) this._playerConnection.destroy();
+        delete this._playerConnection;
         delete this._game;
         delete this._user;
     }

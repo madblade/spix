@@ -9,11 +9,11 @@ import Hub              from './appwide/hub';
 
 import User             from './client/user';
 import Player           from './client/player';
-import PlayerManager    from './client/playermanager';
+import PlayerManager    from './client/player_manager';
 
 import Connection       from './connection/connection';
-import UserConnection   from './connection/userconnection';
-import PlayerConnection from './connection/playerconnection';
+import UserConnection   from './connection/user_connection';
+import PlayerConnection from './connection/player_connection';
 
 import Game             from './game/game';
 import GameFactory      from '../engine/game.factory';
