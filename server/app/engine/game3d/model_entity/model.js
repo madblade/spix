@@ -5,7 +5,7 @@
 'use strict';
 
 import EntityFactory from './factory';
-import CollectionUtil from '../../../math/collections/util';
+import CollectionUtil from '../../math/collections/util';
 
 class EntityManager {
 

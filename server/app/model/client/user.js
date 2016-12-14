@@ -30,27 +30,17 @@ class User {
     get ingame() { return this._ingame; }
     set ingame(value) { if (value) this._ingame = value; }
 
-    /**
-     * Send a message to this user through its UserConnection.
-     * @param kind
-     * @param data
-     */
+    // Send a message to this user through its UserConnection.
     send(kind, data) {
         this._userConnection.send(kind, data);
     }
 
-    /**
-     * Requests the hub to create a new gaming pool.
-     * @param data
-     * @returns {*}
-     */
+    // Requests the hub to create a new gaming pool.
     requestNewGame(data) {
         return this._hub.requestNewGame(this, data);
     }
 
-    /**
-     * Join a specific game.
-     */
+    // Join a specific game.
     join(kind, gameId) {
         this._ingame = true;
         var game = this._hub.getGame(kind, gameId);
@@ -83,9 +73,7 @@ class User {
 
     }
 
-    /**
-     * Leave all games (current game). Stay idle.
-     */
+    // Leave all games (current game). Stay idle.
     leave() {
         this._ingame = false;
         if (this._player) {
@@ -97,10 +85,8 @@ class User {
         this._userConnection.listen();
     }
 
-    /**
-     * Disconnect from ingame socket. Stay inside game model.
-     * Maybe the connection will come back.
-     */
+    // Disconnect from ingame socket. Stay inside game model.
+    // Maybe the connection will come back.
     disconnect() {
         // Do not destroy player (account for unexpected disconnections)
         if (this._player) this._player.disconnect();

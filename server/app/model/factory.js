@@ -4,22 +4,23 @@
 
 'use strict';
 
-import DB from './appwide/db';
-import Hub from './appwide/hub';
-import User from './client/user';
-import Game from './game/game';
-import Player from './client/player';
-import PlayerManager from './client/playerman';
+import DB               from './appwide/db';
+import Hub              from './appwide/hub';
 
-import Connection from './connection/connection';
-import UserConnection from './connection/userconnection';
+import User             from './client/user';
+import Player           from './client/player';
+import PlayerManager    from './client/playermanager';
+
+import Connection       from './connection/connection';
+import UserConnection   from './connection/userconnection';
 import PlayerConnection from './connection/playerconnection';
 
-import GameFactory from '../engine/game.factory';
+import Game             from './game/game';
+import GameFactory      from '../engine/game.factory';
 
 class Factory {
 
-    // App-level classes
+    /** App-level classes */
 
     static createDB(connector) {
         return new DB(connector);
@@ -33,7 +34,7 @@ class Factory {
         return new User(hub, socket, nick, id);
     }
 
-    // Gaming classes
+    /** Gaming classes */
 
     static createGame(hub, kind, gameId, connector) {
         return GameFactory.createGame(hub, kind, gameId, connector);
@@ -47,7 +48,7 @@ class Factory {
         return new PlayerManager();
     }
 
-    // Connection classes
+    /** Connection classes */
 
     static createConnection(app) {
         return new Connection(app);

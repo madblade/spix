@@ -59,7 +59,7 @@ class ExtractAPI {
 
         // Force update entity to load all chunks
         //if (!av.areChunksLoaded) {
-        //    worldManager.entityman.entityUpdated(av.id);
+        //    worldManager.entityModel.entityUpdated(av.id);
         //}
 
         return chunksForNewPlayer;
@@ -123,7 +123,7 @@ class ExtractAPI {
         }
 
         //if (!av.areChunksLoaded) {
-        //    worldManager.entityman.entityUpdated(av.id);
+        //    worldManager.entityModel.entityUpdated(av.id);
         //}
 
         return chunksForPlayer;

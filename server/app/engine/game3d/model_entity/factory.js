@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Avatar from './../entities/avatar';
+import Avatar from './avatar';
 
 class EntityFactory {
 

@@ -23,7 +23,7 @@ class Game {
         this._ready = false;
 
         //
-        this._playerman = Factory.createPlayerManager();
+        this._playerManager = Factory.createPlayerManager();
     }
 
     // Model
@@ -83,7 +83,7 @@ class Game {
         player.join(this.gameId);
 
         // Add player to model.
-        this._playerman.addPlayer(player);
+        this._playerManager.addPlayer(player);
 
         // Start game if need be.
         if (this._isRunning) return;
@@ -95,15 +95,15 @@ class Game {
         console.log('A player left.');
 
         // Remove from model.
-        this._playerman.removePlayer(player);
+        this._playerManager.removePlayer(player);
 
         // Stop game if need be.
-        if (this._playerman.nbPlayers > 0 || !this._isRunning) return;
+        if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
         this.stop(true); // Stop with idle timeout.
     }
 
     removeAllPlayers() {
-        this._playerman.removeAllPlayers();
+        this._playerManager.removeAllPlayers();
         if (this._isRunning) this.stop(true); // Stop with idle timeout.
     }
 
@@ -117,7 +117,7 @@ class Game {
     destroy() {
         if (this._isRunning) this.stop(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
-        this._playerman.destroy();
+        this._playerManager.destroy();
         delete this._hub;
         delete this._timeIdleId;
         delete this._gameId;

@@ -7,11 +7,11 @@
 import Chunk from './../chunk';
 import ExtractionAPI from './../extraction/extractionapi';
 
-import GenTest from './generator.test';
-import GenAnalytic from './generator.analytic';
-import GenSimple from './generator.simple';
-import GenPerlin from './generator.perlin';
-import GenSimplePerlin from './generator.simple-perlin';
+import GenTest from './generator.test.js';
+import GenAnalytic from './generator.analytic.js';
+import GenSimple from './generator.simple.js';
+import GenPerlin from './generator.perlin.js';
+import GenSimplePerlin from './generator.simple-perlin.js';
 
 class ChunkGenerator {
 

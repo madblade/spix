@@ -22,9 +22,7 @@ class UserConnection {
         this._socket.emit(kind, data);
     }
 
-    /**
-     * Game & hub management
-     */
+    // Game & hub management.
     listen() {
         // Use a unique channel for util functions
         // Actions are specified within the data

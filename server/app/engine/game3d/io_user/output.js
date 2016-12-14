@@ -18,16 +18,16 @@ class UserOutput {
         let a = p.avatar;
 
         // Load chunks.
-        let chunks = game.worldman.extractChunksForNewPlayer(p);
+        let chunks = game.worldModel.extractChunksForNewPlayer(p);
         p.send('chk', chunks);
 
         // Load entities.
-        let entities = game.entityman.extractEntitiesInRange(p);
+        let entities = game.entityModel.extractEntitiesInRange(p);
         p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
 
         // Consider player has loaded chunks.
         for (let cid in chunks) {
-            let cs = game.worldman.allChunks;
+            let cs = game.worldModel.allChunks;
             if (cs.hasOwnProperty(cid)) a.setChunkAsLoaded(cs[cid]);
         }
 
@@ -51,39 +51,39 @@ class UserOutput {
 
     updateChunks()  {
         let game = this._game;
-        var updatedChunks = game.worldman.updatedChunks;
+        var updatedChunks = game.worldModel.updatedChunks;
         if (Object.keys(updatedChunks).length < 1) return;
 
-        game.playerman.forEach(p => {
+        game.players.forEach(p => {
             if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
 
             // If an update occurred on an existing, loaded chunk
-            let chunks = game.worldman.extractUpdatedChunksForPlayer(p);
+            let chunks = game.worldModel.extractUpdatedChunksForPlayer(p);
             p.send('chk', chunks);
         });
 
         // Tell object manager we have done update.
-        game.worldman.chunkUpdatesTransmitted();
+        game.worldModel.chunkUpdatesTransmitted();
     }
 
     updateEntities() {
         let game = this._game;
-        var updatedEntities = game.entityman.updatedEntities;
+        var updatedEntities = game.entityModel.updatedEntities;
         if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
         // TODO bundle update in one chunk.
-        game.playerman.forEach(p => {
+        game.players.forEach(p => {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
 
             // If an entity in range of player p has just updated
-            let entities = game.entityman.extractEntitiesInRange(p);
+            let entities = game.entityModel.extractEntitiesInRange(p);
             // TODO detect change in position since the last time.
 
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
 
             // TODO check 'player has updated position'
-            let chunks = game.worldman.extractNewChunksInRangeForPlayer(p);
+            let chunks = game.worldModel.extractNewChunksInRangeForPlayer(p);
 
             if (!chunks || Object.keys(chunks).length === 0) return;
 
@@ -92,14 +92,14 @@ class UserOutput {
 
             // Consider player has loaded chunks.
             for (let cid in chunks) {
-                let cs = game.worldman.allChunks;
+                let cs = game.worldModel.allChunks;
                 if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
             }
             // TODO remove old chunks
         });
 
         // Tell object manager we have done update.
-        game.entityman.updateEntitiesTransmitted();
+        game.entityModel.updateEntitiesTransmitted();
     }
 
     updateMeta() {

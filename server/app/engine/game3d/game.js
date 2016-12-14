@@ -4,15 +4,18 @@
 
 'use strict';
 
-import Game from '../../model/game/game';
+import Game             from '../../model/game/game';
 
-import Physics from './physics/physics';
-import UserInput from './ui/input';
-import UserOutput from './ui/output';
-import AI from './ai/ai';
-import EntityManager from './objects/entities/manager';
-import WorldManager from './objects/world/manager';
-import Chat from './../../model/connection/chat';
+import UserInput        from './io_user/input';
+import UserOutput       from './io_user/output';
+import AI               from './io_ai/ai';
+
+import Physics          from './engine_physics/physics';
+
+import EntityModel      from './model_entity/model';
+import WorldModel       from './model_world/model';
+
+import Chat             from './../../model/connection/chat';
 
 class Game3D extends Game {
 
@@ -34,22 +37,25 @@ class Game3D extends Game {
         //this._physicsEngine;    //
 
         // I/O.
-        //this._input;            //
-        //this._output;           //
+        //this._internalInput;            // A.I.
+        //this._externalInput;            // Users.
+
+        //this._internalOutput;           // A.I.
+        //this._externalOutput;           // Users.
 
 
         // Setup managers.
         this._inputman = new UserInput(this);
         this._outputman = new UserOutput(this);
 
-        this._worldman =  new WorldManager(gameId);
-        this._entityman = new EntityManager(this._worldman);
+        this._worldman =  new WorldModel(gameId);
+        this._entityman = new EntityModel(this._worldman);
         this._worldman.entityman = this._entityman;
 
         this._chat = new Chat(this);
         this._physics = new Physics(this._entityman, this._worldman);
         this._ai = new AI();
-        // super:_playerman
+        // super:_playerManager
 
         // Generate then listen players.
         this._worldman.generate()
@@ -58,7 +64,7 @@ class Game3D extends Game {
     }
 
     configurePlayerManager() {
-        let playerman = this._playerman;
+        let playerman = this._playerManager;
 
         playerman.setAddPlayerBehaviour(p => {
             this._entityman.spawnPlayer(p);
@@ -75,9 +81,9 @@ class Game3D extends Game {
     }
 
     // Model
-    get playerman() { return this._playerman; }
-    get entityman() { return this._entityman; }
-    get worldman() { return this._worldman; }
+    get players() { return this._playerManager; }
+    get entityModel() { return this._entityman; }
+    get worldModel() { return this._worldman; }
     get physics() { return this._physics; }
     get chat() { return this._chat; }
 
@@ -93,7 +99,7 @@ class Game3D extends Game {
         this._ai.update();          // Update perceptions, intents.
         this._outputman.update();   // Send updates.
 
-        // var n = this._playerman.nbPlayers;
+        // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
 
         // this._tt += 1;
