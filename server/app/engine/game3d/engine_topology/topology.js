@@ -6,8 +6,8 @@
 
 class TopologyEngine {
 
-    constructor(worldManager) {
-        this._worldManager = worldManager;
+    constructor(worldModel) {
+        this._worldModel = worldModel;
     }
 
     update() {

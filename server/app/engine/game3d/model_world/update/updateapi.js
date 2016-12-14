@@ -30,7 +30,7 @@ class UpdateAPI {
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
         if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
 
-        let chunk = worldManager.allChunks[starterChunkId];
+        let chunk = worldManager.allChunks.get(starterChunkId);
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
             return chunk;
         }
@@ -48,19 +48,19 @@ class UpdateAPI {
         if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
-            return worldManager.allChunks[rightChunkId];
+            return worldManager.allChunks.get(rightChunkId);
         }
 
         if (isBoundaryY) {
             blockCoordinatesOnChunk[1] = dimY-1;
             const rightChunkId = chunkI + ',' + (chunkJ-1) + ',' + chunkK;
-            return worldManager.allChunks[rightChunkId];
+            return worldManager.allChunks.get(rightChunkId);
         }
 
         if (isBoundaryZ) {
             blockCoordinatesOnChunk[2] = dimZ-1;
             const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
-            return worldManager.allChunks[rightChunkId];
+            return worldManager.allChunks.get(rightChunkId);
         }
     }
 

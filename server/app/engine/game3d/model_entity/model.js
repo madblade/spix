@@ -7,10 +7,10 @@
 import EntityFactory from './factory';
 import CollectionUtil from '../../math/collections/util';
 
-class EntityManager {
+class EntityModel {
 
     constructor(worldManager) {
-        this._worldManager = worldManager;
+        this._worldModel = worldManager;
 
         // Objects.
         this._entities = {};
@@ -53,7 +53,7 @@ class EntityManager {
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
         p.avatar = EntityFactory.createAvatar(id, this);
-        p.avatar.spawn(this._worldManager.getFreePosition());
+        p.avatar.spawn(this._worldModel.getFreePosition());
         this._entities[id] = p.avatar;
     }
 
@@ -81,4 +81,4 @@ class EntityManager {
     }
 }
 
-export default EntityManager;
+export default EntityModel;

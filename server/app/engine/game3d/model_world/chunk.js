@@ -18,7 +18,7 @@ class Chunk {
 
     constructor(xSize, ySize, zSize, chunkId, worldManager) {
         // App.
-        this._worldManager = worldManager;
+        this._worldModel = worldManager;
 
         // Dimensions, coordinates
         this._xSize = xSize;
@@ -72,7 +72,7 @@ class Chunk {
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
     get ready() { return this._ready; }
-    get manager() { return this._worldManager; }
+    get manager() { return this._worldModel; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
@@ -87,7 +87,7 @@ class Chunk {
      */
     preloadNeighbourChunks() {
         if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
-        ChunkLoader.preloadAllNeighbourChunks(this, this._worldManager);
+        ChunkLoader.preloadAllNeighbourChunks(this, this._worldModel);
     }
 
     /**
@@ -116,7 +116,7 @@ class Chunk {
     }
 
     setDirtyFlag() {
-        this._worldManager.chunkUpdated(this._chunkId);
+        this._worldModel.chunkUpdated(this._chunkId);
     }
 
     _toId(x, y, z) {
@@ -159,7 +159,7 @@ class Chunk {
         else
             neighbourChunkK = this._chunkK;
 
-        return this._worldManager.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
+        return this._worldModel.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
     }
 
     /**

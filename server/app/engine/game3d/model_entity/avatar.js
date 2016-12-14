@@ -13,7 +13,7 @@ class Avatar extends Entity {
         this._kind = 'player';
 
         this._entityManager = entityManager;
-        this._loadedChunks = {};
+        this._loadedChunks = new Map();
         this._renderDistance = 8;
         this._role = 0;
     }
@@ -32,22 +32,22 @@ class Avatar extends Entity {
 
     get areChunksLoaded() {
         let side = (1+this._renderDistance*2);
-        return side*side <= Object.keys(this._loadedChunks).length;
+        return side*side <= this._loadedChunks.size;
     }
 
     set renderDistance(renderDistance) { this._renderDistance = renderDistance; }
     set role(role) { this._role = role; }
 
     isChunkLoaded(id) {
-        return this._loadedChunks.hasOwnProperty(id);
+        return this._loadedChunks.has(id);
     }
 
     setChunkAsLoaded(chunk) {
-        this._loadedChunks[chunk.chunkId] = chunk;
+        this._loadedChunks.set(chunk.chunkId, chunk);
     }
 
     setChunkOutOfRange(chunk) {
-        delete this._loadedChunks[chunk.chunkId];
+        this._loadedChunks.delete(chunk.chunkId);
     }
 
 }

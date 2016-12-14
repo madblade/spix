@@ -6,7 +6,7 @@
 
 import Newton from './newton/engine';
 
-class Physics {
+class PhysicsEngine {
 
     constructor(entityman, worldman) {
         this._entityModel = entityman;
@@ -31,4 +31,4 @@ class Physics {
 
 }
 
-export default Physics;
+export default PhysicsEngine;

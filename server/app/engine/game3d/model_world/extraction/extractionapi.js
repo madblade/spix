@@ -42,13 +42,13 @@ class ExtractAPI {
 
         for (let chunkIdId = 0, length = chunkIds.length; chunkIdId < length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
-            if (!chunksInModel.hasOwnProperty(currentChunkId)) {
+            if (!chunksInModel.has(currentChunkId)) {
                 if (ExtractAPI.debug) console.log("We should generate " + currentChunkId + " for the user.");
                 let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
-                chunksInModel[chunk.chunkId] = chunk;
+                chunksInModel.set(chunk.chunkId, chunk);
             }
 
-            let currentChunk = chunksInModel[currentChunkId];
+            let currentChunk = chunksInModel.get(currentChunkId);
             if (!currentChunk.ready) {
                 if (ExtractAPI.debug) console.log("We should extract faces from " + currentChunkId + ".");
                 ExtractAPI.computeChunkFaces(currentChunk);
@@ -69,13 +69,13 @@ class ExtractAPI {
     static computeUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks) {
         var chunksForPlayer = {};
 
-        for (let eid in modelUpdatedChunks) {
-            if (!modelChunks.hasOwnProperty(eid) || !player.avatar.loadedChunks.hasOwnProperty(eid))
-                continue;
+        modelUpdatedChunks.forEach((chunk, id) => {
+            if (!modelChunks.has(id) || !player.avatar.loadedChunks.has(id))
+                return;
 
-            let currentChunk = modelChunks[eid];
-            chunksForPlayer[currentChunk.chunkId] = currentChunk.updates;
-        }
+            let currentChunk = modelChunks.get(id);
+            chunksForPlayer[currentChunk.chunkId] = currentChunk.updates; // TODO Map
+        });
 
         return chunksForPlayer;
     }

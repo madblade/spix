@@ -160,7 +160,7 @@ class ChunkLoader {
 
         for (let i = 0, length = neighbourIds.length; i < length; ++i) {
             let currentId = neighbourIds[i];
-            if (loadedChunks.hasOwnProperty(currentId)) continue;
+            if (loadedChunks.has(currentId)) continue;
 
             // Don't compute faces
             let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
@@ -187,7 +187,7 @@ class ChunkLoader {
 
         for (let i = 0, length = neighbourIds.length; i < length; ++i) {
             let currentId = neighbourIds[i];
-            if (loadedChunks.hasOwnProperty(currentId)) continue;
+            if (loadedChunks.has(currentId)) continue;
 
             // Don't compute faces
             let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
@@ -255,18 +255,18 @@ class ChunkLoader {
 
         function chunkIsToBeLoaded(ic, jc, kc) {
             let currentId = ic+','+jc+','+kc;
-            let currentChunk = allChunks[currentId];
+            let currentChunk = allChunks.get(currentId);
 
             if (!forPlayer) {
                 if (!currentChunk) {
                     return ChunkLoader.addChunk(dx, dy, dz, currentId, worldManager);
                 } else if (!currentChunk.ready) {
                     ExtractAPI.computeChunkFaces(currentChunk);
-                    return allChunks[currentId];
+                    return currentChunk;
                 } else return null;
             } else {
                 if (!avatar.isChunkLoaded(currentId)) {
-                    return allChunks[currentId];
+                    return currentChunk;
                 } else return null;
             }
         }

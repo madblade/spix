@@ -69,7 +69,7 @@ class ChunkIterator {
 
         for (let id = 0, length = neighboursIndices.length; id < length; ++id) {
             let chunkId = neighboursIndices[id];
-            let chunk = chunks[chunkId];
+            let chunk = chunks.get(chunkId);
             if (!chunk) console.log('Iterator: chunk ' + chunkId + ' undefined.');
             else neighbours.push(chunk);
         }
@@ -142,7 +142,7 @@ class ChunkIterator {
 
         const id = chunkI+','+chunkJ+','+chunkK;
 
-        let closestChunk = allChunks[id];
+        let closestChunk = allChunks.get(id);
         if (!closestChunk) {
             console.log('WAIT... Chunk I\'m on is not loaded?');
         }

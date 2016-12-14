@@ -28,7 +28,7 @@ class UserOutput {
         // Consider player has loaded chunks.
         for (let cid in chunks) {
             let cs = game.worldModel.allChunks;
-            if (cs.hasOwnProperty(cid)) a.setChunkAsLoaded(cs[cid]);
+            if (cs.has(cid)) a.setChunkAsLoaded(cs.get(cid));
         }
 
         if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
@@ -52,7 +52,7 @@ class UserOutput {
     updateChunks()  {
         let game = this._game;
         var updatedChunks = game.worldModel.updatedChunks;
-        if (Object.keys(updatedChunks).length < 1) return;
+        if (updatedChunks.size < 1) return;
 
         game.players.forEach(p => {
             if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
@@ -93,7 +93,7 @@ class UserOutput {
             // Consider player has loaded chunks.
             for (let cid in chunks) {
                 let cs = game.worldModel.allChunks;
-                if (cs.hasOwnProperty(cid)) p.avatar.setChunkAsLoaded(cs[cid]);
+                if (cs.has(cid)) p.avatar.setChunkAsLoaded(cs.get(cid));
             }
             // TODO remove old chunks
         });
@@ -108,8 +108,8 @@ class UserOutput {
     }
 
     static playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO extract connected subsurface.6
-        return Object.keys(chunks).length > 0;
+        // TODO extract connected subsurface.
+        return (chunks.size > 0);
     }
 
     static playerConcernedByEntities(player, entities) {

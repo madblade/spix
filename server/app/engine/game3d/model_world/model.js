@@ -8,16 +8,16 @@ import WorldGenerator from './generation/worldgenerator';
 import UpdateAPI from './update/updateapi'
 import ExtractionAPI from './extraction/extractionapi'
 
-class WorldManager {
+class WorldModel {
 
     constructor(gameId) {
         // Objects.
 
         // Chunk id (i+','+j+','+k) -> chunk
-        this._chunks = {};
+        this._chunks = new Map();
 
         // Keep track of modified objects.
-        this._updatedChunks = {};
+        this._updatedChunks = new Map();
 
         // Keep same generation method
         this._generationMethod = "flat";
@@ -54,11 +54,13 @@ class WorldManager {
     }
 
     get updatedChunks() {
-        var updatedChuks = [];
-        for (var id in this._updatedChunks) {
-            updatedChuks[id] = this._chunks[id].blocks;
-        }
-        return updatedChuks;
+        var updatedChunks = new Map();
+
+        this._updatedChunks.forEach(
+            (chunk, id) => updatedChunks.set(id, this._chunks.get(id).blocks)
+        );
+
+        return updatedChunks;
     }
 
     extractUpdatedChunksForPlayer(player) {
@@ -75,7 +77,7 @@ class WorldManager {
     }
 
     addChunk(id, chunk) {
-        this._chunks[id] = chunk;
+        this._chunks.set(id, chunk);
     }
 
     // API Entry Point
@@ -87,9 +89,9 @@ class WorldManager {
             this._chunks = WorldGenerator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
 
             // Finalize chunks (extract surface faces)
-            for (let cid in this._chunks) {
-                this._chunks[cid].computeFaces();
-            }
+            var chunks = [];
+            this._chunks.forEach((chunk, id) => chunks.push(chunk));
+            chunks.forEach(chunk=>chunk.computeFaces());
 
             // Notify
             resolve();
@@ -97,14 +99,14 @@ class WorldManager {
     }
 
     chunkUpdated(chunkId) {
-        this._updatedChunks[chunkId] = true;
+        this._updatedChunks.set(chunkId, true);
     }
 
     chunkUpdatesTransmitted() {
-        for (let chunkId in this._updatedChunks) {
-            this._chunks[chunkId].flushUpdates();
-        }
-        this._updatedChunks = {};
+        this._updatedChunks.forEach(
+            (chunk, id) => this._chunks.get(id).flushUpdates()
+        );
+        this._updatedChunks = new Map();
     }
 
     getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
@@ -166,7 +168,7 @@ class WorldManager {
         const chunkZ = z - k * dz;
 
         const chunkId = i+','+j+','+k;
-        let chunk = this._chunks[chunkId];
+        let chunk = this._chunks.get(chunkId);
         if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId +
             ' from ' + x+','+y+','+z);
             // TODO load concerned chunk.
@@ -184,7 +186,7 @@ class WorldManager {
 
     getChunk(iCoordinate, jCoordinate, kCoordinate) {
         let id = iCoordinate+','+jCoordinate+','+kCoordinate;
-        return this._chunks[id];
+        return this._chunks.get(id);
     }
 
     isChunkLoaded(iCoordinate, jCoordinate) {
@@ -198,4 +200,4 @@ class WorldManager {
 
 }
 
-export default WorldManager;
+export default WorldModel;
