@@ -12,9 +12,8 @@ class WorldManager {
 
     constructor(gameId) {
         // Objects.
-        /**
-         * Chunk id (i+','+j) -> chunk
-         */
+
+        // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = {};
 
         // Keep track of modified objects.

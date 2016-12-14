@@ -45,7 +45,7 @@ class Chat {
 
     broadcast(kind, data) {
         let game = this._game;
-        game.connector.io.to(game.gameId).emit(kind, data);
+        game.connection.io.to(game.gameId).emit(kind, data);
     }
 
 }

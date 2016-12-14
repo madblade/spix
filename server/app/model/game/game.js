@@ -14,7 +14,7 @@ class Game {
         this._gameId = gameId;
         this._jobId = null;
         this._timeIdleId = null;
-        this._connector = connector;
+        this._connection = connector;
 
         //
         this._kind = null;
@@ -31,35 +31,27 @@ class Game {
     get kind() { return this._kind; }
     get gameId() { return this._gameId; }
     get isRunning() { return this._isRunning; }
-    get connector() { return this._connector; }
+    get connector() { return this._connection; }
 
     set ready(value) { this._ready = value; }
 
-    /* ### Manage connection ### */
+    /** Connection **/
 
-    /**
-     * Send a message to ALL connected users.
-     * N.B. encouraged to create custom subchannels within implementations.
-     * @param kind
-     * @param data
-     */
+    // Send a message to ALL connected users.
+    // N.B. encouraged to create custom subchannels within implementations.
     broadcast(kind, data) {
         // TODO optimize with dynamic subchans
-        this._connector.io.to(this._gameId).emit(kind, data);
+        this._connection.io.to(this._gameId).emit(kind, data);
     }
 
-    /* ### Manage loop ### */
+    /** Game loop **/
 
-    /**
-     * Server-render update function (looped).
-     */
+    // Server-render update function (abstract).
     update() {
         console.log("Abstract loop.");
     }
 
-    /**
-     * Start game loop.
-     */
+    // Start game loop.
     start() {
         // Stop waiting for idle threshold.
         clearTimeout(this._timeIdleId);
@@ -72,9 +64,7 @@ class Game {
         }, this._refreshRate);
     }
 
-    /**
-     * Stop game loop.
-     */
+    // Stop game loop.
     stop(doTimeout) {
         console.log("Game stopping.");
         if (this._jobId !== undefined) clearInterval(this._jobId);
@@ -84,12 +74,8 @@ class Game {
         if (doTimeout) this._timeIdleId = setTimeout(_ => this.suicide(), 5000);
     }
 
-    /* ### Manage players ### */
+    /** Players **/
 
-    /**
-     * Add a player.
-     * @param player
-     */
     addPlayer(player) {
         console.log('A player joined.');
 
@@ -105,10 +91,6 @@ class Game {
         this.start();
     }
 
-    /**
-     * Remove a player.
-     * @param player
-     */
     removePlayer(player) {
         console.log('A player left.');
 
@@ -131,9 +113,7 @@ class Game {
         this._hub.endGame(this);
     }
 
-    /**
-     * To be triggered from Hub only.
-     */
+    // To be triggered from Hub only.
     destroy() {
         if (this._isRunning) this.stop(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
@@ -142,7 +122,7 @@ class Game {
         delete this._timeIdleId;
         delete this._gameId;
         delete this._jobId;
-        delete this._connector;
+        delete this._connection;
         delete this._kind;
         delete this._refreshRate;
         delete this._isRunning;

@@ -11,7 +11,7 @@ class User {
     constructor(hub, socket, nick, id) {
         // Model
         this._hub = hub;
-        this._usercon = Factory.createUserCon(this, socket);
+        this._userConnection = Factory.createUserConnection(this, socket);
         this._nick = nick;
         this._id = id;
 
@@ -23,7 +23,7 @@ class User {
     // Model
     get hub() { return this._hub; }
     get id() { return this._id; }
-    get connection() { return this._usercon; }
+    get connection() { return this._userConnection; }
 
     get nick() { return this._nick; }
     set nick(nick) { this._nick = nick; }
@@ -31,12 +31,12 @@ class User {
     set ingame(value) { if (value) this._ingame = value; }
 
     /**
-     * Send a message to this user through its UserCon.
+     * Send a message to this user through its UserConnection.
      * @param kind
      * @param data
      */
     send(kind, data) {
-        this._usercon.send(kind, data);
+        this._userConnection.send(kind, data);
     }
 
     /**
@@ -58,7 +58,7 @@ class User {
 
         // Stop listening for general game management events...
         // Prevents the user from joining multiple games.
-        this._usercon.idle();
+        this._userConnection.idle();
 
         // Create a player associated to this game and spawn it
         var player = Factory.createPlayer(this, game);
@@ -70,13 +70,13 @@ class User {
     fetchHubState() {
         let games = this._hub.listGames();
         if (Object.keys(games).length < 1) {
-            this._usercon.send('hub', JSON.stringify(games));
+            this._userConnection.send('hub', JSON.stringify(games));
             return;
         }
 
         for (let kind in games) {
             if (games[kind] instanceof Array && games[kind].length > 0) {
-                this._usercon.send('hub', JSON.stringify(games));
+                this._userConnection.send('hub', JSON.stringify(games));
                 return;
             }
         }
@@ -94,7 +94,7 @@ class User {
             // So player does not belong to its game model.
             this._player = null;
         }
-        this._usercon.listen();
+        this._userConnection.listen();
     }
 
     /**
@@ -108,12 +108,12 @@ class User {
 
     // Clean references.
     destroy() {
-        this._usercon.destroy();
+        this._userConnection.destroy();
         // Do not destroy player before its game ends.
         // Useful for user reconnection...
         // if (this._player) this._player.destroy();
 
-        delete this._usercon;
+        delete this._userConnection;
         delete this._player;
         delete this._hub;
         delete this._nick;

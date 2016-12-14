@@ -48,7 +48,7 @@ class Hub {
 
         // Create game and notify users.
         const id = this.addGame(kind);
-        this._app.connector.db.notifyGameCreation(kind, id);
+        this._app.connection.db.notifyGameCreation(kind, id);
 
         return true;
     }
@@ -87,7 +87,7 @@ class Hub {
         var gid = CollectionUtils.generateId(this._games[kind]);
 
         // Create matching game
-        var game = Factory.createGame(this, kind, gid, this._app.connector);
+        var game = Factory.createGame(this, kind, gid, this._app.connection);
 
         // Add to games.
         if (game) this._games[kind][gid] = game;

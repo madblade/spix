@@ -11,9 +11,9 @@ import Game from './game/game';
 import Player from './client/player';
 import PlayerManager from './client/playerman';
 
-import Connector from './connection';
-import UserCon from './connection/usercon';
-import PlayerCon from './connection/playercon';
+import Connection from './connection/connection';
+import UserConnection from './connection/userconnection';
+import PlayerConnection from './connection/playerconnection';
 
 import GameFactory from '../engine/game.factory';
 
@@ -49,16 +49,16 @@ class Factory {
 
     // Connection classes
 
-    static createConnector(app) {
-        return new Connector(app);
+    static createConnection(app) {
+        return new Connection(app);
     }
 
-    static createUserCon(user, socket) {
-        return new UserCon(user, socket);
+    static createUserConnection(user, socket) {
+        return new UserConnection(user, socket);
     }
 
-    static createPlayerCon(socket) {
-        return new PlayerCon(socket);
+    static createPlayerConnection(socket) {
+        return new PlayerConnection(socket);
     }
 
 }

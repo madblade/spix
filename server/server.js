@@ -7,7 +7,7 @@
 import express from 'express';
 import http from 'http';
 import config from './config/environment';
-import App from './app';
+import App from './app/app';
 
 // Setup server
 var server = express();

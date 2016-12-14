@@ -6,7 +6,7 @@
 
 import CollectionUtils from '../../engine/math/collections/util';
 
-class PlayerCon {
+class PlayerConnection {
 
     constructor(socket) {
         this._socket = socket;
@@ -94,4 +94,4 @@ class PlayerCon {
 
 }
 
-export default PlayerCon;
+export default PlayerConnection;

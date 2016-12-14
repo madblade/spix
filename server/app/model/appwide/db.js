@@ -10,7 +10,7 @@ import CollectionUtils from '../../engine/math/collections/util';
 class DB {
 
     constructor(connector) {
-        this._connector = connector;
+        this._connection = connector;
         this._users = {};
     }
 
@@ -26,7 +26,7 @@ class DB {
     registerUser(socket) {
         var nick = "";
         var id = CollectionUtils.generateId(this._users);
-        var hub = this._connector.hub;
+        var hub = this._connection.hub;
         var user = Factory.createUser(hub, socket, nick, id);
 
         this._users[id] = user;

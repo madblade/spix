@@ -10,15 +10,15 @@ class App {
 
     constructor() {
         this._hub = Factory.createHub(this);
-        this._connector = Factory.createConnector(this);
+        this._connection = Factory.createConnection(this);
     }
 
     // Model
     get hub() { return this._hub; }
-    get connector() { return this._connector; }
+    get connection() { return this._connection; }
 
     connect(socketio) {
-        this._connector.configure(socketio);
+        this._connection.configure(socketio);
     }
 }
 

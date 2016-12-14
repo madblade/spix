@@ -6,10 +6,10 @@
 
 import Game from '../../model/game/game';
 
-import Physics from './physics';
+import Physics from './physics/physics';
 import UserInput from './ui/input';
 import UserOutput from './ui/output';
-import AI from './ai';
+import AI from './ai/ai';
 import EntityManager from './objects/entities/manager';
 import WorldManager from './objects/world/manager';
 import Chat from './../../model/connection/chat';
@@ -23,6 +23,20 @@ class Game3D extends Game {
         this._kind = 'game3d';
         this._refreshRate = 16;
         this._tt = 0;
+
+        // Models.
+        //this._worldModel;       //
+        //this._entityModel;      //
+        //this._xModel;           //
+
+        // Engines.
+        //this._topologyEngine;   //
+        //this._physicsEngine;    //
+
+        // I/O.
+        //this._input;            //
+        //this._output;           //
+
 
         // Setup managers.
         this._inputman = new UserInput(this);
@@ -40,17 +54,19 @@ class Game3D extends Game {
         // Generate then listen players.
         this._worldman.generate()
             .then(_ => this.configurePlayerManager())
-            .catch(e=>console.log(e));
+            .catch(e => console.log(e));
     }
 
     configurePlayerManager() {
-        this._playerman.setAddPlayerBehaviour(p => {
+        let playerman = this._playerman;
+
+        playerman.setAddPlayerBehaviour(p => {
             this._entityman.spawnPlayer(p);
             this._inputman.listenPlayer(p);
             this._outputman.init(p);
         });
 
-        this._playerman.setRemovePlayerBehaviour(p => {
+        playerman.setRemovePlayerBehaviour(p => {
             this._inputman.removePlayer(p);
             this._entityman.despawnPlayer(p);
         });

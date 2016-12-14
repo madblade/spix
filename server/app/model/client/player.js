@@ -13,7 +13,7 @@ class Player {
         this._game = game;
         // May be given an avatar when logged to a game.
         this._avatar = undefined;
-        this._playercon = Factory.createPlayerCon(user.connection.socket);
+        this._playercon = Factory.createPlayerConnection(user.connection.socket);
     }
 
     // Model
@@ -49,7 +49,7 @@ class Player {
     }
 
     /**
-     * Define custom interactions (see PlayerCon).
+     * Define custom interactions (see PlayerConnection).
      * @param message
      * @param behaviour
      */

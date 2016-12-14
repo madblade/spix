@@ -38,17 +38,14 @@ class PlayerManager {
     }
 
     setAddPlayerBehaviour(f) {
-        if (typeof f === "function") this._handleAddPlayer = f;
+        this._handleAddPlayer = f;
     }
 
     setRemovePlayerBehaviour(f) {
-        if (typeof f === "function") this._handleRemovePlayer = f;
+        this._handleRemovePlayer = f;
     }
 
-    /**
-     * Iterator on players.
-     * @param callback
-     */
+    // Iterator on players.
     forEach(callback) {
         return this._players.forEach(p => callback(p));
     }
