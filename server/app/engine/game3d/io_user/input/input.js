@@ -88,7 +88,7 @@ class UserInput {
 
     action(meta, avatar) {
         if (meta === "g") {
-            this._game.physics.shuffleGravity();
+            this._game.physicsEngine.shuffleGravity();
         }
     }
 

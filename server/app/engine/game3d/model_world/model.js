@@ -28,7 +28,7 @@ class WorldManager {
         this._zSize = 256;
 
         // Entity bus
-        this._entityman = null;
+        this._entityModel = null;
 
         // Handle
         this._handle = gameId;
@@ -42,10 +42,10 @@ class WorldManager {
     get chunkDimensionZ() { return this._zSize; }
 
     get generationMethod() { return this._generationMethod; }
-    get entityman() { return this._entityman; }
+    get entityman() { return this._entityModel; }
 
     set allChunks(newChunks) { this._chunks = newChunks; }
-    set entityman(entityman) { this._entityman = entityman; }
+    set entityman(entityman) { this._entityModel = entityman; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     update() {
@@ -144,11 +144,11 @@ class WorldManager {
     }
 
     addBlock(originEntity, x, y, z, blockId) {
-        UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this._entityman);
+        UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this._entityModel);
     }
 
     delBlock(originEntity, x, y, z) {
-        UpdateAPI.delBlock(originEntity, x, y, z, this, this._entityman);
+        UpdateAPI.delBlock(originEntity, x, y, z, this, this._entityModel);
     }
 
     whatBlock(x, y, z) {

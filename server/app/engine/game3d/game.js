@@ -6,14 +6,18 @@
 
 import Game             from '../../model/game/game';
 
-import UserInput        from './io_user/input';
-import UserOutput       from './io_user/output';
+import UserInput        from './io_user/input/input';
+import UserOutput       from './io_user/output/output';
+import AIInput          from './io_ai/input/input';
+import AIOutput         from './io_ai/output/output';
 import AI               from './io_ai/ai';
 
-import Physics          from './engine_physics/physics';
+import PhysicsEngine    from './engine_physics/physics';
+import TopologyEngine   from './engine_topology/topology';
 
 import EntityModel      from './model_entity/model';
 import WorldModel       from './model_world/model';
+import XModel           from './model_x/model';
 
 import Chat             from './../../model/connection/chat';
 
@@ -28,82 +32,81 @@ class Game3D extends Game {
         this._tt = 0;
 
         // Models.
-        //this._worldModel;       //
-        //this._entityModel;      //
-        //this._xModel;           //
+        this._worldModel =  new WorldModel(gameId);
+        this._entityModel = new EntityModel(this._worldModel);
+        this._worldModel.entityman = this._entityModel;
+        this._xModel = new XModel();
 
         // Engines.
-        //this._topologyEngine;   //
-        //this._physicsEngine;    //
+        this._physicsEngine = new PhysicsEngine(this._entityModel, this._worldModel);
+        this._topologyEngine = new TopologyEngine(this._worldModel);
+        this._ai = new AI();
 
         // I/O.
-        //this._internalInput;            // A.I.
-        //this._externalInput;            // Users.
+        this._internalInput     = new AIInput(this);    // A.I.
+        this._internalOutput    = new AIOutput(this);   // A.I.
+        this._externalInput     = new UserInput(this);  // Human.
+        this._externalOutput    = new UserOutput(this); // Human.
 
-        //this._internalOutput;           // A.I.
-        //this._externalOutput;           // Users.
-
-
-        // Setup managers.
-        this._inputman = new UserInput(this);
-        this._outputman = new UserOutput(this);
-
-        this._worldman =  new WorldModel(gameId);
-        this._entityman = new EntityModel(this._worldman);
-        this._worldman.entityman = this._entityman;
-
+        // Other.
         this._chat = new Chat(this);
-        this._physics = new Physics(this._entityman, this._worldman);
-        this._ai = new AI();
-        // super:_playerManager
 
         // Generate then listen players.
-        this._worldman.generate()
-            .then(_ => this.configurePlayerManager())
-            .catch(e => console.log(e));
-    }
-
-    configurePlayerManager() {
-        let playerman = this._playerManager;
-
-        playerman.setAddPlayerBehaviour(p => {
-            this._entityman.spawnPlayer(p);
-            this._inputman.listenPlayer(p);
-            this._outputman.init(p);
-        });
-
-        playerman.setRemovePlayerBehaviour(p => {
-            this._inputman.removePlayer(p);
-            this._entityman.despawnPlayer(p);
-        });
-
-        this._ready = true;
+        this.generate();
     }
 
     // Model
-    get players() { return this._playerManager; }
-    get entityModel() { return this._entityman; }
-    get worldModel() { return this._worldman; }
-    get physics() { return this._physics; }
-    get chat() { return this._chat; }
+    get players()       { return this._playerManager; }
+    get entityModel()   { return this._entityModel; }
+    get worldModel()    { return this._worldModel; }
+    get physicsEngine() { return this._physicsEngine; }
+    get chat()          { return this._chat; }
 
     //^
     update() {
         // Idea maybe split in several loops (purposes).
         // let time = process.hrtime();
 
-        this._inputman.update();    // First, update inputs.
-        this._physics.update();     // Update physical simulation.
-        this._entityman.update();   // Update entities.
-        this._worldman.update();    // Update blocks.
-        this._ai.update();          // Update perceptions, intents.
-        this._outputman.update();   // Send updates.
+        this._ai.update();              // Update intents.
+
+        this._externalInput.update();   // Update human inputs.
+        this._internalInput.update();   // Update artificial inputs.
+
+        this._physicsEngine.update();   // Update physical simulation.
+        this._topologyEngine.update();  // Update topological model.
+
+        // TODO remove from here
+        this._entityModel.update();     // Update entities.
+        this._worldModel.update();      // Update blocks.
+        this._xModel.update();
+
+        this._externalOutput.update();  // Send updates.
+        this._internalOutput.update();  // Update perceptions.
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
 
         // this._tt += 1;
         // if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
+    }
+
+    generate() {
+        this._worldModel.generate()
+            .then(_ => {
+                this._playerManager.setAddPlayerBehaviour(p => {
+                    this._entityModel.spawnPlayer(p);
+                    this._externalInput.listenPlayer(p);
+                    this._externalOutput.init(p);
+                });
+
+                this._playerManager.setRemovePlayerBehaviour(p => {
+                    this._externalInput.removePlayer(p);
+                    this._entityModel.despawnPlayer(p);
+                });
+
+                this._ready = true;
+            })
+            .catch(e => console.log(e));
     }
 
     save() {

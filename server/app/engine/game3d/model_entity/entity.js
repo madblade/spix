@@ -14,7 +14,7 @@ class Entity {
         // Inputs
         this._directions = null;
 
-        // Physics
+        // PhysicsEngine
         this._rotation = null;
         this._position = null;
         this._speed = null;

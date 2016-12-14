@@ -9,8 +9,8 @@ import Newton from './newton/engine';
 class Physics {
 
     constructor(entityman, worldman) {
-        this._entityman = entityman;
-        this._worldman = worldman;
+        this._entityModel = entityman;
+        this._worldModel = worldman;
 
         /* internal */
         this._stamp = process.hrtime();
@@ -19,7 +19,7 @@ class Physics {
     update() {
         let Δt = process.hrtime(this._stamp)[1];
 
-        Newton.solve(this._entityman, this._worldman, Δt);
+        Newton.solve(this._entityModel, this._worldModel, Δt);
 
         this._stamp = process.hrtime();
     }
