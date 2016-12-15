@@ -18,9 +18,6 @@ class WorldModel {
         // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = new Map();
 
-        // Keep track of modified objects.
-        this._updatedChunks = new Map();
-
         // Keep same generation method
         this._generationMethod = "flat";
 
@@ -45,20 +42,6 @@ class WorldModel {
 
     set allChunks(newChunks) { this._chunks = newChunks; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
-
-    get updatedChunks() {
-        var updatedChunks = new Map();
-
-        this._updatedChunks.forEach(
-            (chunk, id) => updatedChunks.set(id, this._chunks.get(id).blocks)
-        );
-
-        return updatedChunks;
-    }
-
-    extractUpdatedChunksForPlayer(player) {
-        return ExtractionAPI.computeUpdatedChunksForPlayer(player, this._chunks, this._updatedChunks);
-    }
 
     extractNewChunksInRangeForPlayer(player) {
         return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this);
@@ -89,17 +72,6 @@ class WorldModel {
             // Notify
             resolve();
         });
-    }
-
-    chunkUpdated(chunkId) {
-        this._updatedChunks.set(chunkId, true);
-    }
-
-    chunkUpdatesTransmitted() {
-        this._updatedChunks.forEach(
-            (chunk, id) => this._chunks.get(id).flushUpdates()
-        );
-        this._updatedChunks = new Map();
     }
 
     getChunkCoordinates(x, y, z) {

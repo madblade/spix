@@ -101,7 +101,7 @@ class FaceUpdater {
             FaceUpdater.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
 
         // Topology-preserving boundary faces edition
-        FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, true);
+        return FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, true);
     }
 
     /**
@@ -408,13 +408,13 @@ class FaceUpdater {
                 FaceUpdater.removeFaceFromModel(chunk, fid);
             }
         }
-
-        chunk.setDirtyFlag();
     }
 
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
+
+        var updatedChunks = new Set();
 
         if (x === dimensions[0] - 1) {
             let wOrigin = chunk.what(x, y, z);
@@ -460,6 +460,7 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            updatedChunks.add(c);
         }
 
         if (y === 0) {
@@ -473,6 +474,7 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            updatedChunks.add(c);
         }
 
         if (z === 0) {
@@ -486,7 +488,10 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            updatedChunks.add(c);
         }
+
+        return updatedChunks;
     }
 
     static updateSurfaceFacesAfterDeletion(chunk, id, x, y, z) {
@@ -525,7 +530,7 @@ class FaceUpdater {
             FaceUpdater.mergeComponents(chunk, id, x, y, z);
 
         // Boundaries: topology-preserving updates
-        FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, false);
+        return FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
     static mergeComponents(chunk, id, x, y, z) {

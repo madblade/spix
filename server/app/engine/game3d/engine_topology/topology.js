@@ -35,10 +35,11 @@ class TopologyEngine {
         this._updater       = new Updater(this); // Needs Accessor
     }
 
-    get entityModel() { return this._entityModel; }
-    get worldModel()  { return this._worldModel; }
-    get accessor()    { return this._accessor; }
-    get extractor()   { return this._extractor; }
+    get entityModel()  { return this._entityModel; }
+    get worldModel()   { return this._worldModel; }
+    get accessor()     { return this._accessor; }
+    get extractor()    { return this._extractor; }
+    get outputBuffer() { return this._outputBuffer; }
 
     addInput(meta, avatar) {
         this._inputBuffer.push(meta, avatar);
@@ -50,7 +51,15 @@ class TopologyEngine {
     }
 
     getOutput() {
-        return this._outputBuffer.getOutput();
+        return this._outputBuffer.getOutput(this._worldModel.allChunks);
+    }
+
+    flushOutput() {
+        this._outputBuffer.flushOutput(this._worldModel.allChunks);
+    }
+
+    extractChunksForPlayer(p, updatedChunks) {
+        return this._extractor.extractUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
     }
 
 }

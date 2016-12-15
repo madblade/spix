@@ -54,23 +54,21 @@ class UserOutput {
 
     updateChunks()  {
         let engine = this._topologyEngine;
-        var updates = engine.getOutput();
-
+        var updatedChunks = engine.getOutput();
 
         let game = this._game;
-        var updatedChunks = game.worldModel.updatedChunks;
         if (updatedChunks.size < 1) return;
 
         game.players.forEach(p => {
             if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
 
             // If an update occurred on an existing, loaded chunk
-            let chunks = game.worldModel.extractUpdatedChunksForPlayer(p);
+            let chunks = engine.extractChunksForPlayer(p, updatedChunks);
             p.send('chk', chunks);
         });
 
         // Tell object manager we have done update.
-        game.worldModel.chunkUpdatesTransmitted();
+        engine.flushOutput();
     }
 
     updateEntities() {

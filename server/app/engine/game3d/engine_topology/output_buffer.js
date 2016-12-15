@@ -8,20 +8,34 @@
 class OutputBuffer {
 
     constructor() {
-        this._buffer = new Map();
+        this._buffer = new Set();
     }
 
     get buffer() {
         return this._buffer;
     }
 
-    // Shallow copy.
-    getOutput() {
-        return new Map(this._buffer);
+    chunkUpdated(chunkId) {
+        this._buffer.add(chunkId);
     }
 
-    flush() {
-        this._buffer = new Map();
+    // Shallow copy.
+    getOutput(modelChunks) {
+        var updatedChunks = new Map();
+
+        this._buffer.forEach(
+            id => updatedChunks.set(id, modelChunks.get(id).blocks)
+        );
+
+        return updatedChunks;
+    }
+
+    flushOutput(modelChunks) {
+        this._buffer.forEach(
+            id => modelChunks.get(id).flushUpdates()
+        );
+
+        this._buffer = new Set();
     }
 
 }

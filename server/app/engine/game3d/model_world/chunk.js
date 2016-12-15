@@ -112,10 +112,6 @@ class Chunk {
         }
     }
 
-    setDirtyFlag() {
-        this._worldModel.chunkUpdated(this._chunkId);
-    }
-
     _toId(x, y, z) {
         var id = x + y * this._xSize + z * this._xSize * this._ySize;
         if (id >= this._capacity) console.log("chunk._toId: invalid request coordinates.");

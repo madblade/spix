@@ -65,21 +65,6 @@ class ExtractAPI {
         return chunksForNewPlayer;
     }
 
-    // TODO include a distance test.
-    static computeUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks) {
-        var chunksForPlayer = {};
-
-        modelUpdatedChunks.forEach((chunk, id) => {
-            if (!modelChunks.has(id) || !player.avatar.loadedChunks.has(id))
-                return;
-
-            let currentChunk = modelChunks.get(id);
-            chunksForPlayer[currentChunk.chunkId] = currentChunk.updates; // TODO Map
-        });
-
-        return chunksForPlayer;
-    }
-
     static computeNewChunksInRangeForPlayer(player, worldModel) {
         if (!ExtractAPI.load) return;
 
