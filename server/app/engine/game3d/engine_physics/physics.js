@@ -8,9 +8,10 @@ import Newton from './newton/engine';
 
 class PhysicsEngine {
 
-    constructor(entityman, worldman) {
-        this._entityModel = entityman;
-        this._worldModel = worldman;
+    constructor(game) {
+        this._entityModel   = game.entityModel;
+        this._worldModel    = game.worldModel;
+        this._xModel        = game.xModel;
 
         /* internal */
         this._stamp = process.hrtime();

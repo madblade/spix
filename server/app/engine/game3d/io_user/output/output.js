@@ -10,6 +10,9 @@ class UserOutput {
 
     constructor(game) {
         this._game = game;
+
+        this._physicsEngine  = game.physicsEngine;
+        this._topologyEngine = game.topologyEngine;
     }
 
     init(player) {

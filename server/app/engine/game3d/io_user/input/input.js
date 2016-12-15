@@ -8,6 +8,11 @@ class UserInput {
 
     constructor(game) {
         this._game = game;
+        
+        this._physicsEngine  = game.physicsEngine;
+        this._topologyEngine = game.topologyEngine;
+        this._chat           = game.chat;
+
         this._incoming = new Map();
         this._listeners = {};
     }
@@ -76,14 +81,7 @@ class UserInput {
 
     block(meta, avatar) {
         if (!(meta instanceof Array)) return;
-        let action = meta[0];
-
-        // Manage block addition.
-        if (action === "add") {
-            this._game.worldModel.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
-        } else if (action === "del") {
-            this._game.worldModel.delBlock(avatar, meta[1], meta[2], meta[3]);
-        }
+        this._topologyEngine.addInput(meta, avatar);
     }
 
     action(meta, avatar) {
@@ -109,7 +107,7 @@ class UserInput {
             this.push('rotate', player.avatar),
             this.push('block', player.avatar),
             this.push('action', player.avatar),
-            this._game.chat.playerInput(player)
+            this._chat.playerInput(player)
         ];
 
         player.on('m', listener[0]);

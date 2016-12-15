@@ -4,25 +4,45 @@
 
 'use strict';
 
-//import Generator    from './generator/generator';
-//import Extractor    from './extractor/extractor';
-//import Builder      from './builder/builder';
-//import Updater      from './updater/updater';
+import InputBuffer      from './input_buffer';
+import OutputBuffer     from './output_buffer';
+
+import Generator    from './generator/generator';
+import Builder      from './builder/builder';
+import Loader       from './loader/loader';
+import Extractor    from './extractor/extractor';
+import Updater      from './updater/updater';
 
 class TopologyEngine {
 
-    constructor(entityModel, worldModel) {
-        this._entityModel = entityModel;
-        this._worldModel = worldModel;
+    constructor(game) {
+        // Models.
+        this._entityModel   = game.entityModel;
+        this._worldModel    = game.worldModel;
+        this._xModel        = game.xModel;
 
-        //this._generator = new Generator();
-        //this._builder   = new Builder();
-        //this._updater   = new Updater();
-        //this._extractor = new Extractor();
+        // Buffers.
+        this._inputBuffer   = new InputBuffer();
+        this._outputBuffer  = new OutputBuffer();
+
+        // Engine.
+        this._generator     = new Generator(this);
+        this._builder       = new Builder(this);
+        this._loader        = new Loader(this);
+        this._extractor     = new Extractor(this);
+        this._updater       = new Updater(this);
+    }
+
+    get entityModel() { return this._entityModel; }
+    get worldModel()  { return this._worldModel; }
+
+    addInput(meta, avatar) {
+        this._inputBuffer.push(meta, avatar);
     }
 
     update() {
-
+        this._updater.update(this._inputBuffer.getInput());
+        this._inputBuffer.flush();
     }
 
 }

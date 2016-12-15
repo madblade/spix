@@ -6,12 +6,8 @@
 
 class XModel {
 
-    constructor() {
-
-    }
-
-    update() {
-
+    constructor(game) {
+        this._game = game;
     }
 
 }

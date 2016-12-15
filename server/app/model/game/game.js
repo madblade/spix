@@ -27,13 +27,15 @@ class Game {
     }
 
     // Model
-    get ready() { return this._ready; }
-    get kind() { return this._kind; }
-    get gameId() { return this._gameId; }
-    get isRunning() { return this._isRunning; }
-    get connector() { return this._connection; }
+    get players()       { return this._playerManager; }
+    get connector()     { return this._connection; }
 
-    set ready(value) { this._ready = value; }
+    get ready()         { return this._ready; }
+    get kind()          { return this._kind; }
+    get gameId()        { return this._gameId; }
+    get isRunning()     { return this._isRunning; }
+
+    set ready(value)    { this._ready = value; }
 
     /** Connection **/
 

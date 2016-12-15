@@ -31,54 +31,56 @@ class Game3D extends Game {
         this._refreshRate = 16;
         this._tt = 0;
 
-        // Models.
-        this._worldModel =  new WorldModel(this);
-        this._entityModel = new EntityModel(this);
-        this._xModel = new XModel();
+        // Misc.
+        this._chat = new Chat(this);
 
-        // Engines.
-        this._physicsEngine = new PhysicsEngine(this._entityModel, this._worldModel);
-        this._topologyEngine = new TopologyEngine(this._entityModel, this._worldModel);
-        this._ai = new AI();
+        // Models (autonomous).
+        this._worldModel        = new WorldModel(this);
+        this._entityModel       = new EntityModel(this);
+        this._xModel            = new XModel(this);
 
-        // I/O.
+        // Engines (need models).
+        this._ai                = new AI(this);
+        this._physicsEngine     = new PhysicsEngine(this);
+        this._topologyEngine    = new TopologyEngine(this);
+
+        // I/O (need engines).
         this._internalInput     = new AIInput(this);    // A.I.
         this._internalOutput    = new AIOutput(this);   // A.I.
         this._externalInput     = new UserInput(this);  // Human.
         this._externalOutput    = new UserOutput(this); // Human.
-
-        // Other.
-        this._chat = new Chat(this);
 
         // Generate then listen players.
         this.generate();
     }
 
     // Model
-    get players()       { return this._playerManager; }
-    get entityModel()   { return this._entityModel; }
-    get worldModel()    { return this._worldModel; }
-    get physicsEngine() { return this._physicsEngine; }
-    get chat()          { return this._chat; }
+
+    get entityModel()       { return this._entityModel; }
+    get worldModel()        { return this._worldModel; }
+    get xModel()            { return this._xModel; }
+
+    get physicsEngine()     { return this._physicsEngine; }
+    get topologyEngine()    { return this._topologyEngine; }
+
+    get chat()              { return this._chat; }
 
     //^
     update() {
         // Idea maybe split in several loops (purposes).
         // let time = process.hrtime();
 
+        /** Inputs **/
         this._ai.update();              // Update intents.
 
         this._externalInput.update();   // Update human inputs.
         this._internalInput.update();   // Update artificial inputs.
 
-        this._physicsEngine.update();   // Update physical simulation.
+        /** Updates **/
         this._topologyEngine.update();  // Update topological model.
+        this._physicsEngine.update();   // Update physical simulation.
 
-        // TODO remove from here
-        //this._entityModel.update();     // Update entities.
-        //this._worldModel.update();      // Update blocks.
-        //this._xModel.update();
-
+        /** Outputs **/
         this._externalOutput.update();  // Send updates.
         this._internalOutput.update();  // Update perceptions.
 
