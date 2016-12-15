@@ -13,7 +13,7 @@ class UpdateAPI {
     }
 
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
-                                       floors, mustBeEmpty, worldManager, blockCoordinatesOnChunk)
+                                       floors, mustBeEmpty, worldModel, blockCoordinatesOnChunk)
     {
         const starterChunkId = chunkI + ',' + chunkJ + ',' + chunkK;
 
@@ -21,16 +21,16 @@ class UpdateAPI {
         const fy = floors[1];
         const fz = floors[2];
 
-        const dimX = worldManager.chunkDimensionX;
-        const dimY = worldManager.chunkDimensionY;
-        const dimZ = worldManager.chunkDimensionZ;
+        const dimX = worldModel.chunkDimensionX;
+        const dimY = worldModel.chunkDimensionY;
+        const dimZ = worldModel.chunkDimensionZ;
 
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
         if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
 
-        let chunk = worldManager.allChunks.get(starterChunkId);
+        let chunk = worldModel.allChunks.get(starterChunkId);
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
             return chunk;
         }
@@ -48,28 +48,28 @@ class UpdateAPI {
         if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
-            return worldManager.allChunks.get(rightChunkId);
+            return worldModel.allChunks.get(rightChunkId);
         }
 
         if (isBoundaryY) {
             blockCoordinatesOnChunk[1] = dimY-1;
             const rightChunkId = chunkI + ',' + (chunkJ-1) + ',' + chunkK;
-            return worldManager.allChunks.get(rightChunkId);
+            return worldModel.allChunks.get(rightChunkId);
         }
 
         if (isBoundaryZ) {
             blockCoordinatesOnChunk[2] = dimZ-1;
             const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
-            return worldManager.allChunks.get(rightChunkId);
+            return worldModel.allChunks.get(rightChunkId);
         }
     }
 
-    static addBlock(originEntity, x, y, z, blockId, worldManager, entityModel)
+    static addBlock(originEntity, x, y, z, blockId, worldModel, entityModel)
     {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldManager.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coordinates = worldModel.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coordinates[0];
         const j = coordinates[1];
@@ -81,7 +81,7 @@ class UpdateAPI {
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
-            floors, true, worldManager, blockCoordinatesOnChunk);
+            floors, true, worldModel, blockCoordinatesOnChunk);
 
         if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
@@ -101,15 +101,15 @@ class UpdateAPI {
         chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
 
         // Remember this chunk was touched.
-        worldManager.chunkUpdated(chunk.chunkId);
+        worldModel.chunkUpdated(chunk.chunkId);
     }
 
-    static delBlock(originEntity, x, y, z, worldManager, entityManager)
+    static delBlock(originEntity, x, y, z, worldModel, entityModel)
     {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldManager.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coordinates = worldModel.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coordinates[0];
         const j = coordinates[1];
@@ -121,7 +121,7 @@ class UpdateAPI {
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
-            floors, false, worldManager, blockCoordinatesOnChunk);
+            floors, false, worldModel, blockCoordinatesOnChunk);
 
         if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
@@ -132,7 +132,7 @@ class UpdateAPI {
 
         // Validate request.
         if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk,
-                blockCoordinatesOnChunk, entityManager, isBoundaryX, isBoundaryY, isBoundaryZ))
+                blockCoordinatesOnChunk, entityModel, isBoundaryX, isBoundaryY, isBoundaryZ))
         {
             return;
         }
@@ -141,7 +141,7 @@ class UpdateAPI {
         chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
 
         // Remember this chunk was touched.
-        worldManager.chunkUpdated(chunk.chunkId);
+        worldModel.chunkUpdated(chunk.chunkId);
     }
 
     static distance3(v1, v2) {
@@ -231,7 +231,7 @@ class UpdateAPI {
     }
 
     static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
-                                             entityManager, isBoundaryX, isBoundaryY, isBoundaryZ)
+                                             entityModel, isBoundaryX, isBoundaryY, isBoundaryZ)
     {
         function failure(reason) { console.log("Request denied: " + reason); }
 
@@ -289,7 +289,7 @@ class UpdateAPI {
         }
 
         // Validate update.
-        /*if (entityManager.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
+        /*if (entityModel.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
         {
             failure("an entity is present on the block.");
             return false;

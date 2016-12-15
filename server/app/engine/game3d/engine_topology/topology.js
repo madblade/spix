@@ -11,7 +11,8 @@
 
 class TopologyEngine {
 
-    constructor(worldModel) {
+    constructor(entityModel, worldModel) {
+        this._entityModel = entityModel;
         this._worldModel = worldModel;
 
         //this._generator = new Generator();

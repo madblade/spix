@@ -22,9 +22,9 @@ class ChunkGenerator {
      * To finalize creation, add them into the manager model.
      * Then, call ExtractionAPI.computeFaces(chunk).
      */
-    static createRawChunk(x, y, z, id, worldManager) {
+    static createRawChunk(x, y, z, id, worldModel) {
         console.log('createRawChunk ' + id);
-        var c = new Chunk(x, y, z, id, worldManager);
+        var c = new Chunk(x, y, z, id, worldModel);
 
         //GenTest.testChunk(c);
         //GenTest.testMerge(c);
@@ -40,11 +40,11 @@ class ChunkGenerator {
         return c;
     }
 
-    static createChunk(x, y, z, id, worldManager) {
+    static createChunk(x, y, z, id, worldModel) {
         //console.log('createChunk ' + id);
-        var c = new Chunk(x, y, z, id, worldManager);
+        var c = new Chunk(x, y, z, id, worldModel);
 
-        //let generationMethod = worldManager.generationMethod;
+        //let generationMethod = worldModel.generationMethod;
         //if (generationMethod == 'flat') {
         //    GenSimple.fillChunk(c, 41, 1);
             //GenAnalytic.waveChunk(c, 10, 15, 1);

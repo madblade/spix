@@ -129,8 +129,8 @@ class ChunkLoader {
         }
     }
 
-    static preloadAllNeighbourChunks(chunk, worldManager) {
-        let loadedChunks = worldManager.allChunks;
+    static preloadAllNeighbourChunks(chunk, worldModel) {
+        let loadedChunks = worldModel.allChunks;
         let c = chunk;
         let ci = c.chunkI;
         let cj = c.chunkJ;
@@ -163,13 +163,13 @@ class ChunkLoader {
             if (loadedChunks.has(currentId)) continue;
 
             // Don't compute faces
-            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
-            worldManager.addChunk(currentId, neighbour);
+            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldModel);
+            worldModel.addChunk(currentId, neighbour);
         }
     }
 
-    static preloadFlatNeighbourChunks(chunk, worldManager) {
-        let loadedChunks = worldManager.allChunks;
+    static preloadFlatNeighbourChunks(chunk, worldModel) {
+        let loadedChunks = worldModel.allChunks;
         let c = chunk;
         let ci = c.chunkI;
         let cj = c.chunkJ;
@@ -190,29 +190,29 @@ class ChunkLoader {
             if (loadedChunks.has(currentId)) continue;
 
             // Don't compute faces
-            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldManager);
-            worldManager.addChunk(currentId, neighbour);
+            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, worldModel);
+            worldModel.addChunk(currentId, neighbour);
         }
     }
 
-    static addChunk(dimX, dimY, dimZ, chunkId, worldManager) {
+    static addChunk(dimX, dimY, dimZ, chunkId, worldModel) {
         // Do compute faces
-        let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, worldManager);
-        worldManager.addChunk(chunkId, chunk);
+        let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, worldModel);
+        worldModel.addChunk(chunkId, chunk);
         ExtractAPI.computeChunkFaces(chunk);
         return chunk;
     }
 
-    static preLoadNextChunk(player, chunk, worldManager, forPlayer) {
+    static preLoadNextChunk(player, chunk, worldModel, forPlayer) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
         // Get nearest, load.
         let avatar = player.avatar;
-        let allChunks = worldManager.allChunks;
+        let allChunks = worldModel.allChunks;
 
-        const dx = worldManager.chunkDimensionX;
-        const dy = worldManager.chunkDimensionY;
-        const dz = worldManager.chunkDimensionZ;
+        const dx = worldModel.chunkDimensionX;
+        const dy = worldModel.chunkDimensionY;
+        const dz = worldModel.chunkDimensionZ;
 
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
@@ -259,7 +259,7 @@ class ChunkLoader {
 
             if (!forPlayer) {
                 if (!currentChunk) {
-                    return ChunkLoader.addChunk(dx, dy, dz, currentId, worldManager);
+                    return ChunkLoader.addChunk(dx, dy, dz, currentId, worldModel);
                 } else if (!currentChunk.ready) {
                     ExtractAPI.computeChunkFaces(currentChunk);
                     return currentChunk;
@@ -331,13 +331,13 @@ class ChunkLoader {
         }
     }
 
-    static getNextPlayerChunk(player, chunk, worldManager) {
+    static getNextPlayerChunk(player, chunk, worldModel) {
         // Get nearest unloaded until threshold, send back.
 
-        return ChunkLoader.preLoadNextChunk(player, chunk, worldManager, true);
+        return ChunkLoader.preLoadNextChunk(player, chunk, worldModel, true);
     }
 
-    static getOOBPlayerChunks(player, chunk, worldManager) {
+    static getOOBPlayerChunks(player, chunk, worldModel) {
         var oobChunks = [];
         // TODO check implementation
 

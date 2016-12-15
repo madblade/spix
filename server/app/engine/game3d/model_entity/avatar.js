@@ -8,11 +8,11 @@ import Entity from './entity';
 
 class Avatar extends Entity {
 
-    constructor(id, entityManager) {
+    constructor(id, entityModel) {
         super(id);
         this._kind = 'player';
 
-        this._entityManager = entityManager;
+        this._entityModel = entityModel;
         this._loadedChunks = new Map();
         this._renderDistance = 8;
         this._role = 0;
@@ -28,7 +28,7 @@ class Avatar extends Entity {
     get role() { return this._role; }
     get renderDistance() { return this._renderDistance; }
     get loadedChunks() { return this._loadedChunks; }
-    get entityManager() { return this._entityManager; }
+    get entityModel() { return this._entityModel; }
 
     get areChunksLoaded() {
         let side = (1+this._renderDistance*2);

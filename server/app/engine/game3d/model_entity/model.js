@@ -9,8 +9,8 @@ import CollectionUtil from '../../math/collections/util';
 
 class EntityModel {
 
-    constructor(worldManager) {
-        this._worldModel = worldManager;
+    constructor(game) {
+        this._game = game;
 
         // Objects.
         this._entities = {};
@@ -49,7 +49,7 @@ class EntityModel {
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
         p.avatar = EntityFactory.createAvatar(id, this);
-        p.avatar.spawn(this._worldModel.getFreePosition());
+        p.avatar.spawn(this._game.worldModel.getFreePosition());
         this._entities[id] = p.avatar;
     }
 

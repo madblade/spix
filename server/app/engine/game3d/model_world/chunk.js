@@ -16,9 +16,9 @@ class Chunk {
 
     static debug = false;
 
-    constructor(xSize, ySize, zSize, chunkId, worldManager) {
+    constructor(xSize, ySize, zSize, chunkId, worldModel) {
         // App.
-        this._worldModel = worldManager;
+        this._worldModel = worldModel;
 
         // Dimensions, coordinates
         this._xSize = xSize;

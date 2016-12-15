@@ -17,23 +17,23 @@ class ExtractAPI {
         chunk.computeFaces();
     }
 
-    static computeChunksForNewPlayer(player, worldManager) {
+    static computeChunksForNewPlayer(player, worldModel) {
         var chunksForNewPlayer = {};
-        let chunksInModel = worldManager.allChunks;
+        let chunksInModel = worldModel.allChunks;
 
         // From player position, find concerned chunks.
         var av = player.avatar;
         const pos = av.position;
 
         // Belonging chunk coordinates.
-        let coordinates = worldManager.getChunkCoordinates(pos[0], pos[1], pos[2]);
+        let coordinates = worldModel.getChunkCoordinates(pos[0], pos[1], pos[2]);
         const i = coordinates[0];
         const j = coordinates[1];
         const k = coordinates[2];
 
-        const dx = worldManager.chunkDimensionX;
-        const dy = worldManager.chunkDimensionY;
-        const dz = worldManager.chunkDimensionZ;
+        const dx = worldModel.chunkDimensionX;
+        const dy = worldModel.chunkDimensionY;
+        const dz = worldModel.chunkDimensionZ;
 
         let chunkIds = [];
         chunkIds.push((i+','+j+','+k));
@@ -44,7 +44,7 @@ class ExtractAPI {
             let currentChunkId = chunkIds[chunkIdId];
             if (!chunksInModel.has(currentChunkId)) {
                 if (ExtractAPI.debug) console.log("We should generate " + currentChunkId + " for the user.");
-                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldManager); // virtual polymorphism
+                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldModel); // virtual polymorphism
                 chunksInModel.set(chunk.chunkId, chunk);
             }
 
@@ -59,7 +59,7 @@ class ExtractAPI {
 
         // Force update entity to load all chunks
         //if (!av.areChunksLoaded) {
-        //    worldManager.entityModel.entityUpdated(av.id);
+        //    worldModel.entityModel.entityUpdated(av.id);
         //}
 
         return chunksForNewPlayer;
@@ -80,7 +80,7 @@ class ExtractAPI {
         return chunksForPlayer;
     }
 
-    static computeNewChunksInRangeForPlayer(player, worldManager) {
+    static computeNewChunksInRangeForPlayer(player, worldModel) {
         if (!ExtractAPI.load) return;
 
         let av = player.avatar;
@@ -88,21 +88,21 @@ class ExtractAPI {
         let p = av.position;
 
         // Get current chunk.
-        let starterChunk = ChunkIterator.getClosestChunk(p[0], p[1], p[2], worldManager);
+        let starterChunk = ChunkIterator.getClosestChunk(p[0], p[1], p[2], worldModel);
         if (!starterChunk) return;
 
         // Loading circle for server (a bit farther)
-        ChunkLoader.preLoadNextChunk(player, starterChunk, worldManager, false);
+        ChunkLoader.preLoadNextChunk(player, starterChunk, worldModel, false);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO algorithmical zeefication
         // TODO enhance to transmit chunks when users are not so much active and so on
-        var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldManager);
+        var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldModel);
 
         // Unloading circle (quite farther)
         // (i.e. recurse currents and test distance)
-        var chunksToUnload = ChunkLoader.getOOBPlayerChunks(player, starterChunk, worldManager);
+        var chunksToUnload = ChunkLoader.getOOBPlayerChunks(player, starterChunk, worldModel);
 
         if (!newChunk && chunksToUnload.length === 0) return null;
 
@@ -123,7 +123,7 @@ class ExtractAPI {
         }
 
         //if (!av.areChunksLoaded) {
-        //    worldManager.entityModel.entityUpdated(av.id);
+        //    worldModel.entityModel.entityUpdated(av.id);
         //}
 
         return chunksForPlayer;

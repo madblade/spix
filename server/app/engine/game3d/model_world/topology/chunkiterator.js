@@ -8,14 +8,14 @@ class ChunkIterator {
 
     /**
      *
-     * @param worldManager
+     * @param worldModel
      * @param starterChunk
      * @param callback
      *      Callback must return FALSE for early termination
      * @param callbackAdditionalParameters
      * @constructor
      */
-    static BFS(worldManager, starterChunk, callback, callbackAdditionalParameters) {
+    static BFS(worldModel, starterChunk, callback, callbackAdditionalParameters) {
 
         let queue = [];
         let markers = [];
@@ -27,7 +27,7 @@ class ChunkIterator {
             markers.push(current);
 
             // Make your dreams come true
-            let status = callback(current, worldManager, callbackAdditionalParameters);
+            let status = callback(current, worldModel, callbackAdditionalParameters);
 
             // Hard-cut when a chunk is to be loaded (client)
             // WARN! Don't cut server side!!!
@@ -36,7 +36,7 @@ class ChunkIterator {
                 return;
             }
 
-            let neighbours = ChunkIterator.get2DNeighbours(current, worldManager);
+            let neighbours = ChunkIterator.get2DNeighbours(current, worldModel);
             for (let i = 0, l = neighbours.length; i < l; ++i) {
 
                 let neighbour = neighbours[i];
@@ -49,11 +49,11 @@ class ChunkIterator {
         }
     }
 
-    static get2DNeighbours(currentChunk, worldManager) {
+    static get2DNeighbours(currentChunk, worldModel) {
         const i = currentChunk.chunkI;
         const j = currentChunk.chunkJ;
         const k = currentChunk.chunkK;
-        let chunks = worldManager.allChunks;
+        let chunks = worldModel.allChunks;
 
         let neighboursIndices = [
             (i+1)   +','+j      +','+k,
@@ -124,12 +124,12 @@ class ChunkIterator {
 
     }
 
-    static getClosestChunk(xPosition, yPosition, zPosition, worldManager) {
-        let allChunks = worldManager.allChunks;
+    static getClosestChunk(xPosition, yPosition, zPosition, worldModel) {
+        let allChunks = worldModel.allChunks;
 
-        const dx = worldManager.chunkDimensionX;
-        const dy = worldManager.chunkDimensionY;
-        const dz = worldManager.chunkDimensionZ;
+        const dx = worldModel.chunkDimensionX;
+        const dy = worldModel.chunkDimensionY;
+        const dz = worldModel.chunkDimensionZ;
 
         // TODO DRY with manager.getChunkCoordinatesFromFloatingPoint
         const fx = Math.floor(xPosition);

@@ -32,14 +32,13 @@ class Game3D extends Game {
         this._tt = 0;
 
         // Models.
-        this._worldModel =  new WorldModel(gameId);
-        this._entityModel = new EntityModel(this._worldModel);
-        this._worldModel.entityModel = this._entityModel;
+        this._worldModel =  new WorldModel(this);
+        this._entityModel = new EntityModel(this);
         this._xModel = new XModel();
 
         // Engines.
         this._physicsEngine = new PhysicsEngine(this._entityModel, this._worldModel);
-        this._topologyEngine = new TopologyEngine(this._worldModel);
+        this._topologyEngine = new TopologyEngine(this._entityModel, this._worldModel);
         this._ai = new AI();
 
         // I/O.

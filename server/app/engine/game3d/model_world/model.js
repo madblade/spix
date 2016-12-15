@@ -10,7 +10,9 @@ import ExtractionAPI from './extraction/extractionapi'
 
 class WorldModel {
 
-    constructor(gameId) {
+    constructor(game) {
+        this._game = game;
+
         // Objects.
 
         // Chunk id (i+','+j+','+k) -> chunk
@@ -27,11 +29,8 @@ class WorldModel {
         this._ySize = 8;
         this._zSize = 256;
 
-        // Entity bus
-        this._entityModel = null;
-
         // Handle
-        this._handle = gameId;
+        this._handle = game.gameId;
     }
 
     get handle() { return this._handle; }
@@ -42,10 +41,9 @@ class WorldModel {
     get chunkDimensionZ() { return this._zSize; }
 
     get generationMethod() { return this._generationMethod; }
-    get entityModel() { return this._entityModel; }
+    get entityModel() { return this._game.entityModel; }
 
     set allChunks(newChunks) { this._chunks = newChunks; }
-    set entityModel(entityman) { this._entityModel = entityman; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     get updatedChunks() {
@@ -141,11 +139,11 @@ class WorldModel {
     }
 
     addBlock(originEntity, x, y, z, blockId) {
-        UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this._entityModel);
+        UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this.entityModel);
     }
 
     delBlock(originEntity, x, y, z) {
-        UpdateAPI.delBlock(originEntity, x, y, z, this, this._entityModel);
+        UpdateAPI.delBlock(originEntity, x, y, z, this, this.entityModel);
     }
 
     whatBlock(x, y, z) {
