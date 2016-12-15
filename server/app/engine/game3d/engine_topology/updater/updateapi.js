@@ -96,10 +96,8 @@ class UpdateAPI {
         }
 
         // Add block on chunk.
-        chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
-
-        // Remember this chunk was touched.
-        worldModel.chunkUpdated(chunk.chunkId);
+        //chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
+        return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId];
     }
 
     static delBlock(originEntity, x, y, z, worldModel, entityModel, accessor)
@@ -136,10 +134,8 @@ class UpdateAPI {
         }
 
         // Add block on chunk.
-        chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
-
-        // Remember this chunk was touched.
-        worldModel.chunkUpdated(chunk.chunkId);
+        //chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
+        return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]];
     }
 
     static distance3(v1, v2) {

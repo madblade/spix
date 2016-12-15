@@ -38,6 +38,7 @@ class TopologyEngine {
     get entityModel() { return this._entityModel; }
     get worldModel()  { return this._worldModel; }
     get accessor()    { return this._accessor; }
+    get extractor()   { return this._extractor; }
 
     addInput(meta, avatar) {
         this._inputBuffer.push(meta, avatar);

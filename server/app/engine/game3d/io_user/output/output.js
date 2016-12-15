@@ -53,6 +53,10 @@ class UserOutput {
     }
 
     updateChunks()  {
+        let engine = this._topologyEngine;
+        var updates = engine.getOutput();
+
+
         let game = this._game;
         var updatedChunks = game.worldModel.updatedChunks;
         if (updatedChunks.size < 1) return;

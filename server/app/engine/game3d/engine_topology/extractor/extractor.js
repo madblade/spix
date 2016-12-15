@@ -7,7 +7,7 @@
 class Extractor {
 
     constructor(topologyEngine) {
-
+        this._accessor    = topologyEngine.accessor;
     }
 
 }

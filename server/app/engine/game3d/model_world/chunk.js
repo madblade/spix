@@ -9,9 +9,6 @@ import FaceExtractor from './extraction/chunkfacex';
 
 import ChunkLoader from './loading/chunkloader';
 
-import BlockUpdater from './update/blockupdater';
-import FaceUpdater from './update/faceupdater';
-
 class Chunk {
 
     static debug = false;
@@ -206,8 +203,9 @@ class Chunk {
 
         // Update blocks, surface blocks, then surface faces.
         this._blocks[id] = blockId;
-        BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z);
-        FaceUpdater.updateSurfaceFacesAfterAddition(this, id, x, y, z);
+        //BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z);
+        //FaceUpdater.updateSurfaceFacesAfterAddition(this, id, x, y, z);
+        return id;
     }
 
     del(x, y, z) {
@@ -216,8 +214,9 @@ class Chunk {
 
         // Update blocks, surface blocks, then surface faces.
         this._blocks[id] = 0;
-        BlockUpdater.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
-        FaceUpdater.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
+        //BlockUpdater.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
+        //FaceUpdater.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
+        return id;
     }
 
     flushUpdates() {
