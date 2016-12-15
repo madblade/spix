@@ -27,12 +27,12 @@ class TopologyEngine {
         this._outputBuffer  = new OutputBuffer();
 
         // Engine.
+        this._accessor      = new Accessor(this);
         this._generator     = new Generator(this);
         this._builder       = new Builder(this);
         this._loader        = new Loader(this);
         this._extractor     = new Extractor(this);
-        this._updater       = new Updater(this);
-        this._accessor      = new Accessor(this);
+        this._updater       = new Updater(this); // Needs Accessor
     }
 
     get entityModel() { return this._entityModel; }

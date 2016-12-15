@@ -5,7 +5,6 @@
 'use strict';
 
 import WorldGenerator from './generation/worldgenerator';
-import UpdateAPI from './update/updateapi'
 import ExtractionAPI from './extraction/extractionapi'
 import NumberUtils from '../../math/numbers';
 
@@ -103,29 +102,6 @@ class WorldModel {
         this._updatedChunks = new Map();
     }
 
-    getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
-        const dx = this.chunkDimensionX;
-        const dy = this.chunkDimensionY;
-        const dz = this.chunkDimensionZ;
-
-        const modX = (floorX >= 0 ? floorX : (dx + floorX)) % dx;
-        const deltaX = modX === 0;
-
-        const modY = (floorY >= 0 ? floorY : (dy + floorY)) % dy;
-        const deltaY = modY === 0;
-
-        const modZ = (floorZ >= 0 ? floorZ : (dz + floorZ)) % dz;
-        const deltaZ = modZ === 0;
-
-        const Dx = deltaX && NumberUtils.isEpsilon(Math.abs(Math.abs(x)-Math.abs(floorX)));
-        const Dy = deltaY && NumberUtils.isEpsilon(Math.abs(Math.abs(y)-Math.abs(floorY)));
-        const Dz = deltaZ && NumberUtils.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
-
-        let ijk = this.getChunkCoordinates(x, y, z);
-
-        return [ijk[0], ijk[1], ijk[2], Dx, Dy, Dz];
-    }
-
     getChunkCoordinates(x, y, z) {
         const dx = this.chunkDimensionX;
         const dy = this.chunkDimensionY;
@@ -137,14 +113,6 @@ class WorldModel {
         let k = f(z/dz);
 
         return [i,j,k];
-    }
-
-    addBlock(originEntity, x, y, z, blockId) {
-        UpdateAPI.addBlock(originEntity, x, y, z, blockId, this, this.entityModel);
-    }
-
-    delBlock(originEntity, x, y, z) {
-        UpdateAPI.delBlock(originEntity, x, y, z, this, this.entityModel);
     }
 
     whatBlock(x, y, z) {

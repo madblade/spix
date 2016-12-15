@@ -62,12 +62,12 @@ class UpdateAPI {
         }
     }
 
-    static addBlock(originEntity, x, y, z, blockId, worldModel, entityModel)
+    static addBlock(originEntity, x, y, z, blockId, worldModel, entityModel, accessor)
     {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldModel.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coordinates = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coordinates[0];
         const j = coordinates[1];
@@ -102,12 +102,12 @@ class UpdateAPI {
         worldModel.chunkUpdated(chunk.chunkId);
     }
 
-    static delBlock(originEntity, x, y, z, worldModel, entityModel)
+    static delBlock(originEntity, x, y, z, worldModel, entityModel, accessor)
     {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = worldModel.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coordinates = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coordinates[0];
         const j = coordinates[1];

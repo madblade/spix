@@ -4,6 +4,8 @@
 
 'use strict';
 
+import UpdateAPI from './updateapi';
+
 class Updater {
 
     constructor(topologyEngine) {
@@ -13,8 +15,6 @@ class Updater {
     }
 
     update(bufferInput) {
-        let worldModel = this._worldModel;
-
         bufferInput.forEach(input => {
             let meta = input[0];
             let avatar = input[1];
@@ -23,11 +23,21 @@ class Updater {
 
             // Manage block addition.
             if (action === "add") {
-                worldModel.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
+                this.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
             } else if (action === "del") {
-                worldModel.delBlock(avatar, meta[1], meta[2], meta[3]);
+                this.delBlock(avatar, meta[1], meta[2], meta[3]);
             }
         });
+    }
+
+    addBlock(avatar, x, y, z, blockId) {
+
+        UpdateAPI.addBlock(avatar, x, y, z, blockId, this._worldModel, this._entityModel, this._accessor);
+    }
+
+    delBlock(avatar, x, y, z) {
+
+        UpdateAPI.delBlock(avatar, x, y, z, this._worldModel, this._entityModel, this._accessor);
     }
 
 }
