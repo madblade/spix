@@ -5,7 +5,7 @@
 'use strict';
 
 import Factory from './../factory';
-import CollectionUtils from '../../engine/math/collections/util';
+import CollectionUtils from '../../engine/math/collections';
 
 class DB {
 

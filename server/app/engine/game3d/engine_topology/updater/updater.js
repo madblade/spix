@@ -7,7 +7,9 @@
 class Updater {
 
     constructor(topologyEngine) {
-        this._worldModel = topologyEngine.worldModel;
+        this._worldModel  = topologyEngine.worldModel;
+        this._entityModel = topologyEngine.entityModel;
+        this._accessor    = topologyEngine.accessor;
     }
 
     update(bufferInput) {

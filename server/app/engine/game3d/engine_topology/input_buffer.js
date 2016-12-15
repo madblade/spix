@@ -1,5 +1,6 @@
 /**
  * Manage input transactions.
+ * Specialized for world model.
  */
 
 'use strict';

@@ -4,7 +4,7 @@
 
 'use strict';
 
-import CollectionUtils from '../../engine/math/collections/util';
+import CollectionUtils from '../../engine/math/collections';
 
 class PlayerConnection {
 

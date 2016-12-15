@@ -7,11 +7,12 @@
 import InputBuffer      from './input_buffer';
 import OutputBuffer     from './output_buffer';
 
-import Generator    from './generator/generator';
-import Builder      from './builder/builder';
-import Loader       from './loader/loader';
-import Extractor    from './extractor/extractor';
-import Updater      from './updater/updater';
+import Generator        from './generator/generator';
+import Builder          from './builder/builder';
+import Loader           from './loader/loader';
+import Extractor        from './extractor/extractor';
+import Updater          from './updater/updater';
+import Accessor         from './accessor/accessor';
 
 class TopologyEngine {
 
@@ -31,10 +32,12 @@ class TopologyEngine {
         this._loader        = new Loader(this);
         this._extractor     = new Extractor(this);
         this._updater       = new Updater(this);
+        this._accessor      = new Accessor(this);
     }
 
     get entityModel() { return this._entityModel; }
     get worldModel()  { return this._worldModel; }
+    get accessor()    { return this._accessor; }
 
     addInput(meta, avatar) {
         this._inputBuffer.push(meta, avatar);
@@ -43,6 +46,10 @@ class TopologyEngine {
     update() {
         this._updater.update(this._inputBuffer.getInput());
         this._inputBuffer.flush();
+    }
+
+    getOutput() {
+        return this._outputBuffer.getOutput();
     }
 
 }

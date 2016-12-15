@@ -4,13 +4,11 @@
 
 'use strict';
 
+import NumberUtils from '../../../math/numbers';
+
 class UpdateAPI {
 
     static debug = false;
-
-    static isEpsilon(strictlyPositiveNumber) {
-        return (strictlyPositiveNumber < 0.000001);
-    }
 
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
                                        floors, mustBeEmpty, worldModel, blockCoordinatesOnChunk)
@@ -178,7 +176,8 @@ class UpdateAPI {
         const ly = blockCoordinatesOnChunk[1];
         const lz = blockCoordinatesOnChunk[2];
 
-        if (UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
+        let epsilon = NumberUtils.isEpsilon;
+        if (epsilon(dx) && !epsilon(dy) && !epsilon(dz)) {
             // Which side of the face is empty...
             if (!isBoundaryX) {
                 if (chunk.what(lx-1, ly, lz) === 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
@@ -186,12 +185,12 @@ class UpdateAPI {
             //    if (chunk.what(lx, ly, lz) !== 0) blockCoordinatesOnChunk[0] = lx === 0 ? chunk.dimensions[0]-1 : 0;
             }
 
-        } else if (!UpdateAPI.isEpsilon(dx) && UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
+        } else if (!epsilon(dx) && epsilon(dy) && !epsilon(dz)) {
             if (!isBoundaryY) {
                 if (chunk.what(lx, ly-1, lz) === 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
             }
 
-        } else if (!UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && UpdateAPI.isEpsilon(dz)) {
+        } else if (!epsilon(dx) && !epsilon(dy) && epsilon(dz)) {
             if (!isBoundaryZ) {
                 if (chunk.what(lx, ly, lz-1) === 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
             }
@@ -249,17 +248,18 @@ class UpdateAPI {
         const ly = blockCoordinatesOnChunk[1];
         const lz = blockCoordinatesOnChunk[2];
 
-        if (UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
+        let epsilon = NumberUtils.isEpsilon;
+        if (epsilon(dx) && !epsilon(dy) && !epsilon(dz)) {
             if (!isBoundaryX) {
                 if (chunk.what(lx-1, ly, lz) !== 0) blockCoordinatesOnChunk[0] = blockCoordinatesOnChunk[0]-1;
             }
 
-        } else if (!UpdateAPI.isEpsilon(dx) && UpdateAPI.isEpsilon(dy) && !UpdateAPI.isEpsilon(dz)) {
+        } else if (!epsilon(dx) && epsilon(dy) && !epsilon(dz)) {
             if (!isBoundaryY) {
                 if (chunk.what(lx, ly-1, lz) !== 0) blockCoordinatesOnChunk[1] = blockCoordinatesOnChunk[1]-1;
             }
 
-        } else if (!UpdateAPI.isEpsilon(dx) && !UpdateAPI.isEpsilon(dy) && UpdateAPI.isEpsilon(dz)) {
+        } else if (!epsilon(dx) && !epsilon(dy) && epsilon(dz)) {
             if (!isBoundaryZ) {
                 if (chunk.what(lx, ly, lz-1) !== 0) blockCoordinatesOnChunk[2] = blockCoordinatesOnChunk[2]-1;
             }

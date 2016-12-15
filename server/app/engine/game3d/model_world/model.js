@@ -7,6 +7,7 @@
 import WorldGenerator from './generation/worldgenerator';
 import UpdateAPI from './update/updateapi'
 import ExtractionAPI from './extraction/extractionapi'
+import NumberUtils from '../../math/numbers';
 
 class WorldModel {
 
@@ -116,9 +117,9 @@ class WorldModel {
         const modZ = (floorZ >= 0 ? floorZ : (dz + floorZ)) % dz;
         const deltaZ = modZ === 0;
 
-        const Dx = deltaX && UpdateAPI.isEpsilon(Math.abs(Math.abs(x)-Math.abs(floorX)));
-        const Dy = deltaY && UpdateAPI.isEpsilon(Math.abs(Math.abs(y)-Math.abs(floorY)));
-        const Dz = deltaZ && UpdateAPI.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
+        const Dx = deltaX && NumberUtils.isEpsilon(Math.abs(Math.abs(x)-Math.abs(floorX)));
+        const Dy = deltaY && NumberUtils.isEpsilon(Math.abs(Math.abs(y)-Math.abs(floorY)));
+        const Dz = deltaZ && NumberUtils.isEpsilon(Math.abs(Math.abs(z)-Math.abs(floorZ)));
 
         let ijk = this.getChunkCoordinates(x, y, z);
 

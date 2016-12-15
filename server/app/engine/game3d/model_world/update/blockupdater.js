@@ -4,7 +4,7 @@
 
 'use strict';
 
-import CollectionUtils from '../../../math/collections/util';
+import CollectionUtils from '../../../math/collections';
 
 class BlockUpdater {
     
