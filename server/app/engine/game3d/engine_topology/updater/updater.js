@@ -4,9 +4,9 @@
 
 'use strict';
 
-import UpdateAPI from './updateapi';
-import BlockUpdater from './blockupdater';
-import FaceUpdater from './faceupdater';
+import UpdaterAccess from './updater_access';
+import UpdaterBlock from './updater_block';
+import UpdaterFace from './updater_face';
 
 class Updater {
 
@@ -38,15 +38,15 @@ class Updater {
         let w = this._worldModel;
         let o = this._outputBuffer;
 
-        let a = UpdateAPI.addBlock(avatar, x, y, z, blockId, w, this._entityModel, this._accessor);
+        let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, w, this._entityModel, this._accessor);
         if (!a) return;
 
         let $chunk, $x, $y, $z, $blockId;
         [$chunk, $x, $y, $z, $blockId] = a;
 
         let $id = $chunk.add($x, $y, $z, $blockId);
-        BlockUpdater.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z);
-        let updatedChunks = FaceUpdater.updateSurfaceFacesAfterAddition($chunk, $id, $x, $y, $z);
+        UpdaterBlock.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z);
+        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterAddition($chunk, $id, $x, $y, $z);
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(c.chunkId));
@@ -57,15 +57,15 @@ class Updater {
         let w = this._worldModel;
         let o = this._outputBuffer;
 
-        let a = UpdateAPI.delBlock(avatar, x, y, z, w, this._entityModel, this._accessor);
+        let a = UpdaterAccess.delBlock(avatar, x, y, z, w, this._entityModel, this._accessor);
         if (!a) return;
 
         let $chunk, $x, $y, $z;
         [$chunk, $x, $y, $z] = a;
 
         let $id = $chunk.del($x, $y, $z);
-        BlockUpdater.updateSurfaceBlocksAfterDeletion($chunk, $id, $x, $y, $z);
-        let updatedChunks = FaceUpdater.updateSurfaceFacesAfterDeletion($chunk, $id, $x, $y, $z);
+        UpdaterBlock.updateSurfaceBlocksAfterDeletion($chunk, $id, $x, $y, $z);
+        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterDeletion($chunk, $id, $x, $y, $z);
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(c.chunkId));

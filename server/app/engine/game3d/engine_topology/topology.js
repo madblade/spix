@@ -54,12 +54,12 @@ class TopologyEngine {
         return this._outputBuffer.getOutput(this._worldModel.allChunks);
     }
 
-    flushOutput() {
-        this._outputBuffer.flushOutput(this._worldModel.allChunks);
+    getOutputForPlayer(p, updatedChunks) {
+        return this._extractor.extractUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
     }
 
-    extractChunksForPlayer(p, updatedChunks) {
-        return this._extractor.extractUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
+    flushOutput() {
+        this._outputBuffer.flushOutput(this._worldModel.allChunks);
     }
 
 }

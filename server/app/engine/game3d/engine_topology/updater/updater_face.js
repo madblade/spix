@@ -6,7 +6,7 @@
 
 import CollectionUtils from '../../../math/collections';
 
-class FaceUpdater {
+class UpdaterFace {
 
     static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, faces) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
@@ -94,14 +94,14 @@ class FaceUpdater {
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
 
-        FaceUpdater.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true);
+        UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true);
 
-        if (FaceUpdater.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
+        if (UpdaterFace.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
         // N.B. a necessary yet not sufficient condition for effective division of components within the chunk.
-            FaceUpdater.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
+            UpdaterFace.divideConnectedComponents(chunk, id, x, y, z, addedFaces);
 
         // Topology-preserving boundary faces edition
-        return FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, true);
+        return UpdaterFace.updateFacesOnBoundary(chunk, x, y, z, true);
     }
 
     /**
@@ -176,7 +176,7 @@ class FaceUpdater {
                 removedFaceIds[normal] = addedFaceIds[normal] = -1;
                 continue;
             }
-            let faceId = FaceUpdater.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
+            let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
 
             if (removedFaces[normal]) removedFaceIds[normal] = (faceId);
             else removedFaceIds[normal] = -1;
@@ -245,7 +245,7 @@ class FaceUpdater {
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
             var fastIds = fastComponentsIds[componentId];
 
-            let faceColor = FaceUpdater.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
+            let faceColor = UpdaterFace.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
             if (faceColor == 0) continue;
 
             if (isAddition) {
@@ -381,7 +381,7 @@ class FaceUpdater {
             if (w !== 0) { // remove face
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
-                FaceUpdater.removeFaceFromModel(chunk, fid);
+                UpdaterFace.removeFaceFromModel(chunk, fid);
 
             } else { // add face
                 if (updates[0].hasOwnProperty(fid)) {
@@ -389,7 +389,7 @@ class FaceUpdater {
                     updates[2][fid] = wOrigin;
                 }
                 else updates[1][fid] = wOrigin;
-                FaceUpdater.addFaceToModel(chunk, fid, wOrigin);
+                UpdaterFace.addFaceToModel(chunk, fid, wOrigin);
             }
 
         // Removing a block.
@@ -400,12 +400,12 @@ class FaceUpdater {
                     updates[2][fid] = w;
                 }
                 else updates[1][fid] = w;
-                FaceUpdater.addFaceToModel(chunk, fid, w);
+                UpdaterFace.addFaceToModel(chunk, fid, w);
 
             } else { // remove face
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
-                FaceUpdater.removeFaceFromModel(chunk, fid);
+                UpdaterFace.removeFaceFromModel(chunk, fid);
             }
         }
     }
@@ -424,7 +424,7 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             let fid = chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (y === dimensions[1] - 1) {
@@ -435,7 +435,7 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             let fid = capacity + chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (z === dimensions[2] - 1) {
@@ -446,7 +446,7 @@ class FaceUpdater {
                 wOrigin *= -1;
             }
             let fid = 2 * capacity + chunk._toId(x, y, z);
-            FaceUpdater.updateFace(w, wOrigin, fid, chunk, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, chunk, isAddition);
         }
 
         if (x === 0) {
@@ -459,7 +459,7 @@ class FaceUpdater {
                 w *= -1;
                 wOrigin *= -1;
             }
-            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, c, isAddition);
             updatedChunks.add(c);
         }
 
@@ -473,7 +473,7 @@ class FaceUpdater {
                 w *= -1;
                 wOrigin *= -1;
             }
-            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, c, isAddition);
             updatedChunks.add(c);
         }
 
@@ -487,7 +487,7 @@ class FaceUpdater {
                 w *= -1;
                 wOrigin *= -1;
             }
-            FaceUpdater.updateFace(w, wOrigin, fid, c, isAddition);
+            UpdaterFace.updateFace(w, wOrigin, fid, c, isAddition);
             updatedChunks.add(c);
         }
 
@@ -523,14 +523,14 @@ class FaceUpdater {
             !addedFaces[5] && z < dimensions[2]-1  // z+
         ];
 
-        FaceUpdater.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
+        UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
 
-        if (FaceUpdater.detectTopologyChangeAfterDeletion(chunk, id, x, y, z))
+        if (UpdaterFace.detectTopologyChangeAfterDeletion(chunk, id, x, y, z))
         // N.B. the provided criterion gives an immediate, exact answer to the topology request.
-            FaceUpdater.mergeComponents(chunk, id, x, y, z);
+            UpdaterFace.mergeComponents(chunk, id, x, y, z);
 
         // Boundaries: topology-preserving updates
-        return FaceUpdater.updateFacesOnBoundary(chunk, x, y, z, false);
+        return UpdaterFace.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
     static mergeComponents(chunk, id, x, y, z) {
@@ -540,4 +540,4 @@ class FaceUpdater {
     
 }
 
-export default FaceUpdater;
+export default UpdaterFace;

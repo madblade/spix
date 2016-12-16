@@ -99,9 +99,7 @@ class Chunk {
         }
     }
 
-    /**
-     * Detect connected boundary face components.
-     */
+    // Detect connected boundary face components.
     computeConnectedComponents() {
         if (Chunk.debug) console.log("\tComputing connected components...");
         try {
@@ -155,12 +153,7 @@ class Chunk {
         return this._worldModel.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
     }
 
-    /**
-     * Mustn't exceed negative [xyz]Size
-     * @param x
-     * @param y
-     * @param z
-     */
+    // Mustn't exceed negative [xyz] Size
     neighbourWhat(x, y, z) {
         let localX, localY, localZ;
 
@@ -199,8 +192,6 @@ class Chunk {
 
         // Update blocks, surface blocks, then surface faces.
         this._blocks[id] = blockId;
-        //BlockUpdater.updateSurfaceBlocksAfterAddition(this, id, x, y, z);
-        //FaceUpdater.updateSurfaceFacesAfterAddition(this, id, x, y, z);
         return id;
     }
 
@@ -210,8 +201,6 @@ class Chunk {
 
         // Update blocks, surface blocks, then surface faces.
         this._blocks[id] = 0;
-        //BlockUpdater.updateSurfaceBlocksAfterDeletion(this, id, x, y, z);
-        //FaceUpdater.updateSurfaceFacesAfterDeletion(this, id, x, y, z);
         return id;
     }
 

@@ -60,10 +60,11 @@ class UserOutput {
         if (updatedChunks.size < 1) return;
 
         game.players.forEach(p => {
-            if (!UserOutput.playerConcernedByUpdatedChunks(p, updatedChunks)) return;
+            let chunks = engine.getOutputForPlayer(p, updatedChunks);
+
+            if (!chunks) return;
 
             // If an update occurred on an existing, loaded chunk
-            let chunks = engine.extractChunksForPlayer(p, updatedChunks);
             p.send('chk', chunks);
         });
 
@@ -110,11 +111,6 @@ class UserOutput {
     updateMeta() {
         let game = this._game;
         game.chat.updateOutput();
-    }
-
-    static playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO extract connected subsurface.
-        return (chunks.size > 0);
     }
 
     static playerConcernedByEntities(player, entities) {

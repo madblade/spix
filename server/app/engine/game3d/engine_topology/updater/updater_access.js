@@ -6,7 +6,7 @@
 
 import NumberUtils from '../../../math/numbers';
 
-class UpdateAPI {
+class UpdaterAccess {
 
     static debug = false;
 
@@ -26,7 +26,7 @@ class UpdateAPI {
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
-        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
+        if (UpdaterAccess.debug) console.log(blockCoordinatesOnChunk);
 
         let chunk = worldModel.allChunks.get(starterChunkId);
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
@@ -42,7 +42,7 @@ class UpdateAPI {
         // TODO can it be boundary to several chunks at the same time?
         // If request -> nope (requests aint done on edges for security purposes)
 
-        if (UpdateAPI.debug) console.log(starterChunkId);
+        if (UpdaterAccess.debug) console.log(starterChunkId);
         if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
@@ -78,10 +78,10 @@ class UpdateAPI {
         const isBoundaryZ = coordinates[5];
 
         let blockCoordinatesOnChunk = [];
-        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
+        let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
             floors, true, worldModel, blockCoordinatesOnChunk);
 
-        if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
+        if (UpdaterAccess.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
         {
             console.log('Could not find chunk ' + chunk.chunkId);
@@ -89,7 +89,7 @@ class UpdateAPI {
         }
 
         // Validate request.
-        if (!UpdateAPI.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk,
+        if (!UpdaterAccess.translateAndValidateBlockAddition(originEntity, x, y, z, floors, chunk,
                 blockCoordinatesOnChunk, entityModel, isBoundaryX, isBoundaryY, isBoundaryZ))
         {
             return;
@@ -116,10 +116,10 @@ class UpdateAPI {
         const isBoundaryZ = coordinates[5];
 
         let blockCoordinatesOnChunk = [];
-        let chunk = UpdateAPI.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
+        let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
             floors, false, worldModel, blockCoordinatesOnChunk);
 
-        if (UpdateAPI.debug) console.log("Transaction required on " + chunk.chunkId);
+        if (UpdaterAccess.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
         {
             console.log('Could not find chunk ' + chunk.chunkId);
@@ -127,7 +127,7 @@ class UpdateAPI {
         }
 
         // Validate request.
-        if (!UpdateAPI.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk,
+        if (!UpdaterAccess.translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk,
                 blockCoordinatesOnChunk, entityModel, isBoundaryX, isBoundaryY, isBoundaryZ))
         {
             return;
@@ -148,7 +148,7 @@ class UpdateAPI {
     static validateBlockEdition(originEntity, x, y, z, floors) {
         let fx = floors[0]; let fy = floors[1]; let fz = floors[2];
         // 4 blocks maximum range for block editing.
-        const d3 = UpdateAPI.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
+        const d3 = UpdaterAccess.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
         return (d3 < 10);
     }
 
@@ -157,7 +157,7 @@ class UpdateAPI {
     {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors))
+        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z, floors))
         {
             failure("distance not validated by world manager.");
             return false;
@@ -197,7 +197,7 @@ class UpdateAPI {
             return false;
         }
 
-        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
+        if (UpdaterAccess.debug) console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) !== 0)
@@ -230,7 +230,7 @@ class UpdateAPI {
     {
         function failure(reason) { console.log("Request denied: " + reason); }
 
-        if (!UpdateAPI.validateBlockEdition(originEntity, x, y, z, floors))
+        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z, floors))
         {
             failure("distance not validated by world manager.");
             return false;
@@ -266,7 +266,7 @@ class UpdateAPI {
             return false;
         }
 
-        if (UpdateAPI.debug) console.log(blockCoordinatesOnChunk);
+        if (UpdaterAccess.debug) console.log(blockCoordinatesOnChunk);
 
         // Designed block must be 0.
         if (chunk.what(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]) === 0)
@@ -296,4 +296,4 @@ class UpdateAPI {
 
 }
 
-export default UpdateAPI;
+export default UpdaterAccess;
