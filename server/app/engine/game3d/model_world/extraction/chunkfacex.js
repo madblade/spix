@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ChunkLoader from './../loading/chunkloader';
+import ChunkLoader from './../../engine_consistency/loader/chunkloader';
 import FaceLinker from './facelinker';
 
 class CSFX {

@@ -4,8 +4,8 @@
 
 'use strict';
 
-import ChunkGenerator from './../generation/chunkgenerator';
-import ExtractAPI from './../../engine_consistency/builder/extractionapi';
+import ChunkGenerator from './../generator/chunkgenerator';
+import ExtractAPI from './../builder/extractionapi';
 
 class ChunkLoader {
 

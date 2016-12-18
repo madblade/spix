@@ -7,7 +7,7 @@
 import BlockExtractor from './extraction/chunkblockx';
 import FaceExtractor from './extraction/chunkfacex';
 
-import ChunkLoader from './loading/chunkloader';
+import ChunkLoader from './../engine_consistency/loader/chunkloader';
 
 class Chunk {
 

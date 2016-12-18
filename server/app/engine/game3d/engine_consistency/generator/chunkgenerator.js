@@ -4,14 +4,14 @@
 
 'use strict';
 
-import Chunk from './../chunk';
-import ExtractionAPI from './../../engine_consistency/builder/extractionapi';
+import Chunk            from './../../model_world/chunk';
+import ExtractionAPI    from './../builder/extractionapi';
 
-import GenTest from './generator.test.js';
-import GenAnalytic from './generator.analytic.js';
-import GenSimple from './generator.simple.js';
-import GenPerlin from './generator.perlin.js';
-import GenSimplePerlin from './generator.simple-perlin.js';
+import GenTest          from './generator_test.js';
+import GenAnalytic      from './generator_analytic.js';
+import GenSimple        from './generator_simple.js';
+import GenPerlin        from './generator_perlin.js';
+import GenSimplePerlin  from './generator_simple_perlin.js';
 
 class ChunkGenerator {
 

@@ -4,7 +4,7 @@
 
 'use strict';
 
-import WorldGenerator from './generation/worldgenerator';
+import WorldGenerator from './../engine_consistency/generator/worldgenerator';
 import ExtractionAPI from './../engine_consistency/builder/extractionapi'
 import NumberUtils from '../../math/numbers';
 

@@ -4,9 +4,9 @@
 
 'use strict';
 
-import WorldGenerator from '../../model_world/generation/worldgenerator';
+import WorldGenerator from '../generator/worldgenerator';
 import ChunkIterator from '../../model_world/topology/chunkiterator';
-import ChunkLoader from '../../model_world/loading/chunkloader';
+import ChunkLoader from '../loader/chunkloader';
 
 class ExtractAPI {
 

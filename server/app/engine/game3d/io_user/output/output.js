@@ -25,12 +25,10 @@ class UserOutput {
 
         // Load chunks.
         let chunks = consistencyEngine.extractChunksForNewPlayer(p);
-        //let chunks = game.worldModel.extractChunksForNewPlayer(p);
         p.send('chk', chunks);
 
         // Load entities.
         let entities = consistencyEngine.extractEntitiesInRange(p);
-        //let entities = game.entityModel.extractEntitiesInRange(p);
         p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
 
         // Consider player has loaded chunks.
@@ -90,29 +88,27 @@ class UserOutput {
         // Broadcast updates.
         // TODO bundle update in one chunk.
         game.players.forEach(p => {
-            if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
 
             // If an entity in range of player p has just updated
-            //let entities = game.entityModel.extractEntitiesInRange(p);
             let entities = consistencyEngine.extractEntitiesInRange(p);
             // TODO detect change in position since the last time.
-
+            // if (!entities), do it nevertheless, for it gives the player its position.
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
 
             // TODO check 'player has updated position'
-            let chunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
-            //let chunks = game.worldModel.extractNewChunksInRangeForPlayer(p);
-
-            if (!chunks || Object.keys(chunks).length === 0) return;
-
             // TODO dynamically remove chunks with GreyZone, serverside
-            p.send('chk', chunks);
+            let chunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
 
-            // Consider player has loaded chunks.
-            for (let cid in chunks) {
-                let cs = game.worldModel.allChunks;
-                if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
+            if (chunks && Object.keys(chunks).length > 0) {
+                p.send('chk', chunks);
+
+                // Consider player has loaded chunks.
+                for (let cid in chunks) {
+                    let cs = game.worldModel.allChunks;
+                    if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
+                }
             }
+
             // TODO remove old chunks
         });
 
@@ -123,11 +119,6 @@ class UserOutput {
     updateMeta() {
         let game = this._game;
         game.chat.updateOutput();
-    }
-
-    static playerConcernedByEntities(player, entities) {
-        // TODO function of player position.
-        return Object.keys(entities).length > 0;
     }
 
 }
