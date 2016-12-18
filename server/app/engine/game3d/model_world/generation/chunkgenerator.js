@@ -5,7 +5,7 @@
 'use strict';
 
 import Chunk from './../chunk';
-import ExtractionAPI from './../extraction/extractionapi';
+import ExtractionAPI from './../../engine_consistency/builder/extractionapi';
 
 import GenTest from './generator.test.js';
 import GenAnalytic from './generator.analytic.js';

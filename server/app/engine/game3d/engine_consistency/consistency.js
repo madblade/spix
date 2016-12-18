@@ -22,14 +22,40 @@ class ConsistencyEngine {
         this._loader        = new Loader(this);
     }
 
+    get worldModel()  { return this._worldModel; }
+    get entityModel() { return this._entityModel; }
+
     update() {
 
     }
 
-    //extractChunksForNewPlayer(player) {
-    //    return ExtractionAPI.computeChunksForNewPlayer(player, this);
-    //}
+    extractChunksForNewPlayer(player) {
+        return this._builder.computeChunksForNewPlayer(player);
+    }
 
+    extractNewChunksInRangeForPlayer(player) {
+        return this._builder.computeNewChunksInRangeForPlayer(player);
+    }
+
+    extractEntitiesInRange(player) {
+        return this._loader.computeEntitiesInRange(player);
+    }
+
+    setChunksAsLoaded(player, chunks) {
+        let a = player.avatar;
+        let cs = this._worldModel.allChunks;
+
+        for (let cid in chunks)
+            if (cs.has(cid)) a.setChunkAsLoaded(cid);
+    }
+
+    setEntitiesAsLoaded(player, entities) {
+        let a = player.avatar;
+        let es = this._entityModel.entities;
+
+        for (let eid in entities)
+            if (es.hasOwnProperty(eid)) a.setEntityAsLoaded(eid);
+    }
 }
 
 export default ConsistencyEngine;

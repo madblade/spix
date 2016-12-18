@@ -6,7 +6,7 @@
 
 class Generator {
 
-    constructor(topologyEngine) {
+    constructor(consistencyEngine) {
 
     }
 

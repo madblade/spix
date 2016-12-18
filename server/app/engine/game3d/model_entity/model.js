@@ -19,6 +19,12 @@ class EntityModel {
         this._updatedEntities = {};
     }
 
+    get entities() { return this._entities; }
+
+    get updatedEntities() {
+        return this._updatedEntities;
+    }
+
     forEach(callback) {
         let entities = this._entities;
         for (let entityId in entities) {
@@ -26,21 +32,16 @@ class EntityModel {
         }
     }
 
-    get updatedEntities() {
-        return this._updatedEntities;
-    }
-
-    // TODO manage disappearances
-    extractEntitiesInRange(player) {
-        var entities = [];
-        for (var eid in this._entities) {
-            if (this._entities[eid]._id === player.avatar._id) continue;
-
-            let entity = this._entities[eid];
-            entities.push({p:entity.position, r:entity.rotation, k:entity.kind});
-        }
-        return entities;
-    }
+    //extractEntitiesInRange(player) {
+    //    var entities = [];
+    //    for (var eid in this._entities) {
+    //        if (this._entities[eid]._id === player.avatar._id) continue;
+    //
+    //        let entity = this._entities[eid];
+    //        entities.push({p:entity.position, r:entity.rotation, k:entity.kind});
+    //    }
+    //    return entities;
+    //}
 
     updateEntitiesTransmitted() {
         this._updatedEntities = {};

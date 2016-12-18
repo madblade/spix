@@ -10,12 +10,14 @@ class Avatar extends Entity {
 
     constructor(id, entityModel) {
         super(id);
-        this._kind = 'player';
-
         this._entityModel = entityModel;
-        this._loadedChunks = new Map();
+
+        this._kind = 'player';
         this._renderDistance = 8;
         this._role = 0;
+
+        this._loadedChunks   = new Set();
+        this._loadedEntities = new Set();
     }
 
     /**
@@ -42,12 +44,24 @@ class Avatar extends Entity {
         return this._loadedChunks.has(id);
     }
 
-    setChunkAsLoaded(chunk) {
-        this._loadedChunks.set(chunk.chunkId, chunk);
+    setChunkAsLoaded(chunkId) {
+        this._loadedChunks.add(chunkId);
     }
 
-    setChunkOutOfRange(chunk) {
-        this._loadedChunks.delete(chunk.chunkId);
+    setChunkOutOfRange(chunkId) {
+        this._loadedChunks.delete(chunkId);
+    }
+
+    isEntityLoaded(id) {
+        return this._loadedEntities.has(id);
+    }
+
+    setEntityAsLoaded(entityId) {
+        this._loadedEntities.add(entityId);
+    }
+
+    setEntityOutOfRange(entityId) {
+        this._loadedEntities.delete(entityId);
     }
 
 }

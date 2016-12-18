@@ -17,7 +17,7 @@ class Selector {
         var chunksForPlayer = {};
 
         modelUpdatedChunks.forEach((chunk, id) => {
-            if (!modelChunks.has(id) || !player.avatar.loadedChunks.has(id))
+            if (!modelChunks.has(id) || !player.avatar.isChunkLoaded(id))
                 return;
 
             let currentChunk = modelChunks.get(id);

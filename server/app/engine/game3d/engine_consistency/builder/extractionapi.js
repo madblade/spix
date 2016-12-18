@@ -4,9 +4,9 @@
 
 'use strict';
 
-import WorldGenerator from '../generation/worldgenerator';
-import ChunkIterator from '../topology/chunkiterator';
-import ChunkLoader from '../loading/chunkloader';
+import WorldGenerator from '../../model_world/generation/worldgenerator';
+import ChunkIterator from '../../model_world/topology/chunkiterator';
+import ChunkLoader from '../../model_world/loading/chunkloader';
 
 class ExtractAPI {
 
@@ -18,6 +18,7 @@ class ExtractAPI {
     }
 
     static computeChunksForNewPlayer(player, worldModel) {
+        // Object to be (JSON.stringify)-ed.
         var chunksForNewPlayer = {};
         let chunksInModel = worldModel.allChunks;
 
@@ -97,13 +98,13 @@ class ExtractAPI {
             if (ExtractAPI.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
-            av.setChunkAsLoaded(newChunk);
+            av.setChunkAsLoaded(newChunk.chunkId);
             chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
-            av.setChunkOutOfRange(chunkToUnload);
+            av.setChunkOutOfRange(chunkToUnload.chunkId);
             chunksForPlayer[chunkToUnload] = null;
         }
 

@@ -5,7 +5,7 @@
 'use strict';
 
 import WorldGenerator from './generation/worldgenerator';
-import ExtractionAPI from './extraction/extractionapi'
+import ExtractionAPI from './../engine_consistency/builder/extractionapi'
 import NumberUtils from '../../math/numbers';
 
 class WorldModel {
@@ -43,14 +43,14 @@ class WorldModel {
     set allChunks(newChunks) { this._chunks = newChunks; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
-    extractNewChunksInRangeForPlayer(player) {
-        return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this);
-    }
+    //extractNewChunksInRangeForPlayer(player) {
+    //    return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this);
+    //}
 
     // API Entry Point
-    extractChunksForNewPlayer(player) {
-        return ExtractionAPI.computeChunksForNewPlayer(player, this);
-    }
+    //extractChunksForNewPlayer(player) {
+    //    return ExtractionAPI.computeChunksForNewPlayer(player, this);
+    //}
 
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);

@@ -24,20 +24,20 @@ class UserOutput {
         let consistencyEngine = this._consistencyEngine;
 
         // Load chunks.
-        // TODO decouple
-        // let chunks = consistencyEngine.extractChunksForNewPlayer(p);
-        let chunks = game.worldModel.extractChunksForNewPlayer(p);
+        let chunks = consistencyEngine.extractChunksForNewPlayer(p);
+        //let chunks = game.worldModel.extractChunksForNewPlayer(p);
         p.send('chk', chunks);
 
         // Load entities.
-        let entities = game.entityModel.extractEntitiesInRange(p);
+        let entities = consistencyEngine.extractEntitiesInRange(p);
+        //let entities = game.entityModel.extractEntitiesInRange(p);
         p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
 
         // Consider player has loaded chunks.
-        for (let cid in chunks) {
-            let cs = game.worldModel.allChunks;
-            if (cs.has(cid)) a.setChunkAsLoaded(cs.get(cid));
-        }
+        consistencyEngine.setChunksAsLoaded(p, chunks);
+
+        // Consider player has loaded entities.
+        consistencyEngine.setEntitiesAsLoaded(p, entities);
 
         if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
     }
@@ -58,28 +58,32 @@ class UserOutput {
     }
 
     updateChunks()  {
-        let engine = this._topologyEngine;
-        var updatedChunks = engine.getOutput();
+        let topologyEngine = this._topologyEngine;
+        var updatedChunks = topologyEngine.getOutput();
 
         let game = this._game;
         if (updatedChunks.size < 1) return;
 
         game.players.forEach(p => {
-            let chunks = engine.getOutputForPlayer(p, updatedChunks);
+            let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks);
 
             if (!chunks) return;
+
+            // TODO setChunkOutOfRange.
 
             // If an update occurred on an existing, loaded chunk
             p.send('chk', chunks);
         });
 
         // Tell object manager we have done update.
-        engine.flushOutput();
+        topologyEngine.flushOutput();
     }
 
     updateEntities() {
         let game = this._game;
         let physicsEngine  = this._physicsEngine;
+        let consistencyEngine = this._consistencyEngine;
+
         var updatedEntities = game.entityModel.updatedEntities;
         if (Object.keys(updatedEntities).length < 1) return;
 
@@ -89,13 +93,15 @@ class UserOutput {
             if (!UserOutput.playerConcernedByEntities(p, updatedEntities)) return;
 
             // If an entity in range of player p has just updated
-            let entities = game.entityModel.extractEntitiesInRange(p);
+            //let entities = game.entityModel.extractEntitiesInRange(p);
+            let entities = consistencyEngine.extractEntitiesInRange(p);
             // TODO detect change in position since the last time.
 
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
 
             // TODO check 'player has updated position'
-            let chunks = game.worldModel.extractNewChunksInRangeForPlayer(p);
+            let chunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
+            //let chunks = game.worldModel.extractNewChunksInRangeForPlayer(p);
 
             if (!chunks || Object.keys(chunks).length === 0) return;
 
@@ -105,7 +111,7 @@ class UserOutput {
             // Consider player has loaded chunks.
             for (let cid in chunks) {
                 let cs = game.worldModel.allChunks;
-                if (cs.has(cid)) p.avatar.setChunkAsLoaded(cs.get(cid));
+                if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
             }
             // TODO remove old chunks
         });
