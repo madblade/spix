@@ -7,10 +7,7 @@
 import InputBuffer      from './input_buffer';
 import OutputBuffer     from './output_buffer';
 
-import Generator        from './generator/generator';
-import Builder          from './builder/builder';
-import Loader           from './loader/loader';
-import Extractor        from './extractor/extractor';
+import Selector         from './selector/selector';
 import Updater          from './updater/updater';
 import Accessor         from './accessor/accessor';
 
@@ -28,17 +25,14 @@ class TopologyEngine {
 
         // Engine.
         this._accessor      = new Accessor(this);
-        this._generator     = new Generator(this);
-        this._builder       = new Builder(this);
-        this._loader        = new Loader(this);
-        this._extractor     = new Extractor(this);
+        this._selector      = new Selector(this);
         this._updater       = new Updater(this); // Needs Accessor
     }
 
     get entityModel()  { return this._entityModel; }
     get worldModel()   { return this._worldModel; }
     get accessor()     { return this._accessor; }
-    get extractor()    { return this._extractor; }
+    get extractor()    { return this._selector; }
     get outputBuffer() { return this._outputBuffer; }
 
     addInput(meta, avatar) {
@@ -55,7 +49,7 @@ class TopologyEngine {
     }
 
     getOutputForPlayer(p, updatedChunks) {
-        return this._extractor.extractUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
+        return this._selector.selectUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
     }
 
     flushOutput() {

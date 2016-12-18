@@ -4,14 +4,14 @@
 
 'use strict';
 
-class Extractor {
+class Selector {
 
     constructor(topologyEngine) {
         this._accessor    = topologyEngine.accessor;
     }
 
     // TODO distance test, bring back extraction API
-    extractUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks) {
+    selectUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks) {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
         var chunksForPlayer = {};
@@ -34,4 +34,4 @@ class Extractor {
 
 }
 
-export default Extractor;
+export default Selector;

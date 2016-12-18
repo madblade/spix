@@ -4,16 +4,17 @@
 
 'use strict';
 
-import Game             from '../../model/game/game';
+import Game              from '../../model/game/game';
 
-import UserInput        from './io_user/input/input';
-import UserOutput       from './io_user/output/output';
-import AIInput          from './io_ai/input/input';
-import AIOutput         from './io_ai/output/output';
-import AI               from './io_ai/ai';
+import UserInput         from './io_user/input/input';
+import UserOutput        from './io_user/output/output';
+import AIInput           from './io_ai/input/input';
+import AIOutput          from './io_ai/output/output';
+import AI                from './io_ai/ai';
 
-import PhysicsEngine    from './engine_physics/physics';
-import TopologyEngine   from './engine_topology/topology';
+import PhysicsEngine     from './engine_physics/physics';
+import TopologyEngine    from './engine_topology/topology';
+import ConsistencyEngine from './engine_consistency/consistency';
 
 import EntityModel      from './model_entity/model';
 import WorldModel       from './model_world/model';
@@ -43,6 +44,7 @@ class Game3D extends Game {
         this._ai                = new AI(this);
         this._physicsEngine     = new PhysicsEngine(this);
         this._topologyEngine    = new TopologyEngine(this);
+        this._consisencyEngine  = new ConsistencyEngine(this);
 
         // I/O (need engines).
         this._internalInput     = new AIInput(this);    // A.I.
@@ -62,6 +64,7 @@ class Game3D extends Game {
 
     get physicsEngine()     { return this._physicsEngine; }
     get topologyEngine()    { return this._topologyEngine; }
+    get consistencyEngine() { return this._consisencyEngine; }
 
     get chat()              { return this._chat; }
 
@@ -71,18 +74,19 @@ class Game3D extends Game {
         // let time = process.hrtime();
 
         /** Inputs **/
-        this._ai.update();              // Update intents.
+        this._ai.update();               // Update intents.
 
-        this._externalInput.update();   // Update human inputs.
-        this._internalInput.update();   // Update artificial inputs.
+        this._externalInput.update();    // Update human inputs.
+        this._internalInput.update();    // Update artificial inputs.
 
         /** Updates **/
-        this._topologyEngine.update();  // Update topological model.
-        this._physicsEngine.update();   // Update physical simulation.
+        this._topologyEngine.update();   // Update topological model.
+        this._physicsEngine.update();    // Update physical simulation.
+        this._consisencyEngine.update(); // Make client models consistent.
 
         /** Outputs **/
-        this._externalOutput.update();  // Send updates.
-        this._internalOutput.update();  // Update perceptions.
+        this._externalOutput.update();   // Send updates.
+        this._internalOutput.update();   // Update perceptions.
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");

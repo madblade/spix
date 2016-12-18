@@ -11,8 +11,9 @@ class UserOutput {
     constructor(game) {
         this._game = game;
 
-        this._physicsEngine  = game.physicsEngine;
-        this._topologyEngine = game.topologyEngine;
+        this._physicsEngine     = game.physicsEngine;
+        this._topologyEngine    = game.topologyEngine;
+        this._consistencyEngine = game.consistencyEngine;
     }
 
     init(player) {
@@ -20,7 +21,11 @@ class UserOutput {
         let p = player;
         let a = p.avatar;
 
+        let consistencyEngine = this._consistencyEngine;
+
         // Load chunks.
+        // TODO decouple
+        // let chunks = consistencyEngine.extractChunksForNewPlayer(p);
         let chunks = game.worldModel.extractChunksForNewPlayer(p);
         p.send('chk', chunks);
 
@@ -74,6 +79,7 @@ class UserOutput {
 
     updateEntities() {
         let game = this._game;
+        let physicsEngine  = this._physicsEngine;
         var updatedEntities = game.entityModel.updatedEntities;
         if (Object.keys(updatedEntities).length < 1) return;
 
