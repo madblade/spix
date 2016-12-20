@@ -20,16 +20,21 @@ class Integrator {
 
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
+        let hasUpdated;
+
         if (Integrator.isNull(entity.acceleration)) {
             //console.log('Euler');
-            Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, WM);
+            hasUpdated = Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, WM);
         } else {
             //console.log('Leapfrog');
-            Integrator.integrateLeapfrog(dt, impulseSpeed, force, entity, EM, WM);
+            hasUpdated = Integrator.integrateLeapfrog(dt, impulseSpeed, force, entity, EM, WM);
         }
+
+        return hasUpdated;
     }
 
     // First-order integrator
+    // @returns {boolean} whether entity has updated
     static integrateEuler(dt, impulseSpeed, force, entity, EM, WM) {
         let mass = entity.mass;
 
@@ -64,7 +69,8 @@ class Integrator {
         entity.acceleration = newAcceleration;
 
         // Detect movement
-        if (newSpeed[0] === 0 && newSpeed[1] === 0 && newSpeed[2] === 0) return;
+        if (newSpeed[0] === 0 && newSpeed[1] === 0 && newSpeed[2] === 0)
+            return false;
 
         // Guess new position without constraints.
         let newPosition = [position[0], position[1], position[2]];
@@ -74,10 +80,11 @@ class Integrator {
         TerrainCollider.linearCollide(entity, WM, position, newPosition, dt);
 
         // Notify an entity was updated.
-        EM.entityUpdated(entity.id);
+        return true;
     }
 
     // Second-order integrator (time-reversible, symplectic)
+    // @returns {boolean} whether entity has updated
     static integrateLeapfrog(dt, impulseSpeed, force, entity, EM, WM) {
         let mass = entity.mass;
 
@@ -95,7 +102,8 @@ class Integrator {
         for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * dt * (speed[i]+acceleration[i]*dt*0.5);
 
         // Detect change in position.
-        if (Integrator.areEqual(newPosition, position)) return;
+        if (Integrator.areEqual(newPosition, position))
+            return false;
 
         if (TerrainCollider.linearCollide(entity, WM, position, newPosition, dt)) {
             // entity.speed = determined by the collider
@@ -130,8 +138,10 @@ class Integrator {
         entity._impulseSpeed = impulseSpeed;
 
         // Notify an entity was updated.
-        EM.entityUpdated(entity.id);
+        return true;
     }
+
+    // TODO [MEDIUM] Verlet integrator
 
 }
 

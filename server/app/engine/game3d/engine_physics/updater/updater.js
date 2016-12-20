@@ -12,6 +12,9 @@ class Updater {
 
         // Models.
         this._entityModel = physicsEngine.entityModel;
+
+        // Output. (rotation causes entities to update)
+        this._outputBuffer = physicsEngine.outputBuffer;
     }
 
     update(inputBuffer) {
@@ -19,13 +22,6 @@ class Updater {
         // Process incoming actions.
         inputBuffer.forEach( (array, avatar) => // value, key
         {
-            // TODO cleanup
-            //let array  = input[0];
-            //let avatar = input[1];
-            //console.log(array);
-            //let array = meta.meta;
-            //if (!avatar) return;
-
             // TODO compute means or filter some events.
             array.forEach(e => {
                 if (e.action === 'move' && typeof e.meta === "string")
@@ -63,17 +59,17 @@ class Updater {
     };
 
     rotate(meta, avatar) {
-        // TODO manage border effects on entity destructions
         if (avatar.rotation === null) return;
 
         let entityModel = this._entityModel;
+        let outputBuffer = this._outputBuffer;
 
         let p = meta[0];
         let y = meta[1];
 
         if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
             avatar.rotate(p, y);
-            entityModel.entityUpdated(avatar.id);
+            outputBuffer.entityUpdated(avatar.id);
         }
     }
 

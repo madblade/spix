@@ -79,17 +79,13 @@ class Chunk {
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
 
-    /**
-     * Preload neighbours.
-     */
+    // Preload neighbours.
     preloadNeighbourChunks() {
         if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
         ChunkLoader.preloadAllNeighbourChunks(this, this._worldModel);
     }
 
-    /**
-     * Detect boundary blocks.
-     */
+    // Detect boundary blocks.
     computeSurfaceBlocksFromScratch() {
         if (Chunk.debug) console.log('\tExtracting surface...');
         try {

@@ -11,12 +11,20 @@ class Newton {
     static globalTimeDilatation = 20000000;
     static gravity = [0, 0, -0.11];
 
-    static solve(EM, WM, Δt) {
+    static solve(physicsEngine, Δt) {
+
+        let EM = physicsEngine.entityModel;
+        let WM = physicsEngine.worldModel;
+        let o  = physicsEngine.outputBuffer;
 
         const dt = Δt/Newton.globalTimeDilatation;
 
         EM.forEach(function(entity) {
-            Newton.linearSolve(entity, EM, WM, dt);
+            const entityUpdated = Newton.linearSolve(entity, EM, WM, dt);
+
+            if (entityUpdated) {
+                o.entityUpdated(entity.id);
+            }
         });
 
         // Get entities inputs
@@ -45,6 +53,7 @@ class Newton {
 
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
+        var hasUpdated = false;
 
         Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
@@ -52,7 +61,9 @@ class Newton {
 
         // Newton.sumLocalFields(force, pos, EM);
 
-        Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+
+        return hasUpdated;
     }
 
     static quadraticSolve(entity, EM, WM, dt) {
@@ -62,6 +73,7 @@ class Newton {
 
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
+        var hasUpdated = false;
 
         Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
@@ -71,7 +83,9 @@ class Newton {
 
         // TODO manage collisions
 
-        Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+
+        return hasUpdated;
     }
 
     static add(result, toAdd) {

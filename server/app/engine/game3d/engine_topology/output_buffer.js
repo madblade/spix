@@ -8,11 +8,10 @@
 class OutputBuffer {
 
     constructor() {
+        // Contains ids of updated chunks.
+        // Chunks themselves hold information about their being updated.
+        // TODO [LOW] concentrate chunk updates in this buffer.
         this._buffer = new Set();
-    }
-
-    get buffer() {
-        return this._buffer;
     }
 
     chunkUpdated(chunkId) {
@@ -20,15 +19,8 @@ class OutputBuffer {
     }
 
     // Shallow copy.
-    getOutput(modelChunks) {
-        var updatedChunks = new Map();
-
-        // TODO only store ids (topology engine -> helper).
-        this._buffer.forEach(
-            id => updatedChunks.set(id, modelChunks.get(id).blocks)
-        );
-
-        return updatedChunks;
+    getOutput() {
+        return new Set(this._buffer);
     }
 
     flushOutput(modelChunks) {

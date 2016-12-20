@@ -31,6 +31,8 @@ class PhysicsEngine {
     }
 
     get entityModel()   { return this._entityModel; }
+    get worldModel()    { return this._worldModel; }
+    get outputBuffer()  { return this._outputBuffer; }
 
     addInput(meta, avatar) {
         this._inputBuffer.addInput(meta, avatar)
@@ -42,7 +44,7 @@ class PhysicsEngine {
         // TODO decouple solver
         //this._solver.solve();
         let Δt = process.hrtime(this._stamp)[1];
-        Newton.solve(this._entityModel, this._worldModel, Δt);
+        Newton.solve(this, Δt);
         this._stamp = process.hrtime();
 
         this._inputBuffer.flush();
@@ -50,6 +52,10 @@ class PhysicsEngine {
 
     getOutput() {
         return this._outputBuffer.getOutput();
+    }
+
+    flushOutput() {
+        this._outputBuffer.flushOutput(this._entityModel.entities);
     }
 
     shuffleGravity() {

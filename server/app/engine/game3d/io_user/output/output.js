@@ -56,7 +56,7 @@ class UserOutput {
         let topologyEngine    = this._topologyEngine;
         let consistencyEngine = this._consistencyEngine;
 
-        var updatedChunks = topologyEngine.getOutput();
+        let updatedChunks = topologyEngine.getOutput();
 
         game.players.forEach(p => {
             let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks); // TODO couple with consistency inRange check.
@@ -81,7 +81,7 @@ class UserOutput {
 
         });
 
-        // Tell object manager we have done update.
+        // Empty chunk updates buffer.
         topologyEngine.flushOutput();
     }
 
@@ -90,22 +90,26 @@ class UserOutput {
         let physicsEngine     = this._physicsEngine;
         let consistencyEngine = this._consistencyEngine;
 
-        var updatedEntities = game.entityModel.updatedEntities;
-        if (Object.keys(updatedEntities).length < 1) return;
+        let updatedEntities = physicsEngine.getOutput();
+
+        //if (Object.keys(updatedEntities).length < 1) return;
 
         // Broadcast updates.
-        // TODO bundle update in one chunk.
+        // TODO [HIGH] bundle update in one chunk.
         game.players.forEach(p => {
 
             // If an entity in range of player p has just updated
-            let entities = consistencyEngine.extractEntitiesInRange(p); // TODO transfer in 'consistencyEngine' update scheme.
-            // TODO detect change in position since the last time.
-            // if (!entities), do it nevertheless, for it gives the player its position.
+            let entities = consistencyEngine.extractEntitiesInRange(p, updatedEntities);
+
+            // TODO [LOW] detect change in position since the last time.
+            // if (!entities), do it nevertheless, for it gives the player its own position.
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
         });
 
-        // Tell object manager we have done update.
-        game.entityModel.updateEntitiesTransmitted();
+        //game.entityModel.updateEntitiesTransmitted();
+
+        // Empty entity updates buffer.
+        physicsEngine.flushOutput();
     }
 
     updateMeta() {

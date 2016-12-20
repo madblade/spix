@@ -16,14 +16,14 @@ class EntityModel {
         this._entities = {};
 
         // Keep track of modified objects.
-        this._updatedEntities = {};
+        //this._updatedEntities = {};
     }
 
     get entities() { return this._entities; }
 
-    get updatedEntities() {
-        return this._updatedEntities;
-    }
+    //get updatedEntities() {
+    //    return this._updatedEntities;
+    //}
 
     forEach(callback) {
         let entities = this._entities;
@@ -43,9 +43,10 @@ class EntityModel {
     //    return entities;
     //}
 
-    updateEntitiesTransmitted() {
-        this._updatedEntities = {};
-    }
+    // TODO cleanup
+    //updateEntitiesTransmitted() {
+    //    this._updatedEntities = {};
+    //}
 
     spawnPlayer(p) {
         let id = CollectionUtil.generateId(this._entities);
@@ -60,11 +61,9 @@ class EntityModel {
         delete p.avatar;
     }
 
-    entityUpdated(entityId) {
-        // var p = this._entities[entityId].position;
-        // console.log(p[0] + " " + p[1] + " " + p[2]);
-        this._updatedEntities[entityId] = true;
-    }
+    //entityUpdated(entityId) {
+    //    this._updatedEntities[entityId] = true;
+    //}
 
     // TODO optimize with LACKS structure.
     anEntityIsPresentOn(x, y, z) {
