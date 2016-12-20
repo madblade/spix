@@ -13,100 +13,113 @@ class UserInput {
         this._topologyEngine = game.topologyEngine;
         this._chat           = game.chat;
 
-        this._incoming = new Map();
+        //this._buffer = new Map();
         this._listeners = {};
     }
 
     update() {
         // Process incoming actions
-        this._incoming.forEach((array, avatar) => {
-            if (!avatar || avatar === 'undefined') return;
+        //this._buffer.forEach((array, avatar) => {
+        //    if (!avatar || avatar === 'undefined') return;
 
             // avatar: key; array: value
-            array.forEach(e => {
-                if (e.action === 'move' && typeof e.meta === "string")
-                    // TODO compute means or filter some events.
-                    this.move(e.meta, avatar);
+            //array.forEach(e => {
+            //    if (e.action === 'move' && typeof e.meta === "string")
+            //         TODO compute means or filter some events.
+                    //this.move(e.meta, avatar);
 
-                else if (e.action === 'rotate')
-                    this.rotate(e.meta, avatar);
-
-                else if (e.action === 'block')
-                    this.block(e.meta, avatar);
-
-                else if (e.action === 'action' && typeof e.meta === "string")
-                    this.action(e.meta, avatar);
-            });
-        });
+                //else if (e.action === 'rotate')
+                //    this.rotate(e.meta, avatar);
+                //
+                //else if (e.action === 'block')
+                //    this.block(e.meta, avatar);
+                //
+                //else if (e.action === 'action' && typeof e.meta === "string")
+                //    this.action(e.meta, avatar);
+            //});
+        //});
 
         // Flush incoming actions.
-        this._incoming = new Map();
+        //this._buffer = new Map();
     }
 
-    move(meta, avatar) {
-        var hasMoved = true;
-        switch (meta) {
-            case 'f'  : avatar.goForward();     break;
-            case 'r'  : avatar.goRight();       break;
-            case 'l'  : avatar.goLeft();        break;
-            case 'b'  : avatar.goBackwards();   break;
-            case 'u'  : avatar.goUp();          break;
-            case 'd'  : avatar.goDown();        break;
+    //move(meta, avatar) {
+    //    var hasMoved = true;
+    //    switch (meta) {
+    //        case 'f'  : avatar.goForward();     break;
+    //        case 'r'  : avatar.goRight();       break;
+    //        case 'l'  : avatar.goLeft();        break;
+    //        case 'b'  : avatar.goBackwards();   break;
+    //        case 'u'  : avatar.goUp();          break;
+    //        case 'd'  : avatar.goDown();        break;
+    //
+    //        case 'fx' : avatar.stopForward();   break;
+    //        case 'rx' : avatar.stopRight();     break;
+    //        case 'lx' : avatar.stopLeft();      break;
+    //        case 'bx' : avatar.stopBackwards(); break;
+    //        case 'ux' : avatar.stopUp();        break;
+    //        case 'dx' : avatar.stopDown();      break;
+    //        case 'xx' : avatar.stop();          break;
+    //
+    //        default: hasMoved = false;
+    //    }
+    //};
 
-            case 'fx' : avatar.stopForward();   break;
-            case 'rx' : avatar.stopRight();     break;
-            case 'lx' : avatar.stopLeft();      break;
-            case 'bx' : avatar.stopBackwards(); break;
-            case 'ux' : avatar.stopUp();        break;
-            case 'dx' : avatar.stopDown();      break;
-            case 'xx' : avatar.stop();          break;
+    //rotate(meta, avatar) {
+    //    if (!(meta instanceof Array)) return;
+    //    // TODO manage border effects on entity destructions
+    //    if (avatar.rotation === null) return;
+    //
+    //    let p = meta[0], y = meta[1];
+    //
+    //    // Manage player rotation
+    //    if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
+    //        avatar.rotate(p, y);
+    //        this._game.entityModel.entityUpdated(avatar.id);
+    //    }
+    //}
 
-            default: hasMoved = false;
-        }
-    };
+    //block(meta, avatar) {
+    //    if (!(meta instanceof Array)) return;
+    //    this._topologyEngine.addInput(meta, avatar);
+    //}
 
-    rotate(meta, avatar) {
-        if (!(meta instanceof Array)) return;
-        // TODO manage border effects on entity destructions
-        if (avatar.rotation === null) return;
+    //action(meta, avatar) {
+    //    if (meta === "g") {
+    //        this._physicsEngine.shuffleGravity();
+    //    }
+    //}
 
-        let p = meta[0], y = meta[1];
+    //pushToTopology(kind, avatar) {
+    //    return (data => {
+    //        engine.addInput({action:kind, meta:data}, avatar);
+    //
+    //        var array = this._buffer.get(avatar);
+    //        if (!array) {
+    //            this._buffer.set(avatar, [{action:kind, meta:data}]);
+    //        } else {
+    //            this._buffer.get(avatar).push({action:kind, meta:data});
+    //        }
+    //    });
+    //}
 
-        // Manage player rotation
-        if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
-            avatar.rotate(p, y);
-            this._game.entityModel.entityUpdated(avatar.id);
-        }
-    }
-
-    block(meta, avatar) {
-        if (!(meta instanceof Array)) return;
-        this._topologyEngine.addInput(meta, avatar);
-    }
-
-    action(meta, avatar) {
-        if (meta === "g") {
-            this._game.physicsEngine.shuffleGravity();
-        }
-    }
-
-    push(kind, avatar) {
+    pushToEngine(kind, avatar, engine) {
         return (data => {
-            var array = this._incoming.get(avatar);
-            if (!array) {
-                this._incoming.set(avatar, [{action:kind, meta:data}]);
-            } else {
-                this._incoming.get(avatar).push({action:kind, meta:data});
-            }
+            engine.addInput({action: kind, meta: data}, avatar);
         });
     }
 
     listenPlayer(player) {
+        let physicsEngine = this._physicsEngine;
+        let topologyEngine = this._topologyEngine;
+        let avatar = player.avatar;
+
         let listener = this._listeners[player] = [
-            this.push('move', player.avatar),
-            this.push('rotate', player.avatar),
-            this.push('block', player.avatar),
-            this.push('action', player.avatar),
+            this.pushToEngine('move',   avatar, physicsEngine),
+            this.pushToEngine('rotate', avatar, physicsEngine),
+            this.pushToEngine('block',  avatar, topologyEngine),
+            this.pushToEngine('action', avatar, physicsEngine),
+
             this._chat.playerInput(player)
         ];
 

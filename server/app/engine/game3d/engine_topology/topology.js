@@ -36,7 +36,7 @@ class TopologyEngine {
     get outputBuffer() { return this._outputBuffer; }
 
     addInput(meta, avatar) {
-        this._inputBuffer.push(meta, avatar);
+        this._inputBuffer.addInput(meta, avatar);
     }
 
     update() {
@@ -44,10 +44,13 @@ class TopologyEngine {
         this._inputBuffer.flush();
     }
 
+    // Get (chunk id, blocks) map for updated chunks.
     getOutput() {
         return this._outputBuffer.getOutput(this._worldModel.allChunks);
     }
 
+    // Get (chunk id, updates) object for updated chunks concerning specific player.
+    // TODO put in consistency model.
     getOutputForPlayer(p, updatedChunks) {
         return this._selector.selectUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
     }

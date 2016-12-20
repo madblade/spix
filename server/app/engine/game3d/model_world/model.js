@@ -48,7 +48,7 @@ class WorldModel {
     //}
 
     // API Entry Point
-    //extractChunksForNewPlayer(player) {
+    //loadChunksForNewPlayer(player) {
     //    return ExtractionAPI.computeChunksForNewPlayer(player, this);
     //}
 

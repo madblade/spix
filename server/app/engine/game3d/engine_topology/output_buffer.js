@@ -23,6 +23,7 @@ class OutputBuffer {
     getOutput(modelChunks) {
         var updatedChunks = new Map();
 
+        // TODO only store ids (topology engine -> helper).
         this._buffer.forEach(
             id => updatedChunks.set(id, modelChunks.get(id).blocks)
         );

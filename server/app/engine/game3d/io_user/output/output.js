@@ -24,17 +24,13 @@ class UserOutput {
         let consistencyEngine = this._consistencyEngine;
 
         // Load chunks.
-        let chunks = consistencyEngine.extractChunksForNewPlayer(p);
+        let chunks = consistencyEngine.loadChunksForNewPlayer(p);
         p.send('chk', chunks);
+        consistencyEngine.setChunksAsLoaded(p, chunks);
 
         // Load entities.
         let entities = consistencyEngine.extractEntitiesInRange(p);
         p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
-
-        // Consider player has loaded chunks.
-        consistencyEngine.setChunksAsLoaded(p, chunks);
-
-        // Consider player has loaded entities.
         consistencyEngine.setEntitiesAsLoaded(p, entities);
 
         if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
@@ -56,21 +52,33 @@ class UserOutput {
     }
 
     updateChunks()  {
-        let topologyEngine = this._topologyEngine;
+        let game              = this._game;
+        let topologyEngine    = this._topologyEngine;
+        let consistencyEngine = this._consistencyEngine;
+
         var updatedChunks = topologyEngine.getOutput();
 
-        let game = this._game;
-        if (updatedChunks.size < 1) return;
-
         game.players.forEach(p => {
-            let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks);
-
-            if (!chunks) return;
-
-            // TODO setChunkOutOfRange.
+            let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks); // TODO couple with consistency inRange check.
 
             // If an update occurred on an existing, loaded chunk
-            p.send('chk', chunks);
+            if (chunks) p.send('chk', chunks);
+
+            // TODO check 'player has updated position'
+            // TODO dynamically remove chunks with GreyZone, serverside
+            let newChunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
+            // TODO setChunkOutOfRange.
+
+            if (newChunks && Object.keys(newChunks).length > 0) {
+                p.send('chk', newChunks);
+
+                // Consider player has loaded chunks.
+                for (let cid in newChunks) {
+                    let cs = game.worldModel.allChunks;
+                    if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
+                }
+            }
+
         });
 
         // Tell object manager we have done update.
@@ -78,8 +86,8 @@ class UserOutput {
     }
 
     updateEntities() {
-        let game = this._game;
-        let physicsEngine  = this._physicsEngine;
+        let game              = this._game;
+        let physicsEngine     = this._physicsEngine;
         let consistencyEngine = this._consistencyEngine;
 
         var updatedEntities = game.entityModel.updatedEntities;
@@ -90,26 +98,10 @@ class UserOutput {
         game.players.forEach(p => {
 
             // If an entity in range of player p has just updated
-            let entities = consistencyEngine.extractEntitiesInRange(p);
+            let entities = consistencyEngine.extractEntitiesInRange(p); // TODO transfer in 'consistencyEngine' update scheme.
             // TODO detect change in position since the last time.
             // if (!entities), do it nevertheless, for it gives the player its position.
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
-
-            // TODO check 'player has updated position'
-            // TODO dynamically remove chunks with GreyZone, serverside
-            let chunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
-
-            if (chunks && Object.keys(chunks).length > 0) {
-                p.send('chk', chunks);
-
-                // Consider player has loaded chunks.
-                for (let cid in chunks) {
-                    let cs = game.worldModel.allChunks;
-                    if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
-                }
-            }
-
-            // TODO remove old chunks
         });
 
         // Tell object manager we have done update.

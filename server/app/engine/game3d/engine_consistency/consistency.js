@@ -8,18 +8,23 @@ import Generator        from './generator/generator';
 import Builder          from './builder/builder';
 import Loader           from './loader/loader';
 
+import ConsistencyModel from '../model_consistency/model';
+
 class ConsistencyEngine {
 
     constructor(game) {
         // Models.
-        this._entityModel   = game.entityModel;
-        this._worldModel    = game.worldModel;
-        this._xModel        = game.xModel;
+        this._entityModel       = game.entityModel;
+        this._worldModel        = game.worldModel;
+        this._xModel            = game.xModel;
+
+        // Custom model.
+        this._consistencyModel  = new ConsistencyModel(game);
 
         // Engine.
-        this._generator     = new Generator(this);
-        this._builder       = new Builder(this);
-        this._loader        = new Loader(this);
+        this._generator         = new Generator(this);
+        this._builder           = new Builder(this);
+        this._loader            = new Loader(this);
     }
 
     get worldModel()  { return this._worldModel; }
@@ -29,7 +34,7 @@ class ConsistencyEngine {
 
     }
 
-    extractChunksForNewPlayer(player) {
+    loadChunksForNewPlayer(player) {
         return this._builder.computeChunksForNewPlayer(player);
     }
 

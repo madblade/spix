@@ -11,7 +11,7 @@ class InputBuffer {
         this._buffer = [];
     }
 
-    push(avatar, meta) {
+    addInput(avatar, meta) {
         this._buffer.push([avatar, meta]);
     }
 

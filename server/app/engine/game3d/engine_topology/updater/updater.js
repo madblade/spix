@@ -11,6 +11,7 @@ import UpdaterFace from './updater_face';
 class Updater {
 
     constructor(topologyEngine) {
+        // Models.
         this._worldModel   = topologyEngine.worldModel;
         this._entityModel  = topologyEngine.entityModel;
         this._accessor     = topologyEngine.accessor;
@@ -18,11 +19,12 @@ class Updater {
         this._outputBuffer = topologyEngine.outputBuffer;
     }
 
-    update(bufferInput) {
-        bufferInput.forEach(input => {
-            let meta = input[0];
+    update(inputBuffer) {
+        inputBuffer.forEach(input => {
+            let data = input[0];
             let avatar = input[1];
 
+            let meta = data.meta;
             let action = meta[0];
 
             // Manage block addition.
