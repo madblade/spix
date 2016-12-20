@@ -5,7 +5,7 @@
 'use strict';
 
 import ChunkGenerator from './../generator/chunkgenerator';
-import ExtractAPI from './../builder/extractionapi';
+import Extractor from './../builder/extractor';
 
 class ChunkLoader {
 
@@ -199,7 +199,7 @@ class ChunkLoader {
         // Do compute faces
         let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, worldModel);
         worldModel.addChunk(chunkId, chunk);
-        ExtractAPI.computeChunkFaces(chunk);
+        Extractor.computeChunkFaces(chunk);
         return chunk;
     }
 
@@ -261,7 +261,7 @@ class ChunkLoader {
                 if (!currentChunk) {
                     return ChunkLoader.addChunk(dx, dy, dz, currentId, worldModel);
                 } else if (!currentChunk.ready) {
-                    ExtractAPI.computeChunkFaces(currentChunk);
+                    Extractor.computeChunkFaces(currentChunk);
                     return currentChunk;
                 } else return null;
             } else {

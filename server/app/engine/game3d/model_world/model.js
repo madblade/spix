@@ -5,7 +5,7 @@
 'use strict';
 
 import WorldGenerator from './../engine_consistency/generator/worldgenerator';
-import ExtractionAPI from './../engine_consistency/builder/extractionapi'
+import Extractor from './../engine_consistency/builder/extractor';
 import NumberUtils from '../../math/numbers';
 
 class WorldModel {
@@ -44,12 +44,12 @@ class WorldModel {
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     //extractNewChunksInRangeForPlayer(player) {
-    //    return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this);
+    //    return Extractor.computeNewChunksInRangeForPlayer(player, this);
     //}
 
     // API Entry Point
     //loadChunksForNewPlayer(player) {
-    //    return ExtractionAPI.computeChunksForNewPlayer(player, this);
+    //    return Extractor.computeChunksForNewPlayer(player, this);
     //}
 
     addChunk(id, chunk) {
@@ -67,7 +67,7 @@ class WorldModel {
             // Finalize chunks (extract surface faces)
             var chunks = [];
             this._chunks.forEach((chunk, id) => chunks.push(chunk));
-            chunks.forEach(chunk=>chunk.computeFaces());
+            chunks.forEach(chunk=>Extractor.computeChunkFaces(chunk));
 
             // Notify
             resolve();

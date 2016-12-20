@@ -5,7 +5,7 @@
 'use strict';
 
 import Chunk            from './../../model_world/chunk';
-import ExtractionAPI    from './../builder/extractionapi';
+import ExtractionAPI    from './../builder/extractor';
 
 import GenTest          from './generator_test.js';
 import GenAnalytic      from './generator_analytic.js';
@@ -20,7 +20,7 @@ class ChunkGenerator {
     /**
      * N.B. the created chunks are in memory but not ready yet.
      * To finalize creation, add them into the manager model.
-     * Then, call ExtractionAPI.computeFaces(chunk).
+     * Then, call Extractor.computeFaces(chunk).
      */
     static createRawChunk(x, y, z, id, worldModel) {
         console.log('createRawChunk ' + id);

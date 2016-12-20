@@ -4,8 +4,8 @@
 
 'use strict';
 
-import BlockExtractor from './extraction/chunkblockx';
-import FaceExtractor from './extraction/chunkfacex';
+import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
+import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
 import ChunkLoader from './../engine_consistency/loader/chunkloader';
 
@@ -49,9 +49,18 @@ class Chunk {
 
     // TODO [HIGH] decouple deep mechanisms from simple objects...
     computeFaces() {
-        this.preloadNeighbourChunks();
-        this.computeSurfaceBlocksFromScratch();
-        this.computeConnectedComponents();
+        // Preload neighbours.
+        if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
+        ChunkLoader.preloadAllNeighbourChunks(this, this._worldModel);
+
+        // Detect boundary blocks.
+        if (Chunk.debug) console.log('\tExtracting surface...');
+        BlockExtractor.extractSurfaceBlocks(this);
+
+        // Detect connected boundary face components.
+        if (Chunk.debug) console.log("\tComputing connected components...");
+        FaceExtractor.extractConnectedComponents(this);
+
         this._ready = true;
         //console.log("Chunk " + this._chunkId + " ready.");
     }
@@ -80,33 +89,6 @@ class Chunk {
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
 
-    // Preload neighbours.
-    preloadNeighbourChunks() {
-        if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
-        ChunkLoader.preloadAllNeighbourChunks(this, this._worldModel);
-    }
-
-    // Detect boundary blocks.
-    computeSurfaceBlocksFromScratch() {
-        if (Chunk.debug) console.log('\tExtracting surface...');
-        try {
-            BlockExtractor.extractSurfaceBlocks(this);
-        } catch(err) {
-            console.log(err.message);
-        }
-    }
-
-    // Detect connected boundary face components.
-    computeConnectedComponents() {
-        if (Chunk.debug) console.log("\tComputing connected components...");
-        try {
-            FaceExtractor.extractConnectedComponents(this);
-        } catch(err) {
-            console.log("@ extracting connected components");
-            console.log(err.message);
-        }
-    }
-
     _toId(x, y, z) {
         var id = x + y * this._xSize + z * this._xSize * this._ySize;
         if (id >= this._capacity) console.log("chunk._toId: invalid request coordinates.");
@@ -125,27 +107,19 @@ class Chunk {
 
     getNeighbourChunkFromRelativeCoordinates(x, y, z) {
         let neighbourChunkI, neighbourChunkJ, neighbourChunkK;
+        let xS = this._xSize, yS = this._ySize, zS = this._zSize;
 
-        if (x < 0)
-            neighbourChunkI = this._chunkI - 1;
-        else if (x >= this._xSize)
-            neighbourChunkI = this._chunkI + 1;
-        else
-            neighbourChunkI = this._chunkI;
+        if (x < 0)          neighbourChunkI = this._chunkI - 1;
+        else if (x >= xS)   neighbourChunkI = this._chunkI + 1;
+        else                neighbourChunkI = this._chunkI;
 
-        if (y < 0)
-            neighbourChunkJ = this._chunkJ - 1;
-        else if (y >= this._ySize)
-            neighbourChunkJ = this._chunkJ + 1;
-        else
-            neighbourChunkJ = this._chunkJ;
+        if (y < 0)          neighbourChunkJ = this._chunkJ - 1;
+        else if (y >= yS)   neighbourChunkJ = this._chunkJ + 1;
+        else                neighbourChunkJ = this._chunkJ;
 
-        if (z < 0)
-            neighbourChunkK = this._chunkK - 1;
-        else if (z >= this._zSize)
-            neighbourChunkK = this._chunkK + 1;
-        else
-            neighbourChunkK = this._chunkK;
+        if (z < 0)          neighbourChunkK = this._chunkK - 1;
+        else if (z >= zS)   neighbourChunkK = this._chunkK + 1;
+        else                neighbourChunkK = this._chunkK;
 
         return this._worldModel.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
     }
@@ -153,27 +127,19 @@ class Chunk {
     // Mustn't exceed negative [xyz] Size
     neighbourWhat(x, y, z) {
         let localX, localY, localZ;
+        let xS = this._xSize, yS = this._ySize, zS = this._zSize;
 
-        if (x < 0)
-            localX = this._xSize + x;
-        else if (x >= this._xSize)
-            localX = x % this._xSize;
-        else
-            localX = x;
+        if (x < 0)          localX = xS + x;
+        else if (x >= xS)   localX = x % xS;
+        else                localX = x;
 
-        if (y < 0)
-            localY = this._ySize + y;
-        else if (y >= this._ySize)
-            localY = y % this._ySize;
-        else
-            localY = y;
+        if (y < 0)          localY = yS + y;
+        else if (y >= yS)   localY = y % yS;
+        else                localY = y;
 
-        if (z < 0)
-            localZ = this._zSize + z;
-        else if (z >= this._zSize)
-            localZ = z % this._zSize;
-        else
-            localZ = z;
+        if (z < 0)          localZ = zS + z;
+        else if (z >= zS)   localZ = z % zS;
+        else                localZ = z;
 
         const nChunk = this.getNeighbourChunkFromRelativeCoordinates(x, y, z);
         return nChunk.what(localX, localY, localZ);

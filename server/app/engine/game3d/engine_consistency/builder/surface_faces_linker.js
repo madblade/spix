@@ -4,7 +4,7 @@
 
 'use strict';
 
-import CSFX from './chunkfacex';
+import CSFX from './surface_faces_builder';
 
 class FaceLinker {
 

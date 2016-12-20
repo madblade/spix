@@ -15,6 +15,7 @@ class ConsistencyModel {
         // Internals.
         this._entityIdsForEntity = new Map();
         this._chunkIdsForEntity  = new Map();
+        this._chunkIdAndPartsForEntity = new Map();
     }
 
 

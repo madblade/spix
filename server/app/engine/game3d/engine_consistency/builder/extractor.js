@@ -5,10 +5,10 @@
 'use strict';
 
 import WorldGenerator from '../generator/worldgenerator';
-import ChunkIterator from '../../model_world/topology/chunkiterator';
+import ChunkIterator from './iterator_chunks';
 import ChunkLoader from '../loader/chunkloader';
 
-class ExtractAPI {
+class Extractor {
 
     static debug = false;
     static load = true;
@@ -44,15 +44,15 @@ class ExtractAPI {
         for (let chunkIdId = 0, length = chunkIds.length; chunkIdId < length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
             if (!chunksInModel.has(currentChunkId)) {
-                if (ExtractAPI.debug) console.log("We should generate " + currentChunkId + " for the user.");
+                if (Extractor.debug) console.log("We should generate " + currentChunkId + " for the user.");
                 let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldModel); // virtual polymorphism
                 chunksInModel.set(chunk.chunkId, chunk);
             }
 
             let currentChunk = chunksInModel.get(currentChunkId);
             if (!currentChunk.ready) {
-                if (ExtractAPI.debug) console.log("We should extract faces from " + currentChunkId + ".");
-                ExtractAPI.computeChunkFaces(currentChunk);
+                if (Extractor.debug) console.log("We should extract faces from " + currentChunkId + ".");
+                Extractor.computeChunkFaces(currentChunk);
             }
 
             chunksForNewPlayer[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
@@ -62,7 +62,7 @@ class ExtractAPI {
     }
 
     static computeNewChunksInRangeForPlayer(player, worldModel) {
-        if (!ExtractAPI.load) return;
+        if (!Extractor.load) return;
 
         let av = player.avatar;
         if (!av) return; // (Asynchronous) Sometimes the avatar is collected just before this static call.
@@ -90,7 +90,7 @@ class ExtractAPI {
         var chunksForPlayer = {};
 
         if (newChunk) {
-            if (ExtractAPI.debug) console.log("New chunk : " + newChunk.chunkId);
+            if (Extractor.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
             av.setChunkAsLoaded(newChunk.chunkId);
@@ -112,4 +112,4 @@ class ExtractAPI {
 
 }
 
-export default ExtractAPI;
+export default Extractor;

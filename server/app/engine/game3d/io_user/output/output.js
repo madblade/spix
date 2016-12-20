@@ -64,10 +64,10 @@ class UserOutput {
             // If an update occurred on an existing, loaded chunk
             if (chunks) p.send('chk', chunks);
 
-            // TODO check 'player has updated position'
-            // TODO dynamically remove chunks with GreyZone, serverside
+            // TODO [LOW] check 'player has updated position'
+            // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
+            // TODO [HIGH] put un consistencyEngine.update();
             let newChunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
-            // TODO setChunkOutOfRange.
 
             if (newChunks && Object.keys(newChunks).length > 0) {
                 p.send('chk', newChunks);
@@ -105,8 +105,6 @@ class UserOutput {
             // if (!entities), do it nevertheless, for it gives the player its own position.
             p.send('ent', JSON.stringify([p.avatar.position, p.avatar.rotation, entities]));
         });
-
-        //game.entityModel.updateEntitiesTransmitted();
 
         // Empty entity updates buffer.
         physicsEngine.flushOutput();

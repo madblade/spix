@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ExtractionAPI from './extractionapi';
+import Extractor from './extractor';
 
 class Builder {
 
@@ -13,11 +13,11 @@ class Builder {
     }
 
     computeChunksForNewPlayer(player) {
-        return ExtractionAPI.computeChunksForNewPlayer(player, this._worldModel);
+        return Extractor.computeChunksForNewPlayer(player, this._worldModel);
     }
 
     computeNewChunksInRangeForPlayer(player) {
-        return ExtractionAPI.computeNewChunksInRangeForPlayer(player, this._worldModel);
+        return Extractor.computeNewChunksInRangeForPlayer(player, this._worldModel);
     }
 
 }
