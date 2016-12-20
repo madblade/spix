@@ -61,7 +61,6 @@ class Updater {
     rotate(meta, avatar) {
         if (avatar.rotation === null) return;
 
-        let entityModel = this._entityModel;
         let outputBuffer = this._outputBuffer;
 
         let p = meta[0];

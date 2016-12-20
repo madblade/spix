@@ -47,6 +47,7 @@ class Chunk {
         this._updates = [{}, {}, {}];
     }
 
+    // TODO [HIGH] decouple deep mechanisms from simple objects...
     computeFaces() {
         this.preloadNeighbourChunks();
         this.computeSurfaceBlocksFromScratch();

@@ -13,7 +13,6 @@ class UserInput {
         this._topologyEngine = game.topologyEngine;
         this._chat           = game.chat;
 
-        //this._buffer = new Map();
         this._listeners = {};
     }
 

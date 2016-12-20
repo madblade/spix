@@ -76,7 +76,7 @@ class Game3D extends Game {
         /** Inputs **/
         this._ai.update();               // Update intents.
 
-        this._externalInput.update();    // Update human inputs.
+        this._externalInput.update();    // Update human inputs (not needed, done asynchronously).
         this._internalInput.update();    // Update artificial inputs.
 
         /** Updates **/

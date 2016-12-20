@@ -50,7 +50,7 @@ class TopologyEngine {
     }
 
     // Get (chunk id, updates) object for updated chunks concerning specific player.
-    // TODO put in consistency model.
+    // TODO [HIGH] put in consistency model.
     getOutputForPlayer(p, updatedChunks) {
         return this._selector.selectUpdatedChunksForPlayer(p, this._worldModel.allChunks, updatedChunks);
     }

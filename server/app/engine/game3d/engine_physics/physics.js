@@ -7,8 +7,8 @@
 import InputBuffer      from './input_buffer';
 import OutputBuffer     from './output_buffer';
 
-import Newton   from './newton/engine';
-import Updater  from './updater/updater';
+import Solver           from './solver/solver';
+import Updater          from './updater/updater';
 
 class PhysicsEngine {
 
@@ -24,10 +24,7 @@ class PhysicsEngine {
 
         // Engine.
         this._updater       = new Updater(this);
-        //this._solver        = new Solver(this);
-
-        // Internals.
-        this._stamp = process.hrtime();
+        this._solver        = new Solver(this);
     }
 
     get entityModel()   { return this._entityModel; }
@@ -41,11 +38,7 @@ class PhysicsEngine {
     update() {
         this._updater.update(this._inputBuffer.getInput());
 
-        // TODO decouple solver
-        //this._solver.solve();
-        let Δt = process.hrtime(this._stamp)[1];
-        Newton.solve(this, Δt);
-        this._stamp = process.hrtime();
+        this._solver.solve();
 
         this._inputBuffer.flush();
     }
@@ -59,9 +52,7 @@ class PhysicsEngine {
     }
 
     shuffleGravity() {
-        let g = Newton.gravity;
-        // Circular permutation.
-        Newton.gravity = [g[2], g[0], g[1]];
+        this._solver.shuffleGravity();
     }
 
 }

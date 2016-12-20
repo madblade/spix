@@ -92,7 +92,7 @@ class UserOutput {
 
         let updatedEntities = physicsEngine.getOutput();
 
-        //if (Object.keys(updatedEntities).length < 1) return;
+        if (updatedEntities.size < 1) return;
 
         // Broadcast updates.
         // TODO [HIGH] bundle update in one chunk.

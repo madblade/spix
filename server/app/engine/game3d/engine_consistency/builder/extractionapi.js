@@ -58,12 +58,6 @@ class ExtractAPI {
             chunksForNewPlayer[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
         }
 
-        // TODO cleanup
-        // Force update entity to load all chunks
-        //if (!av.areChunksLoaded) {
-        //    worldModel.entityModel.entityUpdated(av.id);
-        //}
-
         return chunksForNewPlayer;
     }
 
