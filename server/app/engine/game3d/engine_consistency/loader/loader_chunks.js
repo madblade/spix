@@ -168,10 +168,12 @@ class ChunkLoader {
         return chunk;
     }
 
-    static preLoadNextChunk(player, chunk, worldModel, forPlayer) {
+    static preLoadNextChunk(player, chunk, worldModel, forPlayer, consistencyModel) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
-        let hasLoadedChunk = (avatar, id) => avatar.isChunkLoaded(id);
+        // TODO [CRIT] cleanup
+        //let hasLoadedChunk = (avatar, id) => avatar.isChunkLoaded(id);
+        let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id); // avatar.isChunkLoaded(id);
 
         // Get nearest, load.
         let avatar = player.avatar;
@@ -298,10 +300,10 @@ class ChunkLoader {
         }
     }
 
-    static getNextPlayerChunk(player, chunk, worldModel) {
+    static getNextPlayerChunk(player, chunk, worldModel, consistencyModel) {
         // Get nearest unloaded until threshold, send back.
 
-        return ChunkLoader.preLoadNextChunk(player, chunk, worldModel, true);
+        return ChunkLoader.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
     }
 
     static getOOBPlayerChunks(player, chunk, worldModel) {

@@ -9,7 +9,9 @@ import Extractor from './extractor';
 class Builder {
 
     constructor(consistencyEngine) {
-        this._worldModel = consistencyEngine.worldModel;
+        // Models.
+        this._worldModel        = consistencyEngine.worldModel;
+        this._consistencyModel  = consistencyEngine.consistencyModel;
     }
 
     computeChunksForNewPlayer(player) {
@@ -17,7 +19,7 @@ class Builder {
     }
 
     computeNewChunksInRangeForPlayer(player) {
-        return Extractor.computeNewChunksInRangeForPlayer(player, this._worldModel);
+        return Extractor.computeNewChunksInRangeForPlayer(player, this._worldModel, this._consistencyModel);
     }
 
 }

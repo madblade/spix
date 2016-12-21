@@ -30,8 +30,9 @@ class ConsistencyEngine {
         this._entityBuffer      = new EntityBuffer();
     }
 
-    get worldModel()  { return this._worldModel; }
-    get entityModel() { return this._entityModel; }
+    get worldModel()            { return this._worldModel; }
+    get entityModel()           { return this._entityModel; }
+    get consistencyModel()      { return this._consistencyModel; }
 
     update() {
 
@@ -54,16 +55,20 @@ class ConsistencyEngine {
         let a = player.avatar;
         let cs = this._worldModel.allChunks;
 
+        // TODO [CRIT] cleanup
         for (let cid in chunks)
-            if (cs.has(cid)) a.setChunkAsLoaded(cid);
+            //if (cs.has(cid)) a.setChunkAsLoaded(cid);
+            if (cs.has(cid)) this._consistencyModel.setChunkLoaded(a.id, cid); // a.setChunkAsLoaded(cid);
     }
 
     setEntitiesAsLoaded(player, entities) {
         let a = player.avatar;
         let es = this._entityModel.entities;
 
+        // TODO [CRIT] cleanup
         for (let eid in entities)
-            if (es.hasOwnProperty(eid)) a.setEntityAsLoaded(eid);
+            //if (es.hasOwnProperty(eid)) a.setEntityAsLoaded(eid);
+            if (es.hasOwnProperty(eid)) this._consistencyModel.setEntityLoaded(a.id, eid); // a.setEntityAsLoaded(eid);
     }
 }
 

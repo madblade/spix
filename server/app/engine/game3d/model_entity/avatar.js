@@ -40,29 +40,29 @@ class Avatar extends Entity {
     set renderDistance(renderDistance) { this._renderDistance = renderDistance; }
     set role(role) { this._role = role; }
 
-    isChunkLoaded(id) {
-        return this._loadedChunks.has(id);
-    }
+    //isChunkLoaded(id) {
+    //    return this._loadedChunks.has(id);
+    //}
 
-    setChunkAsLoaded(chunkId) {
-        this._loadedChunks.add(chunkId);
-    }
+    //setChunkAsLoaded(chunkId) {
+    //    this._loadedChunks.add(chunkId);
+    //}
 
-    setChunkOutOfRange(chunkId) {
-        this._loadedChunks.delete(chunkId);
-    }
+    //setChunkOutOfRange(chunkId) {
+    //    this._loadedChunks.delete(chunkId);
+    //}
 
-    isEntityLoaded(id) {
-        return this._loadedEntities.has(id);
-    }
+    //isEntityLoaded(id) {
+    //    return this._loadedEntities.has(id);
+    //}
 
-    setEntityAsLoaded(entityId) {
-        this._loadedEntities.add(entityId);
-    }
+    //setEntityAsLoaded(entityId) {
+    //    this._loadedEntities.add(entityId);
+    //}
 
-    setEntityOutOfRange(entityId) {
-        this._loadedEntities.delete(entityId);
-    }
+    //setEntityOutOfRange(entityId) {
+    //    this._loadedEntities.delete(entityId);
+    //}
 
 }
 

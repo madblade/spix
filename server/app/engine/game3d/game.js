@@ -103,12 +103,14 @@ class Game3D extends Game {
             .then(_ => {
                 this._playerManager.setAddPlayerBehaviour(p => {
                     this._entityModel.spawnPlayer(p);
+                    this._consistencyModel.spawnPlayer(p);
                     this._externalInput.listenPlayer(p);
                     this._externalOutput.init(p);
                 });
 
                 this._playerManager.setRemovePlayerBehaviour(p => {
                     this._externalInput.removePlayer(p);
+                    this._consistencyModel.removePlayer(p);
                     this._entityModel.despawnPlayer(p);
                 });
 

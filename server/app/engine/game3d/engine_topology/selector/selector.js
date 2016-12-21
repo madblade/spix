@@ -16,12 +16,13 @@ class Selector {
 
         var chunksForPlayer = {};
 
-        modelUpdatedChunks.forEach(id => {
-            if (!modelChunks.has(id)) return;
+        modelUpdatedChunks.forEach(chunkId => {
+            if (!modelChunks.has(chunkId)) return;
 
-            // TODO [CRIT] move isChunkLoaded.
-            if (!player.avatar.isChunkLoaded(id) ||
-                (modelNewChunks && modelNewChunks.hasOwnProperty(id))) {
+            // TODO [CRIT] cleanup
+            //if (!player.avatar.isChunkLoaded(id) ||
+            if (!consistencyModel.hasChunk(player.avatar.id, chunkId) ||
+                (modelNewChunks && modelNewChunks.hasOwnProperty(chunkId))) {
                 // At this point, topology output is being accessed.
                 // So, topology engine has updated and therefore its topology model is up-to-date.
                 // Therefore, there is no need to access updates concerning non-loaded chunks,
@@ -31,7 +32,7 @@ class Selector {
                 return;
             }
 
-            let currentChunk = modelChunks.get(id);
+            let currentChunk = modelChunks.get(chunkId);
             chunksForPlayer[currentChunk.chunkId] = currentChunk.updates; // TODO [LOW] Map
         });
 

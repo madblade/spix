@@ -61,7 +61,7 @@ class Extractor {
         return chunksForNewPlayer;
     }
 
-    static computeNewChunksInRangeForPlayer(player, worldModel) {
+    static computeNewChunksInRangeForPlayer(player, worldModel, consistencyModel) {
         if (!Extractor.load) return;
 
         let av = player.avatar;
@@ -73,13 +73,13 @@ class Extractor {
         if (!starterChunk) return;
 
         // Loading circle for server (a bit farther)
-        ChunkLoader.preLoadNextChunk(player, starterChunk, worldModel, false);
+        ChunkLoader.preLoadNextChunk(player, starterChunk, worldModel, false, consistencyModel);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO algorithmical zeefication
         // TODO enhance to transmit chunks when users are not so much active and so on
-        var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldModel);
+        var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldModel, consistencyModel);
 
         // Unloading circle (quite farther)
         // (i.e. recurse currents and test distance)
@@ -93,13 +93,17 @@ class Extractor {
             if (Extractor.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
-            av.setChunkAsLoaded(newChunk.chunkId);
+            // TODO [CRIT] cleanup
+            //av.setChunkAsLoaded(newChunk.chunkId);
+            consistencyModel.setChunkLoaded(av.id, newChunk.chunkId); // av.setChunkAsLoaded(newChunk.chunkId);
             chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
-            av.setChunkOutOfRange(chunkToUnload.chunkId);
+            // TODO [CRIT] cleanup
+            //av.setChunkOutOfRange(chunkToUnload.chunkId);
+            consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             chunksForPlayer[chunkToUnload] = null;
         }
 
