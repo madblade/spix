@@ -32,7 +32,7 @@ class Hub {
     }
 
     validateRequest() {
-        // TODO think of different criteria
+        // TODO [LOW] think of different criteria
         var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
         var validation = nbGames < 5;
         console.log(nbGames>0?nbGames:'No' + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');

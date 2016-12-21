@@ -42,7 +42,7 @@ class Game {
     // Send a message to ALL connected users.
     // N.B. encouraged to create custom subchannels within implementations.
     broadcast(kind, data) {
-        // TODO optimize with dynamic subchans
+        // TODO [LOW] optimize with dynamic subchans
         this._connection.io.to(this._gameId).emit(kind, data);
     }
 

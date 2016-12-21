@@ -133,7 +133,7 @@ class CSFX {
                                     ccid++;
                                 }
                             }
-                            // TODO check z
+                            // TODO [HIGH] check z
                             if (direction === 5) { // k+
                                 const zblock = nbZ[blockId-capacity+ijS];
                                 if (block !== 0 && zblock === 0) {
@@ -141,7 +141,7 @@ class CSFX {
                                         encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
                                     ccid++;
                                 }
-                                else if (block === 0 && zblock !== 0 && zblock !== undefined) { // TODO properly manage loading
+                                else if (block === 0 && zblock !== 0 && zblock !== undefined) { // TODO [LOW] properly manage loading
                                     CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
                                         encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
                                     ccid++;

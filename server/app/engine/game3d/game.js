@@ -120,7 +120,7 @@ class Game3D extends Game {
     }
 
     save() {
-        // TODO write world into file.
+        // TODO [LONG-TERM] write world into file.
     }
 
 }

@@ -171,9 +171,7 @@ class ChunkLoader {
     static preLoadNextChunk(player, chunk, worldModel, forPlayer, consistencyModel) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
-        // TODO [CRIT] cleanup
-        //let hasLoadedChunk = (avatar, id) => avatar.isChunkLoaded(id);
-        let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id); // avatar.isChunkLoaded(id);
+        let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
 
         // Get nearest, load.
         let avatar = player.avatar;
@@ -189,7 +187,7 @@ class ChunkLoader {
 
         let i = ci;
         let j = cj;
-        let k = ck; // TODO algorithmical zeefication
+        let k = ck; // TODO [MEDIUM] review Z+/- loading.
 
         let depth = 0;
         let foundUnloadedChunk = false;
@@ -308,7 +306,7 @@ class ChunkLoader {
 
     static getOOBPlayerChunks(player, chunk, worldModel) {
         var oobChunks = [];
-        // TODO check implementation
+        // TODO [MEDIUM] check implementation.
 
         // Recurse on loaded chunks.
 

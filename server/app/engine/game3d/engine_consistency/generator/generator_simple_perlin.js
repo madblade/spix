@@ -82,7 +82,7 @@ class SimplePerlin {
         );
     }
 
-    // TODO seed
+    // TODO [HIGH] distribute seed.
     static simplePerlinGeneration(chunk) {
         const dx = chunk.dimensions[0];
         const dy = chunk.dimensions[1];

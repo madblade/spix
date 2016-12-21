@@ -81,7 +81,7 @@ class Newton {
 
         Newton.sumLocalFields(force, pos, EM);
 
-        // TODO manage collisions
+        // TODO [HIGH] manage collisions
 
         hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
 

@@ -77,8 +77,8 @@ class Extractor {
 
         // Loading circle for client (nearer)
         // Only load one at a time!
-        // TODO algorithmical zeefication
-        // TODO enhance to transmit chunks when users are not so much active and so on
+        // TODO [HIGH] check on Z+/-.
+        // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
         var newChunk = ChunkLoader.getNextPlayerChunk(player, starterChunk, worldModel, consistencyModel);
 
         // Unloading circle (quite farther)
@@ -93,23 +93,15 @@ class Extractor {
             if (Extractor.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
-            // TODO [CRIT] cleanup
-            //av.setChunkAsLoaded(newChunk.chunkId);
-            consistencyModel.setChunkLoaded(av.id, newChunk.chunkId); // av.setChunkAsLoaded(newChunk.chunkId);
+            consistencyModel.setChunkLoaded(av.id, newChunk.chunkId);
             chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
-            // TODO [CRIT] cleanup
-            //av.setChunkOutOfRange(chunkToUnload.chunkId);
             consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             chunksForPlayer[chunkToUnload] = null;
         }
-
-        //if (!av.areChunksLoaded) {
-        //    worldModel.entityModel.entityUpdated(av.id);
-        //}
 
         return chunksForPlayer;
     }

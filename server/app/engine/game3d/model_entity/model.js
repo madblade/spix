@@ -38,7 +38,7 @@ class EntityModel {
         delete p.avatar;
     }
 
-    // TODO optimize with LACKS structure.
+    // TODO [MEDIUM] optimize with LACKS structure.
     anEntityIsPresentOn(x, y, z) {
         let entities = this._entities;
         for (let entityId in entities) {

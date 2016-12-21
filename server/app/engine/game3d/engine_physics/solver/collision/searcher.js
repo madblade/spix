@@ -250,7 +250,7 @@ export class ObjectsIterator {
             }
         }
 
-        // TODO Search on Z axis
+        // TODO [LOW] Search on Z axis.
         /*if (this.onZ && this.toRight) {
          }
          if (this.onZ && !this.toRight) {

@@ -49,7 +49,7 @@ class WorldModel {
 
     // API Entry Point
     generate() {
-        // TODO chrono and time out.
+        // TODO [LOW] chrono and time out.
         return new Promise(resolve => {
 
             // Generate blocks.
@@ -96,8 +96,8 @@ class WorldModel {
         let chunk = this._chunks.get(chunkId);
         if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId +
             ' from ' + x+','+y+','+z);
-            // TODO load concerned chunk.
-            // TODO check minus
+            // TODO [MEDIUM] load concerned chunk.
+            // TODO [MEDIUM] check minus
             return;
         }
         return chunk.what(chunkX, chunkY, chunkZ);

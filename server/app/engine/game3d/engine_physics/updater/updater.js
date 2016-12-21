@@ -22,7 +22,7 @@ class Updater {
         // Process incoming actions.
         inputBuffer.forEach( (array, avatar) => // value, key
         {
-            // TODO compute means or filter some events.
+            // TODO [LOW] compute means or filter some events.
             array.forEach(e => {
                 if (e.action === 'move' && typeof e.meta === "string")
                     this.move(e.meta, avatar);

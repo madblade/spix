@@ -144,9 +144,9 @@ class FaceLinker {
         }
     }
 
-    // TODO Z cases verification
-    // TODO manage topology
-    // TODO manage topology client-side
+    // TODO [MEDIUM] Z cases verification.
+    // TODO [HIGH] manage topology.
+    // TODO [HIGH] manage topology client-side.
     /**
      * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, 4 z+, 5 z-
      */

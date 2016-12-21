@@ -10,7 +10,7 @@ class Selector {
         this._accessor    = topologyEngine.accessor;
     }
 
-    // TODO [MEDIUM] distance test
+    // TODO [LOW] distance test.
     selectUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks, modelNewChunks, consistencyModel) {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
@@ -19,8 +19,6 @@ class Selector {
         modelUpdatedChunks.forEach(chunkId => {
             if (!modelChunks.has(chunkId)) return;
 
-            // TODO [CRIT] cleanup
-            //if (!player.avatar.isChunkLoaded(id) ||
             if (!consistencyModel.hasChunk(player.avatar.id, chunkId) ||
                 (modelNewChunks && modelNewChunks.hasOwnProperty(chunkId))) {
                 // At this point, topology output is being accessed.
@@ -40,7 +38,7 @@ class Selector {
     }
 
     playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO extract connected subsurface.
+        // TODO [MEDIUM] extract connected subsurface.
         return (chunks.size > 0);
     }
 

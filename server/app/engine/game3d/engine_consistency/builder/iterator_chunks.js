@@ -131,7 +131,7 @@ class ChunkIterator {
         const dy = worldModel.chunkDimensionY;
         const dz = worldModel.chunkDimensionZ;
 
-        // TODO DRY with manager.getChunkCoordinatesFromFloatingPoint
+        // TODO [HIGH] DRY with manager.getChunkCoordinatesFromFloatingPoint
         const fx = Math.floor(xPosition);
         const fy = Math.floor(yPosition);
         const fz = Math.floor(zPosition);

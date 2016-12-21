@@ -96,7 +96,7 @@ class CSBX {
                     }
                 }
 
-                // TODO check z criteria
+                // TODO [HIGH] z criteria.
                 const kPlus = b+ijSize;
                 if (kPlus < capacity) {
                     if (blocks[kPlus] === 0) {
@@ -142,7 +142,7 @@ class CSBX {
                     }
                 }
 
-                // TODO check z criteria
+                // TODO [HIGH] check z criteria.
                 const kPlus = b+ijSize;
                 if (kPlus === capacity) {
                     if (neighbourBlocks[4][kPlus - capacity] !== 0) {

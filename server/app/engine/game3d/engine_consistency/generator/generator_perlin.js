@@ -267,7 +267,7 @@ class Perlin {
 
     static perlinGeneration(chunk, arg) { // int, int, ...
         const CHUNK_SIZE_X = chunk.dimensions[0];
-        const CHUNK_SIZE_Y = chunk.dimensions[1]; // TODO see algo, diff.
+        const CHUNK_SIZE_Y = chunk.dimensions[1]; // TODO [LOW] see algo, diff.
         const CHUNK_SIZE_Z = chunk.dimensions[2];
         const SHOW_CLOUDS = true;
         const SHOW_TREES = true;

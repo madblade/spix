@@ -47,7 +47,7 @@ class Chunk {
         this._updates = [{}, {}, {}];
     }
 
-    // TODO [HIGH] decouple deep mechanisms from simple objects... do that
+    // TODO [HIGH] decouple deep mechanisms from simple objects...
     computeFaces() {
         // Preload neighbours.
         if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
