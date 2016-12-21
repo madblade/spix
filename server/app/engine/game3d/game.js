@@ -19,6 +19,7 @@ import ConsistencyEngine from './engine_consistency/consistency';
 import EntityModel      from './model_entity/model';
 import WorldModel       from './model_world/model';
 import XModel           from './model_x/model';
+import ConsistencyModel from './model_consistency/model';
 
 import Chat             from './../../model/connection/chat';
 
@@ -39,12 +40,13 @@ class Game3D extends Game {
         this._worldModel        = new WorldModel(this);
         this._entityModel       = new EntityModel(this);
         this._xModel            = new XModel(this);
+        this._consistencyModel  = new ConsistencyModel(this);
 
         // Engines (need models).
         this._ai                = new AI(this);
         this._physicsEngine     = new PhysicsEngine(this);
         this._topologyEngine    = new TopologyEngine(this);
-        this._consisencyEngine  = new ConsistencyEngine(this);
+        this._consistencyEngine = new ConsistencyEngine(this);
 
         // I/O (need engines).
         this._internalInput     = new AIInput(this);    // A.I.
@@ -61,10 +63,11 @@ class Game3D extends Game {
     get entityModel()       { return this._entityModel; }
     get worldModel()        { return this._worldModel; }
     get xModel()            { return this._xModel; }
+    get consistencyModel()  { return this._consistencyModel; }
 
     get physicsEngine()     { return this._physicsEngine; }
     get topologyEngine()    { return this._topologyEngine; }
-    get consistencyEngine() { return this._consisencyEngine; }
+    get consistencyEngine() { return this._consistencyEngine; }
 
     get chat()              { return this._chat; }
 
@@ -82,7 +85,7 @@ class Game3D extends Game {
         /** Updates **/
         this._topologyEngine.update();   // Update topological model.
         this._physicsEngine.update();    // Update physical simulation.
-        this._consisencyEngine.update(); // Make client models consistent.
+        this._consistencyEngine.update(); // Make client models consistent.
 
         /** Outputs **/
         this._externalOutput.update();   // Send updates.

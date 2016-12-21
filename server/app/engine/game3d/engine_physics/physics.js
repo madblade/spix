@@ -23,8 +23,8 @@ class PhysicsEngine {
         this._outputBuffer  = new OutputBuffer();
 
         // Engine.
-        this._updater       = new Updater(this);
-        this._solver        = new Solver(this);
+        this._updater       = new Updater(this); // Parses input and updates model constraints.
+        this._solver        = new Solver(this);  // Updates physical model.
     }
 
     get entityModel()   { return this._entityModel; }

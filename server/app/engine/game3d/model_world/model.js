@@ -43,15 +43,6 @@ class WorldModel {
     set allChunks(newChunks) { this._chunks = newChunks; }
     set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
-    //extractNewChunksInRangeForPlayer(player) {
-    //    return Extractor.computeNewChunksInRangeForPlayer(player, this);
-    //}
-
-    // API Entry Point
-    //loadChunksForNewPlayer(player) {
-    //    return Extractor.computeChunksForNewPlayer(player, this);
-    //}
-
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);
     }
@@ -123,9 +114,8 @@ class WorldModel {
         return this._chunks.get(id);
     }
 
-    isChunkLoaded(iCoordinate, jCoordinate) {
-        let chunk = this.getChunk(iCoordinate, jCoordinate);
-        return chunk === null || chunk === undefined;
+    hasChunk(i, j, k) {
+        return !!(this.getChunk(i, j, k));
     }
 
     isFree(p) {

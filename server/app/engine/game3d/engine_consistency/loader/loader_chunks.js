@@ -42,42 +42,25 @@ class ChunkLoader {
         let wm = chunk.manager;
 
         switch (direction) {
-            case 0: // x+
-                return wm.getChunk(i+1, j, k);
-            case 1: // x-
-                return wm.getChunk(i-1, j, k);
-            case 2: // y+
-                return wm.getChunk(i, j+1, k);
-            case 3: // y-
-                return wm.getChunk(i, j-1, k);
-            case 4: // z+
-                return wm.getChunk(i, j, k+1);
-            case 5: // z- (idem)
-                return wm.getChunk(i, j, k-1);
-            case 6:
-                return wm.getChunk(i+1, j+1, k);
-            case 7:
-                return wm.getChunk(i-1, j+1, k);
-            case 8:
-                return wm.getChunk(i+1, j-1, k);
-            case 9:
-                return wm.getChunk(i-1, j-1, k);
-            case 10:
-                return wm.getChunk(i+1, j, k-1);
-            case 11:
-                return wm.getChunk(i+1, j, k+1);
-            case 12:
-                return wm.getChunk(i-1, j, k-1);
-            case 13:
-                return wm.getChunk(i-1, j, k+1);
-            case 14:
-                return wm.getChunk(i, j+1, k+1);
-            case 15:
-                return wm.getChunk(i, j-1, k+1);
-            case 16:
-                return wm.getChunk(i, j+1, k-1);
-            case 17:
-                return wm.getChunk(i, j-1, k-1);
+            case 0: return wm.getChunk(i+1, j, k);      // x+
+            case 1:  return wm.getChunk(i-1, j, k);     // x-
+            case 2:  return wm.getChunk(i, j+1, k);     // y+
+            case 3:  return wm.getChunk(i, j-1, k);     // y-
+            case 4:  return wm.getChunk(i, j, k+1);     // z+
+            case 5:  return wm.getChunk(i, j, k-1);     // z- (idem)
+            case 6:  return wm.getChunk(i+1, j+1, k);
+            case 7:  return wm.getChunk(i-1, j+1, k);
+            case 8:  return wm.getChunk(i+1, j-1, k);
+            case 9:  return wm.getChunk(i-1, j-1, k);
+            case 10: return wm.getChunk(i+1, j, k-1);
+            case 11: return wm.getChunk(i+1, j, k+1);
+            case 12: return wm.getChunk(i-1, j, k-1);
+            case 13: return wm.getChunk(i-1, j, k+1);
+            case 14: return wm.getChunk(i, j+1, k+1);
+            case 15: return wm.getChunk(i, j-1, k+1);
+            case 16: return wm.getChunk(i, j+1, k-1);
+            case 17: return wm.getChunk(i, j-1, k-1);
+
             default:
         }
     }
@@ -89,42 +72,24 @@ class ChunkLoader {
         let wm = chunk.manager;
 
         switch (direction) {
-            case 0: // x+
-                return wm.isChunkLoaded(i+1, j, k);
-            case 1: // x-
-                return wm.isChunkLoaded(i-1, j, k);
-            case 2: // y+
-                return wm.isChunkLoaded(i, j+1, k);
-            case 3: // y-
-                return wm.isChunkLoaded(i, j-1, k);
-            case 4: // z+ (non-flat models)
-                return wm.isChunkLoaded(i, j, k+1);
-            case 5: // z-
-                return wm.isChunkLoaded(i, j, k-1);
-            case 6:
-                return wm.isChunkLoaded(i+1, j+1, k);
-            case 7:
-                return wm.isChunkLoaded(i-1, j+1, k);
-            case 8:
-                return wm.isChunkLoaded(i+1, j-1, k);
-            case 9:
-                return wm.isChunkLoaded(i-1, j-1, k);
-            case 10:
-                return wm.isChunkLoaded(i+1, j, k-1);
-            case 11:
-                return wm.isChunkLoaded(i+1, j, k+1);
-            case 12:
-                return wm.isChunkLoaded(i-1, j, k-1);
-            case 13:
-                return wm.isChunkLoaded(i-1, j, k+1);
-            case 14:
-                return wm.isChunkLoaded(i, j+1, k+1);
-            case 15:
-                return wm.isChunkLoaded(i, j-1, k+1);
-            case 16:
-                return wm.isChunkLoaded(i, j+1, k-1);
-            case 17:
-                return wm.isChunkLoaded(i, j-1, k-1);
+            case 0:  return wm.hasChunk(i+1, j, k); // x+
+            case 1:  return wm.hasChunk(i-1, j, k); // x-
+            case 2:  return wm.hasChunk(i, j+1, k); // y+
+            case 3:  return wm.hasChunk(i, j-1, k); // y-
+            case 4:  return wm.hasChunk(i, j, k+1); // z+ (non-flat models)
+            case 5:  return wm.hasChunk(i, j, k-1); // z-
+            case 6:  return wm.hasChunk(i+1, j+1, k);
+            case 7:  return wm.hasChunk(i-1, j+1, k);
+            case 8:  return wm.hasChunk(i+1, j-1, k);
+            case 9:  return wm.hasChunk(i-1, j-1, k);
+            case 10: return wm.hasChunk(i+1, j, k-1);
+            case 11: return wm.hasChunk(i+1, j, k+1);
+            case 12: return wm.hasChunk(i-1, j, k-1);
+            case 13: return wm.hasChunk(i-1, j, k+1);
+            case 14: return wm.hasChunk(i, j+1, k+1);
+            case 15: return wm.hasChunk(i, j-1, k+1);
+            case 16: return wm.hasChunk(i, j+1, k-1);
+            case 17: return wm.hasChunk(i, j-1, k-1);
             default:
         }
     }
@@ -206,6 +171,8 @@ class ChunkLoader {
     static preLoadNextChunk(player, chunk, worldModel, forPlayer) {
         const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
 
+        let hasLoadedChunk = (avatar, id) => avatar.isChunkLoaded(id);
+
         // Get nearest, load.
         let avatar = player.avatar;
         let allChunks = worldModel.allChunks;
@@ -232,10 +199,10 @@ class ChunkLoader {
 
             for (let delta = -depth; delta < depth; ++delta) {
                 if (
-                    !avatar.isChunkLoaded((i+delta)+','+(j+depth)+','+k) ||
-                    !avatar.isChunkLoaded((i+delta)+','+(j-depth)+','+k) ||
-                    !avatar.isChunkLoaded((i+depth)+','+(j+delta)+','+k) ||
-                    !avatar.isChunkLoaded((i-depth)+','+(j+delta)+','+k)
+                    !hasLoadedChunk(avatar, (i+delta)+','+(j+depth)+','+k) ||
+                    !hasLoadedChunk(avatar, (i+delta)+','+(j-depth)+','+k) ||
+                    !hasLoadedChunk(avatar, (i+depth)+','+(j+delta)+','+k) ||
+                    !hasLoadedChunk(avatar, (i-depth)+','+(j+delta)+','+k)
                 )
                 {
                     foundUnloadedChunk = true;
@@ -265,7 +232,7 @@ class ChunkLoader {
                     return currentChunk;
                 } else return null;
             } else {
-                if (!avatar.isChunkLoaded(currentId)) {
+                if (!hasLoadedChunk(avatar, currentId)) {
                     return currentChunk;
                 } else return null;
             }

@@ -6,7 +6,7 @@
 
 import WorldGenerator from '../generator/worldgenerator';
 import ChunkIterator from './iterator_chunks';
-import ChunkLoader from '../loader/chunkloader';
+import ChunkLoader from '../loader/loader_chunks';
 
 class Extractor {
 

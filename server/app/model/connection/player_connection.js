@@ -42,9 +42,7 @@ class PlayerConnection {
         CollectionUtils.removeFromArray(this._listeners, message);
     }
 
-    /**
-     * Remove all listeners.
-     */
+    // Remove all listeners.
     offAll() {
         this._listeners.forEach(message => this._socket.removeAllListeners(message));
         this._listeners = [];
@@ -68,17 +66,13 @@ class PlayerConnection {
         CollectionUtils.removeFromArray(this._rooms, room);
     }
 
-    /**
-     * Leave all chans this player was connected to.
-     */
+    // Leave all chans this player was connected to.
     leaveAll() {
         this._rooms.forEach(room => this._socket.leave(room));
         this._rooms = [];
     }
 
-    /**
-     * Close connection: removes all listeners.
-     */
+    // Close connection: removes all listeners.
     close() {
         this.leaveAll();
         this.offAll();

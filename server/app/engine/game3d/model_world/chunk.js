@@ -7,7 +7,7 @@
 import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
 import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
-import ChunkLoader from './../engine_consistency/loader/chunkloader';
+import ChunkLoader from './../engine_consistency/loader/loader_chunks';
 
 class Chunk {
 
@@ -47,7 +47,7 @@ class Chunk {
         this._updates = [{}, {}, {}];
     }
 
-    // TODO [HIGH] decouple deep mechanisms from simple objects...
+    // TODO [HIGH] decouple deep mechanisms from simple objects... do that
     computeFaces() {
         // Preload neighbours.
         if (Chunk.debug) console.log('\tPreloading neighbor chunks...');

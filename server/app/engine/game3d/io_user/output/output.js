@@ -24,12 +24,12 @@ class UserOutput {
         let consistencyEngine = this._consistencyEngine;
 
         // Load chunks.
-        let chunks = consistencyEngine.loadChunksForNewPlayer(p);
+        let chunks = consistencyEngine.initChunkOutputForPlayer(p);
         p.send('chk', chunks);
         consistencyEngine.setChunksAsLoaded(p, chunks);
 
         // Load entities.
-        let entities = consistencyEngine.extractEntitiesInRange(p);
+        let entities = consistencyEngine.getEntityOutputForPlayer(p);
         p.send('ent', JSON.stringify([a.position, a.rotation, entities]));
         consistencyEngine.setEntitiesAsLoaded(p, entities);
 
@@ -59,26 +59,32 @@ class UserOutput {
         let updatedChunks = topologyEngine.getOutput();
 
         game.players.forEach(p => {
-            let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks); // TODO couple with consistency inRange check.
 
-            // If an update occurred on an existing, loaded chunk
-            if (chunks) p.send('chk', chunks);
+            /** New loaded chunks. **/
 
             // TODO [LOW] check 'player has updated position'
             // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
-            // TODO [HIGH] put un consistencyEngine.update();
-            let newChunks = consistencyEngine.extractNewChunksInRangeForPlayer(p);
+            // TODO [HIGH] aggregate with topologyEngine
+            let newChunks = consistencyEngine.getChunkOutputForPlayer(p);
 
             if (newChunks && Object.keys(newChunks).length > 0) {
                 p.send('chk', newChunks);
 
                 // Consider player has loaded chunks.
-                for (let cid in newChunks) {
-                    let cs = game.worldModel.allChunks;
-                    if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
-                }
+                consistencyEngine.setChunksAsLoaded(p, newChunks);
+                //for (let cid in newChunks) {
+                //    let cs = game.worldModel.allChunks;
+                //    if (cs.has(cid)) p.avatar.setChunkAsLoaded(cid);
+                //}
             }
 
+            /** Updated chunks. **/
+
+            // TODO [HIGH] couple with consistency inRange check.
+            let chunks = topologyEngine.getOutputForPlayer(p, updatedChunks, newChunks);
+
+            // If an update occurred on an existing, loaded chunk
+            if (chunks) p.send('chk', chunks);
         });
 
         // Empty chunk updates buffer.
@@ -99,7 +105,7 @@ class UserOutput {
         game.players.forEach(p => {
 
             // If an entity in range of player p has just updated
-            let entities = consistencyEngine.extractEntitiesInRange(p, updatedEntities);
+            let entities = consistencyEngine.getEntityOutputForPlayer(p, updatedEntities);
 
             // TODO [LOW] detect change in position since the last time.
             // if (!entities), do it nevertheless, for it gives the player its own position.

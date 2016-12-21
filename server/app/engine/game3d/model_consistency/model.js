@@ -18,7 +18,9 @@ class ConsistencyModel {
         this._chunkIdAndPartsForEntity = new Map();
     }
 
+    hasChunk(player) {
 
+    }
 
 }
 
