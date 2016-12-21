@@ -77,19 +77,19 @@ class Game3D extends Game {
         // let time = process.hrtime();
 
         /** Inputs **/
-        this._ai.update();               // Update intents.
+        this._ai.update();                // Update intents.
 
-        this._externalInput.update();    // Update human inputs (not needed, done asynchronously).
-        this._internalInput.update();    // Update artificial inputs.
+        this._externalInput.update();     // Update human inputs (not needed, done asynchronously).
+        this._internalInput.update();     // Update artificial inputs.
 
         /** Updates **/
-        this._topologyEngine.update();   // Update topological model.
-        this._physicsEngine.update();    // Update physical simulation.
+        this._topologyEngine.update();    // Update topological model.
+        this._physicsEngine.update();     // Update physical simulation.
         this._consistencyEngine.update(); // Make client models consistent.
 
         /** Outputs **/
-        this._externalOutput.update();   // Send updates.
-        this._internalOutput.update();   // Update perceptions.
+        this._externalOutput.update();    // Send updates.
+        this._internalOutput.update();    // Update perceptions.
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");

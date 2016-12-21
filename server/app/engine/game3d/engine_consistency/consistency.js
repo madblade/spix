@@ -14,6 +14,8 @@ import EntityBuffer     from './buffer_entity';
 class ConsistencyEngine {
 
     constructor(game) {
+        this._game = game;
+
         // Models.
         this._entityModel       = game.entityModel;
         this._worldModel        = game.worldModel;
@@ -34,8 +36,26 @@ class ConsistencyEngine {
     get entityModel()           { return this._entityModel; }
     get consistencyModel()      { return this._consistencyModel; }
 
+    // This only takes care of LOADING things with respect to players.
+    // (entities, chunks)
+    // The Output class directly manages CHANGING things.
+    // (it gets outputs from TopologyEngine and PhysicsEngine, then transmits them to players)
+    // Loading and unloading objects is done exclusively here.
+    // Single criterion for maintaining loaded objects consistent: distance.
+    // (objects are initialized with STATES so they don't need updates)
     update() {
+        // TODO [CRIT] implement
+        let players = this._game.players;
 
+        // Get updated entities.
+
+        // For each player...
+        players.forEach(p => {
+            // Compute change in entities in range.
+            // Compute change in chunks in range.
+            // Update consistency model.
+            // Update output buffer
+        });
     }
 
     initChunkOutputForPlayer(player) {

@@ -35,12 +35,14 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
         var updates = chunkUpdates[cu];
 
         for (var chunkId in updates) {
-            if (updates[chunkId] === null)
+            var update = updates[chunkId];
+
+            if (update === null)
                 this.unloadChunk(chunkId);
             else if (this.isChunkLoaded(chunkId))
-                this.updateChunk(chunkId, updates[chunkId]);
+                this.updateChunk(chunkId, update);
             else
-                this.initializeChunk(chunkId, updates[chunkId]);
+                this.initializeChunk(chunkId, update);
         }
     }
 
@@ -49,6 +51,8 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
 };
 
 App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
+    updates = JSON.parse(updates);
+
     if (this.debug) {
         console.log(updates);
         var nbcc = 0;

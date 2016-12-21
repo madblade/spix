@@ -16,6 +16,9 @@ class ConsistencyModel {
         this._entityIdsForEntity        = new Map();
         this._chunkIdsForEntity         = new Map();
         this._chunkIdAndPartsForEntity  = new Map();
+
+        //
+
     }
 
     spawnPlayer(player) {
@@ -42,6 +45,13 @@ class ConsistencyModel {
 
     setChunkOutOfRange(playerId, chunkId) {
         this._chunkIdsForEntity.get(playerId).delete(chunkId);
+    }
+
+    areChunksLoaded(player) {
+        let avatar = player.avatar;
+        let renderDistance = avatar.renderDistance;
+        let side = 1+renderDistance*2;
+        return side*side <= this._chunkIdsForEntity.get(avatar.id).size;
     }
 
     hasEntity(playerId, entityId) {
