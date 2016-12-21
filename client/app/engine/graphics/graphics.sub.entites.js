@@ -26,7 +26,7 @@ App.Engine.Graphics.prototype.initializeEntity = function(entityId, model, callb
 };
 
 // For composite entities, wrap heavy model parts in higher level structure.
-App.Engine.Graphics.prototype.finalizeEntity = function(createdEntity) {
+App.Engine.Graphics.prototype.finalizeEntity = function(id, createdEntity) {
     // First only manage avatars.
     var wrapper = new THREE.Object3D();
     var head = this.createMesh(
@@ -41,8 +41,8 @@ App.Engine.Graphics.prototype.finalizeEntity = function(createdEntity) {
     wrapper.rotation.x = Math.PI/2;
     wrapper.rotation.y = Math.PI;
 
-    wrapper._id = createdEntity._id;
-    delete createdEntity._id;
+    wrapper._id = id;
+    //delete createdEntity._id;
 
     return wrapper;
 };

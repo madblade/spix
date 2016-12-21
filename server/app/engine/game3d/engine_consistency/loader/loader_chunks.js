@@ -304,9 +304,9 @@ class ChunkLoader {
         return ChunkLoader.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
     }
 
+    // TODO [MEDIUM] check implementation.
     static getOOBPlayerChunks(player, chunk, worldModel) {
         var oobChunks = [];
-        // TODO [MEDIUM] check implementation.
 
         // Recurse on loaded chunks.
 

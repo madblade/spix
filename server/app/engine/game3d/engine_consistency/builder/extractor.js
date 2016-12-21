@@ -38,8 +38,6 @@ class Extractor {
 
         let chunkIds = [];
         chunkIds.push((i+','+j+','+k));
-        //chunkIds.push((i+','+j), ((i-1)+','+j), ((i-1)+','+(j-1)));
-        //chunkIds.push((i+','+j), (i-1+','+j), (i+','+(j-1)), ((i-1)+','+(j-1)));
 
         for (let chunkIdId = 0, length = chunkIds.length; chunkIdId < length; ++chunkIdId) {
             let currentChunkId = chunkIds[chunkIdId];
@@ -65,7 +63,7 @@ class Extractor {
         if (!Extractor.load) return;
 
         let av = player.avatar;
-        if (!av) return; // (Asynchronous) Sometimes the avatar is collected just before this static call.
+        if (!av) return; // TODO [INVESTIGATE] (async) Sometimes the avatar is collected just before this static call.
         let p = av.position;
 
         // Get current chunk.
@@ -85,25 +83,26 @@ class Extractor {
         // (i.e. recurse currents and test distance)
         var chunksToUnload = ChunkLoader.getOOBPlayerChunks(player, starterChunk, worldModel);
 
-        if (!newChunk && chunksToUnload.length === 0) return null;
+        if (!newChunk && chunksToUnload.length === 0) return;
 
-        var chunksForPlayer = {};
+        var newChunksForPlayer = {};
+        var unloadedChunksForPlayer = {};
 
         if (newChunk) {
             if (Extractor.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
             consistencyModel.setChunkLoaded(av.id, newChunk.chunkId);
-            chunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
+            newChunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
             consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
-            chunksForPlayer[chunkToUnload] = null;
+            unloadedChunksForPlayer[chunkToUnload.chunkId] = null;
         }
 
-        return chunksForPlayer;
+        return [newChunksForPlayer, chunksToUnload];
     }
 
 }

@@ -14,6 +14,7 @@ class EntityModel {
 
         // Objects.
         this._entities = {};
+        // TODO [CRIT] put in a Map.
     }
 
     get entities() { return this._entities; }

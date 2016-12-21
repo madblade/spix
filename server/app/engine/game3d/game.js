@@ -85,7 +85,9 @@ class Game3D extends Game {
         /** Updates **/
         this._topologyEngine.update();    // Update topological model.
         this._physicsEngine.update();     // Update physical simulation.
-        this._consistencyEngine.update(); // Make client models consistent.
+
+        /** Aggregation-consistency **/
+        this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
 
         /** Outputs **/
         this._externalOutput.update();    // Send updates.

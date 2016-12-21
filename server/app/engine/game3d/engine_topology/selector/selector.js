@@ -11,7 +11,7 @@ class Selector {
     }
 
     // TODO [LOW] distance test.
-    selectUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks, modelNewChunks, consistencyModel) {
+    selectUpdatedChunksForPlayer(player, modelChunks, modelUpdatedChunks, addedOrDeletedChunks, consistencyModel) {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
         var chunksForPlayer = {};
@@ -20,7 +20,8 @@ class Selector {
             if (!modelChunks.has(chunkId)) return;
 
             if (!consistencyModel.hasChunk(player.avatar.id, chunkId) ||
-                (modelNewChunks && modelNewChunks.hasOwnProperty(chunkId))) {
+                    // not null, has {chunkId: !null}
+                (addedOrDeletedChunks && addedOrDeletedChunks.hasOwnProperty(chunkId) && addedOrDeletedChunks[chunkId])) {
                 // At this point, topology output is being accessed.
                 // So, topology engine has updated and therefore its topology model is up-to-date.
                 // Therefore, there is no need to access updates concerning non-loaded chunks,

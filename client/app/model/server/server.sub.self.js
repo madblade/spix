@@ -65,7 +65,7 @@ App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
 
     // Player id '-1' never used by any other entity.
     graphics.initializeEntity(-1, 'steve', function(createdEntity) {
-        var object3d = graphics.finalizeEntity(createdEntity);
+        var object3d = graphics.finalizeEntity(-1, createdEntity);
         this.avatar = object3d;
         if (this.displayAvatar) graphics.scene.add(object3d);
     }.bind(this));

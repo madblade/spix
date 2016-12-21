@@ -11,7 +11,7 @@ App.Model.Server.prototype.updateEntities = function(data) {
     this.selfModel.updateSelf(data[0], data[1]);
     this.entityModel.updateEntities(data[2]);
 
-    // TODO decouple
+    // TODO [CRIT] cleanup
     // this.app.engine.graphics.updateGraphicEntities(this.position, this.rotation, this.entities);
 };
 

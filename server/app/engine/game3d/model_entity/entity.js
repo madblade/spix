@@ -8,66 +8,64 @@ class Entity {
 
     constructor(id) {
         // Properties
-        this._id = id;
-        this._kind = 'abstract';
+        this._id            = id;
+        this._kind          = 'abstract';
 
         // Inputs
-        this._directions = null;
+        this._directions    = null;
 
         // PhysicsEngine
-        this._rotation = null;
-        this._position = null;
-        this._speed = null;
-        this._acceleration = null;
-        this._mass = 1;
-        this._adherence = [false, false, false, // Right, Into, Up
-            false, false, false]; // Left, From, Down
+        this._rotation      = null;
+        this._position      = null;
+        this._speed         = null;
+        this._acceleration  = null;
+        this._mass          = 1;
+        this._adherence     = [ false, false, false, // Right, Into, Up
+                                false, false, false]; // Left, From, Down
 
         this._impulseSpeedStamp = null;
-        this._needsEuler = true;
+        this._needsEuler        = true;
     }
 
-    get id() { return this._id; }
-    get kind() { return this._kind; }
+    get id()                { return this._id; }
+    get kind()              { return this._kind; }
 
-    get directions() { return this._directions; }
+    get directions()        { return this._directions; }
 
-    get rotation() { return this._rotation; }
-    get position() { return this._position; }
-    get speed() { return this._speed; }
-    get acceleration() { return this._acceleration; }
-    get mass() { return this._mass; }
-    get _impulseSpeed() { return this._impulseSpeedStamp; }
+    get rotation()          { return this._rotation; }
+    get position()          { return this._position; }
+    get speed()             { return this._speed; }
+    get acceleration()      { return this._acceleration; }
+    get mass()              { return this._mass; }
+    get _impulseSpeed()     { return this._impulseSpeedStamp; }
 
-    set adherence(na) { this._adherence = na; }
-    set rotation(nr) { this._rotation = nr; }
-    set position(np) { this._position = np; }
-    set speed(ns) { this._speed = ns; }
-    set acceleration(na) { this._acceleration = na; }
-    set _impulseSpeed(nis) { this._impulseSpeedStamp = nis; }
+    set adherence(na)       { this._adherence = na; }
+    set rotation(nr)        { this._rotation = nr; }
+    set position(np)        { this._position = np; }
+    set speed(ns)           { this._speed = ns; }
+    set acceleration(na)    { this._acceleration = na; }
+    set _impulseSpeed(nis)  { this._impulseSpeedStamp = nis; }
 
-    get adherence() {
-        return this._adherence;
-    }
+    get adherence()         { return this._adherence; }
 
     jump(direction) {
         this._adherence[direction] = false;
     }
 
     spawn(position) {
-        this._position = position;
-        this._rotation = [0, Math.PI/2];
-        this._directions = [false, false, false, false, false, false];
-        this._speed = [0, 0, 0];
-        this._acceleration = [0, 0, 0];
+        this._position          = position;
+        this._rotation          = [0, Math.PI/2];
+        this._directions        = [false, false, false, false, false, false];
+        this._speed             = [0, 0, 0];
+        this._acceleration      = [0, 0, 0];
         this._impulseSpeedStamp = [0, 0, 0];
     }
 
     die() {
-        this._position = null;
-        this._rotation = null;
-        this._speed = null;
-        this._directions = null;
+        this._position          = null;
+        this._rotation          = null;
+        this._speed             = null;
+        this._directions        = null;
     }
 
     stop() {

@@ -18,8 +18,7 @@ App.Model.Server.EntityModel = function(app) {
 
 App.Model.Server.EntityModel.prototype.init = function() {};
 
-App.Model.Server.EntityModel.prototype.addEntity = function(updatedEntity, graphics, entities) {
-    var id = updatedEntity._id;
+App.Model.Server.EntityModel.prototype.addEntity = function(id, updatedEntity, graphics, entities) {
     this.entitiesLoading.add(id);
 
     switch (updatedEntity.k) {
@@ -34,11 +33,10 @@ App.Model.Server.EntityModel.prototype.addEntity = function(updatedEntity, graph
 
 };
 
-App.Model.Server.EntityModel.prototype.updateEntity = function(currentEntity, updatedEntity, graphics, entities) {
+App.Model.Server.EntityModel.prototype.updateEntity = function(id, currentEntity, updatedEntity, graphics, entities) {
     // Update positions and rotation
     var p = currentEntity.position;
     var up = updatedEntity.p;
-
     var animate = p.x !== up[0] || p.y !== up[1];
     p.x = up[0];
     p.y = up[1];
@@ -46,10 +44,10 @@ App.Model.Server.EntityModel.prototype.updateEntity = function(currentEntity, up
     currentEntity.rotation.y = Math.PI + updatedEntity.r[0];
 
     // Update animation
-    if (animate) graphics.updateAnimation(updatedEntity._id);
+    if (animate) graphics.updateAnimation(id);
 
     // Update current "live" entities.
-    entities.set(updatedEntity._id, currentEntity);
+    entities.set(id, currentEntity);
 };
 
 App.Model.Server.EntityModel.prototype.refresh = function() {
@@ -59,16 +57,15 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
     var entities = this.entitiesIngame;
     var pushes = this.entitiesOutdated;
 
-    pushes.forEach(function(updatedEntity) {
+    pushes.forEach(function(updatedEntity, id) {
 
-        var id = updatedEntity._id;
         if (this.entitiesLoading.has(id)) return;
 
         var currentEntity = entities.get(id);
         if (!currentEntity)
-            this.addEntity(updatedEntity, graphics, entities);
+            this.addEntity(id, updatedEntity, graphics, entities);
         else
-            this.updateEntity(currentEntity, updatedEntity, graphics, entities);
+            this.updateEntity(id, currentEntity, updatedEntity, graphics, entities);
 
     }.bind(this));
 
@@ -83,9 +80,9 @@ App.Model.Server.EntityModel.prototype.updateEntities = function(entities) {
     if (entities === undefined || entities === null) return;
 
     var pushes = this.entitiesOutdated;
-    entities.forEach(function(currentEntity) {
-        pushes.set(currentEntity._id, currentEntity);
-    });
+    for (var eid in entities) {
+        pushes.set(eid, entities[eid]);
+    }
 
     // Set dirty flag.
     this.needsUpdate = true;

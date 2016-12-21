@@ -49,7 +49,7 @@ class ConsistencyModel {
 
     areChunksLoaded(player) {
         let avatar = player.avatar;
-        let renderDistance = avatar.renderDistance;
+        let renderDistance = avatar.chunkRenderDistance;
         let side = 1+renderDistance*2;
         return side*side <= this._chunkIdsForEntity.get(avatar.id).size;
     }
