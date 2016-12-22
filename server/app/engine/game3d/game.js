@@ -104,12 +104,11 @@ class Game3D extends Game {
         this._worldModel.generate()
             .then(_ => {
                 this._playerManager.setAddPlayerBehaviour(p => {
-                    // TODO [CRIT] simplify (only add input).
                     this._externalInput.addPlayer(p);
                 });
 
-                this._playerManager.setRemovePlayerBehaviour(p => {
-                    this._externalInput.removePlayer(p);
+                this._playerManager.setRemovePlayerBehaviour(player => {
+                    this._externalInput.removePlayer(player.avatar.id);
                 });
 
                 this._ready = true;

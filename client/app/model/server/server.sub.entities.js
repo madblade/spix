@@ -34,8 +34,12 @@ App.Model.Server.EntityModel.prototype.addEntity = function(id, updatedEntity, g
 };
 
 // TODO [CRIT] entity removal.
-App.Model.Server.EntityModel.prototype.removeEntity = function(id) {
+App.Model.Server.EntityModel.prototype.removeEntity = function(id, graphics, entities) {
+
     console.log("To be implemented");
+    var entity = entities.get(id);
+    graphics.scene.remove(entity);
+    entities.delete(id);
 };
 
 App.Model.Server.EntityModel.prototype.updateEntity = function(id, currentEntity, updatedEntity, graphics, entities) {
@@ -67,10 +71,8 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
         if (this.entitiesLoading.has(id)) return;
 
         var currentEntity = entities.get(id);
-        //console.log(updatedEntity + ' , ' + id);
-
         if (!updatedEntity)
-            this.removeEntity(id);
+            this.removeEntity(id, graphics, entities);
         else if (!currentEntity)
             this.addEntity(id, updatedEntity, graphics, entities);
         else

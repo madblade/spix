@@ -22,11 +22,10 @@ class EntityBuffer {
         else this._addedPlayers.add(player.avatar.id);
     }
 
-    removePlayer(player) {
+    removePlayer(playerId) {
         let addedPlayers = this._addedPlayers;
-        let id = player.avatar.id;
-        if (addedPlayers.has(id)) addedPlayers.delete(id);
-        else this._removedPlayers.add(player.avatar.id);
+        if (addedPlayers.has(playerId)) addedPlayers.delete(playerId);
+        else this._removedPlayers.add(playerId);
     }
 
     // addedEntities:   entity id => {p:e.position, r:e.rotation, k:e.kind}
@@ -47,9 +46,9 @@ class EntityBuffer {
     }
 
     flush() {
-        this._outputBuffer = new Map();
         this._addedPlayers = new Set();
         this._removedPlayers = new Set();
+        this._outputBuffer = new Map();
     }
 
 }

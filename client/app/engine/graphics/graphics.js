@@ -66,6 +66,10 @@ App.Engine.Graphics.prototype.animate = function() {
 };
 
 App.Engine.Graphics.prototype.render = function() {
+
+    // TODO [HIGH] implement knots
+    // renderer.render(bufferScene, camera, bufferTexture);
+
     this.renderer.render(this.scene, this.camera);
 };
 

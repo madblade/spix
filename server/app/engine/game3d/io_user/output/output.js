@@ -20,25 +20,8 @@ class UserOutput {
         return JSON.stringify(message);
     }
 
-    init(player) {
-        let game = this._game;
-        let p = player;
-        let a = p.avatar;
-
-        let consistencyEngine = this._consistencyEngine;
-
-        // Load chunks.
-        let chunks = consistencyEngine.initChunkOutputForPlayer(p);
-        p.send('chk', UserOutput.pack(chunks));
-
-        // Load entities.
-        let entities = consistencyEngine.initEntityOutputForPlayer(p);
-        p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
-
-        if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
-    }
-
     update() {
+
         this.spawnPlayers();
 
         // Idea: defer updates if perf. pb
@@ -58,11 +41,26 @@ class UserOutput {
     }
 
     spawnPlayers() {
-        let addedPlayers = this._consistencyEngine.getPlayerOutput();
-        let players = this._game.players;
+        let consistencyEngine = this._consistencyEngine;
+        let addedPlayers = consistencyEngine.getPlayerOutput();
+        let game = this._game;
+        let players = game.players;
+
         addedPlayers.forEach(pid => {
             let player = players.getPlayerFromId(pid);
-            if (player) this.init(player);
+            if (player) {
+                let p = player, a = p.avatar;
+
+                // Load chunks.
+                let chunks = consistencyEngine.initChunkOutputForPlayer(p);
+                p.send('chk', UserOutput.pack(chunks));
+
+                // Load entities.
+                let entities = consistencyEngine.initEntityOutputForPlayer(p);
+                p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
+
+                if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
+            }
         });
     }
 

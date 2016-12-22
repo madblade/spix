@@ -321,7 +321,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
             geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
             meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
-            this.scene.add(meshes[meshId]); // TODO decouple
+            this.scene.add(meshes[meshId]); // TODO [CRIT] decouple
         }
 
         // Notify object.
@@ -333,7 +333,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
     }
 };
 
-// TODO manage changes
+// TODO [LONG-TERM] manage changes
 App.Engine.Graphics.prototype.updateChunkFaces = function(updated, geometries) {
     for (var uid in updated) {
     }

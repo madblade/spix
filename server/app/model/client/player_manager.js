@@ -37,6 +37,8 @@ class PlayerManager {
     removePlayer(player) {
         CollectionUtils.removeFromArray(this._players, player);
         if (this._handleRemovePlayer) this._handleRemovePlayer(player);
+        player.avatar.die();
+        delete player.avatar;
         player.destroy(); // Clean references from player
     }
 

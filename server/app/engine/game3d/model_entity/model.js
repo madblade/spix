@@ -13,8 +13,6 @@ class EntityModel {
         this._game = game;
 
         // Objects.
-        //this._entities = {};
-
         // TODO [MEDIUM] accessor: LACKS.
         this._entities = new Map();
     }
@@ -37,10 +35,8 @@ class EntityModel {
         entities.set(id, p.avatar);
     }
 
-    removePlayer(p) {
-        p.avatar.die();
-        this._entities.delete(p.avatar.id);
-        delete p.avatar;
+    removePlayer(playerId) {
+        this._entities.delete(playerId);
     }
 
     // TODO [MEDIUM] optimize with LACKS structure.

@@ -28,8 +28,7 @@ class ConsistencyModel {
         this._chunkIdAndPartsForEntity  .set(playerId, new Map());
     }
 
-    removePlayer(player) {
-        let playerId = player.avatar.id;
+    removePlayer(playerId) {
         this._entityIdsForEntity        .delete(playerId);
         this._chunkIdsForEntity         .delete(playerId);
         this._chunkIdAndPartsForEntity  .delete(playerId);
@@ -55,18 +54,14 @@ class ConsistencyModel {
     }
 
     hasEntity(playerId, entityId) {
-        let result = this._entityIdsForEntity.get(playerId).has(entityId);
-        console.log('??? ' + playerId + ' with ' + entityId + ' : ' + result);
-        return result;
+        return this._entityIdsForEntity.get(playerId).has(entityId);
     }
 
     setEntityLoaded(playerId, entityId) {
-        console.log('set ' + playerId + ' with ' + entityId);
         this._entityIdsForEntity.get(playerId).add(entityId);
     }
 
     setEntityOutOfRange(playerId, entityId) {
-        console.log('UNSET ' + playerId + ' with ' + entityId);
         this._entityIdsForEntity.get(playerId).delete(entityId);
     }
 

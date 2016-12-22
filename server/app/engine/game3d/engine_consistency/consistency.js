@@ -46,14 +46,12 @@ class ConsistencyEngine {
         this._entityModel.spawnPlayer(player);
         this._consistencyModel.spawnPlayer(player);
         this._entityBuffer.spawnPlayer(player);
-        //this._externalOutput.init(p);
     }
 
-    // TODO [CRIT] for all who knew him, despawn him from his comrades.
-    despawnPlayer(player) {
-        this._entityBuffer.removePlayer(player);
-        this._consistencyModel.removePlayer(player);
-        this._entityModel.removePlayer(player);
+    despawnPlayer(playerId) {
+        this._entityBuffer.removePlayer(playerId);
+        this._consistencyModel.removePlayer(playerId);
+        this._entityModel.removePlayer(playerId);
     }
 
     // This only takes care of LOADING things with respect to players.
@@ -85,8 +83,7 @@ class ConsistencyEngine {
 
             // Compute change for entities in range.
             let addedEntities, removedEntities,
-                u = this._loader.computeNewEntitiesInRange(p, consistencyModel,
-                    updatedEntities, addedPlayers, removedPlayers);
+                u = this._loader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 

@@ -33,10 +33,11 @@ class UserInput {
                 this.listenPlayer(player);
             }
 
-            // Unlisten then despawn.
+            // Despawn.
             else if (type === 'disconnect') {
-                this.unlistenPlayer(player);
-                consistencyEngine.despawnPlayer(player);
+                // Dispensable to unlisten: a disconnected player has purged its playerConnection.
+                // this.unlistenPlayer(player);
+                consistencyEngine.despawnPlayer(player); // player = playerId
             }
         });
 
@@ -48,8 +49,8 @@ class UserInput {
         this._playerUpdateBuffer.push(['connect', player]);
     }
 
-    removePlayer(player) {
-        this._playerUpdateBuffer.push(['disconnected', player]);
+    removePlayer(playerId) {
+        this._playerUpdateBuffer.push(['disconnect', playerId]);
     }
 
     pushToEngine(kind, avatar, engine) {
