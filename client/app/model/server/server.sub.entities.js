@@ -33,6 +33,11 @@ App.Model.Server.EntityModel.prototype.addEntity = function(id, updatedEntity, g
 
 };
 
+// TODO [CRIT] entity removal.
+App.Model.Server.EntityModel.prototype.removeEntity = function(id) {
+    console.log("To be implemented");
+};
+
 App.Model.Server.EntityModel.prototype.updateEntity = function(id, currentEntity, updatedEntity, graphics, entities) {
     // Update positions and rotation
     var p = currentEntity.position;
@@ -62,7 +67,11 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
         if (this.entitiesLoading.has(id)) return;
 
         var currentEntity = entities.get(id);
-        if (!currentEntity)
+        //console.log(updatedEntity + ' , ' + id);
+
+        if (!updatedEntity)
+            this.removeEntity(id);
+        else if (!currentEntity)
             this.addEntity(id, updatedEntity, graphics, entities);
         else
             this.updateEntity(id, currentEntity, updatedEntity, graphics, entities);
@@ -77,7 +86,7 @@ App.Model.Server.EntityModel.prototype.refresh = function() {
 };
 
 App.Model.Server.EntityModel.prototype.updateEntities = function(entities) {
-    if (entities === undefined || entities === null) return;
+    if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
 
     var pushes = this.entitiesOutdated;
     for (var eid in entities) {

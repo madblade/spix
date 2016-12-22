@@ -9,14 +9,48 @@ class UserInput {
     constructor(game) {
         this._game = game;
         
-        this._physicsEngine  = game.physicsEngine;
-        this._topologyEngine = game.topologyEngine;
-        this._chat           = game.chat;
+        this._physicsEngine     = game.physicsEngine;
+        this._topologyEngine    = game.topologyEngine;
+        this._consistencyEngine = game.consistencyEngine;
+        this._chat              = game.chat;
 
-        this._listeners = {};
+        this._listeners = {}; // TODO [CRIT] Map.
+        this._playerUpdateBuffer = [];
     }
 
-    update() {}
+    // Update change in player connection / disconnection.
+    update() {
+        let consistencyEngine = this._consistencyEngine;
+        let addedOrRemovedPlayers = this._playerUpdateBuffer;
+        // WARN: short-circuits physics engine update.
+        addedOrRemovedPlayers.forEach(update => {
+            let type = update[0];
+            let player = update[1];
+
+            // Spawn and then listen.
+            if (type === 'connect') {
+                consistencyEngine.spawnPlayer(player);
+                this.listenPlayer(player);
+            }
+
+            // Unlisten then despawn.
+            else if (type === 'disconnect') {
+                this.unlistenPlayer(player);
+                consistencyEngine.despawnPlayer(player);
+            }
+        });
+
+        // Flush.
+        this._playerUpdateBuffer = [];
+    }
+
+    addPlayer(player) {
+        this._playerUpdateBuffer.push(['connect', player]);
+    }
+
+    removePlayer(player) {
+        this._playerUpdateBuffer.push(['disconnected', player]);
+    }
 
     pushToEngine(kind, avatar, engine) {
         return (data => {
@@ -25,8 +59,8 @@ class UserInput {
     }
 
     listenPlayer(player) {
-        let physicsEngine = this._physicsEngine;
-        let topologyEngine = this._topologyEngine;
+        let physicsEngine       = this._physicsEngine;
+        let topologyEngine      = this._topologyEngine;
         let avatar = player.avatar;
 
         let listener = this._listeners[player] = [
@@ -45,11 +79,11 @@ class UserInput {
         player.on('chat', listener[4]);
     }
 
-    removePlayer(player) {
+    unlistenPlayer(player) {
         // Do not modify queue.
         // Drop inconsistent players when an update is performed.
         let listener = this._listeners[player];
-        if (!listener || listener === null) {
+        if (!listener) {
             console.log('WARN: a player which was not listened to left.');
             return;
         }

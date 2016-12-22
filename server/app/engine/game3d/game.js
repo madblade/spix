@@ -79,7 +79,7 @@ class Game3D extends Game {
         /** Inputs **/
         this._ai.update();                // Update intents.
 
-        this._externalInput.update();     // Update human inputs (not needed, done asynchronously).
+        this._externalInput.update();     // Update human spawn/quit.
         this._internalInput.update();     // Update artificial inputs.
 
         /** Updates **/
@@ -104,16 +104,12 @@ class Game3D extends Game {
         this._worldModel.generate()
             .then(_ => {
                 this._playerManager.setAddPlayerBehaviour(p => {
-                    this._entityModel.spawnPlayer(p);
-                    this._consistencyModel.spawnPlayer(p);
-                    this._externalInput.listenPlayer(p);
-                    this._externalOutput.init(p);
+                    // TODO [CRIT] simplify (only add input).
+                    this._externalInput.addPlayer(p);
                 });
 
                 this._playerManager.setRemovePlayerBehaviour(p => {
                     this._externalInput.removePlayer(p);
-                    this._consistencyModel.removePlayer(p);
-                    this._entityModel.despawnPlayer(p);
                 });
 
                 this._ready = true;

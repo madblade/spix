@@ -40,6 +40,22 @@ class ConsistencyEngine {
     get entityModel()           { return this._entityModel; }
     get consistencyModel()      { return this._consistencyModel; }
 
+
+    // On connection / disconnection.
+    spawnPlayer(player) {
+        this._entityModel.spawnPlayer(player);
+        this._consistencyModel.spawnPlayer(player);
+        this._entityBuffer.spawnPlayer(player);
+        //this._externalOutput.init(p);
+    }
+
+    // TODO [CRIT] for all who knew him, despawn him from his comrades.
+    despawnPlayer(player) {
+        this._entityBuffer.removePlayer(player);
+        this._consistencyModel.removePlayer(player);
+        this._entityModel.removePlayer(player);
+    }
+
     // This only takes care of LOADING things with respect to players.
     // (entities, chunks)
     // The Output class directly manages CHANGING things.
@@ -48,7 +64,6 @@ class ConsistencyEngine {
     // Single criterion for maintaining loaded objects consistent: distance.
     // (objects are initialized with STATES so they don't need updates)
     update() {
-        // TODO [CRIT] implement
         let players = this._game.players;
 
         // Get buffers.
@@ -58,17 +73,20 @@ class ConsistencyEngine {
         // Model and engines.
         let consistencyModel = this._consistencyModel;
         let updatedEntities = this._physicsEngine.getOutput();
+        let addedPlayers = this._entityBuffer.addedPlayers;
+        let removedPlayers = this._entityBuffer.removedPlayers;
 
         // Object iterator.
-        let forEach = (object, callback) => { for (let id in object) { callback(object[id]) } };
+        let forEach = (object, callback) => { for (let id in object) { callback(parseInt(id)) } };
 
         // For each player...
-        players.forEach(p => {
+        players.forEach(p => { if (p.avatar) {
             let pid = p.avatar.id;
 
             // Compute change for entities in range.
             let addedEntities, removedEntities,
-                u = this._loader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities);
+                u = this._loader.computeNewEntitiesInRange(p, consistencyModel,
+                    updatedEntities, addedPlayers, removedPlayers);
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
@@ -80,17 +98,17 @@ class ConsistencyEngine {
             // Update consistency model.
             // WARN: updates will only be transmitted during next output pass.
             // BE CAREFUL HERE
-            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, e.id));
-            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, e.id));
-            if (addedChunks)        forEach(addedChunks, c => consistencyModel.setChunkLoaded(pid, c.chunkId));
-            if (removedChunks)      forEach(removedChunks, c => consistencyModel.setChunkOutOfRange(pid, c.chunkId));
+            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, e));
+            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, e));
+            if (addedChunks)        forEach(addedChunks, c => consistencyModel.setChunkLoaded(pid, c));
+            if (removedChunks)      forEach(removedChunks, c => consistencyModel.setChunkOutOfRange(pid, c));
 
             // Update output buffers.
             if (addedChunks || removedChunks)
                 cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks);
             if (addedEntities || removedEntities)
                 ebuf.updateEntitiesForPlayer(pid, addedEntities, removedEntities);
-        });
+        }});
     }
 
     getChunkOutput() {
@@ -101,6 +119,10 @@ class ConsistencyEngine {
         return this._entityBuffer.getOutput();
     }
 
+    getPlayerOutput() {
+        return this._entityBuffer.addedPlayers;
+    }
+
     flushBuffers() {
         this._chunkBuffer.flush();
         this._entityBuffer.flush();
@@ -108,45 +130,37 @@ class ConsistencyEngine {
 
     // The first time, FORCE BUILD when output requests CE initial output.
     initChunkOutputForPlayer(player) {
-        var chunkArray = this._builder.computeChunksForNewPlayer(player);
+        let aid = player.avatar.id;
+        let cs = this._worldModel.allChunks;
+        let cm = this._consistencyModel;
 
+        // Object.
+        var chunkOutput = this._builder.computeChunksForNewPlayer(player);
 
-        return chunkArray;
+        for (let cid in chunkOutput)
+            if (cs.has(cid)) cm.setChunkLoaded(aid, cid);
+
+        // WARN: idem, updates must be transmitted right after this call
+        // otherwise its player will be out of sync.
+        return chunkOutput;
     }
 
     // The first time, FORCE COMPUTE in-range entities when output requests CE output.
     initEntityOutputForPlayer(player) {
-        var entityArray = this._loader.computeEntitiesInRange(player);
-
-        return entityArray;
-    }
-
-    // TODO [CRIT] put in update.
-    //getChunkOutputForPlayer(player) {
-    //    return this._builder.computeNewChunksInRangeForPlayer(player);
-    //}
-
-    //getEntityOutputForPlayer(player) {
-    //    return this._loader.computeEntitiesInRange(player);
-    //}
-
-    setChunksAsLoaded(player, chunks) {
-        let a = player.avatar;
-        let cs = this._worldModel.allChunks;
-        let cm = this._consistencyModel;
-
-        for (let cid in chunks)
-            if (cs.has(cid)) cm.setChunkLoaded(a.id, cid);
-    }
-
-    setEntitiesAsLoaded(player, entities) {
-        let a = player.avatar;
+        let aid = player.avatar.id;
         let es = this._entityModel.entities;
         let cm = this._consistencyModel;
 
-        for (let eid in entities)
-            if (es.hasOwnProperty(eid)) cm.setEntityLoaded(a.id, eid);
+        // Object.
+        var entityOutput = this._loader.computeEntitiesInRange(player);
+
+        for (let eid in entityOutput)
+            if (es.has(eid)) cm.setEntityLoaded(aid, eid);
+
+        // Updates must be transmitted after this call.
+        return entityOutput;
     }
+
 }
 
 export default ConsistencyEngine;

@@ -25,6 +25,15 @@ class PlayerManager {
         if (this._handleAddPlayer) this._handleAddPlayer(player);
     }
 
+    getPlayerFromId(playerId) {
+        let players = this._players;
+        for (let p = 0, l = players.length; p < l; ++p) {
+            let player = players[p];
+            if (player.avatar && player.avatar.id === playerId) return player;
+        }
+        return false;
+    }
+
     removePlayer(player) {
         CollectionUtils.removeFromArray(this._players, player);
         if (this._handleRemovePlayer) this._handleRemovePlayer(player);

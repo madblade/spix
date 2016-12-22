@@ -30,17 +30,17 @@ class UserOutput {
         // Load chunks.
         let chunks = consistencyEngine.initChunkOutputForPlayer(p);
         p.send('chk', UserOutput.pack(chunks));
-        consistencyEngine.setChunksAsLoaded(p, chunks);
 
         // Load entities.
         let entities = consistencyEngine.initEntityOutputForPlayer(p);
         p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
-        consistencyEngine.setEntitiesAsLoaded(p, entities);
 
         if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
     }
 
     update() {
+        this.spawnPlayers();
+
         // Idea: defer updates if perf. pb
         //let time = process.hrtime();
         this.updateChunks();
@@ -57,6 +57,15 @@ class UserOutput {
         this._consistencyEngine.flushBuffers();
     }
 
+    spawnPlayers() {
+        let addedPlayers = this._consistencyEngine.getPlayerOutput();
+        let players = this._game.players;
+        addedPlayers.forEach(pid => {
+            let player = players.getPlayerFromId(pid);
+            if (player) this.init(player);
+        });
+    }
+
     updateChunks() {
         let game              = this._game;
         let topologyEngine    = this._topologyEngine;
@@ -65,7 +74,7 @@ class UserOutput {
         let updatedChunks = topologyEngine.getOutput();
         let consistencyOutput = consistencyEngine.getChunkOutput();
 
-        game.players.forEach(p => {
+        game.players.forEach(p => { if (p.avatar) {
             let hasNew, hasUpdated;
             let pid = p.avatar.id;
 
@@ -82,16 +91,12 @@ class UserOutput {
                 if (hasUpdated) Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
 
                 p.send('chk', UserOutput.pack(addedOrRemovedChunks));
-
-                // Consider player has loaded chunks.
-                // TODO [CRIT] cleanup
-                // consistencyEngine.setChunksAsLoaded(p, newChunks);
             }
             else if (hasUpdated) {
                 // If only an update occurred on an existing, loaded chunk.
                 p.send('chk', UserOutput.pack(updatedChunksForPlayer));
             }
-        });
+        }});
 
         // Empty chunk updates buffer.
         topologyEngine.flushOutput();

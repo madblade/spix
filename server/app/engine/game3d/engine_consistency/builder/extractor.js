@@ -98,6 +98,7 @@ class Extractor {
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
+            // TODO [CRIT] deport into consistency update.
             consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             unloadedChunksForPlayer[chunkToUnload.chunkId] = null;
         }

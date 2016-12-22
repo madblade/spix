@@ -13,41 +13,47 @@ class EntityModel {
         this._game = game;
 
         // Objects.
-        this._entities = {};
-        // TODO [CRIT] put in a Map.
+        //this._entities = {};
+
+        // TODO [MEDIUM] accessor: LACKS.
+        this._entities = new Map();
     }
 
     get entities() { return this._entities; }
 
     forEach(callback) {
         let entities = this._entities;
-        for (let entityId in entities) {
-            callback(entities[entityId]);
-        }
+        entities.forEach((entity, id) => {
+            callback(entity);
+        });
     }
 
     spawnPlayer(p) {
-        let id = CollectionUtil.generateId(this._entities);
+        let entities = this._entities;
+        let id = CollectionUtil.generateId(entities);
         p.avatar = EntityFactory.createAvatar(id, this);
         p.avatar.spawn(this._game.worldModel.getFreePosition());
-        this._entities[id] = p.avatar;
+
+        entities.set(id, p.avatar);
     }
 
-    despawnPlayer(p) {
+    removePlayer(p) {
         p.avatar.die();
-        delete this._entities[p.avatar.id];
+        this._entities.delete(p.avatar.id);
         delete p.avatar;
     }
 
     // TODO [MEDIUM] optimize with LACKS structure.
     anEntityIsPresentOn(x, y, z) {
         let entities = this._entities;
-        for (let entityId in entities) {
-            let p = entities[entityId].position;
+        let result = false;
+        entities.forEach((entity, id) => {
+            let p = entity.position;
             if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)
-                return true;
-        }
-        return false;
+                result = true;
+        });
+
+        return result;
     }
 }
 

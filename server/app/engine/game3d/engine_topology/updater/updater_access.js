@@ -216,6 +216,8 @@ class UpdaterAccess {
         }
 
         // Detect entities.
+        // TODO [HIGH] simplify, correct.
+        // TODO [CRIT] directly compute block x,y,z client-side.
         if (entityModel.anEntityIsPresentOn(floors[0], floors[1], floors[2]))
         {
             failure("an entity is present on the block.");

@@ -50,7 +50,11 @@ class CollectionUtils {
         var random = _ => Math.floor(Math.random() * 1000000);
         var id = random();
 
-        if (collection instanceof Array) { // Array
+        if (collection instanceof Map) {
+            while (collection.has(id)) id = random();
+        }
+
+        else if (collection instanceof Array) { // Array
             // Unicity mandatory check
             var f = (e => e.id === id);
             while (collection.filter(f).length > 0) id = random();

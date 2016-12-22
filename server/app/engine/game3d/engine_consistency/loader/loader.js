@@ -20,18 +20,17 @@ class Loader {
 
     computeEntitiesInRange(player) {
         let modelEntities = this._entityModel.entities;
-        let avatar = player.avatar;
-        var entities = [];
+        let aid = player.avatar.id;
+        var entities = {};
 
-        // TODO [CRIT] Map entities.
-        this._entityModel.forEach(e => { if (e.id !== avatar.id) {
-            entities.push({p:e.position, r:e.rotation, k:e.kind});
+        this._entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
+            entities[eid] = {p:e.position, r:e.rotation, k:e.kind};
         }});
 
         return entities;
     }
 
-    computeNewEntitiesInRange(player, consistencyModel, updatedEntities) {
+    computeNewEntitiesInRange(player, consistencyModel, updatedEntities, addedPlayers, removedPlayers) {
         let modelEntities = this._entityModel.entities;
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
@@ -40,6 +39,8 @@ class Loader {
 
         var addedEntities = {};
         var removedEntities = {};
+
+        // TODO [CRIT] REMOVE PLAYERS
 
         // TODO [MEDIUM]: use LACKS structure to pass from O(n²) to O(Cn).
         // TODO [MEDIUM]: also use for AABB phase in physics.
@@ -51,6 +52,9 @@ class Loader {
             let isInRange = distance(e, avatar) < thresh;
             let isPresent = consistencyModel.hasEntity(aid, eid); // TODO [PERF] n² log² n !!
 
+            console.log(isPresent);
+            console.log(isInRange);
+
             if (isInRange && !isPresent)
                 addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind};
 
@@ -59,7 +63,19 @@ class Loader {
 
             else if (isInRange && updatedEntities.hasOwnProperty(eid))
                 addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind};
+
+            else if (isPresent && removedPlayers.has(eid))
+                removedEntities[eid] = null;
         }});
+
+        if (Object.keys(addedEntities).length > 0) {
+            console.log('added');
+            console.log(addedEntities);
+        }
+        if (Object.keys(removedEntities).length > 0) {
+            console.log('removed');
+            console.log(removedEntities);
+        }
 
         return [addedEntities, removedEntities];
     }

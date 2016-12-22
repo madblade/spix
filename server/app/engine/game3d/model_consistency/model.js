@@ -55,14 +55,18 @@ class ConsistencyModel {
     }
 
     hasEntity(playerId, entityId) {
-        return this._entityIdsForEntity.get(playerId).has(entityId);
+        let result = this._entityIdsForEntity.get(playerId).has(entityId);
+        console.log('??? ' + playerId + ' with ' + entityId + ' : ' + result);
+        return result;
     }
 
     setEntityLoaded(playerId, entityId) {
+        console.log('set ' + playerId + ' with ' + entityId);
         this._entityIdsForEntity.get(playerId).add(entityId);
     }
 
     setEntityOutOfRange(playerId, entityId) {
+        console.log('UNSET ' + playerId + ' with ' + entityId);
         this._entityIdsForEntity.get(playerId).delete(entityId);
     }
 

@@ -51,7 +51,7 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
 };
 
 App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
-    updates = JSON.parse(updates);
+    if (!updates) return;
 
     if (this.debug) {
         console.log(updates);
