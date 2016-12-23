@@ -19,9 +19,7 @@ class UpdaterAccess {
         const fy = floors[1];
         const fz = floors[2];
 
-        const dimX = worldModel.chunkDimensionX;
-        const dimY = worldModel.chunkDimensionY;
-        const dimZ = worldModel.chunkDimensionZ;
+        const dimX = worldModel.xSize, dimY = worldModel.ySize, dimZ = worldModel.zSize;
 
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
@@ -67,15 +65,13 @@ class UpdaterAccess {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coords = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
-        const i = coordinates[0];
-        const j = coordinates[1];
-        const k = coordinates[2];
+        const i = coords[0], j = coords[1], k = coords[2];
 
-        const isBoundaryX = coordinates[3];
-        const isBoundaryY = coordinates[4];
-        const isBoundaryZ = coordinates[5];
+        const isBoundaryX = coords[3];
+        const isBoundaryY = coords[4];
+        const isBoundaryZ = coords[5];
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
@@ -105,15 +101,13 @@ class UpdaterAccess {
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coordinates = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coords = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
 
-        const i = coordinates[0];
-        const j = coordinates[1];
-        const k = coordinates[2];
+        const i = coords[0], j = coords[1], k = coords[2];
 
-        const isBoundaryX = coordinates[3];
-        const isBoundaryY = coordinates[4];
-        const isBoundaryZ = coordinates[5];
+        const isBoundaryX = coords[3];
+        const isBoundaryY = coords[4];
+        const isBoundaryZ = coords[5];
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
@@ -134,7 +128,6 @@ class UpdaterAccess {
         }
 
         // Add block on chunk.
-        //chunk.del(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]);
         return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]];
     }
 

@@ -20,7 +20,7 @@ class Generator {
         return new Promise(resolve => {
 
             // Generate blocks.
-            let x = wm.chunkDimensionX, y = wm.chunkDimensionY, z = wm.chunkDimensionZ;
+            let x = wm.xSize, y = wm.ySize, z = wm.zSize;
             var chunkMap = WorldGenerator.generateFlatWorld(x, y, z, wm);
 
             // Affect chunks.

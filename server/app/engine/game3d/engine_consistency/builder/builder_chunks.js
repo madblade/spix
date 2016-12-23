@@ -187,7 +187,7 @@ class ChunkBuilder {
         return chunk;
     }
 
-    static preLoadNextChunk(player, chunk, worldModel, forPlayer, consistencyModel) {
+    static preLoadNextChunk(player, starterChunk, worldModel, forPlayer, consistencyModel) {
         const threshold = forPlayer ? ChunkBuilder.clientLoadingRadius : ChunkBuilder.serverLoadingRadius;
 
         let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
@@ -196,13 +196,8 @@ class ChunkBuilder {
         let avatar = player.avatar;
         let allChunks = worldModel.allChunks;
 
-        const dx = worldModel.chunkDimensionX;
-        const dy = worldModel.chunkDimensionY;
-        const dz = worldModel.chunkDimensionZ;
-
-        const ci = chunk.chunkI;
-        const cj = chunk.chunkJ;
-        const ck = chunk.chunkK;
+        const dx = worldModel.xSize,    dy = worldModel.ySize,    dz = worldModel.zSize;
+        const ci = starterChunk.chunkI, cj = starterChunk.chunkJ, ck = starterChunk.chunkK;
 
         let i = ci;
         let j = cj;
@@ -261,7 +256,7 @@ class ChunkBuilder {
 
         // Back case
         res = chunkIsToBeLoaded((i-depth), j, k);
-        if (res !== null) {
+        if (res) {
             if (ChunkBuilder.debug) if (forPlayer) console.log("BACK CASE");
             return res;
         }
@@ -269,13 +264,13 @@ class ChunkBuilder {
         // Back segment
         for (let nj = 1; nj <= depth; ++nj) {
             res = chunkIsToBeLoaded(i-depth, j+nj, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG+");
                 return res;
             }
 
             res = chunkIsToBeLoaded(i-depth, j-nj, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG-");
                 return res;
             }
@@ -284,12 +279,12 @@ class ChunkBuilder {
         // Side segments
         for (let ni = -depth; ni <= depth; ++ni) {
             res = chunkIsToBeLoaded(i+ni, j-depth, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i-");
                 return res;
             }
             res = chunkIsToBeLoaded(i+ni, j+depth, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i+");
                 return res;
             }
@@ -298,12 +293,12 @@ class ChunkBuilder {
         // Front segment
         for (let nj = -depth; nj < 0; ++nj) {
             res = chunkIsToBeLoaded(i+depth, j-nj, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG-");
                 return res;
             }
             res = chunkIsToBeLoaded(i+depth, j+nj, k);
-            if (res !== null) {
+            if (res) {
                 if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG+");
                 return res;
             }
@@ -311,7 +306,7 @@ class ChunkBuilder {
 
         // Last case
         res = chunkIsToBeLoaded((i+depth), j, k);
-        if (res !== null) {
+        if (res) {
             if (ChunkBuilder.debug) if (forPlayer) console.log("CURRENT FINALLY");
             return res;
         }

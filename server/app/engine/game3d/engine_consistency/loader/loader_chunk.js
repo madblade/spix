@@ -20,25 +20,20 @@ class ChunkLoader {
     }
 
     computeChunksForNewPlayer(player) {
-        let worldModel = this._worldModel;
+        let wm = this._worldModel;
 
         // Object to be (JSON.stringify)-ed.
         var chunksForNewPlayer = {};
-        let chunksInModel = worldModel.allChunks;
+        let chunksInModel = wm.allChunks;
 
         // From player position, find concerned chunks.
-        var av = player.avatar;
-        const pos = av.position;
+        const pos = player.avatar.position;
 
         // Belonging chunk coordinates.
-        let coordinates = worldModel.getChunkCoordinates(pos[0], pos[1], pos[2]);
-        const i = coordinates[0];
-        const j = coordinates[1];
-        const k = coordinates[2];
+        let coords = wm.getChunkCoordinates(pos[0], pos[1], pos[2]);
 
-        const dx = worldModel.chunkDimensionX;
-        const dy = worldModel.chunkDimensionY;
-        const dz = worldModel.chunkDimensionZ;
+        const i = coords[0], j = coords[1], k = coords[2];
+        const dx = wm.xSize, dy = wm.ySize, dz = wm.zSize;
 
         let chunkIds = [];
         chunkIds.push((i+','+j+','+k));
@@ -47,7 +42,7 @@ class ChunkLoader {
             let currentChunkId = chunkIds[chunkIdId];
             if (!chunksInModel.has(currentChunkId)) {
                 if (ChunkLoader.debug) console.log("We should generate " + currentChunkId + " for the user.");
-                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, worldModel); // virtual polymorphism
+                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, wm);
                 chunksInModel.set(chunk.chunkId, chunk);
             }
 
@@ -64,18 +59,16 @@ class ChunkLoader {
     }
 
     computeNewChunksInRangeForPlayer(player) {
+        if (!ChunkLoader.load) return;
+
         // TODO [HIGH] filter: no more than X chunk per player per iteration?
         let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
 
-        if (!ChunkLoader.load) return;
-
-        let av = player.avatar;
-        if (!av) return; // TODO [INVESTIGATE] (async) Sometimes the avatar is collected just before this static call.
-        let p = av.position;
+        const pos = player.avatar.position;
 
         // Get current chunk.
-        let starterChunk = ChunkIterator.getClosestChunk(p[0], p[1], p[2], worldModel);
+        let starterChunk = ChunkIterator.getClosestChunk(pos[0], pos[1], pos[2], worldModel);
         if (!starterChunk) return;
 
         // Loading circle for server (a bit farther)
@@ -100,13 +93,12 @@ class ChunkLoader {
             if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);
 
             // Set chunk as added
-            consistencyModel.setChunkLoaded(av.id, newChunk.chunkId);
+            consistencyModel.setChunkLoaded(player.avatar.id, newChunk.chunkId);
             newChunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
         }
 
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
-            // TODO [CRIT] deport into consistency update.
             // TODO [CRIT] manage chunk load/unload client-side (with all that implies in terms of loading strategy)
             // consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             unloadedChunksForPlayer[chunkToUnload.chunkId] = null;

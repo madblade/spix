@@ -31,9 +31,9 @@ class WorldModel {
     get handle() { return this._handle; }
     get allChunks() { return this._chunks; }
 
-    get chunkDimensionX() { return this._xSize; }
-    get chunkDimensionY() { return this._ySize; }
-    get chunkDimensionZ() { return this._zSize; }
+    get xSize() { return this._xSize; }
+    get ySize() { return this._ySize; }
+    get zSize() { return this._zSize; }
 
     get generationMethod() { return this._generationMethod; }
     get entityModel() { return this._game.entityModel; }
@@ -46,27 +46,16 @@ class WorldModel {
     }
 
     getChunkCoordinates(x, y, z) {
-        const dx = this.chunkDimensionX;
-        const dy = this.chunkDimensionY;
-        const dz = this.chunkDimensionZ;
-
         let f = Math.floor;
-        let i = f(x/dx);
-        let j = f(y/dy);
-        let k = f(z/dz);
-
-        return [i,j,k];
+        const dx = this.xSize, dy = this.ySize, dz = this.zSize;
+        return [f(x/dx), f(y/dy), f(z/dz)];
     }
 
     whatBlock(x, y, z) {
-        const dx = this.chunkDimensionX;
-        const dy = this.chunkDimensionY;
-        const dz = this.chunkDimensionZ;
+        let coords = this.getChunkCoordinates(x, y, z);
 
-        let coordinates = this.getChunkCoordinates(x, y, z);
-        const i = coordinates[0];
-        const j = coordinates[1];
-        const k = coordinates[2];
+        const dx = this.xSize, dy = this.ySize, dz = this.zSize;
+        const i = coords[0], j = coords[1], k = coords[2];
 
         const chunkX = x - i * dx;
         const chunkY = y - j * dy;
@@ -80,6 +69,7 @@ class WorldModel {
             // TODO [MEDIUM] check minus
             return;
         }
+
         return chunk.what(chunkX, chunkY, chunkZ);
     }
 

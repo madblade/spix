@@ -126,15 +126,12 @@ class ChunkIterator {
 
     static getClosestChunk(xPosition, yPosition, zPosition, worldModel) {
         let allChunks = worldModel.allChunks;
+        let floor = Math.floor;
 
-        const dx = worldModel.chunkDimensionX;
-        const dy = worldModel.chunkDimensionY;
-        const dz = worldModel.chunkDimensionZ;
+        const dx = worldModel.xSize, dy = worldModel.ySize, dz = worldModel.zSize;
 
         // TODO [HIGH] DRY with manager.getChunkCoordinatesFromFloatingPoint
-        const fx = Math.floor(xPosition);
-        const fy = Math.floor(yPosition);
-        const fz = Math.floor(zPosition);
+        const fx = floor(xPosition), fy = floor(yPosition), fz = floor(zPosition);
 
         let chunkI = (fx - ( (fx >= 0 ? fx : (dx + fx)) %dx)) / dx;
         let chunkJ = (fy - ( (fy >= 0 ? fy : (dy + fy)) %dy)) / dy;
