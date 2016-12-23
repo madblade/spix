@@ -4,8 +4,8 @@
 
 'use strict';
 
-import ChunkLoader from './loader_chunks';
-import FaceLinker from './surface_faces_linker';
+import ChunkBuilder from './builder_chunks';
+import FaceLinker   from './surface_faces_linker';
 
 class CSFX {
 
@@ -351,7 +351,7 @@ class CSFX {
     static getNeighbourChunks(neighbourChunks, chunk, neighbourBlocks) {
         //neighbourChunks.push();
         for (let i = 0; i < 17; ++i) {
-            neighbourChunks.push(ChunkLoader.getNeighboringChunk(chunk, i));
+            neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
         }
     }

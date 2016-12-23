@@ -7,8 +7,6 @@
 import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
 import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
-import ChunkLoader from './../engine_consistency/builder/loader_chunks';
-
 class Chunk {
 
     static debug = false;

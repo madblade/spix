@@ -4,8 +4,8 @@
 
 'use strict';
 
-import WorldGenerator   from './worldgenerator';
-import Extractor        from '../builder/extractor';
+import WorldGenerator       from './worldgenerator';
+import ChunkBuilder         from '../builder/builder_chunks';
 
 class Generator {
 
@@ -29,7 +29,7 @@ class Generator {
             // Finalize chunks (extract surface faces).
             var chunks = new Map(chunkMap); // Shallow copy.
             // Adds chunks in worldModel, so mutable chunkMapCollection does not fit.
-            chunks.forEach((chunk, id) => Extractor.computeChunkFaces(chunk));
+            chunks.forEach((chunk, id) => ChunkBuilder.computeChunkFaces(chunk));
 
             // Notify
             resolve();

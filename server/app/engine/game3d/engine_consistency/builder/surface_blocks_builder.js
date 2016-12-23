@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ChunkLoader from './loader_chunks';
+import ChunkBuilder from './builder_chunks';
 
 class CSBX {
 
@@ -19,7 +19,7 @@ class CSBX {
 
         // Get all neighbour chunks.
         for (let i = 0; i < numberOfNeighbours; ++i) {
-            neighbourChunks.push(ChunkLoader.getNeighboringChunk(chunk, i));
+            neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
         }
 

@@ -5,15 +5,34 @@
 'use strict';
 
 import ChunkGenerator from './../generator/chunkgenerator';
-import Extractor from './extractor';
+import BlockExtractor       from './surface_blocks_builder';
+import FaceExtractor        from './surface_faces_builder';
 
-class ChunkLoader {
+class ChunkBuilder {
 
     static debug = false;
 
     static serverLoadingRadius = 10;
     static clientLoadingRadius = 2;
     static clientUnloadingRadius = 20;
+
+    static computeChunkFaces(chunk) {
+        let wm = chunk.worldModel;
+
+        // Preload neighbours.
+        if (ChunkBuilder.debug) console.log('\tPreloading neighbor chunks...');
+        ChunkBuilder.preloadAllNeighbourChunks(chunk, wm);
+
+        // Detect boundary blocks.
+        if (ChunkBuilder.debug) console.log('\tExtracting surface...');
+        BlockExtractor.extractSurfaceBlocks(chunk);
+
+        // Detect connected boundary face components.
+        if (ChunkBuilder.debug) console.log("\tComputing connected components...");
+        FaceExtractor.extractConnectedComponents(chunk);
+
+        chunk.ready = true;
+    }
 
     /** MODEL
      0	i+1,	j,		k
@@ -164,12 +183,12 @@ class ChunkLoader {
         // Do compute faces
         let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, worldModel);
         worldModel.addChunk(chunkId, chunk);
-        Extractor.computeChunkFaces(chunk);
+        ChunkBuilder.computeChunkFaces(chunk);
         return chunk;
     }
 
     static preLoadNextChunk(player, chunk, worldModel, forPlayer, consistencyModel) {
-        const threshold = forPlayer ? ChunkLoader.clientLoadingRadius : ChunkLoader.serverLoadingRadius;
+        const threshold = forPlayer ? ChunkBuilder.clientLoadingRadius : ChunkBuilder.serverLoadingRadius;
 
         let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
 
@@ -226,9 +245,9 @@ class ChunkLoader {
 
             if (!forPlayer) {
                 if (!currentChunk) {
-                    return ChunkLoader.addChunk(dx, dy, dz, currentId, worldModel);
+                    return ChunkBuilder.addChunk(dx, dy, dz, currentId, worldModel);
                 } else if (!currentChunk.ready) {
-                    Extractor.computeChunkFaces(currentChunk);
+                    ChunkBuilder.computeChunkFaces(currentChunk);
                     return currentChunk;
                 } else return null;
             } else {
@@ -243,7 +262,7 @@ class ChunkLoader {
         // Back case
         res = chunkIsToBeLoaded((i-depth), j, k);
         if (res !== null) {
-            if (ChunkLoader.debug) if (forPlayer) console.log("BACK CASE");
+            if (ChunkBuilder.debug) if (forPlayer) console.log("BACK CASE");
             return res;
         }
 
@@ -251,13 +270,13 @@ class ChunkLoader {
         for (let nj = 1; nj <= depth; ++nj) {
             res = chunkIsToBeLoaded(i-depth, j+nj, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("BACK SEG+");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG+");
                 return res;
             }
 
             res = chunkIsToBeLoaded(i-depth, j-nj, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("BACK SEG-");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG-");
                 return res;
             }
         }
@@ -266,12 +285,12 @@ class ChunkLoader {
         for (let ni = -depth; ni <= depth; ++ni) {
             res = chunkIsToBeLoaded(i+ni, j-depth, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("SIDE SEG i-");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i-");
                 return res;
             }
             res = chunkIsToBeLoaded(i+ni, j+depth, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("SIDE SEG i+");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i+");
                 return res;
             }
         }
@@ -280,12 +299,12 @@ class ChunkLoader {
         for (let nj = -depth; nj < 0; ++nj) {
             res = chunkIsToBeLoaded(i+depth, j-nj, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("FRONT SEG-");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG-");
                 return res;
             }
             res = chunkIsToBeLoaded(i+depth, j+nj, k);
             if (res !== null) {
-                if (ChunkLoader.debug) if (forPlayer) console.log("FRONT SEG+");
+                if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG+");
                 return res;
             }
         }
@@ -293,7 +312,7 @@ class ChunkLoader {
         // Last case
         res = chunkIsToBeLoaded((i+depth), j, k);
         if (res !== null) {
-            if (ChunkLoader.debug) if (forPlayer) console.log("CURRENT FINALLY");
+            if (ChunkBuilder.debug) if (forPlayer) console.log("CURRENT FINALLY");
             return res;
         }
     }
@@ -301,7 +320,7 @@ class ChunkLoader {
     static getNextPlayerChunk(player, chunk, worldModel, consistencyModel) {
         // Get nearest unloaded until threshold, send back.
 
-        return ChunkLoader.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
+        return ChunkBuilder.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
     }
 
     // TODO [MEDIUM] check implementation.
@@ -315,4 +334,4 @@ class ChunkLoader {
 
 }
 
-export default ChunkLoader;
+export default ChunkBuilder;

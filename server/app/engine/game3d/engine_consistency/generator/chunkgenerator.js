@@ -5,7 +5,6 @@
 'use strict';
 
 import Chunk            from './../../model_world/chunk';
-import ExtractionAPI    from './../builder/extractor';
 
 import GenTest          from './generator_test.js';
 import GenAnalytic      from './generator_analytic.js';
