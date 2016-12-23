@@ -20,11 +20,16 @@ class Loader {
 
     computeEntitiesInRange(player) {
         let modelEntities = this._entityModel.entities;
-        let aid = player.avatar.id;
+        let avatar = player.avatar;
+        let aid = avatar.id;
         var entities = {};
 
+        let thresh = avatar.entityRenderDistance;
+        let distance = Loader.distance;
+
         this._entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
-            entities[eid] = {p:e.position, r:e.rotation, k:e.kind};
+            if (distance(e, avatar) < thresh)
+                entities[eid] = {p:e.position, r:e.rotation, k:e.kind};
         }});
 
         return entities;

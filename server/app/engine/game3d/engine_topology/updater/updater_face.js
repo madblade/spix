@@ -354,7 +354,7 @@ class UpdaterFace {
             fastComponents[cc].push(faceId);
             fastComponentsIds[cc].push(kind);
         } else {
-            console.log('CRITICAL @addFaceToModel: fastComponents doesnt have a ' + cc + ' component. ' +
+            console.log('ERROR @addFaceToModel: fastComponents doesnt have a ' + cc + ' component. ' +
                 'face id: ' + faceId + ' kind: ' + kind);
             fastComponents[cc] = [faceId];
             fastComponentsIds[cc] = [kind];
