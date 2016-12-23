@@ -7,7 +7,7 @@
 import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
 import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
-import ChunkLoader from './../engine_consistency/loader/loader_chunks';
+import ChunkLoader from './../engine_consistency/builder/loader_chunks';
 
 class Chunk {
 
@@ -47,24 +47,6 @@ class Chunk {
         this._updates = [{}, {}, {}];
     }
 
-    // TODO [HIGH] decouple deep mechanisms from simple objects.
-    computeFaces() {
-        // Preload neighbours.
-        if (Chunk.debug) console.log('\tPreloading neighbor chunks...');
-        ChunkLoader.preloadAllNeighbourChunks(this, this._worldModel);
-
-        // Detect boundary blocks.
-        if (Chunk.debug) console.log('\tExtracting surface...');
-        BlockExtractor.extractSurfaceBlocks(this);
-
-        // Detect connected boundary face components.
-        if (Chunk.debug) console.log("\tComputing connected components...");
-        FaceExtractor.extractConnectedComponents(this);
-
-        this._ready = true;
-        //console.log("Chunk " + this._chunkId + " ready.");
-    }
-
     // Getters
     get chunkI() { return this._chunkI; }
     get chunkJ() { return this._chunkJ; }
@@ -79,7 +61,7 @@ class Chunk {
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
     get ready() { return this._ready; }
-    get manager() { return this._worldModel; }
+    get worldModel() { return this._worldModel; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
@@ -88,6 +70,7 @@ class Chunk {
     set fastComponentsIds(newFastComponentsIds) { this._fastConnectedComponentsIds = newFastComponentsIds; }
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
+    set ready(newReady) { this._ready = newReady; }
 
     _toId(x, y, z) {
         var id = x + y * this._xSize + z * this._xSize * this._ySize;

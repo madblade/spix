@@ -5,7 +5,7 @@
 'use strict';
 
 import ChunkGenerator from './../generator/chunkgenerator';
-import Extractor from './../builder/extractor';
+import Extractor from './extractor';
 
 class ChunkLoader {
 
@@ -39,7 +39,7 @@ class ChunkLoader {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
         let k = chunk.chunkK;
-        let wm = chunk.manager;
+        let wm = chunk.worldModel;
 
         switch (direction) {
             case 0: return wm.getChunk(i+1, j, k);      // x+
@@ -69,7 +69,7 @@ class ChunkLoader {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
         let k = chunk.chunkK;
-        let wm = chunk.manager;
+        let wm = chunk.worldModel;
 
         switch (direction) {
             case 0:  return wm.hasChunk(i+1, j, k); // x+

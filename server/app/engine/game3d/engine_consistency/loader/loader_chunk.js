@@ -4,9 +4,9 @@
 
 'use strict';
 
-import Extractor from './extractor';
+import Extractor from './../builder/extractor';
 
-class Builder {
+class ChunkLoader {
 
     constructor(consistencyEngine) {
         // Models.
@@ -14,6 +14,7 @@ class Builder {
         this._consistencyModel  = consistencyEngine.consistencyModel;
     }
 
+    // TODO [CRIT] deport chunk computation into topologyEngine
     computeChunksForNewPlayer(player) {
         return Extractor.computeChunksForNewPlayer(player, this._worldModel);
     }
@@ -24,4 +25,4 @@ class Builder {
 
 }
 
-export default Builder;
+export default ChunkLoader;

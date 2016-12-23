@@ -275,7 +275,7 @@ class Perlin {
 
         const p = chunk.chunkI;
         const q = chunk.chunkJ;
-        const handle = chunk.manager.handle;
+        const handle = chunk.worldModel.handle;
 
         let blocks = new Uint8Array(CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z);
         Perlin.seed(handle, 'SEEED');

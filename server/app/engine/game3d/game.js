@@ -79,14 +79,14 @@ class Game3D extends Game {
         /** Inputs **/
         this._ai.update();                // Update intents.
 
-        this._externalInput.update();     // Update human spawn/quit.
+        this._externalInput.update();     // Update human spawn/leave requests.
         this._internalInput.update();     // Update artificial inputs.
 
         /** Updates **/
         this._topologyEngine.update();    // Update topological model.
         this._physicsEngine.update();     // Update physical simulation.
 
-        /** Aggregation-consistency **/
+        /** Consistency solving: mediator between player and server models **/
         this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
 
         /** Outputs **/
@@ -101,7 +101,7 @@ class Game3D extends Game {
     }
 
     generate() {
-        this._worldModel.generate()
+        this._consistencyEngine.generateWorld()
             .then(_ => {
                 this._playerManager.setAddPlayerBehaviour(p => {
                     this._externalInput.addPlayer(p);

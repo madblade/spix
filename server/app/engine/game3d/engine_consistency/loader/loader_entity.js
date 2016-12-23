@@ -4,7 +4,7 @@
 
 'use strict';
 
-class Loader {
+class EntityLoader {
 
     constructor(consistencyEngine) {
         this._entityModel = consistencyEngine.entityModel;
@@ -25,7 +25,7 @@ class Loader {
         var entities = {};
 
         let thresh = avatar.entityRenderDistance;
-        let distance = Loader.distance;
+        let distance = EntityLoader.distance;
 
         this._entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
@@ -40,7 +40,7 @@ class Loader {
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
 
-        let distance = Loader.distance;
+        let distance = EntityLoader.distance;
 
         var addedEntities = {};
         var removedEntities = {};
@@ -74,4 +74,4 @@ class Loader {
     }
 }
 
-export default Loader;
+export default EntityLoader;

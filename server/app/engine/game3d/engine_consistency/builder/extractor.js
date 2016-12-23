@@ -4,9 +4,12 @@
 
 'use strict';
 
-import WorldGenerator from '../generator/worldgenerator';
-import ChunkIterator from './iterator_chunks';
-import ChunkLoader from '../loader/loader_chunks';
+import WorldGenerator       from '../generator/worldgenerator';
+import ChunkIterator        from './iterator_chunks';
+import ChunkLoader          from './loader_chunks';
+
+import BlockExtractor       from './surface_blocks_builder';
+import FaceExtractor        from './surface_faces_builder';
 
 class Extractor {
 
@@ -14,7 +17,21 @@ class Extractor {
     static load = true;
 
     static computeChunkFaces(chunk) {
-        chunk.computeFaces();
+        let wm = chunk.worldModel;
+
+        // Preload neighbours.
+        if (Extractor.debug) console.log('\tPreloading neighbor chunks...');
+        ChunkLoader.preloadAllNeighbourChunks(chunk, wm);
+
+        // Detect boundary blocks.
+        if (Extractor.debug) console.log('\tExtracting surface...');
+        BlockExtractor.extractSurfaceBlocks(chunk);
+
+        // Detect connected boundary face components.
+        if (Extractor.debug) console.log("\tComputing connected components...");
+        FaceExtractor.extractConnectedComponents(chunk);
+
+        chunk.ready = true;
     }
 
     static computeChunksForNewPlayer(player, worldModel) {
@@ -100,7 +117,7 @@ class Extractor {
             let chunkToUnload = chunksToUnload[i];
             // TODO [CRIT] deport into consistency update.
             // TODO [CRIT] manage chunk load/unload client-side (with all that implies in terms of loading strategy)
-            consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
+            // consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             unloadedChunksForPlayer[chunkToUnload.chunkId] = null;
         }
 

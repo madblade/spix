@@ -4,9 +4,10 @@
 
 'use strict';
 
+import ChunkLoader      from './loader/loader_chunk';
+import EntityLoader     from './loader/loader_entity';
+
 import Generator        from './generator/generator';
-import Builder          from './builder/builder';
-import Loader           from './loader/loader';
 
 import ChunkBuffer      from './buffer_chunk';
 import EntityBuffer     from './buffer_entity';
@@ -28,8 +29,8 @@ class ConsistencyEngine {
 
         // Internal engine.
         this._generator         = new Generator(this);
-        this._builder           = new Builder(this);
-        this._loader            = new Loader(this);
+        this._chunkLoader       = new ChunkLoader(this);
+        this._entityLoader      = new EntityLoader(this);
 
         // Buffers.
         this._chunkBuffer       = new ChunkBuffer();
@@ -74,6 +75,10 @@ class ConsistencyEngine {
         let addedPlayers = this._entityBuffer.addedPlayers;
         let removedPlayers = this._entityBuffer.removedPlayers;
 
+        // Loaders
+        let eLoader = this._entityLoader;
+        let cLoader = this._chunkLoader;
+
         // Object iterator.
         let forEach = (object, callback) => { for (let id in object) { callback(parseInt(id)) } };
 
@@ -83,13 +88,13 @@ class ConsistencyEngine {
 
             // Compute change for entities in range.
             let addedEntities, removedEntities,
-                u = this._loader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
+                u = eLoader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
             // Compute change for chunks in range.
             let addedChunks, removedChunks,
-                v = this._builder.computeNewChunksInRangeForPlayer(p);
+                v = cLoader.computeNewChunksInRangeForPlayer(p);
             if (v) [addedChunks, removedChunks] = v;
 
             // Update consistency model.
@@ -132,7 +137,7 @@ class ConsistencyEngine {
         let cm = this._consistencyModel;
 
         // Object.
-        var chunkOutput = this._builder.computeChunksForNewPlayer(player);
+        var chunkOutput = this._chunkLoader.computeChunksForNewPlayer(player);
 
         for (let cid in chunkOutput)
             if (cs.has(cid)) cm.setChunkLoaded(aid, cid);
@@ -149,13 +154,17 @@ class ConsistencyEngine {
         let cm = this._consistencyModel;
 
         // Object.
-        var entityOutput = this._loader.computeEntitiesInRange(player);
+        var entityOutput = this._entityLoader.computeEntitiesInRange(player);
 
         for (let eid in entityOutput)
             if (es.has(eid)) cm.setEntityLoaded(aid, eid);
 
         // Updates must be transmitted after this call.
         return entityOutput;
+    }
+
+    generateWorld() {
+        return this._generator.generateWorld();
     }
 
 }

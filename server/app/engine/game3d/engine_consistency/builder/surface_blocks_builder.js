@@ -4,7 +4,7 @@
 
 'use strict';
 
-import ChunkLoader from './../loader/loader_chunks';
+import ChunkLoader from './loader_chunks';
 
 class CSBX {
 

@@ -4,8 +4,6 @@
 
 'use strict';
 
-import WorldGenerator from './../engine_consistency/generator/worldgenerator';
-import Extractor from './../engine_consistency/builder/extractor';
 import NumberUtils from '../../math/numbers';
 
 class WorldModel {
@@ -45,24 +43,6 @@ class WorldModel {
 
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);
-    }
-
-    // API Entry Point
-    generate() {
-        // TODO [LOW] chrono and time out.
-        return new Promise(resolve => {
-
-            // Generate blocks.
-            this._chunks = WorldGenerator.generateFlatWorld(this._xSize, this._ySize, this._zSize, this);
-
-            // Finalize chunks (extract surface faces)
-            var chunks = [];
-            this._chunks.forEach((chunk, id) => chunks.push(chunk));
-            chunks.forEach(chunk=>Extractor.computeChunkFaces(chunk));
-
-            // Notify
-            resolve();
-        });
     }
 
     getChunkCoordinates(x, y, z) {
