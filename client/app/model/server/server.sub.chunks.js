@@ -79,7 +79,7 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
     // Add to scene.
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.scene.add(meshes[m]);
+        graphics.addToScene(meshes[m], -1); // TODO [CRIT] couple with knot model.
     }
 };
 
@@ -97,7 +97,7 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
 
     var meshes = this.chunks.get(chunkId).meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.scene.remove(meshes[m]); // TODO put in refresh
+        graphics.scene.remove(meshes[m]); // TODO [CRIT] decouple
     }
 
     this.chunks.delete(chunkId);

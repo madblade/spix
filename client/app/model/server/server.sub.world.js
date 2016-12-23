@@ -20,7 +20,7 @@ App.Model.Server.WorldModel = function(app) {
 
 App.Model.Server.WorldModel.prototype.init = function() {
     var graphics = this.app.engine.graphics;
-    graphics.scene.add(this.light);
+    graphics.addToScene(this.light, -1); // TODO [CRIT] couple with knot model.
 };
 
 App.Model.Server.WorldModel.prototype.refresh = function() {

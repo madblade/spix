@@ -5,6 +5,7 @@
 'use strict';
 
 App.Engine.Graphics = function(app) {
+    // App and access to models.
     this.app = app;
 
     // User customizable settings.
@@ -13,21 +14,27 @@ App.Engine.Graphics = function(app) {
     // Properties.
     this.windowHalfX = window.innerWidth / 2;
     this.windowHalfY = window.innerHeight / 2;
-    this.defaultGeometrySize = 64; // TODO customize newMesh size variable
+    this.defaultGeometrySize = 64; // TODO [LOW] customize newMesh size variable
 
     // Rendering.
-    this.renderer =     this.createRenderer();
-    this.controls =     null;
     this.requestId =    null;
+    this.rendererManager    = this.createRendererManager();
+    this.sceneManager       = this.createSceneManager();
+    this.cameraManager      = this.createCameraManager();
 
-    this.scene =        this.createScene();
-    this.camera =       this.createCamera();
-    this.raycaster =    this.createRaycaster();
+    // TODO remove
+    //this.renderer =     this.createRenderer();
+    //this.scene =        this.createScene();
+    //this.camera =       this.createCamera();
+    //this.raycaster =    this.createRaycaster();
+
+    // Interaction.
+    this.controls =     null;
     this.interaction =  'FP';
 
     // Initialize DOM element
     this.container = document.getElementById('container');
-    this.container.appendChild(this.renderer.domElement);
+    this.container.appendChild(this.rendererManager.renderer.domElement);
 
     // Animations
     this.initializeAnimations();
@@ -66,11 +73,7 @@ App.Engine.Graphics.prototype.animate = function() {
 };
 
 App.Engine.Graphics.prototype.render = function() {
-
-    // TODO [HIGH] implement knots
-    // renderer.render(bufferScene, camera, bufferTexture);
-
-    this.renderer.render(this.scene, this.camera);
+    this.rendererManager.render(this.sceneManager, this.cameraManager);
 };
 
 App.Engine.Graphics.prototype.stop = function() {
@@ -80,7 +83,8 @@ App.Engine.Graphics.prototype.stop = function() {
 };
 
 App.Engine.Graphics.prototype.resize = function () {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    this.cameraManager.resize(width, height);
+    this.rendererManager.resize(width, height);
 };

@@ -9,7 +9,7 @@ App.Model.Server.EntityModel.prototype.loadPlayer = function(id, updatedEntity, 
     graphics.initializeEntity(id, 'steve', function(createdEntity) {
         var object3d = graphics.finalizeEntity(id, createdEntity);
 
-        graphics.scene.add(object3d);
+        graphics.addToScene(object3d); // TODO [CRIT] couple with knot model.
 
         this.updateEntity(id, object3d, updatedEntity, graphics, entities);
         this.entitiesLoading.delete(id);

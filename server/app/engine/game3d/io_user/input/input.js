@@ -14,7 +14,7 @@ class UserInput {
         this._consistencyEngine = game.consistencyEngine;
         this._chat              = game.chat;
 
-        this._listeners = {}; // TODO [CRIT] Map.
+        this._listeners = {}; // TODO [HIGH] Map.
         this._playerUpdateBuffer = [];
     }
 

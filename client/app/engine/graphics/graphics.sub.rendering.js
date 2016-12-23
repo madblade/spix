@@ -1,10 +1,14 @@
 /**
- *
+ * Renderer, render layers management.
  */
 
 'use strict';
 
-App.Engine.Graphics.prototype.createRenderer = function() {
+App.Engine.Graphics.RendererManager = function() {
+    this.renderer = this.createRenderer();
+};
+
+App.Engine.Graphics.RendererManager.prototype.createRenderer = function() {
     // Configure renderer
     var renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -16,14 +20,25 @@ App.Engine.Graphics.prototype.createRenderer = function() {
     return renderer;
 };
 
-App.Engine.Graphics.prototype.createScene = function() {
-    return new THREE.Scene();
+App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, cameraManager) {
+    var renderer = this.renderer;
+    var mainScene = sceneManager.mainScene;
+    var mainCamera = cameraManager.mainCamera;
+
+    var subScenes = sceneManager.subScenes;
+    var subCameras = cameraManager.subCameras;
+
+    // TODO [MEDIUM] sort rendering textures according to positions in World Model.
+    // renderer.render(bufferScene, camera, bufferTexture);
+    renderer.render(mainScene, mainCamera);
 };
 
-App.Engine.Graphics.prototype.removeObjectFromScene = function(object3D) {
-    this.app.scene.remove(object3D);
-    object3D.geometry.dispose();
-    object3D.geometry = null;
-    object3D.material.dispose();
-    object3D.material = null;
+App.Engine.Graphics.RendererManager.prototype.resize = function(width, height) {
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+};
+
+/** Interface with graphics engine. **/
+
+App.Engine.Graphics.prototype.createRendererManager = function() {
+    return new App.Engine.Graphics.RendererManager();
 };

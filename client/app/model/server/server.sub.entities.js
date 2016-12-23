@@ -38,7 +38,7 @@ App.Model.Server.EntityModel.prototype.removeEntity = function(id, graphics, ent
 
     console.log("To be implemented");
     var entity = entities.get(id);
-    graphics.scene.remove(entity);
+    graphics.removeFromScene(entity);
     entities.delete(id);
 };
 

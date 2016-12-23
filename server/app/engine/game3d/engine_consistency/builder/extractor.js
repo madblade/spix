@@ -99,6 +99,7 @@ class Extractor {
         for (let i = 0, l = chunksToUnload; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
             // TODO [CRIT] deport into consistency update.
+            // TODO [CRIT] manage chunk load/unload client-side (with all that implies in terms of loading strategy)
             consistencyModel.setChunkOutOfRange(av.id, chunkToUnload.chunkId);
             unloadedChunksForPlayer[chunkToUnload.chunkId] = null;
         }

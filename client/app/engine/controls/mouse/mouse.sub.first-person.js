@@ -23,7 +23,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-            graphics.moveCameraFromMouse(movementX, movementY, yawObject, pitchObject);
+            graphics.cameraManager.moveCameraFromMouse(movementX, movementY, yawObject, pitchObject);
 
             clientModel.triggerEvent('r', [yawObject.rotation.z, pitchObject.rotation.x]);
         };

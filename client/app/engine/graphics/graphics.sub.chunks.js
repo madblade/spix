@@ -321,7 +321,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
             geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
             meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
-            this.scene.add(meshes[meshId]); // TODO [CRIT] decouple
+            this.addToScene(meshes[meshId], -1); // TODO [CRIT] couple with knot model.
         }
 
         // Notify object.

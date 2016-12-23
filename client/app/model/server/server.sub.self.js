@@ -49,7 +49,7 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
         if (animate) graphics.updateAnimation(-1);
 
         // Update camera.
-        graphics.positionCameraBehind(up); // Camera wrapper actually
+        graphics.cameraManager.positionCameraBehind(up); // Camera wrapper actually
     }
 
     this.needsUpdate = false;
@@ -67,7 +67,7 @@ App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
     graphics.initializeEntity(-1, 'steve', function(createdEntity) {
         var object3d = graphics.finalizeEntity(-1, createdEntity);
         this.avatar = object3d;
-        if (this.displayAvatar) graphics.scene.add(object3d);
+        if (this.displayAvatar) graphics.addToScene(object3d, -1); // TODO [CRIT] couple with knot model.
     }.bind(this));
 
 };

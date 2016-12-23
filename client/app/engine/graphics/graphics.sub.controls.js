@@ -7,12 +7,14 @@
 App.Engine.Graphics.prototype.initializeControls = function() {
     var controlsEngine = this.app.engine.controls;
 
-    var controls = controlsEngine.getControls('first-person', this.camera);
+    // TODO [CRIT] couple with knot model, DONT FORGET TO SWITCH CONTROLS ALONG WITH CAMERA.
+    var controls = controlsEngine.getControls('first-person', this.cameraManager.mainCamera);
 
-    this.scene.remove(this.scene.getObjectByName("controls"));
+    var oldControlsObject = this.sceneManager.mainScene.getObjectByName('controls');
+    if (oldControlsObject) this.removeFromScene(oldControlsObject, -1);
     this.controls = controls;
-    this.controls.name = "controls";
-    this.scene.add(this.controls.getObject());
+    this.controls.name = 'controls';
+    this.addToScene(this.controls.getObject(), -1);
 };
 
 App.Engine.Graphics.prototype.startListeners = function() {
@@ -31,10 +33,10 @@ App.Engine.Graphics.prototype.changeInteraction = function() {
     model.displayAvatar = display;
 
     if (display) {
-        this.scene.add(avatar);
+        this.addToScene(avatar, -1); // TODO [CRIT] couple with knot model.
         this.interaction = 'TP';
     } else {
-        this.scene.remove(avatar);
+        this.removeFromScene(avatar, -1); // TODO [CRIT] decouple
         this.interaction = 'FP';
     }
 };
