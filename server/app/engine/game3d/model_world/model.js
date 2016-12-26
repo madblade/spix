@@ -29,6 +29,7 @@ class WorldModel {
     }
 
     get handle() { return this._handle; }
+    // TODO [HIGH] refactor access to chunks.get(chunkId) and chunks.has(chunkId)
     get allChunks() { return this._chunks; }
 
     get xSize() { return this._xSize; }
@@ -82,6 +83,10 @@ class WorldModel {
     getChunk(iCoordinate, jCoordinate, kCoordinate) {
         let id = iCoordinate+','+jCoordinate+','+kCoordinate;
         return this._chunks.get(id);
+    }
+
+    getChunkById(chunkId) {
+        return this._chunks.get(chunkId);
     }
 
     hasChunk(i, j, k) {

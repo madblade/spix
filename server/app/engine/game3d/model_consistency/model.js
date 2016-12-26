@@ -34,6 +34,8 @@ class ConsistencyModel {
         this._chunkIdAndPartsForEntity  .delete(playerId);
     }
 
+    /** Entity to chunks **/
+
     hasChunk(playerId, chunkId) {
         return this._chunkIdsForEntity.get(playerId).has(chunkId);
     }
@@ -46,12 +48,14 @@ class ConsistencyModel {
         this._chunkIdsForEntity.get(playerId).delete(chunkId);
     }
 
-    areChunksLoaded(player) {
+    doneChunkLoadingPhase(player) {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
         let side = 1+renderDistance*2;
         return side*side <= this._chunkIdsForEntity.get(avatar.id).size;
     }
+
+    /** Entity to entities **/
 
     hasEntity(playerId, entityId) {
         return this._entityIdsForEntity.get(playerId).has(entityId);

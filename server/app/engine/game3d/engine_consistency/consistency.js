@@ -80,7 +80,7 @@ class ConsistencyEngine {
         let cLoader = this._chunkLoader;
 
         // Object iterator.
-        let forEach = (object, callback) => { for (let id in object) { callback(parseInt(id)) } };
+        let forEach = (object, callback) => { for (let id in object) { callback(id) } };
 
         // For each player...
         players.forEach(p => { if (p.avatar) {
@@ -94,15 +94,15 @@ class ConsistencyEngine {
 
             // Compute change for chunks in range.
             let addedChunks, removedChunks,
-                v = cLoader.computeNewChunksInRangeForPlayer(p);
+                v = cLoader.computeNewChunksInRange(p);
             if (v) [addedChunks, removedChunks] = v;
 
             // Update consistency model.
             // WARN: updates will only be transmitted during next output pass.
             // BE CAREFUL HERE
-            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, e));
-            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, e));
-            if (addedChunks)        forEach(addedChunks, c => consistencyModel.setChunkLoaded(pid, c));
+            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e)));
+            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e)));
+            if (addedChunks)        forEach(addedChunks, c => {consistencyModel.setChunkLoaded(pid, c)});
             if (removedChunks)      forEach(removedChunks, c => consistencyModel.setChunkOutOfRange(pid, c));
 
             // Update output buffers.

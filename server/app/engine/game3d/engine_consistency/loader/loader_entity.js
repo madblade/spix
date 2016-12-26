@@ -36,7 +36,7 @@ class EntityLoader {
     }
 
     computeNewEntitiesInRange(player, consistencyModel, updatedEntities, addedPlayers, removedPlayers) {
-        let modelEntities = this._entityModel.entities;
+        let entityModel = this._entityModel;
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
 
@@ -48,7 +48,7 @@ class EntityLoader {
         // TODO [MEDIUM]: use LACKS structure to pass from O(n²) to O(Cn).
         // TODO [MEDIUM]: also use for AABB phase in physics.
         let aid = avatar.id;
-        this._entityModel.forEach(e => { let eid = e.id; if (eid !== aid) { // For all different entities.
+        entityModel.forEach(e => { let eid = e.id; if (eid !== aid) { // For all different entities.
 
             // Compute distance & find in OLD consistency model.
             let isInRange = distance(e, avatar) < thresh;

@@ -37,7 +37,7 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
         for (var chunkId in updates) {
             var update = updates[chunkId];
 
-            if (update === null)
+            if (!update)
                 this.unloadChunk(chunkId);
             else if (this.isChunkLoaded(chunkId))
                 this.updateChunk(chunkId, update);
@@ -86,7 +86,7 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
 App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components) {
     var graphics = this.app.engine.graphics;
     var chunk = this.chunks.get(chunkId);
-    if (chunk === undefined) return;
+    if (!chunk) return;
 
     // TODO use graphics in refresh
     graphics.updateChunk(chunk, chunkId, components, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ);

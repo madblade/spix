@@ -13,8 +13,8 @@ class ChunkBuilder {
     static debug = false;
 
     static serverLoadingRadius = 10;
-    static clientLoadingRadius = 2;
-    static clientUnloadingRadius = 20;
+    static clientLoadingRadius = 2; // Deprecated. See in avatar.js
+    static clientUnloadingRadius = 15;
 
     static computeChunkFaces(chunk) {
         let wm = chunk.worldModel;
@@ -188,7 +188,7 @@ class ChunkBuilder {
     }
 
     static preLoadNextChunk(player, starterChunk, worldModel, forPlayer, consistencyModel) {
-        const threshold = forPlayer ? ChunkBuilder.clientLoadingRadius : ChunkBuilder.serverLoadingRadius;
+        const threshold = forPlayer ? player.avatar.chunkRenderDistance : ChunkBuilder.serverLoadingRadius;
 
         let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
 
@@ -199,9 +199,8 @@ class ChunkBuilder {
         const dx = worldModel.xSize,    dy = worldModel.ySize,    dz = worldModel.zSize;
         const ci = starterChunk.chunkI, cj = starterChunk.chunkJ, ck = starterChunk.chunkK;
 
-        let i = ci;
-        let j = cj;
-        let k = ck; // TODO [MEDIUM] review Z+/- loading.
+        let i = ci,                      j = cj,                   k = ck;
+        // TODO [CRIT] review Z+/- loading.
 
         let depth = 0;
         let foundUnloadedChunk = false;
@@ -312,14 +311,15 @@ class ChunkBuilder {
         }
     }
 
-    static getNextPlayerChunk(player, chunk, worldModel, consistencyModel) {
+    //static getNextPlayerChunk(player, chunk, worldModel, consistencyModel) {
         // Get nearest unloaded until threshold, send back.
 
-        return ChunkBuilder.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
-    }
+        //return ChunkBuilder.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
+    //}
 
-    // TODO [MEDIUM] check implementation.
+    // TODO [CRIT] check implementation & put in iterator.
     static getOOBPlayerChunks(player, chunk, worldModel) {
+
         var oobChunks = [];
 
         // Recurse on loaded chunks.
