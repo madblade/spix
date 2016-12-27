@@ -21,7 +21,7 @@ class ConsistencyModel {
         this.infiniteNormDistance = (pos1, pos2) => {
             var d = 0;
             for (let i = 0; i < 3; ++i)
-                d = Math.max(d, Math.abs(pos1[i] - pos2[i]));
+                d = Math.max(d, Math.abs(parseInt(pos1[i]) - parseInt(pos2[i])));
             return d;
         }
     }
@@ -60,20 +60,27 @@ class ConsistencyModel {
     doneChunkLoadingPhase(player, starterChunk) {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
-        let side = renderDistance*2 - 1;
+        let side = renderDistance*2 + 1;
         let chunks = this._chunkIdsForEntity.get(avatar.id);
-        let innerSize = 0;
+        let actualInnerSize = 0;
         let distance = this.infiniteNormDistance;
 
         let sijk = starterChunk.chunkId.split(',');
+        let _debugGoodChunks = new Set();
         chunks.forEach(chunkId => {
             let ijk = chunkId.split(',');
-            if (distance(sijk, ijk) < renderDistance)
-                innerSize++;
+            if (distance(sijk, ijk) <= renderDistance) {
+                _debugGoodChunks.add(chunkId);
+                actualInnerSize++;
+            }
         });
 
-        const res = (side*side <= innerSize);
-        //if (!res) console.log(innerSize + ' ' + side*side);
+        const expectedSize = side*side*side; // TODO [CRIT] differentiate 3D / 2D.
+        const res = (expectedSize <= actualInnerSize);
+        if (!res) {
+            console.log(actualInnerSize + ' ' + side*side*side);
+            if (actualInnerSize > 21) console.log(_debugGoodChunks);
+        }
         return res;
     }
 

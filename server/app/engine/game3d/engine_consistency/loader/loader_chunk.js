@@ -12,7 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
-    static serverLoadingRadius = 10;
+    static serverLoadingRadius = 3;
 
     constructor(consistencyEngine) {
         // Models.
@@ -65,7 +65,7 @@ class ChunkLoader {
 
             // Test for distance.
             const ids = currentChunkId.split(',');
-            const chunkPosition = [ids[0]*dx/2, ids[1]*dy/2, ids[2]*dz/2];
+            const chunkPosition = [parseInt(ids[0])*dx/2, parseInt(ids[1])*dy/2, parseInt(ids[2])*dz/2];
             const distance = ChunkLoader.squaredDistance(chunkPosition, playerPosition);
             if (distance < minChunkDistance) {
                 minChunkDistance = distance;
@@ -137,7 +137,7 @@ class ChunkLoader {
 
         // No avatar position change, nothing to update.
         else {
-            console.log('nothing to do');
+            //console.log('Nothing to do...');
             return;
         }
 

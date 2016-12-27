@@ -39,8 +39,9 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
 
             if (!update)
                 this.unloadChunk(chunkId);
-            else if (this.isChunkLoaded(chunkId))
+            else if (this.isChunkLoaded(chunkId)) {
                 this.updateChunk(chunkId, update);
+            }
             else
                 this.initializeChunk(chunkId, update);
         }
@@ -95,11 +96,12 @@ App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components
 App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
     var graphics = this.app.engine.graphics;
 
+    console.log('removing ' + chunkId);
     var meshes = this.chunks.get(chunkId).meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
 
         // TODO [CRIT] manage chunk load/unload client-side
-        graphics.scene.remove(meshes[m]);
+        graphics.removeFromScene(meshes[m]);
     }
 
     this.chunks.delete(chunkId);

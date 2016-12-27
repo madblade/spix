@@ -185,55 +185,22 @@ class ChunkBuilder {
         return chunk;
     }
 
+    // TODO [CRIT] review Z+/- loading.
     static preLoadNextChunk(player, starterChunk, worldModel, forPlayer, consistencyModel, serverLoadingRadius) {
         let avatar = player.avatar;
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
         threshold = Math.min(threshold, serverLoadingRadius);
 
-        let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
-
-        // Get nearest, load.
         let allChunks = worldModel.allChunks;
 
         const dx = worldModel.xSize,    dy = worldModel.ySize,    dz = worldModel.zSize;
-        const ci = starterChunk.chunkI, cj = starterChunk.chunkJ, ck = starterChunk.chunkK;
+        const si = starterChunk.chunkI, sj = starterChunk.chunkJ, sk = starterChunk.chunkK;
+        let i = si,                      j = sj,                   k = sk;
 
-        let i = ci,                      j = cj,                   k = ck;
-        // TODO [CRIT] review Z+/- loading.
+        let hasLoadedChunk = (avatar, ic, jc, kc) => consistencyModel.hasChunk(avatar.id, (ic+','+jc+','+kc));
 
-        let depth = 0;
-        let foundUnloadedChunk = false;
-
-        // Testing nearest chunks with Manhattan distance.
-        // Weakness: assert cannot be loaded if !exists in model
-        while (!foundUnloadedChunk && depth <= threshold) {
-            ++depth;
-
-            for (let delta = -depth; delta < depth; ++delta) {
-                if (
-                    !hasLoadedChunk(avatar, (i+delta)+','+(j+depth)+','+k) ||
-                    !hasLoadedChunk(avatar, (i+delta)+','+(j-depth)+','+k) ||
-                    !hasLoadedChunk(avatar, (i+depth)+','+(j+delta)+','+k) ||
-                    !hasLoadedChunk(avatar, (i-depth)+','+(j+delta)+','+k)
-                )
-                {
-                    foundUnloadedChunk = true;
-                    break;
-                }
-            }
-
-        }
-
-        i = ci;
-        j = cj;
-        k = ck;
-
-        // Check if everything is loaded.
-        let res = null;
-        if (depth > threshold) return res;
-
-        function chunkIsToBeLoaded(ic, jc, kc) {
-            let currentId = ic+','+jc+','+kc;
+        let chunkIsToBeLoaded = (ic, jc, kc) => {
+            let currentId = (ic+','+jc+','+kc);
             let currentChunk = allChunks.get(currentId);
 
             if (!forPlayer) {
@@ -244,73 +211,120 @@ class ChunkBuilder {
                     return currentChunk;
                 } else return null;
             } else {
-                if (!hasLoadedChunk(avatar, currentId)) {
+                if (!hasLoadedChunk(avatar, ic, jc, kc)) {
                     return currentChunk;
                 } else return null;
             }
+        };
+
+        let depth = 0;
+        let d3 = true;
+
+        let tI, tJ, tK;
+        // Test all chunks in > distance order.
+        while (depth <= threshold) {
+            ++depth;
+
+            // Differential 3D loading here.
+            for (let deltaK = 0, kLimit = d3?depth:0; deltaK < kLimit; ++deltaK) {
+                for (let deltaI = 0, iLimit = depth; deltaI < iLimit; ++deltaI) {
+                    for (let deltaJ = 0, jLimit = depth; deltaJ < jLimit; ++deltaJ) {
+                        if (deltaI === 0 && deltaJ === 0 && deltaK === 0) continue;
+
+                        tI = (i + deltaI); tJ = (j + deltaJ); tK = (k + deltaK);    //  1   1   1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+                        tI = (i - deltaI);                                          //  -1  1   1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+
+                        tI = (i + deltaI); tJ = (j - deltaJ);                       //  1  -1   1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+                        tI = (i - deltaI);                                          //  -1  -1  1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+
+                        tI = (i + deltaI); tJ = (j + deltaJ); tK = (k - deltaK);    //  1   1   -1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+                        tI = (i - deltaI);                                          //  -1  1   -1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+
+                        tI = (i + deltaI); tJ = (i - deltaJ);                       //  1   -1  -1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+                        tI = (i - deltaI);                                          //  -1  -1  -1
+                        if (!hasLoadedChunk(avatar, tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
+                    }
+                }
+            }
+
         }
+
+        //i = si;
+        //j = sj;
+        //k = sk;
+
+        // Check if everything is loaded.
+        //let res = null;
+        //if (depth > threshold) return res;
 
         // 2D check.
 
         // Back case
-        res = chunkIsToBeLoaded((i-depth), j, k);
-        if (res) {
-            if (ChunkBuilder.debug) if (forPlayer) console.log("BACK CASE");
-            return res;
-        }
+        //res = chunkIsToBeLoaded((i-depth), j, k);
+        //if (res) {
+        //    if (ChunkBuilder.debug) if (forPlayer) console.log("BACK CASE");
+        //    return res;
+        //}
 
         // Back segment
-        for (let nj = 1; nj <= depth; ++nj) {
-            res = chunkIsToBeLoaded(i-depth, j+nj, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG+");
-                return res;
-            }
+        //for (let nj = 1; nj <= depth; ++nj) {
+        //    res = chunkIsToBeLoaded(i-depth, j+nj, k);
+        //    if (res) {
+        //        if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG+");
+        //        return res;
+        //    }
 
-            res = chunkIsToBeLoaded(i-depth, j-nj, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG-");
-                return res;
-            }
-        }
+            //res = chunkIsToBeLoaded(i-depth, j-nj, k);
+            //if (res) {
+            //    if (ChunkBuilder.debug) if (forPlayer) console.log("BACK SEG-");
+            //    return res;
+            //}
+        //}
 
         // Side segments
-        for (let ni = -depth; ni <= depth; ++ni) {
-            res = chunkIsToBeLoaded(i+ni, j-depth, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i-");
-                return res;
-            }
-            res = chunkIsToBeLoaded(i+ni, j+depth, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i+");
-                return res;
-            }
-        }
+        //for (let ni = -depth; ni <= depth; ++ni) {
+        //    res = chunkIsToBeLoaded(i+ni, j-depth, k);
+        //    if (res) {
+        //        if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i-");
+        //        return res;
+        //    }
+        //    res = chunkIsToBeLoaded(i+ni, j+depth, k);
+        //    if (res) {
+        //        if (ChunkBuilder.debug) if (forPlayer) console.log("SIDE SEG i+");
+        //        return res;
+        //    }
+        //}
 
         // Front segment
-        for (let nj = -depth; nj < 0; ++nj) {
-            res = chunkIsToBeLoaded(i+depth, j-nj, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG-");
-                return res;
-            }
-            res = chunkIsToBeLoaded(i+depth, j+nj, k);
-            if (res) {
-                if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG+");
-                return res;
-            }
-        }
+        //for (let nj = -depth; nj < 0; ++nj) {
+        //    res = chunkIsToBeLoaded(i+depth, j-nj, k);
+        //    if (res) {
+        //        if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG-");
+        //        return res;
+        //    }
+        //    res = chunkIsToBeLoaded(i+depth, j+nj, k);
+        //    if (res) {
+        //        if (ChunkBuilder.debug) if (forPlayer) console.log("FRONT SEG+");
+        //        return res;
+        //    }
+        //}
 
         // Last case
-        res = chunkIsToBeLoaded((i+depth), j, k);
-        if (res) {
-            if (ChunkBuilder.debug) if (forPlayer) console.log("CURRENT FINALLY");
-            return res;
-        }
+        //res = chunkIsToBeLoaded((i+depth), j, k);
+        //if (res) {
+        //    if (ChunkBuilder.debug) if (forPlayer) console.log("CURRENT FINALLY");
+        //    return res;
+        //}
     }
 
-    // TODO [CRIT] check implementation & put in iterator.
+    // TODO [CRIT] check implementation.
     static getOOBPlayerChunks(player, starterChunk, consistencyModel, bound) {
         var unloadedChunksForPlayer = {};
         let chunksToUnload = [];
