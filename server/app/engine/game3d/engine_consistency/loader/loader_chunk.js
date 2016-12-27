@@ -12,6 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
+    static serverLoadingRadius = 10;
 
     constructor(consistencyEngine) {
         // Models.
@@ -20,7 +21,7 @@ class ChunkLoader {
     }
 
     // Squared Euclidean.
-    static distance(pos1, pos2) {
+    static squaredDistance(pos1, pos2) {
         let result = 0, d;
         for (let i = 0; i<3; ++i) { d = pos1[i]-pos2[i]; result += d*d; }
         return result;
@@ -65,7 +66,7 @@ class ChunkLoader {
             // Test for distance.
             const ids = currentChunkId.split(',');
             const chunkPosition = [ids[0]*dx/2, ids[1]*dy/2, ids[2]*dz/2];
-            const distance = ChunkLoader.distance(chunkPosition, playerPosition);
+            const distance = ChunkLoader.squaredDistance(chunkPosition, playerPosition);
             if (distance < minChunkDistance) {
                 minChunkDistance = distance;
                 avatar.nearestChunkId = currentChunk;
@@ -102,8 +103,8 @@ class ChunkLoader {
 
         // Case 1: need to load chunks up to R_i (inner circle)
         // and to unload from R_i to R_o (outer circle).
-        if (!consistencyModel.doneChunkLoadingPhase(player)) {
-            //console.log(Math.random());
+        if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
+
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
                 // if !P.has(i,j,k)
@@ -135,7 +136,10 @@ class ChunkLoader {
         }
 
         // No avatar position change, nothing to update.
-        else return;
+        else {
+            console.log('nothing to do');
+            return;
+        }
 
         // Nothing to update.
         if (Object.keys(newChunksForPlayer).length < 1 &&
@@ -147,17 +151,18 @@ class ChunkLoader {
     loadInnerSphere(player, starterChunk) {
         let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
+        let sRadius = ChunkLoader.serverLoadingRadius;
 
         var newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
-        ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, false, consistencyModel);
+        ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, false, consistencyModel, sRadius);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO [HIGH] check on Z+/-.
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
-        var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, true, consistencyModel);
+        var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, true, consistencyModel, sRadius);
 
         if (newChunk) {
             if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);
@@ -167,28 +172,24 @@ class ChunkLoader {
         return newChunksForPlayer;
     }
 
-    // TODO [CRIT] implement
     unloadInnerToOuterSphere(player, starterChunk) {
+        let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
-        return {}; // this.unloadOuterSphere(player, starterChunk);
+
+        let minThreshold = player.avatar.chunkRenderDistance;
+        let maxThreshold = ChunkLoader.serverLoadingRadius;
+        minThreshold = Math.min(minThreshold, maxThreshold);
+
+        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, consistencyModel, minThreshold);
     }
 
     unloadOuterSphere(player, starterChunk) {
         let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
-        var unloadedChunksForPlayer = {};
 
-        // Unloading circle (quite farther)
-        // (i.e. recurse currents and test distance)
-        var chunksToUnload = ChunkBuilder.getOOBPlayerChunks(player, starterChunk, worldModel);
+        let maxThreshold = ChunkLoader.serverLoadingRadius;
 
-        for (let i = 0, l = chunksToUnload; i < l; ++i) {
-            let chunkToUnload = chunksToUnload[i];
-            // TODO [CRIT] manage chunk load/unload client-side (with all that implies in terms of loading strategy)
-            unloadedChunksForPlayer[chunkToUnload.chunkId] = null;
-        }
-
-        return unloadedChunksForPlayer;
+        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, consistencyModel, maxThreshold);
     }
 
 }

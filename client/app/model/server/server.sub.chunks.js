@@ -97,7 +97,9 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
 
     var meshes = this.chunks.get(chunkId).meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.scene.remove(meshes[m]); // TODO [CRIT] decouple
+
+        // TODO [CRIT] manage chunk load/unload client-side
+        graphics.scene.remove(meshes[m]);
     }
 
     this.chunks.delete(chunkId);

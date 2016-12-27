@@ -13,7 +13,7 @@ class Avatar extends Entity {
         //this._entityModel = entityModel;
 
         this._kind = 'player';
-        this._chunkRenderDistance = 8;
+        this._chunkRenderDistance = 2;
         this._entityRenderDistance = 3*16;
         this._role = 0;
 

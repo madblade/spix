@@ -116,10 +116,8 @@ class ChunkBuilder {
     static preloadAllNeighbourChunks(chunk, worldModel) {
         let loadedChunks = worldModel.allChunks;
         let c = chunk;
-        let ci = c.chunkI;
-        let cj = c.chunkJ;
-        let ck = c.chunkK;
         let dims = c.dimensions;
+        let ci = c.chunkI, cj = c.chunkJ, ck = c.chunkK;
 
         let neighbourIds = [
             (ci+1)+','+cj+','+ck,           //  i+1,	j,		k
@@ -187,13 +185,14 @@ class ChunkBuilder {
         return chunk;
     }
 
-    static preLoadNextChunk(player, starterChunk, worldModel, forPlayer, consistencyModel) {
-        const threshold = forPlayer ? player.avatar.chunkRenderDistance : ChunkBuilder.serverLoadingRadius;
+    static preLoadNextChunk(player, starterChunk, worldModel, forPlayer, consistencyModel, serverLoadingRadius) {
+        let avatar = player.avatar;
+        let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
+        threshold = Math.min(threshold, serverLoadingRadius);
 
         let hasLoadedChunk = (avatar, id) => consistencyModel.hasChunk(avatar.id, id);
 
         // Get nearest, load.
-        let avatar = player.avatar;
         let allChunks = worldModel.allChunks;
 
         const dx = worldModel.xSize,    dy = worldModel.ySize,    dz = worldModel.zSize;
@@ -311,20 +310,29 @@ class ChunkBuilder {
         }
     }
 
-    //static getNextPlayerChunk(player, chunk, worldModel, consistencyModel) {
-        // Get nearest unloaded until threshold, send back.
-
-        //return ChunkBuilder.preLoadNextChunk(player, chunk, worldModel, true, consistencyModel);
-    //}
-
     // TODO [CRIT] check implementation & put in iterator.
-    static getOOBPlayerChunks(player, chunk, worldModel) {
+    static getOOBPlayerChunks(player, starterChunk, consistencyModel, bound) {
+        var unloadedChunksForPlayer = {};
+        let chunksToUnload = [];
 
-        var oobChunks = [];
+        let aid = player.avatar.id;
+        let chunkIdsForEntity = consistencyModel.chunkIdsForEntity(aid);
+        let distance = consistencyModel.infiniteNormDistance;
 
-        // Recurse on loaded chunks.
+        let starterChunkPosition = starterChunk.chunkId.split(',');
+        chunkIdsForEntity.forEach(chunkId => {
+            const currentChunkPosition = chunkId.split(',');
+            const d = distance(starterChunkPosition, currentChunkPosition);
+            if (d > bound) chunksToUnload.push(chunkId);
+        });
 
-        return oobChunks;
+        // Recurse on unloaded chunk ids.
+        for (let i = 0, l = chunksToUnload; i < l; ++i) {
+            let chunkToUnload = chunksToUnload[i];
+            unloadedChunksForPlayer[chunkToUnload] = null;
+        }
+
+        return unloadedChunksForPlayer;
     }
 
 }

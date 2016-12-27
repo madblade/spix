@@ -11,7 +11,7 @@ class EntityLoader {
     }
 
     // Squared Euclidean distance.
-    static distance(entityX, entityY) {
+    static entityDistance(entityX, entityY) {
         let result = 0; let d;
         let pX = entityX.position, pY = entityY.position;
         for (let i = 0; i<3; ++i) { d = pX[i]-pY[i]; result += d*d; }
@@ -25,7 +25,7 @@ class EntityLoader {
         var entities = {};
 
         let thresh = avatar.entityRenderDistance;
-        let distance = EntityLoader.distance;
+        let distance = EntityLoader.entityDistance;
 
         this._entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
@@ -40,7 +40,7 @@ class EntityLoader {
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
 
-        let distance = EntityLoader.distance;
+        let distance = EntityLoader.entityDistance;
 
         var addedEntities = {};
         var removedEntities = {};
@@ -69,7 +69,7 @@ class EntityLoader {
                 removedEntities[eid] = null;
         });
 
-        // TODO [CRIT] extensively test.
+        // TODO [HIGH] extensively test.
         return [addedEntities, removedEntities];
     }
 }

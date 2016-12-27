@@ -123,30 +123,6 @@ class ChunkIterator {
         */
 
     }
-
-    //static getClosestChunk(xPosition, yPosition, zPosition, worldModel) {
-    //    let allChunks = worldModel.allChunks;
-    //    let floor = Math.floor;
-    //
-    //    const dx = worldModel.xSize, dy = worldModel.ySize, dz = worldModel.zSize;
-    //
-    //    // TODO [HIGH] DRY with manager.getChunkCoordinatesFromFloatingPoint
-    //    const fx = floor(xPosition), fy = floor(yPosition), fz = floor(zPosition);
-    //
-    //    let chunkI = (fx - ( (fx >= 0 ? fx : (dx + fx)) %dx)) / dx;
-    //    let chunkJ = (fy - ( (fy >= 0 ? fy : (dy + fy)) %dy)) / dy;
-    //    let chunkK = (fz - ( (fz >= 0 ? fz : (dz + fz)) %dz)) / dz;
-    //
-    //    const id = chunkI+','+chunkJ+','+chunkK;
-    //
-    //    let closestChunk = allChunks.get(id);
-    //    if (!closestChunk) {
-    //        console.log('WAIT... Chunk I\'m on is not loaded?');
-    //    }
-    //
-    //    return closestChunk;
-    //}
-
 }
 
 export default ChunkIterator;

@@ -18,7 +18,12 @@ class ConsistencyModel {
         this._chunkIdAndPartsForEntity  = new Map();
 
         //
-
+        this.infiniteNormDistance = (pos1, pos2) => {
+            var d = 0;
+            for (let i = 0; i < 3; ++i)
+                d = Math.max(d, Math.abs(pos1[i] - pos2[i]));
+            return d;
+        }
     }
 
     spawnPlayer(player) {
@@ -36,6 +41,10 @@ class ConsistencyModel {
 
     /** Entity to chunks **/
 
+    chunkIdsForEntity(playerId) {
+        return this._chunkIdsForEntity.get(playerId);
+    }
+
     hasChunk(playerId, chunkId) {
         return this._chunkIdsForEntity.get(playerId).has(chunkId);
     }
@@ -48,11 +57,24 @@ class ConsistencyModel {
         this._chunkIdsForEntity.get(playerId).delete(chunkId);
     }
 
-    doneChunkLoadingPhase(player) {
+    doneChunkLoadingPhase(player, starterChunk) {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
-        let side = 1+renderDistance*2;
-        return side*side <= this._chunkIdsForEntity.get(avatar.id).size;
+        let side = renderDistance*2 - 1;
+        let chunks = this._chunkIdsForEntity.get(avatar.id);
+        let innerSize = 0;
+        let distance = this.infiniteNormDistance;
+
+        let sijk = starterChunk.chunkId.split(',');
+        chunks.forEach(chunkId => {
+            let ijk = chunkId.split(',');
+            if (distance(sijk, ijk) < renderDistance)
+                innerSize++;
+        });
+
+        const res = (side*side <= innerSize);
+        //if (!res) console.log(innerSize + ' ' + side*side);
+        return res;
     }
 
     /** Entity to entities **/
