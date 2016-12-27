@@ -12,7 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
-    static serverLoadingRadius = 3;
+    static serverLoadingRadius = 3; 
 
     constructor(consistencyEngine) {
         // Models.
