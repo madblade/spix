@@ -206,7 +206,9 @@ class ChunkBuilder {
 
             if (!forPlayer) {
                 if (!currentChunk) {
-                    return ChunkBuilder.addChunk(dx, dy, dz, currentId, worldModel);
+                    currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, worldModel);
+                    allChunks.set(currentId, currentChunk);
+                    return currentChunk;
                 } else if (!currentChunk.ready) {
                     ChunkBuilder.computeChunkFaces(currentChunk);
                     return currentChunk;

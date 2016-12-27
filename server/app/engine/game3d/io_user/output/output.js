@@ -21,21 +21,27 @@ class UserOutput {
     }
 
     update() {
+        let t1, t2;
 
+        t1 = process.hrtime();
         this.spawnPlayers();
+        t2 = (process.hrtime(t1)[1]/1000);
+        if (t2 > 1000) console.log(t2 + " µs to spawn players.");
 
-        // Idea: defer updates if perf. pb
-        //let time = process.hrtime();
+        t1 = process.hrtime();
         this.updateChunks();
-        //let t1 = (process.hrtime(time)[1]/1000);
-        //if (t1 > 100) console.log(t1 + " µs to update chks.");
+        t2 = (process.hrtime(t1)[1]/1000);
+        if (t2 > 1000) console.log(t2 + " µs to send chunk updates.");
 
+        t1 = process.hrtime();
         this.updateEntities();
+        t2 = (process.hrtime(t1)[1]/1000);
+        if (t2 > 1000) console.log(t2 + " µs to send entity updates.");
 
-        //let time2 = process.hrtime();
+        t1 = process.hrtime();
         this.updateMeta();
-        //let t2 = (process.hrtime(time2)[1]/1000);
-        //if (t2 > 1000) console.log(t2 + " µs to update etts.");
+        t2 = (process.hrtime(t1)[1]/1000);
+        if (t2 > 1000) console.log(t2 + " µs to send other stuff.");
 
         this._consistencyEngine.flushBuffers();
     }

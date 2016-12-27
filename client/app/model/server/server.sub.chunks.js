@@ -107,7 +107,7 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
 App.Model.Server.ChunkModel.prototype.getCloseTerrain = function() {
     var meshes = [];
     var chks = this.chunks;
-    chks.forEach(function(currentChunk) {
+    chks.forEach(function(currentChunk, cid) {
         // TODO extract on 4 closest chunks.
         if (!currentChunk.meshes) {
             console.log("Warn: corrupted chunk inside client model " + cid);

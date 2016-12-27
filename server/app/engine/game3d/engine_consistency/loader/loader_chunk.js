@@ -12,7 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
-    static serverLoadingRadius = 2;
+    static serverLoadingRadius = 6;
 
     constructor(consistencyEngine) {
         // Models.
@@ -155,13 +155,19 @@ class ChunkLoader {
         var newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
+        let t = process.hrtime();
         ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, false, consistencyModel, sRadius);
+        let dt1 = (process.hrtime(t)[1]/1000);
+        if (dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForServer.');
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO [HIGH] check on Z+/-.
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
+        t = process.hrtime();
         var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, true, consistencyModel, sRadius);
+        dt1 = (process.hrtime(t)[1]/1000);
+        if (dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForPlayer.');
 
         if (newChunk) {
             if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);

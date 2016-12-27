@@ -83,7 +83,10 @@ class ConsistencyEngine {
         let forEach = (object, callback) => { for (let id in object) { callback(id) } };
 
         // For each player...
+        let t = process.hrtime();
+        let dt1;
         players.forEach(p => { if (p.avatar) {
+
             let pid = p.avatar.id;
 
             // Compute change for entities in range.
@@ -92,10 +95,18 @@ class ConsistencyEngine {
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
+            dt1 = (process.hrtime(t)[1]/1000);
+            if (dt1 > 1000) console.log('\t' + dt1 + ' computeNew Entities.');
+            t = process.hrtime();
+
             // Compute change for chunks in range.
             let addedChunks, removedChunks,
                 v = cLoader.computeNewChunksInRange(p);
             if (v) [addedChunks, removedChunks] = v;
+
+            dt1 = (process.hrtime(t)[1]/1000);
+            if (dt1 > 1000) console.log('\t' + dt1 + ' computeNew Chunks.');
+            t = process.hrtime();
 
             // Update consistency model.
             // WARN: updates will only be transmitted during next output pass.
@@ -104,6 +115,7 @@ class ConsistencyEngine {
             if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e)));
             if (addedChunks)        forEach(addedChunks, c => {consistencyModel.setChunkLoaded(pid, c)});
             if (removedChunks)      forEach(removedChunks, c => consistencyModel.setChunkOutOfRange(pid, c));
+
 
             // Update output buffers.
             if (addedChunks || removedChunks)

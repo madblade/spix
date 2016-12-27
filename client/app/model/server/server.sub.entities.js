@@ -35,8 +35,6 @@ App.Model.Server.EntityModel.prototype.addEntity = function(id, updatedEntity, g
 
 // TODO [CRIT] entity removal.
 App.Model.Server.EntityModel.prototype.removeEntity = function(id, graphics, entities) {
-
-    console.log("To be implemented");
     var entity = entities.get(id);
     graphics.removeFromScene(entity);
     entities.delete(id);

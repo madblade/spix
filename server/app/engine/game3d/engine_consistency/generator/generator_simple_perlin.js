@@ -82,11 +82,11 @@ class SimplePerlin {
         );
     }
 
-    // TODO [HIGH] distribute seed.
-    static simplePerlinGeneration(chunk) {
-        const dx = chunk.dimensions[0];
-        const dy = chunk.dimensions[1];
-        const dz = chunk.dimensions[2];
+    static simplePerlinGeneration(chunk, shuffleChunks) {
+        let dims = chunk.dimensions;
+        const dx = dims[0], dy = dims[1], dz = dims[2];
+        const ci = chunk.chunkI, cj = chunk.chunkJ, ck = chunk.chunkK;
+        const offsetX = dx*ci, offsetY = dy*cj, offsetZ = dz*ck;
 
         let perlin = new SimplePerlin();
         let blocks = new Uint8Array(dx * dy * dz);
@@ -94,15 +94,15 @@ class SimplePerlin {
         var data = [];
         let quality = 2;
         const ijS = dx * dy;
-        const z = Math.random() * 100;
+        const z = shuffleChunks ? Math.random()*100 : 50;
 
         for (var j = 0; j < 4; ++j) {
 
             if (j === 0) for (let i = 0; i < ijS; ++i) data[i] = 0;
 
             for (let i = 0; i < ijS; ++i) {
-                let x = i % dx,
-                    y = (i / dx) | 0;
+                let x = offsetX + (i % dx),
+                    y = offsetY + ((i / dx) | 0);
                 data[i] += perlin.noise(x / quality, y / quality, z) * quality;
             }
 
@@ -118,10 +118,16 @@ class SimplePerlin {
                 let h = 16 + getY(x, y);
                 const rock = Math.floor(5*h/6);
                 let xy = x + y*dx;
+
                 for (let zz = 0; zz < rock; ++zz) {
+                    // Rock.
                     blocks[ijS*zz+xy] = 2;
+
+                    // Iron.
                     if (Math.random() > 0.99) blocks[ijS*zz+xy] = 18;
                 }
+
+                // Grass.
                 for (let zz = rock; zz < h; ++zz) {
                     blocks[ijS*zz+xy] = 1;
                 }

@@ -47,7 +47,7 @@ class ChunkGenerator {
         //if (generationMethod == 'flat') {
         //    GenSimple.fillChunk(c, 41, 1);
             //GenAnalytic.waveChunk(c, 10, 15, 1);
-            GenSimplePerlin.simplePerlinGeneration(c);
+            GenSimplePerlin.simplePerlinGeneration(c, false); // chunk, doShuffleChunks
             //GenSimple.fillChunk(c, 256, 0);
         //} else {
         //}
