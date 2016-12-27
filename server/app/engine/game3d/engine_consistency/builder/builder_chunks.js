@@ -257,8 +257,6 @@ class ChunkBuilder {
             }
 
         }
-
-        // console.log('not found ' + depth);
     }
 
     // TODO [CRIT] check implementation.
@@ -274,11 +272,13 @@ class ChunkBuilder {
         chunkIdsForEntity.forEach(chunkId => {
             const currentChunkPosition = chunkId.split(',');
             const d = distance(starterChunkPosition, currentChunkPosition);
-            if (d > bound) chunksToUnload.push(chunkId);
+            if (d > bound) {
+                chunksToUnload.push(chunkId);
+            }
         });
 
         // Recurse on unloaded chunk ids.
-        for (let i = 0, l = chunksToUnload; i < l; ++i) {
+        for (let i = 0, l = chunksToUnload.length; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
             unloadedChunksForPlayer[chunkToUnload] = null;
         }

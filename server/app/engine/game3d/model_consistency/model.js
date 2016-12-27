@@ -46,7 +46,6 @@ class ConsistencyModel {
     }
 
     hasChunk(playerId, chunkId) {
-        //console.log(chunkId + '\t\t\t' + this._chunkIdsForEntity.get(playerId).has(chunkId));
         return this._chunkIdsForEntity.get(playerId).has(chunkId);
     }
 
@@ -67,25 +66,16 @@ class ConsistencyModel {
         let distance = this.infiniteNormDistance;
 
         let sijk = starterChunk.chunkId.split(',');
-        //let _debugGoodChunks = new Set();
         chunks.forEach(chunkId => {
             let ijk = chunkId.split(',');
             if (distance(sijk, ijk) <= renderDistance) {
-                //_debugGoodChunks.add(chunkId);
                 actualInnerSize++;
             }
         });
 
-        const expectedSize = side*side*side; // TODO [HIGH] differentiate 3D / 2D.
-        //const res = (expectedSize <= actualInnerSize);
-        //if (!res) {
-            //console.log(actualInnerSize + ' ' + side*side*side);
-            //if (actualInnerSize > 21) {
-            //    console.log(_debugGoodChunks);
-            //    console.log(chunks);
-            //    console.log('###########');
-            //}
-        //}
+        // TODO [HIGH] differentiate 3D / 2D.
+        const expectedSize = side*side*side;
+
         return expectedSize <= actualInnerSize;
     }
 

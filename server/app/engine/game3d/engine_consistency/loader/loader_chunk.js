@@ -12,7 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
-    static serverLoadingRadius = 3; 
+    static serverLoadingRadius = 2;
 
     constructor(consistencyEngine) {
         // Models.
@@ -137,7 +137,6 @@ class ChunkLoader {
 
         // No avatar position change, nothing to update.
         else {
-            //console.log('Nothing to do...');
             return;
         }
 
@@ -173,7 +172,6 @@ class ChunkLoader {
     }
 
     unloadInnerToOuterSphere(player, starterChunk) {
-        let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
 
         let minThreshold = player.avatar.chunkRenderDistance;
@@ -184,7 +182,6 @@ class ChunkLoader {
     }
 
     unloadOuterSphere(player, starterChunk) {
-        let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
 
         let maxThreshold = ChunkLoader.serverLoadingRadius;

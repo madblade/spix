@@ -96,11 +96,8 @@ App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components
 App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
     var graphics = this.app.engine.graphics;
 
-    console.log('removing ' + chunkId);
     var meshes = this.chunks.get(chunkId).meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-
-        // TODO [CRIT] manage chunk load/unload client-side
         graphics.removeFromScene(meshes[m]);
     }
 
