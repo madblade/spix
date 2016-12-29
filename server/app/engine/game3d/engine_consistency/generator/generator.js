@@ -14,17 +14,18 @@ class Generator {
     }
 
     generateWorld() {
-        let wm = this._worldModel;
+        // TODO [CRIT] worldify generate other worlds.
+        let world = this._worldModel.getWorld(); // TODO [CRIT] worldify
 
         // TODO [LOW] chrono and time out.
         return new Promise(resolve => {
 
             // Generate blocks.
-            let x = wm.xSize, y = wm.ySize, z = wm.zSize;
-            var chunkMap = WorldGenerator.generateFlatWorld(x, y, z, wm);
+            let x = world.xSize, y = world.ySize, z = world.zSize;
+            var chunkMap = WorldGenerator.generateFlatWorld(x, y, z, world);
 
             // Affect chunks.
-            this._worldModel.allChunks = chunkMap;
+            world.allChunks = chunkMap; // TODO [CRIT] worldify
 
             // Finalize chunks (extract surface faces).
             var chunks = new Map(chunkMap); // Shallow copy.

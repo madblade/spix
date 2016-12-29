@@ -10,8 +10,9 @@ class UpdaterAccess {
 
     static debug = false;
 
+    // TODO [CRIT] worldify
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
-                                       floors, mustBeEmpty, worldModel, blockCoordinatesOnChunk)
+                                       floors, mustBeEmpty, world, blockCoordinatesOnChunk)
     {
         const starterChunkId = chunkI + ',' + chunkJ + ',' + chunkK;
 
@@ -19,14 +20,15 @@ class UpdaterAccess {
         const fy = floors[1];
         const fz = floors[2];
 
-        const dimX = worldModel.xSize, dimY = worldModel.ySize, dimZ = worldModel.zSize;
+        const dimX = world.xSize, dimY = world.ySize, dimZ = world.zSize;
+        let allChunks = world.allChunks;
 
         blockCoordinatesOnChunk[0] = (fx >= 0 ? fx : dimX-((-fx)%dimX)) % dimX;
         blockCoordinatesOnChunk[1] = (fy >= 0 ? fy : dimY-((-fy)%dimY)) % dimY;
         blockCoordinatesOnChunk[2] = (fz >= 0 ? fz : dimZ-((-fz)%dimZ)) % dimZ;
         if (UpdaterAccess.debug) console.log(blockCoordinatesOnChunk);
 
-        let chunk = worldModel.allChunks.get(starterChunkId);
+        let chunk = world.allChunks.get(starterChunkId);
         if (!isBoundaryX && !isBoundaryY && !isBoundaryZ) {
             return chunk;
         }
@@ -44,28 +46,30 @@ class UpdaterAccess {
         if (isBoundaryX) {
             blockCoordinatesOnChunk[0] = dimX-1;
             const rightChunkId = (chunkI-1) + ',' + chunkJ + ',' + chunkK;
-            return worldModel.allChunks.get(rightChunkId);
+            return allChunks.get(rightChunkId);
         }
 
         if (isBoundaryY) {
             blockCoordinatesOnChunk[1] = dimY-1;
             const rightChunkId = chunkI + ',' + (chunkJ-1) + ',' + chunkK;
-            return worldModel.allChunks.get(rightChunkId);
+            return allChunks.get(rightChunkId);
         }
 
         if (isBoundaryZ) {
             blockCoordinatesOnChunk[2] = dimZ-1;
             const rightChunkId = chunkI + ',' + chunkJ + ',' + (chunkK-1);
-            return worldModel.allChunks.get(rightChunkId);
+            return allChunks.get(rightChunkId);
         }
     }
 
-    static addBlock(originEntity, x, y, z, blockId, worldModel, entityModel, accessor)
+    // TODO [CRIT] worldify
+    static addBlock(originEntity, x, y, z, blockId, world, entityModel, accessor)
     {
+        let worldId = world.worldId;
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coords = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coords = accessor.getChunkCoordinatesFromFloatingPoint(worldId, x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coords[0], j = coords[1], k = coords[2];
 
@@ -75,7 +79,7 @@ class UpdaterAccess {
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
-            floors, true, worldModel, blockCoordinatesOnChunk);
+            floors, true, world, blockCoordinatesOnChunk);
 
         if (UpdaterAccess.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
@@ -96,12 +100,14 @@ class UpdaterAccess {
         return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId];
     }
 
-    static delBlock(originEntity, x, y, z, worldModel, entityModel, accessor)
+    // TODO [CRIT] worldify
+    static delBlock(originEntity, x, y, z, world, entityModel, accessor)
     {
+        let worldId = world.worldId;
         let floors = [Math.floor(x), Math.floor(y), Math.floor(z)];
 
         // Find chunk (i,j) & block coordinates within chunk.
-        let coords = accessor.getChunkCoordinatesFromFloatingPoint(x, y, z, floors[0], floors[1], floors[2]);
+        let coords = accessor.getChunkCoordinatesFromFloatingPoint(worldId, x, y, z, floors[0], floors[1], floors[2]);
 
         const i = coords[0], j = coords[1], k = coords[2];
 
@@ -111,7 +117,7 @@ class UpdaterAccess {
 
         let blockCoordinatesOnChunk = [];
         let chunk = UpdaterAccess.getChunkAndLocalCoordinates(i, j, k, isBoundaryX, isBoundaryY, isBoundaryZ,
-            floors, false, worldModel, blockCoordinatesOnChunk);
+            floors, false, world, blockCoordinatesOnChunk);
 
         if (UpdaterAccess.debug) console.log("Transaction required on " + chunk.chunkId);
         if (!chunk || chunk === undefined || !chunk.ready)
@@ -220,6 +226,7 @@ class UpdaterAccess {
         return true;
     }
 
+    // TODO [CRIT] determine it client-side, work it with topology engine.
     static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
                                              entityModel, isBoundaryX, isBoundaryY, isBoundaryZ)
     {

@@ -41,6 +41,7 @@ class ConsistencyEngine {
     get entityModel()           { return this._entityModel; }
     get consistencyModel()      { return this._consistencyModel; }
 
+    static bench = false;
 
     // On connection / disconnection.
     spawnPlayer(player) {
@@ -70,6 +71,7 @@ class ConsistencyEngine {
         let ebuf = this._entityBuffer;
 
         // Model and engines.
+        let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
         let updatedEntities = this._physicsEngine.getOutput();
         let addedPlayers = this._entityBuffer.addedPlayers;
@@ -92,11 +94,13 @@ class ConsistencyEngine {
             // Compute change for entities in range.
             let addedEntities, removedEntities,
                 u = eLoader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
+            // TODO [CRIT] worldify.
+
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
             dt1 = (process.hrtime(t)[1]/1000);
-            if (dt1 > 1000) console.log('\t' + dt1 + ' computeNew Entities.');
+            if (ConsistencyEngine.bench && dt1 > 1000) console.log('\t' + dt1 + ' computeNew Entities.');
             t = process.hrtime();
 
             // Compute change for chunks in range.
@@ -105,7 +109,7 @@ class ConsistencyEngine {
             if (v) [addedChunks, removedChunks] = v;
 
             dt1 = (process.hrtime(t)[1]/1000);
-            if (dt1 > 1000) console.log('\t' + dt1 + ' computeNew Chunks.');
+            if (ConsistencyEngine.bench && dt1 > 1000) console.log('\t' + dt1 + ' computeNew Chunks.');
             t = process.hrtime();
 
             // Update consistency model.
@@ -113,8 +117,12 @@ class ConsistencyEngine {
             // BE CAREFUL HERE
             if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e)));
             if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e)));
-            if (addedChunks)        forEach(addedChunks, c => {consistencyModel.setChunkLoaded(pid, c)});
-            if (removedChunks)      forEach(removedChunks, c => consistencyModel.setChunkOutOfRange(pid, c));
+            if (addedChunks)        forEach(addedChunks, wid => {
+                                        forEach(addedChunks[wid], c => {consistencyModel.setChunkLoaded(pid, parseInt(wid), c)});
+                                    }) ;
+            if (removedChunks)      forEach(removedChunks, wid => {
+                                        forEach(removedChunks[wid], c => consistencyModel.setChunkOutOfRange(pid, parseInt(wid), c))
+                                    });
 
 
             // Update output buffers.
@@ -145,14 +153,20 @@ class ConsistencyEngine {
     // The first time, FORCE BUILD when output requests CE initial output.
     initChunkOutputForPlayer(player) {
         let aid = player.avatar.id;
-        let cs = this._worldModel.allChunks;
+        let worldId = player.avatar.worldId;
+        let world = this._worldModel.getWorld(worldId);
+
+        let cs = world.allChunks; // TODO [CRIT] worldify
         let cm = this._consistencyModel;
 
         // Object.
         var chunkOutput = this._chunkLoader.computeChunksForNewPlayer(player);
 
-        for (let cid in chunkOutput)
-            if (cs.has(cid)) cm.setChunkLoaded(aid, cid);
+        for (let wid in chunkOutput) {
+            let chunkIds = chunkOutput[wid];
+            for (let cid in chunkIds)
+                if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid), cid); // TODO [CRIT] worldify
+        }
 
         // WARN: idem, updates must be transmitted right after this call
         // otherwise its player will be out of sync.

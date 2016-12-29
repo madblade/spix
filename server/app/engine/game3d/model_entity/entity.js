@@ -25,6 +25,9 @@ class Entity {
 
         this._impulseSpeedStamp = null;
         this._needsEuler        = true;
+
+        // Situation.
+        this._worldId       = -1;
     }
 
     get id()                { return this._id; }
@@ -38,6 +41,7 @@ class Entity {
     get acceleration()      { return this._acceleration; }
     get mass()              { return this._mass; }
     get _impulseSpeed()     { return this._impulseSpeedStamp; }
+    get worldId()           { return this._worldId; }
 
     set adherence(na)       { this._adherence = na; }
     set rotation(nr)        { this._rotation = nr; }
@@ -45,6 +49,7 @@ class Entity {
     set speed(ns)           { this._speed = ns; }
     set acceleration(na)    { this._acceleration = na; }
     set _impulseSpeed(nis)  { this._impulseSpeedStamp = nis; }
+    set worldId(nwi)        { this._worldId = nwi; }
 
     get adherence()         { return this._adherence; }
 
@@ -52,7 +57,8 @@ class Entity {
         this._adherence[direction] = false;
     }
 
-    spawn(position) {
+    spawn(position, worldId) {
+        this._worldId           = worldId;
         this._position          = position;
         this._rotation          = [0, Math.PI/2];
         this._directions        = [false, false, false, false, false, false];

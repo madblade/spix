@@ -14,10 +14,10 @@ class ConsistencyModel {
 
         // Internals.
         this._entityIdsForEntity        = new Map();
-        this._chunkIdsForEntity         = new Map();
+        this._chunkIdsForEntity         = new Map(); // TODO [CRIT] worldify
         this._chunkIdAndPartsForEntity  = new Map();
 
-        //
+        //// TODO [CRIT] worldify
         this.infiniteNormDistance = (pos1, pos2) => {
             var d = 0;
             for (let i = 0; i < 3; ++i)
@@ -28,9 +28,12 @@ class ConsistencyModel {
 
     spawnPlayer(player) {
         let playerId = player.avatar.id;
+        let chunksMap = new Map();
+        chunksMap.set(player.avatar.worldId, new Set());
+
         this._entityIdsForEntity        .set(playerId, new Set());
-        this._chunkIdsForEntity         .set(playerId, new Set());
-        this._chunkIdAndPartsForEntity  .set(playerId, new Map());
+        this._chunkIdsForEntity         .set(playerId, chunksMap); // TODO [CRIT] worldify
+        this._chunkIdAndPartsForEntity  .set(playerId, new Map()); // TODO [HIGH] think
     }
 
     removePlayer(playerId) {
@@ -41,27 +44,56 @@ class ConsistencyModel {
 
     /** Entity to chunks **/
 
-    chunkIdsForEntity(playerId) {
-        return this._chunkIdsForEntity.get(playerId);
+    chunkIdsPerWorldForEntity(playerId) {
+        playerId = parseInt(playerId);
+
+        return this._chunkIdsForEntity.get(playerId); // TODO [CRIT] worldify
     }
 
-    hasChunk(playerId, chunkId) {
-        return this._chunkIdsForEntity.get(playerId).has(chunkId);
+    // TODO [CRIT] worldify
+    hasChunk(playerId, worldId, chunkId) {
+        playerId = parseInt(playerId);
+        worldId = parseInt(worldId);
+
+        let chunkIdsForEntityInWorld = this._chunkIdsForEntity.get(playerId).get(worldId);
+        return (chunkIdsForEntityInWorld && chunkIdsForEntityInWorld.has(chunkId));
     }
 
-    setChunkLoaded(playerId, chunkId) {
-        this._chunkIdsForEntity.get(playerId).add(chunkId);
+    // TODO [CRIT] worldify
+    setChunkLoaded(playerId, worldId, chunkId) {
+        // Just in case.
+        playerId = parseInt(playerId);
+        worldId = parseInt(worldId);
+
+        let chunksForPlayer = this._chunkIdsForEntity.get(playerId);
+        if (chunksForPlayer.has(worldId)) {
+            chunksForPlayer.get(worldId).add(chunkId);
+        } else {
+            let s = new Set();
+            s.add(chunkId);
+            chunksForPlayer.set(worldId, s);
+        }
     }
 
-    setChunkOutOfRange(playerId, chunkId) {
-        this._chunkIdsForEntity.get(playerId).delete(chunkId);
+    // TODO [CRIT] worldify
+    setChunkOutOfRange(playerId, worldId, chunkId) {
+        playerId = parseInt(playerId);
+        worldId = parseInt(worldId);
+
+        let chunksForPlayerInWorld = this._chunkIdsForEntity.get(playerId).get(worldId);
+        chunksForPlayerInWorld.delete(chunkId);
     }
 
+    // TODO [CRIT] worldify
     doneChunkLoadingPhase(player, starterChunk) {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
+        let worldId = avatar.worldId;
+
         let side = renderDistance*2 + 1;
-        let chunks = this._chunkIdsForEntity.get(avatar.id);
+        let chunks = this._chunkIdsForEntity.get(avatar.id).get(worldId);
+        if (!chunks) return false;
+
         let actualInnerSize = 0;
         let distance = this.infiniteNormDistance;
 

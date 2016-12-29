@@ -20,32 +20,35 @@ class UserOutput {
         return JSON.stringify(message);
     }
 
+    static bench = false;
+
     update() {
         let t1, t2;
 
         t1 = process.hrtime();
         this.spawnPlayers();
         t2 = (process.hrtime(t1)[1]/1000);
-        if (t2 > 1000) console.log(t2 + " µs to spawn players.");
+        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to spawn players.");
 
         t1 = process.hrtime();
         this.updateChunks();
         t2 = (process.hrtime(t1)[1]/1000);
-        if (t2 > 1000) console.log(t2 + " µs to send chunk updates.");
+        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send chunk updates.");
 
         t1 = process.hrtime();
         this.updateEntities();
         t2 = (process.hrtime(t1)[1]/1000);
-        if (t2 > 1000) console.log(t2 + " µs to send entity updates.");
+        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send entity updates.");
 
         t1 = process.hrtime();
         this.updateMeta();
         t2 = (process.hrtime(t1)[1]/1000);
-        if (t2 > 1000) console.log(t2 + " µs to send other stuff.");
+        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send other stuff.");
 
         this._consistencyEngine.flushBuffers();
     }
 
+    // Every player spawns in initial world '-1'.
     spawnPlayers() {
         let consistencyEngine = this._consistencyEngine;
         let addedPlayers = consistencyEngine.getPlayerOutput();
@@ -78,27 +81,44 @@ class UserOutput {
         let updatedChunks = topologyEngine.getOutput();
         let consistencyOutput = consistencyEngine.getChunkOutput();
 
+        // TODO [CRIT] check that.
+        //console.log(updatedChunks);
+        //console.log(consistencyOutput);
+
         game.players.forEach(p => { if (p.avatar) {
             let hasNew, hasUpdated;
             let pid = p.avatar.id;
 
             // TODO [LOW] check 'player has updated position'
             // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
+            // player id -> changes (world id -> chunk id -> changes)
             let addedOrRemovedChunks = consistencyOutput.get(pid);
             hasNew = (addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0);
 
+            // TODO [CRIT] worldify
             let updatedChunksForPlayer = topologyEngine.getOutputForPlayer(p, updatedChunks, addedOrRemovedChunks);
             hasUpdated = (updatedChunksForPlayer && Object.keys(updatedChunksForPlayer).length > 0);
 
             if (hasNew) {
                 // New chunk + update => bundle updates with new chunks in one call.
-                if (hasUpdated) Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
+                if (hasUpdated) {
+                    for (var wiA in addedOrRemovedChunks) {
+                        if (wiA in updatedChunksForPlayer) {
+                            Object.assign(addedOrRemovedChunks[wiA], updatedChunksForPlayer[wiA]);
+                            delete updatedChunksForPlayer[wiA];
+                        }
+                    }
 
-                p.send('chk', UserOutput.pack(addedOrRemovedChunks));
+                    Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
+                }
+
+                let output = UserOutput.pack(addedOrRemovedChunks);
+                p.send('chk', output);
             }
             else if (hasUpdated) {
                 // If only an update occurred on an existing, loaded chunk.
-                p.send('chk', UserOutput.pack(updatedChunksForPlayer));
+                let output = UserOutput.pack(updatedChunksForPlayer);
+                p.send('chk', output);
             }
         }});
 

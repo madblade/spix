@@ -198,7 +198,7 @@ App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
         if (sizes[meshId] === 0) {
             console.log("INFO: geometry deletion.");
             // Remove mesh from scene.
-            this.scene.remove(meshes[meshId]); // TODO decouple
+            this.sceneManager.removeFromScene(meshes[meshId]); // TODO [CRIT] knotify
             geometries[meshId]  = undefined;
             materials[meshId]   = undefined;
             meshes[meshId]      = undefined;

@@ -36,8 +36,13 @@ class TopologyEngine {
     get selector()              { return this._selector; }
     get outputBuffer()          { return this._outputBuffer; }
 
+    // TODO [CRIT] worldify
     addInput(meta, avatar) {
-        this._inputBuffer.addInput(meta, avatar);
+        // Security: copy avatar state before physics engine updates positions and world translations.
+        let pos = avatar.position;
+        let secureAvatar = { position: [pos[0], pos[1], pos[2]], worldId: avatar.worldId};
+
+        this._inputBuffer.addInput(meta, secureAvatar);
     }
 
     update() {
@@ -47,19 +52,19 @@ class TopologyEngine {
 
     // Get (chunk id, blocks) map for updated chunks.
     getOutput() {
-        return this._outputBuffer.getOutput(this._worldModel.allChunks);
+        return this._outputBuffer.getOutput(); // TODO [CRIT] worldify
     }
 
     // Get (chunk id, updates) object for updated chunks concerning specific player.
     // TODO [HIGH] put in consistency model.
     getOutputForPlayer(p, updatedChunks, newChunks) {
-        let chks = this._worldModel.allChunks;
-        let cm = this._consistencyModel;
-        return this._selector.selectUpdatedChunksForPlayer(p, chks, updatedChunks, newChunks, cm);
+        let worldModel = this._worldModel;
+        let consistencyModel = this._consistencyModel;
+        return this._selector.selectUpdatedChunksForPlayer(p, worldModel, consistencyModel, updatedChunks, newChunks);
     }
 
     flushOutput() {
-        this._outputBuffer.flushOutput(this._worldModel.allChunks);
+        this._outputBuffer.flushOutput(this._worldModel); // TODO [CRIT] worldify
     }
 
 }

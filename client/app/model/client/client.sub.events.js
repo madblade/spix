@@ -35,7 +35,7 @@ App.Model.Client.prototype.pushEvents = function() {
     var maxNumberOfEvents = this.maxNumberOfEventsPer16ms;
     if (this.numberOfEvents > maxNumberOfEvents ) {
         this.filterEvents(); // Remove unnecessary events.
-        console.log('Calm down, user...');
+        console.log('Calm down, user... ' + this.numberOfEvents);
     }
 
     // Push to server

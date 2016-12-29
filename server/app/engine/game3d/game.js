@@ -39,7 +39,7 @@ class Game3D extends Game {
         // Models (autonomous).
         this._worldModel        = new WorldModel(this);
         this._entityModel       = new EntityModel(this);
-        this._xModel            = new XModel(this);
+        this._xModel            = new XModel(this);     // Needs world model.
         this._consistencyModel  = new ConsistencyModel(this);
 
         // Engines (need models).
@@ -71,6 +71,8 @@ class Game3D extends Game {
 
     get chat()              { return this._chat; }
 
+    static bench = false;
+
     //^
     update() {
         // Idea maybe split in several loops (purposes).
@@ -81,33 +83,33 @@ class Game3D extends Game {
         t = process.hrtime();
         this._ai.update();                // Update intents.
         dt1 = (process.hrtime(t)[1]/1000);
-        if (dt1 > 1000) console.log(dt1 +' µs to update intents.');
+        if (Game3D.bench && dt1 > 1000) console.log(dt1 +' µs to update intents.');
 
         t = process.hrtime();
         this._externalInput.update();     // Update human spawn/leave requests.
         this._internalInput.update();     // Update artificial inputs.
         dt2 = (process.hrtime(t)[1]/1000);
-        if (dt2 > 1000) console.log(dt2 +' µs to update inputs.');
+        if (Game3D.bench && dt2 > 1000) console.log(dt2 +' µs to update inputs.');
 
         /** Updates **/
         t = process.hrtime();
         this._topologyEngine.update();    // Update topological model.
         this._physicsEngine.update();     // Update physical simulation.
         dt3 = (process.hrtime(t)[1]/1000);
-        if (dt3 > 1000) console.log(dt3 +' µs to update engines.');
+        if (Game3D.bench && dt3 > 1000) console.log(dt3 +' µs to update engines.');
 
         /** Consistency solving: mediator between player and server models **/
         t = process.hrtime();
         this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
         dt4 = (process.hrtime(t)[1]/1000);
-        if (dt4 > 10000) console.log(dt4 +' µs to update consistency.');
+        if (Game3D.bench && dt4 > 10000) console.log(dt4 +' µs to update consistency.');
 
         /** Outputs **/
         t = process.hrtime();
         this._externalOutput.update();    // Send updates.
         this._internalOutput.update();    // Update perceptions.
         dt5 = (process.hrtime(t)[1]/1000);
-        if (dt5 > 1000) console.log(dt5 +' µs to update outputs.');
+        if (Game3D.bench && dt5 > 1000) console.log(dt5 +' µs to update outputs.');
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");

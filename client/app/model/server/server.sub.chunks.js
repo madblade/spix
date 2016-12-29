@@ -34,16 +34,39 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
     for (var cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
         var updates = chunkUpdates[cu];
 
-        for (var chunkId in updates) {
-            var update = updates[chunkId];
-
-            if (!update)
-                this.unloadChunk(chunkId);
-            else if (this.isChunkLoaded(chunkId)) {
-                this.updateChunk(chunkId, update);
+        for (var worldId in updates) {
+            if (worldId !== '-1') {
+                console.log(worldId + ' not supported yet: another world.');
+                continue;
             }
-            else
-                this.initializeChunk(chunkId, update);
+
+            var subdates = updates[worldId];
+            for (var chunkId in subdates) {
+                var update = subdates[chunkId];
+
+                if (!update){
+                    this.unloadChunk(chunkId);
+                }
+                else if (this.isChunkLoaded(chunkId)) {
+                    // TODO [HIGH] server-side, use distinct channels for chunk updates.
+                    if (update.length != 3) {
+                        console.log('WARN: corrupt update or model @refresh / updateChunk.');
+                        console.log(update);
+                        return;
+                    } else {
+                        this.updateChunk(chunkId, update);
+                    }
+                }
+                else {
+                    if (update.length != 2) {
+                        console.log('WARN: corrupt update or model @refresh / initChunk.');
+                        console.log(update);
+                        return;
+                    } else {
+                        this.initializeChunk(chunkId, update);
+                    }
+                }
+            }
         }
     }
 
@@ -78,6 +101,11 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
     this.chunks.set(chunkId, chunk);
 
     // Add to scene.
+    if (!chunk || !chunk.hasOwnProperty('meshes')) {
+        console.log('WARN. Update miss @ initializeChunk: ' + chunkId);
+        console.log(all);
+        return;
+    }
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
         graphics.addToScene(meshes[m], -1); // TODO [CRIT] couple with knot model.
@@ -95,8 +123,13 @@ App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components
 
 App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
     var graphics = this.app.engine.graphics;
+    var chunk = this.chunks.get(chunkId);
+    if (!chunk) {
+        console.log('WARN. Update miss @unloadChunk ' + chunkId);
+        return;
+    }
 
-    var meshes = this.chunks.get(chunkId).meshes;
+    var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
         graphics.removeFromScene(meshes[m]);
     }
@@ -109,8 +142,9 @@ App.Model.Server.ChunkModel.prototype.getCloseTerrain = function() {
     var chks = this.chunks;
     chks.forEach(function(currentChunk, cid) {
         // TODO extract on 4 closest chunks.
-        if (!currentChunk.meshes) {
+        if (!currentChunk || !currentChunk.hasOwnProperty('meshes')) {
             console.log("Warn: corrupted chunk inside client model " + cid);
+            console.log(chks);
             return;
         }
         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});

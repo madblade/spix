@@ -21,9 +21,9 @@ class ChunkGenerator {
      * To finalize creation, add them into the manager model.
      * Then, call Extractor.computeFaces(chunk).
      */
-    static createRawChunk(x, y, z, id, worldModel) {
+    static createRawChunk(x, y, z, id, world) { // TODO [CRIT] worldify
         console.log('createRawChunk ' + id);
-        var c = new Chunk(x, y, z, id, worldModel);
+        var c = new Chunk(x, y, z, id, world);
 
         //GenTest.testChunk(c);
         //GenTest.testMerge(c);
@@ -39,9 +39,9 @@ class ChunkGenerator {
         return c;
     }
 
-    static createChunk(x, y, z, id, worldModel) {
+    static createChunk(x, y, z, id, world) { // TODO [CRIT] worldify
         //console.log('createChunk ' + id);
-        var c = new Chunk(x, y, z, id, worldModel);
+        var c = new Chunk(x, y, z, id, world);
 
         //let generationMethod = worldModel.generationMethod;
         //if (generationMethod == 'flat') {

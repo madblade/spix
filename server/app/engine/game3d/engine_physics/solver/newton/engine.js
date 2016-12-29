@@ -14,13 +14,15 @@ class Newton {
     static solve(physicsEngine, Δt) {
 
         let EM = physicsEngine.entityModel;
-        let WM = physicsEngine.worldModel;
+        let WM = physicsEngine.worldModel; // TODO [HIGH] worldify, sort/optimize in entityModel.
         let o  = physicsEngine.outputBuffer;
 
         const dt = Δt/Newton.globalTimeDilatation;
 
         EM.forEach(function(entity) {
-            const entityUpdated = Newton.linearSolve(entity, EM, WM, dt);
+            const worldId = entity.worldId;
+            const world = WM.getWorld(worldId);
+            const entityUpdated = Newton.linearSolve(entity, EM, world, dt);
 
             if (entityUpdated) {
                 o.entityUpdated(entity.id);
@@ -46,7 +48,7 @@ class Newton {
         // Manage fragmentation
     }
 
-    static linearSolve(entity, EM, WM, dt) {
+    static linearSolve(entity, EM, world, dt) {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
@@ -61,12 +63,12 @@ class Newton {
 
         // Newton.sumLocalFields(force, pos, EM);
 
-        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world);
 
         return hasUpdated;
     }
 
-    static quadraticSolve(entity, EM, WM, dt) {
+    static quadraticSolve(entity, EM, world, dt) {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
@@ -83,7 +85,7 @@ class Newton {
 
         // TODO [HIGH] manage collisions
 
-        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world);
 
         return hasUpdated;
     }

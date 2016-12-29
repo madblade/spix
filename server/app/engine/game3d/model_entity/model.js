@@ -28,9 +28,11 @@ class EntityModel {
 
     spawnPlayer(p) {
         let entities = this._entities;
+        let worldModel = this._game.worldModel;
         let id = CollectionUtil.generateId(entities);
         p.avatar = EntityFactory.createAvatar(id, this);
-        p.avatar.spawn(this._game.worldModel.getFreePosition());
+        let world = worldModel.getWorld(); // TODO [CRIT] worldify better
+        p.avatar.spawn(world.getFreePosition(), world.worldId);
 
         entities.set(id, p.avatar);
     }

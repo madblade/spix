@@ -12,8 +12,8 @@ class Accessor {
         this._worldModel = topologyEngine.worldModel;
     }
 
-    getChunkCoordinatesFromFloatingPoint(x, y, z, floorX, floorY, floorZ) {
-        const w = this._worldModel;
+    getChunkCoordinatesFromFloatingPoint(worldId, x, y, z, floorX, floorY, floorZ) {
+        const w = this._worldModel.getWorld(worldId);
 
         const dx = w.xSize, dy = w.ySize, dz = w.zSize;
 

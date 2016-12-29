@@ -11,24 +11,39 @@ class OutputBuffer {
         // Contains ids of updated chunks.
         // Chunks themselves hold information about their being updated.
         // TODO [LOW] concentrate chunk updates in this buffer.
-        this._buffer = new Set();
+        // world id => Set(... chunk ids)
+        this._buffer = new Map();
     }
 
-    chunkUpdated(chunkId) {
-        this._buffer.add(chunkId);
+    chunkUpdated(worldId, chunkId) {
+        let worldSet = this._buffer.get(worldId);
+        if (worldSet) {
+            worldSet.add(chunkId);
+        } else {
+            let chunkIdSet = new Set();
+            chunkIdSet.add(chunkId);
+            this._buffer.set(worldId, chunkIdSet);
+        }
     }
 
     // Shallow copy.
+    // TODO [CRIT] worldify
     getOutput() {
-        return new Set(this._buffer);
+        return new Map(this._buffer);
     }
 
-    flushOutput(modelChunks) {
-        this._buffer.forEach(
-            id => modelChunks.get(id).flushUpdates()
-        );
+    // TODO [CRIT] worldify
+    flushOutput(worldModel) {
+        let buffer = this._buffer;
 
-        this._buffer = new Set();
+        buffer.forEach((chunkSet, worldId) => {
+            let chunks = worldModel.getWorld(worldId).allChunks;
+            chunkSet.forEach(
+                id => chunks.get(id).flushUpdates()
+            );
+        });
+
+        this._buffer = new Map();
     }
 
 }

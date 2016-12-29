@@ -12,6 +12,7 @@ class ChunkLoader {
 
     static debug = false;
     static load = true;
+    static bench = false;
     static serverLoadingRadius = 6;
 
     constructor(consistencyEngine) {
@@ -28,19 +29,20 @@ class ChunkLoader {
     };
 
     computeChunksForNewPlayer(player) {
-        let wm = this._worldModel;
         let avatar = player.avatar;
+        let worldId = avatar.worldId;
+        let world = this._worldModel.getWorld(worldId);
 
         // Object to be (JSON.stringify)-ed.
         var chunksForNewPlayer = {};
-        let chunksInModel = wm.allChunks;
+        let chunksInModel = world.allChunks;
 
         // From player position, find concerned chunks.
         const playerPosition = avatar.position;
-        let coords = wm.getChunkCoordinates(playerPosition[0], playerPosition[1], playerPosition[2]);
+        let coords = world.getChunkCoordinates(playerPosition[0], playerPosition[1], playerPosition[2]);
 
         const i = coords[0], j = coords[1], k = coords[2];
-        const dx = wm.xSize, dy = wm.ySize, dz = wm.zSize;
+        const dx = world.xSize, dy = world.ySize, dz = world.zSize;
         let minChunkDistance = Number.POSITIVE_INFINITY;
 
         let chunkIds = [];
@@ -50,9 +52,9 @@ class ChunkLoader {
             let currentChunkId = chunkIds[m];
 
             // Generate chunk.
-            if (!chunksInModel.has(currentChunkId)) {
+            if (!chunksInModel.has(currentChunkId)) { // TODO [CRIT] worldify
                 if (ChunkLoader.debug) console.log("We should generate " + currentChunkId + " for the user.");
-                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, wm);
+                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, world);
                 chunksInModel.set(currentChunkId, chunk);
             }
 
@@ -72,29 +74,37 @@ class ChunkLoader {
                 avatar.nearestChunkId = currentChunk;
             }
 
-            chunksForNewPlayer[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
+            let cfnpw = chunksForNewPlayer[worldId];
+            if (cfnpw) {
+                cfnpw[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
+            } else {
+                chunksForNewPlayer[worldId] = {};
+                chunksForNewPlayer[worldId][currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
+            }
         }
 
         return chunksForNewPlayer;
     }
 
+    // TODO [CRIT] X-access chunks. n nearest, 1 chunk per X.
     computeNewChunksInRange(player) {
         if (!ChunkLoader.load) return;
+        const avatar = player.avatar;
 
         // TODO [HIGH] filter: no more than X chunk per player per iteration?
-        let worldModel = this._worldModel;
+        let worldId = avatar.worldId;
+        let world = this._worldModel.getWorld(worldId);
         let consistencyModel = this._consistencyModel;
 
-        const avatar = player.avatar;
         const pos = avatar.position;
 
         // Has nearest chunk changed?
-        let coords = worldModel.getChunkCoordinates(pos[0], pos[1], pos[2]);
+        let coords = world.getChunkCoordinates(pos[0], pos[1], pos[2]);
         let nearestChunkId = coords[0]+','+coords[1]+','+coords[2];
         let formerNearestChunkId = avatar.nearestChunkId;
 
         // Get current chunk.
-        let starterChunk = worldModel.getChunkById(nearestChunkId);
+        let starterChunk = world.getChunkById(nearestChunkId); // TODO [CRIT] worldify
         if (!starterChunk) return;
 
         // Return variables.
@@ -104,7 +114,6 @@ class ChunkLoader {
         // Case 1: need to load chunks up to R_i (inner circle)
         // and to unload from R_i to R_o (outer circle).
         if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
-
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
                 // if !P.has(i,j,k)
@@ -148,7 +157,8 @@ class ChunkLoader {
     }
 
     loadInnerSphere(player, starterChunk) {
-        let worldModel = this._worldModel;
+        let worldId = player.avatar.worldId;
+        let world = this._worldModel.getWorld(worldId); // TODO [CRIT] put elsewhere, this is awful
         let consistencyModel = this._consistencyModel;
         let sRadius = ChunkLoader.serverLoadingRadius;
 
@@ -156,22 +166,22 @@ class ChunkLoader {
 
         // Loading circle for server (a bit farther)
         let t = process.hrtime();
-        ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, false, consistencyModel, sRadius);
+        ChunkBuilder.preLoadNextChunk(player, starterChunk, world, false, consistencyModel, sRadius);
         let dt1 = (process.hrtime(t)[1]/1000);
-        if (dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForServer.');
+        if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForServer.');
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO [HIGH] check on Z+/-.
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
         t = process.hrtime();
-        var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, worldModel, true, consistencyModel, sRadius);
+        var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, world, true, consistencyModel, sRadius);
         dt1 = (process.hrtime(t)[1]/1000);
-        if (dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForPlayer.');
+        if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForPlayer.');
 
         if (newChunk) {
             if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);
-            newChunksForPlayer[newChunk.chunkId] = [newChunk.fastComponents, newChunk.fastComponentsIds];
+            newChunksForPlayer[worldId] = {[newChunk.chunkId]: [newChunk.fastComponents, newChunk.fastComponentsIds]}; // TODO [HIGH] not only one at a time
         }
 
         return newChunksForPlayer;

@@ -8,10 +8,10 @@ import ChunkGenerator from './chunkgenerator';
 
 class WorldGenerator {
 
-    static generateFlatWorld(chunkSizeX, chunkSizeY, chunkSizeZ, worldModel) {
-        var world = new Map();
-        world.set('0,0,0', WorldGenerator.generateFlatChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, worldModel));
-        return world;
+    static generateFlatWorld(chunkSizeX, chunkSizeY, chunkSizeZ, world) {
+        var worldMap = new Map();
+        worldMap.set('0,0,0', WorldGenerator.generateFlatChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, world));
+        return worldMap;
         /*return {
             '0,0,0':      WorldGenerator.generateFlatChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, worldModel),
             '-1,0':      WorldGenerator.generateFlatChunk(chunkSizeX, chunkSizeY, chunkSizeZ, -1, 0, 0, worldModel),
@@ -21,9 +21,9 @@ class WorldGenerator {
         };*/
     }
 
-    static generateFlatChunk(x, y, z, i, j, k, worldModel) {
+    static generateFlatChunk(x, y, z, i, j, k, world) {
         let id = i+','+j+','+k;
-        return ChunkGenerator.createRawChunk(x, y, z, id, worldModel);
+        return ChunkGenerator.createRawChunk(x, y, z, id, world);
     }
 
     static generatePerlinWorld() {

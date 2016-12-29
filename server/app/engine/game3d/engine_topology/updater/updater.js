@@ -23,6 +23,8 @@ class Updater {
         inputBuffer.forEach(input => {
             let data = input[0];
             let avatar = input[1];
+            let worldId = avatar.worldId;
+            if (!worldId) return; // Avatar was disconnected between input & update.
 
             let meta = data.meta;
             let action = meta[0];
@@ -37,10 +39,13 @@ class Updater {
     }
 
     addBlock(avatar, x, y, z, blockId) {
-        let w = this._worldModel;
+        let worldId = avatar.worldId;
+        let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;
+        let em = this._entityModel;
+        let accessor = this._accessor;
 
-        let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, w, this._entityModel, this._accessor);
+        let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, world, em, accessor);
         if (!a) return;
 
         let $chunk, $x, $y, $z, $blockId;
@@ -51,15 +56,18 @@ class Updater {
         let updatedChunks = UpdaterFace.updateSurfaceFacesAfterAddition($chunk, $id, $x, $y, $z);
 
         // Push updates.
-        updatedChunks.forEach(c => o.chunkUpdated(c.chunkId));
-        o.chunkUpdated($chunk.chunkId);
+        updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));
+        o.chunkUpdated(worldId, $chunk.chunkId);
     }
 
     delBlock(avatar, x, y, z) {
-        let w = this._worldModel;
+        let worldId = avatar.worldId;
+        let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;
+        let em = this._entityModel;
+        let accessor = this._accessor;
 
-        let a = UpdaterAccess.delBlock(avatar, x, y, z, w, this._entityModel, this._accessor);
+        let a = UpdaterAccess.delBlock(avatar, x, y, z, world, em, accessor);
         if (!a) return;
 
         let $chunk, $x, $y, $z;
@@ -70,8 +78,8 @@ class Updater {
         let updatedChunks = UpdaterFace.updateSurfaceFacesAfterDeletion($chunk, $id, $x, $y, $z);
 
         // Push updates.
-        updatedChunks.forEach(c => o.chunkUpdated(c.chunkId));
-        o.chunkUpdated($chunk.chunkId);
+        updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));
+        o.chunkUpdated(worldId, $chunk.chunkId);
     }
 
 }

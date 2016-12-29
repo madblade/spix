@@ -41,6 +41,7 @@ class EntityLoader {
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
+        // TODO [CRIT] distance to knot then other world's player.
 
         let distance = EntityLoader.entityDistance;
 

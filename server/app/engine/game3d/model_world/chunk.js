@@ -11,9 +11,9 @@ class Chunk {
 
     static debug = false;
 
-    constructor(xSize, ySize, zSize, chunkId, worldModel) {
+    constructor(xSize, ySize, zSize, chunkId, world) {
         // App.
-        this._worldModel = worldModel;
+        this._world = world;
 
         // Dimensions, coordinates
         this._xSize = xSize;
@@ -59,7 +59,7 @@ class Chunk {
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
     get ready() { return this._ready; }
-    get worldModel() { return this._worldModel; }
+    get world() { return this._world; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
@@ -102,7 +102,7 @@ class Chunk {
         else if (z >= zS)   neighbourChunkK = this._chunkK + 1;
         else                neighbourChunkK = this._chunkK;
 
-        return this._worldModel.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
+        return this._world.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK); // TODO [CRIT] worldify
     }
 
     // Mustn't exceed negative [xyz] Size
