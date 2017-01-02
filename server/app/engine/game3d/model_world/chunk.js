@@ -89,20 +89,22 @@ class Chunk {
     getNeighbourChunkFromRelativeCoordinates(x, y, z) {
         let neighbourChunkI, neighbourChunkJ, neighbourChunkK;
         let xS = this._xSize, yS = this._ySize, zS = this._zSize;
+        let ci = this._chunkI, cj = this._chunkJ, ck = this._chunkK;
+        let world = this._world;
 
-        if (x < 0)          neighbourChunkI = this._chunkI - 1;
-        else if (x >= xS)   neighbourChunkI = this._chunkI + 1;
-        else                neighbourChunkI = this._chunkI;
+        if (x < 0)          neighbourChunkI = ci - 1;
+        else if (x >= xS)   neighbourChunkI = ci + 1;
+        else                neighbourChunkI = ci;
 
-        if (y < 0)          neighbourChunkJ = this._chunkJ - 1;
-        else if (y >= yS)   neighbourChunkJ = this._chunkJ + 1;
-        else                neighbourChunkJ = this._chunkJ;
+        if (y < 0)          neighbourChunkJ = cj - 1;
+        else if (y >= yS)   neighbourChunkJ = cj + 1;
+        else                neighbourChunkJ = cj;
 
-        if (z < 0)          neighbourChunkK = this._chunkK - 1;
-        else if (z >= zS)   neighbourChunkK = this._chunkK + 1;
-        else                neighbourChunkK = this._chunkK;
+        if (z < 0)          neighbourChunkK = ck - 1;
+        else if (z >= zS)   neighbourChunkK = ck + 1;
+        else                neighbourChunkK = ck;
 
-        return this._world.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK); // TODO [CRIT] worldify
+        return world.getChunk(neighbourChunkI, neighbourChunkJ, neighbourChunkK);
     }
 
     // Mustn't exceed negative [xyz] Size

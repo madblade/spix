@@ -15,7 +15,7 @@ class Generator {
 
     generateWorld() {
         // TODO [CRIT] worldify generate other worlds.
-        let world = this._worldModel.getWorld(); // TODO [CRIT] worldify
+        let world = this._worldModel.getWorld();
 
         // TODO [LOW] chrono and time out.
         return new Promise(resolve => {
@@ -25,7 +25,7 @@ class Generator {
             var chunkMap = WorldGenerator.generateFlatWorld(x, y, z, world);
 
             // Affect chunks.
-            world.allChunks = chunkMap; // TODO [CRIT] worldify
+            world.allChunks = chunkMap;
 
             // Finalize chunks (extract surface faces).
             var chunks = new Map(chunkMap); // Shallow copy.

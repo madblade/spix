@@ -104,11 +104,44 @@ class XModel {
     /** Remove **/
 
     removePortal(portalId) {
-        // TODO
+        // Unlink and remove portal.
+        let portalToKnots = this._portalsToKnots;
+        let portals = this._portals;
+        let portal = portals.get(portalId);
+        if (!portal) return;
+
+        let knot = portalToKnots.get(portalId);
+
+        if (knot) {
+            let otherEnd = knot.otherEnd(portal);
+
+            if (otherEnd)
+                knot.removePortal(portal);
+            else
+                this._knots.delete(otherEnd.id);
+
+            portalToKnots.delete(portalId);
+        }
+
+        portals.delete(portalId);
     }
 
+    // TODO [CRIT]
     removeKnot(knotId) {
-        // TODO
+        // Unlink portals.
+        let knots = this._knots;
+        let portalToKnots = this._portalsToKnots;
+        let knot = knots.get(knotId);
+
+        if (knot) {
+            let end1 = knot.portal1;
+            let end2 = knot.portal2;
+
+            if (end1) { portalToKnots.remove(end1.id); }
+            if (end2) { portalToKnots.remove(end2.id); }
+
+            knots.remove(knotId);
+        }
     }
 
     /** Get **/
@@ -127,7 +160,8 @@ class XModel {
                     let knot = this._portalsToKnots.get(portal.id);
                     if (knot) {
                         let otherPortal = knot.otherEnd(portal);
-                        portalsToWorlds.set(portal.id, otherPortal);
+                        if (otherPortal)
+                            portalsToWorlds.set(portal.id, otherPortal);
                     }
                 });
         });

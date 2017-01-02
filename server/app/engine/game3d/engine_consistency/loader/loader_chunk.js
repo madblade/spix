@@ -52,7 +52,7 @@ class ChunkLoader {
             let currentChunkId = chunkIds[m];
 
             // Generate chunk.
-            if (!chunksInModel.has(currentChunkId)) { // TODO [CRIT] worldify
+            if (!chunksInModel.has(currentChunkId)) { // TODO [LOW] worldify or delegate to consistency updater (better).
                 if (ChunkLoader.debug) console.log("We should generate " + currentChunkId + " for the user.");
                 let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, world);
                 chunksInModel.set(currentChunkId, chunk);
@@ -86,12 +86,13 @@ class ChunkLoader {
         return chunksForNewPlayer;
     }
 
-    // TODO [CRIT] X-access chunks. n nearest, 1 chunk per X.
+    // TODO [CRIT] worldify X-access chunks. n nearest, 1 chunk per X.
     computeNewChunksInRange(player) {
         if (!ChunkLoader.load) return;
         const avatar = player.avatar;
 
-        // TODO [HIGH] filter: no more than X chunk per player per iteration?
+        // TODO [CRIT] worldify idea : X-WORLD distance adds a 1-chunk infinite norm distance every time it crosses a portal
+        // TODO [HIGH] worldify filter: no more than X chunk per player per iteration?
         let worldId = avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
         let consistencyModel = this._consistencyModel;
@@ -104,7 +105,7 @@ class ChunkLoader {
         let formerNearestChunkId = avatar.nearestChunkId;
 
         // Get current chunk.
-        let starterChunk = world.getChunkById(nearestChunkId); // TODO [CRIT] worldify
+        let starterChunk = world.getChunkById(nearestChunkId);
         if (!starterChunk) return;
 
         // Return variables.
@@ -158,7 +159,7 @@ class ChunkLoader {
 
     loadInnerSphere(player, starterChunk) {
         let worldId = player.avatar.worldId;
-        let world = this._worldModel.getWorld(worldId); // TODO [CRIT] put elsewhere, this is awful
+        let world = this._worldModel.getWorld(worldId); // TODO [CRIT] worldify think of another location for that
         let consistencyModel = this._consistencyModel;
         let sRadius = ChunkLoader.serverLoadingRadius;
 

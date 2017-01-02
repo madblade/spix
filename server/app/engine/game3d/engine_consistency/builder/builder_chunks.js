@@ -58,7 +58,7 @@ class ChunkBuilder {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
         let k = chunk.chunkK;
-        let world = chunk.world; // TODO [CRIT] worldify
+        let world = chunk.world;
 
         switch (direction) {
             case 0: return world.getChunk(i+1, j, k);      // x+
@@ -187,12 +187,14 @@ class ChunkBuilder {
 
     static preLoadNextChunk(player, starterChunk, world, forPlayer, consistencyModel, serverLoadingRadius) {
         let avatar = player.avatar;
-        let worldId = avatar.worldId; // TODO [CRIT] worldify check chain of events: avatar could have crossed a portal in the MEANWHILE.
+        // TODO [CRIT] worldify check chain of events: avatar could have crossed a portal meanwhile.
+        let worldId = avatar.worldId;
         const aid = avatar.id;
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
         threshold = Math.min(threshold, serverLoadingRadius);
 
-        let allChunks = world.allChunks; // TODO [CRIT] worldify
+        // TODO [CRIT] worldify get a tree with other 'allChunks' from xModel.getConnectivity
+        let allChunks = world.allChunks;
 
         const dx = world.xSize,    dy = world.ySize,    dz = world.zSize;
         const si = starterChunk.chunkI, sj = starterChunk.chunkJ, sk = starterChunk.chunkK;
@@ -267,7 +269,7 @@ class ChunkBuilder {
         let chunksToUnload = [];
 
         let aid = avatar.id;
-        let mainWorldId = avatar.worldId; // TODO [CRIT] worldify
+        let mainWorldId = avatar.worldId;
         let chunkIdsForEntity = consistencyModel.chunkIdsPerWorldForEntity(aid);
         let distance = consistencyModel.infiniteNormDistance;
 
@@ -275,7 +277,7 @@ class ChunkBuilder {
         chunkIdsForEntity.forEach((chunkIds, worldId) => {
             chunkIds.forEach(chunkId => {
                 const currentChunkPosition = chunkId.split(',');
-                // TODO [CRIT] worldify distance.
+                // TODO [CRIT] worldify distance criterion, use chunks from other worlds.
                 const d = distance(starterChunkPosition, currentChunkPosition);
                 if (d > bound) {
                     chunksToUnload.push(chunkId);

@@ -21,7 +21,7 @@ class ChunkGenerator {
      * To finalize creation, add them into the manager model.
      * Then, call Extractor.computeFaces(chunk).
      */
-    static createRawChunk(x, y, z, id, world) { // TODO [CRIT] worldify
+    static createRawChunk(x, y, z, id, world) {
         console.log('createRawChunk ' + id);
         var c = new Chunk(x, y, z, id, world);
 
@@ -39,24 +39,17 @@ class ChunkGenerator {
         return c;
     }
 
-    static createChunk(x, y, z, id, world) { // TODO [CRIT] worldify
-        //console.log('createChunk ' + id);
+    static createChunk(x, y, z, id, world) {
+
         var c = new Chunk(x, y, z, id, world);
 
-        //let generationMethod = worldModel.generationMethod;
-        //if (generationMethod == 'flat') {
-        //    GenSimple.fillChunk(c, 41, 1);
-            //GenAnalytic.waveChunk(c, 10, 15, 1);
-            GenSimplePerlin.simplePerlinGeneration(c, false); // chunk, doShuffleChunks
-            //GenSimple.fillChunk(c, 256, 0);
-        //} else {
-        //}
-
-        //try {
-        //    GenPerlin.perlinGeneration(c);
-        //} catch (e) {
-        //    console.log(e.stack);
-        //}
+        // let generationMethod = world.generationMethod;
+        // switch (generationMethod) {
+        // GenSimple.fillChunk(c, 41, 1);
+        // GenAnalytic.waveChunk(c, 10, 15, 1);
+        // GenSimple.fillChunk(c, 256, 0);
+        // GenPerlin.perlinGeneration(c);
+        GenSimplePerlin.simplePerlinGeneration(c, false); // params: chunk, doShuffleChunks
 
         return c;
     }

@@ -14,10 +14,10 @@ class ConsistencyModel {
 
         // Internals.
         this._entityIdsForEntity        = new Map();
-        this._chunkIdsForEntity         = new Map(); // TODO [CRIT] worldify
+        this._chunkIdsForEntity         = new Map();
         this._chunkIdAndPartsForEntity  = new Map();
 
-        //// TODO [CRIT] worldify
+        // TODO [CRIT] worldify (with xModel.getConnectivity)
         this.infiniteNormDistance = (pos1, pos2) => {
             var d = 0;
             for (let i = 0; i < 3; ++i)
@@ -32,7 +32,7 @@ class ConsistencyModel {
         chunksMap.set(player.avatar.worldId, new Set());
 
         this._entityIdsForEntity        .set(playerId, new Set());
-        this._chunkIdsForEntity         .set(playerId, chunksMap); // TODO [CRIT] worldify
+        this._chunkIdsForEntity         .set(playerId, chunksMap);
         this._chunkIdAndPartsForEntity  .set(playerId, new Map()); // TODO [HIGH] think
     }
 
@@ -47,10 +47,9 @@ class ConsistencyModel {
     chunkIdsPerWorldForEntity(playerId) {
         playerId = parseInt(playerId);
 
-        return this._chunkIdsForEntity.get(playerId); // TODO [CRIT] worldify
+        return this._chunkIdsForEntity.get(playerId);
     }
 
-    // TODO [CRIT] worldify
     hasChunk(playerId, worldId, chunkId) {
         playerId = parseInt(playerId);
         worldId = parseInt(worldId);
@@ -59,7 +58,6 @@ class ConsistencyModel {
         return (chunkIdsForEntityInWorld && chunkIdsForEntityInWorld.has(chunkId));
     }
 
-    // TODO [CRIT] worldify
     setChunkLoaded(playerId, worldId, chunkId) {
         // Just in case.
         playerId = parseInt(playerId);
@@ -75,7 +73,6 @@ class ConsistencyModel {
         }
     }
 
-    // TODO [CRIT] worldify
     setChunkOutOfRange(playerId, worldId, chunkId) {
         playerId = parseInt(playerId);
         worldId = parseInt(worldId);
@@ -84,7 +81,6 @@ class ConsistencyModel {
         chunksForPlayerInWorld.delete(chunkId);
     }
 
-    // TODO [CRIT] worldify
     doneChunkLoadingPhase(player, starterChunk) {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
@@ -113,6 +109,7 @@ class ConsistencyModel {
 
     /** Entity to entities **/
 
+    // TODO [CRIT] worldify entities
     hasEntity(playerId, entityId) {
         return this._entityIdsForEntity.get(playerId).has(entityId);
     }

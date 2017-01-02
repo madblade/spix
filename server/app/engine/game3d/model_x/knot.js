@@ -27,13 +27,22 @@ class Knot {
         this._portal2 = portal2;
     }
 
-    get portal2() { return this._portal2; }
-    get portal1() { return this._portal1; }
+    get id()        { return this._id; }
+    get portal2()   { return this._portal2; }
+    get portal1()   { return this._portal1; }
 
     otherEnd(portal) {
         if (portal === this._portal1) return this._portal2;
         else if (portal === this._portal2) return this._portal1;
         else return null;
+    }
+
+    // Can a portal link to itself?
+    removePortal(portal) {
+        if (portal === this._portal1)
+            this._portal1 = null;
+        else if (portal === this._portal2)
+            this._portal2 = null;
     }
 
 }

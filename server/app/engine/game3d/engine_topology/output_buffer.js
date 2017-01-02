@@ -27,12 +27,10 @@ class OutputBuffer {
     }
 
     // Shallow copy.
-    // TODO [CRIT] worldify
     getOutput() {
         return new Map(this._buffer);
     }
 
-    // TODO [CRIT] worldify
     flushOutput(worldModel) {
         let buffer = this._buffer;
 

@@ -94,7 +94,6 @@ class ConsistencyEngine {
             // Compute change for entities in range.
             let addedEntities, removedEntities,
                 u = eLoader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
-            // TODO [CRIT] worldify.
 
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
@@ -156,7 +155,7 @@ class ConsistencyEngine {
         let worldId = player.avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
 
-        let cs = world.allChunks; // TODO [CRIT] worldify
+        let cs = world.allChunks;
         let cm = this._consistencyModel;
 
         // Object.
@@ -165,7 +164,7 @@ class ConsistencyEngine {
         for (let wid in chunkOutput) {
             let chunkIds = chunkOutput[wid];
             for (let cid in chunkIds)
-                if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid), cid); // TODO [CRIT] worldify
+                if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid), cid);
         }
 
         // WARN: idem, updates must be transmitted right after this call

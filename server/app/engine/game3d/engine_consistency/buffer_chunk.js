@@ -10,9 +10,10 @@ class ChunkBuffer {
         this._outputBuffer = new Map();
     }
 
-    // addedChunks:     chunk id => [fast components, fast component ids]
-    // removedChunks:   chunk id => null
-    updateChunksForPlayer(playerId, addedChunks, removedChunks) { // TODO [CRIT] worldify
+    // addedChunks:     world id => chunk id => [fast components, fast component ids]
+    // removedChunks:   world id => chunk id => null
+    // updatedChunks:   (topologyEngine)
+    updateChunksForPlayer(playerId, addedChunks, removedChunks) {
         // Check.
         if (!addedChunks && !removedChunks) return;
 

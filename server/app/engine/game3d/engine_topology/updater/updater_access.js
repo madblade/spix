@@ -10,7 +10,6 @@ class UpdaterAccess {
 
     static debug = false;
 
-    // TODO [CRIT] worldify
     static getChunkAndLocalCoordinates(chunkI, chunkJ, chunkK, isBoundaryX, isBoundaryY, isBoundaryZ,
                                        floors, mustBeEmpty, world, blockCoordinatesOnChunk)
     {
@@ -62,7 +61,6 @@ class UpdaterAccess {
         }
     }
 
-    // TODO [CRIT] worldify
     static addBlock(originEntity, x, y, z, blockId, world, entityModel, accessor)
     {
         let worldId = world.worldId;
@@ -100,7 +98,6 @@ class UpdaterAccess {
         return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId];
     }
 
-    // TODO [CRIT] worldify
     static delBlock(originEntity, x, y, z, world, entityModel, accessor)
     {
         let worldId = world.worldId;
@@ -226,7 +223,7 @@ class UpdaterAccess {
         return true;
     }
 
-    // TODO [CRIT] determine it client-side, work it with topology engine.
+    // TODO [HIGH] determine it client-side, work it with topology engine.
     static translateAndValidateBlockDeletion(originEntity, x, y, z, floors, chunk, blockCoordinatesOnChunk,
                                              entityModel, isBoundaryX, isBoundaryY, isBoundaryZ)
     {

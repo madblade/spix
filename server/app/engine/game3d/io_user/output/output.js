@@ -61,10 +61,12 @@ class UserOutput {
                 let p = player, a = p.avatar;
 
                 // Load chunks.
+                // Format: {worldId: {chunkId: [fastComps, fastCompIds]}}
                 let chunks = consistencyEngine.initChunkOutputForPlayer(p);
                 p.send('chk', UserOutput.pack(chunks));
 
                 // Load entities.
+                // Format: {entityId: {p:pos, r:rot, k:kind}
                 let entities = consistencyEngine.initEntityOutputForPlayer(p);
                 p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
 
@@ -81,10 +83,6 @@ class UserOutput {
         let updatedChunks = topologyEngine.getOutput();
         let consistencyOutput = consistencyEngine.getChunkOutput();
 
-        // TODO [CRIT] check that.
-        //console.log(updatedChunks);
-        //console.log(consistencyOutput);
-
         game.players.forEach(p => { if (p.avatar) {
             let hasNew, hasUpdated;
             let pid = p.avatar.id;
@@ -95,7 +93,6 @@ class UserOutput {
             let addedOrRemovedChunks = consistencyOutput.get(pid);
             hasNew = (addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0);
 
-            // TODO [CRIT] worldify
             let updatedChunksForPlayer = topologyEngine.getOutputForPlayer(p, updatedChunks, addedOrRemovedChunks);
             hasUpdated = (updatedChunksForPlayer && Object.keys(updatedChunksForPlayer).length > 0);
 
@@ -112,10 +109,17 @@ class UserOutput {
                     Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
                 }
 
+                // Format:
+                // {worldId:
+                //      {chunkId: [fastCC, fastCCId]} ......... Added chunk
+                //      {chunkId: [removed, added, updated]} .. Updated chunk
+                //      {chunkId: null} ....................... Removed chunk
+                // }
                 let output = UserOutput.pack(addedOrRemovedChunks);
                 p.send('chk', output);
             }
             else if (hasUpdated) {
+                // (Format: ditto)
                 // If only an update occurred on an existing, loaded chunk.
                 let output = UserOutput.pack(updatedChunksForPlayer);
                 p.send('chk', output);

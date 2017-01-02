@@ -23,7 +23,7 @@ class Portal {
         this._orientation = orientation;
     }
 
-
+    get id()        { return this._id; }
 
 }
 

@@ -31,7 +31,8 @@ class EntityModel {
         let worldModel = this._game.worldModel;
         let id = CollectionUtil.generateId(entities);
         p.avatar = EntityFactory.createAvatar(id, this);
-        let world = worldModel.getWorld(); // TODO [CRIT] worldify better
+        // TODO [CRIT] worldify spawn directly in another world.
+        let world = worldModel.getWorld();
         p.avatar.spawn(world.getFreePosition(), world.worldId);
 
         entities.set(id, p.avatar);

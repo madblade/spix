@@ -16,7 +16,6 @@ class ChunkIterator {
      * @constructor
      */
     static BFS(world, starterChunk, callback, callbackAdditionalParameters) {
-        // TODO [CRIT] worldify
         let queue = [];
         let markers = [];
 
@@ -27,7 +26,7 @@ class ChunkIterator {
             markers.push(current);
 
             // Make your dreams come true
-            let status = callback(current, world, callbackAdditionalParameters); // TODO [CRIT] worldify
+            let status = callback(current, world, callbackAdditionalParameters);
 
             // Hard-cut when a chunk is to be loaded (client)
             // WARN! Don't cut server side!!!
@@ -36,7 +35,7 @@ class ChunkIterator {
                 return;
             }
 
-            let neighbours = ChunkIterator.get2DNeighbours(current, world); // TODO [CRIT] worldify
+            let neighbours = ChunkIterator.get2DNeighbours(current, world);
             for (let i = 0, l = neighbours.length; i < l; ++i) {
 
                 let neighbour = neighbours[i];
@@ -49,11 +48,11 @@ class ChunkIterator {
         }
     }
 
-    static get2DNeighbours(currentChunk, world) { // TODO [CRIT] worldify
+    static get2DNeighbours(currentChunk, world) {
         const i = currentChunk.chunkI;
         const j = currentChunk.chunkJ;
         const k = currentChunk.chunkK;
-        let chunks = world.allChunks; // TODO [CRIT] worldify
+        let chunks = world.allChunks;
 
         let neighboursIndices = [
             (i+1)   +','+j      +','+k,

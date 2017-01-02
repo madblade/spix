@@ -36,7 +36,6 @@ class TopologyEngine {
     get selector()              { return this._selector; }
     get outputBuffer()          { return this._outputBuffer; }
 
-    // TODO [CRIT] worldify
     addInput(meta, avatar) {
         // Security: copy avatar state before physics engine updates positions and world translations.
         let pos = avatar.position;
@@ -52,7 +51,7 @@ class TopologyEngine {
 
     // Get (chunk id, blocks) map for updated chunks.
     getOutput() {
-        return this._outputBuffer.getOutput(); // TODO [CRIT] worldify
+        return this._outputBuffer.getOutput();
     }
 
     // Get (chunk id, updates) object for updated chunks concerning specific player.
@@ -64,7 +63,7 @@ class TopologyEngine {
     }
 
     flushOutput() {
-        this._outputBuffer.flushOutput(this._worldModel); // TODO [CRIT] worldify
+        this._outputBuffer.flushOutput(this._worldModel);
     }
 
 }
