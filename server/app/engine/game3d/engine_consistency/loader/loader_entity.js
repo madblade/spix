@@ -4,6 +4,8 @@
 
 'use strict';
 
+import GeometryUtils        from '../../../math/geometry';
+
 class EntityLoader {
 
     constructor(consistencyEngine) {
@@ -26,7 +28,7 @@ class EntityLoader {
 
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
-        let distance = EntityLoader.entityDistance;
+        let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
             if (distance(e, avatar) < thresh)

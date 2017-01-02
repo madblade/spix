@@ -4,6 +4,8 @@
 
 'use strict';
 
+import GeometryUtils    from '../../math/geometry';
+
 class ConsistencyModel {
 
     constructor(game) {
@@ -16,14 +18,6 @@ class ConsistencyModel {
         this._entityIdsForEntity        = new Map();
         this._chunkIdsForEntity         = new Map();
         this._chunkIdAndPartsForEntity  = new Map();
-
-        // TODO [CRIT] worldify (with xModel.getConnectivity)
-        this.infiniteNormDistance = (pos1, pos2) => {
-            var d = 0;
-            for (let i = 0; i < 3; ++i)
-                d = Math.max(d, Math.abs(parseInt(pos1[i]) - parseInt(pos2[i])));
-            return d;
-        }
     }
 
     spawnPlayer(player) {
@@ -91,7 +85,7 @@ class ConsistencyModel {
         if (!chunks) return false;
 
         let actualInnerSize = 0;
-        let distance = this.infiniteNormDistance;
+        let distance = GeometryUtils.infiniteNormDistance;
 
         let sijk = starterChunk.chunkId.split(',');
         chunks.forEach(chunkId => {

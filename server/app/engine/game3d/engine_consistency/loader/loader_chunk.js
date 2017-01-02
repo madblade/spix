@@ -4,6 +4,8 @@
 
 'use strict';
 
+import GeometryUtils        from '../../../math/geometry';
+
 import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
 import ChunkIterator        from '../builder/iterator_chunks';
@@ -20,13 +22,6 @@ class ChunkLoader {
         this._worldModel        = consistencyEngine.worldModel;
         this._consistencyModel  = consistencyEngine.consistencyModel;
     }
-
-    // Squared Euclidean.
-    static squaredDistance(pos1, pos2) {
-        let result = 0, d;
-        for (let i = 0; i<3; ++i) { d = pos1[i]-pos2[i]; result += d*d; }
-        return result;
-    };
 
     computeChunksForNewPlayer(player) {
         let avatar = player.avatar;
@@ -68,7 +63,7 @@ class ChunkLoader {
             // Test for distance.
             const ids = currentChunkId.split(',');
             const chunkPosition = [parseInt(ids[0])*dx/2, parseInt(ids[1])*dy/2, parseInt(ids[2])*dz/2];
-            const distance = ChunkLoader.squaredDistance(chunkPosition, playerPosition);
+            const distance = GeometryUtils.chunkSquaredEuclideanDistance(chunkPosition, playerPosition);
             if (distance < minChunkDistance) {
                 minChunkDistance = distance;
                 avatar.nearestChunkId = currentChunk;
@@ -113,14 +108,14 @@ class ChunkLoader {
         var unloadedChunksForPlayer = {};
 
         // Case 1: need to load chunks up to R_i (inner circle)
-        // and to unload from R_i to R_o (outer circle).
+        // and to unload from R_o (outer circle).
         if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
                 // if !P.has(i,j,k)
                     // Load (i,j,k) and break
 
-            //unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
+            // unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
             unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             // For (i,j,k) s.t. P.has(i,j,k)
                 // if d({i,j,k}, P) > P.thresh
@@ -128,11 +123,12 @@ class ChunkLoader {
             avatar.nearestChunkId = nearestChunkId;
         }
 
-        // Case 2: chunks were loaded up to R_i, but player walked
+        // TODO [OPTIM] don't test when doneChunkLoadingPhase has been reached once, until (nearest !== formerNearest)
+        // Case 2: if chunks were loaded up to R_i, but player walked
         // into another chunk. Need to ensure all chunks are loaded up to R_i
         // and every loaded chunk that happens to be outside R_o is unloaded.
-        /*else if (nearestChunkId !== formerNearestChunkId) { 
-            console.log('loading done, walking towards new chunk');
+        /*
+        else if (nearestChunkId !== formerNearestChunkId) {
 
             // For (i,j,k) s.t. d({i,j,k}, P) < P.thresh
                 // if !P.has(i,j,k)
@@ -144,11 +140,12 @@ class ChunkLoader {
                     // Unload (i,j,k)
             unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             avatar.nearestChunkId = nearestChunkId;
-        }*/
+        }
+        */
 
         // No avatar position change, nothing to update.
         else {
-            this.unloadOuterSphere(player, starterChunk);
+            unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             return;
         }
 
@@ -184,7 +181,8 @@ class ChunkLoader {
 
         if (newChunk) {
             if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);
-            newChunksForPlayer[worldId] = {[newChunk.chunkId]: [newChunk.fastComponents, newChunk.fastComponentsIds]}; // TODO [HIGH] not only one at a time
+            // TODO [HIGH] not only one at a time
+            newChunksForPlayer[worldId] = {[newChunk.chunkId]: [newChunk.fastComponents, newChunk.fastComponentsIds]};
         }
 
         return newChunksForPlayer;
@@ -203,9 +201,7 @@ class ChunkLoader {
     unloadOuterSphere(player, starterChunk) {
         let consistencyModel = this._consistencyModel;
 
-        let minThreshold = player.avatar.chunkUnloadDistance;
-        let maxThreshold = WorldModel.serverLoadingRadius;
-        maxThreshold = Math.min(minThreshold, maxThreshold);
+        let maxThreshold = player.avatar.chunkUnloadDistance;
 
         return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, consistencyModel, maxThreshold);
     }

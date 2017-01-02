@@ -4,7 +4,7 @@
 
 'use strict';
 
-import DB               from './client/user_db';
+import UserDB               from './client/user_db';
 import Hub              from './game/hub';
 
 import User             from './client/user';
@@ -22,8 +22,8 @@ class Factory {
 
     /** App-level classes */
 
-    static createDB(connector) {
-        return new DB(connector);
+    static createUserDB(connector) {
+        return new UserDB(connector);
     }
 
     static createHub(app) {

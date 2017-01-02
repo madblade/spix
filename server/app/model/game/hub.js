@@ -11,7 +11,6 @@ class Hub {
 
     constructor(app) {
         this._app = app;
-        //this._games = {};
         this._games = new Map();
     }
 
@@ -33,9 +32,7 @@ class Hub {
     }
 
     validateRequest() {
-        // TODO [LOW] think of different criteria
         // Count games.
-        //var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
         let games = this._games;
 
         let nbGames = 0;
@@ -65,7 +62,6 @@ class Hub {
     }
 
     getGame(kind, gameId) {
-        //return this._games[kind][gameId];
         let gamesOfKind = this._games.get(kind);
         return gamesOfKind.get(gameId);
     }
@@ -77,15 +73,6 @@ class Hub {
     listGames() {
         let games = {};
         let modelGames = this._games;
-
-        //var f = kind => gid => {
-            //if (this._games[kind][gid].ready) games[kind].push(gid);
-        //};
-
-        //for (let kind in this._games) {
-        //    games[kind] = [];
-        //    CollectionUtils.forEachProperty(this._games[kind], f(kind));
-        //}
 
         modelGames.forEach((gamesForKind, kind) => {
             games[kind] = [];
@@ -108,16 +95,13 @@ class Hub {
         let connection = this._app.connection;
 
         // Init list of games of this kind
-        //if (!this._games[kind]) this._games[kind] = {};
         if (!games.has(kind)) games.set(kind, new Map());
-        //var gid = CollectionUtils.generateId(this._games[kind]);
         let gid = CollectionUtils.generateId(games.get(kind));
 
         // Create matching game
         var game = Factory.createGame(this, kind, gid, connection);
 
         // Add to games.
-        //if (game) this._games[kind][gid] = game;
         if (game) games.get(kind).set(gid, game);
 
         return game.gameId;
@@ -134,7 +118,6 @@ class Hub {
         let kind = game.kind;
 
         game.destroy();
-        // delete this._games[kind][gid];
         let gamesOfKind = games.get(kind);
         gamesOfKind.delete(gid);
         if (gamesOfKind.size < 1) games.delete(kind);

@@ -4,7 +4,9 @@
 
 'use strict';
 
-import ChunkGenerator from './../generator/chunkgenerator';
+import GeometryUtils        from '../../../math/geometry';
+
+import ChunkGenerator       from './../generator/chunkgenerator';
 import BlockExtractor       from './surface_blocks_builder';
 import FaceExtractor        from './surface_faces_builder';
 
@@ -271,7 +273,7 @@ class ChunkBuilder {
         let aid = avatar.id;
         let mainWorldId = avatar.worldId;
         let chunkIdsForEntity = consistencyModel.chunkIdsPerWorldForEntity(aid);
-        let distance = consistencyModel.infiniteNormDistance;
+        let distance = GeometryUtils.infiniteNormDistance;
 
         let starterChunkPosition = starterChunk.chunkId.split(',');
         chunkIdsForEntity.forEach((chunkIds, worldId) => {
@@ -289,7 +291,7 @@ class ChunkBuilder {
         unloadedChunksForPlayer[mainWorldId] = {};
         for (let i = 0, l = chunksToUnload.length; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
-            unloadedChunksForPlayer[mainWorldId] = {[chunkToUnload]: null};
+            unloadedChunksForPlayer[mainWorldId][chunkToUnload] = null;
         }
 
         return unloadedChunksForPlayer;

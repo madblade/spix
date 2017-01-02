@@ -4,7 +4,8 @@
 
 'use strict';
 
-import NumberUtils from '../../../math/numbers';
+import GeometryUtils    from '../../../math/geometry';
+import NumberUtils      from '../../../math/numbers';
 
 class UpdaterAccess {
 
@@ -133,17 +134,10 @@ class UpdaterAccess {
         return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2]];
     }
 
-    static distance3(v1, v2) {
-        let x = v1[0]-v2[0]; x*=x;
-        let y = v1[1]-v2[1]; y*=y;
-        let z = v1[2]-v2[2]; z*=z;
-        return Math.sqrt(x+y+z);
-    }
-
     static validateBlockEdition(originEntity, x, y, z, floors) {
         let fx = floors[0]; let fy = floors[1]; let fz = floors[2];
         // 4 blocks maximum range for block editing.
-        const d3 = UpdaterAccess.distance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
+        const d3 = GeometryUtils.euclideabDistance3(originEntity.position, [fx+.5, fy+.5, fz+.5]);
         return (d3 < 10);
     }
 

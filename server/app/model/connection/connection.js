@@ -10,7 +10,7 @@ class Connector {
 
     constructor(app) {
         this._app = app;
-        this._db = Factory.createDB(this);
+        this._userDB = Factory.createUserDB(this);
         this._io = null;
         this._debug = false;
     }
@@ -18,19 +18,19 @@ class Connector {
     // Model
     get hub() { return this._app.hub; }
     get io() { return this._io; }
-    get db() { return this._db; }
+    get db() { return this._userDB; }
 
     // When the user connects, register him
     setupUser(socket) {
         // Add user to app DB
-        var user = this._db.registerUser(socket);
+        var user = this._userDB.registerUser(socket);
 
         // A user knows its socket and reciprocally
         socket.user = user;
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
-        setTimeout(_ => socket.emit('connected', ''), 500);
+        setTimeout(_ => socket.emit('connected', ''), 400);
     }
 
     setupDisconnect(socket) {
@@ -46,7 +46,7 @@ class Connector {
             user.leave(); // First disconnects then makes the game forget.
 
             // Destroy user.
-            this._db.removeUser(user);
+            this._userDB.removeUser(user);
 
             if (this._debug) socket.log('DISCONNECTED');
         });
