@@ -4,6 +4,7 @@
 
 'use strict';
 
+import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
 import ChunkIterator        from '../builder/iterator_chunks';
 import ChunkBuilder         from '../builder/builder_chunks';
@@ -13,7 +14,6 @@ class ChunkLoader {
     static debug = false;
     static load = true;
     static bench = false;
-    static serverLoadingRadius = 6;
 
     constructor(consistencyEngine) {
         // Models.
@@ -120,7 +120,8 @@ class ChunkLoader {
                 // if !P.has(i,j,k)
                     // Load (i,j,k) and break
 
-            unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
+            //unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
+            unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             // For (i,j,k) s.t. P.has(i,j,k)
                 // if d({i,j,k}, P) > P.thresh
                     // Unload (i,j,k)
@@ -130,7 +131,7 @@ class ChunkLoader {
         // Case 2: chunks were loaded up to R_i, but player walked
         // into another chunk. Need to ensure all chunks are loaded up to R_i
         // and every loaded chunk that happens to be outside R_o is unloaded.
-        else if (nearestChunkId !== formerNearestChunkId) {
+        /*else if (nearestChunkId !== formerNearestChunkId) { 
             console.log('loading done, walking towards new chunk');
 
             // For (i,j,k) s.t. d({i,j,k}, P) < P.thresh
@@ -143,10 +144,11 @@ class ChunkLoader {
                     // Unload (i,j,k)
             unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             avatar.nearestChunkId = nearestChunkId;
-        }
+        }*/
 
         // No avatar position change, nothing to update.
         else {
+            this.unloadOuterSphere(player, starterChunk);
             return;
         }
 
@@ -161,7 +163,7 @@ class ChunkLoader {
         let worldId = player.avatar.worldId;
         let world = this._worldModel.getWorld(worldId); // TODO [CRIT] worldify think of another location for that
         let consistencyModel = this._consistencyModel;
-        let sRadius = ChunkLoader.serverLoadingRadius;
+        let sRadius = WorldModel.serverLoadingRadius;
 
         var newChunksForPlayer = {};
 
@@ -192,7 +194,7 @@ class ChunkLoader {
         let consistencyModel = this._consistencyModel;
 
         let minThreshold = player.avatar.chunkRenderDistance;
-        let maxThreshold = ChunkLoader.serverLoadingRadius;
+        let maxThreshold = WorldModel.serverLoadingRadius;
         minThreshold = Math.min(minThreshold, maxThreshold);
 
         return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, consistencyModel, minThreshold);
@@ -201,7 +203,9 @@ class ChunkLoader {
     unloadOuterSphere(player, starterChunk) {
         let consistencyModel = this._consistencyModel;
 
-        let maxThreshold = ChunkLoader.serverLoadingRadius;
+        let minThreshold = player.avatar.chunkUnloadDistance;
+        let maxThreshold = WorldModel.serverLoadingRadius;
+        maxThreshold = Math.min(minThreshold, maxThreshold);
 
         return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, consistencyModel, maxThreshold);
     }

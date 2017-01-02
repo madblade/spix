@@ -11,9 +11,9 @@ App.Model.Server.ChunkModel = function(app) {
     this.chunks = new Map();
     this.chunkUpdates = [];
 
-    this.chunkSizeX = 8;
-    this.chunkSizeY = 8;
-    this.chunkSizeZ = 256;
+    this.chunkSizeX = 16;
+    this.chunkSizeY = 16;
+    this.chunkSizeZ = 32;
     this.chunkCapacity = this.chunkSizeX * this.chunkSizeY * this.chunkSizeZ;
 
     // Graphical component

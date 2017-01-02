@@ -11,7 +11,8 @@ class Hub {
 
     constructor(app) {
         this._app = app;
-        this._games = {};
+        //this._games = {};
+        this._games = new Map();
     }
 
     static validateUser(user) {
@@ -33,14 +34,24 @@ class Hub {
 
     validateRequest() {
         // TODO [LOW] think of different criteria
-        var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
-        var validation = nbGames < 5;
+        // Count games.
+        //var nbGames = CollectionUtils.numberOfNestedProperties(this._games);
+        let games = this._games;
+
+        let nbGames = 0;
+        games.forEach((gamesForKind, kind) => {
+            nbGames += gamesForKind.size;
+        });
+
+        const validation = nbGames < 5;
         console.log(nbGames>0?nbGames:'No' + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
         if (!validation) console.log('Invalid game creation request.');
         return validation;
     }
 
     requestNewGame(user, kind) {
+        let app = this._app;
+
         // Verify.
         if (!Hub.validateUser(user)) return false;
         if (!Hub.validateKind(kind)) return false;
@@ -48,13 +59,15 @@ class Hub {
 
         // Create game and notify users.
         const id = this.addGame(kind);
-        this._app.connection.db.notifyGameCreation(kind, id);
+        app.connection.db.notifyGameCreation(kind, id);
 
         return true;
     }
 
     getGame(kind, gameId) {
-        return this._games[kind][gameId];
+        //return this._games[kind][gameId];
+        let gamesOfKind = this._games.get(kind);
+        return gamesOfKind.get(gameId);
     }
 
     /**
@@ -63,15 +76,24 @@ class Hub {
      */
     listGames() {
         let games = {};
+        let modelGames = this._games;
 
-        var f = kind => gid => {
-            if (this._games[kind][gid].ready) games[kind].push(gid);
-        };
+        //var f = kind => gid => {
+            //if (this._games[kind][gid].ready) games[kind].push(gid);
+        //};
 
-        for (let kind in this._games) {
+        //for (let kind in this._games) {
+        //    games[kind] = [];
+        //    CollectionUtils.forEachProperty(this._games[kind], f(kind));
+        //}
+
+        modelGames.forEach((gamesForKind, kind) => {
             games[kind] = [];
-            CollectionUtils.forEachProperty(this._games[kind], f(kind));
-        }
+            let g = games[kind];
+            gamesForKind.forEach((game, gameId) => {
+                g.push(gameId);
+            });
+        });
 
         return games;
     }
@@ -82,15 +104,21 @@ class Hub {
      * @returns {*}
      */
     addGame(kind) {
+        let games = this._games;
+        let connection = this._app.connection;
+
         // Init list of games of this kind
-        if (!this._games[kind]) this._games[kind] = {};
-        var gid = CollectionUtils.generateId(this._games[kind]);
+        //if (!this._games[kind]) this._games[kind] = {};
+        if (!games.has(kind)) games.set(kind, new Map());
+        //var gid = CollectionUtils.generateId(this._games[kind]);
+        let gid = CollectionUtils.generateId(games.get(kind));
 
         // Create matching game
-        var game = Factory.createGame(this, kind, gid, this._app.connection);
+        var game = Factory.createGame(this, kind, gid, connection);
 
         // Add to games.
-        if (game) this._games[kind][gid] = game;
+        //if (game) this._games[kind][gid] = game;
+        if (game) games.get(kind).set(gid, game);
 
         return game.gameId;
     }
@@ -101,10 +129,15 @@ class Hub {
             return;
         }
 
-        var gid = game.gameId;
-        var kind = game.kind;
+        let games = this._games;
+        let gid = game.gameId;
+        let kind = game.kind;
+
         game.destroy();
-        delete this._games[kind][gid];
+        // delete this._games[kind][gid];
+        let gamesOfKind = games.get(kind);
+        gamesOfKind.delete(gid);
+        if (gamesOfKind.size < 1) games.delete(kind);
     }
 
 }

@@ -18,9 +18,9 @@ class World {
         this._generationMethod = "flat";
 
         // Constants
-        this._xSize = 8;
-        this._ySize = 8;
-        this._zSize = 256;
+        this._xSize = 16;
+        this._ySize = 16;
+        this._zSize = 32;
     }
 
     get worldId() { return this._worldId; }
@@ -68,8 +68,8 @@ class World {
     }
 
     getFreePosition() {
-        let z = 150;
         let zLimit = this._zSize;
+        let z = zLimit - 2;
         while (this.whatBlock(4, 4, z) !== 0 && z < zLimit) ++z;
         return [4.5, 4.5, z];
     }

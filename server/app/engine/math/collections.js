@@ -21,7 +21,8 @@ class CollectionUtils {
 
     static insert(element, array) {
         if (array === undefined) {
-            console.log("BLD @insert: undefined array.");
+            let e = new Error('BLD @insert: undefined array.');
+            console.log(e.stack);
             return -1;
         }
         var location = CollectionUtils._locationOf(element, array) + 1;
@@ -35,7 +36,8 @@ class CollectionUtils {
 
     static insertWithLocation(location, element, array) {
         if (array === undefined) {
-            console.log("BLD: undefined array.");
+            let e = new Error('BLD: undefined array.');
+            console.log(e.stack);
             return -1;
         }
         if (array[location] === element) {
@@ -72,16 +74,10 @@ class CollectionUtils {
         return Object.keys(object).length;
     }
 
-    static numberOfNestedProperties(object) {
-        var result = 0;
-        for (var property in object)
-            result+=Object.keys(object[property]).length;
-        return result;
-    }
-
     static removeFromArray(array, object) {
         if (array === undefined) {
-            console.log("BLD @removeFromArray: undefined array.");
+            let e = new Error('BLD @removeFromArray: undefined array.');
+            console.log(e.stack);
             return -1;
         }
         const objectId = array.indexOf(object);

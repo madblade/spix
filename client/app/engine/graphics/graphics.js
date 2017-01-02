@@ -17,16 +17,10 @@ App.Engine.Graphics = function(app) {
     this.defaultGeometrySize = 64; // TODO [LOW] customize newMesh size variable
 
     // Rendering.
-    this.requestId =    null;
+    this.requestId          = null;
     this.rendererManager    = this.createRendererManager();
     this.sceneManager       = this.createSceneManager();
     this.cameraManager      = this.createCameraManager();
-
-    // TODO remove
-    //this.renderer =     this.createRenderer();
-    //this.scene =        this.createScene();
-    //this.camera =       this.createCamera();
-    //this.raycaster =    this.createRaycaster();
 
     // Interaction.
     this.controls =     null;

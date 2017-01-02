@@ -9,7 +9,9 @@ import Integrator from './integrator';
 class Newton {
 
     static globalTimeDilatation = 20000000;
+    //static globalTimeDilatation = 3000000;
     static gravity = [0, 0, -0.11];
+    //static gravity = [0, 0, 0];
 
     static solve(physicsEngine, Δt) {
 

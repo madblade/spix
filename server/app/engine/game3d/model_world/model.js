@@ -9,6 +9,8 @@ import CollectionUtils from '../../math/collections';
 
 class WorldModel {
 
+    static serverLoadingRadius = 5;
+
     constructor(game) {
         this._game = game;
 

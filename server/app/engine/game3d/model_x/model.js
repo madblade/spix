@@ -94,6 +94,7 @@ class XModel {
         let id = CollectionUtils.generateId(knots);
         var knot = new Knot(id, portal1, portal2);
 
+        // Create in model.
         knots.set(id, knot);
         portalsToKnots.set(knot.portal1.id, knot);
         portalsToKnots.set(knot.portal2.id, knot);
@@ -126,7 +127,6 @@ class XModel {
         portals.delete(portalId);
     }
 
-    // TODO [CRIT]
     removeKnot(knotId) {
         // Unlink portals.
         let knots = this._knots;

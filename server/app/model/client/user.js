@@ -42,6 +42,8 @@ class User {
 
     // Join a specific game.
     join(kind, gameId) {
+        gameId = parseInt(gameId);
+
         this._ingame = true;
         var game = this._hub.getGame(kind, gameId);
         if (!game) return false;

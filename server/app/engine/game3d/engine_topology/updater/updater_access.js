@@ -94,7 +94,6 @@ class UpdaterAccess {
         }
 
         // Add block on chunk.
-        //chunk.add(blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId);
         return [chunk, blockCoordinatesOnChunk[0], blockCoordinatesOnChunk[1], blockCoordinatesOnChunk[2], blockId];
     }
 

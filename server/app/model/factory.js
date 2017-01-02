@@ -4,8 +4,8 @@
 
 'use strict';
 
-import DB               from './appwide/db';
-import Hub              from './appwide/hub';
+import DB               from './client/user_db';
+import Hub              from './game/hub';
 
 import User             from './client/user';
 import Player           from './client/player';

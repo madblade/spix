@@ -210,7 +210,8 @@ class UpdaterFace {
 
             let currentComponent = fastComponents[componentId];
             if (currentComponent === undefined) {
-                console.log('BLD: skipping removal on component ' + componentId);
+                let e = new Error('BLD: skipping removal on component ' + componentId);
+                console.log(e.stack);
                 continue;
             }
             let index = CollectionUtils.removeFromArray(currentComponent, fid);
@@ -237,7 +238,9 @@ class UpdaterFace {
                 // TODO provide non-topo approach
                 // Somehow getting here means that the added block isn't topologically linked to any other
                 // component. So we have to create a new component id.
-                console.log('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');
+                let e = new Error('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');
+                console.log(e.stack);
+
                 fastComponents[componentId] = [];
                 fastComponentsIds[componentId] = [];
                 oldComponent = componentId;
