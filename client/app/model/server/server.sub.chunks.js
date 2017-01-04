@@ -4,17 +4,18 @@
 
 'use strict';
 
+/** Model **/
+
 App.Model.Server.ChunkModel = function(app) {
     this.app = app;
 
-    // Model component
-    this.chunks = new Map();
+    // Model component.
+    this.worlds = new Map();
+    this.worldProperties = new Map();
     this.chunkUpdates = [];
 
-    this.chunkSizeX = 16;
-    this.chunkSizeY = 16;
-    this.chunkSizeZ = 32;
-    this.chunkCapacity = this.chunkSizeX * this.chunkSizeY * this.chunkSizeZ;
+    // Initialize overworld.
+    this.addWorld(-1);
 
     // Graphical component
     var graphics = app.engine.graphics;
@@ -24,6 +25,23 @@ App.Model.Server.ChunkModel = function(app) {
     this.texture = graphics.loadTexture('atlas_512.png');
     this.textureCoordinates = graphics.getTextureCoordinates();
 };
+
+App.Model.Server.ChunkModel.prototype.addWorld = function(worldId) {
+    if (this.worlds.has(worldId)) return;
+
+    var world = new Map();
+    var property = {
+        chunkSizeX : 16,
+        chunkSizeY : 16,
+        chunkSizeZ : 32
+    };
+    property.chunkCapacity = property.chunkSizeX * property.chunkSizeY * property.chunkSizeZ;
+
+    this.worlds.set(worldId, world);
+    this.worldProperties.set(worldId, property);
+};
+
+/** Dynamics **/
 
 App.Model.Server.ChunkModel.prototype.init = function() {};
 
@@ -45,16 +63,16 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
                 var update = subdates[chunkId];
 
                 if (!update){
-                    this.unloadChunk(chunkId);
+                    this.unloadChunk(worldId, chunkId);
                 }
-                else if (this.isChunkLoaded(chunkId)) {
+                else if (this.isChunkLoaded(worldId, chunkId)) {
                     // TODO [HIGH] server-side, use distinct channels for chunk updates.
                     if (update.length != 3) {
                         console.log('WARN: corrupt update or model @refresh / updateChunk.');
                         console.log(update);
                         return;
                     } else {
-                        this.updateChunk(chunkId, update);
+                        this.updateChunk(worldId, chunkId, update);
                     }
                 }
                 else {
@@ -63,7 +81,7 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
                         console.log(update);
                         return;
                     } else {
-                        this.initializeChunk(chunkId, update);
+                        this.initializeChunk(worldId, chunkId, update);
                     }
                 }
             }
@@ -80,7 +98,7 @@ App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
     if (this.debug) {
         console.log(updates);
         var nbcc = 0;
-        for (var cid in updates) { if (updates[cid][1][1]!==undefined) nbcc += updates[cid][1][1].length; }
+        for (var cid in updates) { if (updates[cid][1][1]) nbcc += updates[cid][1][1].length; }
         console.log(nbcc);
     }
 
@@ -89,16 +107,31 @@ App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
     this.needsUpdate = true;
 };
 
-App.Model.Server.ChunkModel.prototype.isChunkLoaded = function(chunkId) {
-    return this.chunks.has(chunkId);
+// TODO [CRIT] worldify
+App.Model.Server.ChunkModel.prototype.isChunkLoaded = function(worldId, chunkId) {
+    var world = this.worlds.get(worldId);
+    return (world && world.has(chunkId));
 };
 
-App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
+// TODO [CRIT] couple with knot model.
+App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkId, all) {
     var graphics = this.app.engine.graphics;
 
+    // Initialize model if a new world is transmitted.
+    var world = this.worlds.get(worldId);
+    if (!world) {
+        this.addWorld(worldId);
+        world = this.worlds.get(worldId);
+    }
+
+    var property = this.worldProperties.get(worldId);
+    var sizeX = property.chunkSizeX;
+    var sizeY = property.chunkSizeY;
+    var sizeZ = property.chunkSizeZ;
+
     // TODO use graphics in refresh
-    var chunk = graphics.initializeChunk(chunkId, all, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ, this.chunkCapacity);
-    this.chunks.set(chunkId, chunk);
+    var chunk = graphics.initializeChunk(chunkId, all, sizeX, sizeY, sizeZ);
+    world.set(chunkId, chunk);
 
     // Add to scene.
     if (!chunk || !chunk.hasOwnProperty('meshes')) {
@@ -108,22 +141,42 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(chunkId, all) {
     }
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.addToScene(meshes[m], -1); // TODO [CRIT] couple with knot model.
+        graphics.addToScene(meshes[m], -1); // TODO [CRIT] link scene
     }
 };
 
-App.Model.Server.ChunkModel.prototype.updateChunk = function(chunkId, components) {
+// TODO [CRIT] worldify
+App.Model.Server.ChunkModel.prototype.updateChunk = function(worldId, chunkId, components) {
     var graphics = this.app.engine.graphics;
-    var chunk = this.chunks.get(chunkId);
-    if (!chunk) return;
+
+    var world = this.worlds.get(worldId);
+    if (!world) {
+        console.log('Error: updateChunk trying to access unloaded world.');
+        return;
+    }
+    var property = this.worldProperties.get(worldId);
+
+    var chunk = world.get(chunkId);
+    if (!chunk) {
+        console.log('Error: updateChunk trying to update unloaded chunk.');
+        return;
+    }
+
+    var sizeX = property.chunkSizeX;
+    var sizeY = property.chunkSizeY;
+    var sizeZ = property.chunkSizeZ;
 
     // TODO use graphics in refresh
-    graphics.updateChunk(chunk, chunkId, components, this.chunkSizeX, this.chunkSizeY, this.chunkSizeZ);
+    graphics.updateChunk(chunk, chunkId, components, sizeX, sizeY, sizeZ);
 };
 
-App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
+// TODO [CRIT] worldify
+App.Model.Server.ChunkModel.prototype.unloadChunk = function(worldId, chunkId) {
     var graphics = this.app.engine.graphics;
-    var chunk = this.chunks.get(chunkId);
+    var world = this.worlds.get(worldId);
+    if (!world) return;
+
+    var chunk = world.get(chunkId);
     if (!chunk) {
         console.log('WARN. Update miss @unloadChunk ' + chunkId);
         return;
@@ -131,23 +184,30 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(chunkId) {
 
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.removeFromScene(meshes[m]);
+        graphics.removeFromScene(meshes[m], -1); // TODO [CRIT] worldify
     }
 
-    this.chunks.delete(chunkId);
+    world.delete(chunkId);
 };
 
-App.Model.Server.ChunkModel.prototype.getCloseTerrain = function() {
+// TODO [CRIT] worldify
+App.Model.Server.ChunkModel.prototype.getCloseTerrain = function(worldId) {
+    // Only chunks within current world.
+    if (!worldId) worldId = '-1'; // Get overworld by default TODO [LOW] check security
+    var world = this.worlds.get(worldId);
+    if (!world) return;
+
     var meshes = [];
-    var chks = this.chunks;
-    chks.forEach(function(currentChunk, cid) {
+    world.forEach(function(currentChunk, cid) {
         // TODO extract on 4 closest chunks.
         if (!currentChunk || !currentChunk.hasOwnProperty('meshes')) {
             console.log("Warn: corrupted chunk inside client model " + cid);
-            console.log(chks);
+            console.log(world);
             return;
         }
+
         currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh)});
     });
+
     return meshes;
 };

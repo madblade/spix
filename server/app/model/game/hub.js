@@ -63,6 +63,7 @@ class Hub {
 
     getGame(kind, gameId) {
         let gamesOfKind = this._games.get(kind);
+        if (!gamesOfKind) return;
         return gamesOfKind.get(gameId);
     }
 

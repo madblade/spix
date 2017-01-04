@@ -48,7 +48,14 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
     intersects.sort(function(a,b) { return a.distance > b.distance; });
     var point = intersects[0].point;
     var newBlockType = 1; // TODO user selection for block type.
-    clientModel.triggerEvent('b', ['add', point.x, point.y, point.z, newBlockType]);
+
+    var rx = point.x, ry = point.y, rz = point.z;
+
+    //var x = rx.toPrecision(16+Math.round(Math.log10(Math.floor(rx))));
+    //var y = ry.toPrecision(16+Math.round(Math.log10(Math.floor(rx))));
+    //var z = rz.toPrecision(16+Math.round(Math.log10(Math.floor(rx))));
+
+    clientModel.triggerEvent('b', ['add', rx, ry, rz, newBlockType]);
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {

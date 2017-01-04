@@ -10,7 +10,8 @@ App.Model.Server.SelfModel = function(app) {
     // Model component
     this.position = null;
     this.rotation = null;
-    this.id = null;
+    this.entityId = '-1';     // Self default
+    this.worldId = '-1';      // Overworld default
 
     // Graphical component
     var graphics = app.engine.graphics;
@@ -29,6 +30,7 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
     var up = this.position;
     var r = this.rotation;
+    var id = this.entityId;
 
     var graphics = this.app.engine.graphics;
     var avatar = this.avatar;
@@ -46,7 +48,7 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
         avatar.rotation.y = Math.PI + r[0];
 
         // Update animation.
-        if (animate) graphics.updateAnimation(-1);
+        if (animate) graphics.updateAnimation(id);
 
         // Update camera.
         graphics.cameraManager.positionCameraBehind(up); // Camera wrapper actually
@@ -64,10 +66,13 @@ App.Model.Server.SelfModel.prototype.updateSelf = function(p, r) {
 App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
 
     // Player id '-1' never used by any other entity.
-    graphics.initializeEntity(-1, 'steve', function(createdEntity) {
-        var object3d = graphics.finalizeEntity(-1, createdEntity);
+    var id = this.entityId;
+
+    graphics.initializeEntity(id, 'steve', function(createdEntity) {
+        var object3d = graphics.finalizeEntity(id, createdEntity);
         this.avatar = object3d;
-        if (this.displayAvatar) graphics.addToScene(object3d, -1); // TODO [CRIT] couple with knot model.
+        // TODO [CRIT] couple with knot model.
+        if (this.displayAvatar) graphics.addToScene(object3d, id);
     }.bind(this));
 
 };

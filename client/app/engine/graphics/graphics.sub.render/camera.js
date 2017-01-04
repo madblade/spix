@@ -76,10 +76,11 @@ App.Engine.Graphics.CameraManager.prototype.createRaycaster = function() {
 App.Engine.Graphics.CameraManager.prototype.performRaycast = function() {
     var graphicsEngine = this.graphicsEngine;
     var chunkModel = graphicsEngine.app.model.server.chunkModel;
+    var selfModel = graphicsEngine.app.model.server.selfModel;
 
     var raycaster = this.raycaster;
     var camera = this.mainCamera;
-    var terrain = chunkModel.getCloseTerrain();
+    var terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
     return raycaster.intersectObjects(terrain, true);
