@@ -7,7 +7,6 @@
 class Selector {
 
     constructor(topologyEngine) {
-        this._accessor    = topologyEngine.accessor;
     }
 
     // TODO [LOW] distance test.

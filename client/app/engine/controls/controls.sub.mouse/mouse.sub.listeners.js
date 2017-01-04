@@ -82,13 +82,6 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
         }
     }
 
-    var int = [];
-    intersects.forEach(i => {int.push(i.point.z)});
-    console.log('r ' + rx + ' ' + ry + ' ' + rz);
-    console.log('f ' + fx + ' ' + fy + ' ' + fz);
-    console.log(int);
-
-
     clientModel.triggerEvent('b', ['add', fx, fy, fz, newBlockType]);
 };
 
@@ -141,7 +134,6 @@ App.Engine.UI.prototype.onRightMouseDown = function() {
     }
 
     clientModel.triggerEvent('b', ['del', fx, fy, fz]);
-    //clientModel.triggerEvent('b', ['del', point.x, point.y, point.z]);
 };
 
 App.Engine.UI.prototype.onMiddleMouseDown = function() {

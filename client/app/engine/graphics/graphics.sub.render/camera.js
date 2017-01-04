@@ -22,7 +22,7 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 };
 
 App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster) {
-    var near = forRaycaster ? 1 : this.mainNear;
+    var near = forRaycaster ? 1 : this.mainNear; // W. T. F.
     var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, near, this.mainFar);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);

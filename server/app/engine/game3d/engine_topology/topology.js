@@ -9,7 +9,6 @@ import OutputBuffer     from './output_buffer';
 
 import Selector         from './selector/selector';
 import Updater          from './updater/updater';
-import Accessor         from './accessor/accessor';
 
 class TopologyEngine {
 
@@ -25,14 +24,12 @@ class TopologyEngine {
         this._outputBuffer      = new OutputBuffer();
 
         // Engine.
-        this._accessor          = new Accessor(this);
         this._selector          = new Selector(this); // Extracts subsets for players.
         this._updater           = new Updater(this);  // Updates model. Needs Accessor.
     }
 
     get entityModel()           { return this._entityModel; }
     get worldModel()            { return this._worldModel; }
-    get accessor()              { return this._accessor; }
     get selector()              { return this._selector; }
     get outputBuffer()          { return this._outputBuffer; }
 

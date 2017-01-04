@@ -14,7 +14,6 @@ class Updater {
         // Models.
         this._worldModel   = topologyEngine.worldModel;
         this._entityModel  = topologyEngine.entityModel;
-        this._accessor     = topologyEngine.accessor;
 
         this._outputBuffer = topologyEngine.outputBuffer;
     }
@@ -43,9 +42,8 @@ class Updater {
         let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;
         let em = this._entityModel;
-        let accessor = this._accessor;
 
-        let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, world, em, accessor);
+        let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, world, em);
         if (!a) return;
 
         let $chunk, $x, $y, $z, $blockId;
@@ -65,9 +63,8 @@ class Updater {
         let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;
         let em = this._entityModel;
-        let accessor = this._accessor;
 
-        let a = UpdaterAccess.delBlock(avatar, x, y, z, world, em, accessor);
+        let a = UpdaterAccess.delBlock(avatar, x, y, z, world, em);
         if (!a) return;
 
         let $chunk, $x, $y, $z;
