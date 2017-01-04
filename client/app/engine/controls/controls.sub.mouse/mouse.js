@@ -12,11 +12,11 @@ App.Engine.UI.prototype.setupMouse = function() {
     this.setupPointerLock();
 };
 
-App.Engine.UI.prototype.getControls = function(controlType, camera) {
+App.Engine.UI.prototype.getControls = function(controlType, cameraManager) {
     var controls;
 
     if (controlType === 'first-person') {
-        controls = this.getFirstPersonControls(camera);
+        controls = this.getFirstPersonControls(cameraManager.mainCamera, cameraManager.mainRaycasterCamera);
         controls.type = 'fp';
     } else {
         controls = undefined;

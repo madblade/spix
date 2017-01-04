@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
+App.Engine.UI.prototype.getFirstPersonControls = function(camera, raycasterCamera) {
     var scope = this;
 
     var clientModel = this.app.model.client;
@@ -12,18 +12,26 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
 
     return (function() {
         camera.rotation.set(0,0,0);
+        raycasterCamera.rotation.set(0, 0, 0);
+
         var pitchObject = new THREE.Object3D();
+        var pitchObjectR = new THREE.Object3D();
         pitchObject.add(camera);
+        pitchObjectR.add(raycasterCamera);
 
         var yawObject = new THREE.Object3D();
+        var yawObjectR = new THREE.Object3D();
         yawObject.add(pitchObject);
+        yawObjectR.add(pitchObjectR);
 
         var onMouseMove = function (event) {
             if (!scope.threeControlsEnabled) return;
             var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
+            // TODO [CRIT] worldify and decouple.
             graphics.cameraManager.moveCameraFromMouse(movementX, movementY, yawObject, pitchObject);
+            graphics.cameraManager.moveCameraFromMouse(movementX, movementY, yawObjectR, pitchObjectR);
 
             clientModel.triggerEvent('r', [yawObject.rotation.z, pitchObject.rotation.x]);
         };
@@ -32,7 +40,7 @@ App.Engine.UI.prototype.getFirstPersonControls = function(camera) {
             stopListeners : function () { document.removeEventListener('mousemove', onMouseMove, false); },
             startListeners : function() { document.addEventListener('mousemove', onMouseMove, false); },
             getObject : function () {
-                return yawObject;
+                return [yawObject, yawObjectR];
                 // return camera;
             },
             getDirection : function () {

@@ -7,14 +7,23 @@
 App.Engine.Graphics.CameraManager = function(graphicsEngine) {
     this.graphicsEngine = graphicsEngine;
 
-    this.mainCamera = this.createCamera();
+    // Camera properties.
+    this.mainFOV = 90;
+    this.mainAspect = window.innerWidth / window.innerHeight;
+    this.mainNear = 0.0001;
+    this.mainFar = 100000;
+
+    // Cameras.
+    this.mainCamera = this.createCamera(false);
     this.subCameras = new Map();
 
+    this.mainRaycasterCamera = this.createCamera(true);
     this.raycaster = this.createRaycaster();
 };
 
-App.Engine.Graphics.CameraManager.prototype.createCamera = function() {
-    var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.0001, 100000);
+App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster) {
+    var near = forRaycaster ? 1 : this.mainNear;
+    var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, near, this.mainFar);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
     return camera;
@@ -29,6 +38,7 @@ App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) 
     var newMainCamera = this.subCameras.get(cameraId);
     if (!newMainCamera) { console.log('Failed to switch with camera ' + cameraId); return; }
     var oldMainCamera = this.mainCamera;
+    // TODO [CRIT] worldify with raycaster camera
 
     this.mainCamera = newMainCamera;
     this.addCamera(oldMainCamera);
@@ -39,14 +49,17 @@ App.Engine.Graphics.CameraManager.prototype.positionCameraBehind = function(vect
     var i = this.graphicsEngine.interaction;
 
     if (i === 'FP') {
-        cameraWrapper.position.x = vector[0];
-        cameraWrapper.position.y = vector[1]; // + 10;
-        cameraWrapper.position.z = vector[2] + 1.6;
-
+        cameraWrapper.forEach(function(cam) {
+            cam.position.x = vector[0];
+            cam.position.y = vector[1]; // + 10;
+            cam.position.z = vector[2] + 1.6;
+        });
     } else if (i === 'TP') {
-        cameraWrapper.position.x = vector[0];
-        cameraWrapper.position.y = vector[1]; // + 10;
-        cameraWrapper.position.z = vector[2] + 1.8;
+        cameraWrapper.forEach(function(cam) {
+            cam[0].position.x = vector[0];
+            cam[0].position.y = vector[1]; // + 10;
+            cam[0].position.z = vector[2] + 1.8;
+        });
     }
 };
 
@@ -62,9 +75,15 @@ App.Engine.Graphics.CameraManager.prototype.moveCameraFromMouse = function(movem
 
 App.Engine.Graphics.CameraManager.prototype.resize = function(width, height) {
     // TODO [HIGH] apply to other cameras AND RENDER TARGETS (DONT FORGET).
+    var aspect = width / height;
+
     var camera = this.mainCamera;
-    camera.aspect = width / height;
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
+
+    var raycasterCamera = this.mainRaycasterCamera;
+    raycasterCamera.aspect = aspect;
+    raycasterCamera.updateProjectionMatrix();
 };
 
 // Raycasting
@@ -79,15 +98,22 @@ App.Engine.Graphics.CameraManager.prototype.performRaycast = function() {
     var selfModel = graphicsEngine.app.model.server.selfModel;
 
     var raycaster = this.raycaster;
-    var camera = this.mainCamera;
+    var camera = this.mainRaycasterCamera;
     var terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
+    var intersects;
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    return raycaster.intersectObjects(terrain, true);
+    intersects = raycaster.intersectObjects(terrain);
+
+    return intersects;
 };
 
 /** Interface with graphics engine. **/
 
 App.Engine.Graphics.prototype.createCameraManager = function() {
     return new App.Engine.Graphics.CameraManager(this);
+};
+
+App.Engine.Graphics.prototype.getCameraCoordinates = function() {
+    return this.controls.getObject()[0].position;
 };
