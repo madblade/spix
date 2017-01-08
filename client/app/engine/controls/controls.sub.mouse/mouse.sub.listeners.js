@@ -44,7 +44,6 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
     }
     intersects.sort(function(a,b) { return a.distance > b.distance; });
     var point = intersects[0].point;
-    var newBlockType = 1; // TODO user selection for block type.
 
     // Compute blocks.
     var flo = Math.floor;
@@ -83,7 +82,7 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
         }
     }
 
-    clientModel.triggerEvent('ray', ['add', fx, fy, fz, newBlockType]);
+    clientModel.triggerEvent('ray', ['add', fx, fy, fz]);
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {

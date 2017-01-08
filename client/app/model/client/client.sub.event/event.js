@@ -18,7 +18,8 @@ App.Model.Client.EventComponent.prototype.init = function() {
 };
 
 App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
-    var clientModel = this.clientModel;
+    var clientSelfModel = this.clientModel.selfComponent;
+    var serverSelfModel = this.clientModel.app.model.server.selfModel;
 
     switch (type) {
         case 'm':
@@ -31,8 +32,10 @@ App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
             this.triggerRotation(type, data);
             break;
         case 'ray': // Ray casted.
-            var i = clientModel.selfComponent.clickInteraction;
+            var i = clientSelfModel.clickInteraction;
             if (i.isBlock()) {
+                // From inventory, select block to be added.
+                data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
                 this.triggerBlock('b', data);
             } else if (i.isX()) {
                 this.triggerBlock('x', data);

@@ -7,21 +7,34 @@
 App.Model.Client.SelfComponent = function(clientModel) {
     this.clientModel = clientModel;
 
-    // Model.
+    /** Model **/
+
+    // Camera.
     this._cameraInteraction = 'first-person';
     this.cameraInteraction = {
         isFirstPerson: function() { return this._cameraInteraction === 'first-person'; }.bind(this),
         isThirdPerson: function() { return this._cameraInteraction === 'third-person'; }.bind(this)
     };
 
+    // Selected action.
     this._clickInteraction = 'block';
     this.clickInteraction = {
         isBlock: function() { return this._clickInteraction === 'block' }.bind(this),
         isX: function() { return this._clickInteraction === 'x' }.bind(this)
     };
 
-    // Changes.
+    // Inventory.
+    this.currentItem = 0; // Index of current item in inventory.
+
+    /** Dynamic **/
+
+    // Buffer filled by engine->controls.
     this.changes = [];
+};
+
+// TODO [MEDIUM] implement items
+App.Model.Client.SelfComponent.prototype.getCurrentItem = function() {
+    return this.currentItem;
 };
 
 App.Model.Client.SelfComponent.prototype.triggerChange = function(type, data) {

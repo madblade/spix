@@ -7,13 +7,16 @@
 App.Model.Server.SelfModel = function(app) {
     this.app = app;
 
-    // Model component
-    this.position = null;
-    this.rotation = null;
+    // General.
     this.entityId = '-1';     // Self default
     this.worldId = '-1';      // Overworld default
 
-    // Graphical component
+    // Model component.
+    this.position = null;
+    this.rotation = null;
+    this.inventory = this.getInventory();
+
+    // Graphical component.
     var graphics = app.engine.graphics;
     this.needsUpdate = false;
     this.displayAvatar = false;
