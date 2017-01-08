@@ -4,7 +4,20 @@
 
 'use strict';
 
-App.Model.Client.prototype.triggerEvent = function(type, data) {
+App.Model.Client.EventComponent = function(app) {
+    this.app = app;
+
+    this.eventsToPush = [];
+    this.activeControls = {};
+    this.numberOfEvents = 0;
+    this.maxNumberOfEventsPer16ms = 16;
+};
+
+App.Model.Client.EventComponent.prototype.init = function() {
+    this.activeControls = this.getActiveControls(); // TODO put in self model
+};
+
+App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
 
     switch(type) {
         case 'm':
@@ -27,7 +40,7 @@ App.Model.Client.prototype.triggerEvent = function(type, data) {
     this.numberOfEvents++;
 };
 
-App.Model.Client.prototype.pushEvents = function() {
+App.Model.Client.EventComponent.prototype.pushEvents = function() {
     var connectionEngine = this.app.engine.connection;
     var events = this.eventsToPush;
     var currentEvent;
@@ -39,6 +52,7 @@ App.Model.Client.prototype.pushEvents = function() {
     }
 
     // Push to server
+    // TODO [PERF] simplify and aggregate per client.
     for (var eventId = 0, length = events.length; eventId < length; ++eventId) {
         currentEvent = events[eventId];
         connectionEngine.send(currentEvent[0], currentEvent[1]);
@@ -49,7 +63,7 @@ App.Model.Client.prototype.pushEvents = function() {
     this.numberOfEvents = 0;
 };
 
-App.Model.Client.prototype.getEventsOfType = function(type) {
+App.Model.Client.EventComponent.prototype.getEventsOfType = function(type) {
     var events = this.eventsToPush;
     var result = [];
 
@@ -65,7 +79,7 @@ App.Model.Client.prototype.getEventsOfType = function(type) {
     return result;
 };
 
-App.Model.Client.prototype.filterEvents = function() {
+App.Model.Client.EventComponent.prototype.filterEvents = function() {
     var events = this.eventsToPush;
     var filteredEvents = [];
     var lastRotation;

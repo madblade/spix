@@ -56,9 +56,9 @@ App.Engine.Graphics.CameraManager.prototype.positionCameraBehind = function(vect
         });
     } else if (i === 'TP') {
         cameraWrapper.forEach(function(cam) {
-            cam[0].position.x = vector[0];
-            cam[0].position.y = vector[1]; // + 10;
-            cam[0].position.z = vector[2] + 1.8;
+            cam.position.x = vector[0];
+            cam.position.y = vector[1]; // + 10;
+            cam.position.z = vector[2] + 1.8;
         });
     }
 };

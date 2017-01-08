@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Model.Client.prototype.getActiveControls = function() {
+App.Model.Client.EventComponent.prototype.getActiveControls = function() {
     return {
         forward: false,
         backwards: false,

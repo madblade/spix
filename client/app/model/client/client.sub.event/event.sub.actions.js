@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Model.Client.prototype.triggerMovement = function(type, data) {
+App.Model.Client.EventComponent.prototype.triggerMovement = function(type, data) {
     var ak = this.activeControls;
     var events = this.eventsToPush;
     var addEvent = function() { events.push([type, data]); };
@@ -78,7 +78,7 @@ App.Model.Client.prototype.triggerMovement = function(type, data) {
     }
 };
 
-App.Model.Client.prototype.triggerAction = function(type, data) {
+App.Model.Client.EventComponent.prototype.triggerAction = function(type, data) {
     var events = this.eventsToPush;
 
     switch(data) {
@@ -90,12 +90,12 @@ App.Model.Client.prototype.triggerAction = function(type, data) {
     }
 };
 
-App.Model.Client.prototype.triggerRotation = function(type, data) {
+App.Model.Client.EventComponent.prototype.triggerRotation = function(type, data) {
     var events = this.eventsToPush;
     events.push([type, data]);
 };
 
-App.Model.Client.prototype.triggerBlock = function(type, data) {
+App.Model.Client.EventComponent.prototype.triggerBlock = function(type, data) {
     var events = this.eventsToPush;
     events.push([type, data]);
 };

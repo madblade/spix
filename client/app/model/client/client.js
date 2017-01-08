@@ -1,5 +1,7 @@
 /**
- *
+ * Manages whatever mechanism must remain client-side,
+ * along with aggregating, filtering and triggering events
+ * to be sent.
  */
 
 'use strict';
@@ -7,17 +9,22 @@
 App.Model.Client = function(app) {
     this.app = app;
 
-    this.eventsToPush = [];
-    this.activeControls = {};
+    // Client model component.
+    this.selfComponent = new App.Model.Client.SelfComponent(app);
 
-    this.numberOfEvents = 0;
-    this.maxNumberOfEventsPer16ms = 16;
+    // Event component.
+    this.eventComponent = new App.Model.Client.EventComponent(app);
+
 };
 
 App.Model.Client.prototype.init = function() {
-    this.activeControls = this.getActiveControls();
+    this.eventComponent.init();
 };
 
 App.Model.Client.prototype.refresh = function() {
-    this.pushEvents();
+    this.eventComponent.pushEvents();
+};
+
+App.Model.Client.prototype.triggerEvent = function(type, data) {
+    this.eventComponent.triggerEvent(type, data);
 };
