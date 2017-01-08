@@ -67,13 +67,13 @@ class Game {
     }
 
     // Stop game loop.
-    stop(doTimeout) {
+    pause(doTimeout) {
         console.log("Game stopping.");
         if (this._jobId !== undefined) clearInterval(this._jobId);
         this._isRunning = false;
 
         // Set idle time limit before despawning this game.
-        if (doTimeout) this._timeIdleId = setTimeout(_ => this.suicide(), 5000);
+        if (doTimeout) this._timeIdleId = setTimeout(_ => this.stop(), 30000);
     }
 
     /** Players **/
@@ -101,23 +101,23 @@ class Game {
 
         // Stop game if need be.
         if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
-        this.stop(true); // Stop with idle timeout.
+        this.pause(true); // Stop with idle timeout.
     }
 
     removeAllPlayers() {
         this._playerManager.removeAllPlayers();
-        if (this._isRunning) this.stop(true); // Stop with idle timeout.
+        if (this._isRunning) this.pause(true); // Stop with idle timeout.
     }
 
     // Auto-destruction for being idle for too long. Internal use.
-    suicide() {
+    stop() {
         console.log("Game " + this._gameId + " ended for being idle for too long.");
         this._hub.endGame(this);
     }
 
     // To be triggered from Hub only.
     destroy() {
-        if (this._isRunning) this.stop(false); // Going to destroy -> no idle timeout.
+        if (this._isRunning) this.pause(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
         this._playerManager.destroy();
         delete this._hub;

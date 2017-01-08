@@ -19,7 +19,10 @@ class Newton {
         let WM = physicsEngine.worldModel; // TODO [HIGH] worldify, sort/optimize in entityModel.
         let o  = physicsEngine.outputBuffer;
 
-        const dt = Δt/Newton.globalTimeDilatation;
+        let dt = Δt/Newton.globalTimeDilatation;
+        if (dt > 5.0) {
+            dt = 5.0;
+        }
 
         EM.forEach(function(entity) {
             const worldId = entity.worldId;
