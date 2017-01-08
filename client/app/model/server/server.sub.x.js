@@ -18,6 +18,6 @@ App.Model.Server.XModel.prototype.refresh = function() {
     var graphics = this.app.engine.graphics;
 };
 
-App.Model.Server.XModel.prototype.updateX = function() {
+App.Model.Server.XModel.prototype.updateX = function(data) {
     console.log('update x model');
 };

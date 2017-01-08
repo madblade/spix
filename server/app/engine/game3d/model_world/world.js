@@ -45,6 +45,11 @@ class World {
         return [f(x/dx), f(y/dy), f(z/dz)];
     }
 
+    getChunkByCoordinates(x, y, z) {
+        let c = this.getChunkCoordinates(x, y, z);
+        return this.getChunk(...c);
+    };
+
     whatBlock(x, y, z) {
         let coords = this.getChunkCoordinates(x, y, z);
 

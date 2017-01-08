@@ -12,14 +12,6 @@ class EntityLoader {
         this._entityModel = consistencyEngine.entityModel;
     }
 
-    // Squared Euclidean distance.
-    static entityDistance(entityX, entityY) {
-        let result = 0; let d;
-        let pX = entityX.position, pY = entityY.position;
-        for (let i = 0; i<3; ++i) { d = pX[i]-pY[i]; result += d*d; }
-        return result;
-    };
-
     computeEntitiesInRange(player) {
         let entityModel = this._entityModel;
         let avatar = player.avatar;
@@ -45,7 +37,7 @@ class EntityLoader {
         thresh *= thresh; // Squared distance.
         // TODO [CRIT] worldify distance to knot then other world's player.
 
-        let distance = EntityLoader.entityDistance;
+        let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         var addedEntities = {};
         var removedEntities = {};

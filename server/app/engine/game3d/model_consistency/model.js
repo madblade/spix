@@ -18,6 +18,7 @@ class ConsistencyModel {
         this._entityIdsForEntity        = new Map();
         this._chunkIdsForEntity         = new Map();
         this._chunkIdAndPartsForEntity  = new Map();
+        this._xIdsForEntity             = new Map();
     }
 
     spawnPlayer(player) {
@@ -28,12 +29,14 @@ class ConsistencyModel {
         this._entityIdsForEntity        .set(playerId, new Set());
         this._chunkIdsForEntity         .set(playerId, chunksMap);
         this._chunkIdAndPartsForEntity  .set(playerId, new Map()); // TODO [HIGH] think
+        this._xIdsForEntity             .set(playerId, new Map());
     }
 
     removePlayer(playerId) {
         this._entityIdsForEntity        .delete(playerId);
         this._chunkIdsForEntity         .delete(playerId);
         this._chunkIdAndPartsForEntity  .delete(playerId);
+        this._xIdsForEntity             .delete(playerId);
     }
 
     /** Entity to chunks **/
@@ -114,6 +117,22 @@ class ConsistencyModel {
 
     setEntityOutOfRange(playerId, entityId) {
         this._entityIdsForEntity.get(playerId).delete(entityId);
+    }
+
+    /** Entity to xs **/
+
+    // Note: it would not have been wise to consider an x as an 'entity'.
+    // ENHANCEMENT [LONG-TERM]: can an x move over time?
+    hasX(playerId, xId) {
+        return this._xIdsForEntity.get(playerId).has(xId);
+    }
+
+    setXLoaded(playerId, xId) {
+        this._xIdsForEntity.get(playerId).add(xId);
+    }
+
+    setXOutOfRange(playerId, xId) {
+        this._xIdsForEntity.get(playerId).delete(xId);
     }
 
 }

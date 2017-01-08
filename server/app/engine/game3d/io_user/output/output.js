@@ -22,6 +22,7 @@ class UserOutput {
 
     static bench = false;
 
+    // TODO [HIGH] -> don't recurse over every player, rather over updates...
     update() {
         let t1, t2;
 
@@ -39,6 +40,11 @@ class UserOutput {
         this.updateEntities();
         t2 = (process.hrtime(t1)[1]/1000);
         if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send entity updates.");
+
+        t1 = process.hrtime();
+        this.updateX();
+        t2 = (process.hrtime(t1)[1]/1000);
+        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send x updates.");
 
         t1 = process.hrtime();
         this.updateMeta();
@@ -160,6 +166,25 @@ class UserOutput {
 
         // Empty entity updates buffer.
         physicsEngine.flushOutput();
+    }
+
+    updateX() {
+        let game = this._game;
+        let consistencyEngine = this._consistencyEngine;
+        let xOutput = consistencyEngine.getXOutput();
+
+        game.players.forEach(p => {
+            let pid = p.avatar.id;
+            let addedOrRemovedX = xOutput.get(pid);
+
+            if (addedOrRemovedX) {
+                let output = UserOutput.pack(addedOrRemovedX);
+                p.send('x', output);
+            }
+        });
+
+        // TODO [HIGH] when x updates are implemented.
+        // xEngine.flushOutput();
     }
 
     updateMeta() {

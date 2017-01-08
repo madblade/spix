@@ -24,6 +24,7 @@ class Portal {
     }
 
     get id()        { return this._id; }
+    get worldId()   { return this._worldId; }
 
 }
 

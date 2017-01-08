@@ -104,6 +104,10 @@ class XModel {
 
     /** Remove **/
 
+    removePortalFromPosition(worldId, x, y, z) {
+        // TODO [CRIT] worldify
+    }
+
     removePortal(portalId) {
         // Unlink and remove portal.
         let portalToKnots = this._portalsToKnots;
@@ -146,22 +150,23 @@ class XModel {
 
     /** Get **/
 
-    getConnectivity(avatar) {
-        let worldId = avatar.worldId;
+    // Returns a Map portalId -> [otherEndId, otherWorldId]
+    getConnectivity(originChunkId, worldId) {
+        // TODO [CRIT] use chunk iterator for neighbour (visible) chunks.
         let chunksToPortals = this._worldToChunksToPortals.get(worldId);
 
         if (!chunksToPortals || chunksToPortals.size < 1) return;
         var portalsToWorlds = new Map();
 
-        chunksToPortals.forEach((portals, chunkId) =>{
-            // TODO [CRIT] knotify
+        chunksToPortals.forEach((portals, currentChunkId) => {
+            // TODO [CRIT] make it so there it goes through other worlds.
             // if (distance(avatar, chunk) < thresh)
                 portals.forEach(portal => {
                     let knot = this._portalsToKnots.get(portal.id);
                     if (knot) {
                         let otherPortal = knot.otherEnd(portal);
                         if (otherPortal)
-                            portalsToWorlds.set(portal.id, otherPortal);
+                            portalsToWorlds.set(portal.id, [otherPortal.id, otherPortal.worldId]);
                     }
                 });
         });

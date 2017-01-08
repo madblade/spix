@@ -42,6 +42,7 @@ class ConsistencyEngine {
     get game()                  { return this._game; }
     get worldModel()            { return this._worldModel; }
     get entityModel()           { return this._entityModel; }
+    get xModel()                { return this._xModel; }
     get consistencyModel()      { return this._consistencyModel; }
 
     get physicsEngine()         { return this._physicsEngine; }
@@ -83,9 +84,14 @@ class ConsistencyEngine {
         return this._entityBuffer.addedPlayers;
     }
 
+    getXOutput() {
+        return this._updater.getOutput();
+    }
+
     flushBuffers() {
         this._chunkBuffer.flush();
         this._entityBuffer.flush();
+        this._updater.flushBuffers();
     }
 
     // The first time, FORCE BUILD when output requests CE initial output.
