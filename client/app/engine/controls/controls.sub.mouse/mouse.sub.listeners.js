@@ -57,6 +57,7 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
     var ex = dx < 0.0000001, ey = dy < 0.0000001, ez = dz < 0.0000001;
 
     if (ex + ey + ez !== 1) {
+        // TODO [HIGH] how do I remove an X?
         console.log("Error: precision on intersection @addBlock");
         return;
     }
@@ -82,7 +83,7 @@ App.Engine.UI.prototype.onLeftMouseDown = function() {
         }
     }
 
-    clientModel.triggerEvent('b', ['add', fx, fy, fz, newBlockType]);
+    clientModel.triggerEvent('ray', ['add', fx, fy, fz, newBlockType]);
 };
 
 App.Engine.UI.prototype.onRightMouseDown = function() {
@@ -133,7 +134,7 @@ App.Engine.UI.prototype.onRightMouseDown = function() {
         }
     }
 
-    clientModel.triggerEvent('b', ['del', fx, fy, fz]);
+    clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
 };
 
 App.Engine.UI.prototype.onMiddleMouseDown = function() {

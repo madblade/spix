@@ -18,9 +18,39 @@ class Updater {
         this._entityBuffer = consistencyEngine.entityBuffer;
         this._chunkLoader = consistencyEngine.chunkLoader;
         this._entityLoader = consistencyEngine.entityLoader;
+
+        // X buffer.
+        this._inputBuffer = [];
     }
 
     static bench = false;
+
+    addInput(meta, avatar) {
+        this._inputBuffer.push([avatar, meta]);
+    }
+
+    update() {
+        // User-send updates (mainly x).
+        this.processBuffer();
+
+        // Compute aggregates to send.
+        this.updateConsistency();
+    }
+
+    processBuffer() {
+        var buffer = this._inputBuffer;
+
+        buffer.forEach(x => {
+
+            // console.log(x[0]); // Avatar
+
+            console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, worldId ] }
+
+        });
+
+        // Flush buffer.
+        this._inputBuffer = [];
+    }
 
     // This only takes care of LOADING things with respect to players.
     // (entities, chunks)
@@ -29,7 +59,7 @@ class Updater {
     // Loading and unloading objects is done exclusively here.
     // Single criterion for maintaining loaded objects consistent: distance.
     // (objects are initialized with STATES so they don't need updates)
-    update() {
+    updateConsistency() {
         let players = this._game.players;
 
         // Get buffers.

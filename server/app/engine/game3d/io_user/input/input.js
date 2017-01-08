@@ -62,22 +62,26 @@ class UserInput {
     listenPlayer(player) {
         let physicsEngine       = this._physicsEngine;
         let topologyEngine      = this._topologyEngine;
+        let consistencyEngine   = this._consistencyEngine;
         let avatar = player.avatar;
 
         let listener = this._listeners[player] = [
             this.pushToEngine('move',   avatar, physicsEngine),
             this.pushToEngine('rotate', avatar, physicsEngine),
             this.pushToEngine('block',  avatar, topologyEngine),
+            this.pushToEngine('gate',  avatar, consistencyEngine),
             this.pushToEngine('action', avatar, physicsEngine),
 
             this._chat.playerInput(player)
         ];
 
-        player.on('m', listener[0]);
-        player.on('r', listener[1]);
-        player.on('b', listener[2]);
-        player.on('a', listener[3]);
-        player.on('chat', listener[4]);
+        let i = 0;
+        player.on('m', listener[i++]);
+        player.on('r', listener[i++]);
+        player.on('b', listener[i++]);
+        player.on('x', listener[i++]);
+        player.on('a', listener[i++]);
+        player.on('chat', listener[i++]);
     }
 
     unlistenPlayer(player) {
@@ -89,11 +93,13 @@ class UserInput {
             return;
         }
 
-        player.off('m', listener[0]);
-        player.off('r', listener[1]);
-        player.off('b', listener[2]);
-        player.off('a', listener[3]);
-        player.off('chat', listener[4]);
+        let i = 0;
+        player.off('m', listener[i++]);
+        player.off('r', listener[i++]);
+        player.off('b', listener[i++]);
+        player.off('x', listener[i++]);
+        player.off('a', listener[i++]);
+        player.off('chat', listener[i++]);
 
         delete this._listeners[player];
     }

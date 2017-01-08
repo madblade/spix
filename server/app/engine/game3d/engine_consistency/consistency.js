@@ -63,6 +63,10 @@ class ConsistencyEngine {
         this._entityModel.removePlayer(playerId);
     }
 
+    addInput(meta, avatar) {
+        this._updater.addInput(meta, avatar);
+    }
+
     update() {
         this._updater.update();
     }

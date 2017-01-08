@@ -18,6 +18,8 @@ App.Model.Client.EventComponent.prototype.init = function() {
 };
 
 App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
+    var clientModel = this.clientModel;
+
     switch (type) {
         case 'm':
             this.triggerMovement(type, data);
@@ -28,11 +30,17 @@ App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
         case 'r':
             this.triggerRotation(type, data);
             break;
-        case 'click':
-            // TODO [CRIT] GOTO SELF
-            break;
-        case 'b':
-            this.triggerBlock(type, data);
+        case 'ray': // Ray casted.
+            var i = clientModel.selfComponent.clickInteraction;
+            if (i.isBlock()) {
+                this.triggerBlock('b', data);
+            } else if (i.isX()) {
+                this.triggerBlock('x', data);
+            } else {
+                // TODO [MEDIUM] object, skill...
+                // Validate server-side? Keep duplicate in selfComponent?
+            }
+
             break;
         default:
             break;
