@@ -4,8 +4,8 @@
 
 'use strict';
 
-App.Model.Client.EventComponent = function(app) {
-    this.app = app;
+App.Model.Client.EventComponent = function(clientModel) {
+    this.clientModel = clientModel;
 
     this.eventsToPush = [];
     this.activeControls = {};
@@ -18,8 +18,7 @@ App.Model.Client.EventComponent.prototype.init = function() {
 };
 
 App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
-
-    switch(type) {
+    switch (type) {
         case 'm':
             this.triggerMovement(type, data);
             break;
@@ -28,6 +27,9 @@ App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
             break;
         case 'r':
             this.triggerRotation(type, data);
+            break;
+        case 'click':
+            // TODO [CRIT] GOTO SELF
             break;
         case 'b':
             this.triggerBlock(type, data);
@@ -41,7 +43,7 @@ App.Model.Client.EventComponent.prototype.triggerEvent = function(type, data) {
 };
 
 App.Model.Client.EventComponent.prototype.pushEvents = function() {
-    var connectionEngine = this.app.engine.connection;
+    var connectionEngine = this.clientModel.app.engine.connection;
     var events = this.eventsToPush;
     var currentEvent;
 

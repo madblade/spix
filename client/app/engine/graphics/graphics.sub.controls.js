@@ -26,18 +26,9 @@ App.Engine.Graphics.prototype.stopListeners = function() {
     this.controls.stopListeners();
 };
 
-App.Engine.Graphics.prototype.changeInteraction = function() {
-
-    var model = this.app.model.server.selfModel;
-    var avatar = model.avatar;
-    var display = !model.displayAvatar;
-    model.displayAvatar = display;
-
-    if (display) {
-        this.addToScene(avatar, -1); // TODO [CRIT] couple with knot model.
-        this.interaction = 'TP';
-    } else {
-        this.removeFromScene(avatar, -1); // TODO [CRIT] decouple
-        this.interaction = 'FP';
-    }
+App.Engine.Graphics.prototype.changeAvatarVisibility = function(display, avatar, worldId) {
+    if (display)
+        this.addToScene(avatar, worldId);
+    else
+        this.removeFromScene(avatar, worldId);
 };

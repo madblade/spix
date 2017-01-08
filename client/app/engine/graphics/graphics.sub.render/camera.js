@@ -46,15 +46,15 @@ App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) 
 
 App.Engine.Graphics.CameraManager.prototype.positionCameraBehind = function(vector) {
     var cameraWrapper = this.graphicsEngine.controls.getObject();
-    var i = this.graphicsEngine.interaction;
+    var i = this.graphicsEngine.getCameraInteraction();
 
-    if (i === 'FP') {
+    if (i.isFirstPerson()) {
         cameraWrapper.forEach(function(cam) {
             cam.position.x = vector[0];
             cam.position.y = vector[1]; // + 10;
             cam.position.z = vector[2] + 1.6;
         });
-    } else if (i === 'TP') {
+    } else if (i.isThirdPerson()) {
         cameraWrapper.forEach(function(cam) {
             cam.position.x = vector[0];
             cam.position.y = vector[1]; // + 10;

@@ -65,11 +65,13 @@ App.Engine.Graphics.prototype.createSceneManager = function() {
 };
 
 App.Engine.Graphics.prototype.addToScene = function(object3D, sceneId) {
+    sceneId = parseInt(sceneId);
     if (!sceneId) sceneId = -1;
     this.sceneManager.addObject(object3D, sceneId);
 };
 
 App.Engine.Graphics.prototype.removeFromScene = function(object3D, sceneId) {
+    sceneId = parseInt(sceneId);
     if (!sceneId) sceneId = -1;
     this.sceneManager.removeObject(object3D, sceneId);
 };

@@ -43,7 +43,7 @@ App.Engine.UI.prototype.registerKeyDown = function() {
                 clientModel.triggerEvent('m', 'u');
                 break;
             case k.leftHandEast2: // F
-                graphics.changeInteraction();
+                clientModel.triggerChange('interaction', 'toggle');
                 break;
             case k.leftHandEast3: // (G)ravity.
                 clientModel.triggerEvent('a', 'g');

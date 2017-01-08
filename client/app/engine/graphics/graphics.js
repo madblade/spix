@@ -24,7 +24,6 @@ App.Engine.Graphics = function(app) {
 
     // Interaction.
     this.controls =     null;
-    this.interaction =  'FP';
 
     // Initialize DOM element
     this.container = document.getElementById('container');
@@ -81,4 +80,8 @@ App.Engine.Graphics.prototype.resize = function () {
     var height = window.innerHeight;
     this.cameraManager.resize(width, height);
     this.rendererManager.resize(width, height);
+};
+
+App.Engine.Graphics.prototype.getCameraInteraction = function() {
+    return this.app.model.client.getCameraInteraction();
 };
