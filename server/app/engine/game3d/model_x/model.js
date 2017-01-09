@@ -6,7 +6,12 @@
 
 import Knot             from './knot';
 import Portal           from './portal';
+
 import CollectionUtils  from '../../math/collections';
+import GeometryUtils    from '../../math/geometry';
+
+// TODO [CRIT] OK I know it's not right to put that here
+import WorldGenerator   from '../engine_consistency/generator/worldgenerator';
 
 class XModel {
 
@@ -40,7 +45,11 @@ class XModel {
         if (orientation !== '+' && orientation !== '-' && orientation !== 'both') return;
         // Portal must be orthogonal an axis: exactly one block coordinate in common.
         let bx = x1 === x2, by = y1 === y2, bz = z1 === z2;
-        if (bx + by + bz !== 1) return;
+        let sum = bx + by + bz;
+        if (sum !== 1 && sum !== 2) {
+            console.log('Portal not axis-aligned: ' + sum);
+            return;
+        }
         // Portal minimal size.
 
         // Check chunks.
@@ -51,23 +60,38 @@ class XModel {
         let chunk2 = world.getChunk(...coords2);
         if (chunk1 && chunk1 !== chunk2) return;
 
-        let id = CollectionUtils.generateId(portals);
-        var portal = new Portal(worldId, id, [x1, y1, z1], [x2, y2, z2], position, orientation);
+        let portalId = CollectionUtils.generateId(portals);
+        var portal = new Portal(worldId, portalId, [x1, y1, z1], [x2, y2, z2], position, orientation, chunk1);
 
-        portals.set(id, portal);
+        let chunkId = chunk1.chunkId;
+        portals.set(portalId, portal);
         let wtpc = worldToChunksToPortals.get(worldId), ctpc;
         if (wtpc) {
-            ctpc = wtpc.get(chunk1.chunkId);
+            ctpc = wtpc.get(chunkId);
             if (ctpc) ctpc.push(portal);
-            else wtpc.set(chunk1.chunkId, [portal]);
+            else wtpc.set(chunkId, [portal]);
         } else {
             wtpc = new Map();
-            wtpc.set(chunk1.chunkId, [portal]);
+            wtpc.set(chunkId, [portal]);
             worldToChunksToPortals.set(worldId, wtpc);
         }
 
         if (otherPortalId) {
-            this.addKnot(id, otherPortalId);
+            this.addKnot(portalId, otherPortalId);
+        } else {
+            let newWorld = this._worldModel.addWorld();
+            if (!newWorld) {
+                console.log('Failed to create a new world.');
+                return;
+            }
+
+            // Force generation and add portal.
+            let xS = newWorld.xSize, yS = newWorld.ySize, zS = newWorld.zSize;
+            // TODO [CRIT] change worlds here.
+            let ijk = chunkId.split(',');
+            let newChunk = WorldGenerator.generateFlatChunk(xS, yS, zS, ...ijk, newWorld);
+            newWorld.addChunk(newChunk.chunkId, newChunk);
+            this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, position, orientation, portalId);
         }
     }
 
@@ -150,23 +174,53 @@ class XModel {
 
     /** Get **/
 
+    getPortal(portalId) {
+        return this._portals.get(portalId);
+    }
+
+    chunkContainsPortal(worldId, chunkId, portalId) {
+        let ctp = this._worldToChunksToPortals.get(worldId);
+        if (!ctp) return false;
+        let p = ctp.get(chunkId);
+        if (!p) return false;
+        return p.indexOf(portalId) > -1;
+    }
+
+    getPortalsFromChunk(worldId, chunkId) {
+        let ctp = this._worldToChunksToPortals.get(worldId);
+        if (!ctp) return null;
+        return ctp.get(chunkId);
+    }
+
+    getOtherSide(portalId) {
+        let p = this._portals.get(portalId);
+        if (!p) return;
+        let k = this._portalsToKnots.get(portalId);
+        if (!k) return;
+        return k.otherEnd(p);
+    }
+
     // Returns a Map portalId -> [otherEndId, otherWorldId]
-    getConnectivity(originChunkId, worldId) {
+    // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
+    getConnectivity(originChunkId, worldId, threshold) {
         // TODO [CRIT] use chunk iterator for neighbour (visible) chunks.
         let chunksToPortals = this._worldToChunksToPortals.get(worldId);
 
         if (!chunksToPortals || chunksToPortals.size < 1) return;
         var portalsToWorlds = new Map();
 
+        // TODO [CRIT] make it so there it goes through other worlds, & distance increases.
         chunksToPortals.forEach((portals, currentChunkId) => {
-            // TODO [CRIT] make it so there it goes through other worlds.
             // if (distance(avatar, chunk) < thresh)
                 portals.forEach(portal => {
                     let knot = this._portalsToKnots.get(portal.id);
                     if (knot) {
                         let otherPortal = knot.otherEnd(portal);
-                        if (otherPortal)
+                        if (otherPortal) // Should always apply.
+                        {
                             portalsToWorlds.set(portal.id, [otherPortal.id, otherPortal.worldId]);
+                        }
+                        else { console.log('There is a portal that is not linked.'); }
                     }
                 });
         });

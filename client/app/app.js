@@ -13,8 +13,8 @@ var App = App || {
     'Modules': {}
 };
 
-// The road to wisdom? Well it's plain & simple to express
-// Err and err and err again, but less and less and less - Piet Hein
+// Preserve these perfect tenets, ye
+// Ever keep these precepts three.
 App.Core = function() {
 
     // State pattern manages in-game, loading, menus.

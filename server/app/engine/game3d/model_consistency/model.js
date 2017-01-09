@@ -18,7 +18,9 @@ class ConsistencyModel {
         this._entityIdsForEntity        = new Map();
         this._chunkIdsForEntity         = new Map();
         this._chunkIdAndPartsForEntity  = new Map();
+
         this._xIdsForEntity             = new Map();
+        this._partialXs                 = new Map();
     }
 
     spawnPlayer(player) {
@@ -28,15 +30,19 @@ class ConsistencyModel {
 
         this._entityIdsForEntity        .set(playerId, new Set());
         this._chunkIdsForEntity         .set(playerId, chunksMap);
-        this._chunkIdAndPartsForEntity  .set(playerId, new Map()); // TODO [HIGH] think
-        this._xIdsForEntity             .set(playerId, new Map());
+        this._chunkIdAndPartsForEntity  .set(playerId, new Map()); // TODO [LOW] think
+
+        this._xIdsForEntity             .set(playerId, new Set());
+        this._partialXs                 .set(playerId, new Set());
     }
 
     removePlayer(playerId) {
         this._entityIdsForEntity        .delete(playerId);
         this._chunkIdsForEntity         .delete(playerId);
         this._chunkIdAndPartsForEntity  .delete(playerId);
+
         this._xIdsForEntity             .delete(playerId);
+        this._partialXs                 .delete(playerId);
     }
 
     /** Entity to chunks **/
@@ -121,6 +127,10 @@ class ConsistencyModel {
 
     /** Entity to xs **/
 
+    getXIdsForEntity(entityId) {
+        return this._xIdsForEntity.get(entityId);
+    }
+
     // Note: it would not have been wise to consider an x as an 'entity'.
     // ENHANCEMENT [LONG-TERM]: can an x move over time?
     hasX(playerId, xId) {
@@ -133,6 +143,20 @@ class ConsistencyModel {
 
     setXOutOfRange(playerId, xId) {
         this._xIdsForEntity.get(playerId).delete(xId);
+    }
+
+    setPartialX(playerId, xId) {
+        this._partialXs.get(playerId).add(xId);
+    }
+
+    unsetPartialX(playerId, xId) {
+        this._partialXs.get(playerId).delete(xId);
+    }
+
+    isPartialX(playerId, xId) {
+        let p = this._partialXs.get(playerId);
+        if (!p) return false;
+        return p.has(xId);
     }
 
 }

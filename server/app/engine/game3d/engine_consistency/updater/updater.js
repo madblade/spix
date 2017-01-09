@@ -51,7 +51,11 @@ class Updater {
         var buffer = this._inputBuffer;
         var xUpdater = this._xUpdater;
 
-        buffer.forEach(x => xUpdater.update(x[0], x[1]));
+        buffer.forEach(x => {
+            // console.log(x[0]); // Avatar
+            console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, portalToLinkId ] }
+            xUpdater.update(x[0], x[1])
+        });
 
         // Flush X INPUT (BEFORE SEND UPDATE).
         this._inputBuffer = [];
@@ -106,7 +110,7 @@ class Updater {
 
             // Compute change for entities in range.
             let addedEntities, removedEntities,
-                u = eLoader.computeNewEntitiesInRange(p, consistencyModel, updatedEntities, addedPlayers, removedPlayers);
+                u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
 
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.

@@ -31,8 +31,6 @@ class XUpdater {
             xModel.removePortalFromPosition(originWorld, x, y, z);
         }
 
-        // console.log(x[0]); // Avatar
-        console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, worldId ] }
     }
 
 }

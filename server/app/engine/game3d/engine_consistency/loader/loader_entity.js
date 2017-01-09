@@ -10,6 +10,7 @@ class EntityLoader {
 
     constructor(consistencyEngine) {
         this._entityModel = consistencyEngine.entityModel;
+        this._consistencyModel = consistencyEngine.consistencyModel;
     }
 
     computeEntitiesInRange(player) {
@@ -30,8 +31,9 @@ class EntityLoader {
         return entities;
     }
 
-    computeNewEntitiesInRange(player, consistencyModel, updatedEntities, addedPlayers, removedPlayers) {
+    computeNewEntitiesInRange(player, updatedEntities, addedPlayers, removedPlayers) {
         let entityModel = this._entityModel;
+        let consistencyModel = this._consistencyModel;
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.

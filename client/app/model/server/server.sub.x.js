@@ -19,5 +19,7 @@ App.Model.Server.XModel.prototype.refresh = function() {
 };
 
 App.Model.Server.XModel.prototype.updateX = function(data) {
-    console.log('update x model');
+    console.log('### There is a new portal in range.');
+    console.log(data);
+    console.log('### /');
 };

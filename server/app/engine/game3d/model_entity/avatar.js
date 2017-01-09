@@ -13,10 +13,15 @@ class Avatar extends Entity {
         //this._entityModel = entityModel;
 
         this._kind = 'player';
+
+        // Counted as a number of chunks.
         this._chunkRenderDistance = 3;
         this._chunkUnloadDistance = 10;
+        this._portalRenderDistance = 3;
 
+        // Counted as a number of blocks.
         this._entityRenderDistance = 2*8;
+
         this._role = 0;
 
         this._nearestChunkId = null;
@@ -27,6 +32,7 @@ class Avatar extends Entity {
     get chunkRenderDistance()                   { return this._chunkRenderDistance; }
     get chunkUnloadDistance()                   { return this._chunkUnloadDistance; }
     get entityRenderDistance()                  { return this._entityRenderDistance; }
+    get portalRenderDistance()                  { return this._portalRenderDistance; }
     get nearestChunkId()                        { return this._nearestChunkId; }
     //get entityModel()                           { return this._entityModel; }
 
@@ -34,6 +40,7 @@ class Avatar extends Entity {
     set chunkRenderDistance(renderDistance)     { this._chunkRenderDistance = renderDistance; }
     set chunkUnloadDistance(unloadDistance)     { this._chunkUnloadDistance = unloadDistance; }
     set entityRenderDistance(renderDistance)    { this._entityRenderDistance = renderDistance; }
+    set portalRenderDistance(renderDistance)    { this._portalRenderDistance = renderDistance; }
     set nearestChunkId(chunkId)                 { this._nearestChunkId = chunkId; }
 }
 

@@ -177,7 +177,10 @@ class UserOutput {
             let pid = p.avatar.id;
             let addedOrRemovedX = xOutput.get(pid);
 
-            if (addedOrRemovedX) {
+            // TODO [CRIT] continue here...
+            if (Object.keys(addedOrRemovedX).size > 0) console.log(addedOrRemovedX);
+
+            if (addedOrRemovedX && Object.keys(addedOrRemovedX).size > 0) {
                 let output = UserOutput.pack(addedOrRemovedX);
                 p.send('x', output);
             }
