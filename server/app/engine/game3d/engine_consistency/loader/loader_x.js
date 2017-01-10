@@ -32,7 +32,7 @@ class XLoader {
         // Compute new portals in range.
         let portals = xm.getConnectivity(chunk, wm, portalLoadingRadius);
         let addedPortals = {};
-        if (portals) portals.forEach((array, portalId) => {
+        if (portals) portals[0].forEach((array, portalId) => {
             let partial = cm.isPartialX();
             if (cm.hasX(avatarId, portalId) && !partial) return;
 
@@ -55,6 +55,7 @@ class XLoader {
         });
 
         // Update out of range portals.
+        // TODO [OPTIM] when getConnectivity is performed, just remember which levels correspond to which portals...
         let playerXs = cm.getXIdsForEntity(avatarId);
         let removedPortals = {};
         playerXs.forEach(portalId => {

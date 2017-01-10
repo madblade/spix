@@ -39,7 +39,8 @@ class GeometryUtils {
 
     /** Weird topology distances **/
 
-    // TODO [MEDIUM] there is a way to heavily optimize this request.
+    // TODO [OPTIM] there is a way to heavily optimize this request and getConnectivity
+    // TODO [OPTIM] (optimize getConnectivity and delete this function: see loader_x)
     // Every time a portal is created, you add in an associative map
     // coordinates of both linked chunks (order is important).
     // Then you can compute offsets for two chunks in different worlds (just take

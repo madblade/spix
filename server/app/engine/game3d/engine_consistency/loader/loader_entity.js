@@ -68,7 +68,6 @@ class EntityLoader {
                 removedEntities[eid] = null;
         });
 
-        // TODO [HIGH] extensively test.
         return [addedEntities, removedEntities];
     }
 }

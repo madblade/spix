@@ -31,7 +31,7 @@ class XModel {
         this._portalsToKnots = new Map();
 
         // Cached requests
-        this._cachedConnectivity = new Map(); // WorldId+ChunkId -> portals ids.
+        this._cachedConnectivity = [new Map(), new Map()]; // WorldId+ChunkId -> portals ids.
         // To update whenever avatar moves from one chunk to another.
     }
 
@@ -106,7 +106,7 @@ class XModel {
             this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, position, orientation, portalId);
         }
 
-        this._cachedConnectivity = new Map();
+        this._cachedConnectivity = [new Map(), new Map()];
     }
 
     // (x1, y1, z1): first block
@@ -167,7 +167,8 @@ class XModel {
         }
 
         portals.delete(portalId);
-        this._cachedConnectivity = new Map();
+        // TODO [OPTIM] compute connected components in 4D manifold
+        this._cachedConnectivity = [new Map(), new Map()];
     }
 
     removeKnot(knotId) {
@@ -223,16 +224,21 @@ class XModel {
     // Returns a Map portalId -> [otherEndId, otherWorldId]
     // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
     // TODO [CRIT] continue here
-    getConnectivity(chunk, wModel, thresh) {
+    getConnectivity(chunk, wModel, thresh, outputChunkIdWrapper) {
+
+        if (this._portals.size < 1) return; // Quite often.
+        // TODO [OPTIM] for all (currentWorld)chunksToPortals, if chunkDistance(A,B)>thresh, return early.
 
         // Request cache.
         let originChunkId = chunk.chunkId;
         let worldId = chunk.world.worldId;
         let aggregate = worldId + originChunkId;
-        let cached = this._cachedConnectivity.get(aggregate);
-        if (cached) return cached;
+        let cached1 = this._cachedConnectivity[0].get(aggregate);
+        let cached2 = this._cachedConnectivity[1].get(aggregate);
+        if (cached1 && cached2) return [cached1, cached2];
 
-        var result = new Map();
+        var recursedPortals = new Map();
+        var recursedChunks = new Set();
 
         // BFS.
         let marks = new Set();
@@ -248,10 +254,11 @@ class XModel {
             let marksId = wid + chunkId;
             if (marks.has(marksId)) continue;
             marks.add(marksId);
-            console.log(chunkId);
+            recursedChunks.add([wid, chunkId]);
+            // console.log(chunkId);
 
             depth = currentDepth;
-            console.log(depth);
+            // console.log(depth);
             let world = wModel.getWorld(wid);
             let ijk = chunkId.split(',');
             let i = parseInt(ijk[0]), j = parseInt(ijk[1]), k = parseInt(ijk[2]);
@@ -260,11 +267,15 @@ class XModel {
                 world.getChunk(i, j+1, k), world.getChunk(i, j-1, k),
                 world.getChunk(i, j, k+1), world.getChunk(i, j, k-1)
             ];
-            let ok = true;
+
+            let everyChunkLoaded = true;
             chks.forEach(c => { if (c) {
                 stack.push([c, currentDepth+1]);
-            } else { ok = false; }});
-            //if (!ok) return new Map();
+            } else { everyChunkLoaded = false; }});
+            // if (!everyChunkLoaded) return new Map();
+            // Here, return if world has not yet loaded
+            // some recursed chunks
+
             let gates = this.getPortalsFromChunk(wid, chunkId);
             if (gates) {
                 gates.forEach(g => {
@@ -274,17 +285,20 @@ class XModel {
                     let otherChunk = otherSide.chunk;
                     console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
                     console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
-                    result.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                    recursedPortals.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                     if (otherChunk) stack.push([otherChunk, currentDepth+1]);
                 });
             }
 
+            // Usually (always, I think) already sorted.
+            // But it's important to keep it sorted. Make sure.
             stack.sort((a, b) => a[1] - b[1]);
         }
 
-        console.log(result);
-        this._cachedConnectivity.set(aggregate, result);
-        return result;
+        // console.log(result);
+        this._cachedConnectivity[0].set(aggregate, recursedPortals);
+        this._cachedConnectivity[1].set(aggregate, recursedChunks);
+        return [recursedPortals, recursedChunks];
     }
 
 }
