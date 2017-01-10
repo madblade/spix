@@ -56,7 +56,7 @@ class GeometryUtils {
         let done = new Set();
         let depth = 0;
         let stack = [[chunk, depth]];
-        while (stack.length > 0 && depth < thresh) {
+        while (stack.length > 0 && depth <= thresh) {
             // Test current element: does it contain target?
             let element = stack.shift();
 
@@ -76,7 +76,7 @@ class GeometryUtils {
             depth = currentDepth;
             let world = wModel.getWorld(worldId);
             let ijk = chunkId.split(',');
-            let i = ijk[0], j = ijk[1], k = ijk[2];
+            let i = parseInt(ijk[0]), j = parseInt(ijk[1]), k = parseInt(ijk[2]);
 
             // Lazily evaluate connectivity then push front.
 

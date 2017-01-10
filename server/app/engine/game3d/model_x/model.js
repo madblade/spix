@@ -248,35 +248,41 @@ class XModel {
             let marksId = wid + chunkId;
             if (marks.has(marksId)) continue;
             marks.add(marksId);
+            console.log(chunkId);
 
             depth = currentDepth;
+            console.log(depth);
             let world = wModel.getWorld(wid);
             let ijk = chunkId.split(',');
-            let i = ijk[0], j = ijk[1], k = ijk[2];
+            let i = parseInt(ijk[0]), j = parseInt(ijk[1]), k = parseInt(ijk[2]);
             let chks = [
                 world.getChunk(i+1, j, k), world.getChunk(i-1, j, k),
                 world.getChunk(i, j+1, k), world.getChunk(i, j-1, k),
                 world.getChunk(i, j, k+1), world.getChunk(i, j, k-1)
             ];
+            let ok = true;
             chks.forEach(c => { if (c) {
                 stack.push([c, currentDepth+1]);
-            }});
+            } else { ok = false; }});
+            //if (!ok) return new Map();
             let gates = this.getPortalsFromChunk(wid, chunkId);
             if (gates) {
                 gates.forEach(g => {
+                    let currentPortal = this.getPortal(g);
                     let otherSide = this.getOtherSide(g);
                     if (!otherSide) return;
                     let otherChunk = otherSide.chunk;
-
-                    console.log("origin: world " + this.getPortal(g).worldId + ", portal " + this.getPortal(g).id);
+                    console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
                     console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
-                    result.set(g, [otherSide.id, otherSide.chunkId, otherSide.worldId, ...otherSide.state]);
-                    // portalsToWorlds.set(portalId, [otherPortal.id, otherPortal.worldId]);
+                    result.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                     if (otherChunk) stack.push([otherChunk, currentDepth+1]);
                 });
             }
+
+            stack.sort((a, b) => a[1] - b[1]);
         }
 
+        console.log(result);
         this._cachedConnectivity.set(aggregate, result);
         return result;
     }
