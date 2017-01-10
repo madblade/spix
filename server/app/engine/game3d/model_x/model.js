@@ -29,6 +29,10 @@ class XModel {
 
         // Portal id => knots
         this._portalsToKnots = new Map();
+
+        // Cached requests
+        this._cachedConnectivity = new Map(); // WorldId+ChunkId -> portals ids.
+        // To update whenever avatar moves from one chunk to another.
     }
 
     /** Create / link **/
@@ -101,6 +105,8 @@ class XModel {
             newWorld.addChunk(newChunk.chunkId, newChunk);
             this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, position, orientation, portalId);
         }
+
+        this._cachedConnectivity = new Map();
     }
 
     // (x1, y1, z1): first block
@@ -161,6 +167,7 @@ class XModel {
         }
 
         portals.delete(portalId);
+        this._cachedConnectivity = new Map();
     }
 
     removeKnot(knotId) {
@@ -216,31 +223,62 @@ class XModel {
     // Returns a Map portalId -> [otherEndId, otherWorldId]
     // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
     // TODO [CRIT] continue here
-    getConnectivity(originChunkId, worldId, threshold) {
-        // TODO [CRIT] use chunk iterator for neighbour (visible) chunks.
-        let chunksToPortals = this._worldToChunksToPortals.get(worldId);
+    getConnectivity(chunk, wModel, thresh) {
 
-        if (!chunksToPortals || chunksToPortals.size < 1) return;
-        var portalsToWorlds = new Map();
+        // Request cache.
+        let originChunkId = chunk.chunkId;
+        let worldId = chunk.world.worldId;
+        let aggregate = worldId + originChunkId;
+        let cached = this._cachedConnectivity.get(aggregate);
+        if (cached) return cached;
 
-        // TODO [CRIT] make it so there it goes through other worlds, & distance increases.
-        chunksToPortals.forEach((portals, currentChunkId) => {
-            // if (distance(avatar, chunk) < thresh)
-                portals.forEach(portalId => {
-                    let portal = this._portals.get(portalId);
-                    let knot = this._portalsToKnots.get(portalId);
-                    if (knot) {
-                        let otherPortal = knot.otherEnd(portal);
-                        if (otherPortal) // Should always apply.
-                        {
-                            portalsToWorlds.set(portalId, [otherPortal.id, otherPortal.worldId]);
-                        }
-                        else { console.log('There is a portal that is not linked.'); }
-                    }
+        var result = new Map();
+
+        // BFS.
+        let marks = new Set();
+        let depth = 0;
+        let stack = [[chunk, depth]];
+        while (stack.length > 0 && depth < thresh) {
+            let element = stack.shift();
+            let currentChunk = element[0];
+            let currentDepth = element[1];
+            let wid = currentChunk.world.worldId;
+            let chunkId = currentChunk.chunkId;
+
+            let marksId = wid + chunkId;
+            if (marks.has(marksId)) continue;
+            marks.add(marksId);
+
+            depth = currentDepth;
+            let world = wModel.getWorld(wid);
+            let ijk = chunkId.split(',');
+            let i = ijk[0], j = ijk[1], k = ijk[2];
+            let chks = [
+                world.getChunk(i+1, j, k), world.getChunk(i-1, j, k),
+                world.getChunk(i, j+1, k), world.getChunk(i, j-1, k),
+                world.getChunk(i, j, k+1), world.getChunk(i, j, k-1)
+            ];
+            chks.forEach(c => { if (c) {
+                stack.push([c, currentDepth+1]);
+            }});
+            let gates = this.getPortalsFromChunk(wid, chunkId);
+            if (gates) {
+                gates.forEach(g => {
+                    let otherSide = this.getOtherSide(g);
+                    if (!otherSide) return;
+                    let otherChunk = otherSide.chunk;
+
+                    console.log("origin: world " + this.getPortal(g).worldId + ", portal " + this.getPortal(g).id);
+                    console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
+                    result.set(g, [otherSide.id, otherSide.chunkId, otherSide.worldId, ...otherSide.state]);
+                    // portalsToWorlds.set(portalId, [otherPortal.id, otherPortal.worldId]);
+                    if (otherChunk) stack.push([otherChunk, currentDepth+1]);
                 });
-        });
+            }
+        }
 
-        return portalsToWorlds;
+        this._cachedConnectivity.set(aggregate, result);
+        return result;
     }
 
 }

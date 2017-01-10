@@ -27,6 +27,8 @@ class Portal {
 
     get id()        { return this._id; }
     get worldId()   { return this._worldId; }
+    get chunkId()   { return this._chunk.chunkId; }
+    get state()     { return [...this._block1, ...this._block2, this._position, this._orientation]; }
     get chunk()     { return this._chunk; }
 
 }

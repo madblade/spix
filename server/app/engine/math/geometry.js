@@ -39,6 +39,14 @@ class GeometryUtils {
 
     /** Weird topology distances **/
 
+    // TODO [MEDIUM] there is a way to heavily optimize this request.
+    // Every time a portal is created, you add in an associative map
+    // coordinates of both linked chunks (order is important).
+    // Then you can compute offsets for two chunks in different worlds (just take
+    // min distance by considering all possible combinations of ways going through superposed chunks).
+    // A way to do it efficiently is to keep a Voronoi-like structure that emulate a geographical sorting of gates,
+    // along with a sorted list of distance further between any pair of 4D subworlds.
+    // Do a bit of graph analysis here.
     static entityToPortalDistance(entity, portal, xModel, wModel, thresh) {
         // Get starting chunk.
         let chunk = wModel.getWorld(entity.worldId).getChunkByCoordinates(...entity.position);
@@ -46,8 +54,8 @@ class GeometryUtils {
 
         // BFS.
         let done = new Set();
-        let stack = [[chunk, 0]];
         let depth = 0;
+        let stack = [[chunk, depth]];
         while (stack.length > 0 && depth < thresh) {
             // Test current element: does it contain target?
             let element = stack.shift();
@@ -60,8 +68,8 @@ class GeometryUtils {
 
             let doneId = worldId.toString()+chunkId.toString();
             if (done.has(doneId)) continue;
-
             done.add(doneId);
+
             if (xModel.chunkContainsPortal(worldId, chunkId, targetId))
                 return currentDepth;
 
@@ -70,7 +78,6 @@ class GeometryUtils {
             let ijk = chunkId.split(',');
             let i = ijk[0], j = ijk[1], k = ijk[2];
 
-            // TODO [MEDIUM] might certainly be optimized somehow (my brain cant handle much more tonight 2017/01/09).
             // Lazily evaluate connectivity then push front.
 
             // Regular connectivity.

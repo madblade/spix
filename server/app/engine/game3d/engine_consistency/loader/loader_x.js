@@ -30,7 +30,7 @@ class XLoader {
         // Map (portal id -> [other portal id, other portal world])
 
         // Compute new portals in range.
-        let portals = xm.getConnectivity(chunk.chunkId, worldId, portalLoadingRadius);
+        let portals = xm.getConnectivity(chunk, wm, portalLoadingRadius);
         let addedPortals = {};
         if (portals) portals.forEach((array, portalId) => {
             let partial = cm.isPartialX();
@@ -39,15 +39,15 @@ class XLoader {
             // Manage other end as a whole.
             if (partial) {
                 if (array) {
-                    addedPortals[portalId] = [...array]; // Other end id, other world id.
+                    addedPortals[portalId] = [...array]; // Other end id, chunk, xyzp, orientation, world id.
                     cm.unsetPartialX(avatarId, portalId);
                 } // Else, nothing to do still.
             } else {
                 if (array) {
                     addedPortals[portalId] = [...array];
                 } else {
-                    // If those other ids are null, client will consider the portal blank.
-                    addedPortals[portalId] = null;
+                    // If those other ids have length 0, client will consider the portal blank.
+                    addedPortals[portalId] = [0];
                     // Then they are flagged as 'partial' in consistency model.
                     cm.setPartialX(avatarId, portalId);
                 }
@@ -61,7 +61,6 @@ class XLoader {
             let p = xm.getPortal(portalId);
             let d = GeometryUtils.entityToPortalDistance(a, p, xm, wm, portalLoadingRadius);
             if (d > portalLoadingRadius) {
-                console.log(d);
                 removedPortals[portalId] = null;
             }
         });
