@@ -134,26 +134,32 @@ class ConsistencyModel {
     // Note: it would not have been wise to consider an x as an 'entity'.
     // ENHANCEMENT [LONG-TERM]: can an x move over time?
     hasX(playerId, xId) {
+        xId = parseInt(xId);
         return this._xIdsForEntity.get(playerId).has(xId);
     }
 
     setXLoaded(playerId, xId) {
+        xId = parseInt(xId);
         this._xIdsForEntity.get(playerId).add(xId);
     }
 
     setXOutOfRange(playerId, xId) {
+        xId = parseInt(xId);
         this._xIdsForEntity.get(playerId).delete(xId);
     }
 
     setPartialX(playerId, xId) {
+        xId = parseInt(xId);
         this._partialXs.get(playerId).add(xId);
     }
 
     unsetPartialX(playerId, xId) {
+        xId = parseInt(xId);
         this._partialXs.get(playerId).delete(xId);
     }
 
     isPartialX(playerId, xId) {
+        xId = parseInt(xId);
         let p = this._partialXs.get(playerId);
         if (!p) return false;
         return p.has(xId);

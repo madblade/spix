@@ -50,7 +50,7 @@ class GeometryUtils {
         let depth = 0;
         while (stack.length > 0 && depth < thresh) {
             // Test current element: does it contain target?
-            let element = stack.pop();
+            let element = stack.shift();
 
             let currentChunk = element[0];
             let currentDepth = element[1];
@@ -58,7 +58,7 @@ class GeometryUtils {
             let worldId = currentChunk.world.worldId;
             let chunkId = currentChunk.chunkId;
 
-            let doneId = worldId+chunkId;
+            let doneId = worldId.toString()+chunkId.toString();
             if (done.has(doneId)) continue;
 
             done.add(doneId);
@@ -90,7 +90,7 @@ class GeometryUtils {
             let gates = xModel.getPortalsFromChunk(worldId, chunkId);
             if (gates) {
                 gates.forEach(g => {
-                    let otherSide = xModel.getOtherSide(g.id);
+                    let otherSide = xModel.getOtherSide(g);
                     if (!otherSide) return;
                     let otherChunk = otherSide.chunk;
 

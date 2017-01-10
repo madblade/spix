@@ -20,8 +20,9 @@ class XUpdater {
         // let action = data.action; // 'gate'
         let meta = data.meta;
 
-        let originWorld = avatar.worldId;
+        let originWorld = parseInt(avatar.worldId);
         let portalToLink = meta[4];
+        if (portalToLink) portalToLink = parseInt(portalToLink);
 
         let x = meta[1], y = meta[2], z = meta[3];
 

@@ -68,11 +68,19 @@ class XModel {
         let wtpc = worldToChunksToPortals.get(worldId), ctpc;
         if (wtpc) {
             ctpc = wtpc.get(chunkId);
-            if (ctpc) ctpc.push(portal);
-            else wtpc.set(chunkId, [portal]);
+            if (ctpc) {
+                ctpc.add(portalId);
+            }
+            else {
+                ctpc = new Set();
+                ctpc.add(portalId);
+                wtpc.set(chunkId, ctpc);
+            }
         } else {
             wtpc = new Map();
-            wtpc.set(chunkId, [portal]);
+            ctpc = new Set();
+            ctpc.add(portalId);
+            wtpc.set(chunkId, ctpc);
             worldToChunksToPortals.set(worldId, wtpc);
         }
 
@@ -175,24 +183,29 @@ class XModel {
     /** Get **/
 
     getPortal(portalId) {
+        portalId = parseInt(portalId);
         return this._portals.get(portalId);
     }
 
     chunkContainsPortal(worldId, chunkId, portalId) {
+        // portalId = parseInt(portalId);
+        worldId = parseInt(worldId);
         let ctp = this._worldToChunksToPortals.get(worldId);
         if (!ctp) return false;
         let p = ctp.get(chunkId);
         if (!p) return false;
-        return p.indexOf(portalId) > -1;
+        return p.has(portalId);
     }
 
     getPortalsFromChunk(worldId, chunkId) {
+        worldId = parseInt(worldId);
         let ctp = this._worldToChunksToPortals.get(worldId);
         if (!ctp) return null;
         return ctp.get(chunkId);
     }
 
     getOtherSide(portalId) {
+        portalId = parseInt(portalId);
         let p = this._portals.get(portalId);
         if (!p) return;
         let k = this._portalsToKnots.get(portalId);
@@ -202,6 +215,7 @@ class XModel {
 
     // Returns a Map portalId -> [otherEndId, otherWorldId]
     // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
+    // TODO [CRIT] continue here
     getConnectivity(originChunkId, worldId, threshold) {
         // TODO [CRIT] use chunk iterator for neighbour (visible) chunks.
         let chunksToPortals = this._worldToChunksToPortals.get(worldId);
@@ -212,13 +226,14 @@ class XModel {
         // TODO [CRIT] make it so there it goes through other worlds, & distance increases.
         chunksToPortals.forEach((portals, currentChunkId) => {
             // if (distance(avatar, chunk) < thresh)
-                portals.forEach(portal => {
-                    let knot = this._portalsToKnots.get(portal.id);
+                portals.forEach(portalId => {
+                    let portal = this._portals.get(portalId);
+                    let knot = this._portalsToKnots.get(portalId);
                     if (knot) {
                         let otherPortal = knot.otherEnd(portal);
                         if (otherPortal) // Should always apply.
                         {
-                            portalsToWorlds.set(portal.id, [otherPortal.id, otherPortal.worldId]);
+                            portalsToWorlds.set(portalId, [otherPortal.id, otherPortal.worldId]);
                         }
                         else { console.log('There is a portal that is not linked.'); }
                     }
