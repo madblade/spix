@@ -4,7 +4,7 @@
   "dependencies": {
     "angular-socket-io": "~0.7.0",
     "Hyphenator": "~5.1.0",
-    "three.js": "^0.76.0",
+    "three.js": "^0.82.0",
     "jquery": "^2.2.3",
     "bootstrap-css-only": "^3.3.6"
   },

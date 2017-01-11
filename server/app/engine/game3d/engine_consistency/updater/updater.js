@@ -152,6 +152,8 @@ class Updater {
                 }) ;
             }
             if (removedChunks)      forEach(removedChunks, wid => {
+
+                // TODO [CRIT] purge cache for removed chunks (xModel)
                 forEach(removedChunks[wid], c => consistencyModel.setChunkOutOfRange(pid, parseInt(wid), c))
             });
 

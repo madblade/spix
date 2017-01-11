@@ -22,7 +22,7 @@ App.Model.Server.XModel.prototype.init = function() {};
 App.Model.Server.XModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
 
-    let updates = this.xUpdates;
+    var updates = this.xUpdates;
     for (var i = 0, l = updates.length; i < l; ++i) {
         var data = updates[i];
         for (var portalId in data) {

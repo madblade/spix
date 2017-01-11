@@ -32,6 +32,7 @@ App.Model.Server.ChunkModel.prototype.addWorld = function(worldId, worldInfo) {
         return;
     }
 
+    console.log('This world I don\'t know... ' + worldId);
     var world = new Map();
     var property = {
         chunkSizeX : worldInfo[0], // 16,
