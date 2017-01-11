@@ -15,7 +15,7 @@ App.Model.Server.ChunkModel = function(app) {
     this.chunkUpdates = [];
 
     // Initialize overworld.
-    this.addWorld(-1);
+    // this.addWorld(-1);
 
     // Graphical component
     var graphics = app.engine.graphics;
@@ -26,14 +26,17 @@ App.Model.Server.ChunkModel = function(app) {
     this.textureCoordinates = graphics.getTextureCoordinates();
 };
 
-App.Model.Server.ChunkModel.prototype.addWorld = function(worldId) {
-    if (this.worlds.has(worldId)) return;
+App.Model.Server.ChunkModel.prototype.addWorld = function(worldId, worldInfo) {
+    if (this.worlds.has(worldId)) {
+        // console.log('This world I know... (' + typeof worldId +')');
+        return;
+    }
 
     var world = new Map();
     var property = {
-        chunkSizeX : 16,
-        chunkSizeY : 16,
-        chunkSizeZ : 32
+        chunkSizeX : worldInfo[0], // 16,
+        chunkSizeY : worldInfo[1], // 16,
+        chunkSizeZ : worldInfo[2]  // 32
     };
 
     property.chunkCapacity = property.chunkSizeX * property.chunkSizeY * property.chunkSizeZ;
@@ -53,10 +56,18 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
     for (var cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
         var updates = chunkUpdates[cu];
 
+        if ('worlds' in updates) {
+            //console.log('World metadata:');
+            //console.log(updates['worlds']);
+            var worlds = updates['worlds'];
+            for (var wid in worlds) {
+                var wif = worlds[wid];
+                for (var id = 0, wl=wif.length; id<wl; ++id) wif[id] = parseInt(wif[id]);
+                this.addWorld(wid, wif);
+            }
+        }
         for (var worldId in updates) {
             if (worldId === 'worlds') {
-                // console.log('World metadata: ');
-                // console.log(updates[worldId]);
                 continue;
             }
             if (worldId !== '-1') {
@@ -126,8 +137,10 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkI
     // Initialize model if a new world is transmitted.
     var world = this.worlds.get(worldId);
     if (!world) {
-        this.addWorld(worldId);
-        world = this.worlds.get(worldId);
+        console.log('Got chunk ' + chunkId + ' ('+typeof worldId+') from an unknown world: ' + worldId);
+        return;
+        // this.addWorld(worldId);
+        // world = this.worlds.get(worldId);
     }
 
     var property = this.worldProperties.get(worldId);

@@ -98,7 +98,8 @@ class ConsistencyEngine {
     initChunkOutputForPlayer(player) {
         let aid = player.avatar.id;
         let worldId = player.avatar.worldId;
-        let world = this._worldModel.getWorld(worldId);
+        let worldModel = this._worldModel;
+        let world = worldModel.getWorld(worldId);
 
         let cs = world.allChunks;
         let cm = this._consistencyModel;
@@ -106,11 +107,18 @@ class ConsistencyEngine {
         // Object.
         var chunkOutput = this._chunkLoader.computeChunksForNewPlayer(player);
 
+        let addedW = {};
         for (let wid in chunkOutput) {
+            if (!(wid in addedW)) {
+                let w = worldModel.getWorld(parseInt(wid));
+                addedW[wid] = [w.xSize, w.ySize, w.zSize];
+            }
             let chunkIds = chunkOutput[wid];
             for (let cid in chunkIds)
                 if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid), cid);
         }
+
+        chunkOutput['worlds'] = addedW;
 
         // WARN: idem, updates must be transmitted right after this call
         // otherwise its player will be out of sync.
