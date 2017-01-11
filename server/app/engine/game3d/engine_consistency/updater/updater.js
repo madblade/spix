@@ -128,7 +128,7 @@ class Updater {
             if (Updater.bench && dt1 > 1000) console.log('\t' + dt1 + ' computeNew Chunks.');
             t = process.hrtime();
 
-            let addedX, removedX,
+            let addedX, removedX, addedW,
                 x = xLoader.computeNewXInRange(p);
             if (x) [addedX, removedX] = x;
 
@@ -138,20 +138,26 @@ class Updater {
             if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e)));
             if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e)));
 
-            if (addedChunks)        forEach(addedChunks, wid => {
-                forEach(addedChunks[wid], c => {consistencyModel.setChunkLoaded(pid, parseInt(wid), c)});
-            }) ;
+            if (addedX)             forEach(addedX, x => consistencyModel.setXLoaded(pid, parseInt(x)));
+            if (removedX)           forEach(removedX, x => consistencyModel.setXOutOfRange(pid, parseInt(x)));
+
+            if (addedChunks)        {
+                addedW = {};
+                forEach(addedChunks, wid => {
+                    if (!(wid in addedW)) {
+                        let w = worldModel.getWorld(parseInt(wid));
+                        addedW[wid] = [w.xSize, w.ySize, w.zSize];
+                    }
+                    forEach(addedChunks[wid], c => {consistencyModel.setChunkLoaded(pid, parseInt(wid), c)});
+                }) ;
+            }
             if (removedChunks)      forEach(removedChunks, wid => {
                 forEach(removedChunks[wid], c => consistencyModel.setChunkOutOfRange(pid, parseInt(wid), c))
             });
 
-            if (addedX)             forEach(addedX, x => consistencyModel.setXLoaded(pid, parseInt(x)));
-            if (removedX)           forEach(removedX, x => consistencyModel.setXOutOfRange(pid, parseInt(x)));
-
-
             // Update output buffers.
             if (addedChunks || removedChunks)
-                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks);
+                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW);
             if (addedEntities || removedEntities)
                 ebuf.updateEntitiesForPlayer(pid, addedEntities, removedEntities);
             if (addedX || removedX)

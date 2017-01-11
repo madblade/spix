@@ -13,7 +13,7 @@ class ChunkBuffer {
     // addedChunks:     world id => chunk id => [fast components, fast component ids]
     // removedChunks:   world id => chunk id => null
     // updatedChunks:   (topologyEngine)
-    updateChunksForPlayer(playerId, addedChunks, removedChunks) {
+    updateChunksForPlayer(playerId, addedChunks, removedChunks, addedWorlds) {
         // Check.
         if (!addedChunks && !removedChunks) return;
 
@@ -30,6 +30,8 @@ class ChunkBuffer {
             Object.assign(addedChunks, removedChunks);
         }
         else if (removedChunks) addedChunks = removedChunks;
+
+        if (addedWorlds) addedChunks['worlds'] = addedWorlds;
 
         // Output.
         this._outputBuffer.set(playerId, addedChunks);

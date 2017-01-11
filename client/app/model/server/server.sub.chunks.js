@@ -35,6 +35,7 @@ App.Model.Server.ChunkModel.prototype.addWorld = function(worldId) {
         chunkSizeY : 16,
         chunkSizeZ : 32
     };
+
     property.chunkCapacity = property.chunkSizeX * property.chunkSizeY * property.chunkSizeZ;
 
     this.worlds.set(worldId, world);
@@ -53,6 +54,11 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
         var updates = chunkUpdates[cu];
 
         for (var worldId in updates) {
+            if (worldId === 'worlds') {
+                // console.log('World metadata: ');
+                // console.log(updates[worldId]);
+                continue;
+            }
             if (worldId !== '-1') {
                 console.log(worldId + ' not supported yet: another world.');
                 continue;

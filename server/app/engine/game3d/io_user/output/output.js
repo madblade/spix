@@ -116,7 +116,9 @@ class UserOutput {
                 }
 
                 // Format:
-                // {worldId:
+                // {
+                //  'worlds': {worldId:[x,y,z]} ............... World metadata
+                //  worldId:
                 //      {chunkId: [fastCC, fastCCId]} ......... Added chunk
                 //      {chunkId: [removed, added, updated]} .. Updated chunk
                 //      {chunkId: null} ....................... Removed chunk
@@ -161,6 +163,12 @@ class UserOutput {
 
             // TODO [LOW] detect change in position since the last time.
             // if (!entities), do it nevertheless, for it gives the player its own position.
+            // Format:
+            // [myPosition, myRotation, {
+            //  entityId:
+            //      null .................. removed entity
+            //      {p: [], r:[], k:''} ... added or updated entity
+            // }]
             p.send('ent', UserOutput.pack([p.avatar.position, p.avatar.rotation, addedOrRemovedEntities]));
         });
 
@@ -179,6 +187,12 @@ class UserOutput {
 
             if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0) {
                 let output = UserOutput.pack(addedOrRemovedX);
+
+                // Format:
+                // {portalId:
+                //  null ....................................... removed portal
+                //  [otherId, chunkId, worldId, ...state] ...... new or updated portal
+                // }
                 p.send('x', output);
             }
         });

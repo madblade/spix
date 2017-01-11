@@ -7,6 +7,9 @@
 App.Model.Server.XModel = function(app) {
     this.app = app;
 
+    // Model component
+    this.portals = new Map();
+
     // Buffer
     this.xUpdates = [];
 
@@ -26,10 +29,12 @@ App.Model.Server.XModel.prototype.refresh = function() {
 
             var meta = data[portalId];
             var isArray = meta instanceof Array;
-            if (isArray && meta.length === 1) {
+            // TODO [CRIT] worldify test & uncomment
+            /* if (isArray && meta.length === 1) {
                 // Raw portal.
-                this.addPartialPortal(portalId);
-            } else if (isArray && meta.length === 11) {
+                this.addStubPortal(portalId);
+            } else */
+            if (isArray && meta.length > 0) {
                 // Full portal.
 
                 var otherPortalId   = meta[0];
@@ -55,7 +60,7 @@ App.Model.Server.XModel.prototype.refresh = function() {
 
 /** API
  *  [11] -> new linked portal
-    0:448165    -> other portal id
+    0:448165    -> other portal id (null -> blank portal)
     1:"0,0,0"   -> current side's chunk id (could change: f.x. in the same world)
     2:645486    -> current side's world id
     3:2         -> b1.x (absolutes)
@@ -66,8 +71,6 @@ App.Model.Server.XModel.prototype.refresh = function() {
     8:18        -> b2.z |==> determination of which axis portal is orthogonal to
     9:0.999     -> position (/rel + axix)
     10:"both"   -> orientation ("+", "-" or "both")
- * [1] -> new blank portal
-    0: 0
  * null -> removed portal
  **/
 App.Model.Server.XModel.prototype.updateX = function(data) {

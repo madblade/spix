@@ -281,7 +281,10 @@ class XModel {
                 gates.forEach(g => {
                     let currentPortal = this.getPortal(g);
                     let otherSide = this.getOtherSide(g);
-                    if (!otherSide) return;
+                    if (!otherSide) {
+                        recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                        return; // Continue forEach
+                    }
                     let otherChunk = otherSide.chunk;
                     console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
                     console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
