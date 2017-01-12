@@ -173,7 +173,6 @@ class ChunkLoader {
         // Loading circle for server (a bit farther)
         let t = process.hrtime();
 
-         //ChunkBuilder.preLoadNextChunk(player, starterChunk, world, false, consistencyModel, sRadius);
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
         ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, false);
@@ -187,7 +186,6 @@ class ChunkLoader {
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
         t = process.hrtime();
 
-         //var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, world, true, consistencyModel, sRadius);
         var newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, true);
 
         dt1 = (process.hrtime(t)[1]/1000);

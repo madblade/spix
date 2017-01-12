@@ -201,47 +201,19 @@ class ChunkBuilder {
 
         let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, (ic+','+jc+','+kc));
 
-        /*
-        let chunkIsToBeLoaded = (wid, ic, jc, kc) => {
-            let currentId = (ic+','+jc+','+kc);
-            let currentWorld = worldModel.getWorld(wid);
-            let currentChunks = currentWorld.allChunks;
-            let currentChunk = currentChunks.get(currentId);
-            const dx = currentWorld.xSize, dy = currentWorld.ySize, dz = currentWorld.zSize;
-
-            if (!forPlayer) {
-                if (!currentChunk) {
-                    currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, currentWorld);
-                    currentChunks.set(currentId, currentChunk);
-                    return currentChunk;
-                } else if (!currentChunk.ready) {
-                    ChunkBuilder.computeChunkFaces(currentChunk);
-                    return currentChunk;
-                } else return null;
-            } else {
-                if (!hasLoadedChunk(ic, jc, kc)) {
-                    return currentChunk;
-                } else return null;
-            }
-        };
-        */
-
         for (let id = 0, l = chunks.length; id < l; ++id) {
             let current = chunks[id];
 
-            //let c = current[0];
             let wid = current[0];
             let currentId = current[1];
             let ijk = currentId.split(',');
             if (!hasLoadedChunk(wid, ...ijk)) {
-                // let currentId = (ic+','+jc+','+kc);
                 let currentWorld = worldModel.getWorld(wid);
                 let currentChunks = currentWorld.allChunks;
                 let currentChunk = currentChunks.get(currentId);
                 const dx = currentWorld.xSize, dy = currentWorld.ySize, dz = currentWorld.zSize;
 
                 if (!forPlayer) {
-                    // console.log('server');
                     if (!currentChunk) {
                         currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, currentWorld);
                         currentChunks.set(currentId, currentChunk);
@@ -252,14 +224,8 @@ class ChunkBuilder {
                         return currentChunk;
                     } else return null;
                 } else {
-                    // TODO console.log(wid + ' ' + currentId);
-                    // console.log('player');
-                    //if (!hasLoadedChunk(ic, jc, kc)) {
-                    //if (!hasLoadedChunk(wid, ...ijk)) {
-                        return currentChunk;
-                    //} else return null;
+                    return currentChunk;
                 }
-                // return chunkIsToBeLoaded(wid, ...ijk);
             }
         }
     }
@@ -272,7 +238,6 @@ class ChunkBuilder {
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
         threshold = Math.min(threshold, serverLoadingRadius);
 
-        // TODO [CRIT] worldify get a tree with other 'allChunks' from xModel.getConnectivity
         let allChunks = world.allChunks;
 
         const dx = world.xSize,    dy = world.ySize,    dz = world.zSize;
@@ -344,14 +309,12 @@ class ChunkBuilder {
 
     static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh) {
         let avatar = player.avatar;
-        let avatarWorld = avatar.worldId;
         var unloadedChunksForPlayer = {};
         let chunksToUnload = [];
 
         let aid = avatar.id;
         let startWid = avatar.worldId;
         let chunkIdsForEntity = consistencyModel.chunkIdsPerWorldForEntity(aid);
-        //let distance;
 
         let w = worldModel.getWorld(startWid);
         if (!w) { console.log('Could not get starting world from avatar.'); return; }
@@ -369,44 +332,13 @@ class ChunkBuilder {
                 if (distance === undefined || distance === null || distance > thresh)
                     chunksToUnload.push([worldId, chunkId])
             });
-
-            /*
-            if (worldId === avatarWorld) {
-                // Regular topology.
-                let starterChunkPosition = starterChunk.chunkId.split(',');
-                distance = GeometryUtils.infiniteNormDistance;
-                chunkIds.forEach(chunkId => {
-                    const currentChunkPosition = chunkId.split(',');
-                    const d = distance(starterChunkPosition, currentChunkPosition);
-                    if (d > thresh) {
-                        chunksToUnload.push(chunkId);
-                    }
-                })
-            } else {
-                // Weird topology.
-                distance = GeometryUtils.infiniteNormTransDistance;
-                let currentWorld = worldModel.getWorld(worldId);
-                chunkIds.forEach(chunkId => {
-                    let currentChunk = currentWorld.getChunkById(chunkId);
-
-                    // const d = distance(starterChunk, currentChunk, xModel, worldModel, thresh);
-                    const d = 0;
-                    if (d > thresh) {
-                        chunksToUnload.push(chunkId);
-                    }
-                })
-            }
-            */
-
         });
 
         // Recurse on unloaded chunk ids.
-        // unloadedChunksForPlayer[startWid] = {};
         for (let i = 0, l = chunksToUnload.length; i < l; ++i) {
             let chunkToUnload = chunksToUnload[i];
             let currentWorld = chunkToUnload[0];
             let currentId = chunkToUnload[1];
-            // if (currentWorld != '-1') console.log(currentWorld + ',' + currentId);
             if (!unloadedChunksForPlayer.hasOwnProperty(currentWorld))
                 unloadedChunksForPlayer[currentWorld] = {};
 

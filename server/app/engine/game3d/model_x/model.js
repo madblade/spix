@@ -35,6 +35,8 @@ class XModel {
         // To update whenever avatar moves from one chunk to another.
     }
 
+    static debug = false;
+
     /** Create / link **/
 
     // One knows it must link parts of this knots before it opens...
@@ -196,7 +198,6 @@ class XModel {
     }
 
     chunkContainsPortal(worldId, chunkId, portalId) {
-        // portalId = parseInt(portalId);
         worldId = parseInt(worldId);
         let ctp = this._worldToChunksToPortals.get(worldId);
         if (!ctp) return false;
@@ -227,13 +228,8 @@ class XModel {
     getConnectivity(startWid, startCid, wModel, thresh, force) {
 
         if (!force && this._portals.size < 1) return; // Quite often.
-        // TODO [OPTIM] for all (currentWorld)chunksToPortals, if chunkDistance(A,B)>thresh, return early.
-        // let dontCache = thresh < 4;
-        // We can cache always
 
         // Request cache.
-        //let originChunkId = chunk.chunkId;
-        //let worldId = chunk.world.worldId;
         let aggregate = startWid + ';' + startCid + ';' + thresh;
         let cached1 = this._cachedConnectivity[0].get(aggregate);
         let cached2 = this._cachedConnectivity[1].get(aggregate);
@@ -253,48 +249,26 @@ class XModel {
             let currentChunk = element[1];
             let currentDepth = element[2];
 
-            //let wid = currentChunk.world.worldId;
-            //let chunkId = currentChunk.chunkId;
-
-            //let marksId = wid +','+ chunkId;
             let marksId = currentWorld +','+ currentChunk;
-            //console.log(marksId);
             if (marks.has(marksId)) continue;
-            //console.log('passed');
             marks.add(marksId);
-            //recursedChunks.add([wid, chunkId]);
             recursedChunks.push([currentWorld, currentChunk, currentDepth]);
-            // console.log(chunkId);
             count++;
 
             depth = currentDepth;
-            //let world = wModel.getWorld(wid);
-            //let ijk = chunkId.split(',');
             let world = wModel.getWorld(currentWorld);
             let ijk = currentChunk.split(',');
             let i = parseInt(ijk[0]), j = parseInt(ijk[1]), k = parseInt(ijk[2]);
             let chks = [
-                //world.getChunk(i+1, j, k), world.getChunk(i-1, j, k),
-                //world.getChunk(i, j+1, k), world.getChunk(i, j-1, k),
-                //world.getChunk(i, j, k+1), world.getChunk(i, j, k-1)
                 ((i+1)+','+j+','+k),  ((i-1)+','+j+','+k),
                 (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
                 (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
             ];
 
-            //let everyChunkLoaded = true;
             chks.forEach(c => {
-                //if (c) {
-                //if (!marks.has(wid+','+c.chunkId)) stack.push([c, currentDepth+1]);
                 if (!marks.has(currentWorld + ',' + c)) stack.push([currentWorld, c, currentDepth + 1]);
-                //} else { everyChunkLoaded = false; }}
             });
-            // dontCache = !everyChunkLoaded;
-            // if (!everyChunkLoaded) return new Map();
-            // Here, return if world has not yet loaded
-            // some recursed chunks
 
-            // let gates = this.getPortalsFromChunk(wid, chunkId);
             let gates = this.getPortalsFromChunk(currentWorld, currentChunk);
             if (gates) {
                 gates.forEach(g => {
@@ -303,10 +277,9 @@ class XModel {
                     if (!otherSide) {
                         recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                     } else {
-                        // TODO [CRIT] rework that
                         let otherChunk = otherSide.chunk;
-                        console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
-                        console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
+                        if (XModel.debug) console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
+                        if (XModel.debug) console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
                         recursedPortals.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                         if (otherChunk) {
                             let otherWorld = otherChunk.world.worldId;
@@ -323,12 +296,8 @@ class XModel {
             stack.sort((a, b) => a[2] - b[2]);
         }
 
-        console.log(count + ' iterations on ' + startWid+'/'+startCid+'/'+thresh);
-        //console.log(recursedChunks);
-        //let e = new Error();
-        //console.log(e.stack);
+        if (XModel.debug) console.log(count + ' iterations on ' + startWid+'/'+startCid+'/'+thresh);
 
-        // console.log(result);
         this._cachedConnectivity[0].set(aggregate, recursedPortals);
         this._cachedConnectivity[1].set(aggregate, recursedChunks);
         return [recursedPortals, recursedChunks];

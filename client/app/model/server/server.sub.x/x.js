@@ -9,6 +9,7 @@ App.Model.Server.XModel = function(app) {
 
     // Model component
     this.portals = new Map();
+    this.backwardLinks = new Map();
 
     // Buffer
     this.xUpdates = [];
