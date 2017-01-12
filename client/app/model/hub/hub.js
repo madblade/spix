@@ -32,7 +32,7 @@ App.Model.Hub.prototype.update = function(data) {
         }
     }
 
-    if (app.isLoading) {
+    if (app.isLoading()) {
         // Update state.
         app.setState('hub', map);
 

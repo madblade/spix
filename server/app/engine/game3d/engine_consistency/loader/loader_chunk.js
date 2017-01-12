@@ -174,7 +174,9 @@ class ChunkLoader {
         let t = process.hrtime();
 
          //ChunkBuilder.preLoadNextChunk(player, starterChunk, world, false, consistencyModel, sRadius);
-        ChunkBuilder.loadNextChunk(player, starterChunk, worldModel, xModel, consistencyModel, sRadius, false);
+        const wid = starterChunk.world.worldId;
+        const cid = starterChunk.chunkId;
+        ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, false);
 
         let dt1 = (process.hrtime(t)[1]/1000);
         if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForServer.');
@@ -186,7 +188,7 @@ class ChunkLoader {
         t = process.hrtime();
 
          //var newChunk = ChunkBuilder.preLoadNextChunk(player, starterChunk, world, true, consistencyModel, sRadius);
-        var newChunk = ChunkBuilder.loadNextChunk(player, starterChunk, worldModel, xModel, consistencyModel, sRadius, true);
+        var newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, true);
 
         dt1 = (process.hrtime(t)[1]/1000);
         if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForPlayer.');

@@ -30,9 +30,11 @@ class XLoader {
         // Map (portal id -> [other portal id, other portal world])
 
         // Compute new portals in range.
-        let portals = xm.getConnectivity(chunk, wm, portalLoadingRadius);
+        let connectivity = xm.getConnectivity(worldId, chunk.chunkId, wm, portalLoadingRadius);
+        if (!connectivity) return;
         let addedPortals = {};
-        if (portals) portals[0].forEach((array, portalId) => {
+        let portals = connectivity[0];
+        if (portals) portals.forEach((array, portalId) => {
             let partial = cm.isPartialX();
             if (cm.hasX(avatarId, portalId) && !partial) return;
 
@@ -58,14 +60,25 @@ class XLoader {
         // TODO [OPTIM] when getConnectivity is performed, just remember which levels correspond to which portals...
         let playerXs = cm.getXIdsForEntity(avatarId);
         let removedPortals = {};
-        playerXs.forEach(portalId => {
-            let p = xm.getPortal(portalId);
-            let d = GeometryUtils.entityToPortalDistance(a, p, xm, wm, portalLoadingRadius);
-            //console.log(d);
-            if (d > portalLoadingRadius) {
-                removedPortals[portalId] = null;
-            }
-        });
+
+        let chunks = connectivity[1];
+        if (chunks) {
+            let marks = new Map();
+            chunks.forEach(c => marks.set(c[0]+','+c[1], c[2]));
+
+            playerXs.forEach(portalId => {
+                let p = xm.getPortal(portalId);
+                let i = p.worldId+','+p.chunkId;
+                let d = marks.get(i);
+                if (d === undefined || d === null || d > portalLoadingRadius)
+                    removedPortals[portalId] = null;
+                //let d = GeometryUtils.entityToPortalDistance(a, p, xm, wm, portalLoadingRadius);
+                //console.log(d);
+                //if (d > portalLoadingRadius) {
+                //    removedPortals[portalId] = null;
+                //}
+            });
+        }
 
         //if (Object.keys(addedPortals). length > 0) console.log(addedPortals);
         //if (Object.keys(removedPortals).length > 0) console.log(removedPortals);

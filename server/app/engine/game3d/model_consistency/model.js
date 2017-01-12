@@ -91,7 +91,8 @@ class ConsistencyModel {
 
         let side = renderDistance*2 + 1;
 
-        let worlds = this._chunkIdsForEntity.get(avatar.id); // TODO [CRIT] gon on from there to fix loading...
+        // TODO [CRIT] gon on from there to fix loading...
+        let worlds = this._chunkIdsForEntity.get(avatar.id);
 
         let chunks = this._chunkIdsForEntity.get(avatar.id).get(worldId);
         if (!chunks) return false;

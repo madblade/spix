@@ -16,7 +16,7 @@ class Avatar extends Entity {
 
         // Counted as a number of chunks.
         this._chunkRenderDistance = 5;
-        this._chunkUnloadDistance = 10;
+        this._chunkUnloadDistance = 5;
         this._portalRenderDistance = 2; // TODO [CRIT] think how to fix that the first time it is not fully cached on model.
 
         // Counted as a number of blocks.
