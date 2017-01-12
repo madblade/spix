@@ -50,13 +50,19 @@ class GeometryUtils {
     // Do a bit of graph analysis here.
     static entityToPortalDistance(entity, portal, xModel, wModel, thresh) {
         // Get starting chunk.
-        let chunk = wModel.getWorld(entity.worldId).getChunkByCoordinates(...entity.position);
-        let targetId = portal.id;
+        let chunk1 = wModel.getWorld(entity.worldId).getChunkByCoordinates(...entity.position);
+        let chunk2 = portal.chunk;
+
+        return GeometryUtils.infiniteNormTransDistance(chunk1, chunk2, xModel, wModel, thresh);
+    }
+
+    static infiniteNormTransDistance(chunk1, chunk2, xModel, wModel, thresh) {
+        let worldId2 = chunk2.world.worldId;
 
         // BFS.
         let done = new Set();
         let depth = 0;
-        let stack = [[chunk, depth]];
+        let stack = [[chunk1, depth]];
         while (stack.length > 0 && depth <= thresh) {
             // Test current element: does it contain target?
             let element = stack.shift();
@@ -71,7 +77,7 @@ class GeometryUtils {
             if (done.has(doneId)) continue;
             done.add(doneId);
 
-            if (xModel.chunkContainsPortal(worldId, chunkId, targetId))
+            if (worldId === worldId2 && chunkId === chunk2.chunkId)
                 return currentDepth;
 
             depth = currentDepth;

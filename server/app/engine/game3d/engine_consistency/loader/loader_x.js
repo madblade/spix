@@ -61,11 +61,14 @@ class XLoader {
         playerXs.forEach(portalId => {
             let p = xm.getPortal(portalId);
             let d = GeometryUtils.entityToPortalDistance(a, p, xm, wm, portalLoadingRadius);
+            //console.log(d);
             if (d > portalLoadingRadius) {
                 removedPortals[portalId] = null;
             }
         });
 
+        //if (Object.keys(addedPortals). length > 0) console.log(addedPortals);
+        //if (Object.keys(removedPortals).length > 0) console.log(removedPortals);
         return [addedPortals, removedPortals];
     }
 

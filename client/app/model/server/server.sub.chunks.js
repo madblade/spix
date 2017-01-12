@@ -88,6 +88,7 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
                     if (update.length != 3) {
                         console.log('WARN: corrupt update or model @refresh / updateChunk.');
                         console.log(update);
+                        this.chunkUpdates = [];
                         return;
                     } else {
                         this.updateChunk(worldId, chunkId, update);

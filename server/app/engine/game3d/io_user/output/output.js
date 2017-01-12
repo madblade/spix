@@ -27,7 +27,7 @@ class UserOutput {
         let t1, t2;
 
         t1 = process.hrtime();
-        this.spawnPlayers();
+        //this.spawnPlayers();
         t2 = (process.hrtime(t1)[1]/1000);
         if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to spawn players.");
 
@@ -105,7 +105,7 @@ class UserOutput {
             if (hasNew) {
                 // New chunk + update => bundle updates with new chunks in one call.
                 if (hasUpdated) {
-                    for (var wiA in addedOrRemovedChunks) {
+                    for (let wiA in addedOrRemovedChunks) {
                         if (wiA in updatedChunksForPlayer) {
                             Object.assign(addedOrRemovedChunks[wiA], updatedChunksForPlayer[wiA]);
                             delete updatedChunksForPlayer[wiA];
@@ -123,8 +123,11 @@ class UserOutput {
                 //      {chunkId: [removed, added, updated]} .. Updated chunk
                 //      {chunkId: null} ....................... Removed chunk
                 // }
+
                 let output = UserOutput.pack(addedOrRemovedChunks);
                 p.send('chk', output);
+                // TODO [CRIT] check appearance of []
+                // for (let wiA in addedOrRemovedChunks) console.log(Object.keys(addedOrRemovedChunks[wiA]));
             }
             else if (hasUpdated) {
                 // (Format: ditto)

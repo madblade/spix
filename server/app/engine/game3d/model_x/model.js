@@ -224,15 +224,16 @@ class XModel {
     // Returns a Map portalId -> [otherEndId, otherWorldId]
     // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
     // TODO [CRIT] continue here
-    getConnectivity(chunk, wModel, thresh, outputChunkIdWrapper) {
+    getConnectivity(chunk, wModel, thresh, force) {
 
-        if (this._portals.size < 1) return; // Quite often.
+        if (!force && this._portals.size < 1) return; // Quite often.
         // TODO [OPTIM] for all (currentWorld)chunksToPortals, if chunkDistance(A,B)>thresh, return early.
+        let dontCache = false;
 
         // Request cache.
         let originChunkId = chunk.chunkId;
         let worldId = chunk.world.worldId;
-        let aggregate = worldId + originChunkId;
+        let aggregate = worldId + ';' + originChunkId + ';' + thresh;
         let cached1 = this._cachedConnectivity[0].get(aggregate);
         let cached2 = this._cachedConnectivity[1].get(aggregate);
         if (cached1 && cached2) return [cached1, cached2];
@@ -258,7 +259,6 @@ class XModel {
             // console.log(chunkId);
 
             depth = currentDepth;
-            // console.log(depth);
             let world = wModel.getWorld(wid);
             let ijk = chunkId.split(',');
             let i = parseInt(ijk[0]), j = parseInt(ijk[1]), k = parseInt(ijk[2]);
@@ -272,6 +272,7 @@ class XModel {
             chks.forEach(c => { if (c) {
                 stack.push([c, currentDepth+1]);
             } else { everyChunkLoaded = false; }});
+            dontCache = !everyChunkLoaded;
             // if (!everyChunkLoaded) return new Map();
             // Here, return if world has not yet loaded
             // some recursed chunks
@@ -283,13 +284,13 @@ class XModel {
                     let otherSide = this.getOtherSide(g);
                     if (!otherSide) {
                         recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
-                        return; // Continue forEach
+                    } else {
+                        let otherChunk = otherSide.chunk;
+                        console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
+                        console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
+                        recursedPortals.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                        if (otherChunk) stack.push([otherChunk, currentDepth+1]);
                     }
-                    let otherChunk = otherSide.chunk;
-                    console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
-                    console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
-                    recursedPortals.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
-                    if (otherChunk) stack.push([otherChunk, currentDepth+1]);
                 });
             }
 
@@ -299,8 +300,8 @@ class XModel {
         }
 
         // console.log(result);
-        this._cachedConnectivity[0].set(aggregate, recursedPortals);
-        this._cachedConnectivity[1].set(aggregate, recursedChunks);
+        if (!dontCache) this._cachedConnectivity[0].set(aggregate, recursedPortals);
+        if (!dontCache) this._cachedConnectivity[1].set(aggregate, recursedChunks);
         return [recursedPortals, recursedChunks];
     }
 

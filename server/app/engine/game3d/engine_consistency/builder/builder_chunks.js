@@ -187,6 +187,63 @@ class ChunkBuilder {
         return chunk;
     }
 
+    static loadNextChunk(player, chunk, worldModel, xModel, consistencyModel, serverLoadingRadius, forPlayer) {
+
+        let avatar = player.avatar;
+        let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
+        threshold = Math.min(threshold, serverLoadingRadius);
+
+        let connectivity = xModel.getConnectivity(chunk, worldModel, threshold, true);
+        if (!connectivity) return;
+        let chunks = connectivity[1]; // !! Should be sorted from the nearest to the farthest.
+        if (!chunks) return;
+        let aid = avatar.id;
+
+        let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, (ic+','+jc+','+kc));
+
+        let chunkIsToBeLoaded = (wid, ic, jc, kc) => {
+            let currentId = (ic+','+jc+','+kc);
+            let currentWorld = worldModel.getWorld(wid);
+            let currentChunks = currentWorld.allChunks;
+            let currentChunk = currentChunks.get(currentId);
+            const dx = currentWorld.xSize, dy = currentWorld.ySize, dz = currentWorld.zSize;
+
+            if (!forPlayer) {
+                if (!currentChunk) {
+                    currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, currentWorld);
+                    currentChunks.set(currentId, currentChunk);
+                    return currentChunk;
+                } else if (!currentChunk.ready) {
+                    ChunkBuilder.computeChunkFaces(currentChunk);
+                    return currentChunk;
+                } else return null;
+            } else {
+                if (!hasLoadedChunk(ic, jc, kc)) {
+                    return currentChunk;
+                } else return null;
+            }
+        };
+
+        let iter = chunks.entries();
+        let current;
+        while (current = iter.next().value) {
+            let c = current[0];
+            let wid = c[0];
+            let currentId = c[1];
+            let ijk = currentId.split(',');
+            if (!hasLoadedChunk(wid, ...ijk)) return chunkIsToBeLoaded(wid, ...ijk);
+        }
+
+        /*
+        for (let i = 0, l = chunks.length; i < l; ++i) {
+            let currentIds = chunks[i];
+            let wid = parseInt(currentIds[0]);
+            let ijk = currentIds[1].split(',').map(x => parseInt(x));
+            if (!hasLoadedChunk(wid, ...ijk)) return chunkIsToBeLoaded(wid, ...ijk);
+        }
+        */
+    }
+
     static preLoadNextChunk(player, starterChunk, world, forPlayer, consistencyModel, serverLoadingRadius) {
         let avatar = player.avatar;
         // TODO [CRIT] worldify check chain of events: avatar could have crossed a portal meanwhile.
@@ -265,26 +322,43 @@ class ChunkBuilder {
         }
     }
 
-    static getOOBPlayerChunks(player, starterChunk, consistencyModel, bound) {
+    static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh) {
         let avatar = player.avatar;
+        let avatarWorld = avatar.worldId;
         var unloadedChunksForPlayer = {};
         let chunksToUnload = [];
 
         let aid = avatar.id;
         let mainWorldId = avatar.worldId;
         let chunkIdsForEntity = consistencyModel.chunkIdsPerWorldForEntity(aid);
-        let distance = GeometryUtils.infiniteNormDistance;
+        let distance;
 
-        let starterChunkPosition = starterChunk.chunkId.split(',');
         chunkIdsForEntity.forEach((chunkIds, worldId) => {
-            chunkIds.forEach(chunkId => {
-                const currentChunkPosition = chunkId.split(',');
-                // TODO [CRIT] worldify distance criterion, use chunks from other worlds.
-                const d = distance(starterChunkPosition, currentChunkPosition);
-                if (d > bound) {
-                    chunksToUnload.push(chunkId);
-                }
-            })
+            if (worldId === avatarWorld) {
+                // Regular topology.
+                let starterChunkPosition = starterChunk.chunkId.split(',');
+                distance = GeometryUtils.infiniteNormDistance;
+                chunkIds.forEach(chunkId => {
+                    const currentChunkPosition = chunkId.split(',');
+                    const d = distance(starterChunkPosition, currentChunkPosition);
+                    if (d > thresh) {
+                        chunksToUnload.push(chunkId);
+                    }
+                })
+            } else {
+                // Weird topology.
+                /*distance = GeometryUtils.infiniteNormTransDistance;
+                let currentWorld = worldModel.getWorld(worldId);
+                chunkIds.forEach(chunkId => {
+                    let currentChunk = currentWorld.getChunkById(chunkId);
+
+                    const d = distance(starterChunk, currentChunk, xModel, worldModel, thresh);
+                    if (d > thresh) {
+                        chunksToUnload.push(chunkId);
+                    }
+                })*/
+            }
+
         });
 
         // Recurse on unloaded chunk ids.
