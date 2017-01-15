@@ -69,13 +69,13 @@ App.Model.Server.SelfModel.prototype.updateSelf = function(p, r) {
 App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
 
     // Player id '-1' never used by any other entity.
-    var id = this.entityId;
+    var entityId = this.entityId;
+    var worldId = this.worldId;
 
-    graphics.initializeEntity(id, 'steve', function(createdEntity) {
-        var object3d = graphics.finalizeEntity(id, createdEntity);
+    graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
+        var object3d = graphics.finalizeEntity(entityId, createdEntity);
         this.avatar = object3d;
-        // TODO [CRIT] couple with knot model.
-        if (this.displayAvatar) graphics.addToScene(object3d, id);
+        if (this.displayAvatar) graphics.addToScene(object3d, worldId);
     }.bind(this));
 
 };

@@ -18,8 +18,8 @@ App.Engine.Graphics = function(app) {
 
     // Rendering.
     this.requestId          = null;
-    this.rendererManager    = this.createRendererManager();
     this.sceneManager       = this.createSceneManager();
+    this.rendererManager    = this.createRendererManager();
     this.cameraManager      = this.createCameraManager();
 
     // Interaction.

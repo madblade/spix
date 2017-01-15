@@ -20,6 +20,9 @@ App.Model.Server.XModel = function(app) {
 
 App.Model.Server.XModel.prototype.init = function() {};
 
+// Should always be called AFTER worldModel.refresh()
+// So there is no more world to be added, all possible worlds
+// are available for display in their portals texture renderer.
 App.Model.Server.XModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
 

@@ -34,16 +34,18 @@ App.Model.Server.ChunkModel.prototype.addWorld = function(worldId, worldInfo) {
 
     console.log('This world I don\'t know... ' + worldId);
     var world = new Map();
-    var property = {
+    var properties = {
         chunkSizeX : worldInfo[0], // 16,
         chunkSizeY : worldInfo[1], // 16,
         chunkSizeZ : worldInfo[2]  // 32
     };
 
-    property.chunkCapacity = property.chunkSizeX * property.chunkSizeY * property.chunkSizeZ;
+    properties.chunkCapacity = properties.chunkSizeX * properties.chunkSizeY * properties.chunkSizeZ;
 
     this.worlds.set(worldId, world);
-    this.worldProperties.set(worldId, property);
+    this.worldProperties.set(worldId, properties);
+
+    return properties;
 };
 
 /** Dynamics **/
@@ -52,6 +54,7 @@ App.Model.Server.ChunkModel.prototype.init = function() {};
 
 App.Model.Server.ChunkModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
+    var graphics = this.app.engine.graphics;
 
     var chunkUpdates = this.chunkUpdates;
     for (var cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
@@ -64,17 +67,27 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
             for (var wid in worlds) {
                 var wif = worlds[wid];
                 for (var id = 0, wl=wif.length; id<wl; ++id) wif[id] = parseInt(wif[id]);
-                this.addWorld(wid, wif);
+
+                // Add new world and matching scene.
+                var properties = this.addWorld(wid, wif);
+                if (properties) {
+                    // 1 world <-> 1 scene, multiple cameras
+                    graphics.addScene(wid);
+                    var light = graphics.createLight('hemisphere');
+                    light.position.set(0.5, 1, 0.75);
+                    graphics.addToScene(light, wid);
+                }
             }
         }
         for (var worldId in updates) {
             if (worldId === 'worlds') {
                 continue;
             }
-            if (worldId !== '-1') {
-                console.log(worldId + ' not supported yet: another world.');
-                continue;
-            }
+            // TODO [CRIT] investigate
+            //if (worldId !== '-1') {
+            //    console.log(worldId + ' not supported yet: another world.');
+                //continue;
+            //}
 
             var subdates = updates[worldId];
             for (var chunkId in subdates) {
@@ -126,13 +139,11 @@ App.Model.Server.ChunkModel.prototype.updateChunks = function(updates) {
     this.needsUpdate = true;
 };
 
-// TODO [CRIT] worldify
 App.Model.Server.ChunkModel.prototype.isChunkLoaded = function(worldId, chunkId) {
     var world = this.worlds.get(worldId);
     return (world && world.has(chunkId));
 };
 
-// TODO [CRIT] couple with knot model.
 App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkId, all) {
     var graphics = this.app.engine.graphics;
 
@@ -141,6 +152,7 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkI
     if (!world) {
         console.log('Got chunk ' + chunkId + ' ('+typeof worldId+') from an unknown world: ' + worldId);
         return;
+        // TODO [CRIT] knotify
         // this.addWorld(worldId);
         // world = this.worlds.get(worldId);
     }
@@ -150,8 +162,7 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkI
     var sizeY = property.chunkSizeY;
     var sizeZ = property.chunkSizeZ;
 
-    // TODO use graphics in refresh
-    var chunk = graphics.initializeChunk(chunkId, all, sizeX, sizeY, sizeZ);
+    var chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ);
     world.set(chunkId, chunk);
 
     // Add to scene.
@@ -162,11 +173,10 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkI
     }
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.addToScene(meshes[m], -1); // TODO [CRIT] link scene
+        graphics.addToScene(meshes[m], worldId);
     }
 };
 
-// TODO [CRIT] worldify
 App.Model.Server.ChunkModel.prototype.updateChunk = function(worldId, chunkId, components) {
     var graphics = this.app.engine.graphics;
 
@@ -187,11 +197,9 @@ App.Model.Server.ChunkModel.prototype.updateChunk = function(worldId, chunkId, c
     var sizeY = property.chunkSizeY;
     var sizeZ = property.chunkSizeZ;
 
-    // TODO use graphics in refresh
-    graphics.updateChunk(chunk, chunkId, components, sizeX, sizeY, sizeZ);
+    graphics.updateChunk(worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ);
 };
 
-// TODO [CRIT] worldify
 App.Model.Server.ChunkModel.prototype.unloadChunk = function(worldId, chunkId) {
     var graphics = this.app.engine.graphics;
     var world = this.worlds.get(worldId);
@@ -205,7 +213,7 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(worldId, chunkId) {
 
     var meshes = chunk.meshes;
     for (var m = 0, l = meshes.length; m < l; ++m) {
-        graphics.removeFromScene(meshes[m], -1); // TODO [CRIT] worldify
+        graphics.removeFromScene(meshes[m], worldId);
     }
 
     world.delete(chunkId);

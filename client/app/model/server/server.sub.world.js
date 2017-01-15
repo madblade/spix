@@ -20,7 +20,11 @@ App.Model.Server.WorldModel = function(app) {
 
 App.Model.Server.WorldModel.prototype.init = function() {
     var graphics = this.app.engine.graphics;
-    graphics.addToScene(this.light, -1); // TODO [CRIT] couple with knot model.
+    var selfModel = this.app.model.server.selfModel;
+    var worldId = selfModel.worldId;
+
+    // TODO [CRIT] couple with knot model.
+    // graphics.addToScene(this.light, worldId);
 };
 
 App.Model.Server.WorldModel.prototype.refresh = function() {

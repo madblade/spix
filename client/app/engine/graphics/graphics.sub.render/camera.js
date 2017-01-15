@@ -29,16 +29,19 @@ App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster
     return camera;
 };
 
-App.Engine.Graphics.CameraManager.prototype.addCamera = function() {
-    // TODO [CRIT] compute new Id & dev model for knots.
-    this.subCameras.set(1000, this.createCamera());
+App.Engine.Graphics.CameraManager.prototype.addCamera = function(cameraId) {
+    var camera = new THREE.PerspectiveCamera(this.mainFOV, 0.5, this.mainNear, this.mainFar);
+    camera.position.set(0, 0, 28);
+    camera.rotation.set(0, 0, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    this.subCameras.set(cameraId, camera);
 };
 
+// TODO [CRIT] worldify (with raycaster)
 App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) {
     var newMainCamera = this.subCameras.get(cameraId);
     if (!newMainCamera) { console.log('Failed to switch with camera ' + cameraId); return; }
     var oldMainCamera = this.mainCamera;
-    // TODO [CRIT] worldify with raycaster camera
 
     this.mainCamera = newMainCamera;
     this.addCamera(oldMainCamera);
@@ -54,7 +57,9 @@ App.Engine.Graphics.CameraManager.prototype.positionCameraBehind = function(vect
             cam.position.y = vector[1]; // + 10;
             cam.position.z = vector[2] + 1.6;
         });
-    } else if (i.isThirdPerson()) {
+    }
+
+    else if (i.isThirdPerson()) {
         cameraWrapper.forEach(function(cam) {
             cam.position.x = vector[0];
             cam.position.y = vector[1]; // + 10;

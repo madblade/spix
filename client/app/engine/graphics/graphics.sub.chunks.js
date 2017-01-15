@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.initializeChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
+App.Engine.Graphics.prototype.createChunk = function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
 {
     // TODO don't discriminate components
     // TODO discriminate components server-side
@@ -95,7 +95,8 @@ App.Engine.Graphics.prototype.initializeChunk = function(chunkId, all, chunkSize
 };
 
 
-App.Engine.Graphics.prototype.updateChunk = function(chunk, chunkId, components, chunkSizeX, chunkSizeY, chunkSizeZ)
+App.Engine.Graphics.prototype.updateChunk = function(worldId, chunk, chunkId, components,
+                                                     chunkSizeX, chunkSizeY, chunkSizeZ)
 {
 
     var geometries =        chunk.geometries;
@@ -110,15 +111,15 @@ App.Engine.Graphics.prototype.updateChunk = function(chunk, chunkId, components,
     var added =     components[1];
     var updated =   components[2];
 
-    this.removeChunkFaces(removed, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
+    this.removeChunkFaces(worldId, removed, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
 
-    this.addChunkFaces(added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
+    this.addChunkFaces(worldId, added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
         chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
 
-    this.updateChunkFaces(updated, geometries);
+    this.updateChunkFaces(worldId, updated, geometries);
 };
 
-App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
+App.Engine.Graphics.prototype.removeChunkFaces = function(worldId, removed,
                                                           geometries, materials, meshes, capacities, sizes,
                                                           whereToFindFace, whichFaceIs)
 {
@@ -198,7 +199,7 @@ App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
         if (sizes[meshId] === 0) {
             console.log("INFO: geometry deletion.");
             // Remove mesh from scene.
-            this.sceneManager.removeFromScene(meshes[meshId], -1); // TODO [CRIT] knotify
+            this.sceneManager.removeFromScene(meshes[meshId], worldId);
             geometries[meshId]  = undefined;
             materials[meshId]   = undefined;
             meshes[meshId]      = undefined;
@@ -217,7 +218,7 @@ App.Engine.Graphics.prototype.removeChunkFaces = function(removed,
     }
 };
 
-App.Engine.Graphics.prototype.addChunkFaces = function(added,
+App.Engine.Graphics.prototype.addChunkFaces = function(worldId, added,
                                                        geometries, materials, meshes, capacities, sizes,
                                                        whereToFindFace, whichFaceIs,
                                                        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
@@ -321,7 +322,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
             geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
             meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
-            this.addToScene(meshes[meshId], -1); // TODO [CRIT] couple with knot model.
+            this.addToScene(meshes[meshId], worldId);
         }
 
         // Notify object.
@@ -334,7 +335,7 @@ App.Engine.Graphics.prototype.addChunkFaces = function(added,
 };
 
 // TODO [LONG-TERM] manage changes
-App.Engine.Graphics.prototype.updateChunkFaces = function(updated, geometries) {
+App.Engine.Graphics.prototype.updateChunkFaces = function(worldId, updated, geometries) {
     for (var uid in updated) {
     }
 };

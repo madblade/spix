@@ -21,20 +21,49 @@ App.Engine.Graphics.RendererManager.prototype.createRenderer = function() {
 };
 
 App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, cameraManager) {
+    var rendererManager = this;
     var renderer = this.renderer;
     var mainScene = sceneManager.mainScene;
     var mainCamera = cameraManager.mainCamera;
 
     var subScenes = sceneManager.subScenes;
     var subCameras = cameraManager.subCameras;
+    var screens = sceneManager.screens;
 
-    // TODO [MEDIUM] sort rendering textures according to positions in World Model.
+    screens.forEach(function(screen, portalId) {
+        if (screen.length !== 3) {
+            console.log(screen.length);
+            return;
+        }
+        var bufferTexture = screen[1];
+        if (!bufferTexture) {
+            console.log('Could not get matchin RTT.');
+            return;
+        }
+        var bufferCamera = subCameras.get(portalId);
+        if (!bufferCamera) {
+            console.log('Could not get matching camera.');
+            return;
+        }
+        var bufferScene = subScenes.get(screen[2]);
+        if (!bufferScene) {
+            // Happens when current portal is a stub.
+            // console.log('Could not get matching scene.');
+            return;
+        }
+
+        renderer.render(bufferScene, bufferCamera, bufferTexture);
+    });
+
+    // TODO [HIGH] sort rendering textures according to positions in World Model.
     // renderer.render(bufferScene, camera, bufferTexture);
     renderer.render(mainScene, mainCamera);
 };
 
 App.Engine.Graphics.RendererManager.prototype.resize = function(width, height) {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    if (!width) width = window.innerWidth;
+    if (!height) height = window.innerHeight;
+    this.renderer.setSize(width, height);
 };
 
 /** Interface with graphics engine. **/

@@ -265,6 +265,7 @@ class XModel {
                 (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
             ];
 
+            // TODO [HIGH] discriminate depth k+ and k-
             chks.forEach(c => {
                 if (!marks.has(currentWorld + ',' + c)) stack.push([currentWorld, c, currentDepth + 1]);
             });

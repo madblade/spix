@@ -6,16 +6,18 @@
 
 App.Engine.Graphics.prototype.initializeControls = function() {
     var controlsEngine = this.app.engine.controls;
+    var selfModel = this.app.model.server.selfModel;
+    var worldId = selfModel.worldId;
 
-    // TODO [CRIT] couple with knot model, DONT FORGET TO SWITCH CONTROLS ALONG WITH CAMERA.
+    // TODO [CRIT] DONT FORGET TO SWITCH CONTROLS ALONG WITH CAMERA.
     var controls = controlsEngine.getControls('first-person', this.cameraManager);
 
     var oldControlsObject = this.sceneManager.mainScene.getObjectByName('controls');
-    if (oldControlsObject) this.removeFromScene(oldControlsObject, -1);
+    if (oldControlsObject) this.removeFromScene(oldControlsObject, worldId);
     this.controls = controls;
     this.controls.name = 'controls';
-    this.addToScene(this.controls.getObject()[0], -1);
-    this.addToScene(this.controls.getObject()[1], -1);
+    this.addToScene(this.controls.getObject()[0], worldId);
+    this.addToScene(this.controls.getObject()[1], worldId);
 };
 
 App.Engine.Graphics.prototype.startListeners = function() {

@@ -9,6 +9,7 @@ App.Model.Server.XModel.prototype.addPortal = function(portalId, otherPortalId,
 {
     var graphics = this.app.engine.graphics;
     console.log('Adding portal ' + portalId + ' and linking to ' + otherPortalId);
+    portalId = parseInt(portalId);
 
     // Build portal model.
     if (this.portals.has(portalId)) {
@@ -22,27 +23,39 @@ App.Model.Server.XModel.prototype.addPortal = function(portalId, otherPortalId,
     // Complete other portals which lead to this one.
     var backwards = this.backwardLinks;
     var bplinks = backwards.get(portalId);
-    if (bplinks) bplinks.forEach(function(previousPortal) {
+    console.log(backwards);
+    console.log(portalId + ', ' + bplinks);
+    var portals = this.portals;
+    if (bplinks) bplinks.forEach(function(previousPortalId) {
+        var previousPortal = portals.get(previousPortalId);
         graphics.completeStubPortalObject(previousPortal, portal);
     });
 
     // Register other end to be linked backwards by this one.
     var otherPortal = otherPortalId ? this.portals.get(otherPortalId) : null;
     if (otherPortal) {
-        var blinks = backwards.get(otherPortalId);
-        if (blinks) blinks.add(portalId);
-        else {
-            blinks = new Set();
-            blinks.add(otherPortalId);
-            backwards.set(portalId, blinks);
-        }
+        this.addBackwardLinks(portalId, otherPortalId);
+        this.addBackwardLinks(otherPortalId, portalId);
 
     // Do add current portal.
         graphics.addPortalObject(portal, otherPortal);
     } else {
+        if (otherPortalId) this.addBackwardLinks(otherPortalId, portalId);
         graphics.addStubPortalObject(portal);
     }
 
+};
+
+// portalId -> otherPortalId
+App.Model.Server.XModel.prototype.addBackwardLinks = function(portalId, otherPortalId) {
+    var backwards = this.backwardLinks;
+    var blinks = backwards.get(otherPortalId);
+    if (blinks) blinks.add(portalId);
+    else {
+        blinks = new Set();
+        blinks.add(otherPortalId);
+        backwards.set(portalId, blinks);
+    }
 };
 
 App.Model.Server.XModel.prototype.removePortal = function(portalId) {
@@ -54,15 +67,13 @@ App.Model.Server.XModel.prototype.removePortal = function(portalId) {
         console.log('\t... portal ' + portalId + ' not present in model.');
     }
 
-    // TODO [CRIT] for all formerly linked, remove part in graphics
-
     var backwards = this.backwardLinks;
     var linked = backwards.get(portalId);
     if (linked) linked.forEach(function(lportal) {
         graphics.removePartOfPortalObject(lportal, portal);
     });
 
-    graphics.removePortalObject(portal);
+    if (portal) graphics.removePortalObject(portal);
 
     backwards.delete(portalId);
     this.portals.delete(portalId);
