@@ -19,7 +19,6 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
     // Create screen.
     var screen = this.getScreen(portalId);
     if (!screen) {
-        // TODO [CRIT] render target dimensions.
         var tempPosition = portal.tempPosition;
         var tempWidth = portal.tempWidth;
         var tempHeight = portal.tempHeight;
@@ -53,7 +52,6 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
         });
         var mesh = new THREE.Mesh(geometry, material);
 
-        // TODO [CRIT] render target position, rotation.
         mesh.position.x = tempPosition[0] + 0.5;
         mesh.position.y = tempPosition[1];
         mesh.position.z = tempPosition[2] + 1;

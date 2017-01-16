@@ -8,7 +8,6 @@ class GeometryUtils {
 
     /** Common topology distances **/
 
-    // TODO [CRIT] worldify (with xModel.getConnectivity)
     static infiniteNormDistance(pos1, pos2) {
         var d = 0;
         for (let i = 0; i < 3; ++i)
@@ -22,8 +21,11 @@ class GeometryUtils {
         return result;
     };
 
-    // TODO [CRIT] worldify: test worldId
     static entitySquaredEuclideanDistance(entityX, entityY) {
+        // Two entities on different worlds are considered infinitely far.
+        if (entityX.worldId !== entityY.worldId) return Number.POSITIVE_INFINITY;
+
+        // Else return regular Euclidean distance.
         let result = 0; let d;
         let pX = entityX.position, pY = entityY.position;
         for (let i = 0; i<3; ++i) { d = pX[i]-pY[i]; result += d*d; }

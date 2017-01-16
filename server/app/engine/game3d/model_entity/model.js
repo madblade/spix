@@ -31,7 +31,8 @@ class EntityModel {
         let worldModel = this._game.worldModel;
         let id = CollectionUtil.generateId(entities);
         p.avatar = EntityFactory.createAvatar(id, this);
-        // TODO [CRIT] worldify spawn directly in another world.
+
+        // TODO [MEDIUM] custom spawn world and location.
         let world = worldModel.getWorld();
         p.avatar.spawn(world.getFreePosition(), world.worldId);
 

@@ -83,11 +83,6 @@ App.Model.Server.ChunkModel.prototype.refresh = function() {
             if (worldId === 'worlds') {
                 continue;
             }
-            // TODO [CRIT] investigate
-            //if (worldId !== '-1') {
-            //    console.log(worldId + ' not supported yet: another world.');
-                //continue;
-            //}
 
             var subdates = updates[worldId];
             for (var chunkId in subdates) {
@@ -152,9 +147,6 @@ App.Model.Server.ChunkModel.prototype.initializeChunk = function(worldId, chunkI
     if (!world) {
         console.log('Got chunk ' + chunkId + ' ('+typeof worldId+') from an unknown world: ' + worldId);
         return;
-        // TODO [CRIT] knotify
-        // this.addWorld(worldId);
-        // world = this.worlds.get(worldId);
     }
 
     var property = this.worldProperties.get(worldId);
@@ -219,10 +211,11 @@ App.Model.Server.ChunkModel.prototype.unloadChunk = function(worldId, chunkId) {
     world.delete(chunkId);
 };
 
-// TODO [CRIT] worldify
 App.Model.Server.ChunkModel.prototype.getCloseTerrain = function(worldId) {
     // Only chunks within current world.
-    if (!worldId) worldId = '-1'; // Get overworld by default TODO [LOW] check security
+
+    // Get overworld by default. WARN security.
+    if (!worldId) worldId = '-1';
     var world = this.worlds.get(worldId);
     if (!world) return;
 

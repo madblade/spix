@@ -23,10 +23,14 @@ class EntityLoader {
         thresh *= thresh; // Squared distance.
         let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
+        // TODO [LACKS] optim O(n²) -> O(Cn)
         entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
                 entities[eid] = {p:e.position, r:e.rotation, k:e.kind};
         }});
+
+        // TODO [HIGH] worldify: compute entities on loaded chunks.
+        // (as it is the only way to detect in-range entities)
 
         return entities;
     }
@@ -37,21 +41,23 @@ class EntityLoader {
         let avatar = player.avatar;
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
-        // TODO [CRIT] worldify distance to knot then other world's player.
 
+        // TODO [HIGH] also compute entities on loaded chunks.
         let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         var addedEntities = {};
         var removedEntities = {};
 
-        // TODO [MEDIUM]: use LACKS structure to pass from O(n²) to O(Cn).
-        // TODO [MEDIUM]: also use for AABB phase in physics.
+        // TODO [LACKS]: O(n²) -> O(Cn).
+        // TODO [HIGH]: also use for AABB phase in physics.
         let aid = avatar.id;
         entityModel.forEach(e => { let eid = e.id; if (eid !== aid) { // For all different entities.
 
             // Compute distance & find in OLD consistency model.
             let isInRange = distance(e, avatar) < thresh;
-            let isPresent = consistencyModel.hasEntity(aid, eid); // TODO [PERF] n² log² n !!
+
+            // TODO [PERF] n² log² n !!
+            let isPresent = consistencyModel.hasEntity(aid, eid);
 
             if (isInRange && !isPresent)
                 addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind};

@@ -42,12 +42,12 @@ App.Engine.Graphics.CameraManager.prototype.addCamera = function(cameraId, camer
         return;
     }
 
-    var aspect = cameraAspect ? cameraAspect : 0.5;
     var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
     var p = cameraPosition;
     this.subCameras.set(cameraId, camera);
     var wrapper = this.createSubWrapper(cameraId);
     var yaw = wrapper[1];
+    // TODO [CRIT] init camera position, rotation
     yaw.position.set(p[0], p[1], p[2]+1);
 };
 
@@ -136,12 +136,11 @@ App.Engine.Graphics.CameraManager.prototype.moveCameraFromMouse = function(movem
 
     // Apply transform to portals.
     this.subWrappers.forEach(function(subWrapper, cameraId) {
+        // TODO [CRIT] update camera position, rotation rel. to portal position.
         var pit = subWrapper[0];
         var yaw = subWrapper[1];
         yaw.rotation.z = yz;
         pit.rotation.x = px;
-        //subWrapper.rotation.z = yz;
-        //subWrapper.rotation.x = px;
     });
 
     //this.subCameras.forEach(function(camera) { console.log(camera.rotation.z); });

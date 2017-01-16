@@ -86,6 +86,7 @@ App.Engine.Graphics.prototype.addScene = function(newSceneId) {
     return sceneManager.addScene(newSceneId);
 };
 
+// TODO [CRIT] unload portal, screen, shaders.
 App.Engine.Graphics.prototype.forgetScene = function(sceneId) {
     var sceneManager = this.sceneManager;
 
@@ -96,7 +97,6 @@ App.Engine.Graphics.prototype.forgetScene = function(sceneId) {
         return;
     }
 
-    // TODO [CRIT] ensure camera and renderer are deleted before
     this.subScenes.delete(sceneId);
 };
 

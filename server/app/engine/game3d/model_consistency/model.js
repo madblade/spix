@@ -91,7 +91,7 @@ class ConsistencyModel {
 
         let side = renderDistance*2 + 1;
 
-        // TODO [CRIT] gon on from there to fix loading...
+        // TODO [CRIT] worldify (with xModel.getConnectivity)
         let worlds = this._chunkIdsForEntity.get(avatar.id);
 
         let chunks = this._chunkIdsForEntity.get(avatar.id).get(worldId);

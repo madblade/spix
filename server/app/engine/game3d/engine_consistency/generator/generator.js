@@ -14,7 +14,7 @@ class Generator {
     }
 
     generateWorld() {
-        // TODO [CRIT] worldify generate other worlds.
+        // TODO [MEDIUM] generate distinct worlds.
         let world = this._worldModel.getWorld();
 
         // TODO [LOW] chrono and time out.

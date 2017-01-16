@@ -33,14 +33,9 @@ App.Model.Server.XModel.prototype.refresh = function() {
 
             var meta = data[portalId];
             var isArray = meta instanceof Array;
-            // TODO [CRIT] worldify test & uncomment
-            /* if (isArray && meta.length === 1) {
-                // Raw portal.
-                this.addStubPortal(portalId);
-            } else */
+
             if (isArray && meta.length > 0) {
                 // Full portal.
-
                 var otherPortalId   = meta[0];
                 var chunkId         = meta[1];
                 var worldId         = meta[2];

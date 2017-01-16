@@ -232,7 +232,6 @@ class ChunkBuilder {
 
     static preLoadNextChunk(player, starterChunk, world, forPlayer, consistencyModel, serverLoadingRadius) {
         let avatar = player.avatar;
-        // TODO [CRIT] worldify check chain of events: avatar could have crossed a portal meanwhile.
         let worldId = avatar.worldId;
         const aid = avatar.id;
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;

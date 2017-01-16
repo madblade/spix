@@ -22,8 +22,6 @@ App.Model.Server.WorldModel.prototype.init = function() {
     var graphics = this.app.engine.graphics;
     var selfModel = this.app.model.server.selfModel;
     var worldId = selfModel.worldId;
-
-    // TODO [CRIT] couple with knot model.
     // graphics.addToScene(this.light, worldId);
 };
 

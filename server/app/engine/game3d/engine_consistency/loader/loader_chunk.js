@@ -82,13 +82,12 @@ class ChunkLoader {
         return chunksForNewPlayer;
     }
 
-    // TODO [CRIT] worldify X-access chunks. n nearest, 1 chunk per X.
+    // THOUGHT [OPTIM] n nearest, 1 chunk per X.
+    // no more than X chunk per player per iteration?
     computeNewChunksInRange(player) {
         if (!ChunkLoader.load) return;
         const avatar = player.avatar;
 
-        // TODO [CRIT] worldify idea : X-WORLD distance adds a 1-chunk infinite norm distance every time it crosses a portal
-        // TODO [HIGH] worldify filter: no more than X chunk per player per iteration?
         let worldId = avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
         let consistencyModel = this._consistencyModel;
@@ -127,7 +126,7 @@ class ChunkLoader {
             avatar.nearestChunkId = nearestChunkId;
         }
 
-        // TODO [OPTIM] don't test when doneChunkLoadingPhase has been reached once, until (nearest !== formerNearest)
+        // THOUGHT [OPTIM] don't test when doneChunkLoadingPhase has been reached once, until (nearest !== formerNearest)
         // Case 2: if chunks were loaded up to R_i, but player walked
         // into another chunk. Need to ensure all chunks are loaded up to R_i
         // and every loaded chunk that happens to be outside R_o is unloaded.
@@ -165,7 +164,8 @@ class ChunkLoader {
         let worldModel = this._worldModel;
         let xModel = this._xModel;
         let consistencyModel = this._consistencyModel;
-        let world = worldModel.getWorld(worldId); // TODO [CRIT] worldify think of another location for that
+        // TODO [HIGH] worldify think of another location for that
+        let world = worldModel.getWorld(worldId);
         let sRadius = WorldModel.serverLoadingRadius;
 
         var newChunksForPlayer = {};

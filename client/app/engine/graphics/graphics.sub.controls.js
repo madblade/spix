@@ -9,7 +9,7 @@ App.Engine.Graphics.prototype.initializeControls = function() {
     var selfModel = this.app.model.server.selfModel;
     var worldId = selfModel.worldId;
 
-    // TODO [CRIT] DONT FORGET TO SWITCH CONTROLS ALONG WITH CAMERA.
+    // TODO [CRIT] passify switch camera listeners.
     this.controls = controlsEngine.getControls('first-person');
 
     this.addToScene(this.cameraManager.mainWrapper[1], worldId);

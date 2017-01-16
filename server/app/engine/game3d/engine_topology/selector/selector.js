@@ -9,8 +9,6 @@ class Selector {
     constructor(topologyEngine) {
     }
 
-    // TODO [LOW] distance test.
-    // TODO [CRIT] worldify still with distance checks
     selectUpdatedChunksForPlayer(player, worldModel, consistencyModel,
                                  modelUpdatedChunks,    // topology output      Map(world id -> set of updtd chks)
                                  addedOrDeletedChunks   // consistency output   {world id => {cid => [fc, fcids]} }
@@ -33,7 +31,7 @@ class Selector {
                     (addedOrDeletedChunksInWorld && addedOrDeletedChunksInWorld.hasOwnProperty(chunkId) && addedOrDeletedChunksInWorld[chunkId]
                     )) {
                     // At this point, topology output is being accessed.
-                    // So, topology engine has updated and therefore its topology model is up-to-date.
+                    // So, topology engine has updated and its topology model is up-to-date.
                     // Therefore, there is no need to access updates concerning non-loaded chunks,
                     // for full, up-to-date, extracted surfaces are available to consistencyEngine.
                     // (reminder: updates are kept for lazy server-client communication)
@@ -54,7 +52,7 @@ class Selector {
     }
 
     playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO [MEDIUM] extract connected subsurface.
+        // TODO [LOW] extract connected subsurface.
         return (chunks.size > 0);
     }
 

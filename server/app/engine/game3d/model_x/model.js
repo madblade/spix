@@ -10,7 +10,6 @@ import Portal           from './portal';
 import CollectionUtils  from '../../math/collections';
 import GeometryUtils    from '../../math/geometry';
 
-// TODO [CRIT] OK I know it's not right to put that here
 import WorldGenerator   from '../engine_consistency/generator/worldgenerator';
 
 class XModel {
@@ -99,9 +98,9 @@ class XModel {
                 return;
             }
 
-            // Force generation and add portal.
+            // Force generation (1 chunk) and add portal.
             let xS = newWorld.xSize, yS = newWorld.ySize, zS = newWorld.zSize;
-            // TODO [CRIT] change worlds here.
+            // TODO [HIGH] Maybe it's not right to generate chunks here.
             let ijk = chunkId.split(',');
             let newChunk = WorldGenerator.generateFlatChunk(xS, yS, zS, ...ijk, newWorld);
             newWorld.addChunk(newChunk.chunkId, newChunk);
@@ -188,6 +187,10 @@ class XModel {
 
             knots.remove(knotId);
         }
+
+        // Invalidate cache.
+        // THOUGHT [OPTIM] think of a wiser invalidation method.
+        this._cachedConnectivity = [new Map(), new Map()];
     }
 
     /** Get **/
@@ -223,8 +226,7 @@ class XModel {
     }
 
     // Returns a Map portalId -> [otherEndId, otherWorldId]
-    // TODO [CRIT] CACHE RESULTS AND INVALIDATE AT XMODEL TRANSACTION
-    // TODO [CRIT] continue here
+    // THOUGHT [OPTIM] cache deepest request, then filter cached requests from then on
     getConnectivity(startWid, startCid, wModel, thresh, force) {
 
         if (!force && this._portals.size < 1) return; // Quite often.

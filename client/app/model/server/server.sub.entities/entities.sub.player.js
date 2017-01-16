@@ -9,7 +9,8 @@ App.Model.Server.EntityModel.prototype.loadPlayer = function(id, updatedEntity, 
     graphics.initializeEntity(id, 'steve', function(createdEntity) {
         var object3d = graphics.finalizeEntity(id, createdEntity);
 
-        graphics.addToScene(object3d, -1); // TODO [CRIT] couple with knot model.
+        // TODO [CRIT] worldify entities.
+        graphics.addToScene(object3d, -1);
 
         this.updateEntity(id, object3d, updatedEntity, graphics, entities);
         this.entitiesLoading.delete(id);
