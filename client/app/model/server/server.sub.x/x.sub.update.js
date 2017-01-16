@@ -40,8 +40,12 @@ App.Model.Server.XModel.prototype.addPortal = function(portalId, otherPortalId,
     // Do add current portal.
         graphics.addPortalObject(portal, otherPortal);
     } else {
-        if (otherPortalId) this.addBackwardLinks(otherPortalId, portalId);
-        graphics.addStubPortalObject(portal);
+        if (otherPortalId) {
+            this.addBackwardLinks(otherPortalId, portalId);
+            graphics.addStubPortalObject(portal, otherPortalId);
+        } else {
+            console.log('Error building stub portal: could not get other end.');
+        }
     }
 
 };

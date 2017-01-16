@@ -66,7 +66,10 @@ App.Engine.Graphics.prototype.animate = function() {
 };
 
 App.Engine.Graphics.prototype.render = function() {
-    this.rendererManager.render(this.sceneManager, this.cameraManager);
+    var sceneManager = this.sceneManager;
+    var cameraManager = this.cameraManager;
+    var portals = this.app.model.server.xModel.portals;
+    this.rendererManager.render(sceneManager, cameraManager, portals);
 };
 
 App.Engine.Graphics.prototype.stop = function() {

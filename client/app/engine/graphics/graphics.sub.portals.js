@@ -45,7 +45,9 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
         this.addScreen(portalId, screen);
     }
 
-    if (screen) this.addToScene(screen[0], worldId);
+    if (screen) {
+        this.addToScene(screen[0], worldId);
+    }
 };
 
 App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherPortal) {
