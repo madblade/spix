@@ -5,6 +5,9 @@
 'use strict';
 
 App.Engine.Graphics.RendererManager = function() {
+    // Cap number of passes.
+    this.renderMax = Number.POSITIVE_INFINITY;
+
     this.renderer = this.createRenderer();
 };
 
@@ -30,7 +33,11 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     var subCameras = cameraManager.subCameras;
     var screens = sceneManager.screens;
 
+    var renderCount = 0;
+    var renderMax = this.renderMax;
     screens.forEach(function(screen, portalId) {
+        if (renderCount > renderMax) return;
+
         if (screen.length !== 3) {
             console.log(screen.length);
             return;
@@ -53,6 +60,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
         }
 
         renderer.render(bufferScene, bufferCamera, bufferTexture);
+        ++renderCount;
     });
 
     // TODO [HIGH] sort rendering textures according to positions in World Model.

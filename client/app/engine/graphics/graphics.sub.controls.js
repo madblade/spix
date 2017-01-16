@@ -10,14 +10,10 @@ App.Engine.Graphics.prototype.initializeControls = function() {
     var worldId = selfModel.worldId;
 
     // TODO [CRIT] DONT FORGET TO SWITCH CONTROLS ALONG WITH CAMERA.
-    var controls = controlsEngine.getControls('first-person', this.cameraManager);
+    this.controls = controlsEngine.getControls('first-person');
 
-    var oldControlsObject = this.sceneManager.mainScene.getObjectByName('controls');
-    if (oldControlsObject) this.removeFromScene(oldControlsObject, worldId);
-    this.controls = controls;
-    this.controls.name = 'controls';
-    this.addToScene(this.controls.getObject()[0], worldId);
-    this.addToScene(this.controls.getObject()[1], worldId);
+    this.addToScene(this.cameraManager.mainWrapper[1], worldId);
+    this.addToScene(this.cameraManager.raycasterWrapper[1], worldId);
 };
 
 App.Engine.Graphics.prototype.startListeners = function() {

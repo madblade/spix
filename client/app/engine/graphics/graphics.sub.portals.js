@@ -62,7 +62,9 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
         console.log('A completed stub cannot be completed again: ' + portalId);
         return;
     }
-    this.cameraManager.addCamera(portalId);
+    var aspect = portal.tempWidth/portal.tempHeight;
+    var p1 = otherPortal.tempPosition;
+    this.cameraManager.addCamera(portalId, aspect, p1);
 
     // Link scene.
     var otherWorldId = otherPortal.worldId;

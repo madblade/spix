@@ -54,7 +54,7 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
         if (animate) graphics.updateAnimation(id);
 
         // Update camera.
-        graphics.cameraManager.positionCameraBehind(up); // Camera wrapper actually
+        graphics.cameraManager.updateCameraPosition(up); // Camera wrapper actually
     }
 
     this.needsUpdate = false;
