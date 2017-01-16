@@ -61,15 +61,17 @@ App.Engine.Graphics.prototype.createSceneManager = function() {
 };
 
 App.Engine.Graphics.prototype.addToScene = function(object3D, sceneId) {
-    if (!sceneId) sceneId = this.mainScene.sceneId;
+    var sceneManager = this.sceneManager;
+    if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
     sceneId = parseInt(sceneId);
-    this.sceneManager.addObject(object3D, sceneId);
+    sceneManager.addObject(object3D, sceneId);
 };
 
 App.Engine.Graphics.prototype.removeFromScene = function(object3D, sceneId) {
-    if (!sceneId) sceneId = this.mainScene.sceneId;
+    var sceneManager = this.sceneManager;
+    if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
     sceneId = parseInt(sceneId);
-    this.sceneManager.removeObject(object3D, sceneId);
+    sceneManager.removeObject(object3D, sceneId);
 };
 
 App.Engine.Graphics.prototype.addScene = function(newSceneId) {

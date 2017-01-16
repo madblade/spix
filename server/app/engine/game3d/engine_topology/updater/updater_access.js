@@ -73,7 +73,7 @@ class UpdaterAccess {
 
     static validateBlockEdition(originEntity, x, y, z) {
         // 10 blocks maximum range for block editing.
-        const d3 = GeometryUtils.euclideabDistance3(originEntity.position, [x+.5, y+.5, z+.5]);
+        const d3 = GeometryUtils.euclideanDistance3(originEntity.position, [x+.5, y+.5, z+.5]);
         return (d3 < 10);
     }
 

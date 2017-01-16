@@ -35,6 +35,7 @@ App.Model.Server.EntityModel.prototype.addEntity = function(id, updatedEntity, g
 
 App.Model.Server.EntityModel.prototype.removeEntity = function(id, graphics, entities) {
     var entity = entities.get(id);
+    // TODO [CRIT] worldify entities.
     graphics.removeFromScene(entity);
     entities.delete(id);
 };

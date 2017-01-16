@@ -226,7 +226,16 @@ class XModel {
     }
 
     // Returns a Map portalId -> [otherEndId, otherWorldId]
-    // THOUGHT [OPTIM] cache deepest request, then filter cached requests from then on
+    // THOUGHT 1 [OPTIM] cache deepest request, then filter cached requests from then on
+
+    // THOUGHT 2 [OPTIM] optimize time with memory.
+    // Every time a portal is created, you add in an associative map
+    // coordinates of both linked chunks (order is important).
+    // Then you can compute offsets for two chunks in different worlds (just take
+    // min distance by considering all possible combinations of ways going through superposed chunks).
+    // A way to do it efficiently is to keep a Voronoi-like structure that emulate a geographical sorting of gates,
+    // along with a sorted list of distance further between any pair of 4D subworlds.
+    // Affectation can be solved by Munkres' algorithm.
     getConnectivity(startWid, startCid, wModel, thresh, force) {
 
         if (!force && this._portals.size < 1) return; // Quite often.

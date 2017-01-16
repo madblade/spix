@@ -14,10 +14,6 @@ class ChunkBuilder {
 
     static debug = false;
 
-    static serverLoadingRadius = 10;
-    static clientLoadingRadius = 2; // Deprecated. See in avatar.js
-    static clientUnloadingRadius = 15;
-
     static computeChunkFaces(chunk) {
         let world = chunk.world;
 
@@ -227,82 +223,6 @@ class ChunkBuilder {
                     return currentChunk;
                 }
             }
-        }
-    }
-
-    static preLoadNextChunk(player, starterChunk, world, forPlayer, consistencyModel, serverLoadingRadius) {
-        let avatar = player.avatar;
-        let worldId = avatar.worldId;
-        const aid = avatar.id;
-        let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
-        threshold = Math.min(threshold, serverLoadingRadius);
-
-        let allChunks = world.allChunks;
-
-        const dx = world.xSize,    dy = world.ySize,    dz = world.zSize;
-        const si = starterChunk.chunkI, sj = starterChunk.chunkJ, sk = starterChunk.chunkK;
-        let i = si,                      j = sj,                   k = sk;
-
-        let hasLoadedChunk = (ic, jc, kc) => consistencyModel.hasChunk(aid, worldId, (ic+','+jc+','+kc));
-
-        let chunkIsToBeLoaded = (ic, jc, kc) => {
-            let currentId = (ic+','+jc+','+kc);
-            let currentChunk = allChunks.get(currentId);
-
-            if (!forPlayer) {
-                if (!currentChunk) {
-                    currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, world);
-                    allChunks.set(currentId, currentChunk);
-                    return currentChunk;
-                } else if (!currentChunk.ready) {
-                    ChunkBuilder.computeChunkFaces(currentChunk);
-                    return currentChunk;
-                } else return null;
-            } else {
-                if (!hasLoadedChunk(ic, jc, kc)) {
-                    return currentChunk;
-                } else return null;
-            }
-        };
-
-        let depth = 0;
-        let d3 = true;
-
-        let tI, tJ, tK;
-        // Test all chunks in > distance order.
-        while (depth <= threshold) {
-            ++depth;
-
-            // Differential 3D loading here.
-            // TODO [LOW] simplify redundancy checks.
-            for (let deltaK = 0, kLimit = d3?depth:0; deltaK < kLimit; ++deltaK) {
-                for (let deltaI = 0, iLimit = depth; deltaI < iLimit; ++deltaI) {
-                    for (let deltaJ = 0, jLimit = depth; deltaJ < jLimit; ++deltaJ) {
-                        if (deltaI === 0 && deltaJ === 0 && deltaK === 0) continue;
-
-                        tI = (i + deltaI); tJ = (j + deltaJ); tK = (k + deltaK);    //  1   1   1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-                        tI = (i - deltaI);                                          //  -1  1   1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-
-                        tI = (i + deltaI); tJ = (j - deltaJ);                       //  1  -1   1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-                        tI = (i - deltaI);                                          //  -1  -1  1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-
-                        tI = (i + deltaI); tJ = (j + deltaJ); tK = (k - deltaK);    //  1   1   -1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-                        tI = (i - deltaI);                                          //  -1  1   -1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-
-                        tI = (i + deltaI); tJ = (j - deltaJ);                       //  1   -1  -1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-                        tI = (i - deltaI);                                          //  -1  -1  -1
-                        if (!hasLoadedChunk(tI, tJ, tK)) return chunkIsToBeLoaded(tI, tJ, tK);
-                    }
-                }
-            }
-
         }
     }
 

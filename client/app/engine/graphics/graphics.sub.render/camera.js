@@ -143,9 +143,6 @@ App.Engine.Graphics.CameraManager.prototype.moveCameraFromMouse = function(movem
         pit.rotation.x = px;
     });
 
-    //this.subCameras.forEach(function(camera) { console.log(camera.rotation.z); });
-    //this.subWrappers.forEach(function(camera) { console.log(camera[1].rotation.z); });
-
     // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
     // camera.quaternion.multiply(tmpQuaternion);
     // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
