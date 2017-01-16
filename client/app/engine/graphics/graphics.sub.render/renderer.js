@@ -25,13 +25,16 @@ App.Engine.Graphics.RendererManager.prototype.createRenderer = function() {
 
 App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, cameraManager, portals) {
     var renderer = this.renderer;
+
+    // Render first pass.
     var mainScene = sceneManager.mainScene;
     var mainCamera = cameraManager.mainCamera;
+    renderer.render(mainScene, mainCamera);
 
+    // Render every portal.
     var subScenes = sceneManager.subScenes;
     var subCameras = cameraManager.subCameras;
     var screens = sceneManager.screens;
-
     var renderCount = 0;
     var renderMax = this.renderMax;
     screens.forEach(function(screen, portalId) {
@@ -72,6 +75,8 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
 
     // TODO [HIGH] sort rendering textures according to positions in World Model.
     // renderer.render(bufferScene, camera, bufferTexture);
+
+    // Render second pass (avoid portal texture lags).
     renderer.render(mainScene, mainCamera);
 };
 

@@ -31,7 +31,7 @@ class ChunkGenerator {
         //GenAnalytic.waveChunk(c, 40, 48, 1);
         try {
             // GenPerlin.perlinGeneration(c);
-            GenSimplePerlin.simplePerlinGeneration(c);
+            GenSimplePerlin.simplePerlinGeneration(c, false, world.worldId);
         } catch (e) {
             console.log(e.stack);
         }
@@ -49,7 +49,7 @@ class ChunkGenerator {
         // GenAnalytic.waveChunk(c, 10, 15, 1);
         // GenSimple.fillChunk(c, 256, 0);
         // GenPerlin.perlinGeneration(c);
-        GenSimplePerlin.simplePerlinGeneration(c, false); // params: chunk, doShuffleChunks
+        GenSimplePerlin.simplePerlinGeneration(c, false, world.worldId); // params: chunk, doShuffleChunks
 
         return c;
     }

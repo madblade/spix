@@ -82,11 +82,14 @@ class SimplePerlin {
         );
     }
 
-    static simplePerlinGeneration(chunk, shuffleChunks) {
+    static simplePerlinGeneration(chunk, shuffleChunks, worldId) {
         let dims = chunk.dimensions;
         const dx = dims[0], dy = dims[1], dz = dims[2];
         const ci = chunk.chunkI, cj = chunk.chunkJ, ck = chunk.chunkK;
         const offsetX = dx*ci, offsetY = dy*cj, offsetZ = dz*ck;
+
+        // Fill with grass on main world, sand everywhere else.
+        const mainBlockId = (worldId == -1 ? 1 : 17);
 
         let perlin = new SimplePerlin();
         let blocks = new Uint8Array(dx * dy * dz);
@@ -129,7 +132,7 @@ class SimplePerlin {
 
                 // Grass.
                 for (let zz = rock; zz < h; ++zz) {
-                    blocks[ijS*zz+xy] = 1;
+                    blocks[ijS*zz+xy] = mainBlockId;
                 }
             }
         }

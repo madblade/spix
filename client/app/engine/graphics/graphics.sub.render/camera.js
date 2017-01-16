@@ -43,7 +43,7 @@ App.Engine.Graphics.CameraManager.prototype.addCamera = function(cameraId, camer
     }
 
     var aspect = cameraAspect ? cameraAspect : 0.5;
-    var camera = new THREE.PerspectiveCamera(this.mainFOV, aspect, this.mainNear, this.mainFar);
+    var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
     var p = cameraPosition;
     this.subCameras.set(cameraId, camera);
     var wrapper = this.createSubWrapper(cameraId);

@@ -44,7 +44,7 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
         var portalVShader = this.getPortalVertexShader();
         var portalFShader = this.getPortalFragmentShader();
         var material = new THREE.ShaderMaterial({
-            side: THREE.FrontSide,
+            side: THREE.DoubleSide,
             uniforms: {
                 texture1: { type:'t', value:rtTexture.texture }
             },
