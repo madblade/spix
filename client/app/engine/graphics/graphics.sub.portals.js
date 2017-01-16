@@ -69,6 +69,7 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
     // Link scene.
     var otherWorldId = otherPortal.worldId;
     screen.push(otherWorldId); // Important.
+    this.cameraManager.addWrapperToScene(portalId, worldId);
     var scene = this.getScene(otherWorldId);
 };
 

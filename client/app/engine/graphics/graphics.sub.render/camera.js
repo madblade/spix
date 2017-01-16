@@ -37,13 +37,28 @@ App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster
 };
 
 App.Engine.Graphics.CameraManager.prototype.addCamera = function(cameraId, cameraAspect, cameraPosition) {
+    if (this.subCameras.has(cameraId)) {
+        console.log('Camera ' + cameraId + ' cannot be added a second time.');
+        return;
+    }
+
     var aspect = cameraAspect ? cameraAspect : 0.5;
     var camera = new THREE.PerspectiveCamera(this.mainFOV, aspect, this.mainNear, this.mainFar);
     var p = cameraPosition;
-    camera.position.set(p[0], p[1], p[2]+1);
-    camera.rotation.set(Math.PI/2, 0, 0);
-    //camera.lookAt(new THREE.Vector3(0, 0, 0));
     this.subCameras.set(cameraId, camera);
+    var wrapper = this.createSubWrapper(cameraId);
+    var yaw = wrapper[1];
+    yaw.position.set(p[0], p[1], p[2]+1);
+};
+
+App.Engine.Graphics.CameraManager.prototype.addWrapperToScene = function(cameraId, worldId) {
+    var wrapper = this.subWrappers.get(cameraId);
+    if (!wrapper) {
+        console.log('Could not get wrapper for camera ' + cameraId);
+        return;
+    }
+
+    this.graphicsEngine.addToScene(wrapper[1], worldId);
 };
 
 App.Engine.Graphics.CameraManager.prototype.createWrapper = function(camera) {
@@ -62,6 +77,7 @@ App.Engine.Graphics.CameraManager.prototype.createSubWrapper = function(cameraId
     }
     var wrapper = this.createWrapper(camera);
     this.subWrappers.set(cameraId, wrapper);
+    return wrapper;
 };
 
 // TODO [HIGH] worldify
@@ -79,6 +95,8 @@ App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) 
 
 App.Engine.Graphics.CameraManager.prototype.updateCameraPosition = function(vector) {
     var wrappers = [this.mainWrapper, this.raycasterWrapper];
+    this.subWrappers.forEach(function(wrapper) { wrappers.push(wrapper); });
+
     var i = this.graphicsEngine.getCameraInteraction();
 
     if (i.isFirstPerson()) {
@@ -101,19 +119,33 @@ App.Engine.Graphics.CameraManager.prototype.updateCameraPosition = function(vect
 };
 
 App.Engine.Graphics.CameraManager.prototype.moveCameraFromMouse = function(movementX, movementY) {
+    // Rotate main camera.
     var pitchObject = this.mainWrapper[0];
     var yawObject = this.mainWrapper[1];
-    var pitchObjectR = this.raycasterWrapper[0];
-    var yawObjectR = this.raycasterWrapper[1];
-
     yawObject.rotation.z -= movementX * 0.002;
     pitchObject.rotation.x -= movementY * 0.002;
     pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
 
+    // Rotate raycaster camera.
+    var pitchObjectR = this.raycasterWrapper[0];
+    var yawObjectR = this.raycasterWrapper[1];
     var yz = yawObject.rotation.z;
     var px = pitchObject.rotation.x;
     yawObjectR.rotation.z = yz;
     pitchObjectR.rotation.x = px;
+
+    // Apply transform to portals.
+    this.subWrappers.forEach(function(subWrapper, cameraId) {
+        var pit = subWrapper[0];
+        var yaw = subWrapper[1];
+        yaw.rotation.z = yz;
+        pit.rotation.x = px;
+        //subWrapper.rotation.z = yz;
+        //subWrapper.rotation.x = px;
+    });
+
+    //this.subCameras.forEach(function(camera) { console.log(camera.rotation.z); });
+    //this.subWrappers.forEach(function(camera) { console.log(camera[1].rotation.z); });
 
     // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
     // camera.quaternion.multiply(tmpQuaternion);

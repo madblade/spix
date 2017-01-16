@@ -24,7 +24,6 @@ App.Engine.Graphics.RendererManager.prototype.createRenderer = function() {
 };
 
 App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, cameraManager) {
-    var rendererManager = this;
     var renderer = this.renderer;
     var mainScene = sceneManager.mainScene;
     var mainCamera = cameraManager.mainCamera;
@@ -36,22 +35,14 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     var renderCount = 0;
     var renderMax = this.renderMax;
     screens.forEach(function(screen, portalId) {
+        if (screen.length !== 3) { console.log('Not rendering screen ' + portalId + ',' + screen.length); return; }
+
         if (renderCount > renderMax) return;
 
-        if (screen.length !== 3) {
-            console.log(screen.length);
-            return;
-        }
         var bufferTexture = screen[1];
-        if (!bufferTexture) {
-            console.log('Could not get matchin RTT.');
-            return;
-        }
+        if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
         var bufferCamera = subCameras.get(portalId);
-        if (!bufferCamera) {
-            console.log('Could not get matching camera.');
-            return;
-        }
+        if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
         var bufferScene = subScenes.get(screen[2]);
         if (!bufferScene) {
             // Happens when current portal is a stub.
