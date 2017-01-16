@@ -24,15 +24,33 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
         var tempWidth = portal.tempWidth;
         var tempHeight = portal.tempHeight;
 
-        var width = (tempWidth * window.innerWidth) / 2;
-        var height = (tempHeight * window.innerHeight) / 2;
+        var width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
+        var height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
         var rtTexture = new THREE.WebGLRenderTarget(
             width, height,
             { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat }
         );
 
         var geometry = new THREE.PlaneBufferGeometry(tempWidth, tempHeight);
-        var material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xffffff, map: rtTexture.texture } );
+        // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        var uvs = geometry.attributes.uv.array;
+        var uvi = 0;
+        // Quad 1
+        uvs[uvi++] = 1.0; uvs[uvi++] = 1.0; // 1, 1 -> top right
+        uvs[uvi++] = 0.;  uvs[uvi++] = 1.0; // 0, 1 -> top left
+        uvs[uvi++] = 1.0; uvs[uvi++] = 0.;  // 1, 0 -> bottom right
+        uvs[uvi++] = 0.;  uvs[uvi++] = 0.;  // 0, 0 -> bottom left
+
+        var portalVShader = this.getPortalVertexShader();
+        var portalFShader = this.getPortalFragmentShader();
+        var material = new THREE.ShaderMaterial({
+            side: THREE.FrontSide,
+            uniforms: {
+                texture1: { type:'t', value:rtTexture.texture }
+            },
+            vertexShader: portalVShader,
+            fragmentShader: portalFShader
+        });
         var mesh = new THREE.Mesh(geometry, material);
 
         // TODO [CRIT] render target position, rotation.
@@ -60,7 +78,7 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
 
     // Create and configure renderer, camera.
     var screen = this.getScreen(portalId);
-    if (screen.length !== 2) {
+    if (!screen || screen.length !== 2) {
         console.log('A completed stub cannot be completed again: ' + portalId);
         return;
     }
