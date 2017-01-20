@@ -37,18 +37,25 @@ App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster
 };
 
 App.Engine.Graphics.CameraManager.prototype.addCamera = function(cameraId, cameraAspect, cameraPosition) {
+    //var p = cameraPosition;
     if (this.subCameras.has(cameraId)) {
         console.log('Camera ' + cameraId + ' cannot be added a second time.');
         return;
     }
 
     var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
-    var p = cameraPosition;
     this.subCameras.set(cameraId, camera);
     var wrapper = this.createSubWrapper(cameraId);
+    var pitch = wrapper[0];
     var yaw = wrapper[1];
-    // TODO [CRIT] init camera position, rotation
-    yaw.position.set(p[0], p[1], p[2]+1);
+
+    var mainYaw = this.mainWrapper[1];
+    var mp = mainYaw.position;
+    var mainPitch = this.mainWrapper[0];
+    var mr = mainPitch.rotation;
+
+    yaw.position.set(mp.x, mp.y, mp.z);
+    pitch.rotation.set(mr.x, mr.y, mr.z);
 };
 
 App.Engine.Graphics.CameraManager.prototype.addWrapperToScene = function(cameraId, worldId) {
@@ -80,15 +87,15 @@ App.Engine.Graphics.CameraManager.prototype.createSubWrapper = function(cameraId
     return wrapper;
 };
 
-// TODO [HIGH] worldify
-// TODO [MEDIUM] with raycaster
+// TODO [HIGH] passify, dont forget raycaster
 App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) {
     var newMainCamera = this.subCameras.get(cameraId);
     if (!newMainCamera) { console.log('Failed to switch with camera ' + cameraId); return; }
     var oldMainCamera = this.mainCamera;
 
     this.mainCamera = newMainCamera;
-    this.addCamera(oldMainCamera); // TODO [HIGH] aspect, position
+    // TODO [HIGH] aspect, position
+    this.addCamera(oldMainCamera);
 };
 
 // Update.

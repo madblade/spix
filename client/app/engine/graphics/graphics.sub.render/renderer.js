@@ -37,6 +37,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     var screens = sceneManager.screens;
     var renderCount = 0;
     var renderMax = this.renderMax;
+
     screens.forEach(function(screen, portalId) {
         if (screen.length !== 3) { console.log('Not rendering screen ' + portalId + ',' + screen.length); return; }
 
@@ -77,7 +78,8 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     // renderer.render(bufferScene, camera, bufferTexture);
 
     // Render second pass (avoid portal texture lags).
-    renderer.render(mainScene, mainCamera);
+    //if (renderCount > 1)
+        renderer.render(mainScene, mainCamera);
 };
 
 App.Engine.Graphics.RendererManager.prototype.resize = function(width, height) {
