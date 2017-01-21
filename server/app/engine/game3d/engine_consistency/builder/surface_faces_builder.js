@@ -9,7 +9,7 @@ import FaceLinker   from './surface_faces_linker';
 
 class CSFX {
 
-    static forceOneComponentPerChunk = false; // Lazy, inefficient in terms of i/o
+    static forceOneComponentPerChunk = true; // Lazy, inefficient in terms of i/o
 
     static debug = false;
     static debugIJKRecursion = false;

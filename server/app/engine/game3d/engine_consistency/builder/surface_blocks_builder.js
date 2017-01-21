@@ -144,7 +144,7 @@ class CSBX {
 
                 // TODO [HIGH] check z criteria.
                 const kPlus = b+ijSize;
-                if (kPlus === capacity) {
+                if (kPlus >= capacity) {
                     if (neighbourBlocks[4][kPlus - capacity] !== 0) {
                         addSurfaceBlock(b, currentSbs);
                         // continue;
