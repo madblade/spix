@@ -78,7 +78,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     // renderer.render(bufferScene, camera, bufferTexture);
 
     // Render second pass (avoid portal texture lags).
-    //if (renderCount > 1)
+    if (renderCount > 0)
         renderer.render(mainScene, mainCamera);
 };
 

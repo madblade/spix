@@ -80,13 +80,13 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
         console.log('A completed stub cannot be completed again: ' + portalId);
         return;
     }
-    var aspect = portal.tempWidth/portal.tempHeight;
-    var p1 = otherPortal.tempPosition;
-    this.cameraManager.addCamera(portalId, aspect, p1);
+
+    this.cameraManager.addCamera(portal, otherPortal);
 
     // Link scene.
     var otherWorldId = otherPortal.worldId;
-    screen.push(otherWorldId); // Important.
+    // Important.
+    screen.push(otherWorldId); // TODO [HIGH] think of a way to refactor it.
     this.cameraManager.addWrapperToScene(portalId, worldId);
     var scene = this.getScene(otherWorldId);
 };

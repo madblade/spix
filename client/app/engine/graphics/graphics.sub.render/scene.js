@@ -54,6 +54,21 @@ App.Engine.Graphics.SceneManager.prototype.getScene = function(sceneId) {
     return (sceneId == this.mainScene.sceneId ? this.mainScene : this.subScenes.get(sceneId));
 };
 
+App.Engine.Graphics.SceneManager.prototype.resize = function(width, height) {
+    if (!width) width = window.innerWidth;
+    if (!height) height = window.innerHeight;
+
+    var screens = this.screens;
+    screens.forEach(function(screen, portalId) {
+        if (screen.length !== 3) {
+            console.log('Not rendering screen ' + portalId + ',' + screen.length);
+            return;
+        }
+        var bufferTexture = screen[1];
+        bufferTexture.setSize(width, height);
+    });
+};
+
 /** Interface with graphics engine. **/
 
 App.Engine.Graphics.prototype.createSceneManager = function() {

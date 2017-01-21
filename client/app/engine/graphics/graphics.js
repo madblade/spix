@@ -81,8 +81,13 @@ App.Engine.Graphics.prototype.stop = function() {
 App.Engine.Graphics.prototype.resize = function () {
     var width = window.innerWidth;
     var height = window.innerHeight;
+
+    console.log('resizing');
     this.cameraManager.resize(width, height);
     this.rendererManager.resize(width, height);
+
+    // Resize render targets
+    this.sceneManager.resize(width, height);
 };
 
 App.Engine.Graphics.prototype.getCameraInteraction = function() {
