@@ -1,5 +1,5 @@
 /**
- *
+ * Portal management functions.
  */
 
 'use strict';
@@ -57,12 +57,12 @@ App.Engine.Graphics.prototype.addStubPortalObject = function(portal) {
         mesh.position.z = tempPosition[2] + 1;
         mesh.rotation.x = Math.PI/2;
 
-        screen = [mesh, rtTexture];
+        screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture);
         this.addScreen(portalId, screen);
     }
 
     if (screen) {
-        this.addToScene(screen[0], worldId);
+        this.addToScene(screen.getMesh(), worldId);
     }
 };
 
@@ -76,7 +76,7 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
 
     // Create and configure renderer, camera.
     var screen = this.getScreen(portalId);
-    if (!screen || screen.length !== 2) {
+    if (!screen || !screen.isLinked()) {
         console.log('A completed stub cannot be completed again: ' + portalId);
         return;
     }
@@ -86,7 +86,7 @@ App.Engine.Graphics.prototype.completeStubPortalObject = function(portal, otherP
     // Link scene.
     var otherWorldId = otherPortal.worldId;
     // Important.
-    screen.push(otherWorldId); // TODO [HIGH] think of a way to refactor it.
+    screen.setOtherWorldId(otherWorldId);
     this.cameraManager.addWrapperToScene(portalId, worldId);
     var scene = this.getScene(otherWorldId);
 };

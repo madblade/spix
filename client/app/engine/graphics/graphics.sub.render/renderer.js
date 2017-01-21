@@ -23,6 +23,7 @@ App.Engine.Graphics.RendererManager.prototype.createRenderer = function() {
     return renderer;
 };
 
+// TODO [CRIT] remove this portal dependency
 App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, cameraManager, portals) {
     var renderer = this.renderer;
 
@@ -39,15 +40,15 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
     var renderMax = this.renderMax;
 
     screens.forEach(function(screen, portalId) {
-        if (screen.length !== 3) { console.log('Not rendering screen ' + portalId + ',' + screen.length); return; }
+        if (!screen.isLinked()) { console.log('Not rendering screen ' + portalId); return; }
 
         if (renderCount > renderMax) return;
 
-        var bufferTexture = screen[1];
+        var bufferTexture = screen.getRenderTarget();
         if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
         var bufferCamera = subCameras.get(portalId);
         if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
-        var bufferSceneId = screen[2];
+        var bufferSceneId = screen.getOtherWorldId();
         var bufferScene = subScenes.get(bufferSceneId);
         if (!bufferScene) {
             // Happens when current portal is a stub.
@@ -64,7 +65,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
         if (!portal) return;
         var otherScreen = screens.get(portal.portalLinkedForward);
         var otherEnd = null;
-        if (otherScreen) otherEnd = otherScreen[0];
+        if (otherScreen) otherEnd = otherScreen.getMesh();
         if (otherEnd) sceneManager.removeObject(otherEnd, bufferSceneId);
 
         // Do render.

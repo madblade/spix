@@ -60,11 +60,12 @@ App.Engine.Graphics.SceneManager.prototype.resize = function(width, height) {
 
     var screens = this.screens;
     screens.forEach(function(screen, portalId) {
-        if (screen.length !== 3) {
-            console.log('Not rendering screen ' + portalId + ',' + screen.length);
+        if (!screen.isLinked()) {
+            console.log('Not resizing screen ' + portalId);
             return;
         }
-        var bufferTexture = screen[1];
+        //var bufferTexture = screen[1];
+        var bufferTexture = screen.getRenderTarget();
         bufferTexture.setSize(width, height);
     });
 };
