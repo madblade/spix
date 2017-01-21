@@ -46,8 +46,9 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
 
         var bufferTexture = screen.getRenderTarget();
         if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
-        var bufferCamera = subCameras.get(portalId).getRecorder();
+        var bufferCamera = subCameras.get(portalId);
         if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
+        bufferCamera = bufferCamera.getRecorder();
         var bufferSceneId = screen.getOtherWorldId();
         var bufferScene = subScenes.get(bufferSceneId);
         if (!bufferScene) {

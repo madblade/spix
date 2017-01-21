@@ -6,7 +6,8 @@
     "Hyphenator": "~5.1.0",
     "three.js": "^0.82.0",
     "jquery": "^2.2.3",
-    "bootstrap-css-only": "^3.3.6"
+    "bootstrap-css-only": "^3.3.6",
+    "stats.js": "*"
   },
   "devDependencies": {}
 }

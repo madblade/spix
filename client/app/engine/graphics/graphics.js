@@ -29,6 +29,9 @@ App.Engine.Graphics = function(app) {
     this.container = document.getElementById('container');
     this.container.appendChild(this.rendererManager.renderer.domElement);
 
+    // Benches.
+    this.fps = new Stats();
+
     // Animations
     this.initializeAnimations();
 
@@ -44,6 +47,9 @@ App.Engine.Graphics.prototype.run = function() {
     // Init animation.
     this.resize();
     this.animate();
+
+    // Init stats.
+    // document.body.appendChild(this.fps.dom);
 };
 
 App.Engine.Graphics.prototype.stop = function() {
@@ -58,6 +64,9 @@ App.Engine.Graphics.prototype.animate = function() {
 
     // Request animation frame.
     this.requestId = requestAnimationFrame(this.animate.bind(this));
+
+    // Bench.
+    this.fps.update();
 
     // Render.
     serverModel.refresh();
