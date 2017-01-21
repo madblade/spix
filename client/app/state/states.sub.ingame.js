@@ -13,7 +13,7 @@ App.State.StateManager.prototype.startIngame = function() {
 };
 
 App.State.StateManager.prototype.endIngame = function() {
-    app.engine.controls.stopListeners();
+    this.app.engine.controls.stopListeners();
 
     return new Promise(function(resolve) {
         $('#announce').empty().removeClass('reticle-wrapper');

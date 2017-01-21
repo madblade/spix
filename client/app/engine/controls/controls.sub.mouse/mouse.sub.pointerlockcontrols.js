@@ -5,6 +5,8 @@
 'use strict';
 
 App.Engine.UI.prototype.setupPointerLock = function() {
+    var app = this.app;
+
     if (!('webkitPointerLockElement' in document) &&
         !('mozPointerLockElement' in document) &&
         !('pointerLockElement' in document)) return;

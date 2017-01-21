@@ -38,9 +38,8 @@ App.Core = function() {
     };
 
     // Modules can be registered to add custom behaviours
-    this.modules = {
-        'chat':         new App.Modules.Chat(this)
-    };
+    this.register = new App.Modules.Register(this);
+    this.register.registerDefaultModules();
 };
 
 App.Core.prototype.start = function() {

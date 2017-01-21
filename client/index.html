@@ -38,6 +38,10 @@
 
 <!-- Add your site or application content here -->
 <noscript>JS off</noscript>
+<div id="hud" style="position:absolute;">
+    <div id="position"></div>
+    <div id="chat"></div>
+</div>
 <div id="announce"></div>
 <div id="container"></div>
 
@@ -134,9 +138,11 @@
 <script src="app/model/server/server.sub.x/x.sub.portal.js"></script>
 <script src="app/model/server/server.sub.x/x.sub.update.js"></script>
 <script src="app/modules/chat/chat.js"></script>
+<script src="app/modules/hud/hud.js"></script>
 <script src="app/modules/polyfills/dom.js"></script>
 <script src="app/modules/polyfills/promise.js"></script>
 <script src="app/modules/polyfills/raf.js"></script>
+<script src="app/modules/register/register.js"></script>
 <script src="app/state/states.js"></script>
 <script src="app/state/states.sub.hub.js"></script>
 <script src="app/state/states.sub.ingame.js"></script>
@@ -145,7 +151,13 @@
 <!-- endinjector -->
 <!-- endbuild -->
 
-<script>var app = new App.Core(); app.start();</script>
+<script>
+    var register = (function () {
+        var app = new App.Core();
+        app.start();
+        return app.register;
+    })();
+</script>
 
 </body>
 </html>

@@ -4,8 +4,8 @@
 
 'use strict';
 
-App.Modules.Chat = function(app) {
-    this.app = app;
+App.Modules.Chat = function(register) {
+    this.register = register;
 };
 
 /**
@@ -20,5 +20,5 @@ App.Modules.Chat.prototype.updateChat = function(data) {
  * @param message
  */
 App.Modules.Chat.prototype.sendMessage = function(message) {
-    this.app.engine.connection.send('chat', message);
+    this.register.sendMessage('chat', message);
 };

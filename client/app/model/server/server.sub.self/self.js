@@ -31,6 +31,9 @@ App.Model.Server.SelfModel.prototype.init = function() {
 
 App.Model.Server.SelfModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
+
+    var register = this.app.register;
+
     var up = this.position;
     var r = this.rotation;
     var id = this.entityId;
@@ -48,6 +51,9 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
         p.y = up[1];
         p.z = up[2];
 
+        // Notify modules.
+        register.updateSelfState({'position': [p.x, p.y, p.z]});
+
         avatar.rotation.y = Math.PI + r[0];
 
         // Update animation.
@@ -61,9 +67,16 @@ App.Model.Server.SelfModel.prototype.refresh = function() {
 };
 
 App.Model.Server.SelfModel.prototype.updateSelf = function(p, r) {
-    this.position = p;
-    this.rotation = r;
-    this.needsUpdate = true;
+    var pos = this.position;
+    var rot = this.rotation;
+    if (!pos || !rot ||
+        pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2]
+        || rot[0] !== r[0] || rot[1] !== r[1])
+    {
+        this.position = p;
+        this.rotation = r;
+        this.needsUpdate = true;
+    }
 };
 
 App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
