@@ -72,6 +72,7 @@ App.Model.Client.SelfComponent.prototype.processChanges = function() {
                     scope._cameraInteraction = 'first-person';
 
                 graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
+                graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
                 break;
 
             case 'interaction':

@@ -66,3 +66,11 @@ App.Engine.Graphics.Camera.prototype.setCameraPosition = function(x, y, z) {
     yaw.position.y = y;
     yaw.position.z = z;
 };
+
+App.Engine.Graphics.Camera.prototype.setFirstPerson = function() {
+    this.cameraObject.position.z = 0;
+};
+
+App.Engine.Graphics.Camera.prototype.setThirdPerson = function() {
+    this.cameraObject.position.z = 4;
+};

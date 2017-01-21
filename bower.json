@@ -1,5 +1,5 @@
 {
-  "name": "voxels",
+  "name": "spix",
   "version": "0.0.0",
   "dependencies": {
     "angular-socket-io": "~0.7.0",

@@ -85,12 +85,14 @@ App.Engine.Graphics.CameraManager.prototype.updateCameraPosition = function(vect
     if (i.isFirstPerson()) {
         cams.forEach(function(cam, cameraId) {
             cam.setCameraPosition(x, y, z);
+            cam.setFirstPerson();
         });
     }
 
     else if (i.isThirdPerson()) {
         cams.forEach(function(cam, cameraId) {
             cam.setCameraPosition(x, y, z+0.2);
+            cam.setThirdPerson();
         });
     }
 };
