@@ -82,11 +82,13 @@ App.Engine.Graphics.prototype.resize = function () {
     var width = window.innerWidth;
     var height = window.innerHeight;
 
-    console.log('resizing');
+    // Update aspects.
     this.cameraManager.resize(width, height);
+
+    // Update main renderer.
     this.rendererManager.resize(width, height);
 
-    // Resize render targets
+    // Resize render targets.
     this.sceneManager.resize(width, height);
 };
 

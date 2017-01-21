@@ -12,8 +12,8 @@ App.Engine.Graphics.prototype.initializeControls = function() {
     // TODO [CRIT] passify switch camera listeners.
     this.controls = controlsEngine.getControls('first-person');
 
-    this.addToScene(this.cameraManager.mainWrapper[1], worldId);
-    this.addToScene(this.cameraManager.raycasterWrapper[1], worldId);
+    this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
+    this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
 };
 
 App.Engine.Graphics.prototype.startListeners = function() {

@@ -29,7 +29,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
 
     // Render first pass.
     var mainScene = sceneManager.mainScene;
-    var mainCamera = cameraManager.mainCamera;
+    var mainCamera = cameraManager.mainCamera.getRecorder();
     renderer.render(mainScene, mainCamera);
 
     // Render every portal.
@@ -46,7 +46,7 @@ App.Engine.Graphics.RendererManager.prototype.render = function(sceneManager, ca
 
         var bufferTexture = screen.getRenderTarget();
         if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
-        var bufferCamera = subCameras.get(portalId);
+        var bufferCamera = subCameras.get(portalId).getRecorder();
         if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
         var bufferSceneId = screen.getOtherWorldId();
         var bufferScene = subScenes.get(bufferSceneId);

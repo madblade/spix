@@ -19,21 +19,16 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 
     this.mainRaycasterCamera = this.createCamera(true);
     this.raycaster = this.createRaycaster();
-
-    // Wrappers.
-    this.mainWrapper = this.createWrapper(this.mainCamera);
-    this.raycasterWrapper = this.createWrapper(this.mainRaycasterCamera);
-    this.subWrappers = new Map();
 };
 
 // Factory.
 
 App.Engine.Graphics.CameraManager.prototype.createCamera = function(forRaycaster) {
-    var near = forRaycaster ? 1 : this.mainNear; // W. T. F.
-    var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, near, this.mainFar);
-    camera.position.set(0, 0, 0);
-    camera.rotation.set(0, 0, 0);
-    return camera;
+    return new App.Engine.Graphics.Camera(
+        this.mainFOV,
+        this.mainAspect,
+        (forRaycaster ? 1 : this.mainNear), // TODO [LOW] check security.
+        this.mainFar);
 };
 
 App.Engine.Graphics.CameraManager.prototype.addCamera = function(frameSource, frameDestination) {
@@ -41,57 +36,29 @@ App.Engine.Graphics.CameraManager.prototype.addCamera = function(frameSource, fr
 
     // TODO [CRIT] compute relative positions and rotations.
 
-    //var p = cameraPosition;
     if (this.subCameras.has(cameraId)) {
         console.log('Camera ' + cameraId + ' cannot be added a second time.');
         return;
     }
 
-    var camera = new THREE.PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
+    var mainCamera = this.mainCamera;
+    var camera = this.createCamera(false);
     this.subCameras.set(cameraId, camera);
-    var wrapper = this.createSubWrapper(cameraId);
-    var pitch = wrapper[0];
-    var yaw = wrapper[1];
 
-    var mainYaw = this.mainWrapper[1];
-    var myp = mainYaw.position;
-    var myr = mainYaw.rotation;
-    var mainPitch = this.mainWrapper[0];
-    var mpr = mainPitch.rotation;
-
-    yaw.position.set(myp.x, myp.y, myp.z);
-    // TODO yaw rotation
-    yaw.rotation.set(myr.x, myr.y, myr.z);
-    pitch.rotation.set(mpr.x, mpr.y, mpr.z);
+    var mainPosition = mainCamera.getCameraPosition();
+    camera.setCameraPosition(mainPosition.x, mainPosition.y, mainPosition.z);
+    camera.setZRotation(mainCamera.getZRotation());
+    camera.setXRotation(mainCamera.getXRotation());
 };
 
-App.Engine.Graphics.CameraManager.prototype.addWrapperToScene = function(cameraId, worldId) {
-    var wrapper = this.subWrappers.get(cameraId);
-    if (!wrapper) {
+App.Engine.Graphics.CameraManager.prototype.addCameraToScene = function(cameraId, worldId) {
+    var camera = this.subCameras.get(cameraId);
+    if (!camera) {
         console.log('Could not get wrapper for camera ' + cameraId);
         return;
     }
 
-    this.graphicsEngine.addToScene(wrapper[1], worldId);
-};
-
-App.Engine.Graphics.CameraManager.prototype.createWrapper = function(camera) {
-    camera.rotation.set(0, 0, 0);
-    var pitchObject = new THREE.Object3D();
-    pitchObject.add(camera);
-    var yawObject = new THREE.Object3D();
-    yawObject.add(pitchObject);
-    return [pitchObject, yawObject];
-};
-
-App.Engine.Graphics.CameraManager.prototype.createSubWrapper = function(cameraId) {
-    var camera = this.subCameras.get(cameraId);
-    if (!camera) {
-        console.log('Could not create wrapper for camera ' + cameraId);
-    }
-    var wrapper = this.createWrapper(camera);
-    this.subWrappers.set(cameraId, wrapper);
-    return wrapper;
+    this.graphicsEngine.addToScene(camera.get3DObject(), worldId);
 };
 
 // TODO [HIGH] passify, dont forget raycaster
@@ -101,83 +68,75 @@ App.Engine.Graphics.CameraManager.prototype.switchToCamera = function(cameraId) 
     var oldMainCamera = this.mainCamera;
 
     this.mainCamera = newMainCamera;
-    // TODO [HIGH] aspect, position
-    // this.addCamera(oldMainCamera);
 };
 
 // Update.
 
 App.Engine.Graphics.CameraManager.prototype.updateCameraPosition = function(vector) {
-    var wrappers = [this.mainWrapper, this.raycasterWrapper];
-    this.subWrappers.forEach(function(wrapper) { wrappers.push(wrapper); });
+    var cams = [this.mainCamera, this.mainRaycasterCamera];
+    this.subCameras.forEach(function(cam) { cams.push(cam); });
 
     var i = this.graphicsEngine.getCameraInteraction();
 
+    var x = vector[0];
+    var y = vector[1];
+    var z = vector[2] + 1.6;
+
     if (i.isFirstPerson()) {
-        wrappers.forEach(function(cam, cameraId) {
-            var yaw = cam[1];
-            yaw.position.x = vector[0];
-            yaw.position.y = vector[1]; // + 10;
-            yaw.position.z = vector[2] + 1.6;
+        cams.forEach(function(cam, cameraId) {
+            cam.setCameraPosition(x, y, z);
         });
     }
 
     else if (i.isThirdPerson()) {
-        wrappers.forEach(function(cam, cameraId) {
-            var yaw = cam[1];
-            yaw.position.x = vector[0];
-            yaw.position.y = vector[1]; // + 10;
-            yaw.position.z = vector[2] + 1.8;
+        cams.forEach(function(cam, cameraId) {
+            cam.setCameraPosition(x, y, z+0.2);
         });
     }
 };
 
 App.Engine.Graphics.CameraManager.prototype.moveCameraFromMouse = function(movementX, movementY) {
     // Rotate main camera.
-    var pitchObject = this.mainWrapper[0];
-    var yawObject = this.mainWrapper[1];
-    yawObject.rotation.z -= movementX * 0.002;
-    pitchObject.rotation.x -= movementY * 0.002;
-    pitchObject.rotation.x = Math.max(0, Math.min(Math.PI, pitchObject.rotation.x));
+    var camera = this.mainCamera;
+    camera.rotateZ(-movementX * 0.002);
+    camera.rotateX(-movementY * 0.002);
+    var rotationZ = camera.getZRotation();
+    var rotationX = camera.getXRotation();
 
     // Rotate raycaster camera.
-    var pitchObjectR = this.raycasterWrapper[0];
-    var yawObjectR = this.raycasterWrapper[1];
-    var yz = yawObject.rotation.z;
-    var px = pitchObject.rotation.x;
-    yawObjectR.rotation.z = yz;
-    pitchObjectR.rotation.x = px;
+    var raycasterCamera = this.mainRaycasterCamera;
+    raycasterCamera.setZRotation(rotationZ);
+    raycasterCamera.setXRotation(rotationX);
 
     // Apply transform to portals.
-    this.subWrappers.forEach(function(subWrapper, cameraId) {
+    this.subCameras.forEach(function(subCamera, cameraId) {
         // TODO [CRIT] update camera position, rotation rel. to portal position.
-        var pit = subWrapper[0];
-        var yaw = subWrapper[1];
-        yaw.rotation.z = yz;
-        pit.rotation.x = px;
+        subCamera.setZRotation(rotationZ);
+        subCamera.setXRotation(rotationX);
     });
 
     // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
     // camera.quaternion.multiply(tmpQuaternion);
     // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
-    return [yz, px];
+    return [rotationZ, rotationX];
 };
 
 App.Engine.Graphics.CameraManager.prototype.resize = function(width, height) {
     // TODO [HIGH] apply to other cameras AND RENDER TARGETS (DONT FORGET).
     var aspect = width / height;
 
-    var camera = this.mainCamera;
+    var camera = this.mainCamera.getRecorder();
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
 
-    var raycasterCamera = this.mainRaycasterCamera;
+    var raycasterCamera = this.mainRaycasterCamera.getRecorder();
     raycasterCamera.aspect = aspect;
     raycasterCamera.updateProjectionMatrix();
 
     this.subCameras.forEach(function(currentCamera, cameraId) {
-        currentCamera.aspect = aspect;
-        currentCamera.updateProjectionMatrix();
+        var recorder = currentCamera.getRecorder();
+        recorder.aspect = aspect;
+        recorder.updateProjectionMatrix();
     });
 };
 
@@ -193,7 +152,7 @@ App.Engine.Graphics.CameraManager.prototype.performRaycast = function() {
     var selfModel = graphicsEngine.app.model.server.selfModel;
 
     var raycaster = this.raycaster;
-    var camera = this.mainRaycasterCamera;
+    var camera = this.mainRaycasterCamera.getRecorder();
     var terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
     var intersects;
@@ -210,5 +169,5 @@ App.Engine.Graphics.prototype.createCameraManager = function() {
 };
 
 App.Engine.Graphics.prototype.getCameraCoordinates = function() {
-    return this.cameraManager.mainWrapper[1].position;
+    return this.cameraManager.mainCamera.getCameraPosition();
 };

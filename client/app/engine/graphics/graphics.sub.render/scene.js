@@ -64,7 +64,6 @@ App.Engine.Graphics.SceneManager.prototype.resize = function(width, height) {
             console.log('Not resizing screen ' + portalId);
             return;
         }
-        //var bufferTexture = screen[1];
         var bufferTexture = screen.getRenderTarget();
         bufferTexture.setSize(width, height);
     });
