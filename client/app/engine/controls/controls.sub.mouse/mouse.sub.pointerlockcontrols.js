@@ -34,12 +34,13 @@ App.Engine.UI.prototype.setupPointerLock = function() {
     }
 
     $(document).mousedown(function (event) {
-        if (app.getState() !== 'ingame') return;
+        if (app.getState() !== 'ingame' || app.isFocused())
+            return;
 
         switch (event.which) {
-            case 2: // Middle
-                break;
             case 1: // Left
+                break;
+            case 2: // Middle
             case 3: // Right
             default:
                 return;
@@ -48,6 +49,7 @@ App.Engine.UI.prototype.setupPointerLock = function() {
         // Ask the browser to lock the pointer.
         event.preventDefault();
         scope.requestPointerLock();
+        app.setFocused(true);
     });
 };
 
@@ -66,5 +68,6 @@ App.Engine.UI.prototype.pointerLockChanged = function(isPointerLocked) {
 
     if (!isPointerLocked) {
         app.setState('settings');
+        app.setFocused(false);
     }
 };

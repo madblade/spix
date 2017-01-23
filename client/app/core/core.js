@@ -16,6 +16,14 @@ App.Core.prototype.isLoading = function() {
     return this.getState() === 'loading';
 };
 
+App.Core.prototype.isFocused = function() {
+    return this.state.focus;
+};
+
+App.Core.prototype.setFocused = function(isFocused) {
+    this.state.focus = isFocused ? true : false;
+};
+
 // Called when the socket is connected.
 App.Core.prototype.connectionEstablished = function() {
     console.log("Connected.");

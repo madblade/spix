@@ -11,6 +11,7 @@ App.State.StateManager = function(app) {
     this.states = {};
     this.previousState = '';
     this.state = '';
+    this.focus = false;
 
     // Register actions
     this.register.forEach(function(f){f(this)}.bind(this));

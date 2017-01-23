@@ -26,6 +26,7 @@ App.Engine.Settings.prototype.listenHome = function() {
         this.unlistenHome();
         this.stateManager.setState('ingame');
         this.controlsEngine.requestPointerLock();
+        this.app.setFocused(true);
     }.bind(this));
 
     this.listeners.push('graphics', 'gameplay', 'audio', 'return');
