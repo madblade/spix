@@ -32,63 +32,67 @@ App.Model.Client.SelfComponent = function(clientModel) {
     this.changes = [];
 };
 
-// TODO [MEDIUM] implement items
-App.Model.Client.SelfComponent.prototype.getCurrentItem = function() {
-    return this.currentItem;
-};
 
-App.Model.Client.SelfComponent.prototype.triggerChange = function(type, data) {
-    this.changes.push([type, data]);
-};
+extend(App.Model.Client.SelfComponent.prototype, {
 
-App.Model.Client.SelfComponent.prototype.processChanges = function() {
-    var changes = this.changes;
-    if (changes.length < 1) return;
+    // TODO [MEDIUM] implement items
+    getCurrentItem: function() {
+        return this.currentItem;
+    },
 
-    var scope = this;
-    var serverSelfModel = this.clientModel.app.model.server.selfModel;
-    var graphicsEngine = this.clientModel.app.engine.graphics;
+    triggerChange: function(type, data) {
+        this.changes.push([type, data]);
+    },
 
-    // ENHANCEMENT [LOW]: filter & simplify
-    changes.forEach(function(event) {
-        var type = event[0];
-        var data = event[1];
-        if (!type || !data) return;
-        switch (type) {
-            case 'camera':
-                var avatar = serverSelfModel.avatar;
-                var worldId = serverSelfModel.worldId;
-                var display;
-                if (data === 'toggle')
-                    display = !serverSelfModel.displayAvatar;
-                else
-                    display = data;
+    processChanges: function() {
+        var changes = this.changes;
+        if (changes.length < 1) return;
 
-                serverSelfModel.displayAvatar = display;
+        var scope = this;
+        var serverSelfModel = this.clientModel.app.model.server.selfModel;
+        var graphicsEngine = this.clientModel.app.engine.graphics;
 
-                if (display)
-                    scope._cameraInteraction = 'third-person';
-                else
-                    scope._cameraInteraction = 'first-person';
+        // ENHANCEMENT [LOW]: filter & simplify
+        changes.forEach(function(event) {
+            var type = event[0];
+            var data = event[1];
+            if (!type || !data) return;
+            switch (type) {
+                case 'camera':
+                    var avatar = serverSelfModel.avatar;
+                    var worldId = serverSelfModel.worldId;
+                    var display;
+                    if (data === 'toggle')
+                        display = !serverSelfModel.displayAvatar;
+                    else
+                        display = data;
 
-                graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
-                graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
-                break;
+                    serverSelfModel.displayAvatar = display;
 
-            case 'interaction':
-                if (scope._clickInteraction === 'block') {
-                    scope._clickInteraction = 'x';
-                } else if (scope._clickInteraction === 'x') {
-                    scope._clickInteraction = 'block';
-                }
+                    if (display)
+                        scope._cameraInteraction = 'third-person';
+                    else
+                        scope._cameraInteraction = 'first-person';
 
-                break;
+                    graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
+                    graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
+                    break;
 
-            default:
-                break;
-        }
-    });
+                case 'interaction':
+                    if (scope._clickInteraction === 'block') {
+                        scope._clickInteraction = 'x';
+                    } else if (scope._clickInteraction === 'x') {
+                        scope._clickInteraction = 'block';
+                    }
 
-    this.changes = [];
-};
+                    break;
 
+                default:
+                    break;
+            }
+        });
+
+        this.changes = [];
+    }
+
+});

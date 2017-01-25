@@ -21,56 +21,60 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
     this.cameraObject = camera;     // Explicit     (constant)
 };
 
-App.Engine.Graphics.Camera.prototype.getRecorder = function() {
-    return this.cameraObject;
-};
+extend(App.Engine.Graphics.Camera.prototype, {
 
-App.Engine.Graphics.Camera.prototype.get3DObject = function() {
-    return this.yaw;
-};
+    getRecorder: function() {
+        return this.cameraObject;
+    },
 
-App.Engine.Graphics.Camera.prototype.getCameraPosition = function() {
-    return this.yaw.position;
-};
+    get3DObject: function() {
+        return this.yaw;
+    },
 
-App.Engine.Graphics.Camera.prototype.rotateX = function(deltaX) {
-    var pitch = this.pitch;
-    pitch.rotation.x += deltaX;
-    pitch.rotation.x = Math.max(0, Math.min(Math.PI, pitch.rotation.x));
-};
+    getCameraPosition: function() {
+        return this.yaw.position;
+    },
 
-App.Engine.Graphics.Camera.prototype.rotateZ = function(deltaZ) {
-    var yaw = this.yaw;
-    yaw.rotation.z += deltaZ;
-};
+    rotateX: function(deltaX) {
+        var pitch = this.pitch;
+        pitch.rotation.x += deltaX;
+        pitch.rotation.x = Math.max(0, Math.min(Math.PI, pitch.rotation.x));
+    },
 
-App.Engine.Graphics.Camera.prototype.getXRotation = function() {
-    return this.pitch.rotation.x;
-};
+    rotateZ: function(deltaZ) {
+        var yaw = this.yaw;
+        yaw.rotation.z += deltaZ;
+    },
 
-App.Engine.Graphics.Camera.prototype.setXRotation = function(rotationX) {
-    this.pitch.rotation.x = rotationX;
-};
+    getXRotation: function() {
+        return this.pitch.rotation.x;
+    },
 
-App.Engine.Graphics.Camera.prototype.getZRotation = function() {
-    return this.yaw.rotation.z;
-};
+    setXRotation: function(rotationX) {
+        this.pitch.rotation.x = rotationX;
+    },
 
-App.Engine.Graphics.Camera.prototype.setZRotation = function(rotationZ) {
-    this.yaw.rotation.z = rotationZ;
-};
+    getZRotation: function() {
+        return this.yaw.rotation.z;
+    },
 
-App.Engine.Graphics.Camera.prototype.setCameraPosition = function(x, y, z) {
-    var yaw = this.yaw;
-    yaw.position.x = x;
-    yaw.position.y = y;
-    yaw.position.z = z;
-};
+    setZRotation: function(rotationZ) {
+        this.yaw.rotation.z = rotationZ;
+    },
 
-App.Engine.Graphics.Camera.prototype.setFirstPerson = function() {
-    this.cameraObject.position.z = 0;
-};
+    setCameraPosition: function(x, y, z) {
+        var yaw = this.yaw;
+        yaw.position.x = x;
+        yaw.position.y = y;
+        yaw.position.z = z;
+    },
 
-App.Engine.Graphics.Camera.prototype.setThirdPerson = function() {
-    this.cameraObject.position.z = 4;
-};
+    setFirstPerson: function() {
+        this.cameraObject.position.z = 0;
+    },
+
+    setThirdPerson: function() {
+        this.cameraObject.position.z = 4;
+    }
+
+});

@@ -24,71 +24,75 @@ App.Model.Server.SelfModel = function(app) {
     this.avatar = null;
 };
 
-App.Model.Server.SelfModel.prototype.init = function() {
-    var graphics = this.app.engine.graphics;
-    this.loadSelf(graphics);
-};
+extend(App.Model.Server.SelfModel.prototype, {
 
-App.Model.Server.SelfModel.prototype.refresh = function() {
-    if (!this.needsUpdate) return;
+    init: function() {
+        var graphics = this.app.engine.graphics;
+        this.loadSelf(graphics);
+    },
 
-    var register = this.app.register;
+    refresh: function() {
+        if (!this.needsUpdate) return;
 
-    var up = this.position;
-    var r = this.rotation;
-    var id = this.entityId;
+        var register = this.app.register;
 
-    var graphics = this.app.engine.graphics;
-    var avatar = this.avatar;
+        var up = this.position;
+        var r = this.rotation;
+        var id = this.entityId;
 
-    if (!(graphics.controls) || !avatar) return;
-    var p = avatar.position;
+        var graphics = this.app.engine.graphics;
+        var avatar = this.avatar;
 
-    if (up !== null && r !== null && p !== null) {
+        if (!(graphics.controls) || !avatar) return;
+        var p = avatar.position;
 
-        var animate = p.x !== up[0] || p.y !== up[1];
-        p.x = up[0];
-        p.y = up[1];
-        p.z = up[2];
+        if (up !== null && r !== null && p !== null) {
 
-        // Notify modules.
-        register.updateSelfState({'position': [p.x, p.y, p.z]});
+            var animate = p.x !== up[0] || p.y !== up[1];
+            p.x = up[0];
+            p.y = up[1];
+            p.z = up[2];
 
-        avatar.rotation.y = Math.PI + r[0];
+            // Notify modules.
+            register.updateSelfState({'position': [p.x, p.y, p.z]});
 
-        // Update animation.
-        if (animate) graphics.updateAnimation(id);
+            avatar.rotation.y = Math.PI + r[0];
 
-        // Update camera.
-        graphics.cameraManager.updateCameraPosition(up);
+            // Update animation.
+            if (animate) graphics.updateAnimation(id);
+
+            // Update camera.
+            graphics.cameraManager.updateCameraPosition(up);
+        }
+
+        this.needsUpdate = false;
+    },
+
+    updateSelf: function(p, r) {
+        var pos = this.position;
+        var rot = this.rotation;
+        if (!pos || !rot ||
+            pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2]
+            || rot[0] !== r[0] || rot[1] !== r[1])
+        {
+            this.position = p;
+            this.rotation = r;
+            this.needsUpdate = true;
+        }
+    },
+
+    loadSelf: function(graphics) {
+
+        // Player id '-1' never used by any other entity.
+        var entityId = this.entityId;
+        var worldId = this.worldId;
+
+        graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
+            var object3d = graphics.finalizeEntity(entityId, createdEntity);
+            this.avatar = object3d;
+            if (this.displayAvatar) graphics.addToScene(object3d, worldId);
+        }.bind(this));
+
     }
 
-    this.needsUpdate = false;
-};
-
-App.Model.Server.SelfModel.prototype.updateSelf = function(p, r) {
-    var pos = this.position;
-    var rot = this.rotation;
-    if (!pos || !rot ||
-        pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2]
-        || rot[0] !== r[0] || rot[1] !== r[1])
-    {
-        this.position = p;
-        this.rotation = r;
-        this.needsUpdate = true;
-    }
-};
-
-App.Model.Server.SelfModel.prototype.loadSelf = function(graphics) {
-
-    // Player id '-1' never used by any other entity.
-    var entityId = this.entityId;
-    var worldId = this.worldId;
-
-    graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
-        var object3d = graphics.finalizeEntity(entityId, createdEntity);
-        this.avatar = object3d;
-        if (this.displayAvatar) graphics.addToScene(object3d, worldId);
-    }.bind(this));
-
-};
+});

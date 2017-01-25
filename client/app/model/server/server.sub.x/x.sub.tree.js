@@ -18,43 +18,47 @@ XNode = function(nodeId, parentArc) {
     this.childrenArcs = [];
 };
 
-XNode.prototype.getNodeId = function() {
-    return this.nodeId;
-};
+extend(XNode.prototype, {
 
-XNode.prototype.getNumberOfChildren = function() {
-    return this.childrenArcs.length;
-};
+    getNodeId: function() {
+        return this.nodeId;
+    },
 
-XNode.prototype.addExistingChild = function(arcId, node) {
-    var arc = new XArc(this, node, arcId);
-    node.parentArcs.push(arc);
-    this.childrenArcs.push(arc);
-    return node;
-};
+    getNumberOfChildren: function() {
+        return this.childrenArcs.length;
+    },
 
-XNode.prototype.addNewChild = function(arcId, nodeId) {
-    var node = new XNode(nodeId);
-    var arc = new XArc(this, node, arcId);
-    node.parentArcs.push(arc);
-    this.childrenArcs.push(arc);
-    return node;
-};
+    addExistingChild: function(arcId, node) {
+        var arc = new XArc(this, node, arcId);
+        node.parentArcs.push(arc);
+        this.childrenArcs.push(arc);
+        return node;
+    },
 
-XNode.prototype.getParentArcId = function() {
-    if (this.parentArcs === null) throw('Root has no parent.');
-    return this.parentArcs.getArcId();
-};
+    addNewChild: function(arcId, nodeId) {
+        var node = new XNode(nodeId);
+        var arc = new XArc(this, node, arcId);
+        node.parentArcs.push(arc);
+        this.childrenArcs.push(arc);
+        return node;
+    },
 
-XNode.prototype.getChildrenArcs = function() {
-    return this.childrenArcs;
-};
+    getParentArcId: function() {
+        if (this.parentArcs === null) throw('Root has no parent.');
+        return this.parentArcs.getArcId();
+    },
 
-XNode.prototype.forEachChild = function(callback) {
-    this.childrenArcs.forEach(function(arc) {
-        callback(arc);
-    });
-};
+    getChildrenArcs: function() {
+        return this.childrenArcs;
+    },
+
+    forEachChild: function(callback) {
+        this.childrenArcs.forEach(function(arc) {
+            callback(arc);
+        });
+    },
+
+});
 
 XArc = function(parentNode, childNode, arcId) {
     this.arcId = arcId;
@@ -62,17 +66,21 @@ XArc = function(parentNode, childNode, arcId) {
     this.childNode = childNode;
 };
 
-XArc.prototype.getChild = function() {
-    return this.childNode;
-};
+extend(XArc.prototype, {
 
-XArc.prototype.getParent = function() {
-    return this.parentNode;
-};
+    getChild: function() {
+        return this.childNode;
+    },
 
-XArc.prototype.getArcId = function() {
-    return this.arcId;
-};
+    getParent: function() {
+        return this.parentNode;
+    },
+
+    getArcId: function() {
+        return this.arcId;
+    }
+
+});
 
 XGraph = function(rootId) {
     this.root = new XNode(rootId, null);
@@ -80,107 +88,111 @@ XGraph = function(rootId) {
     this.nodes.set(rootId, this.root);
 };
 
-XGraph.prototype.insertNode = function(newArcId, newNodeId, parentNodeId) {
-    var node = this.nodes.get(parentNodeId);
-    if (!node) {
-        node = new XNode(parentNodeId, null);
-        this.nodes.set(parentNodeId, node);
-    }
+extend(XGraph.prototype, {
 
-    var newNode = this.nodes.get(newNodeId);
-    if (newNode) {
-        node.addExistingChild(newArcId, newNode);
-    } else {
-        newNode = node.addNewChild(newArcId, newNodeId);
-        this.nodes.set(newNodeId, newNode);
-    }
+    insertNode: function(newArcId, newNodeId, parentNodeId) {
+        var node = this.nodes.get(parentNodeId);
+        if (!node) {
+            node = new XNode(parentNodeId, null);
+            this.nodes.set(parentNodeId, node);
+        }
 
-    return newNode;
-};
+        var newNode = this.nodes.get(newNodeId);
+        if (newNode) {
+            node.addExistingChild(newArcId, newNode);
+        } else {
+            newNode = node.addNewChild(newArcId, newNodeId);
+            this.nodes.set(newNodeId, newNode);
+        }
 
-XGraph.prototype.hasNode = function(nodeId) {
-    return this.nodes.has(nodeId);
-};
+        return newNode;
+    },
 
-XGraph.prototype.getNode = function(nodeId) {
-    return this.nodes.get(nodeId);
-};
+    hasNode: function(nodeId) {
+        return this.nodes.has(nodeId);
+    },
 
-XGraph.prototype.toString = function() {
-    var string = '';
-    var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd;
-    var marks = new Set(); // Verification.
-    var queueNodes = [this.root];
-    var queueOtherEnds = [null];
+    getNode: function(nodeId) {
+        return this.nodes.get(nodeId);
+    },
 
-    var currentDepth = 0;
-    var queueDepth = [currentDepth];
-    var queueArcs = [null];
-    var elementDepths = new Map();
-    var processed = false;
+    toString: function() {
+        var string = '';
+        var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd;
+        var marks = new Set(); // Verification.
+        var queueNodes = [this.root];
+        var queueOtherEnds = [null];
 
-    // DFS.
-    while (queueNodes.length > 0) {
-        currentElement = queueNodes.pop();
-        currentDepth = queueDepth.pop();
-        currentArc = queueArcs.pop();
-        currentOtherEnd = queueOtherEnds.pop();
-        currentElementId = currentElement.getNodeId();
+        var currentDepth = 0;
+        var queueDepth = [currentDepth];
+        var queueArcs = [null];
+        var elementDepths = new Map();
+        var processed = false;
 
-        if (currentArc) {
-            currentArcId = currentArc.getArcId();
+        // DFS.
+        while (queueNodes.length > 0) {
+            currentElement = queueNodes.pop();
+            currentDepth = queueDepth.pop();
+            currentArc = queueArcs.pop();
+            currentOtherEnd = queueOtherEnds.pop();
+            currentElementId = currentElement.getNodeId();
 
-            var modifier = '';
-            processed = marks.has(currentElementId);
-            if (processed) {
-                var formerDepth = elementDepths.get(currentElementId);
-                if (formerDepth === currentDepth-2) { modifier = 'cyan'; }
-                else if (formerDepth < currentDepth) { modifier = 'red'; }
-                else if (formerDepth === currentDepth) { modifier = 'orange'; }
-            } else { modifier = 'lime'; }
+            if (currentArc) {
+                currentArcId = currentArc.getArcId();
 
-            var offset = '';
-            for (var o = 0; o<currentDepth; ++o) {
-                if (o === currentDepth - 1) {
-                    if (queueDepth.indexOf(currentDepth) > -1) {
-                        offset+='├';
-                    } else {
-                        offset+='└';
-                    }
-                    offset+='─';
-                } else {
-                    if (queueDepth.indexOf(o) > -1) {
-                        offset+='|';
-                    } else {
-                        if (queueDepth.indexOf(o+1) > -1) {
-                            offset+='\u00a0|\u00a0';
+                var modifier = '';
+                processed = marks.has(currentElementId);
+                if (processed) {
+                    var formerDepth = elementDepths.get(currentElementId);
+                    if (formerDepth === currentDepth-2) { modifier = 'cyan'; }
+                    else if (formerDepth < currentDepth) { modifier = 'red'; }
+                    else if (formerDepth === currentDepth) { modifier = 'orange'; }
+                } else { modifier = 'lime'; }
+
+                var offset = '';
+                for (var o = 0; o<currentDepth; ++o) {
+                    if (o === currentDepth - 1) {
+                        if (queueDepth.indexOf(currentDepth) > -1) {
+                            offset+='├';
                         } else {
-                            offset+='\u00a0\u00a0\u00a0';
+                            offset+='└';
+                        }
+                        offset+='─';
+                    } else {
+                        if (queueDepth.indexOf(o) > -1) {
+                            offset+='|';
+                        } else {
+                            if (queueDepth.indexOf(o+1) > -1) {
+                                offset+='\u00a0|\u00a0';
+                            } else {
+                                offset+='\u00a0\u00a0\u00a0';
+                            }
                         }
                     }
                 }
+                if (string.length > 1) string += '\n';
+                var origin = '';
+                if (currentOtherEnd) origin += 'w.' + currentOtherEnd.getNodeId()+'...';
+                string += offset + modifier + ' ' + origin + 'w.{' + currentElementId + '} p.' + currentArcId;
             }
-            if (string.length > 1) string += '\n';
-            var origin = '';
-            if (currentOtherEnd) origin += 'w.' + currentOtherEnd.getNodeId()+'...';
-            string += offset + modifier + ' ' + origin + 'w.{' + currentElementId + '} p.' + currentArcId;
+
+            if (!processed) {
+                // Mark and go next.
+                elementDepths.set(currentElementId, currentDepth);
+                marks.add(currentElementId);
+                var nextDepth = currentDepth + 1;
+                var childrenArcs = currentElement.getChildrenArcs();
+                for (var i = 0, l = childrenArcs.length; i < l; ++i) {
+                    var arc = childrenArcs[i];
+                    queueArcs.push(arc);
+                    queueNodes.push(arc.getChild());
+                    queueDepth.push(nextDepth);
+                    queueOtherEnds.push(arc.getParent());
+                }
+            }
         }
 
-        if (!processed) {
-            // Mark and go next.
-            elementDepths.set(currentElementId, currentDepth);
-            marks.add(currentElementId);
-            var nextDepth = currentDepth + 1;
-            var childrenArcs = currentElement.getChildrenArcs();
-            for (var i = 0, l = childrenArcs.length; i < l; ++i) {
-                var arc = childrenArcs[i];
-                queueArcs.push(arc);
-                queueNodes.push(arc.getChild());
-                queueDepth.push(nextDepth);
-                queueOtherEnds.push(arc.getParent());
-            }
-        }
+        return string;
     }
 
-    return string;
-};
+});

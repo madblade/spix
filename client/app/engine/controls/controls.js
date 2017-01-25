@@ -23,23 +23,27 @@ App.Engine.UI = function(app) {
     this.touch = {};
 };
 
-App.Engine.UI.prototype.run = function() {
-    var graphicsEngine = this.app.engine.graphics;
+extend(App.Engine.UI.prototype, {
 
-    // TODO detect device (PC, tablet, smartphone, VR <- lol)
-    this.setupKeyboard();
-    this.setupMouse();
-    this.setupTouch();
+    run: function() {
+        var graphicsEngine = this.app.engine.graphics;
 
-    $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
-};
+        // TODO detect device (PC, tablet, smartphone, VR <- lol)
+        this.setupKeyboard();
+        this.setupMouse();
+        this.setupTouch();
 
-App.Engine.UI.prototype.stop = function() {
-    this.stopListeners();
-};
+        $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
+    },
 
-App.Engine.UI.prototype.stopListeners = function() {
-    this.stopKeyboardListeners();
-    this.stopMouseListeners();
-    this.stopTouchListeners();
-};
+    stop: function() {
+        this.stopListeners();
+    },
+
+    stopListeners: function() {
+        this.stopKeyboardListeners();
+        this.stopMouseListeners();
+        this.stopTouchListeners();
+    }
+
+});

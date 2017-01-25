@@ -4,29 +4,33 @@
 
 'use strict';
 
-/**
- * Get key codes (internationalization required).
- * @param layout
- */
-App.Engine.UI.prototype.getKeyControls = function(layout) {
-    var keyControls;
+extend(App.Engine.UI.prototype, {
 
-    switch (layout) {
-        case 'en':
-        case 'en-US':
-        case 'en-GB':
-            keyControls = this.getQWERTY();
-            break;
+    /**
+     * Get key codes (internationalization required).
+     * @param layout
+     */
+    getKeyControls: function(layout) {
+        var keyControls;
 
-        case ('fr'):
-            keyControls = this.getAZERTY();
-            break;
+        switch (layout) {
+            case 'en':
+            case 'en-US':
+            case 'en-GB':
+                keyControls = this.getQWERTY();
+                break;
 
-        default:
-            console.log('Invalid keyboard layout. Switching to English as default.');
-            keyControls = this.getQWERTY();
-            return;
+            case ('fr'):
+                keyControls = this.getAZERTY();
+                break;
+
+            default:
+                console.log('Invalid keyboard layout. Switching to English as default.');
+                keyControls = this.getQWERTY();
+                return;
+        }
+
+        return keyControls;
     }
 
-    return keyControls;
-};
+});

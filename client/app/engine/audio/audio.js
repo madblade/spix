@@ -19,51 +19,55 @@ App.Engine.Audio = function(app) {
 
 };
 
-App.Engine.Audio.prototype.run = function() {
+extend(App.Engine.Audio.prototype, {
 
-    function loadSound(name, callback) {
-        var xObj = new XMLHttpRequest();
-        xObj.open('GET', 'audio/' + name + '.mp3', true);
-        xObj.responseType = 'arraybuffer';
-        xObj.onreadystatechange = function () {
-            if (xObj.readyState == 4 && xObj.status == "200") {
-                audioContext.decodeAudioData(xObj.response, function(buffer) {
-                    callback(buffer);
+    run: function() {
+
+        function loadSound(name, callback) {
+            var xObj = new XMLHttpRequest();
+            xObj.open('GET', 'audio/' + name + '.mp3', true);
+            xObj.responseType = 'arraybuffer';
+            xObj.onreadystatechange = function () {
+                if (xObj.readyState == 4 && xObj.status == "200") {
+                    audioContext.decodeAudioData(xObj.response, function(buffer) {
+                        callback(buffer);
+                    });
+                }
+            };
+            xObj.send(null);
+        }
+
+        try {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+
+            var sounds = this.sounds;
+            sounds.all.forEach(function(sound) {
+                loadSound(sound, function (buffer) {
+                    sounds[sound] = new App.Engine.Audio.Sound(sound, buffer);
                 });
-            }
-        };
-        xObj.send(null);
-    }
+            });
+        } catch(e) {
+            /*
+             $("#content").fadeOut(function() {
+             $(this).html($("#contentNoAudio").html(),'fast').fadeIn('fast');
+             });
+             */
+        }
+    },
 
-    try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        this.audioContext = new AudioContext();
+    stop: function() {
+        this.stopAllSounds();
+    },
 
+    stopAllSounds: function() {
         var sounds = this.sounds;
         sounds.all.forEach(function(sound) {
-            loadSound(sound, function (buffer) {
-                sounds[sound] = new App.Engine.Audio.Sound(sound, buffer);
-            });
+            if (sounds[sound].source !== null && sounds[sound].playing) {
+                sounds[sound].source.stop();
+                sounds[sound].playing = false;
+            }
         });
-    } catch(e) {
-        /*
-        $("#content").fadeOut(function() {
-            $(this).html($("#contentNoAudio").html(),'fast').fadeIn('fast');
-        });
-        */
     }
-};
 
-App.Engine.Audio.prototype.stop = function() {
-    this.stopAllSounds();
-};
-
-App.Engine.Audio.prototype.stopAllSounds = function() {
-    var sounds = this.sounds;
-    sounds.all.forEach(function(sound) {
-        if (sounds[sound].source !== null && sounds[sound].playing) {
-            sounds[sound].source.stop();
-            sounds[sound].playing = false;
-        }
-    });
-};
+});

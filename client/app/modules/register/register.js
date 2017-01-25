@@ -8,27 +8,31 @@ App.Modules.Register = function(app) {
     this.modules = {};
 };
 
-App.Modules.Register.prototype.registerDefaultModules = function() {
-    this.registerModule('chat', new App.Modules.Chat(this));
-    this.registerModule('hud', new App.Modules.Hud(this));
-};
+extend(App.Modules.Register.prototype, {
 
-App.Modules.Register.prototype.registerModule = function(moduleName, module) {
-    if (this.modules.hasOwnProperty(moduleName)) {
-        throw "Error: module already registered.";
+    registerDefaultModules: function() {
+        this.registerModule('chat', new App.Modules.Chat(this));
+        this.registerModule('hud', new App.Modules.Hud(this));
+    },
+
+    registerModule: function(moduleName, module) {
+        if (this.modules.hasOwnProperty(moduleName)) {
+            throw "Error: module already registered.";
+        }
+
+        this.modules[moduleName] = module;
+    },
+
+    updateSelfState: function(data) {
+        this.modules['hud'].updateSelfState(data);
+    },
+
+    updateChat: function(data) {
+        this.modules['chat'].updateChat(data);
+    },
+
+    sendMessage: function(message) {
+        console.log('Sending message.');
     }
 
-    this.modules[moduleName] = module;
-};
-
-App.Modules.Register.prototype.updateSelfState = function(data) {
-    this.modules['hud'].updateSelfState(data);
-};
-
-App.Modules.Register.prototype.updateChat = function(data) {
-    this.modules['chat'].updateChat(data);
-};
-
-App.Modules.Register.prototype.sendMessage = function(message) {
-    console.log('Sending message.');
-};
+});

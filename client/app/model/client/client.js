@@ -16,23 +16,27 @@ App.Model.Client = function(app) {
     this.eventComponent = new App.Model.Client.EventComponent(this);
 };
 
-App.Model.Client.prototype.init = function() {
-    this.eventComponent.init();
-};
+extend(App.Model.Client.prototype, {
 
-App.Model.Client.prototype.refresh = function() {
-    this.selfComponent.processChanges();
-    this.eventComponent.pushEvents();
-};
+    init: function() {
+        this.eventComponent.init();
+    },
 
-App.Model.Client.prototype.triggerEvent = function(type, data) {
-    this.eventComponent.triggerEvent(type, data);
-};
+    refresh: function() {
+        this.selfComponent.processChanges();
+        this.eventComponent.pushEvents();
+    },
 
-App.Model.Client.prototype.triggerChange = function(type, data) {
-    this.selfComponent.triggerChange(type, data);
-};
+    triggerEvent: function(type, data) {
+        this.eventComponent.triggerEvent(type, data);
+    },
 
-App.Model.Client.prototype.getCameraInteraction = function() {
-    return this.selfComponent.cameraInteraction;
-};
+    triggerChange: function(type, data) {
+        this.selfComponent.triggerChange(type, data);
+    },
+
+    getCameraInteraction: function() {
+        return this.selfComponent.cameraInteraction;
+    }
+
+});

@@ -31,43 +31,47 @@ App.Model.Server.XModel.WorldMap = function(xModel) {
     this.needsUpdate = true;
 };
 
-App.Model.Server.XModel.WorldMap.prototype.computeWorldMap = function() {
-    var portals = this.xModel.portals;
-    var starterWorldId = this.xModel.selfModel.worldId;
+extend(App.Model.Server.XModel.WorldMap.prototype, {
 
-    // Map worlds to portals.
-    // var worldIdToPortalId = this.worldToPortals;
-    var xGraph = new XGraph(parseInt(starterWorldId));
+    computeWorldMap: function() {
+        var portals = this.xModel.portals;
+        var starterWorldId = this.xModel.selfModel.worldId;
 
-    var forwardPortalId, forwardPortal, forwardWorldId, currentWorldId;
+        // Map worlds to portals.
+        // var worldIdToPortalId = this.worldToPortals;
+        var xGraph = new XGraph(parseInt(starterWorldId));
 
-    portals.forEach(function(portal, portalId) {
-        currentWorldId = portal.worldId;
-        forwardPortalId = portal.portalLinkedForward;
-        if (!forwardPortalId) return;
-        forwardPortal = portals.get(forwardPortalId);
-        if (!forwardPortal) return;
-        forwardWorldId = forwardPortal.worldId;
-        xGraph.insertNode(parseInt(portalId), parseInt(forwardWorldId), parseInt(currentWorldId));
-    });
+        var forwardPortalId, forwardPortal, forwardWorldId, currentWorldId;
 
-    this.xGraph = xGraph;
-    this.needsUpdate = false;
-};
+        portals.forEach(function(portal, portalId) {
+            currentWorldId = portal.worldId;
+            forwardPortalId = portal.portalLinkedForward;
+            if (!forwardPortalId) return;
+            forwardPortal = portals.get(forwardPortalId);
+            if (!forwardPortal) return;
+            forwardWorldId = forwardPortal.worldId;
+            xGraph.insertNode(parseInt(portalId), parseInt(forwardWorldId), parseInt(currentWorldId));
+        });
 
-App.Model.Server.XModel.WorldMap.prototype.invalidate = function() {
-    this.needsUpdate = true;
-};
+        this.xGraph = xGraph;
+        this.needsUpdate = false;
+    },
 
-// Representation
-App.Model.Server.XModel.WorldMap.prototype.renderString = function() {
-    this.computeWorldMap();
-    this.string = this.xGraph.toString();
-    this.needsUpdate = false;
-    return this.string;
-};
+    invalidate: function() {
+        this.needsUpdate = true;
+    },
 
-App.Model.Server.XModel.WorldMap.prototype.toString = function() {
-    if (this.needsUpdate) this.renderString();
-    return this.string;
-};
+    // Representation
+    renderString: function() {
+        this.computeWorldMap();
+        this.string = this.xGraph.toString();
+        this.needsUpdate = false;
+        return this.string;
+    },
+
+    toString: function() {
+        if (this.needsUpdate) this.renderString();
+        return this.string;
+    }
+
+});

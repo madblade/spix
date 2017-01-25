@@ -8,10 +8,14 @@
 // TODO error reporting
 // TODO wrapping DOM queries
 
-App.Core.prototype.registerModule = function(module) {
+extend(App.Core.prototype, {
 
-};
+    registerModule: function(module) {
 
-App.Core.prototype.restartModule = function(module) {
+    },
 
-};
+    restartModule: function(module) {
+
+    }
+
+});

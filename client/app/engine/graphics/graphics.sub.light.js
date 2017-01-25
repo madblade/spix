@@ -4,17 +4,21 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.createLight = function(whatLight) {
-    var light;
+extend(App.Engine.Graphics.prototype, {
 
-    switch (whatLight) {
-        case 'hemisphere':
-            light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
-            break;
+    createLight: function(whatLight) {
+        var light;
 
-        default:
-            light = new THREE.AmbientLight(0x404040);
+        switch (whatLight) {
+            case 'hemisphere':
+                light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+                break;
+
+            default:
+                light = new THREE.AmbientLight(0x404040);
+        }
+
+        return light;
     }
 
-    return light;
-};
+});

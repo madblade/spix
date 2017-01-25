@@ -15,22 +15,26 @@ App.Model.Server = function(app) {
     this.isRunning = false;
 };
 
-App.Model.Server.prototype.init = function() {
-    this.isRunning = true;
-    this.selfModel.init();
-    this.chunkModel.init();
-    this.entityModel.init();
-    this.xModel.init();
-};
+extend(App.Model.Server.prototype, {
 
-App.Model.Server.prototype.stop = function() {
-    this.isRunning = false;
-};
+    init: function() {
+        this.isRunning = true;
+        this.selfModel.init();
+        this.chunkModel.init();
+        this.entityModel.init();
+        this.xModel.init();
+    },
 
-// Update graphics.
-App.Model.Server.prototype.refresh = function() {
-    this.selfModel.refresh();
-    this.chunkModel.refresh();
-    this.entityModel.refresh();
-    this.xModel.refresh();
-};
+    stop: function() {
+        this.isRunning = false;
+    },
+
+    // Update graphics.
+    refresh: function() {
+        this.selfModel.refresh();
+        this.chunkModel.refresh();
+        this.entityModel.refresh();
+        this.xModel.refresh();
+    }
+
+});

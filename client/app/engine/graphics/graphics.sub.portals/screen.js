@@ -11,26 +11,30 @@ App.Engine.Graphics.Screen = function(screenId, mesh, renderTarget) {
     this.otherWorldId = null;
 };
 
-App.Engine.Graphics.Screen.prototype.getId = function() {
-    return this.screenId;
-};
+extend(App.Engine.Graphics.Screen.prototype, {
 
-App.Engine.Graphics.Screen.prototype.getMesh = function() {
-    return this.mesh;
-};
+    getId: function() {
+        return this.screenId;
+    },
 
-App.Engine.Graphics.Screen.prototype.getRenderTarget = function() {
-    return this.renderTarget;
-};
+    getMesh: function() {
+        return this.mesh;
+    },
 
-App.Engine.Graphics.Screen.prototype.getOtherWorldId = function() {
-    return this.otherWorldId;
-};
+    getRenderTarget: function() {
+        return this.renderTarget;
+    },
 
-App.Engine.Graphics.Screen.prototype.setOtherWorldId = function(otherWorldId) {
-    this.otherWorldId = otherWorldId;
-};
+    getOtherWorldId: function() {
+        return this.otherWorldId;
+    },
 
-App.Engine.Graphics.Screen.prototype.isLinked = function() {
-    return (this.otherWorldId !== null || this.otherWorldId !== undefined);
-};
+    setOtherWorldId: function(otherWorldId) {
+        this.otherWorldId = otherWorldId;
+    },
+
+    isLinked: function() {
+        return (this.otherWorldId !== null || this.otherWorldId !== undefined);
+    }
+
+});

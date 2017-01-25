@@ -4,45 +4,49 @@
 
 'use strict';
 
-App.Engine.Graphics.prototype.initializeEntity = function(entityId, model, callbackOnMesh) {
-    var loader = new THREE.JSONLoader();
-    var mixers = this.mixers;
+extend(App.Engine.Graphics.prototype, {
 
-    loader.load('app/assets/models/' + model + '.json', function(geometry) {
-        var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-            vertexColors: THREE.FaceColors,
-            morphTargets: true
-        }));
+    initializeEntity: function(entityId, model, callbackOnMesh) {
+        var loader = new THREE.JSONLoader();
+        var mixers = this.mixers;
 
-        mesh.scale.set(1.0, 1.0, 1.0);
+        loader.load('app/assets/models/' + model + '.json', function(geometry) {
+            var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+                vertexColors: THREE.FaceColors,
+                morphTargets: true
+            }));
 
-        var mixer = new THREE.AnimationMixer(mesh);
-        var clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
-        mixer.clipAction(clip).setDuration(1).play();
-        mixers.set(entityId, mixer);
+            mesh.scale.set(1.0, 1.0, 1.0);
 
-        callbackOnMesh(mesh);
-    });
-};
+            var mixer = new THREE.AnimationMixer(mesh);
+            var clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
+            mixer.clipAction(clip).setDuration(1).play();
+            mixers.set(entityId, mixer);
 
-// For composite entities, wrap heavy model parts in higher level structure.
-App.Engine.Graphics.prototype.finalizeEntity = function(id, createdEntity) {
-    // First only manage avatars.
-    var wrapper = new THREE.Object3D();
-    var head = this.createMesh(
-        this.createGeometry('box'),
-        this.createMaterial('flat-phong')
-    );
+            callbackOnMesh(mesh);
+        });
+    },
 
-    wrapper.add(createdEntity); // Body.
-    wrapper.add(head);
+    // For composite entities, wrap heavy model parts in higher level structure.
+    finalizeEntity: function(id, createdEntity) {
+        // First only manage avatars.
+        var wrapper = new THREE.Object3D();
+        var head = this.createMesh(
+            this.createGeometry('box'),
+            this.createMaterial('flat-phong')
+        );
 
-    head.position.y = 1.6;
-    wrapper.rotation.x = Math.PI/2;
-    wrapper.rotation.y = Math.PI;
+        wrapper.add(createdEntity); // Body.
+        wrapper.add(head);
 
-    wrapper._id = id;
-    //delete createdEntity._id;
+        head.position.y = 1.6;
+        wrapper.rotation.x = Math.PI/2;
+        wrapper.rotation.y = Math.PI;
 
-    return wrapper;
-};
+        wrapper._id = id;
+        //delete createdEntity._id;
+
+        return wrapper;
+    }
+
+});

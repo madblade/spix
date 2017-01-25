@@ -10,48 +10,52 @@ App.Engine.Settings = function(app) {
     this.listeners = [];
 };
 
-App.Engine.Settings.prototype.run = function() {
-    var app = this.app;
+extend(App.Engine.Settings.prototype, {
 
-    this.controlsEngine =   app.engine.controls;
-    this.stateManager =     app.state;
+    run: function() {
+        var app = this.app;
 
-    this.graphicsSettings = app.engine.graphics.settings;
-    this.controlsSettings = app.engine.controls.settings;
-    this.audioSettings =    app.engine.audio.settings;
+        this.controlsEngine =   app.engine.controls;
+        this.stateManager =     app.state;
 
-    // Add content, then fade in and add listeners.
-    $("#announce").addClass('settings').append(this.getHomeHTML()).center().fadeIn();
-    this.listenHome();
+        this.graphicsSettings = app.engine.graphics.settings;
+        this.controlsSettings = app.engine.controls.settings;
+        this.audioSettings =    app.engine.audio.settings;
 
-    $(document).keydown(function(event) {
-        if (!event.keyCode) { return; }
-        if (event.keyCode === this.controlsEngine.keyControls.escape) {
-            // Remove listeners and get away from the bike.
-            $(document).off('keydown');
-            this.unlistenHome();
-            this.stateManager.setState('ingame');
-        }
-    }.bind(this));
-};
+        // Add content, then fade in and add listeners.
+        $("#announce").addClass('settings').append(this.getHomeHTML()).center().fadeIn();
+        this.listenHome();
 
-App.Engine.Settings.prototype.stop = function() {
-    // Fade out settings menu.
-    return new Promise(function(resolve) {
-        var settings = $("#announce");
-        settings.fadeOut(200, function() {
-            settings.empty().removeClass('settings');
-            resolve();
+        $(document).keydown(function(event) {
+            if (!event.keyCode) { return; }
+            if (event.keyCode === this.controlsEngine.keyControls.escape) {
+                // Remove listeners and get away from the bike.
+                $(document).off('keydown');
+                this.unlistenHome();
+                this.stateManager.setState('ingame');
+            }
+        }.bind(this));
+    },
+
+    stop: function() {
+        // Fade out settings menu.
+        return new Promise(function(resolve) {
+            var settings = $("#announce");
+            settings.fadeOut(200, function() {
+                settings.empty().removeClass('settings');
+                resolve();
+            });
         });
-    });
-};
+    },
 
-App.Engine.Settings.prototype.unlisten = function() {
-    this.listeners.forEach(function(listener) {
-        var element = $('#'+listener);
-        element.off('click');
-        element.off('keydown');
-    });
+    unlisten: function() {
+        this.listeners.forEach(function(listener) {
+            var element = $('#'+listener);
+            element.off('click');
+            element.off('keydown');
+        });
 
-    this.listeners = [];
-};
+        this.listeners = [];
+    }
+
+});

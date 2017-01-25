@@ -4,35 +4,39 @@
 
 'use strict';
 
-App.Engine.UI.prototype.setupMouse = function() {
+extend(App.Engine.UI.prototype, {
 
-    this.buttons = {left: 1, middle: 2, right: 3};
+    setupMouse: function() {
 
-    // Click / move handlers.
-    this.setupPointerLock();
-};
+        this.buttons = {left: 1, middle: 2, right: 3};
 
-App.Engine.UI.prototype.getControls = function(controlType) {
-    var controls;
+        // Click / move handlers.
+        this.setupPointerLock();
+    },
 
-    if (controlType === 'first-person') {
-        controls = this.getFirstPersonControls();
-        controls.type = 'fp';
-    } else {
-        controls = undefined;
+    getControls: function(controlType) {
+        var controls;
+
+        if (controlType === 'first-person') {
+            controls = this.getFirstPersonControls();
+            controls.type = 'fp';
+        } else {
+            controls = undefined;
+        }
+
+        return controls;
+    },
+
+    startMouseListeners: function() {
+        var graphicsEngine = this.app.engine.graphics;
+        graphicsEngine.startListeners();
+        this.registerMouseDown();
+    },
+
+    stopMouseListeners: function() {
+        var graphicsEngine = this.app.engine.graphics;
+        graphicsEngine.stopListeners();
+        this.unregisterMouseDown();
     }
 
-    return controls;
-};
-
-App.Engine.UI.prototype.startMouseListeners = function() {
-    var graphicsEngine = this.app.engine.graphics;
-    graphicsEngine.startListeners();
-    this.registerMouseDown();
-};
-
-App.Engine.UI.prototype.stopMouseListeners = function() {
-    var graphicsEngine = this.app.engine.graphics;
-    graphicsEngine.stopListeners();
-    this.unregisterMouseDown();
-};
+});

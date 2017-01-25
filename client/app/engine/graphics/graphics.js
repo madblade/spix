@@ -39,68 +39,68 @@ App.Engine.Graphics = function(app) {
     this.loadTextures();
 };
 
-App.Engine.Graphics.prototype.run = function() {
+extend(App.Engine.Graphics.prototype, {
 
-    // Controls are tightly linked to camera.
-    this.initializeControls();
+    run: function() {
 
-    // Init animation.
-    this.resize();
-    this.animate();
+        // Controls are tightly linked to camera.
+        this.initializeControls();
 
-    // Init stats.
-    // document.body.appendChild(this.fps.dom);
-};
+        // Init animation.
+        this.resize();
+        this.animate();
 
-App.Engine.Graphics.prototype.stop = function() {
-    cancelAnimationFrame(this.requestId);
-};
+        // Init stats.
+        // document.body.appendChild(this.fps.dom);
+    },
 
-/** Main loop. **/
+    /** Main loop. **/
 
-App.Engine.Graphics.prototype.animate = function() {
-    var clientModel = this.app.model.client;
-    var serverModel = this.app.model.server;
+    animate: function() {
+        var clientModel = this.app.model.client;
+        var serverModel = this.app.model.server;
 
-    // Request animation frame.
-    this.requestId = requestAnimationFrame(this.animate.bind(this));
+        // Request animation frame.
+        this.requestId = requestAnimationFrame(this.animate.bind(this));
 
-    // Bench.
-    this.fps.update();
+        // Bench.
+        this.fps.update();
 
-    // Render.
-    serverModel.refresh();
-    this.render();
-    clientModel.refresh();
-};
+        // Render.
+        serverModel.refresh();
+        this.render();
+        clientModel.refresh();
+    },
 
-App.Engine.Graphics.prototype.render = function() {
-    var sceneManager = this.sceneManager;
-    var cameraManager = this.cameraManager;
-    var portals = this.app.model.server.xModel.portals;
-    this.rendererManager.render(sceneManager, cameraManager, portals);
-};
+    render: function() {
+        var sceneManager = this.sceneManager;
+        var cameraManager = this.cameraManager;
+        var portals = this.app.model.server.xModel.portals;
+        this.rendererManager.render(sceneManager, cameraManager, portals);
+    },
 
-App.Engine.Graphics.prototype.stop = function() {
-    if (this.requestId) {
-        cancelAnimationFrame(this.requestId);
+    stop: function() {
+        if (this.requestId) {
+            cancelAnimationFrame(this.requestId);
+        }
+    },
+
+    resize: function() {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        // Update aspects.
+        this.cameraManager.resize(width, height);
+
+        // Update main renderer.
+        this.rendererManager.resize(width, height);
+
+        // Resize render targets.
+        this.sceneManager.resize(width, height);
+    },
+
+    getCameraInteraction: function() {
+        return this.app.model.client.getCameraInteraction();
     }
-};
 
-App.Engine.Graphics.prototype.resize = function () {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-
-    // Update aspects.
-    this.cameraManager.resize(width, height);
-
-    // Update main renderer.
-    this.rendererManager.resize(width, height);
-
-    // Resize render targets.
-    this.sceneManager.resize(width, height);
-};
-
-App.Engine.Graphics.prototype.getCameraInteraction = function() {
-    return this.app.model.client.getCameraInteraction();
-};
+});

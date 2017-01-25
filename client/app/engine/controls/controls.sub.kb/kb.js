@@ -4,56 +4,60 @@
 
 'use strict';
 
-App.Engine.UI.prototype.setupKeyboard = function() {
+extend(App.Engine.UI.prototype, {
 
-    // Try to detect user language
-    this.settings.language = window.navigator.userLanguage || window.navigator.language || "en-US";
+    setupKeyboard: function() {
 
-    // TODO remove this (convenient just for me).
-    this.settings.language = "fr";
+        // Try to detect user language
+        this.settings.language = window.navigator.userLanguage || window.navigator.language || "en-US";
 
-    // Controls
-    this.keyControls = this.getKeyControls(this.settings.language);
+        // TODO remove this (convenient just for me).
+        this.settings.language = "fr";
 
-    // Tweak for filtering some events...
-    this.tweak = 0;
-};
+        // Controls
+        this.keyControls = this.getKeyControls(this.settings.language);
 
-App.Engine.UI.prototype.startKeyboardListeners = function() {
-    this.registerKeyDown();
-    this.registerKeyUp();
-};
+        // Tweak for filtering some events...
+        this.tweak = 0;
+    },
 
-App.Engine.UI.prototype.stopKeyboardListeners = function() {
-    this.stopKeyboardInteraction();
-    this.unregisterKeyDown();
-    this.unregisterKeyUp();
-};
+    startKeyboardListeners: function() {
+        this.registerKeyDown();
+        this.registerKeyUp();
+    },
 
-/**
- * @param newLayout
- *      Layout language (en or fr) to use from now on.
- * @param dontRestartListeners
- *      If the method should keep listeners silent.
- * @param newBinding
- *      Optional. For custom layouts, a new [action, key] binding.
- */
-App.Engine.UI.prototype.changeLayout = function(newLayout, dontRestartListeners, newBinding) {
-    // Prevent keys from being fired when configuring.
-    this.stopKeyboardListeners();
+    stopKeyboardListeners: function() {
+        this.stopKeyboardInteraction();
+        this.unregisterKeyDown();
+        this.unregisterKeyUp();
+    },
 
-    switch (newLayout) {
-        case 'fr':
-        case 'en':
-        case 'en-US':
-        case 'en-GB':
-            this.keyControls = this.getKeyControls(newLayout);
-            break;
-        case 'custom':
-        default:
-            this.setupCustomLayout(newBinding);
+    /**
+     * @param newLayout
+     *      Layout language (en or fr) to use from now on.
+     * @param dontRestartListeners
+     *      If the method should keep listeners silent.
+     * @param newBinding
+     *      Optional. For custom layouts, a new [action, key] binding.
+     */
+    changeLayout: function(newLayout, dontRestartListeners, newBinding) {
+        // Prevent keys from being fired when configuring.
+        this.stopKeyboardListeners();
+
+        switch (newLayout) {
+            case 'fr':
+            case 'en':
+            case 'en-US':
+            case 'en-GB':
+                this.keyControls = this.getKeyControls(newLayout);
+                break;
+            case 'custom':
+            default:
+                this.setupCustomLayout(newBinding);
+        }
+
+        // Restore event listeners.
+        if (!dontRestartListeners) this.startKeyboardListeners();
     }
 
-    // Restore event listeners.
-    if (!dontRestartListeners) this.startKeyboardListeners();
-};
+});

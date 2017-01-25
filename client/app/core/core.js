@@ -4,83 +4,87 @@
 
 'use strict';
 
-App.Core.prototype.getState = function() {
-    return this.state.state;
-};
+extend(App.Core.prototype, {
 
-App.Core.prototype.setState = function(state, opt) {
-    this.state.setState(state, opt);
-};
+    getState: function() {
+        return this.state.state;
+    },
 
-App.Core.prototype.isLoading = function() {
-    return this.getState() === 'loading';
-};
+    setState: function(state, opt) {
+        this.state.setState(state, opt);
+    },
 
-App.Core.prototype.isFocused = function() {
-    return this.state.focus;
-};
+    isLoading: function() {
+        return this.getState() === 'loading';
+    },
 
-App.Core.prototype.setFocused = function(isFocused) {
-    this.state.focus = isFocused ? true : false;
-};
+    isFocused: function() {
+        return this.state.focus;
+    },
 
-// Called when the socket is connected.
-App.Core.prototype.connectionEstablished = function() {
-    console.log("Connected.");
+    setFocused: function(isFocused) {
+        this.state.focus = isFocused ? true : false;
+    },
 
-    // TODO splash screen.
-    setTimeout(
-        function() {this.engine.connection.requestHubState()}.bind(this),
-        1500
-    );
-};
+    // Called when the socket is connected.
+    connectionEstablished: function() {
+        console.log("Connected.");
 
-// Called when a 'creation' request is emitted from Hub state.
-App.Core.prototype.requestGameCreation = function(gameType) {
-    if (this.getState() !== 'hub')
-        throw 'Could not request game creation outside of Hub.';
+        // TODO splash screen.
+        setTimeout(
+            function() {this.engine.connection.requestHubState()}.bind(this),
+            1500
+        );
+    },
 
-    this.engine.connection.requestGameCreation(gameType);
-    // TODO single-page without reloading every time a new game is asked...
-    //location.reload();
-};
+    // Called when a 'creation' request is emitted from Hub state.
+    requestGameCreation: function(gameType) {
+        if (this.getState() !== 'hub')
+            throw 'Could not request game creation outside of Hub.';
 
-// Called when a 'join' request is emitted from Hub state.
-App.Core.prototype.join = function(gameType, gameId) {
-    if (this.getState() !== 'hub')
-        throw 'Could not request game joining outside of Hub.';
+        this.engine.connection.requestGameCreation(gameType);
+        // TODO single-page without reloading every time a new game is asked...
+        //location.reload();
+    },
 
-    console.log('Join request...');
+    // Called when a 'join' request is emitted from Hub state.
+    join: function(gameType, gameId) {
+        if (this.getState() !== 'hub')
+            throw 'Could not request game joining outside of Hub.';
 
-    // Configuration.
-    this.setState('ingame');
-    this.engine.connection.configureGame(gameType, gameId);
+        console.log('Join request...');
 
-    // Start model loop.
-    this.model.client.init(gameType);
-    this.model.server.init(gameType);
-    console.log('Game effectively started.');
+        // Configuration.
+        this.setState('ingame');
+        this.engine.connection.configureGame(gameType, gameId);
 
-    // Try to join specified game.
-    this.engine.connection.join(gameType, gameId);
-};
+        // Start model loop.
+        this.model.client.init(gameType);
+        this.model.server.init(gameType);
+        console.log('Game effectively started.');
 
-// Run game when joining confirmed.
-App.Core.prototype.joinedServer = function() {
-    console.log('Joined server.');
+        // Try to join specified game.
+        this.engine.connection.join(gameType, gameId);
+    },
 
-    // Run game
-    this.runGame();
-};
+    // Run game when joining confirmed.
+    joinedServer: function() {
+        console.log('Joined server.');
 
-App.Core.prototype.runGame = function() {
-    this.engine.graphics.run();
-    this.engine.controls.run();
-    this.engine.audio.run();
-};
+        // Run game
+        this.runGame();
+    },
 
-App.Core.prototype.stopGame = function() {
-    this.engine.graphics.stop();
-    this.engine.controls.stop();
-    this.engine.audio.stop();
-};
+    runGame: function() {
+        this.engine.graphics.run();
+        this.engine.controls.run();
+        this.engine.audio.run();
+    },
+
+    stopGame: function() {
+        this.engine.graphics.stop();
+        this.engine.controls.stop();
+        this.engine.audio.stop();
+    }
+
+});

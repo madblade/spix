@@ -8,15 +8,19 @@ App.State.StateManager.prototype.register.push(function(scope) {
     scope.registerState('ingame', scope.startIngame, scope.endIngame);
 });
 
-App.State.StateManager.prototype.startIngame = function() {
-    $('#announce').removeClass().empty().addClass('reticle-wrapper').append('<div class="reticle"></div>').center().show();
-};
+extend(App.State.StateManager.prototype, {
 
-App.State.StateManager.prototype.endIngame = function() {
-    this.app.engine.controls.stopListeners();
+    startIngame: function() {
+        $('#announce').removeClass().empty().addClass('reticle-wrapper').append('<div class="reticle"></div>').center().show();
+    },
 
-    return new Promise(function(resolve) {
-        $('#announce').empty().removeClass('reticle-wrapper');
-       resolve();
-    });
-};
+    endIngame: function() {
+        this.app.engine.controls.stopListeners();
+
+        return new Promise(function(resolve) {
+            $('#announce').empty().removeClass('reticle-wrapper');
+            resolve();
+        });
+    }
+
+});

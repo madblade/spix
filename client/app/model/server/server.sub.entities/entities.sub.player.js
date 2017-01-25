@@ -4,17 +4,21 @@
 
 'use strict';
 
-App.Model.Server.EntityModel.prototype.loadPlayer = function(id, updatedEntity, graphics, entities) {
+extend(App.Model.Server.EntityModel.prototype, {
 
-    graphics.initializeEntity(id, 'steve', function(createdEntity) {
-        var object3d = graphics.finalizeEntity(id, createdEntity);
+    loadPlayer: function(id, updatedEntity, graphics, entities) {
 
-        // TODO [CRIT] worldify entities.
-        graphics.addToScene(object3d, -1);
+        graphics.initializeEntity(id, 'steve', function(createdEntity) {
+            var object3d = graphics.finalizeEntity(id, createdEntity);
 
-        this.updateEntity(id, object3d, updatedEntity, graphics, entities);
-        this.entitiesLoading.delete(id);
+            // TODO [CRIT] worldify entities.
+            graphics.addToScene(object3d, -1);
 
-    }.bind(this));
+            this.updateEntity(id, object3d, updatedEntity, graphics, entities);
+            this.entitiesLoading.delete(id);
 
-};
+        }.bind(this));
+
+    }
+
+});
