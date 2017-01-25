@@ -15,10 +15,21 @@ App.Model.Server.XModel.prototype.addPortal = function(portalId, otherPortalId,
     if (this.portals.has(portalId)) {
         console.log('Portal ' + portalId + ' was here already...');
     }
+
     var portal = new App.Model.Server.XModel.Portal(portalId, otherPortalId,
         chunkId, worldId, end1, end2, position, orientation);
+
+    // Add portal to model.
     this.portals.set(portalId, portal);
 
+    // Add to world-portal model.
+    var worldPortals = this.worldToPortals.get(worldId);
+    if (worldPortals) worldPortals.add(portalId);
+    else {
+        worldPortals = new Set();
+        worldPortals.add(portalId);
+        this.worldToPortals.set(worldId, worldPortals);
+    }
 
     // Complete other portals which lead to this one.
     var backwards = this.backwardLinks;
@@ -71,14 +82,23 @@ App.Model.Server.XModel.prototype.removePortal = function(portalId) {
         console.log('\t... portal ' + portalId + ' not present in model.');
     }
 
+    // Impact link model.
     var backwards = this.backwardLinks;
     var linked = backwards.get(portalId);
     if (linked) linked.forEach(function(lportal) {
         graphics.removePartOfPortalObject(lportal, portal);
     });
-
-    if (portal) graphics.removePortalObject(portal);
-
     backwards.delete(portalId);
+
+    // Impact world-portal model
+    if (portal) {
+        var worldId = portal.worldId;
+        var worldPortals = this.worldToPortals.get(worldId);
+        worldPortals.delete(portalId);
+        if (worldPortals.size < 1) this.worldToPortals.delete(worldId);
+    }
+
+    // Impact portal model.
+    if (portal) graphics.removePortalObject(portal);
     this.portals.delete(portalId);
 };

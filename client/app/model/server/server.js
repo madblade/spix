@@ -10,7 +10,7 @@ App.Model.Server = function(app) {
     this.selfModel      = new App.Model.Server.SelfModel(app);
     this.chunkModel     = new App.Model.Server.ChunkModel(app);
     this.entityModel    = new App.Model.Server.EntityModel(app);
-    this.xModel         = new App.Model.Server.XModel(app);
+    this.xModel         = new App.Model.Server.XModel(app, this.selfModel);
 
     this.isRunning = false;
 };

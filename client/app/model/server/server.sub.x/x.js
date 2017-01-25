@@ -4,17 +4,28 @@
 
 'use strict';
 
-App.Model.Server.XModel = function(app) {
+App.Model.Server.XModel = function(app, selfModel) {
     this.app = app;
+    this.selfModel = selfModel;
 
-    // Model component
+    /** Model component **/
+
+    // Portal id -> portal (knows self world, forward portal)
     this.portals = new Map();
+
+    // World id -> set of all portals contained in this world
+    this.worldToPortals = new Map();
+
+    // Portal id -> set of all portals that link to this one
     this.backwardLinks = new Map();
 
-    // Buffer
+    // Map helper
+    this.worldMap = new App.Model.Server.XModel.WorldMap(this);
+
+    /** Buffer **/
     this.xUpdates = [];
 
-    // Graphical component
+    /** Graphical component **/
     this.needsUpdate = false;
 };
 
@@ -26,7 +37,10 @@ App.Model.Server.XModel.prototype.init = function() {};
 App.Model.Server.XModel.prototype.refresh = function() {
     if (!this.needsUpdate) return;
 
+    var register = this.app.register;
+    var worldMap = this.worldMap;
     var updates = this.xUpdates;
+
     for (var i = 0, l = updates.length; i < l; ++i) {
         var data = updates[i];
         for (var portalId in data) {
@@ -45,10 +59,13 @@ App.Model.Server.XModel.prototype.refresh = function() {
                 var orientation     = meta[10];
 
                 this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
-
+                worldMap.invalidate();
+                register.updateSelfState({'diagram': worldMap.toString()});
             } else {
                 // Null -> remove portal
                 this.removePortal(portalId);
+                worldMap.invalidate();
+                register.updateSelfState({'diagram': worldMap.toString()});
             }
         }
     }

@@ -48,6 +48,7 @@ App.Engine.UI.prototype.setupPointerLock = function() {
 
         // Ask the browser to lock the pointer.
         event.preventDefault();
+        event.stopPropagation();
         scope.requestPointerLock();
         app.setFocused(true);
     });
