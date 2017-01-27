@@ -56,7 +56,7 @@ extend(XNode.prototype, {
         this.childrenArcs.forEach(function(arc) {
             callback(arc);
         });
-    },
+    }
 
 });
 
@@ -144,9 +144,9 @@ extend(XGraph.prototype, {
                 processed = marks.has(currentElementId);
                 if (processed) {
                     var formerDepth = elementDepths.get(currentElementId);
-                    if (formerDepth === currentDepth-2) { modifier = 'cyan'; }
-                    else if (formerDepth < currentDepth) { modifier = 'red'; }
-                    else if (formerDepth === currentDepth) { modifier = 'orange'; }
+                    if (formerDepth === currentDepth - 2) { modifier = 'cyan'; }
+                    else if (formerDepth < currentDepth - 2) { modifier = 'red'; }
+                    else if (formerDepth >= currentDepth - 1) { modifier = 'orange'; }
                 } else { modifier = 'lime'; }
 
                 var offset = '';

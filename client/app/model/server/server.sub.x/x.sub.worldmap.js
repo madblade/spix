@@ -59,6 +59,7 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
 
     invalidate: function() {
         this.needsUpdate = true;
+        return this;
     },
 
     // Representation

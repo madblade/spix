@@ -83,14 +83,15 @@ extend(App.Engine.Graphics.prototype, {
             return;
         }
 
-        this.cameraManager.addCamera(portal, otherPortal);
-
         // Link scene.
         var otherWorldId = otherPortal.worldId;
         // Important.
         screen.setOtherWorldId(otherWorldId);
 
+        this.cameraManager.addCamera(portal, otherPortal);
         this.cameraManager.addCameraToScene(portalId, worldId);
+
+        //
         var scene = this.getScene(otherWorldId);
     },
 

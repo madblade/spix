@@ -26,6 +26,9 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 extend(App.Engine.Graphics.CameraManager.prototype, {
 
     createCamera: function(forRaycaster) {
+        // Resize (when window is resized on hub, portals are not affected)
+        this.mainAspect = window.innerWidth / window.innerHeight;
+
         return new App.Engine.Graphics.Camera(
             this.mainFOV,
             this.mainAspect,

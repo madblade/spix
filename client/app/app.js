@@ -4,7 +4,8 @@
 
 'use strict';
 
-// Utility function to extend a prototype that spawns across multiple files.
+// Utility function to extend a prototype.
+// Useful when it spawns across multiple files.
 function extend(prototype, functions) {
     if (typeof prototype !== 'object' || typeof functions !== 'object')
         throw Error('Could not extend ' + prototype + ' with ' + functions);

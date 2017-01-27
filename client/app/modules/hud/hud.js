@@ -41,6 +41,12 @@ extend(App.Modules.Hud.prototype, {
             s = '<p style="color:white;">' + s + '</p>';
             $('#diagram').html(s); // .css('color', 'cyan');
         }
+
+        else if (newState.hasOwnProperty('active_item')) {
+            var h = newState['active_item'];
+            $('#items').text(h).css('color', 'orange');
+        }
+
     }
 
 });

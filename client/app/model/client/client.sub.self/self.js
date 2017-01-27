@@ -35,6 +35,10 @@ App.Model.Client.SelfComponent = function(clientModel) {
 
 extend(App.Model.Client.SelfComponent.prototype, {
 
+    init: function() {
+        register.updateSelfState({'active_item': this._clickInteraction});
+    },
+
     // TODO [MEDIUM] implement items
     getCurrentItem: function() {
         return this.currentItem;
@@ -51,6 +55,7 @@ extend(App.Model.Client.SelfComponent.prototype, {
         var scope = this;
         var serverSelfModel = this.clientModel.app.model.server.selfModel;
         var graphicsEngine = this.clientModel.app.engine.graphics;
+        var register = this.clientModel.app.register;
 
         // ENHANCEMENT [LOW]: filter & simplify
         changes.forEach(function(event) {
@@ -84,6 +89,7 @@ extend(App.Model.Client.SelfComponent.prototype, {
                     } else if (scope._clickInteraction === 'x') {
                         scope._clickInteraction = 'block';
                     }
+                    register.updateSelfState({'active_item': scope._clickInteraction});
 
                     break;
 

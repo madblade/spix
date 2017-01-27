@@ -19,6 +19,7 @@ App.Model.Client = function(app) {
 extend(App.Model.Client.prototype, {
 
     init: function() {
+        this.selfComponent.init();
         this.eventComponent.init();
     },
 

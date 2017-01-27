@@ -61,13 +61,11 @@ extend(App.Model.Server.XModel.prototype, {
                     var orientation     = meta[10];
 
                     this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
-                    worldMap.invalidate();
-                    register.updateSelfState({'diagram': worldMap.toString()});
+                    register.updateSelfState({'diagram': worldMap.invalidate().toString()});
                 } else {
                     // Null -> remove portal
                     this.removePortal(portalId);
-                    worldMap.invalidate();
-                    register.updateSelfState({'diagram': worldMap.toString()});
+                    register.updateSelfState({'diagram': worldMap.invalidate().toString()});
                 }
             }
         }
