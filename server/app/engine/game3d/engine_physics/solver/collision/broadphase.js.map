@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../../../../../server/app/engine/game3d/engine_physics/solver/collision/broadphase.js"],"names":[],"mappings":";;;;AAIA;;;;;;;;;;;;IAEM;;;;kBAIS","file":"broadphase.js","sourcesContent":["/**\n *\n */\n\n'use strict';\n\nclass BPC {\n\n}\n\nexport default BPC;\n"]}

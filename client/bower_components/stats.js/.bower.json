@@ -1,0 +1,29 @@
+{
+  "name": "stats.js",
+  "homepage": "https://github.com/mrdoob/stats.js",
+  "description": "JavaScript Performance Monitor",
+  "main": "build/stats.js",
+  "keywords": [
+    "stats",
+    "statistics",
+    "performance",
+    "monitor",
+    "fps"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "examples",
+    "utils",
+    "LICENSE"
+  ],
+  "_release": "066cb4e8cf",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "066cb4e8cf9e1c8c7bbc501a9a325f707a2b1cb4"
+  },
+  "_source": "https://github.com/mrdoob/stats.js.git",
+  "_target": "*",
+  "_originalSource": "stats.js",
+  "_direct": true
+}
