@@ -6,11 +6,18 @@
 
 extend(App.Model.Server.prototype, {
 
+    updateMe: function(data) {
+        if (!this.isRunning) return;
+        data = JSON.parse(data);
+
+        var mainState = data[0];
+        this.selfModel.updateSelf(mainState[0], mainState[1], mainState[2]);
+    },
+
     updateEntities: function(data) {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 
-        this.selfModel.updateSelf(data[0], data[1]);
         this.entityModel.updateEntities(data[2]);
     },
 

@@ -13,6 +13,7 @@ extend(App.Engine.Connection.prototype, {
 
         this.addCustomListener('chk', serverModel.updateChunks.bind(serverModel));
         this.addCustomListener('ent', serverModel.updateEntities.bind(serverModel));
+        this.addCustomListener('me', serverModel.updateMe.bind(serverModel));
         this.addCustomListener('x', serverModel.updateX.bind(serverModel));
         this.addCustomListener('chat', register.updateChat.bind(register));
     },
@@ -20,6 +21,7 @@ extend(App.Engine.Connection.prototype, {
     unregisterSocketForGame3D: function() {
         this.removeCustomListener('chk');
         this.removeCustomListener('ent');
+        this.removeCustomListener('me');
         this.removeCustomListener('x');
         this.removeCustomListener('chat');
     }

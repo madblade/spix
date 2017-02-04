@@ -24,14 +24,19 @@ class Newton {
             dt = 5.0;
         }
 
-        EM.forEach(function(entity) {
-            const worldId = entity.worldId;
+        // Decouple entities from worlds.
+        // A given entity can span across multiple worlds.
+        let worldEntities = EM.worldEntities;
+        worldEntities.forEach((entityMap, worldId) => {
             const world = WM.getWorld(worldId);
-            const entityUpdated = Newton.linearSolve(entity, EM, world, dt);
 
-            if (entityUpdated) {
-                o.entityUpdated(entity.id);
-            }
+            entityMap.forEach((entity, entityId) => {
+                const entityUpdated = Newton.linearSolve(entity, EM, world, dt);
+
+                if (entityUpdated) {
+                    o.entityUpdated(entityId);
+                }
+            });
         });
 
         // Get entities inputs

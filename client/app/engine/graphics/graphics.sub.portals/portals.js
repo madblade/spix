@@ -12,8 +12,8 @@ extend(App.Engine.Graphics.prototype, {
         console.log('Adding stub: p(' + portalId + '), w(' + worldId + ')');
 
         // Get scene.
-        var scene = this.getScene(worldId);
-        if (!scene) {
+        var scene = this.getScene(worldId, true); // Force scene manager to create a scene.
+        if (!scene) { // Still possible.
             console.log('Could not load scene from ' + worldId + ' (' + (typeof worldId) + ')');
             return;
         }
@@ -34,13 +34,13 @@ extend(App.Engine.Graphics.prototype, {
 
             var geometry = new THREE.PlaneBufferGeometry(tempWidth, tempHeight);
             // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-            var uvs = geometry.attributes.uv.array;
-            var uvi = 0;
+            //var uvs = geometry.attributes.uv.array;
+            //var uvi = 0;
             // Quad 1
-            uvs[uvi++] = 1.0; uvs[uvi++] = 1.0; // 1, 1 -> top right
-            uvs[uvi++] = 0.;  uvs[uvi++] = 1.0; // 0, 1 -> top left
-            uvs[uvi++] = 1.0; uvs[uvi++] = 0.;  // 1, 0 -> bottom right
-            uvs[uvi++] = 0.;  uvs[uvi++] = 0.;  // 0, 0 -> bottom left
+            //uvs[uvi++] = 1.0; uvs[uvi++] = 1.0; // 1, 1 -> top right
+            //uvs[uvi++] = 0.;  uvs[uvi++] = 1.0; // 0, 1 -> top left
+            //uvs[uvi++] = 1.0; uvs[uvi++] = 0.;  // 1, 0 -> bottom right
+            //uvs[uvi++] = 0.;  uvs[uvi++] = 0.;  // 0, 0 -> bottom left
 
             var portalVShader = this.getPortalVertexShader();
             var portalFShader = this.getPortalFragmentShader();
@@ -59,7 +59,7 @@ extend(App.Engine.Graphics.prototype, {
             mesh.position.z = tempPosition[2] + 1;
             mesh.rotation.x = Math.PI/2;
 
-            screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture);
+            screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture, worldId);
             this.addScreen(portalId, screen);
         }
 
@@ -68,7 +68,8 @@ extend(App.Engine.Graphics.prototype, {
         }
     },
 
-    completeStubPortalObject: function(portal, otherPortal) {
+    // portal linked forward to otherPortal
+    completeStubPortalObject: function(portal, otherPortal, worldMap) {
         var worldId = portal.worldId;
         var portalId = portal.portalId;
 
@@ -78,38 +79,92 @@ extend(App.Engine.Graphics.prototype, {
 
         // Create and configure renderer, camera.
         var screen = this.getScreen(portalId);
-        if (!screen || !screen.isLinked()) {
-            console.log('A completed stub cannot be completed again: ' + portalId);
+        if (!screen) {
+            console.log('Could not get screen to complete: ' + portalId);
             return;
         }
 
         // Link scene.
         var otherWorldId = otherPortal.worldId;
         // Important.
+        console.log(portalId + ' -> SETTING OWID ' + otherWorldId + ' ' + typeof otherWorldId);
         screen.setOtherWorldId(otherWorldId);
+        screen.getRenderTarget().setSize(window.innerWidth, window.innerHeight);
 
+        var pathsToPortal = [];
+        worldMap.xGraph.applyFromPosition(null, portalId, function(portal, path, depth) {
+            pathsToPortal.push(path);
+        });
+
+        console.log(pathsToPortal);
+        // TODO [CRIT] add several times with different paths.
+        // TODO [CRIT] compute all paths.
+        // TODO [CRIT] DON'T ACCOUNT for portals that are too far away!
+        // TODO [CRIT] that's how many camera paths I'll have to add until the leaves.
         this.cameraManager.addCamera(portal, otherPortal);
         this.cameraManager.addCameraToScene(portalId, worldId);
 
-        //
-        var scene = this.getScene(otherWorldId);
+        // var scene = this.getScene(otherWorldId);
     },
 
-    addPortalObject: function(portal, otherPortal) {
+    addPortalObject: function(portal, otherPortal, worldMap) {
         var worldId = portal.worldId;
 
         this.addStubPortalObject(portal);
-        this.completeStubPortalObject(portal, otherPortal);
+        this.completeStubPortalObject(portal, otherPortal, worldMap);
     },
 
-    removePartOfPortalObject: function(portal, otherPortal) {
+    // Remove link between portal (which is still present) and otherPortal
+    // which is to be removed. Portal used to lead to otherPortal.
+    removePartOfPortalObject: function(portal, otherPortal, worldMap) {
         var worldId = portal.worldId;
+
+        console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
+
+        // Remove screen and subCameras.
+        var currentPortalId = portal.portalId;
+        var otherPortalId = otherPortal.portalId;
+        var screenToBeRemoved = this.getScreen(otherPortalId);
+        var screenToBeAltered = this.getScreen(currentPortalId);
+
+        // 1 portal <=> 1 screen
+        // But beware! 1 portal <=> multiple cameras.
+        // Camera paths are necessary for handling redundancy in portal
+        // chains.
+
+        // TODO [CRIT] a camera must know its full render path.
+        // TODO [CRIT] search in depth and remove every portal in the chain.
+        // TODO [CRIT] remove screen otherWorldId
+        // TODO [CRIT] remove in-depth subCameras.
+        // TODO [CRIT] remove backwards variable
+
+        if (!screenToBeAltered) { console.log('WARN @portals.js: screen to be altered not found.'); }
+        else {
+            screenToBeAltered.setOtherWorldId(null);
+            screenToBeAltered.getRenderTarget().setSize(0, 0);
+            //screenToBeAltered.getMesh().material = new THREE.MeshBasicMaterial({});
+        }
+
+        if (!screenToBeRemoved) { console.log('WARN @portals.js: screen to be removed not found.'); }
+        else {
+            //this.removeScreen(screenToBeRemoved.screenId);
+        }
 
     },
 
-    removePortalObject: function(portal) {
+    // Remove the aforementioned portal.
+    removePortalObject: function(portal, worldMap) {
         var worldId = portal.worldId;
 
+        var currentPortalId = portal.portalId;
+
+        console.log('Removing full portal: p(' + portal.portalId + ')');
+        // TODO [CRIT] search in depth and remove every portal in the chain.
+
+        // 1 screen <-> 1 portal
+        var screenToBeRemoved = this.getScreen(currentPortalId);
+
+        this.removeScreen(screenToBeRemoved.screenId);
     }
 
 });

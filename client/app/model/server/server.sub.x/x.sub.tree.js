@@ -28,24 +28,26 @@ extend(XNode.prototype, {
         return this.childrenArcs.length;
     },
 
-    addExistingChild: function(arcId, node) {
+    addExistingChild: function(arcId, node, xgraph) {
         var arc = new XArc(this, node, arcId);
+        xgraph.setArc(arcId, this);
         node.parentArcs.push(arc);
         this.childrenArcs.push(arc);
         return node;
     },
 
-    addNewChild: function(arcId, nodeId) {
+    addNewChild: function(arcId, nodeId, xgraph) {
         var node = new XNode(nodeId);
         var arc = new XArc(this, node, arcId);
+        xgraph.setArc(arcId, arc);
         node.parentArcs.push(arc);
         this.childrenArcs.push(arc);
         return node;
     },
 
-    getParentArcId: function() {
+    getParentArcs: function() {
         if (this.parentArcs === null) throw('Root has no parent.');
-        return this.parentArcs.getArcId();
+        return this.parentArcs;
     },
 
     getChildrenArcs: function() {
@@ -85,10 +87,18 @@ extend(XArc.prototype, {
 XGraph = function(rootId) {
     this.root = new XNode(rootId, null);
     this.nodes = new Map();
+    this.arcs = new Map();
     this.nodes.set(rootId, this.root);
 };
 
+// Node are used for worlds,
+// Arcs for portals.
 extend(XGraph.prototype, {
+
+    setArc(arcId, arc) {
+        if (this.arcs.has(arcId)) console.log('XGraph: adding an existing arc to the graph.');
+        this.arcs.set(arcId, arc);
+    },
 
     insertNode: function(newArcId, newNodeId, parentNodeId) {
         var node = this.nodes.get(parentNodeId);
@@ -99,9 +109,10 @@ extend(XGraph.prototype, {
 
         var newNode = this.nodes.get(newNodeId);
         if (newNode) {
-            node.addExistingChild(newArcId, newNode);
+            // N.B. graph passed to add arc to model
+            node.addExistingChild(newArcId, newNode, this);
         } else {
-            newNode = node.addNewChild(newArcId, newNodeId);
+            newNode = node.addNewChild(newArcId, newNodeId, this);
             this.nodes.set(newNodeId, newNode);
         }
 
@@ -116,6 +127,88 @@ extend(XGraph.prototype, {
         return this.nodes.get(nodeId);
     },
 
+    // TODO [CRIT] from a given arc, get the minimal path to the root.
+    // applyFromPostion(null, portalId, (arc, path, depth) => { this.paths.push(path); })
+
+    // Given an arc (portal), breadth-first apply a function
+    // that go from it (or the root) to the leaves or to a specified arc id.
+    // Generic BFS.
+    applyFromPosition: function(starterArcId, deepestArcId, callback) {
+        var starterNode = this.root;
+        if (starterArcId) {
+            var starterArc = this.arcs.get(starterArcId);
+            if (!starterArc) { console.log('Error at XGraph: starter arc not found.'); return; }
+            starterNode = starterArc.getChild();
+        }
+
+        var arcMarkers = new Set();
+        var nodeMarkers = new Map();
+        nodeMarkers.set(starterNode.getNodeId(), 0); // node id, depth
+
+        var stack = [];
+        var paths = []; // Arc paths. Nodes are easily deduced.
+        var depths = [];
+
+        var starterArcs = starterNode.childrenArcs;
+        if (!starterArcs) { console.log('XGraph: no arc found.'); return; }
+        starterArcs.forEach(function(arc) {
+            stack.push(arc);
+            paths.push('' + arc.getArcId());
+            depths.push(1);
+        });
+
+        var maxDepth = Number.POSITIVE_INFINITY;
+
+        var head, depth, path;
+        while (stack.length > 0) {
+            // Get current element.
+            head = stack.pop();
+            path = paths.pop();
+            depth = depths.pop();
+
+            var currentId = head.getArcId();
+            arcMarkers.add(currentId);
+            if (currentId === deepestArcId) {
+                maxDepth = depth;
+            }
+
+            var childNode = head.getChild();
+            if (childNode && nodeMarkers.get(childNode.getNodeId()) < depth) continue;
+
+            // Do callback.
+            callback(head, path, depth);
+
+            // Prepare next elements.
+            var newDepth = depth + 1;
+            if (newDepth > maxDepth) continue;
+            // No other arc to process?
+            if (!childNode) continue;
+            // Node was already processed?
+            var testNodeId = childNode.getNodeId();
+            var testRecursedNode = nodeMarkers.get(testNodeId);
+            if (testRecursedNode < newDepth) {
+                // Here, node was already encountered,
+                // so it is marked to avoid 1-step recursion.
+                continue;
+            }
+            nodeMarkers.set(testNodeId, newDepth);
+
+            var childrenArcs = childNode.getChildrenArcs();
+            for (var i = 0, l = childrenArcs.length; i < l; ++i) {
+                var arc = childrenArcs[i];
+
+                var addedArcId = arc.getArcId();
+                if (!arcMarkers.has(addedArcId)) {
+                    stack.push(arc);
+                    depths.push(newDepth);
+                    paths.push(path + ',' + addedArcId);
+                }
+            }
+        }
+
+    },
+
+    // Compute a graph representation, starting from the root. Custom BFS.
     toString: function() {
         var string = '';
         var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd;
@@ -129,7 +222,7 @@ extend(XGraph.prototype, {
         var elementDepths = new Map();
         var processed = false;
 
-        // DFS.
+        // BFS.
         while (queueNodes.length > 0) {
             currentElement = queueNodes.pop();
             currentDepth = queueDepth.pop();

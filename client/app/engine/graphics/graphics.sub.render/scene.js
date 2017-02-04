@@ -71,7 +71,13 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
         });
     },
 
+    removeScreen: function(screenId) {
+        var screen = this.screens.get(screenId);
+        if (!screen) return;
 
+        this.removeObject(screen.getMesh(), screen.getWorldId());
+        this.screens.delete(screenId);
+    }
 
 });
 
@@ -125,8 +131,12 @@ extend(App.Engine.Graphics.prototype, {
         this.subScenes.delete(sceneId);
     },
 
-    getScene: function(sceneId) {
-        return this.sceneManager.getScene(sceneId);
+    getScene: function(sceneId, force) {
+        var scene = this.sceneManager.getScene(sceneId);
+        if (!scene && force) {
+            scene = this.addScene(sceneId);
+        }
+        return scene;
     },
 
     addScreen: function(screenId, screenObject) {
@@ -135,6 +145,10 @@ extend(App.Engine.Graphics.prototype, {
 
     getScreen: function(screenId) {
         return this.sceneManager.screens.get(screenId);
+    },
+
+    removeScreen: function(screenId) {
+        this.sceneManager.removeScreen(screenId);
     }
 
 });

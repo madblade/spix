@@ -15,6 +15,9 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
     pitch.add(camera);
     yaw.add(pitch);
 
+    // 4D logic
+    this.renderPath = '';
+
     // Don't expose these internal variables.
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
     this.pitch = pitch;             // Intermediate (rotation.x)

@@ -48,6 +48,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
 
             var bufferTexture = screen.getRenderTarget();
             if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
+
+            // TODO [CRIT] how to get a camera given its path...
             var bufferCamera = subCameras.get(portalId);
             if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
             bufferCamera = bufferCamera.getRecorder();

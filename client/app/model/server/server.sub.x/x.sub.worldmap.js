@@ -5,6 +5,7 @@
 'use strict';
 
 /*
+ * Does not display stubs.
  *
  *  w0
  *  ├─ w1        | p1 -> p1'
@@ -54,7 +55,6 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
         });
 
         this.xGraph = xGraph;
-        this.needsUpdate = false;
     },
 
     invalidate: function() {

@@ -104,6 +104,7 @@ class Updater {
         // For each player...
         let t = process.hrtime();
         let dt1;
+        let debugThresh = 1000;
         players.forEach(p => { if (p.avatar) {
 
             let pid = p.avatar.id;
@@ -116,7 +117,7 @@ class Updater {
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
             dt1 = (process.hrtime(t)[1]/1000);
-            if (Updater.bench && dt1 > 1000) console.log('\t' + dt1 + ' computeNew Entities.');
+            if (Updater.bench && dt1 > debugThresh) console.log('\t' + dt1 + ' computeNew Entities.');
             t = process.hrtime();
 
             // Compute change for chunks in range.
@@ -125,7 +126,7 @@ class Updater {
             if (v) [addedChunks, removedChunks] = v;
 
             dt1 = (process.hrtime(t)[1]/1000);
-            if (Updater.bench && dt1 > 1000) console.log('\t' + dt1 + ' computeNew Chunks.');
+            if (Updater.bench && dt1 > debugThresh) console.log('\t' + dt1 + ' computeNew Chunks.');
             t = process.hrtime();
 
             let addedX, removedX, addedW,

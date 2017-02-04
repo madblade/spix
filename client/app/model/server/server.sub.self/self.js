@@ -18,6 +18,7 @@ App.Model.Server.SelfModel = function(app) {
 
     // Graphical component.
     var graphics = app.engine.graphics;
+    this.worldNeedsUpdate = false;
     this.needsUpdate = false;
     this.displayAvatar = false;
 
@@ -44,19 +45,25 @@ extend(App.Model.Server.SelfModel.prototype, {
         var avatar = this.avatar;
 
         if (!(graphics.controls) || !avatar) return;
+
+        if (this.worldNeedsUpdate) {
+
+        } else {
+
+        }
+
         var p = avatar.position;
 
         if (up !== null && r !== null && p !== null) {
 
             var animate = p.x !== up[0] || p.y !== up[1];
-            p.x = up[0];
-            p.y = up[1];
-            p.z = up[2];
+            p.x = up[0]; p.y = up[1]; p.z = up[2];
 
             // Notify modules.
             register.updateSelfState({'position': [p.x, p.y, p.z]});
 
             avatar.rotation.y = Math.PI + r[0];
+            // TODO [CRIT] handle world ID change
 
             // Update animation.
             if (animate) graphics.updateAnimation(id);
@@ -65,12 +72,14 @@ extend(App.Model.Server.SelfModel.prototype, {
             graphics.cameraManager.updateCameraPosition(up);
         }
 
+        this.worldNeedsUpdate = false;
         this.needsUpdate = false;
     },
 
-    updateSelf: function(p, r) {
+    updateSelf: function(p, r, w) {
         var pos = this.position;
         var rot = this.rotation;
+        var wid = this.worldId;
         if (!pos || !rot ||
             pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2]
             || rot[0] !== r[0] || rot[1] !== r[1])
@@ -78,6 +87,11 @@ extend(App.Model.Server.SelfModel.prototype, {
             this.position = p;
             this.rotation = r;
             this.needsUpdate = true;
+        }
+
+        if (!wid || wid !== w) {
+            this.worldNeedsUpdate = true;
+            this.worldId = w.toString();
         }
     },
 

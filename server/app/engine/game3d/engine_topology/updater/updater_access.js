@@ -14,6 +14,7 @@ class UpdaterAccess {
         const dimX = world.xSize, dimY = world.ySize, dimZ = world.zSize;
         let chunkCoordinates = world.getChunkCoordinates(x, y, z);
         let chunk = world.getChunk(...chunkCoordinates);
+        let worldId = world.worldId;
 
         let xOnChunk = (x >= 0 ? x : dimX-((-x)%dimX)) % dimX;
         let yOnChunk = (y >= 0 ? y : dimY-((-y)%dimY)) % dimY;
@@ -33,7 +34,7 @@ class UpdaterAccess {
             return;
         }
 
-        if (entityModel.anEntityIsPresentOn(x, y, z))
+        if (entityModel.anEntityIsPresentOn(worldId, x, y, z))
         {
             failure('An entity is present on the block.');
             return false;

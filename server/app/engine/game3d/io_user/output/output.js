@@ -172,7 +172,15 @@ class UserOutput {
             //      null .................. removed entity
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
+            // TODO [HIGH] bundle, detect change.
             p.send('ent', UserOutput.pack([p.avatar.position, p.avatar.rotation, addedOrRemovedEntities]));
+            let av = p.avatar;
+            // Array of [1. position, 2. rotation, 3. worldId] for each world.
+            // First one is the main world.
+            let selfState = [[av.position, av.rotation, av.worldId]];
+            let otherStates = av.otherStates;
+            otherStates.forEach((state, worldId) => selfState.push([state.position, state.rotation, worldId]));
+            p.send('me', UserOutput.pack(selfState));
         });
 
         // Empty entity updates buffer.
@@ -200,7 +208,7 @@ class UserOutput {
             }
         });
 
-        // TODO [HIGH] when x updates are implemented.
+        // TODO [MEDIUM] when x updates are implemented.
         // xEngine.flushOutput();
     }
 

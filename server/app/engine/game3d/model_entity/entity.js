@@ -27,7 +27,11 @@ class Entity {
         this._needsEuler        = true;
 
         // Situation.
+        // Barycenter.
         this._worldId       = -1;
+        // When crossing multiple portals...
+        // 1 state = Object { position:p, rotation:r }
+        this._otherStates = new Map();
     }
 
     get id()                { return this._id; }
@@ -42,6 +46,7 @@ class Entity {
     get mass()              { return this._mass; }
     get _impulseSpeed()     { return this._impulseSpeedStamp; }
     get worldId()           { return this._worldId; }
+    get otherStates()       { return this._otherStates; }
 
     set adherence(na)       { this._adherence = na; }
     set rotation(nr)        { this._rotation = nr; }

@@ -12,12 +12,17 @@ class EntityModel {
     constructor(game) {
         this._game = game;
 
-        // Objects.
+        // Fast register for all entities.
         // TODO [MEDIUM] accessor: LACKS.
         this._entities = new Map();
+
+        // Entity registers are duplicated and refined here.
+        // An entity can be present in distinct worlds.
+        this._worldEntities = new Map();
     }
 
     get entities() { return this._entities; }
+    get worldEntities() { return this._worldEntities; }
 
     forEach(callback) {
         let entities = this._entities;
@@ -29,23 +34,41 @@ class EntityModel {
     spawnPlayer(p) {
         let entities = this._entities;
         let worldModel = this._game.worldModel;
-        let id = CollectionUtil.generateId(entities);
-        p.avatar = EntityFactory.createAvatar(id, this);
+        let playerId = CollectionUtil.generateId(entities);
+        p.avatar = EntityFactory.createAvatar(playerId, this);
+        let avatar = p.avatar;
 
         // TODO [MEDIUM] custom spawn world and location.
         let world = worldModel.getWorld();
-        p.avatar.spawn(world.getFreePosition(), world.worldId);
+        let worldId = world.worldId;
+        avatar.spawn(world.getFreePosition(), worldId);
 
-        entities.set(id, p.avatar);
+        let worldEntities = this._worldEntities.get(worldId);
+        if (!worldEntities) {
+            worldEntities = new Map();
+            worldEntities.set(playerId, avatar);
+            this._worldEntities.set(worldId, worldEntities);
+        } else {
+            worldEntities.set(playerId, avatar);
+        }
+        entities.set(playerId, avatar);
     }
 
     removePlayer(playerId) {
+        let worldEntities = this._worldEntities;
+        let entity = this._entities.get(playerId);
+        let worldId = entity.worldId;
+        let otherStates = entity.otherStates;
+
+        otherStates.forEach((state, wid) => worldEntities.get(wid).delete(playerId));
+        this._worldEntities.get(worldId).delete(playerId);
         this._entities.delete(playerId);
     }
 
-    // TODO [MEDIUM] optimize with LACKS structure.
-    anEntityIsPresentOn(x, y, z) {
-        let entities = this._entities;
+    anEntityIsPresentOn(worldId, x, y, z) {
+        //let entities = this._entities;
+        // TODO [MEDIUM] optimize with LACKS structure.
+        let entities = this._worldEntities.get(worldId);
         let result = false;
         entities.forEach((entity, id) => {
             let p = entity.position;
@@ -55,6 +78,27 @@ class EntityModel {
 
         return result;
     }
+
+    appearInWorld(worldId, entityId) {
+        // All entities are kept in a global register.
+        let currentEntity = this._entities.get(entityId);
+        let entitiesInWorld = this._worldEntities.get(worldId);
+
+        if (!entitiesInWorld) {
+            entitiesInWorld = new Map();
+            entitiesInWorld.set(entityId, currentEntity);
+            this._worldEntities.set(worldId, entitiesInWorld);
+        } else {
+            entitiesInWorld.set(entityId, currentEntity);
+        }
+    }
+
+    disappearFromWorld(worldId, entityId) {
+        let entitiesInWorld = this._worldEntities.get(worldId);
+        if (!entitiesInWorld) return;
+        entitiesInWorld.delete(entityId);
+    }
+
 }
 
 export default EntityModel;

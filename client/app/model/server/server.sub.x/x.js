@@ -60,12 +60,14 @@ extend(App.Model.Server.XModel.prototype, {
                     var position        = meta[9];
                     var orientation     = meta[10];
 
-                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
-                    register.updateSelfState({'diagram': worldMap.invalidate().toString()});
+                    // Do add portal (not that world map is recomputed in process)
+                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation, worldMap);
+                    register.updateSelfState({'diagram': worldMap.toString()});
                 } else {
                     // Null -> remove portal
-                    this.removePortal(portalId);
-                    register.updateSelfState({'diagram': worldMap.invalidate().toString()});
+                    // (world map is recomputed in process)
+                    this.removePortal(portalId, worldMap);
+                    register.updateSelfState({'diagram': worldMap.toString()});
                 }
             }
         }

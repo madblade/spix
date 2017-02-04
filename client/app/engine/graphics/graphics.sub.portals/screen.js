@@ -4,10 +4,11 @@
 
 'use strict';
 
-App.Engine.Graphics.Screen = function(screenId, mesh, renderTarget) {
+App.Engine.Graphics.Screen = function(screenId, mesh, renderTarget, worldId) {
     this.screenId = screenId;
     this.mesh = mesh;
     this.renderTarget = renderTarget;
+    this.worldId = worldId;
     this.otherWorldId = null;
 };
 
@@ -23,6 +24,10 @@ extend(App.Engine.Graphics.Screen.prototype, {
 
     getRenderTarget: function() {
         return this.renderTarget;
+    },
+
+    getWorldId: function() {
+        return this.worldId;
     },
 
     getOtherWorldId: function() {
