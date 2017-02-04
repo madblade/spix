@@ -117,7 +117,7 @@ extend(App.Engine.Graphics.prototype, {
         return sceneManager.addScene(newSceneId);
     },
 
-    // TODO [CRIT] unload portal, screen, shaders.
+    // TODO [HIGH] unload scene.
     forgetScene: function(sceneId) {
         var sceneManager = this.sceneManager;
 

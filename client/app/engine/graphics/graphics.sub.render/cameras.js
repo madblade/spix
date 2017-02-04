@@ -37,6 +37,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
     },
 
     addCamera: function(frameSource, frameDestination) {
+        // TODO [CRIT] this is not valid. Maybe use path as id to limit brain mess.
         var cameraId = frameSource.portalId;
 
         // TODO [CRIT] compute relative positions and rotations.
@@ -64,6 +65,15 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         }
 
         this.graphicsEngine.addToScene(camera.get3DObject(), worldId);
+    },
+
+    // TODO [HIGH] investigate the Camera Path Problem.
+    removeCamera: function(cameraId) {
+
+    },
+
+    removeCameraFromScene: function(cameraId, worldId) {
+
     },
 
     // TODO [HIGH] passify, dont forget raycaster

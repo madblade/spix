@@ -7,7 +7,7 @@
 import InputBuffer      from './input_buffer';
 import OutputBuffer     from './output_buffer';
 
-import Solver           from './solver/solver';
+import FrontEnd         from './solver/frontend';
 import Updater          from './updater/updater';
 
 class PhysicsEngine {
@@ -24,7 +24,7 @@ class PhysicsEngine {
 
         // Engine.
         this._updater       = new Updater(this); // Parses input and updates model constraints.
-        this._solver        = new Solver(this);  // Updates physical model.
+        this._frontend      = new FrontEnd(this);  // Updates physical model.
     }
 
     get entityModel()   { return this._entityModel; }
@@ -38,7 +38,7 @@ class PhysicsEngine {
     update() {
         this._updater.update(this._inputBuffer.getInput());
 
-        this._solver.solve();
+        this._frontend.solve();
 
         this._inputBuffer.flush();
     }
@@ -52,7 +52,7 @@ class PhysicsEngine {
     }
 
     shuffleGravity() {
-        this._solver.shuffleGravity();
+        this._frontend.shuffleGravity();
     }
 
 }

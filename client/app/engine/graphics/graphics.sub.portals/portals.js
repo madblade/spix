@@ -141,8 +141,9 @@ extend(App.Engine.Graphics.prototype, {
         if (!screenToBeAltered) { console.log('WARN @portals.js: screen to be altered not found.'); }
         else {
             screenToBeAltered.setOtherWorldId(null);
+            // Tweak to prevent weird stuff when a portal camera has been unloaded but
+            // the rendered texture is still displaying the last rendered frame.
             screenToBeAltered.getRenderTarget().setSize(0, 0);
-            //screenToBeAltered.getMesh().material = new THREE.MeshBasicMaterial({});
         }
 
         if (!screenToBeRemoved) { console.log('WARN @portals.js: screen to be removed not found.'); }

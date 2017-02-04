@@ -4,9 +4,9 @@
 
 'use strict';
 
-import Newton from './newton/engine';
+import RigidBodies from './rigid_bodies/engine';
 
-class Solver {
+class FrontEnd {
 
     constructor(physicsEngine) {
         // Models.
@@ -26,15 +26,15 @@ class Solver {
 
     solve() {
         let Δt = process.hrtime(this._stamp)[1];
-        Newton.solve(this, Δt);
+        RigidBodies.solve(this, Δt);
         this._stamp = process.hrtime();
     }
 
     shuffleGravity() {
-        let g = Newton.gravity;
-        Newton.gravity = [g[2], g[0], g[1]];
+        let g = RigidBodies.gravity;
+        RigidBodies.gravity = [g[2], g[0], g[1]];
     }
 
 }
 
-export default Solver;
+export default FrontEnd;

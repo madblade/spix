@@ -16,21 +16,30 @@ class Integrator {
         return vector3a[0] === vector3b[0] && vector3a[1] === vector3b[1] && vector3a[2] === vector3b[2];
     }
 
+    // Returns true when an entity has updated.
     static updatePosition(dt, impulseSpeed, force, entity, EM, world) {
 
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
-        let hasUpdated;
+        let newPosition;
 
         if (Integrator.isNull(entity.acceleration)) {
             //console.log('Euler');
-            hasUpdated = Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, world);
+            newPosition = Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, world);
+            if (!newPosition) return false;
+
+            // Update properties, phase 2.
+            TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
+            return true;
+
         } else {
             //console.log('Leapfrog');
-            hasUpdated = Integrator.integrateLeapfrog(dt, impulseSpeed, force, entity, EM, world);
-        }
+            newPosition = Integrator.integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, EM, world);
+            if (!newPosition) return false;
 
-        return hasUpdated;
+            let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt)
+            return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, EM, world, hasCollided);
+        }
     }
 
     // First-order integrator
@@ -76,18 +85,14 @@ class Integrator {
         let newPosition = [position[0], position[1], position[2]];
         for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * speed[i] * dt;
 
-        // Update properties, phase 2.
-        TerrainCollider.linearCollide(entity, world, position, newPosition, dt);
-
         // Notify an entity was updated.
-        return true;
+        return newPosition;
     }
 
     // Second-order integrator (time-reversible, symplectic)
     // @returns {boolean} whether entity has updated
-    static integrateLeapfrog(dt, impulseSpeed, force, entity, EM, world) {
-        let mass = entity.mass;
-
+    //static integrateLeapfrog(dt, impulseSpeed, force, entity, EM, world) {
+    static integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, EM, world) {
         let position = entity.position;
         let speed = entity.speed;
         let acceleration = entity.acceleration;
@@ -99,13 +104,17 @@ class Integrator {
 
         // Guess new position without constraints.
         let newPosition = [position[0], position[1], position[2]];
-        for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * dt * (speed[i]+acceleration[i]*dt*0.5);
+        for (let i = 0; i < 3; ++i) newPosition[i] += 0.1 * dt * (speed[i] + acceleration[i] * dt * 0.5);
 
         // Detect change in position.
         if (Integrator.areEqual(newPosition, position))
             return false;
 
-        if (TerrainCollider.linearCollide(entity, world, position, newPosition, dt)) {
+        return newPosition;
+    }
+
+    static integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, EM, world, hasCollided) {
+        if (hasCollided) {
             // entity.speed = determined by the collider
             // entity.acceleration[2] = -0.11;
             //let newAcceleration = [0, 0, 0];
@@ -115,6 +124,10 @@ class Integrator {
             entity.speed[1] = entity._impulseSpeed[1];
 
         } else {
+
+            let mass = entity.mass;
+            let speed = entity.speed;
+            let acceleration = entity.acceleration;
 
             // Update acceleration
             let newAcceleration = [0, 0, 0];

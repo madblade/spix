@@ -6,7 +6,7 @@
 
 import Integrator from './integrator';
 
-class Newton {
+class RigidBodies {
 
     static globalTimeDilatation = 20000000;
     //static globalTimeDilatation = 3000000;
@@ -19,7 +19,7 @@ class Newton {
         let WM = physicsEngine.worldModel; // TODO [HIGH] worldify, sort/optimize in entityModel.
         let o  = physicsEngine.outputBuffer;
 
-        let dt = Δt/Newton.globalTimeDilatation;
+        let dt = Δt/RigidBodies.globalTimeDilatation;
         if (dt > 5.0) {
             dt = 5.0;
         }
@@ -31,7 +31,7 @@ class Newton {
             const world = WM.getWorld(worldId);
 
             entityMap.forEach((entity, entityId) => {
-                const entityUpdated = Newton.linearSolve(entity, EM, world, dt);
+                const entityUpdated = RigidBodies.linearSolve(entity, EM, world, dt);
 
                 if (entityUpdated) {
                     o.entityUpdated(entityId);
@@ -67,11 +67,11 @@ class Newton {
         var force = [0, 0, 0];
         var hasUpdated = false;
 
-        Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+        RigidBodies.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
-        Newton.sumGlobalFields(force, pos, entity);
+        RigidBodies.sumGlobalFields(force, pos, entity);
 
-        // Newton.sumLocalFields(force, pos, EM);
+        // RigidBodies.sumLocalFields(force, pos, EM);
 
         hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world);
 
@@ -87,11 +87,11 @@ class Newton {
         var force = [0, 0, 0];
         var hasUpdated = false;
 
-        Newton.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+        RigidBodies.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
 
-        Newton.sumGlobalFields(force, pos, entity);
+        RigidBodies.sumGlobalFields(force, pos, entity);
 
-        Newton.sumLocalFields(force, pos, EM);
+        RigidBodies.sumLocalFields(force, pos, EM);
 
         // TODO [HIGH] manage collisions
 
@@ -149,13 +149,13 @@ class Newton {
         } else {
             if (ds[4]&&!ds[5]) {
                 for (let i = 0; i<3; ++i) {
-                    if (Newton.gravity[i] < 0 && entity.adherence[i]) {
+                    if (RigidBodies.gravity[i] < 0 && entity.adherence[i]) {
                         entity.acceleration[i] = 3.3/dt;
                         entity.jump(i); // In which direction I jump
                     }
                 }
                 for (let i = 3; i<6; ++i) {
-                    if (Newton.gravity[i-3] > 0 && entity.adherence[i]) {
+                    if (RigidBodies.gravity[i-3] > 0 && entity.adherence[i]) {
                         entity.acceleration[i-3] = -3.3/dt;
                         entity.jump(i); // In which direction I jump
                     }
@@ -167,25 +167,25 @@ class Newton {
         desiredSpeed[1] *= 0.65;
         desiredSpeed[2] *= 0.65;
 
-        Newton.add(speed, desiredSpeed);
+        RigidBodies.add(speed, desiredSpeed);
     }
 
     static sumGlobalFields(force, pos, entity) {
         // Gravity
-        let grav = Newton.gravity;
+        let grav = RigidBodies.gravity;
         let m = entity.mass;
         var sum = [grav[0]*m, grav[1]*m, grav[2]*m];
 
         // sum[2] = 0; // ignore grav
 
-        Newton.add(force, sum);
+        RigidBodies.add(force, sum);
     }
 
     static sumLocalFields(force, pos, EM) {
         var sum = [0, 0, 0];
-        Newton.add(force, sum);
+        RigidBodies.add(force, sum);
     }
 
 }
 
-export default Newton;
+export default RigidBodies;
