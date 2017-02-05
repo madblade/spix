@@ -11,6 +11,7 @@ App.Model.Server = function(app) {
     this.chunkModel     = new App.Model.Server.ChunkModel(app);
     this.entityModel    = new App.Model.Server.EntityModel(app);
     this.xModel         = new App.Model.Server.XModel(app, this.selfModel);
+    this.selfModel.xModel = this.xModel;
 
     this.isRunning = false;
 };

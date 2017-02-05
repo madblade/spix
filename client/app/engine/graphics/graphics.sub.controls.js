@@ -11,7 +11,6 @@ extend(App.Engine.Graphics.prototype, {
         var selfModel = this.app.model.server.selfModel;
         var worldId = selfModel.worldId;
 
-        // TODO [CRIT] passify switch camera listeners.
         this.controls = controlsEngine.getControls('first-person');
 
         this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);

@@ -34,6 +34,11 @@ App.Model.Server.XModel.WorldMap = function(xModel) {
 
 extend(App.Model.Server.XModel.WorldMap.prototype, {
 
+    switchRoot: function(oldRootId, newRootId) {
+        this.xGraph.switchRoot(oldRootId, newRootId);
+        this.invalidate();
+    },
+
     computeWorldMap: function() {
         var portals = this.xModel.portals;
         var starterWorldId = this.xModel.selfModel.worldId;

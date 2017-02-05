@@ -94,6 +94,12 @@ extend(App.Model.Server.XModel.prototype, {
     updateX: function(data) {
         this.xUpdates.push(data);
         this.needsUpdate = true;
+    },
+
+    switchAvatarToWorld: function(oldWorldId, newWorldId) {
+        oldWorldId = parseInt(oldWorldId);
+        newWorldId = parseInt(newWorldId);
+        this.worldMap.switchRoot(oldWorldId, newWorldId);
     }
 
 });

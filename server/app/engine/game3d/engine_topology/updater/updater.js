@@ -25,8 +25,6 @@ class Updater {
             let worldId = avatar.worldId;
             if (!worldId) return; // Avatar was disconnected between input & update.
 
-            console.log('input on world ' + worldId);
-
             let meta = data.meta;
             let action = meta[0];
 

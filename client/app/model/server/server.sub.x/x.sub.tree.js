@@ -127,8 +127,33 @@ extend(XGraph.prototype, {
         return this.nodes.get(nodeId);
     },
 
-    // TODO [CRIT] from a given arc, get the minimal path to the root.
-    // applyFromPostion(null, portalId, (arc, path, depth) => { this.paths.push(path); })
+    switchRoot: function(oldRootId, newRootId) {
+        // Allow only 1-length switch at a time.
+        var oldRoot = this.root;
+        if (oldRoot.getNodeId() !== oldRootId) {
+            console.log('XGraph Error: trying to switch from invalid root.');
+            return;
+        }
+
+        var children = oldRoot.getChildrenArcs();
+        if (!children) return; // No other world.
+
+        var currentArc, currentNode, currentNodeId;
+        for (var cid = 0, nbc = children.length; cid < nbc; ++cid) {
+            currentArc = children[cid];
+            currentNode = currentArc.getChild();
+            if (!currentNode) continue;
+
+            currentNodeId = currentNode.getNodeId();
+            if (currentNodeId === newRootId) {
+                // Do switch root with corresponding node.
+
+                console.log('FOUND ROOT');
+                this.root = currentNode;
+                break;
+            }
+        }
+    },
 
     // Given an arc (portal), breadth-first apply a function
     // that go from it (or the root) to the leaves or to a specified arc id.

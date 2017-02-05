@@ -6,6 +6,7 @@
 
 App.Model.Server.SelfModel = function(app) {
     this.app = app;
+    this.xModel = null;
 
     // General.
     this.entityId = '-1';     // Self default
@@ -50,7 +51,8 @@ extend(App.Model.Server.SelfModel.prototype, {
         if (this.worldNeedsUpdate && this.oldWorldId) {
             // TODO [CRIT] switch scenes.
             graphics.switchToScene(this.oldWorldId, this.worldId);
-            //graphics.switchToCamera(this.oldWorldId, this.worldId);
+            this.xModel.switchAvatarToWorld(this.oldWorldId, this.worldId);
+            register.updateSelfState({'diagram': this.xModel.worldMap.toString()});
         }
 
         var p = avatar.position;
@@ -64,7 +66,6 @@ extend(App.Model.Server.SelfModel.prototype, {
             register.updateSelfState({'position': [p.x, p.y, p.z]});
 
             avatar.rotation.y = Math.PI + r[0];
-            // TODO [CRIT] handle world ID change
 
             // Update animation.
             if (animate) graphics.updateAnimation(id);
