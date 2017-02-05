@@ -40,11 +40,6 @@ class XCollider {
                     fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
                     fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
 
-                    //console.log('#');
-                    //console.log(op);
-                    //console.log(np);
-                    //console.log(fx0+','+fx1+','+fy0+','+fy1+','+fz0+','+fz1);
-
                     if ((op[0] > fx0 && np[0] < fx1 || op[0] < fx0 && np[0] > fx1) &&
                         op[1] > fy0 && op[1] < fy1 && np[1] > fy0 && np[1] < fy1 &&
                         op[2]+.5 > fz0 && op[2] < fz1 && np[2]+.5 > fz0 && np[2] < fz1

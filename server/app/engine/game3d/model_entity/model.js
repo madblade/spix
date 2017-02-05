@@ -71,6 +71,7 @@ class EntityModel {
         // TODO [MEDIUM] optimize with LACKS structure.
         let entities = this._worldEntities.get(worldId);
         let result = false;
+        if (!entities) return result;
         entities.forEach((entity, id) => {
             let p = entity.position;
             if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)

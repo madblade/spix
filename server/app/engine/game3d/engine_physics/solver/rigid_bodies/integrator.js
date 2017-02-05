@@ -37,7 +37,6 @@ class Integrator {
                 let newWorldId = xCrossed.worldId;
                 world = WM.getWorld(newWorldId);
                 entity.worldId = newWorldId;
-                console.log('crossed world');
             }
 
             // Update properties, phase 2.
@@ -56,7 +55,6 @@ class Integrator {
                 let newWorldId = xCrossed.worldId;
                 world = WM.getWorld(newWorldId);
                 entity.worldId = newWorldId;
-                console.log('crossed world');
             }
 
             let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);

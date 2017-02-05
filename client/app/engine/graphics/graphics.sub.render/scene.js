@@ -38,9 +38,10 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
         this.subScenes.delete(sceneId);
         this.addScene(oldMainSceneId, oldMainScene);
 
-        var mainCameraId = cameraManager.mainCamera.getCameraId();
-        cameraManager.removeCameraFromScene(mainCameraId, oldMainSceneId);
-        cameraManager.addCameraToScene(mainCameraId, sceneId);
+        cameraManager.switchMainCameraToWorld(oldMainSceneId, sceneId);
+        //var mainCameraId = cameraManager.mainCamera.getCameraId();
+        //cameraManager.removeCameraFromScene(mainCameraId, oldMainSceneId);
+        //cameraManager.addCameraToScene(mainCameraId, sceneId);
     },
 
     addObject: function(object, sceneId) {

@@ -88,6 +88,18 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId);
     },
 
+    switchMainCameraToWorld: function(oldMainSceneId, sceneId) {
+        var mainCamera = this.mainCamera;
+        var mainRaycasterCamera = this.mainRaycasterCamera;
+        var graphics = this.graphicsEngine;
+
+        graphics.removeFromScene(mainCamera.get3DObject(), oldMainSceneId);
+        graphics.removeFromScene(mainRaycasterCamera.get3DObject(), oldMainSceneId);
+
+        graphics.addToScene(mainCamera.get3DObject(), sceneId);
+        graphics.addToScene(mainRaycasterCamera.get3DObject(), sceneId);
+    },
+
     // TODO [HIGH] passify, dont forget raycaster
     switchToCamera: function(oldWorldId, newWorldId) {
         //var newMainCamera = this.subCameras.get(newMainCameraId);

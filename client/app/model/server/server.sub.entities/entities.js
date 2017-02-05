@@ -62,7 +62,7 @@ extend(App.Model.Server.EntityModel.prototype, {
         if (currentEntity.getWorldId() !== worldId) {
             graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
             currentEntity.setWorldId(worldId);
-            graphics.addToScene(currentEntity.getObject3D(), currentEntity.getWorldId());
+            graphics.addToScene(currentEntity.getObject3D(), worldId);
         }
 
         // Update current "live" entities.

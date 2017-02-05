@@ -21,6 +21,14 @@ class GeometryUtils {
         return result;
     };
 
+    static entitySquaredTransEuclideanDistance(entityX, entityY) {
+        // Every world is a parallel leaf.
+        let result = 0; let d;
+        let pX = entityX.position, pY = entityY.position;
+        for (let i = 0; i<3; ++i) { d = pX[i]-pY[i]; result += d*d; }
+        return result;
+    }
+
     static entitySquaredEuclideanDistance(entityX, entityY) {
         // Two entities on different worlds are considered infinitely far.
         if (entityX.worldId !== entityY.worldId) return Number.POSITIVE_INFINITY;

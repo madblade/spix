@@ -21,12 +21,15 @@ class EntityLoader {
 
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
-        let distance = GeometryUtils.entitySquaredEuclideanDistance;
+
+        let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
+        // TODO [HIGH] compute entity distance as chunk distance
+        // let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         // TODO [LACKS] optim O(n²) -> O(Cn)
         entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
-                entities[eid] = {p:e.position, r:e.rotation, k:e.kind};
+                entities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
         }});
 
         // TODO [HIGH] worldify: compute entities on loaded chunks.
@@ -43,7 +46,8 @@ class EntityLoader {
         thresh *= thresh; // Squared distance.
 
         // TODO [HIGH] also compute entities on loaded chunks.
-        let distance = GeometryUtils.entitySquaredEuclideanDistance;
+        //let distance = GeometryUtils.entitySquaredEuclideanDistance;
+        let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
 
         var addedEntities = {};
         var removedEntities = {};
