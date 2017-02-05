@@ -17,6 +17,7 @@ class RigidBodies {
 
         let EM = physicsEngine.entityModel;
         let WM = physicsEngine.worldModel; // TODO [HIGH] worldify, sort/optimize in entityModel.
+        let XM = physicsEngine.xModel;
         let o  = physicsEngine.outputBuffer;
 
         let dt = Δt/RigidBodies.globalTimeDilatation;
@@ -31,7 +32,7 @@ class RigidBodies {
             const world = WM.getWorld(worldId);
 
             entityMap.forEach((entity, entityId) => {
-                const entityUpdated = RigidBodies.linearSolve(entity, EM, world, dt);
+                const entityUpdated = RigidBodies.linearSolve(entity, EM, WM, XM, world, dt);
 
                 if (entityUpdated) {
                     o.entityUpdated(entityId);
@@ -58,7 +59,9 @@ class RigidBodies {
         // Manage fragmentation
     }
 
-    static linearSolve(entity, EM, world, dt) {
+    static linearSolve(entity, EM, WM, XM, world, dt) {
+        if (!entity || !entity.rotation) return;
+
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
@@ -73,12 +76,12 @@ class RigidBodies {
 
         // RigidBodies.sumLocalFields(force, pos, EM);
 
-        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, WM, XM, world);
 
         return hasUpdated;
     }
 
-    static quadraticSolve(entity, EM, world, dt) {
+    static quadraticSolve(entity, EM, WM, XM, world, dt) {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
@@ -95,7 +98,7 @@ class RigidBodies {
 
         // TODO [HIGH] manage collisions
 
-        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world);
+        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, EM, world, XM);
 
         return hasUpdated;
     }

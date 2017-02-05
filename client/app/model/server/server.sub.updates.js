@@ -18,7 +18,7 @@ extend(App.Model.Server.prototype, {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 
-        this.entityModel.updateEntities(data[2]);
+        this.entityModel.updateEntities(data);
     },
 
     updateChunks: function(data) {

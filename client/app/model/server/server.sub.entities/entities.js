@@ -37,23 +37,33 @@ extend(App.Model.Server.EntityModel.prototype, {
 
     removeEntity: function(id, graphics, entities) {
         var entity = entities.get(id);
-        // TODO [CRIT] worldify entities.
-        graphics.removeFromScene(entity);
+        graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
         entities.delete(id);
     },
 
+    // TODO [HIGH] an entity model...
     updateEntity: function(id, currentEntity, updatedEntity, graphics, entities) {
         // Update positions and rotation
-        var p = currentEntity.position;
+        var object3D = currentEntity.getObject3D();
+
+        var p = object3D.position;
         var up = updatedEntity.p;
         var animate = p.x !== up[0] || p.y !== up[1];
         p.x = up[0];
         p.y = up[1];
         p.z = up[2];
-        currentEntity.rotation.y = Math.PI + updatedEntity.r[0];
+        object3D.rotation.y = Math.PI + updatedEntity.r[0];
 
         // Update animation
         if (animate) graphics.updateAnimation(id);
+
+        // Switch worlds.
+        var worldId = parseInt(updatedEntity.w);
+        if (currentEntity.getWorldId() !== worldId) {
+            graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
+            currentEntity.setWorldId(worldId);
+            graphics.addToScene(currentEntity.getObject3D(), currentEntity.getWorldId());
+        }
 
         // Update current "live" entities.
         entities.set(id, currentEntity);

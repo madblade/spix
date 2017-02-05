@@ -61,7 +61,8 @@ class EntityModel {
         let otherStates = entity.otherStates;
 
         otherStates.forEach((state, wid) => worldEntities.get(wid).delete(playerId));
-        this._worldEntities.get(worldId).delete(playerId);
+        let worldEntitiesInWorld = this._worldEntities.get(worldId);
+        if (worldEntitiesInWorld) worldEntitiesInWorld.delete(playerId);
         this._entities.delete(playerId);
     }
 

@@ -60,13 +60,15 @@ class EntityLoader {
             let isPresent = consistencyModel.hasEntity(aid, eid);
 
             if (isInRange && !isPresent)
-                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind};
+                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
+                // TODO [MEDIUM] manage transition several world ids.
 
             else if (!isInRange && isPresent)
                 removedEntities[eid] = null;
 
             else if (isInRange && updatedEntities.has(eid))
-                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind};
+                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
+                // TODO [MEDIUM] manage transition several world ids.
         }});
 
         removedPlayers.forEach(eid => {

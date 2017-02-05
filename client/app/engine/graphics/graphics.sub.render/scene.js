@@ -27,7 +27,8 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
     },
 
     // Switch main scene with some scene that must be in this.subScenes
-    switchToScene: function(sceneId) {
+    switchToScene: function(sceneId, cameraManager) {
+        sceneId = parseInt(sceneId);
         var newMainScene = this.subScenes.get(sceneId);
         if (!newMainScene) { console.log('Failed to switch to scene ' + sceneId); return; }
         var oldMainScene = this.mainScene;
@@ -36,6 +37,10 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
         this.mainScene = newMainScene;
         this.subScenes.delete(sceneId);
         this.addScene(oldMainSceneId, oldMainScene);
+
+        var mainCameraId = cameraManager.mainCamera.getCameraId();
+        cameraManager.removeCameraFromScene(mainCameraId, oldMainSceneId);
+        cameraManager.addCameraToScene(mainCameraId, sceneId);
     },
 
     addObject: function(object, sceneId) {
@@ -149,6 +154,11 @@ extend(App.Engine.Graphics.prototype, {
 
     removeScreen: function(screenId) {
         this.sceneManager.removeScreen(screenId);
+    },
+
+    switchToScene: function(oldSceneId, newSceneId) {
+        console.log('Switching from ' + oldSceneId + ' to ' + newSceneId);
+        this.sceneManager.switchToScene(newSceneId, this.cameraManager);
     }
 
 });

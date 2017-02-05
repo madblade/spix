@@ -53,6 +53,10 @@ extend(App.Engine.UI.prototype, {
                     clientModel.triggerEvent('a', 'g');
                     break;
 
+                case k.leftHandNorthWest: // A
+                    // TODO debug here
+                    break;
+
                 case k.enter:
                     /*
                      TODO for chat:

@@ -29,6 +29,7 @@ class PhysicsEngine {
 
     get entityModel()   { return this._entityModel; }
     get worldModel()    { return this._worldModel; }
+    get xModel()        { return this._xModel; }
     get outputBuffer()  { return this._outputBuffer; }
 
     addInput(meta, avatar) {

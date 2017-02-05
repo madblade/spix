@@ -9,12 +9,13 @@ extend(App.Model.Server.EntityModel.prototype, {
     loadPlayer: function(id, updatedEntity, graphics, entities) {
 
         graphics.initializeEntity(id, 'steve', function(createdEntity) {
-            var object3d = graphics.finalizeEntity(id, createdEntity);
 
-            // TODO [CRIT] worldify entities.
-            graphics.addToScene(object3d, -1);
+            var object3D = graphics.finalizeEntity(id, createdEntity);
 
-            this.updateEntity(id, object3d, updatedEntity, graphics, entities);
+            var entity = new App.Model.Server.EntityModel.Entity(object3D, parseInt(updatedEntity.w));
+            graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+
+            this.updateEntity(id, entity, updatedEntity, graphics, entities);
             this.entitiesLoading.delete(id);
 
         }.bind(this));

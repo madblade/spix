@@ -15,6 +15,7 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 
     // Cameras.
     this.mainCamera = this.createCamera(false);
+    this.mainCamera.setCameraId(-1);
     this.subCameras = new Map();
 
     this.mainRaycasterCamera = this.createCamera(true);
@@ -49,6 +50,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
 
         var mainCamera = this.mainCamera;
         var camera = this.createCamera(false);
+        camera.setCameraId(cameraId);
         this.subCameras.set(cameraId, camera);
 
         var mainPosition = mainCamera.getCameraPosition();
@@ -59,6 +61,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
 
     addCameraToScene: function(cameraId, worldId) {
         var camera = this.subCameras.get(cameraId);
+        if (!camera && cameraId === this.mainCamera.getCameraId())
+            camera = this.mainCamera;
         if (!camera) {
             console.log('Could not get wrapper for camera ' + cameraId);
             return;
@@ -73,16 +77,25 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
     },
 
     removeCameraFromScene: function(cameraId, worldId) {
+        var camera = this.subCameras.get(cameraId);
+        if (!camera && cameraId === this.mainCamera.getCameraId())
+            camera = this.mainCamera;
+        if (!camera) {
+            console.log('Could not get wrapper for camera ' + cameraId);
+            return;
+        }
 
+        this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId);
     },
 
     // TODO [HIGH] passify, dont forget raycaster
-    switchToCamera: function(cameraId) {
-        var newMainCamera = this.subCameras.get(cameraId);
-        if (!newMainCamera) { console.log('Failed to switch with camera ' + cameraId); return; }
-        var oldMainCamera = this.mainCamera;
+    switchToCamera: function(oldWorldId, newWorldId) {
+        //var newMainCamera = this.subCameras.get(newMainCameraId);
+        //if (!newMainCamera) { console.log('Failed to switch with camera ' + newMainCameraId); return; }
+        //var oldMainCamera = this.mainCamera;
 
-        this.mainCamera = newMainCamera;
+        //this.mainCamera = newMainCamera;
+        //this.subCameras.set(oldMainCameraId, oldMainCamera);
     },
 
     // Update.
@@ -189,6 +202,10 @@ extend(App.Engine.Graphics.prototype, {
 
     getCameraCoordinates: function() {
         return this.cameraManager.mainCamera.getCameraPosition();
+    },
+
+    switchToCamera: function(oldId, newId) {
+        return this.cameraManager.switchToCamera(oldId, newId);
     }
 
 });

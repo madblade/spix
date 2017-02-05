@@ -10,6 +10,7 @@ App.Model.Server.SelfModel = function(app) {
     // General.
     this.entityId = '-1';     // Self default
     this.worldId = '-1';      // Overworld default
+    this.oldWorldId = null;
 
     // Model component.
     this.position = null;
@@ -46,10 +47,10 @@ extend(App.Model.Server.SelfModel.prototype, {
 
         if (!(graphics.controls) || !avatar) return;
 
-        if (this.worldNeedsUpdate) {
-
-        } else {
-
+        if (this.worldNeedsUpdate && this.oldWorldId) {
+            // TODO [CRIT] switch scenes.
+            graphics.switchToScene(this.oldWorldId, this.worldId);
+            //graphics.switchToCamera(this.oldWorldId, this.worldId);
         }
 
         var p = avatar.position;
@@ -77,6 +78,8 @@ extend(App.Model.Server.SelfModel.prototype, {
     },
 
     updateSelf: function(p, r, w) {
+        w = w.toString();
+
         var pos = this.position;
         var rot = this.rotation;
         var wid = this.worldId;
@@ -91,7 +94,8 @@ extend(App.Model.Server.SelfModel.prototype, {
 
         if (!wid || wid !== w) {
             this.worldNeedsUpdate = true;
-            this.worldId = w.toString();
+            this.oldWorldId = this.worldId;
+            this.worldId = w;
         }
     },
 

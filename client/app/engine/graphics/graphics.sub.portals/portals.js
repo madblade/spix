@@ -54,10 +54,11 @@ extend(App.Engine.Graphics.prototype, {
             });
             var mesh = new THREE.Mesh(geometry, material);
 
-            mesh.position.x = tempPosition[0] + 0.5;
-            mesh.position.y = tempPosition[1];
+            mesh.position.x = tempPosition[0] + 0.999;
+            mesh.position.y = tempPosition[1] + 0.5;
             mesh.position.z = tempPosition[2] + 1;
             mesh.rotation.x = Math.PI/2;
+            mesh.rotation.y = Math.PI/2;
 
             screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture, worldId);
             this.addScreen(portalId, screen);

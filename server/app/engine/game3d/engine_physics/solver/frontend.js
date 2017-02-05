@@ -12,6 +12,7 @@ class FrontEnd {
         // Models.
         this._entityModel   = physicsEngine.entityModel;
         this._worldModel    = physicsEngine.worldModel;
+        this._xModel        = physicsEngine.xModel;
 
         // Output.
         this._outputBuffer  = physicsEngine.outputBuffer;
@@ -22,6 +23,7 @@ class FrontEnd {
 
     get entityModel()   { return this._entityModel; }
     get worldModel()    { return this._worldModel; }
+    get xModel()        { return this._xModel; }
     get outputBuffer()  { return this._outputBuffer; }
 
     solve() {

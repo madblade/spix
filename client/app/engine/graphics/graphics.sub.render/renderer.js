@@ -33,6 +33,11 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         var mainScene = sceneManager.mainScene;
         var mainCamera = cameraManager.mainCamera.getRecorder();
         renderer.render(mainScene, mainCamera);
+        //try {
+        //} catch (e) {
+        //    console.log('##');
+        //    console.log(e.stack);
+        //}
 
         // Render every portal.
         var subScenes = sceneManager.subScenes;
@@ -76,7 +81,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             // Do render.
             renderer.render(bufferScene, bufferCamera, bufferTexture);
 
-            if (otherEnd) sceneManager.addObject(otherEnd, bufferSceneId);
+            // TODO [CRIT] fix this stuff
+            //if (otherEnd) sceneManager.addObject(otherEnd, bufferSceneId);
             ++renderCount;
         });
 

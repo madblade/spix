@@ -22,7 +22,7 @@ class XModel {
         this._knots = new Map();
         this._portals = new Map();
 
-        // world id => [map: chunk id => array of portals]
+        // world id => [map: chunk id => set of portal ids]
         // TODO [LONG-TERM] optimize by sorting.
         this._worldToChunksToPortals = new Map();
 
@@ -35,6 +35,8 @@ class XModel {
     }
 
     static debug = false;
+
+    get portals() { return this._portals; }
 
     /** Create / link **/
 

@@ -5,6 +5,7 @@
 'use strict';
 
 import TerrainCollider from '../collision/terrain';
+import XCollider from '../collision/x';
 
 class Integrator {
 
@@ -17,7 +18,7 @@ class Integrator {
     }
 
     // Returns true when an entity has updated.
-    static updatePosition(dt, impulseSpeed, force, entity, EM, world) {
+    static updatePosition(dt, impulseSpeed, force, entity, EM, WM, XM, world) {
 
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
@@ -28,8 +29,20 @@ class Integrator {
             newPosition = Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, world);
             if (!newPosition) return false;
 
+            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, XM);
+            if (xCrossed) {
+                // TODO [CRIT] use the following
+                // xCrossed.chunkId;
+                // xCrossed.state;
+                let newWorldId = xCrossed.worldId;
+                world = WM.getWorld(newWorldId);
+                entity.worldId = newWorldId;
+                console.log('crossed world');
+            }
+
             // Update properties, phase 2.
             TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
+
             return true;
 
         } else {
@@ -37,8 +50,18 @@ class Integrator {
             newPosition = Integrator.integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, EM, world);
             if (!newPosition) return false;
 
-            let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt)
+            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, XM);
+            if (xCrossed) {
+                // TODO [CRIT] repair
+                let newWorldId = xCrossed.worldId;
+                world = WM.getWorld(newWorldId);
+                entity.worldId = newWorldId;
+                console.log('crossed world');
+            }
+
+            let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
             return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, EM, world, hasCollided);
+
         }
     }
 

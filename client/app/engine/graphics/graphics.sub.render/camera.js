@@ -17,6 +17,7 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
 
     // 4D logic
     this.renderPath = '';
+    this.cameraId = null;
 
     // Don't expose these internal variables.
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
@@ -25,6 +26,14 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
 };
 
 extend(App.Engine.Graphics.Camera.prototype, {
+
+    setCameraId: function(cameraId) {
+        this.cameraId = cameraId;
+    },
+
+    getCameraId: function() {
+        return this.cameraId;
+    },
 
     getRecorder: function() {
         return this.cameraObject;

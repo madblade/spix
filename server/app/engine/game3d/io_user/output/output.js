@@ -173,7 +173,7 @@ class UserOutput {
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
             // TODO [HIGH] bundle, detect change.
-            p.send('ent', UserOutput.pack([p.avatar.position, p.avatar.rotation, addedOrRemovedEntities]));
+            p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
             // Array of [1. position, 2. rotation, 3. worldId] for each world.
             // First one is the main world.
