@@ -28,6 +28,7 @@ class XCollider {
 
             let sum = 0 + (x1 === x0) + (y1 === y0) + (z1 === z0);
             // TODO [CRIT] fix that asap.
+            // TODO [CRIT] compute intersection point (or locigally test for it)
             if (sum !== 2) {
                 console.log('XCollide error: portal orientation could not be determined: ' + sum);
             }
@@ -42,8 +43,9 @@ class XCollider {
 
                     if ((op[0] > fx0 && np[0] < fx1 || op[0] < fx0 && np[0] > fx1) &&
                         op[1] > fy0 && op[1] < fy1 && np[1] > fy0 && np[1] < fy1 &&
-                        op[2]+.5 > fz0 && op[2] < fz1 && np[2]+.5 > fz0 && np[2] < fz1
-                    ) {
+                        op[2]+.5 > fz0 && op[2]+.5 < fz1 && np[2]+.5 > fz0 && np[2]+.5 < fz1
+                       )
+                    {
                         // Do collide & change world
                         // TODO [CRIT] Manage collisions with things on the other side.
                         return xModel.getOtherSide(xId);
@@ -51,11 +53,34 @@ class XCollider {
 
                     return false;
 
-                // TODO [HIGH] implement there, then implement wiser
+                // TODO [HIGH] implement wiser
                 case 'y':
+                    fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1);
+                    fy0 = y0 + p;               fy1 = fy0;
+                    fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1);
+
+                    if (op[0] > fx0 && op[0] < fx1 && np[0] > fx0 && np[0] < fx1 &&
+                        (op[1] > fy0 && np[1] < fy1 || op[1] < fy0 && np[1] > fy1) &&
+                        op[2]+.5 > fz0 && op[2]+.5 < fz1 && np[2]+.5 > fz0 && np[2]+.5 < fz1
+                       )
+                    {
+                        return xModel.getOtherSide(xId);
+                    }
+
                     return false;
 
                 case 'z':
+                    fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1);
+                    fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1);
+                    fz0 = z0 + p;               fz1 = fz0;
+
+                    if (op[0] > fx0 && op[0] < fx1 && np[0] > fx0 && np[0] < fx1 &&
+                        op[1] > fy0 && op[1] < fy1 && np[1] > fy0 && np[1] < fy1 &&
+                        (op[2]+.5 < fz0 && np[2]+.5 > fz1 || op[2]+.5 > fz0 && np[2]+.5 < fz1)
+                       )
+                    {
+                        return xModel.getOtherSide(xId);
+                    }
 
                     return false;
                 default:

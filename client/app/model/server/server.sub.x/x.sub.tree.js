@@ -147,8 +147,6 @@ extend(XGraph.prototype, {
             currentNodeId = currentNode.getNodeId();
             if (currentNodeId === newRootId) {
                 // Do switch root with corresponding node.
-
-                console.log('FOUND ROOT');
                 this.root = currentNode;
                 break;
             }

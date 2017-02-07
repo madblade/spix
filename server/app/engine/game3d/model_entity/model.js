@@ -31,6 +31,24 @@ class EntityModel {
         });
     }
 
+    setWorldForEntity(entity, newWorldId) {
+        let entityId = entity.id;
+        let worldId = entity.worldId;
+        entity.worldId = newWorldId;
+
+        let worldIdToEntities = this._worldEntities.get(worldId);
+        if (worldIdToEntities) worldIdToEntities.delete(entityId);
+
+        let newWorldIdToEntities = this._worldEntities.get(newWorldId);
+        if (newWorldIdToEntities) {
+            newWorldIdToEntities.set(entityId, entity);
+        } else {
+            newWorldIdToEntities = new Map();
+            newWorldIdToEntities.set(entityId, entity);
+            this._worldEntities.set(newWorldId, newWorldIdToEntities);
+        }
+    }
+
     spawnPlayer(p) {
         let entities = this._entities;
         let worldModel = this._game.worldModel;

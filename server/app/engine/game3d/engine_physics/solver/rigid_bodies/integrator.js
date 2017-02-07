@@ -35,8 +35,7 @@ class Integrator {
                 // xCrossed.chunkId;
                 // xCrossed.state;
                 let newWorldId = xCrossed.worldId;
-                world = WM.getWorld(newWorldId);
-                entity.worldId = newWorldId;
+                EM.setWorldForEntity(entity, newWorldId);
             }
 
             // Update properties, phase 2.
@@ -51,10 +50,8 @@ class Integrator {
 
             let xCrossed = XCollider.xCollide(entity.position, newPosition, world, XM);
             if (xCrossed) {
-                // TODO [CRIT] repair
                 let newWorldId = xCrossed.worldId;
-                world = WM.getWorld(newWorldId);
-                entity.worldId = newWorldId;
+                EM.setWorldForEntity(entity, newWorldId);
             }
 
             let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);

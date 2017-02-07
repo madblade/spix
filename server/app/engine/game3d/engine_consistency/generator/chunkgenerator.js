@@ -29,12 +29,13 @@ class ChunkGenerator {
         //GenTest.testMerge(c);
         //GenSimple.fillChunk(c, 40, 1);
         //GenAnalytic.waveChunk(c, 40, 48, 1);
-        try {
+        //try {
             // GenPerlin.perlinGeneration(c);
-            GenSimplePerlin.simplePerlinGeneration(c, false, world.worldId);
-        } catch (e) {
-            console.log(e.stack);
-        }
+        let shuffleChunks = true;
+        GenSimplePerlin.simplePerlinGeneration(c, shuffleChunks, world.worldId);
+        //} catch (e) {
+        //    console.log(e.stack);
+        //}
 
         return c;
     }
