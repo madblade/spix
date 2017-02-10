@@ -19,6 +19,7 @@ class UpdaterAccess {
         let xOnChunk = (x >= 0 ? x : dimX-((-x)%dimX)) % dimX;
         let yOnChunk = (y >= 0 ? y : dimY-((-y)%dimY)) % dimY;
         let zOnChunk = (z >= 0 ? z : dimZ-((-z)%dimZ)) % dimZ;
+        //console.log(xOnChunk + ',' + yOnChunk + ',' + zOnChunk);
 
         let coordsOnChunk = [xOnChunk, yOnChunk, zOnChunk];
 

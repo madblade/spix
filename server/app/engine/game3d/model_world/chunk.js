@@ -72,7 +72,11 @@ class Chunk {
 
     _toId(x, y, z) {
         var id = x + y * this._xSize + z * this._xSize * this._ySize;
-        if (id >= this._capacity) console.log("chunk._toId: invalid request coordinates.");
+        if (id >= this._capacity) {
+            console.log('chunk._toId: invalid request coordinates: ' + x + ',' + y + ',' + z + ' -> ' + id);
+            let e = new Error();
+            console.log(e.stack);
+        }
         return id;
     }
 

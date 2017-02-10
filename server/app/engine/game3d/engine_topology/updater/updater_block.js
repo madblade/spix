@@ -19,6 +19,7 @@ class UpdaterBlock {
     }
 
     // The difficulty is to keep layered surfaceBlocks sorted.
+    // TODO [HIGH] I am quite sure this does not work at all.
     static updateSurfaceBlocksAfterAddition(chunk, id, x, y, z) {
         let surfaceBlocks = chunk.surfaceBlocks;
         let dimensions = chunk.dimensions;

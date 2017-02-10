@@ -71,6 +71,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             var otherScreen = screens.get(portal.portalLinkedForward);
             var otherEnd = null;
             if (otherScreen) otherEnd = otherScreen.getMesh();
+            // TODO [CRIT] put that on world map eval...
+            // TODO [CRIT] fix border effect: third person mesh
             if (otherEnd) sceneManager.removeObject(otherEnd, bufferSceneId);
 
             // Do render.

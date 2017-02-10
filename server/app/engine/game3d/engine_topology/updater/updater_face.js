@@ -5,6 +5,7 @@
 'use strict';
 
 import CollectionUtils from '../../../math/collections';
+import CSFX from '../../engine_consistency/builder/surface_faces_builder'; // Get linkage strategy.
 
 class UpdaterFace {
 
@@ -231,7 +232,9 @@ class UpdaterFace {
             if (fid === -1) continue;
 
             // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
-            const componentId = oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent;
+            const componentId = CSFX.forceOneComponentPerChunk ? 1 :
+                (oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent);
+
             if (fastComponents[componentId] === undefined) {
                 // TODO check in divide...
                 // TODO check borders with this approach
@@ -443,7 +446,7 @@ class UpdaterFace {
 
         if (z === dimensions[2] - 1) {
             let wOrigin = chunk.what(x, y, z);
-            let w = chunk.neighbourContains(x, y, z + 1);
+            let w = chunk.neighbourWhat(x, y, z + 1);
             if (!isAddition) {
                 w *= -1;
                 wOrigin *= -1;

@@ -50,9 +50,14 @@ extend(App.Model.Server.SelfModel.prototype, {
 
         if (this.worldNeedsUpdate && this.oldWorldId) {
             // TODO [CRIT] switch scenes.
-            graphics.switchToScene(this.oldWorldId, this.worldId);
-            this.xModel.switchAvatarToWorld(this.oldWorldId, this.worldId);
-            register.updateSelfState({'diagram': this.xModel.worldMap.toString()});
+            var xModel = this.xModel;
+            var worldId = this.worldId;
+
+            if (this.displayAvatar) graphics.removeFromScene(this.avatar, this.oldWorldId);
+            graphics.switchToScene(this.oldWorldId, worldId);
+            xModel.switchAvatarToWorld(this.oldWorldId, worldId);
+            if (this.displayAvatar) graphics.addToScene(this.avatar, worldId);
+            register.updateSelfState({'diagram': xModel.worldMap.toString()});
         }
 
         var p = avatar.position;
