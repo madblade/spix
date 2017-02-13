@@ -56,10 +56,17 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
             forwardPortal = portals.get(forwardPortalId);
             if (!forwardPortal) return;
             forwardWorldId = forwardPortal.worldId;
-            xGraph.insertNode(parseInt(portalId), parseInt(forwardWorldId), parseInt(currentWorldId));
+            xGraph.insertNode(parseInt(portalId), parseInt(forwardPortalId),
+                parseInt(forwardWorldId), parseInt(currentWorldId)
+            );
         });
 
         this.xGraph = xGraph;
+        return this;
+    },
+
+    computeRenderingGraph: function() {
+        return this.xGraph.computeFlatGraph();
     },
 
     invalidate: function() {
@@ -70,7 +77,7 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
     // Representation
     renderString: function() {
         this.computeWorldMap();
-        this.string = this.xGraph.toString();
+        this.string = this.xGraph.computeFlatGraph().toString();
         this.needsUpdate = false;
         return this.string;
     },

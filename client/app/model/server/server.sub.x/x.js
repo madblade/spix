@@ -42,6 +42,7 @@ extend(App.Model.Server.XModel.prototype, {
         var register = this.app.register;
         var worldMap = this.worldMap;
         var updates = this.xUpdates;
+        var refreshWorldMap = false;
 
         for (var i = 0, l = updates.length; i < l; ++i) {
             var data = updates[i];
@@ -61,15 +62,25 @@ extend(App.Model.Server.XModel.prototype, {
                     var orientation     = meta[10];
 
                     // Do add portal (not that world map is recomputed in process)
+                    // TODO [CRIT] decouple
+                    worldMap.invalidate().computeWorldMap();
                     this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation, worldMap);
-                    register.updateSelfState({'diagram': worldMap.toString()});
+                    refreshWorldMap = true;
                 } else {
                     // Null -> remove portal
                     // (world map is recomputed in process)
+                    // TODO [CRIT] decouple
+                    worldMap.invalidate().computeWorldMap();
                     this.removePortal(portalId, worldMap);
-                    register.updateSelfState({'diagram': worldMap.toString()});
+                    refreshWorldMap = true;
                 }
             }
+        }
+
+        if (refreshWorldMap) {
+            var s = worldMap.invalidate().computeWorldMap().computeRenderingGraph().toString();
+            register.updateSelfState({'diagram': s});
+            worldMap.xGraph.computeRenderingGraph();
         }
 
         this.xUpdates = [];

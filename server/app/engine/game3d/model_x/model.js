@@ -47,6 +47,12 @@ class XModel {
         let portals = this._portals;
         let worldToChunksToPortals = this._worldToChunksToPortals;
 
+        // TODO [HIGH] determine a free position
+        //while ((!world.isFree([x1, y1, z1]) || !world.isFree([x2, y2, z2])) && z2 < world.zSize) {
+        //    z1++; z2++;
+        //}
+        //if (z2 >= world.zSize) return;
+
         // Check parameters.
         // Orientation should be correct.
         if (orientation !== '+' && orientation !== '-' && orientation !== 'both') return;

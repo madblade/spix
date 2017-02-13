@@ -89,6 +89,9 @@ XGraph = function(rootId) {
     this.nodes = new Map();
     this.arcs = new Map();
     this.nodes.set(rootId, this.root);
+
+    // Flat version going from root, linked to rendering graph strategy.
+    this.flatGraph = [];
 };
 
 // Node are used for worlds,
@@ -100,7 +103,9 @@ extend(XGraph.prototype, {
         this.arcs.set(arcId, arc);
     },
 
-    insertNode: function(newArcId, newNodeId, parentNodeId) {
+    insertNode: function(newArcId, forwardArcId, newNodeId, parentNodeId) {
+        newArcId = newArcId + ',' + forwardArcId;
+
         var node = this.nodes.get(parentNodeId);
         if (!node) {
             node = new XNode(parentNodeId, null);
@@ -231,84 +236,137 @@ extend(XGraph.prototype, {
 
     },
 
-    // Compute a graph representation, starting from the root. Custom BFS.
     toString: function() {
         var string = '';
-        var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd;
+        var flatGraph = this.flatGraph;
+
+        var currentStep;
+        for (var i = 0, l = flatGraph.length; i < l; ++i) {
+            currentStep = flatGraph[i];
+            // 0: depth
+            // 1: type
+            //      green: regular arc
+            //      cyan: involution (the same pid as previously leads to the previous wid)
+            //      orange: denote an independent cycle
+            //      red: denote a dependant cycle (higher order involution)
+            // 2: pid
+            // 3: wid origin
+            // 4: wid destination
+
+            var dep = currentStep.depth;
+            var mod = currentStep.type;
+            var por = currentStep.pid;
+            var ori = currentStep.origin;
+            var ele = currentStep.destination;
+
+            for (var j = 0, d = dep; j < d; ++j) string += '\u00a0';
+            string += mod + ' w.' + ori + 'w.{' + ele + '} p.' + por;
+            string += '\n';
+        }
+
+        return string;
+    },
+
+    computeRenderingGraph: function() {
+        var flatGraph = this.flatGraph;
+        var currentStep;
+        var st = '';
+        for (var i = 0, l = flatGraph.length; i < l; ++i) {
+            currentStep = flatGraph[i];
+            st+=currentStep.path+'\n';
+        }
+        console.log(st);
+    },
+
+    // Compute a graph representation, starting from the root. Custom BFS.
+    computeFlatGraph: function() {
+        var flatGraph = [];
+        var currentStep;
+
+        var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd, currentPath;
         var marks = new Set(); // Verification.
+        var markedPaths = new Set();
         var queueNodes = [this.root];
         var queueOtherEnds = [null];
 
         var currentDepth = 0;
+        var queuePaths = [''];
         var queueDepth = [currentDepth];
         var queueArcs = [null];
         var elementDepths = new Map();
         var processed = false;
 
-        // BFS.
+        // DFS.
         while (queueNodes.length > 0) {
             currentElement = queueNodes.pop();
             currentDepth = queueDepth.pop();
             currentArc = queueArcs.pop();
+            currentPath = queuePaths.pop();
             currentOtherEnd = queueOtherEnds.pop();
             currentElementId = currentElement.getNodeId();
 
             if (currentArc) {
                 currentArcId = currentArc.getArcId();
 
-                var modifier = '';
+                currentStep = {};
                 processed = marks.has(currentElementId);
                 if (processed) {
+                    // Locate where destination world last was.
                     var formerDepth = elementDepths.get(currentElementId);
-                    if (formerDepth === currentDepth - 2) { modifier = 'cyan'; }
-                    else if (formerDepth < currentDepth - 2) { modifier = 'red'; }
-                    else if (formerDepth >= currentDepth - 1) { modifier = 'orange'; }
-                } else { modifier = 'lime'; }
 
-                var offset = '';
-                for (var o = 0; o<currentDepth; ++o) {
-                    if (o === currentDepth - 1) {
-                        if (queueDepth.indexOf(currentDepth) > -1) {
-                            offset+='├';
-                        } else {
-                            offset+='└';
-                        }
-                        offset+='─';
-                    } else {
-                        if (queueDepth.indexOf(o) > -1) {
-                            offset+='|';
-                        } else {
-                            if (queueDepth.indexOf(o+1) > -1) {
-                                offset+='\u00a0|\u00a0';
-                            } else {
-                                offset+='\u00a0\u00a0\u00a0';
-                            }
-                        }
+                    // Detect direct involution.
+                    var b = currentPath.split(';'); var c = b.pop().split(',').reverse(); b.pop(); b.push(c);
+                    var directInvolutionPath = b.join(';');
+                    if (markedPaths.has(directInvolutionPath)) {
+                        currentStep.type = 'cyan';
+                    }
+
+                    // TODO [CRIT] detect through another path.
+                    // Detect cycles
+                    else if (formerDepth < currentDepth - 1) {
+                        currentStep.type = 'red';
+                    } else if (formerDepth >= currentDepth - 1) {
+                        currentStep.type = 'orange';
                     }
                 }
-                if (string.length > 1) string += '\n';
-                var origin = '';
-                if (currentOtherEnd) origin += 'w.' + currentOtherEnd.getNodeId()+'...';
-                string += offset + modifier + ' ' + origin + 'w.{' + currentElementId + '} p.' + currentArcId;
+                // Regular path (at first pass)
+                else {
+                    currentStep.type = 'lime';
+                }
+
+                currentStep.depth = currentDepth;
+                if (currentOtherEnd)
+                    currentStep.origin = currentOtherEnd.getNodeId();
+                currentStep.destination = currentElementId;
+                currentStep.pid = currentArcId;
+                currentStep.path = currentPath; // Without the last pid.
+
+                flatGraph.push(currentStep);
             }
 
             if (!processed) {
                 // Mark and go next.
-                elementDepths.set(currentElementId, currentDepth);
+                if (currentDepth < elementDepths.get(currentElementId))
+                    elementDepths.set(currentElementId, currentDepth);
                 marks.add(currentElementId);
+                markedPaths.add(currentPath);
+
                 var nextDepth = currentDepth + 1;
                 var childrenArcs = currentElement.getChildrenArcs();
                 for (var i = 0, l = childrenArcs.length; i < l; ++i) {
                     var arc = childrenArcs[i];
                     queueArcs.push(arc);
                     queueNodes.push(arc.getChild());
+                    if (currentPath.length > 0) currentPath += ';';
+                    queuePaths.push(currentPath + arc.getArcId());
                     queueDepth.push(nextDepth);
                     queueOtherEnds.push(arc.getParent());
                 }
             }
         }
 
-        return string;
+        this.flatGraph = flatGraph;
+        return this;
     }
 
 });

@@ -57,7 +57,11 @@ extend(App.Model.Server.SelfModel.prototype, {
             graphics.switchToScene(this.oldWorldId, worldId);
             xModel.switchAvatarToWorld(this.oldWorldId, worldId);
             if (this.displayAvatar) graphics.addToScene(this.avatar, worldId);
-            register.updateSelfState({'diagram': xModel.worldMap.toString()});
+
+            var worldMap = xModel.worldMap;
+            var s = worldMap.invalidate().computeWorldMap().computeRenderingGraph().toString();
+            register.updateSelfState({'diagram': s});
+            worldMap.xGraph.computeRenderingGraph();
         }
 
         var p = avatar.position;
