@@ -70,7 +70,7 @@ extend(App.Engine.Graphics.prototype, {
     },
 
     // portal linked forward to otherPortal
-    completeStubPortalObject: function(portal, otherPortal) {
+    completeStubPortalObject: function(portal, otherPortal, cameraPath, cameraTransform) {
         var worldId = portal.worldId;
         var portalId = portal.portalId;
 
@@ -92,27 +92,17 @@ extend(App.Engine.Graphics.prototype, {
         screen.setOtherWorldId(otherWorldId);
         screen.getRenderTarget().setSize(window.innerWidth, window.innerHeight);
 
-        //var pathsToPortal = [];
-        //worldMap.xGraph.applyFromPosition(null, portalId, function(portal, path, depth) {
-        //    pathsToPortal.push(path);
-        //});
-        //console.log(pathsToPortal);
-        
         // TODO [CRIT] add several times with different paths.
         // TODO [CRIT] compute all paths.
         // TODO [CRIT] DON'T ACCOUNT for portals that are too far away!
         // TODO [CRIT] that's how many camera paths I'll have to add until the leaves.
-        this.cameraManager.addCamera(portal, otherPortal);
-        this.cameraManager.addCameraToScene(portalId, worldId);
-
-        // var scene = this.getScene(otherWorldId);
+        this.cameraManager.addCamera(portal, otherPortal, cameraPath, cameraTransform);
+        this.cameraManager.addCameraToScene(cameraPath, worldId);
     },
 
-    addPortalObject: function(portal, otherPortal) {
-        var worldId = portal.worldId;
-
+    addPortalObject: function(portal, otherPortal, cameraPath, cameraTransform) {
         this.addStubPortalObject(portal);
-        this.completeStubPortalObject(portal, otherPortal);
+        this.completeStubPortalObject(portal, otherPortal, cameraPath, cameraTransform);
     },
 
     // Remove link between portal (which is still present) and otherPortal

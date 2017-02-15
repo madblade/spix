@@ -7,8 +7,11 @@
 App.Engine.Graphics.RendererManager = function() {
     // Cap number of passes.
     this.renderMax = Number.POSITIVE_INFINITY;
-
+    
     this.renderer = this.createRenderer();
+
+    // Lightweight screen, camera and scene manager for portals.
+    this.renderRegister = [];
 };
 
 extend(App.Engine.Graphics.RendererManager.prototype, {
@@ -25,9 +28,14 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         return renderer;
     },
 
+    setRenderRegister: function(renderRegister) {
+        this.renderRegister = renderRegister;  
+    },
+
     // TODO [CRIT] remove this portal dependency
     render: function(sceneManager, cameraManager, portals) {
         var renderer = this.renderer;
+        var renderRegister = this.renderRegister;
 
         // Render first pass.
         var mainScene = sceneManager.mainScene;
@@ -35,56 +43,44 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         renderer.render(mainScene, mainCamera);
 
         // Render every portal.
-        var subScenes = sceneManager.subScenes;
-        var subCameras = cameraManager.subCameras;
-        var screens = sceneManager.screens;
         var renderCount = 0;
         var renderMax = this.renderMax;
-
-        screens.forEach(function(screen, portalId) {
-            if (!screen.isLinked()) { console.log('Not rendering screen ' + portalId); return; }
-
-            if (renderCount > renderMax) return;
-
-            var bufferTexture = screen.getRenderTarget();
-            if (!bufferTexture) { console.log('Could not get matching RTT.'); return; }
-
-            // TODO [CRIT] how to get a camera given its path...
-            var bufferCamera = subCameras.get(portalId);
-            if (!bufferCamera) { console.log('Could not get matching camera.'); return; }
-            bufferCamera = bufferCamera.getRecorder();
-            var bufferSceneId = screen.getOtherWorldId();
-            var bufferScene = subScenes.get(bufferSceneId);
-            if (!bufferScene) {
-                // Happens when current portal is a stub.
-                 console.log('Could not get matching scene: ' + bufferSceneId);
-                return;
+        
+        var currentPass, screen1, screen2, scene, camera;
+        var bufferScene, bufferCamera, bufferTexture;
+        var otherEnd, otherSceneId;
+        for (var i = 0, n = renderRegister.length; i < n; ++i) {
+            if (renderCount++ > renderMax) break;
+            
+            currentPass = renderRegister[i];
+            screen1 = currentPass.screen1;
+            screen2 = currentPass.screen2;
+            camera = currentPass.camera;
+            
+            bufferScene = currentPass.scene;
+            bufferCamera = camera.getRecorder();
+            bufferTexture = screen1.getRenderTarget();
+            
+            if (!bufferScene)   { console.log('Could not get buffer scene.'); 
+                // Sometimes the x model would be initialized before the w model.
+                if (currentPass.sceneId) { currentPass.scene = sceneManager.getScene(currentPass.sceneId); }
+                continue;
             }
-
-            // Before a portal P1 render, we must ensure that its other end P2
-            // is removed from the matching scene.
-            // 1 World <-> 1 Scene
-            // 1 Scene <-> multiple portals, so we have to remove 1 port
-            // and put it back after every render.
-            var portal = portals.get(portalId);
-            if (!portal) return;
-            var otherScreen = screens.get(portal.portalLinkedForward);
-            var otherEnd = null;
-            if (otherScreen) otherEnd = otherScreen.getMesh();
-            // TODO [CRIT] put that on world map eval...
-            // TODO [CRIT] fix border effect: third person mesh
-            if (otherEnd) sceneManager.removeObject(otherEnd, bufferSceneId);
-
-            // Do render.
+            if (!bufferCamera)  { console.log('Could not get buffer camera.'); continue; }
+            if (!bufferTexture) { console.log('Could not get buffer texture.'); continue; }
+            
+            if (screen2) {
+                otherSceneId = currentPass.sceneId;
+                otherEnd = screen2.getMesh();
+                sceneManager.removeObject(otherEnd, otherSceneId);
+            }
+            
             renderer.render(bufferScene, bufferCamera, bufferTexture);
-
-            // TODO [CRIT] fix this stuff
-            //if (otherEnd) sceneManager.addObject(otherEnd, bufferSceneId);
-            ++renderCount;
-        });
-
-        // TODO [HIGH] sort rendering textures according to positions in World Model.
-        // renderer.render(bufferScene, camera, bufferTexture);
+            
+            if (screen2) {    
+                sceneManager.addObject(otherEnd, otherSceneId);
+            }
+        }
 
         // Render second pass (avoid portal texture lags).
         if (renderCount > 0)

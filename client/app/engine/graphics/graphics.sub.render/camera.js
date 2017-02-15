@@ -16,10 +16,12 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     yaw.add(pitch);
 
     // 4D logic
-    this.rotTransform = [0, 0, 0];
-    this.posTransform = [0, 0, 0];
-    this.cameraId = null;
     this.worldId = worldId;
+    this.cameraId = null;
+    this.cameraTransform = [
+        0, 0, 0,    // Pos transform 
+        0, 0, 0     // Rot transform
+    ];
 
     // Don't expose these internal variables.
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
@@ -91,9 +93,12 @@ extend(App.Engine.Graphics.Camera.prototype, {
         yaw.position.z = z;
     },
     
-    setTransform: function(rot, pos) {
-        this.rotTransform = rot;
-        this.posTransform = pos;
+    setCameraTransform: function(cameraTransform) {
+        this.cameraTransform = cameraTransform;
+    },
+
+    getCameraTransform: function() {
+        return this.cameraTransform;
     },
 
     setFirstPerson: function() {

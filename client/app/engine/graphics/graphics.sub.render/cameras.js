@@ -38,9 +38,10 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             worldId);
     },
 
-    addCamera: function(frameSource, frameDestination) {
+    addCamera: function(frameSource, frameDestination, cameraPath, cameraTransform) {
         // TODO [CRIT] this is not valid. Maybe use path as id to limit brain mess.
-        var cameraId = frameSource.portalId;
+        //var cameraId = frameSource.portalId;
+        var cameraId = cameraPath;
 
         // TODO [CRIT] compute relative positions and rotations.
 
@@ -52,6 +53,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         var mainCamera = this.mainCamera;
         var camera = this.createCamera(false);
         camera.setCameraId(cameraId);
+        camera.setCameraTransform(cameraTransform);
         this.subCameras.set(cameraId, camera);
 
         var mainPosition = mainCamera.getCameraPosition();
@@ -67,7 +69,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
         if (!camera) {
-            console.log('Could not get wrapper for camera ' + cameraId);
+            console.log('@addCamera: could not get wrapper for camera ' + cameraId);
             return;
         }
         
@@ -86,7 +88,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
         if (!camera) {
-            console.log('Could not get wrapper for camera ' + cameraId);
+            console.log('@removeCamera: could not get wrapper for camera ' + cameraId);
             return;
         }
 

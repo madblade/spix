@@ -302,14 +302,16 @@ extend(XGraph.prototype, {
         // So reorder rendering phase according to camera depths.
 
         var currentStep, originWid, destinationWid, originPid, destinationPid;
-        var widPath, pidPath, depth;
+        var widPath, pidPathString, pidPath, depth;
+        var cameraTransform;
         for (var i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];
             originWid       = currentStep.origin;
             destinationWid  = currentStep.destination;
             originPid       = parseInt(currentStep.pid.split(',')[0]);
             destinationPid  = parseInt(currentStep.pid.split(',')[1]);
-            pidPath         = currentStep.path.split(';');
+            pidPathString   = currentStep.path;
+            pidPath         = pidPathString.split(';');
             widPath         = currentStep.wpath.split(';');
             depth           = currentStep.depth;
 
@@ -325,9 +327,29 @@ extend(XGraph.prototype, {
                         console.log('Problem while adding portal ' + originPid + ' / ' + destinationPid);
                         console.log('Origin: ' + p1 + ', Destination ' + p2); continue;
                     }
-                    graphicsEngine.addPortalObject(p1, p2);
-                    renderRegister.push({ depth: depth,  });
-                    // TODO [CRIT] here
+                    console.log(originPid + ' -> ' + destinationPid);
+                    console.log(originWid + ' -> ' + destinationWid);
+                    
+                    // Compute cameraTransform
+                    cameraTransform = [
+                        0, 0, 0, // pos
+                        0, 0, 0
+                    ]; // rot
+                    for (var pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
+                        var currentP = pidPath[pathId][0];
+                        // TODO [CRIT] compute transform
+                    }
+                    
+                    graphicsEngine.addPortalObject(p1, p2, pidPathString, cameraTransform);
+                    renderRegister.push({ 
+                        depth: depth, 
+                        screen1: screens.get(originPid),
+                        screen2: screens.get(destinationPid),
+                        sceneId: destinationWid,
+                        scene: scenes.get(destinationWid),
+                        camera: cameras.get(pidPathString)
+                    });
+                    
                 break;
                 
                 case 'orange':
@@ -361,6 +383,9 @@ extend(XGraph.prototype, {
 
         // Sort in reverse order! (high depth to low depth).
         renderRegister.sort(function(a, b) { return a.depth < b.depth });
+        
+        // Update renderer.
+        graphicsEngine.rendererManager.setRenderRegister(renderRegister);
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.
