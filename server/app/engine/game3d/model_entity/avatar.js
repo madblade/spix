@@ -17,7 +17,7 @@ class Avatar extends Entity {
         // Counted as a number of chunks.
         this._chunkRenderDistance = 5;
         this._chunkUnloadDistance = 5;
-        this._portalRenderDistance = 2;
+        this._portalRenderDistance = 3;
 
         // Counted as a number of blocks.
         this._entityRenderDistance = 2*8;

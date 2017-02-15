@@ -48,7 +48,6 @@ extend(App.Model.Server.SelfModel.prototype, {
         if (!(graphics.controls) || !avatar) return;
 
         if (this.worldNeedsUpdate && this.oldWorldId) {
-            // TODO [CRIT] switch scenes.
             var xModel = this.xModel;
             var worldId = this.worldId;
             var oldWorldId = this.oldWorldId;

@@ -32,15 +32,13 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         this.renderRegister = renderRegister;  
     },
 
-    // TODO [CRIT] remove this portal dependency
-    render: function(sceneManager, cameraManager, portals) {
+    render: function(sceneManager, cameraManager) {
         var renderer = this.renderer;
         var renderRegister = this.renderRegister;
 
         // Render first pass.
         var mainScene = sceneManager.mainScene;
         var mainCamera = cameraManager.mainCamera.getRecorder();
-        renderer.render(mainScene, mainCamera);
 
         // Render every portal.
         var renderCount = 0;
@@ -77,14 +75,12 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             
             renderer.render(bufferScene, bufferCamera, bufferTexture);
             
-            if (screen2) {    
+            if (screen2) {
                 sceneManager.addObject(otherEnd, otherSceneId);
             }
         }
 
-        // Render second pass (avoid portal texture lags).
-        if (renderCount > 0)
-            renderer.render(mainScene, mainCamera);
+        renderer.render(mainScene, mainCamera);
     },
 
     resize: function(width, height) {

@@ -43,12 +43,9 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
         var portals = this.xModel.portals;
         var starterWorldId = this.xModel.selfModel.worldId;
 
-        // Map worlds to portals.
-        // var worldIdToPortalId = this.worldToPortals;
         var xGraph = new XGraph(parseInt(starterWorldId));
 
         var forwardPortalId, forwardPortal, forwardWorldId, currentWorldId;
-
         portals.forEach(function(portal, portalId) {
             currentWorldId = portal.worldId;
             forwardPortalId = portal.portalLinkedForward;
@@ -56,9 +53,14 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
             forwardPortal = portals.get(forwardPortalId);
             if (!forwardPortal) return;
             forwardWorldId = forwardPortal.worldId;
-            xGraph.insertNode(parseInt(portalId), parseInt(forwardPortalId),
-                parseInt(forwardWorldId), parseInt(currentWorldId)
+            
+            xGraph.insertNode(
+                parseInt(portalId), 
+                parseInt(forwardPortalId),
+                parseInt(forwardWorldId), 
+                parseInt(currentWorldId)
             );
+            
         });
 
         this.xGraph = xGraph;

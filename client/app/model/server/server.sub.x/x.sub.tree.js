@@ -488,11 +488,12 @@ extend(XGraph.prototype, {
                     queueArcs.push(arc);
                     queueNodes.push(arc.getChild());
 
-                    if (currentPidPath.length > 0) currentPidPath += ';';
-                    queuePidPaths.push(currentPidPath + arc.getArcId());
+                    var sep = '';
+                    if (currentPidPath.length > 0 && arc.getArcId()) sep = ';';
+                    queuePidPaths.push(currentPidPath + sep + arc.getArcId());
 
-                    if (currentWidPath.length > 0) currentWidPath += ';';
-                    queueWidPaths.push(currentWidPath + currentElementId);
+                    if (currentWidPath.length > 0 && currentElementId.length > 0) sep = ';';
+                    queueWidPaths.push(currentWidPath + sep + currentElementId);
 
                     queueDepth.push(nextDepth);
                     queueOtherEnds.push(arc.getParent());

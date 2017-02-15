@@ -60,15 +60,11 @@ extend(App.Model.Server.XModel.prototype, {
                     var orientation     = meta[10];
 
                     // Do add portal (not that world map is recomputed in process)
-                    // TODO [CRIT] decouple
-                    //worldMap.invalidate().computeWorldMap();
                     this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
                     refreshWorldMap = true;
+                    
                 } else {
                     // Null -> remove portal
-                    // (world map is recomputed in process)
-                    // TODO [CRIT] decouple
-                    worldMap.invalidate().computeWorldMap();
                     this.removePortal(portalId);
                     refreshWorldMap = true;
                 }

@@ -7,7 +7,6 @@
 extend(App.Engine.UI.prototype, {
 
     getFirstPersonControls: function() {
-        var clientModel = this.app.model.client;
         var graphics = this.app.engine.graphics;
 
         var scope = this;
@@ -17,9 +16,9 @@ extend(App.Engine.UI.prototype, {
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
             // TODO [MEDIUM] differentiate controls type in graphics
-            var rotation = graphics.cameraManager.moveCameraFromMouse(movementX, movementY);
-
-            clientModel.triggerEvent('r', [rotation[0], rotation[1]]);
+            
+            //var rotation = graphics.cameraManager.moveCameraFromMouse(movementX, movementY);
+            graphics.cameraManager.addCameraRotationEvent(movementX, movementY);
         };
 
         return {

@@ -20,6 +20,8 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 
     this.mainRaycasterCamera = this.createCamera(true, -1);
     this.raycaster = this.createRaycaster();
+    
+    this.incomingRotationEvents = [];
 };
 
 // Factory.
@@ -39,8 +41,6 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
     },
 
     addCamera: function(frameSource, frameDestination, cameraPath, cameraTransform) {
-        // TODO [CRIT] this is not valid. Maybe use path as id to limit brain mess.
-        //var cameraId = frameSource.portalId;
         var cameraId = cameraPath;
 
         // TODO [CRIT] compute relative positions and rotations.
@@ -140,6 +140,26 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
                 cam.setCameraPosition(x, y, z+0.2);
                 cam.setThirdPerson();
             });
+        }
+    },
+    
+    addCameraRotationEvent: function(eventX, eventY) {
+        this.incomingRotationEvents.push([eventX, eventY]);
+    },
+    
+    refresh: function() {
+        var incoming = this.incomingRotationEvents;
+        var rotation;
+        for (var i = 0, l = incoming.length; i < l; ++i) {
+            //console.log(incoming[0]+','+incoming[1]);
+            rotation = this.moveCameraFromMouse(incoming[i][0], incoming[i][1]);
+        }
+        this.incomingRotationEvents = [];
+
+        // TODO [LOW] put somewhere else
+        if (rotation) {
+            var clientModel = this.graphicsEngine.app.model.client;
+            clientModel.triggerEvent('r', [rotation[0], rotation[1]]);
         }
     },
 

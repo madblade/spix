@@ -70,13 +70,25 @@ extend(App.Engine.Graphics.prototype, {
         serverModel.refresh();
         this.render();
         clientModel.refresh();
+        
+        // Rendering twice fixes inertia artifacts on WebGL render targets AND I DON'T KNOW WHY.
+        // Perf loss is visually compensated by the decoupled camera movement aggregation scheme.
+        serverModel.refresh();
+        this.render();
+        clientModel.refresh();
     },
 
     render: function() {
         var sceneManager = this.sceneManager;
         var cameraManager = this.cameraManager;
+        var rendererManager = this.rendererManager;
         var portals = this.app.model.server.xModel.portals;
-        this.rendererManager.render(sceneManager, cameraManager, portals);
+        
+        // Refresh camera mouse movements.
+        cameraManager.refresh();
+        
+        // Perform rendering.
+        rendererManager.render(sceneManager, cameraManager, portals);
     },
 
     stop: function() {

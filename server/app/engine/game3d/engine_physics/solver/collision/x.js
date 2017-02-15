@@ -19,9 +19,10 @@ class XCollider {
 
         for (let i = 0, l = arr.length; i < l; ++i) {
             let xId = arr[i];
-
             let portal = portals.get(xId);
-            let state = portal.state; // [...this._block1, ...this._block2, this._position, this._orientation]
+            
+            // [...this._block1, ...this._block2, this._position, this._orientation]
+            let state = portal.state; 
             let x0 = state[0], y0 = state[1], z0 = state[2];
             let x1 = state[3], y1 = state[4], z1 = state[5];
             let p = state[6]; // Ratio towards +
@@ -35,7 +36,9 @@ class XCollider {
 
             let axis = x1 === x0 ? 'x' : y1 === y0 ? 'y' : z1 === z0 ? 'z' : '?';
             let fx0, fx1, fy0, fy1, fz0, fz1;
+            
             switch (axis) {
+                
                 case 'x':
                     fx0 = x0 + p;               fx1 = fx0;
                     fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
@@ -51,7 +54,7 @@ class XCollider {
                         return xModel.getOtherSide(xId);
                     }
 
-                    return false;
+                    break;
 
                 // TODO [HIGH] implement wiser
                 case 'y':
@@ -67,7 +70,7 @@ class XCollider {
                         return xModel.getOtherSide(xId);
                     }
 
-                    return false;
+                    break;
 
                 case 'z':
                     fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1);
@@ -82,10 +85,13 @@ class XCollider {
                         return xModel.getOtherSide(xId);
                     }
 
-                    return false;
+                    break;
+                
                 default:
             }
         }
+        
+        return false;
 
     }
 

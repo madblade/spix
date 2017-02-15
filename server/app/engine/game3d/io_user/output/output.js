@@ -153,6 +153,7 @@ class UserOutput {
 
         // Broadcast updates.
         // TODO [HIGH] bundle update in one chunk.
+        // TODO [CRIT] ensure sync for player disconnections.
         game.players.forEach(p => {
             let pid = p.avatar.id;
 
