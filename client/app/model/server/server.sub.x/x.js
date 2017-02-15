@@ -16,9 +16,6 @@ App.Model.Server.XModel = function(app, selfModel) {
     // World id -> set of all portals contained in this world
     this.worldToPortals = new Map();
 
-    // Portal id -> set of all portals that link to this one
-    this.backwardLinks = new Map();
-
     // Map helper
     this.worldMap = new App.Model.Server.XModel.WorldMap(this);
 
@@ -43,6 +40,7 @@ extend(App.Model.Server.XModel.prototype, {
         var worldMap = this.worldMap;
         var updates = this.xUpdates;
         var refreshWorldMap = false;
+        var graphics = this.app.engine.graphics;
 
         for (var i = 0, l = updates.length; i < l; ++i) {
             var data = updates[i];
@@ -63,24 +61,24 @@ extend(App.Model.Server.XModel.prototype, {
 
                     // Do add portal (not that world map is recomputed in process)
                     // TODO [CRIT] decouple
-                    worldMap.invalidate().computeWorldMap();
-                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation, worldMap);
+                    //worldMap.invalidate().computeWorldMap();
+                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
                     refreshWorldMap = true;
                 } else {
                     // Null -> remove portal
                     // (world map is recomputed in process)
                     // TODO [CRIT] decouple
                     worldMap.invalidate().computeWorldMap();
-                    this.removePortal(portalId, worldMap);
+                    this.removePortal(portalId);
                     refreshWorldMap = true;
                 }
             }
         }
 
         if (refreshWorldMap) {
-            var s = worldMap.invalidate().computeWorldMap().computeRenderingGraph().toString();
+            var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
             register.updateSelfState({'diagram': s});
-            worldMap.xGraph.computeRenderingGraph();
+            worldMap.computeRenderingGraph(graphics);
         }
 
         this.xUpdates = [];

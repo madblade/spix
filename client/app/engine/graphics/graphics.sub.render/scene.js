@@ -5,7 +5,7 @@
 'use strict';
 
 App.Engine.Graphics.SceneManager = function() {
-    this.mainScene = this.createScene('-1');
+    this.mainScene = this.createScene(-1);
     this.subScenes  = new Map();
     this.screens = new Map();
 };
@@ -29,7 +29,7 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
     // Switch main scene with some scene that must be in this.subScenes
     switchToScene: function(sceneId, cameraManager, avatar) {
         sceneId = parseInt(sceneId);
-        if (sceneId === -1) sceneId = '-1';
+        
         var newMainScene = this.subScenes.get(sceneId);
         if (!newMainScene) { console.log('Failed to switch to scene ' + sceneId); return; }
         var oldMainScene = this.mainScene;
@@ -45,9 +45,6 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
         }
 
         cameraManager.switchMainCameraToWorld(oldMainSceneId, sceneId);
-        //var mainCameraId = cameraManager.mainCamera.getCameraId();
-        //cameraManager.removeCameraFromScene(mainCameraId, oldMainSceneId);
-        //cameraManager.addCameraToScene(mainCameraId, sceneId);
     },
 
     addObject: function(object, sceneId) {

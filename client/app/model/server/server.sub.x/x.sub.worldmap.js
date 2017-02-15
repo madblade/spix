@@ -65,8 +65,12 @@ extend(App.Model.Server.XModel.WorldMap.prototype, {
         return this;
     },
 
-    computeRenderingGraph: function() {
+    computeFlatGraph: function() {
         return this.xGraph.computeFlatGraph();
+    },
+
+    computeRenderingGraph: function(graphicsEngine) {
+        return this.xGraph.computeRenderingGraph(graphicsEngine, this.xModel);
     },
 
     invalidate: function() {

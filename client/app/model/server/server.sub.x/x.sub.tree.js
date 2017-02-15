@@ -246,7 +246,8 @@ extend(XGraph.prototype, {
             // 0: depth
             // 1: type
             //      green: regular arc
-            //      cyan: involution (the same pid as previously leads to the previous wid)
+            //      yellow: 0-order involution
+            //      cyan: 1st order involution (the same pid as previously leads to the previous wid)
             //      orange: denote an independent cycle
             //      red: denote a dependant cycle (higher order involution)
             // 2: pid
@@ -258,24 +259,108 @@ extend(XGraph.prototype, {
             var por = currentStep.pid;
             var ori = currentStep.origin;
             var ele = currentStep.destination;
+            var pat = currentStep.path;
+            var wpt = currentStep.wpath;
 
-            for (var j = 0, d = dep; j < d; ++j) string += '\u00a0';
-            string += mod + ' w.' + ori + 'w.{' + ele + '} p.' + por;
+            for (var j = 0, d = dep; j < d; ++j) string += '\u00a0\u00a0\u00a0';
+            string += mod + ' w.' + ori + 'w.{' + ele + '} p.' + por + ' // ' + pat + '|' + wpt;
             string += '\n';
         }
 
         return string;
     },
 
-    computeRenderingGraph: function() {
+    // Add cameras and everything and so on.
+    computeRenderingGraph: function(graphicsEngine, xModel) {
         var flatGraph = this.flatGraph;
-        var currentStep;
-        var st = '';
+
+        var cameraManager = graphicsEngine.cameraManager;
+        var sceneManager = graphicsEngine.sceneManager;
+        var rendererManager = graphicsEngine.rendererManager;
+        var worldToPortals = xModel.worldToPortals;
+
+        var portals = xModel.portals; // Fixed by xModel
+        var scenes = sceneManager.subScenes; // Fixed by wModel
+    
+        var screens = sceneManager.screens;
+        var cameras = cameraManager.subCameras;
+        screens.forEach(function(screen) { sceneManager.removeScreen(screen.getId()); });
+        cameras.forEach(function(camera) { cameraManager.removeCameraFromScene(camera.getCameraId(), camera.getWorldId()) });
+        sceneManager.screens = new Map();
+        cameraManager.subCameras = new Map();
+        screens = sceneManager.screens;
+        cameras = cameraManager.subCameras;
+
+        var mainCamera = cameraManager.mainCamera;
+        var mainRCCamera = cameraManager.mainRaycasterCamera;
+        var mainScene = sceneManager.mainScene;
+
+        var renderRegister = [];
+        // For each camera, remember its path.
+        // When rendering is performed,
+        // Every camera shall have to render from its transformed state back to the root.
+        // So reorder rendering phase according to camera depths.
+
+        var currentStep, originWid, destinationWid, originPid, destinationPid;
+        var widPath, pidPath, depth;
         for (var i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];
-            st+=currentStep.path+'\n';
+            originWid       = currentStep.origin;
+            destinationWid  = currentStep.destination;
+            originPid       = parseInt(currentStep.pid.split(',')[0]);
+            destinationPid  = parseInt(currentStep.pid.split(',')[1]);
+            pidPath         = currentStep.path.split(';');
+            widPath         = currentStep.wpath.split(';');
+            depth           = currentStep.depth;
+
+            switch (currentStep.type) {
+                
+                case 'lime': // Regular.
+                    // Add screen.
+                    // Add camera.
+                    // Add path to camera.
+                    var p1 = portals.get(originPid);
+                    var p2 = portals.get(destinationPid);
+                    if (!p1 || !p2) {
+                        console.log('Problem while adding portal ' + originPid + ' / ' + destinationPid);
+                        console.log('Origin: ' + p1 + ', Destination ' + p2); continue;
+                    }
+                    graphicsEngine.addPortalObject(p1, p2);
+                    renderRegister.push({ depth: depth,  });
+                    // TODO [CRIT] here
+                break;
+                
+                case 'orange':
+                    // Add screen.
+                    // Add camera to all descendants.
+                    
+                break;
+                
+                case 'yellow':
+                    // Add screen.
+                    // Add camera to descendants, after?
+                break;
+                
+                case 'cyan':
+                    // It rewires backwards.
+                    // Do only when current camera isn't right camera
+                    
+                break;
+                
+                case 'red':
+                    // Do nothing. Incorrect orientation of deeper
+                    // cameras, however, should not be noticeable.
+                    // Worst case: recurse on them.
+                    
+                break;
+                
+                default:
+            }
+
         }
-        console.log(st);
+
+        // Sort in reverse order! (high depth to low depth).
+        renderRegister.sort(function(a, b) { return a.depth < b.depth });
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.
@@ -283,73 +368,93 @@ extend(XGraph.prototype, {
         var flatGraph = [];
         var currentStep;
 
-        var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd, currentPath;
+        var currentElement, currentElementId, currentArc, currentArcId, currentOtherEnd;
+        var currentPidPath, currentWidPath;
         var marks = new Set(); // Verification.
         var markedPaths = new Set();
         var queueNodes = [this.root];
         var queueOtherEnds = [null];
 
         var currentDepth = 0;
-        var queuePaths = [''];
+        var queueWidPaths = [''];
+        var queuePidPaths = [''];
         var queueDepth = [currentDepth];
         var queueArcs = [null];
         var elementDepths = new Map();
-        var processed = false;
+        var elementPaths = new Map();
+        var elementProcessed = false;
 
         // DFS.
         while (queueNodes.length > 0) {
             currentElement = queueNodes.pop();
             currentDepth = queueDepth.pop();
             currentArc = queueArcs.pop();
-            currentPath = queuePaths.pop();
+            currentPidPath = queuePidPaths.pop();
+            currentWidPath = queueWidPaths.pop();
             currentOtherEnd = queueOtherEnds.pop();
             currentElementId = currentElement.getNodeId();
 
+            elementProcessed = marks.has(currentElementId);
+            //
+            var b = currentPidPath.split(';');
+            var c = b.pop().split(',').reverse(); b.pop(); b.push(c);
+            var directInvolutionPath = b.join(';');
+            //
+            var e = currentPidPath.split(';'); e.pop(); e.join(';');
+            var widArray = currentWidPath.split(';');
+
             if (currentArc) {
                 currentArcId = currentArc.getArcId();
-
                 currentStep = {};
-                processed = marks.has(currentElementId);
-                if (processed) {
-                    // Locate where destination world last was.
-                    var formerDepth = elementDepths.get(currentElementId);
 
-                    // Detect direct involution.
-                    var b = currentPath.split(';'); var c = b.pop().split(',').reverse(); b.pop(); b.push(c);
-                    var directInvolutionPath = b.join(';');
-                    if (markedPaths.has(directInvolutionPath)) {
-                        currentStep.type = 'cyan';
-                    }
-
-                    // TODO [CRIT] detect through another path.
-                    // Detect cycles
-                    else if (formerDepth < currentDepth - 1) {
-                        currentStep.type = 'red';
-                    } else if (formerDepth >= currentDepth - 1) {
-                        currentStep.type = 'orange';
-                    }
+                // Detect direct 0-involutions
+                if (elementProcessed && currentOtherEnd && currentOtherEnd.getNodeId() === currentElementId) {
+                    // Check element swap with next one.
+                    // if (currentDepth)
+                    currentStep.type = 'yellow';
                 }
-                // Regular path (at first pass)
-                else {
+
+                else if (elementProcessed && markedPaths.has(directInvolutionPath)) {
+                    // Detect direct 1-involutions.
+                    currentStep.type = 'cyan';
+                }
+
+                // Dependent cycle (full path is common)
+                else if (elementProcessed && widArray.indexOf(currentElementId) > -1) {
+                    currentStep.type = 'red';
+                }
+
+                // Independent cycle (path is partly common)
+                // It was detected because the current world is marked as processed.
+                else if (elementProcessed) {
+                    currentStep.type = 'orange';
+                }
+
+                // Regular path (at first pass, other derived may be considered degenerate).
+                else if (!elementProcessed) {
                     currentStep.type = 'lime';
                 }
 
                 currentStep.depth = currentDepth;
-                if (currentOtherEnd)
-                    currentStep.origin = currentOtherEnd.getNodeId();
+                //if (currentOtherEnd)
+                // TODO [HIGH] check. I guess an arc has always a parent and a child.
+                currentStep.origin = currentOtherEnd.getNodeId();
                 currentStep.destination = currentElementId;
                 currentStep.pid = currentArcId;
-                currentStep.path = currentPath; // Without the last pid.
+                currentStep.path = currentPidPath; // Without the last pid.
+                currentStep.wpath = currentWidPath; // Without the last wid.
 
                 flatGraph.push(currentStep);
             }
 
-            if (!processed) {
+            if (!elementProcessed) {
                 // Mark and go next.
-                if (currentDepth < elementDepths.get(currentElementId))
+                if (!elementDepths.has(currentElementId) || currentDepth < elementDepths.get(currentElementId)) {
+                    elementPaths.set(currentElementId, currentPidPath);
                     elementDepths.set(currentElementId, currentDepth);
+                }
                 marks.add(currentElementId);
-                markedPaths.add(currentPath);
+                markedPaths.add(currentPidPath);
 
                 var nextDepth = currentDepth + 1;
                 var childrenArcs = currentElement.getChildrenArcs();
@@ -357,8 +462,13 @@ extend(XGraph.prototype, {
                     var arc = childrenArcs[i];
                     queueArcs.push(arc);
                     queueNodes.push(arc.getChild());
-                    if (currentPath.length > 0) currentPath += ';';
-                    queuePaths.push(currentPath + arc.getArcId());
+
+                    if (currentPidPath.length > 0) currentPidPath += ';';
+                    queuePidPaths.push(currentPidPath + arc.getArcId());
+
+                    if (currentWidPath.length > 0) currentWidPath += ';';
+                    queueWidPaths.push(currentWidPath + currentElementId);
+
                     queueDepth.push(nextDepth);
                     queueOtherEnds.push(arc.getParent());
                 }

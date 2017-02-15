@@ -38,13 +38,12 @@ extend(App.Model.Server.SelfModel.prototype, {
         if (!this.needsUpdate) return;
 
         var register = this.app.register;
+        var graphics = this.app.engine.graphics;
 
+        var avatar = this.avatar;
         var up = this.position;
         var r = this.rotation;
         var id = this.entityId;
-
-        var graphics = this.app.engine.graphics;
-        var avatar = this.avatar;
 
         if (!(graphics.controls) || !avatar) return;
 
@@ -52,16 +51,17 @@ extend(App.Model.Server.SelfModel.prototype, {
             // TODO [CRIT] switch scenes.
             var xModel = this.xModel;
             var worldId = this.worldId;
+            var oldWorldId = this.oldWorldId;
 
-            if (this.displayAvatar) graphics.removeFromScene(this.avatar, this.oldWorldId);
-            graphics.switchToScene(this.oldWorldId, worldId);
-            xModel.switchAvatarToWorld(this.oldWorldId, worldId);
-            if (this.displayAvatar) graphics.addToScene(this.avatar, worldId);
+            if (this.displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+            graphics.switchToScene(oldWorldId, worldId);
+            xModel.switchAvatarToWorld(oldWorldId, worldId);
+            if (this.displayAvatar) graphics.addToScene(avatar, worldId);
 
             var worldMap = xModel.worldMap;
-            var s = worldMap.invalidate().computeWorldMap().computeRenderingGraph().toString();
+            var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
             register.updateSelfState({'diagram': s});
-            worldMap.xGraph.computeRenderingGraph();
+            worldMap.computeRenderingGraph(graphics);
         }
 
         var p = avatar.position;

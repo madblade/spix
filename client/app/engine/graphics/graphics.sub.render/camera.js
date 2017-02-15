@@ -4,7 +4,7 @@
 
 'use strict';
 
-App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
+App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId) {
 
     // Wrap for primitive manipulation simplicity.
     var camera = new THREE.PerspectiveCamera(fov, aspect, nearPlane, farPlane);
@@ -16,8 +16,10 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane) {
     yaw.add(pitch);
 
     // 4D logic
-    this.renderPath = '';
+    this.rotTransform = [0, 0, 0];
+    this.posTransform = [0, 0, 0];
     this.cameraId = null;
+    this.worldId = worldId;
 
     // Don't expose these internal variables.
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
@@ -33,6 +35,14 @@ extend(App.Engine.Graphics.Camera.prototype, {
 
     getCameraId: function() {
         return this.cameraId;
+    },
+    
+    setWorldId: function(worldId) {
+        this.worldId = worldId;  
+    },
+    
+    getWorldId: function() {
+        return this.worldId;
     },
 
     getRecorder: function() {
@@ -79,6 +89,11 @@ extend(App.Engine.Graphics.Camera.prototype, {
         yaw.position.x = x;
         yaw.position.y = y;
         yaw.position.z = z;
+    },
+    
+    setTransform: function(rot, pos) {
+        this.rotTransform = rot;
+        this.posTransform = pos;
     },
 
     setFirstPerson: function() {

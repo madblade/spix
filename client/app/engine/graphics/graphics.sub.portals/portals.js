@@ -70,7 +70,7 @@ extend(App.Engine.Graphics.prototype, {
     },
 
     // portal linked forward to otherPortal
-    completeStubPortalObject: function(portal, otherPortal, worldMap) {
+    completeStubPortalObject: function(portal, otherPortal) {
         var worldId = portal.worldId;
         var portalId = portal.portalId;
 
@@ -92,12 +92,12 @@ extend(App.Engine.Graphics.prototype, {
         screen.setOtherWorldId(otherWorldId);
         screen.getRenderTarget().setSize(window.innerWidth, window.innerHeight);
 
-        var pathsToPortal = [];
-        worldMap.xGraph.applyFromPosition(null, portalId, function(portal, path, depth) {
-            pathsToPortal.push(path);
-        });
-
-        console.log(pathsToPortal);
+        //var pathsToPortal = [];
+        //worldMap.xGraph.applyFromPosition(null, portalId, function(portal, path, depth) {
+        //    pathsToPortal.push(path);
+        //});
+        //console.log(pathsToPortal);
+        
         // TODO [CRIT] add several times with different paths.
         // TODO [CRIT] compute all paths.
         // TODO [CRIT] DON'T ACCOUNT for portals that are too far away!
@@ -108,11 +108,11 @@ extend(App.Engine.Graphics.prototype, {
         // var scene = this.getScene(otherWorldId);
     },
 
-    addPortalObject: function(portal, otherPortal, worldMap) {
+    addPortalObject: function(portal, otherPortal) {
         var worldId = portal.worldId;
 
         this.addStubPortalObject(portal);
-        this.completeStubPortalObject(portal, otherPortal, worldMap);
+        this.completeStubPortalObject(portal, otherPortal);
     },
 
     // Remove link between portal (which is still present) and otherPortal

@@ -57,7 +57,7 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             var bufferScene = subScenes.get(bufferSceneId);
             if (!bufferScene) {
                 // Happens when current portal is a stub.
-                // console.log('Could not get matching scene.');
+                 console.log('Could not get matching scene: ' + bufferSceneId);
                 return;
             }
 

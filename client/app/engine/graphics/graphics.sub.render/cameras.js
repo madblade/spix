@@ -14,11 +14,11 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
     this.mainFar = 100000;
 
     // Cameras.
-    this.mainCamera = this.createCamera(false);
+    this.mainCamera = this.createCamera(false, -1);
     this.mainCamera.setCameraId(-1);
     this.subCameras = new Map();
 
-    this.mainRaycasterCamera = this.createCamera(true);
+    this.mainRaycasterCamera = this.createCamera(true, -1);
     this.raycaster = this.createRaycaster();
 };
 
@@ -26,7 +26,7 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
 
 extend(App.Engine.Graphics.CameraManager.prototype, {
 
-    createCamera: function(forRaycaster) {
+    createCamera: function(forRaycaster, worldId) {
         // Resize (when window is resized on hub, portals are not affected)
         this.mainAspect = window.innerWidth / window.innerHeight;
 
@@ -34,7 +34,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             this.mainFOV,
             this.mainAspect,
             (forRaycaster ? 1 : this.mainNear), // TODO [LOW] check security.
-            this.mainFar);
+            this.mainFar,
+            worldId);
     },
 
     addCamera: function(frameSource, frameDestination) {
@@ -60,6 +61,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
     },
 
     addCameraToScene: function(cameraId, worldId) {
+        worldId = parseInt(worldId);
+        
         var camera = this.subCameras.get(cameraId);
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
@@ -67,7 +70,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             console.log('Could not get wrapper for camera ' + cameraId);
             return;
         }
-
+        
+        camera.setWorldId(worldId);
         this.graphicsEngine.addToScene(camera.get3DObject(), worldId);
     },
 
@@ -77,6 +81,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
     },
 
     removeCameraFromScene: function(cameraId, worldId) {
+        worldId = parseInt(worldId);
         var camera = this.subCameras.get(cameraId);
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
