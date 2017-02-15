@@ -51,16 +51,16 @@ extend(App.Model.Server.SelfModel.prototype, {
             var xModel = this.xModel;
             var worldId = this.worldId;
             var oldWorldId = this.oldWorldId;
-
-            if (this.displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+            var displayAvatar = this.displayAvatar;
+                
+            if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
-            if (this.displayAvatar) graphics.addToScene(avatar, worldId);
+            if (displayAvatar) graphics.addToScene(avatar, worldId);
 
-            var worldMap = xModel.worldMap;
-            var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
-            register.updateSelfState({'diagram': s});
-            worldMap.computeRenderingGraph(graphics);
+            if (this.xModel) {
+                this.xModel.forceUpdate = true;
+            }
         }
 
         var p = avatar.position;

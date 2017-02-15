@@ -9,7 +9,6 @@ extend(App.Model.Server.XModel.prototype, {
     addPortal: function(portalId, otherPortalId,
                         chunkId, worldId, end1, end2, position, orientation)
     {
-        console.log('\n\n');
         console.log('Adding portal ' + portalId + ' and linking to ' + otherPortalId);
         portalId = parseInt(portalId);
 
@@ -41,7 +40,6 @@ extend(App.Model.Server.XModel.prototype, {
         var modelPortals = this.portals;
         var worldToPortals = this.worldToPortals;
 
-        console.log('\n\n');
         console.log('Removing portal ' + portalId + ' ' + typeof portalId);
 
         var portal = modelPortals.get(portalId);

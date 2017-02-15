@@ -269,6 +269,21 @@ extend(XGraph.prototype, {
 
         return string;
     },
+    
+    computeCameraTransform: function(pidPath, portals, cameraManager) {
+        var root = cameraManager.mainCamera;
+        var cameraTransform = [
+            0, 0, 0, // Position
+            0, 0, 0  // Rotation
+        ];
+        
+        for (var pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
+            var currentPid = parseInt(pidPath[pathId][0]);
+            var currentP = portals.get(currentPid);
+            
+            // TODO [CRIT] compute transform
+        }  
+    },
 
     // Add cameras and everything and so on.
     computeRenderingGraph: function(graphicsEngine, xModel) {
@@ -284,16 +299,15 @@ extend(XGraph.prototype, {
     
         var screens = sceneManager.screens;
         var cameras = cameraManager.subCameras;
+        
+        // TODO [MEDIUM] optim: screens are heavy to rewire
+        // TODO [MEDIUM] optim: relax constraints on world loading rate server-side
         screens.forEach(function(screen) { sceneManager.removeScreen(screen.getId()); });
         cameras.forEach(function(camera) { cameraManager.removeCameraFromScene(camera.getCameraId(), camera.getWorldId()) });
         sceneManager.screens = new Map();
         cameraManager.subCameras = new Map();
         screens = sceneManager.screens;
         cameras = cameraManager.subCameras;
-
-        var mainCamera = cameraManager.mainCamera;
-        var mainRCCamera = cameraManager.mainRaycasterCamera;
-        var mainScene = sceneManager.mainScene;
 
         var renderRegister = [];
         // For each camera, remember its path.
@@ -327,18 +341,14 @@ extend(XGraph.prototype, {
                         console.log('Problem while adding portal ' + originPid + ' / ' + destinationPid);
                         console.log('Origin: ' + p1 + ', Destination ' + p2); continue;
                     }
-                    console.log(originPid + ' -> ' + destinationPid);
-                    console.log(originWid + ' -> ' + destinationWid);
                     
                     // Compute cameraTransform
                     cameraTransform = [
                         0, 0, 0, // pos
                         0, 0, 0
                     ]; // rot
-                    for (var pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
-                        var currentP = pidPath[pathId][0];
-                        // TODO [CRIT] compute transform
-                    }
+                    
+                    cameraTransform = this.computeCameraTransform(pidPath, portals, cameraManager);
                     
                     graphicsEngine.addPortalObject(p1, p2, pidPathString, cameraTransform);
                     renderRegister.push({ 
@@ -385,7 +395,7 @@ extend(XGraph.prototype, {
         renderRegister.sort(function(a, b) { return a.depth < b.depth });
         
         // Update renderer.
-        graphicsEngine.rendererManager.setRenderRegister(renderRegister);
+        rendererManager.setRenderRegister(renderRegister);
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.

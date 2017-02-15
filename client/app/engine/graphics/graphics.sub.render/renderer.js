@@ -19,7 +19,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
     createRenderer: function() {
         // Configure renderer
         var renderer = new THREE.WebGLRenderer({
-            antialias: true,
+            // TODO [MEDIUM] propose different antialiasing strategy
+            //antialias: true,
             alpha: true
         });
 

@@ -24,6 +24,7 @@ App.Model.Server.XModel = function(app, selfModel) {
 
     /** Graphical component **/
     this.needsUpdate = false;
+    this.forceUpdate = false;
 };
 
 extend(App.Model.Server.XModel.prototype, {
@@ -34,7 +35,7 @@ extend(App.Model.Server.XModel.prototype, {
     // So there is no more world to be added, all possible worlds
     // are available for display in their portals texture renderer.
     refresh: function() {
-        if (!this.needsUpdate) return;
+        if (!this.needsUpdate && !this.forceUpdate) return;
 
         var register = this.app.register;
         var worldMap = this.worldMap;
@@ -71,10 +72,11 @@ extend(App.Model.Server.XModel.prototype, {
             }
         }
 
-        if (refreshWorldMap) {
+        if (refreshWorldMap || this.forceUpdate) {
             var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
             register.updateSelfState({'diagram': s});
             worldMap.computeRenderingGraph(graphics);
+            this.forceUpdate = false;
         }
 
         this.xUpdates = [];

@@ -9,7 +9,7 @@ extend(App.Engine.Graphics.prototype, {
     addStubPortalObject: function(portal) {
         var worldId = portal.worldId; // World this portal stands in.
         var portalId = portal.portalId;
-        console.log('Adding stub: p(' + portalId + '), w(' + worldId + ')');
+        //console.log('Adding stub: p(' + portalId + '), w(' + worldId + ')');
 
         // Get scene.
         var scene = this.getScene(worldId, true); // Force scene manager to create a scene.
@@ -76,7 +76,7 @@ extend(App.Engine.Graphics.prototype, {
 
         // Affect linked portal.
         portal.portalLinkedForward = otherPortal.portalId;
-        console.log('Completing stub: p(' + portalId + '), w(' + worldId + '), f(' + otherPortal.portalId + ')');
+        //console.log('Completing stub: p(' + portalId + '), w(' + worldId + '), f(' + otherPortal.portalId + ')');
 
         // Create and configure renderer, camera.
         var screen = this.getScreen(portalId);
@@ -84,13 +84,6 @@ extend(App.Engine.Graphics.prototype, {
             console.log('Could not get screen to complete: ' + portalId);
             return;
         }
-
-        // Link scene.
-        var otherWorldId = otherPortal.worldId;
-        // Important.
-        console.log(portalId + ' -> SETTING OWID ' + otherWorldId + ' ' + typeof otherWorldId);
-        screen.setOtherWorldId(otherWorldId);
-        screen.getRenderTarget().setSize(window.innerWidth, window.innerHeight);
 
         // TODO [CRIT] add several times with different paths.
         // TODO [CRIT] compute all paths.
@@ -110,7 +103,7 @@ extend(App.Engine.Graphics.prototype, {
     removePartOfPortalObject: function(portal, otherPortal, worldMap) {
         var worldId = portal.worldId;
 
-        console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
+        //console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
 
         // Remove screen and subCameras.
         var currentPortalId = portal.portalId;

@@ -14,16 +14,9 @@ App.Model.Server.ChunkModel = function(app) {
     this.worldProperties = new Map();
     this.chunkUpdates = [];
 
-    // Initialize overworld.
-    // this.addWorld(-1);
-
     // Graphical component
-    var graphics = app.engine.graphics;
     this.needsUpdate = false;
     this.debug = false;
-
-    this.texture = graphics.loadTexture('atlas_512.png');
-    this.textureCoordinates = graphics.getTextureCoordinates();
 };
 
 extend(App.Model.Server.ChunkModel.prototype, {

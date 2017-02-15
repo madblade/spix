@@ -151,12 +151,11 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         var incoming = this.incomingRotationEvents;
         var rotation;
         for (var i = 0, l = incoming.length; i < l; ++i) {
-            //console.log(incoming[0]+','+incoming[1]);
             rotation = this.moveCameraFromMouse(incoming[i][0], incoming[i][1]);
         }
         this.incomingRotationEvents = [];
 
-        // TODO [LOW] put somewhere else
+        // TODO [CRIT] perform additional fitlering
         if (rotation) {
             var clientModel = this.graphicsEngine.app.model.client;
             clientModel.triggerEvent('r', [rotation[0], rotation[1]]);

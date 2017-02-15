@@ -31,6 +31,7 @@ App.Engine.Graphics = function(app) {
 
     // Benches.
     this.fps = new Stats();
+    // document.body.appendChild(this.fps.dom);
 
     // Animations
     this.initializeAnimations();

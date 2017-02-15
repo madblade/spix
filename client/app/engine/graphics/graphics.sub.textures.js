@@ -13,8 +13,18 @@ extend(App.Engine.Graphics.prototype, {
 
     loadTexture: function(whatTexture) {
         var loader = new THREE.TextureLoader();
-        var texture = loader.load("app/assets/textures/"+whatTexture);
+        var maxAnisotropy = this.rendererManager.renderer.getMaxAnisotropy();
+        
+        var texture = loader.load('app/assets/textures/' + whatTexture);
 
+        // TODO [MEDIUM] propose different anisotropy filtering
+        //texture.anisotropy = maxAnisotropy; 
+        texture.generateMipmaps = true;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        // TODO [MEDIUM] graphical effects
+        //texture.minFilter = THREE.LinearMipMapLinearFilter;
+        
         // Mipmapping...
         // var p = 512;
         // for (var i = 0; i<10; ++i) {
@@ -25,16 +35,9 @@ extend(App.Engine.Graphics.prototype, {
         //     p/=2;
         // }
 
-        // Somehow anisotropy enforces linear mipmap interpolation...
-        // texture.anisotropy = this.renderer.getMaxAnisotropy();
-        texture.generateMipmaps = false;
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
-
-        // TODO fix those ugly anisotropic white lines
         // Idea #1: use THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
         // then, var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-        // Where materials is an [] of materials and the faces use a materialIndex paramater to get appointed the right mat.
+        // Where materials is an [] of materials and the faces use a materialIndex parameter to get appointed the right mat.
         // Idea #2: shader
 
         return texture;

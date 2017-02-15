@@ -176,6 +176,8 @@ class UserOutput {
             // TODO [HIGH] bundle, detect change.
             p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
+            if (!av) return;
+            
             // Array of [1. position, 2. rotation, 3. worldId] for each world.
             // First one is the main world.
             let selfState = [[av.position, av.rotation, av.worldId]];
