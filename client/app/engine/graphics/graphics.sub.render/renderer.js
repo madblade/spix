@@ -29,6 +29,10 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         return renderer;
     },
 
+    getRenderRegister: function() {
+        return this.renderRegister;  
+    },
+    
     setRenderRegister: function(renderRegister) {
         this.renderRegister = renderRegister;  
     },
@@ -57,6 +61,7 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             camera = currentPass.camera;
             
             bufferScene = currentPass.scene;
+            if (!camera) continue;
             bufferCamera = camera.getRecorder();
             bufferTexture = screen1.getRenderTarget();
             

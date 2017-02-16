@@ -283,38 +283,21 @@ extend(XGraph.prototype, {
             
             // TODO [CRIT] compute transform
         }  
+        
+        return cameraTransform;
     },
 
     // Add cameras and everything and so on.
     computeRenderingGraph: function(graphicsEngine, xModel) {
         var flatGraph = this.flatGraph;
+        if (flatGraph.length < 1) return;
+        graphicsEngine.flushPortalUpdates();
 
         var cameraManager = graphicsEngine.cameraManager;
-        var sceneManager = graphicsEngine.sceneManager;
-        var rendererManager = graphicsEngine.rendererManager;
         var worldToPortals = xModel.worldToPortals;
 
         var portals = xModel.portals; // Fixed by xModel
-        var scenes = sceneManager.subScenes; // Fixed by wModel
     
-        var screens = sceneManager.screens;
-        var cameras = cameraManager.subCameras;
-        
-        // TODO [MEDIUM] optim: screens are heavy to rewire
-        // TODO [MEDIUM] optim: relax constraints on world loading rate server-side
-        screens.forEach(function(screen) { sceneManager.removeScreen(screen.getId()); });
-        cameras.forEach(function(camera) { cameraManager.removeCameraFromScene(camera.getCameraId(), camera.getWorldId()) });
-        sceneManager.screens = new Map();
-        cameraManager.subCameras = new Map();
-        screens = sceneManager.screens;
-        cameras = cameraManager.subCameras;
-
-        var renderRegister = [];
-        // For each camera, remember its path.
-        // When rendering is performed,
-        // Every camera shall have to render from its transformed state back to the root.
-        // So reorder rendering phase according to camera depths.
-
         var currentStep, originWid, destinationWid, originPid, destinationPid;
         var widPath, pidPathString, pidPath, depth;
         var cameraTransform;
@@ -342,23 +325,12 @@ extend(XGraph.prototype, {
                         console.log('Origin: ' + p1 + ', Destination ' + p2); continue;
                     }
                     
-                    // Compute cameraTransform
-                    cameraTransform = [
-                        0, 0, 0, // pos
-                        0, 0, 0
-                    ]; // rot
-                    
                     cameraTransform = this.computeCameraTransform(pidPath, portals, cameraManager);
                     
-                    graphicsEngine.addPortalObject(p1, p2, pidPathString, cameraTransform);
-                    renderRegister.push({ 
-                        depth: depth, 
-                        screen1: screens.get(originPid),
-                        screen2: screens.get(destinationPid),
-                        sceneId: destinationWid,
-                        scene: scenes.get(destinationWid),
-                        camera: cameras.get(pidPathString)
-                    });
+                    graphicsEngine.addPortalObject(
+                        p1, p2, pidPathString, cameraTransform,
+                        depth, originPid, destinationPid, destinationWid, pidPathString
+                    );
                     
                 break;
                 
@@ -390,12 +362,11 @@ extend(XGraph.prototype, {
             }
 
         }
-
-        // Sort in reverse order! (high depth to low depth).
-        renderRegister.sort(function(a, b) { return a.depth < b.depth });
         
-        // Update renderer.
-        rendererManager.setRenderRegister(renderRegister);
+        // Optimisation: remove only screens that differ from last pass.
+        // Add remaining ones asynchronously.
+        graphicsEngine.unflushPortalUpdates();
+
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.

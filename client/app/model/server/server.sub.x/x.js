@@ -75,6 +75,7 @@ extend(App.Model.Server.XModel.prototype, {
         if (refreshWorldMap || this.forceUpdate) {
             var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
             register.updateSelfState({'diagram': s});
+            // TODO [HIGH] this should be heavily optimized.
             worldMap.computeRenderingGraph(graphics);
             this.forceUpdate = false;
         }

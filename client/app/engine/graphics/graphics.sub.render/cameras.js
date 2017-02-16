@@ -46,7 +46,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         // TODO [CRIT] compute relative positions and rotations.
 
         if (this.subCameras.has(cameraId)) {
-            console.log('Camera ' + cameraId + ' cannot be added a second time.');
+            //console.log('Camera ' + cameraId + ' cannot be added a second time.');
+            console.log('Skipping camera addition.');
             return;
         }
 
@@ -91,6 +92,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             console.log('@removeCamera: could not get wrapper for camera ' + cameraId);
             return;
         }
+        
+        if (!worldId) worldId = camera.getWorldId();
 
         this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId);
     },

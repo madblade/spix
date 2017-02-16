@@ -14,7 +14,8 @@ App.Engine.Graphics = function(app) {
     // Properties.
     this.windowHalfX = window.innerWidth / 2;
     this.windowHalfY = window.innerHeight / 2;
-    this.defaultGeometrySize = 64; // TODO [LOW] customize newMesh size variable
+    // TODO [LOW] customize newMesh size variable
+    this.defaultGeometrySize = 64; 
 
     // Rendering.
     this.requestId          = null;
@@ -38,6 +39,11 @@ App.Engine.Graphics = function(app) {
 
     // Textures
     this.loadTextures();
+    
+    // Optimizations
+    this.portalUpdates = [];
+    this.lastRenderPaths = new Set();
+    this.lastRenderGates = new Set();
 };
 
 extend(App.Engine.Graphics.prototype, {
@@ -84,6 +90,9 @@ extend(App.Engine.Graphics.prototype, {
         var cameraManager = this.cameraManager;
         var rendererManager = this.rendererManager;
         var portals = this.app.model.server.xModel.portals;
+        
+        // Refresh portals.
+        this.processPortalUpdates();
         
         // Refresh camera mouse movements.
         cameraManager.refresh();

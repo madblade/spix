@@ -93,9 +93,97 @@ extend(App.Engine.Graphics.prototype, {
         this.cameraManager.addCameraToScene(cameraPath, worldId);
     },
 
-    addPortalObject: function(portal, otherPortal, cameraPath, cameraTransform) {
+    processPortalUpdates: function() {
+        var portalUpdates = this.portalUpdates;
+        if (portalUpdates.length < 1) return;
+        var u = portalUpdates.shift();
+        this.addPortalGraphics(u.portal, u.otherPortal, u.cameraPath, u.cameraTransform,
+            u.depth, u.originPid, u.destinationPid, u.destinationWid, u.pidPathString);
+    },
+    
+    flushPortalUpdates: function() {
+        this.portalUpdates = [];
+    },
+    
+    unflushPortalUpdates: function() {
+        var portalUpdates = this.portalUpdates;
+        var lastRenderPaths = this.lastRenderPaths;
+        var lastRenderGates = this.lastRenderGates;
+        
+        // Remove only screens and cameras that need to be.
+        var cameraManager = this.cameraManager;
+        var sceneManager = this.sceneManager;
+        
+        var rp = new Set(), rg = new Set();
+        for (var i = 0, l = portalUpdates.length; i < l; ++i) {
+            var currentUpdate = portalUpdates[i];
+            rp.add(currentUpdate.pidPathString);
+            rg.add(currentUpdate.originPid);
+        }
+        lastRenderPaths.forEach(function(path) { if (!rp.has(path)) cameraManager.removeCameraFromScene(path) });
+        lastRenderGates.forEach(function(gate) { if (!rg.has(gate)) sceneManager.removeScreen(gate); });
+        
+        // Flush render targets.
+        // TODO [HIGH] graphics: adaptive render register (prevent texture freezing) 
+        this.rendererManager.setRenderRegister([]);
+        this.lastRenderPaths = new Set();
+        this.lastRenderGates = new Set();
+    },
+    
+    addPortalGraphics: function(portal, otherPortal, cameraPath, cameraTransform,
+                                depth, originPid, destinationPid, destinationWid, pidPathString) 
+    {
+        var renderRegister = this.rendererManager.getRenderRegister();
+        for (var i in renderRegister) if (renderRegister.hasOwnProperty(i) && renderRegister[i].id === pidPathString)
+            return; // already added.
+        
         this.addStubPortalObject(portal);
         this.completeStubPortalObject(portal, otherPortal, cameraPath, cameraTransform);
+        
+        var screens = this.sceneManager.screens;
+        var cameras = this.cameraManager.subCameras;
+        var scenes = this.sceneManager.subScenes;
+
+        // For each camera, remember its path.
+        // When rendering is performed,
+        // Every camera shall have to render from its transformed state back to the root.
+        // So reorder rendering phase according to camera depths.
+        renderRegister.push({
+            id: pidPathString,
+            
+            depth: depth,
+            screen1: screens.get(originPid),
+            screen2: screens.get(destinationPid),
+            sceneId: destinationWid,
+            scene: scenes.get(destinationWid),
+            camera: cameras.get(pidPathString)
+        });
+
+        this.lastRenderPaths.add(pidPathString);
+        this.lastRenderGates.add(originPid);
+        
+        // Sort in reverse order! (high depth to low depth).
+        renderRegister.sort(function(a, b) { return a.depth < b.depth });
+
+        // Update renderer.
+        this.rendererManager.setRenderRegister(renderRegister);
+    },
+    
+    addPortalObject: function(portal, otherPortal, cameraPath, cameraTransform,
+                              depth, originPid, destinationPid, destinationWid, pidPathString) 
+    {
+        this.portalUpdates.push({
+            portal: portal,
+            otherPortal: otherPortal,
+            cameraPath: cameraPath,
+            cameraTransform: cameraTransform,
+            
+            depth: depth,
+            originPid: originPid,
+            destinationPid: destinationPid,
+            destinationWid: destinationWid,
+            pidPathString: pidPathString
+        });
     },
 
     // Remove link between portal (which is still present) and otherPortal
