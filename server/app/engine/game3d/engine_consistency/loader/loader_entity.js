@@ -16,7 +16,7 @@ class EntityLoader {
     computeEntitiesInRange(player) {
         let entityModel = this._entityModel;
         let avatar = player.avatar;
-        let aid = avatar.id;
+        let aid = avatar.entityId;
         var entities = {};
 
         let thresh = avatar.entityRenderDistance;
@@ -27,7 +27,7 @@ class EntityLoader {
         // let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         // TODO [LACKS] optim O(n²) -> O(Cn)
-        entityModel.forEach(e => { let eid = e.id; if (eid !== aid) {
+        entityModel.forEach(e => { let eid = e.entityId; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
                 entities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
         }});
@@ -54,8 +54,8 @@ class EntityLoader {
 
         // TODO [LACKS]: O(n²) -> O(Cn).
         // TODO [HIGH]: also use for AABB phase in physics.
-        let aid = avatar.id;
-        entityModel.forEach(e => { let eid = e.id; if (eid !== aid) { // For all different entities.
+        let aid = avatar.entityId;
+        entityModel.forEach(e => { let eid = e.entityId; if (eid !== aid) { // For all different entities.
 
             // Compute distance & find in OLD consistency model.
             let isInRange = distance(e, avatar) < thresh;

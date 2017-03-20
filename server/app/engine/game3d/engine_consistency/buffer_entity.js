@@ -17,7 +17,7 @@ class EntityBuffer {
 
     spawnPlayer(player) {
         let removedPlayers = this._removedPlayers;
-        let id = player.avatar.id;
+        let id = player.avatar.entityId;
         if (removedPlayers.has(id)) removedPlayers.delete(id);
         else this._addedPlayers.add(id);
     }

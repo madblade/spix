@@ -61,6 +61,7 @@ class UserOutput {
         let game = this._game;
         let players = game.players;
 
+        // TODO [OPT] use arrays
         addedPlayers.forEach(pid => {
             let player = players.getPlayerFromId(pid);
             if (player) {
@@ -89,9 +90,10 @@ class UserOutput {
         let updatedChunks = topologyEngine.getOutput();
         let consistencyOutput = consistencyEngine.getChunkOutput();
 
+        // TODO [OPT] use arrays
         game.players.forEach(p => { if (p.avatar) {
             let hasNew, hasUpdated;
-            let pid = p.avatar.id;
+            let pid = p.avatar.entityId;
 
             // TODO [LOW] check 'player has updated position'
             // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
@@ -154,8 +156,9 @@ class UserOutput {
         // Broadcast updates.
         // TODO [HIGH] bundle update in one chunk.
         // TODO [CRIT] ensure sync for player disconnections.
+        // TODO [OPT] use arrays
         game.players.forEach(p => {
-            let pid = p.avatar.id;
+            let pid = p.avatar.entityId;
 
             // If an entity in range of player p has just updated.
             let addedOrRemovedEntities = consistencyOutput.get(pid);
@@ -195,8 +198,9 @@ class UserOutput {
         let consistencyEngine = this._consistencyEngine;
         let xOutput = consistencyEngine.getXOutput();
 
+        // TODO [OPT] use arrays
         game.players.forEach(p => {
-            let pid = p.avatar.id;
+            let pid = p.avatar.entityId;
             let addedOrRemovedX = xOutput.get(pid);
 
             if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0) {

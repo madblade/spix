@@ -24,7 +24,7 @@ class ConsistencyModel {
     }
 
     spawnPlayer(player) {
-        let playerId = player.avatar.id;
+        let playerId = player.avatar.entityId;
         let chunksMap = new Map();
         chunksMap.set(player.avatar.worldId, new Set());
 
@@ -92,9 +92,10 @@ class ConsistencyModel {
         let side = renderDistance*2 + 1;
 
         // TODO [CRIT] worldify (with xModel.getConnectivity)
-        let worlds = this._chunkIdsForEntity.get(avatar.id);
+        let aid = avatar.entityId;
+        let worlds = this._chunkIdsForEntity.get(aid);
 
-        let chunks = this._chunkIdsForEntity.get(avatar.id).get(worldId);
+        let chunks = worlds.get(worldId);
         if (!chunks) return false;
 
         let actualInnerSize = 0;

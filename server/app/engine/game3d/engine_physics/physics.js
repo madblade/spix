@@ -32,22 +32,30 @@ class PhysicsEngine {
     get xModel()        { return this._xModel; }
     get outputBuffer()  { return this._outputBuffer; }
 
+    /** ######################## **/
+    
     addInput(meta, avatar) {
         this._inputBuffer.addInput(meta, avatar)
     }
 
     update() {
-        this._updater.update(this._inputBuffer.getInput());
+        
+        let input = this._inputBuffer.getInput();
+        
+        this._updater.update(input);
 
         this._frontend.solve();
 
         this._inputBuffer.flush();
+    
     }
 
     getOutput() {
         return this._outputBuffer.getOutput();
     }
-
+    
+    /** ######################## **/
+    
     flushOutput() {
         this._outputBuffer.flushOutput(this._entityModel.entities);
     }

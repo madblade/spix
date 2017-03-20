@@ -105,9 +105,10 @@ class Updater {
         let t = process.hrtime();
         let dt1;
         let debugThresh = 1000;
+        // TODO [OPT] use arrays
         players.forEach(p => { if (p.avatar) {
 
-            let pid = p.avatar.id;
+            let pid = p.avatar.entityId;
 
             // Compute change for entities in range.
             let addedEntities, removedEntities,

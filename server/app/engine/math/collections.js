@@ -48,7 +48,7 @@ class CollectionUtils {
         return location;
     }
 
-    static generateId(collection) {
+    static generateId(collection, propertyIdName) {
         var random = _ => Math.floor(Math.random() * 1000000);
         var id = random();
 
@@ -58,7 +58,11 @@ class CollectionUtils {
 
         else if (collection instanceof Array) { // Array
             // Unicity mandatory check
-            var f = (e => e.id === id);
+            
+            if (!propertyIdName) throw Error('@generateId: generating id for ' +
+                'array for unknown property identifier');
+            
+            var f = (e => e[propertyIdName] === id);
             while (collection.filter(f).length > 0) id = random();
         }
 

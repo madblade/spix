@@ -16,7 +16,7 @@ class XLoader {
 
     computeNewXInRange(player) {
         let a = player.avatar;
-        let avatarId = a.id;
+        let avatarId = a.entityId;
         let p = a.position;
         let worldId = a.worldId;
         let portalLoadingRadius = a.portalRenderDistance;

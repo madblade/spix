@@ -126,7 +126,7 @@ class Game3D extends Game {
                 });
 
                 this._playerManager.setRemovePlayerBehaviour(player => {
-                    this._externalInput.removePlayer(player.avatar.id);
+                    this._externalInput.removePlayer(player.avatar.entityId);
                 });
 
                 this._ready = true;
@@ -135,7 +135,7 @@ class Game3D extends Game {
     }
 
     save() {
-        // TODO [LONG-TERM] write world into file.
+        // TODO [LONG-TERM] write world and entities into file.
     }
 
 }

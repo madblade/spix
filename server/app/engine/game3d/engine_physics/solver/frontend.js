@@ -4,37 +4,48 @@
 
 'use strict';
 
-import RigidBodies from './rigid_bodies/engine';
+import RigidBodies from './rigid_bodies/rigid_bodies';
+import Orderer from './rigid_bodies/orderer';
 
 class FrontEnd {
 
     constructor(physicsEngine) {
-        // Models.
-        this._entityModel   = physicsEngine.entityModel;
-        this._worldModel    = physicsEngine.worldModel;
-        this._xModel        = physicsEngine.xModel;
-
-        // Output.
-        this._outputBuffer  = physicsEngine.outputBuffer;
-
+        // Model access.
+        this._physicsEngine = physicsEngine;
+        
         // Internals.
-        this._stamp = process.hrtime();
+        this._rigidBodies   = new RigidBodies();
+        this._orderer       = new Orderer(physicsEngine.entityModel, physicsEngine.xModel);
+        this._stamp         = process.hrtime();
     }
-
-    get entityModel()   { return this._entityModel; }
-    get worldModel()    { return this._worldModel; }
-    get xModel()        { return this._xModel; }
-    get outputBuffer()  { return this._outputBuffer; }
 
     solve() {
+        
+        let physicsEngine = this._physicsEngine,
+            rigidBodies = this._rigidBodies,
+            orderer = this._orderer;
+        
+        let em = physicsEngine.entityModel,
+            wm = physicsEngine.worldModel,
+            xm = physicsEngine.xModel,
+            ob = physicsEngine.outputBuffer;
+        
         let Δt = process.hrtime(this._stamp)[1];
-        RigidBodies.solve(this, Δt);
+        
+        rigidBodies.solve(orderer, em, wm, xm, ob, Δt);
+        
+        // RigidBodies.solve(this, Δt);
         this._stamp = process.hrtime();
+    
     }
 
+    // Can be triggered to change physics behaviour.
     shuffleGravity() {
-        let g = RigidBodies.gravity;
-        RigidBodies.gravity = [g[2], g[0], g[1]];
+        let rigidBodies = this._rigidBodies;
+        let g = rigidBodies.gravity;
+        rigidBodies.gravity = [g[2], g[0], g[1]];   
+        //let g = RigidBodies.gravity;
+        //RigidBodies.gravity = [g[2], g[0], g[1]];
     }
 
 }

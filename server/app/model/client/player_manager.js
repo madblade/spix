@@ -29,7 +29,8 @@ class PlayerManager {
         let players = this._players;
         for (let p = 0, l = players.length; p < l; ++p) {
             let player = players[p];
-            if (player.avatar && player.avatar.id === playerId) return player;
+            let avatar = player.avatar;
+            if (avatar && avatar.entityId === playerId) return player;
         }
         return false;
     }

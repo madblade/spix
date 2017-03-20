@@ -30,7 +30,6 @@ class TopologyEngine {
 
     get entityModel()           { return this._entityModel; }
     get worldModel()            { return this._worldModel; }
-    get selector()              { return this._selector; }
     get outputBuffer()          { return this._outputBuffer; }
 
     addInput(meta, avatar) {

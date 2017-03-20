@@ -16,7 +16,7 @@ class Selector {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
         var chunksForPlayer = {};
-        let aid = player.avatar.id;
+        let aid = player.avatar.entityId;
 
         modelUpdatedChunks.forEach((chunkIdSet, worldId) => {
             let world = worldModel.getWorld(worldId);

@@ -19,7 +19,7 @@ class UpdaterBlock {
     }
 
     // The difficulty is to keep layered surfaceBlocks sorted.
-    // TODO [HIGH] I am quite sure this does not work at all.
+    // TODO [HIGH] I am quite sure this does not work at all for neighbour chunks.
     static updateSurfaceBlocksAfterAddition(chunk, id, x, y, z) {
         let surfaceBlocks = chunk.surfaceBlocks;
         let dimensions = chunk.dimensions;
@@ -31,19 +31,19 @@ class UpdaterBlock {
         if (x > 0) {
             if (chunk.contains(x-1, y, z)) {
                 xm = true;
-                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x-1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x-1, y, z+1)) &&
+                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>dimensions[1] || chunk.contains(x-1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>dimensions[2] || chunk.contains(x-1, y, z+1)) &&
                     (x-2<0 || chunk.contains(x-2, y, z)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x-1, y, z);
             }
         }
 
-        if (x < dimensions[0]) {
+        if (x+1 < dimensions[0]) {
             if (chunk.contains(x+1, y, z)) {
                 xp = true;
-                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x+1, y, z+1)) &&
-                    (x+2>=dimensions[0] || chunk.contains(x+2, y, z)))
+                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>dimensions[1] || chunk.contains(x+1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>dimensions[2] || chunk.contains(x+1, y, z+1)) &&
+                    (x+2>dimensions[0] || chunk.contains(x+2, y, z)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x+1, y, z);
             }
         }
@@ -52,18 +52,18 @@ class UpdaterBlock {
         if (y > 0) {
             if (chunk.contains(x, y-1, z)) {
                 ym = true;
-                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y-1, z)) &&
-                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y-1, z+1)) &&
+                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>dimensions[0] || chunk.contains(x+1, y-1, z)) &&
+                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>dimensions[2] || chunk.contains(x, y-1, z+1)) &&
                     (y-2<0 || chunk.contains(x, y-2, z)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x, y-1, z);
             }
         }
-        if (y < dimensions[1]) {
+        if (y+1 < dimensions[1]) {
             if (chunk.contains(x, y+1, z)) {
                 yp = true;
-                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y, z+1)) &&
-                    (y+2>=dimensions[1] || chunk.contains(x, y+2, z)))
+                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>dimensions[0] || chunk.contains(x+1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>dimensions[2] || chunk.contains(x, y, z+1)) &&
+                    (y+2>dimensions[1] || chunk.contains(x, y+2, z)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x, y+1, z);
             }
         }
@@ -72,18 +72,18 @@ class UpdaterBlock {
         if (z > 0) {
             if (chunk.contains(x, y, z-1)) {
                 zm = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z-1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z-1)) &&
+                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>dimensions[0] || chunk.contains(x+1, y, z-1)) &&
+                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>dimensions[1] || chunk.contains(x, y+1, z-1)) &&
                     (z-2<0 || chunk.contains(x, y, z-2)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z-1);
             }
         }
-        if (z < dimensions[2]) {
+        if (z+1 < dimensions[2]) {
             if (chunk.contains(x, y, z+1)) {
                 zp = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
-                    (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
+                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>dimensions[0] || chunk.contains(x+1, y, z+1)) &&
+                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>dimensions[1] || chunk.contains(x, y+1, z+1)) &&
+                    (z+2>dimensions[2] || chunk.contains(x, y, z+2)))
                     UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
             }
         }
@@ -104,18 +104,18 @@ class UpdaterBlock {
         if (x > 0) {
             if (chunk.contains(x-1, y, z)) {
                 xm = true;
-                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x-1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x-1, y, z+1)) &&
+                if ((y-1<0 || chunk.contains(x-1, y-1, z)) && (y+1>dimensions[1] || chunk.contains(x-1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x-1, y, z-1)) && (z+1>dimensions[2] || chunk.contains(x-1, y, z+1)) &&
                     (x-2<0 || chunk.contains(x-2, y, z)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x-1, y, z);
             }
         }
-        if (x < dimensions[0]) {
+        if (x+1 < dimensions[0]) {
             if (chunk.contains(x+1, y, z)) {
                 xp = true;
-                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>=dimensions[1] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>=dimensions[2] || chunk.contains(x+1, y, z+1)) &&
-                    (x+2>=dimensions[0] || chunk.contains(x+2, y, z)))
+                if ((y-1<0 || chunk.contains(x+1, y-1, z)) && (y+1>dimensions[1] || chunk.contains(x+1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x+1, y, z-1)) && (z+1>dimensions[2] || chunk.contains(x+1, y, z+1)) &&
+                    (x+2>dimensions[0] || chunk.contains(x+2, y, z)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x+1, y, z);
             }
         }
@@ -124,18 +124,18 @@ class UpdaterBlock {
         if (y > 0) {
             if (chunk.contains(x, y-1, z)) {
                 ym = true;
-                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y-1, z)) &&
-                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y-1, z+1)) &&
+                if ((x-1<0 || chunk.contains(x-1, y-1, z)) && (x+1>dimensions[0] || chunk.contains(x+1, y-1, z)) &&
+                    (z-1<0 || chunk.contains(x, y-1, z-1)) && (z+1>dimensions[2] || chunk.contains(x, y-1, z+1)) &&
                     (y-2<0 || chunk.contains(x, y-2, z)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x, y-1, z);
             }
         }
-        if (y < dimensions[1]) {
+        if (y+1 < dimensions[1]) {
             if (chunk.contains(x, y+1, z)) {
                 yp = true;
-                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>=dimensions[0] || chunk.contains(x+1, y+1, z)) &&
-                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>=dimensions[2] || chunk.contains(x, y+1, z+1)) &&
-                    (y+2>=dimensions[1] || chunk.contains(x, y+2, z)))
+                if ((x-1<0 || chunk.contains(x-1, y+1, z)) && (x+1>dimensions[0] || chunk.contains(x+1, y+1, z)) &&
+                    (z-1<0 || chunk.contains(x, y+1, z-1)) && (z+1>dimensions[2] || chunk.contains(x, y+1, z+1)) &&
+                    (y+2>dimensions[1] || chunk.contains(x, y+2, z)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x, y+1, z);
             }
         }
@@ -144,18 +144,18 @@ class UpdaterBlock {
         if (z > 0) {
             if (chunk.contains(x, y, z-1)) {
                 zm = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z-1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z-1)) &&
+                if ((x-1<0 || chunk.contains(x-1, y, z-1)) && (x+1>dimensions[0] || chunk.contains(x+1, y, z-1)) &&
+                    (y-1<0 || chunk.contains(x, y-1, z-1)) && (y+1>dimensions[1] || chunk.contains(x, y+1, z-1)) &&
                     (z-2<0 || chunk.contains(x, y, z-2)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x, y, z-1);
             }
         }
-        if (z < dimensions[2]) {
+        if (z+1 < dimensions[2]) {
             if (chunk.contains(x, y, z+1)) {
                 zp = true;
-                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>=dimensions[0] || chunk.contains(x+1, y, z+1)) &&
-                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>=dimensions[1] || chunk.contains(x, y+1, z+1)) &&
-                    (z+2>=dimensions[2] || chunk.contains(x, y, z+2)))
+                if ((x-1<0 || chunk.contains(x-1, y, z+1)) && (x+1>dimensions[0] || chunk.contains(x+1, y, z+1)) &&
+                    (y-1<0 || chunk.contains(x, y-1, z+1)) && (y+1>dimensions[1] || chunk.contains(x, y+1, z+1)) &&
+                    (z+2>dimensions[2] || chunk.contains(x, y, z+2)))
                     UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x, y, z+1);
             }
         }

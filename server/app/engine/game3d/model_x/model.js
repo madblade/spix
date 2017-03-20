@@ -37,6 +37,7 @@ class XModel {
     static debug = false;
 
     get portals() { return this._portals; }
+    get worldToChunksToPortals() { return this._worldToChunksToPortals; }
 
     /** Create / link **/
 
@@ -143,8 +144,8 @@ class XModel {
 
         // Create in model.
         knots.set(id, knot);
-        portalsToKnots.set(knot.portal1.id, knot);
-        portalsToKnots.set(knot.portal2.id, knot);
+        portalsToKnots.set(knot.portal1.portalId, knot);
+        portalsToKnots.set(knot.portal2.portalId, knot);
 
         return knot;
     }
@@ -170,7 +171,7 @@ class XModel {
             if (otherEnd)
                 knot.removePortal(portal);
             else
-                this._knots.delete(otherEnd.id);
+                this._knots.delete(otherEnd.portalId);
 
             portalToKnots.delete(portalId);
         }
@@ -190,8 +191,8 @@ class XModel {
             let end1 = knot.portal1;
             let end2 = knot.portal2;
 
-            if (end1) { portalToKnots.remove(end1.id); }
-            if (end2) { portalToKnots.remove(end2.id); }
+            if (end1) { portalToKnots.remove(end1.portalId); }
+            if (end2) { portalToKnots.remove(end2.portalId); }
 
             knots.remove(knotId);
         }
@@ -298,9 +299,9 @@ class XModel {
                         recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                     } else {
                         let otherChunk = otherSide.chunk;
-                        if (XModel.debug) console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.id);
-                        if (XModel.debug) console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.id);
-                        recursedPortals.set(g, [otherSide.id, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                        if (XModel.debug) console.log("origin: world " + currentPortal.worldId + ", portal " + currentPortal.portalId);
+                        if (XModel.debug) console.log("destin: world " + otherSide.worldId + ", portal " + otherSide.portalId);
+                        recursedPortals.set(g, [otherSide.portalId, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
                         if (otherChunk) {
                             let otherWorld = otherChunk.world.worldId;
                             let otherChunkId = otherChunk.chunkId;

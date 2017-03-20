@@ -14,6 +14,7 @@ class EntityModel {
 
         // Fast register for all entities.
         // TODO [MEDIUM] accessor: LACKS.
+        // TODO [OPT] use arrays
         this._entities = new Map();
 
         // Entity registers are duplicated and refined here.
@@ -32,7 +33,7 @@ class EntityModel {
     }
 
     setWorldForEntity(entity, newWorldId) {
-        let entityId = entity.id;
+        let entityId = entity.entityId;
         let worldId = entity.worldId;
         entity.worldId = newWorldId;
 

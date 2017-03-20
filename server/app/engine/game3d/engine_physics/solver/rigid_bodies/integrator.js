@@ -18,7 +18,7 @@ class Integrator {
     }
 
     // Returns true when an entity has updated.
-    static updatePosition(dt, impulseSpeed, force, entity, EM, WM, XM, world) {
+    static updatePosition(dt, impulseSpeed, force, entity, em, wm, xm, world) {
 
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
@@ -26,16 +26,16 @@ class Integrator {
 
         if (Integrator.isNull(entity.acceleration)) {
             //console.log('Euler');
-            newPosition = Integrator.integrateEuler(dt, impulseSpeed, force, entity, EM, world);
+            newPosition = Integrator.integrateEuler(dt, impulseSpeed, force, entity, em, world);
             if (!newPosition) return false;
 
-            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, XM);
+            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, xm);
             if (xCrossed) {
                 // TODO [CRIT] use the following
                 // xCrossed.chunkId;
                 // xCrossed.state;
                 let newWorldId = xCrossed.worldId;
-                EM.setWorldForEntity(entity, newWorldId);
+                em.setWorldForEntity(entity, newWorldId);
             }
 
             // Update properties, phase 2.
@@ -45,17 +45,17 @@ class Integrator {
 
         } else {
             //console.log('Leapfrog');
-            newPosition = Integrator.integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, EM, world);
+            newPosition = Integrator.integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, em, world);
             if (!newPosition) return false;
 
-            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, XM);
+            let xCrossed = XCollider.xCollide(entity.position, newPosition, world, xm);
             if (xCrossed) {
                 let newWorldId = xCrossed.worldId;
-                EM.setWorldForEntity(entity, newWorldId);
+                em.setWorldForEntity(entity, newWorldId);
             }
 
             let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
-            return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, EM, world, hasCollided);
+            return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, em, world, hasCollided);
 
         }
     }
@@ -107,6 +107,9 @@ class Integrator {
         return newPosition;
     }
 
+    // Higher order integrators induce heavier loads when solving in narrow phase.
+    // More precisely, orders higher than 4 would need numerical solvers such as Newton-Raphson.
+    
     // Second-order integrator (time-reversible, symplectic)
     // @returns {boolean} whether entity has updated
     //static integrateLeapfrog(dt, impulseSpeed, force, entity, EM, world) {

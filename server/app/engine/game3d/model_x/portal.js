@@ -16,7 +16,7 @@ class Portal {
      * @param chunk origin chunk (portals are fixed ATM)
      */
     constructor(worldId, id, c1, c2, position, orientation, chunk) {
-        this._id = id;
+        this._portalId = id;
         this._worldId = worldId;
         this._block1 = c1;
         this._block2 = c2;
@@ -25,9 +25,10 @@ class Portal {
         this._chunk = chunk;
     }
 
-    get id()        { return this._id; }
+    get portalId()  { return this._portalId; }
     get worldId()   { return this._worldId; }
     get chunkId()   { return this._chunk.chunkId; }
+    get position()  { return this._position; }
     get state()     { return [...this._block1, ...this._block2, this._position, this._orientation]; }
     get chunk()     { return this._chunk; }
 

@@ -193,7 +193,7 @@ class ChunkBuilder {
         if (!connectivity) return;
         let chunks = connectivity[1]; // !! Should be sorted from the nearest to the farthest.
         if (!chunks) return;
-        let aid = avatar.id;
+        let aid = avatar.entityId;
 
         let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, (ic+','+jc+','+kc));
 
@@ -231,7 +231,7 @@ class ChunkBuilder {
         var unloadedChunksForPlayer = {};
         let chunksToUnload = [];
 
-        let aid = avatar.id;
+        let aid = avatar.entityId;
         let startWid = avatar.worldId;
         let chunkIdsForEntity = consistencyModel.chunkIdsPerWorldForEntity(aid);
 

@@ -96,7 +96,7 @@ class ConsistencyEngine {
 
     // The first time, FORCE BUILD when output requests CE initial output.
     initChunkOutputForPlayer(player) {
-        let aid = player.avatar.id;
+        let aid = player.avatar.entityId;
         let worldId = player.avatar.worldId;
         let worldModel = this._worldModel;
         let world = worldModel.getWorld(worldId);
@@ -127,7 +127,7 @@ class ConsistencyEngine {
 
     // The first time, FORCE COMPUTE in-range entities when output requests CE output.
     initEntityOutputForPlayer(player) {
-        let aid = player.avatar.id;
+        let aid = player.avatar.entityId;
         let es = this._entityModel.entities;
         let cm = this._consistencyModel;
 

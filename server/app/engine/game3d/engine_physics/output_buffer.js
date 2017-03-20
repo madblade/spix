@@ -20,7 +20,7 @@ class OutputBuffer {
         return new Set(this._buffer);
     }
 
-    flushOutput(modelEntities) {
+    flushOutput() {
         this._buffer = new Set();
     }
 
