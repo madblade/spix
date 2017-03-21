@@ -24,7 +24,7 @@ class Portal {
         this._orientation = orientation;
         this._chunk = chunk;
         
-        // Physics optimization.
+        // Physics properties and optimization.
         this._indexX = -1;
         this._indexY = -1;
         this._indexZ = -1;
@@ -38,6 +38,13 @@ class Portal {
     get state()     { return [...this._block1, ...this._block2, this._position, this._orientation]; }
     get chunk()     { return this._chunk; }
 
+    // Physics.
+    set indexX(indexX)  { this._indexX = indexX; }
+    get indexX()        { return this._indexX; }
+    set indexY(indexY)  { this._indexY = indexY; }
+    get indexY()        { return this._indexY; }
+    set indexZ(indexZ)  { this._indexZ = indexZ; }
+    get indexZ()        { return this._indexZ; }
 }
 
 export default Portal;

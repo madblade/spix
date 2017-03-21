@@ -33,26 +33,25 @@ class Entity {
         // 1 state = Object { position:p, rotation:r }
         this._otherStates = new Map();
         
-        // Physics optimization.
+        // Physics properties and optimization.
         this._indexX      = -1;
         this._indexY      = -1;
         this._indexZ      = -1;
     }
 
-    get entityId()                { return this._entityId; }
+    get entityId()          { return this._entityId; }
+    get worldId()           { return this._worldId; }
     get kind()              { return this._kind; }
-
-    get directions()        { return this._directions; }
-
     get rotation()          { return this._rotation; }
     get position()          { return this._position; }
+    get directions()        { return this._directions; }
     get speed()             { return this._speed; }
     get acceleration()      { return this._acceleration; }
     get mass()              { return this._mass; }
-    get _impulseSpeed()     { return this._impulseSpeedStamp; }
-    get worldId()           { return this._worldId; }
+    get adherence()         { return this._adherence; }
     get otherStates()       { return this._otherStates; }
-
+    get _impulseSpeed()     { return this._impulseSpeedStamp; }
+    
     set adherence(na)       { this._adherence = na; }
     set rotation(nr)        { this._rotation = nr; }
     set position(np)        { this._position = np; }
@@ -60,8 +59,6 @@ class Entity {
     set acceleration(na)    { this._acceleration = na; }
     set _impulseSpeed(nis)  { this._impulseSpeedStamp = nis; }
     set worldId(nwi)        { this._worldId = nwi; }
-
-    get adherence()         { return this._adherence; }
 
     jump(direction) {
         this._adherence[direction] = false;
@@ -109,6 +106,14 @@ class Entity {
         this._rotation[1] = y;
     }
 
+    // Physics.
+    set indexX(indexX)  { this._indexX = indexX; }
+    get indexX()        { return this._indexX; }
+    set indexY(indexY)  { this._indexY = indexY; }
+    get indexY()        { return this._indexY; }
+    set indexZ(indexZ)  { this._indexZ = indexZ; }
+    get indexZ()        { return this._indexZ; }
+    
 }
 
 export default Entity;
