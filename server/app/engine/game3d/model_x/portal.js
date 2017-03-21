@@ -23,6 +23,12 @@ class Portal {
         this._position = position;
         this._orientation = orientation;
         this._chunk = chunk;
+        
+        // Physics optimization.
+        this._indexX = -1;
+        this._indexY = -1;
+        this._indexZ = -1;
+        
     }
 
     get portalId()  { return this._portalId; }

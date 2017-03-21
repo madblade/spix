@@ -32,6 +32,11 @@ class Entity {
         // When crossing multiple portals...
         // 1 state = Object { position:p, rotation:r }
         this._otherStates = new Map();
+        
+        // Physics optimization.
+        this._indexX      = -1;
+        this._indexY      = -1;
+        this._indexZ      = -1;
     }
 
     get entityId()                { return this._entityId; }

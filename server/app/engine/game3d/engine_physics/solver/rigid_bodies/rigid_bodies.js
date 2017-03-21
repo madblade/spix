@@ -55,7 +55,8 @@ class RigidBodies {
         // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
         //    smoothly slice along constrained boundaries until component is extinct.
         
-        // 8. Perform updates in consistency maps.
+        // 8. Perform updates in optimization structures.
+        //    Perform updates in consistency maps.
         
         let dt = Δt / this.globalTimeDilatation;
         if (dt > 5.0) {

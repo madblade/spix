@@ -30,11 +30,13 @@ class FrontEnd {
             xm = physicsEngine.xModel,
             ob = physicsEngine.outputBuffer;
         
+        // Compute adaptive time step.
         let Δt = process.hrtime(this._stamp)[1];
         
+        // Solve physics constraints with basic ordering optimization.
         rigidBodies.solve(orderer, em, wm, xm, ob, Δt);
         
-        // RigidBodies.solve(this, Δt);
+        // Stamp.
         this._stamp = process.hrtime();
     
     }
@@ -44,8 +46,6 @@ class FrontEnd {
         let rigidBodies = this._rigidBodies;
         let g = rigidBodies.gravity;
         rigidBodies.gravity = [g[2], g[0], g[1]];   
-        //let g = RigidBodies.gravity;
-        //RigidBodies.gravity = [g[2], g[0], g[1]];
     }
 
 }
