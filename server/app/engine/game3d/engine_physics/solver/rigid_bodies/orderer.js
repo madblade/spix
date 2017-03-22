@@ -21,6 +21,10 @@ class Orderer {
         this._zAxis = new Map();
         
     }
+
+    get xAxis() { return this._xAxis; }
+    get yAxis() { return this._yAxis; }
+    get zAxis() { return this._zAxis; }
     
     static dichotomyLowerBound(a, value, prop) {
         var lo = 0, hi = a.length - 1, mid;
@@ -93,11 +97,14 @@ class Orderer {
                 });
 
                 if (worldXs) {
-                    worldXs.forEach(xs => xs.forEach((x, xid) => {
-                        currentXAxis.push({kind: 'x', id: xid, val: x.position[0]});
-                        currentYAxis.push({kind: 'x', id: xid, val: x.position[1]});
-                        currentZAxis.push({kind: 'x', id: xid, val: x.position[2]});
-                    }))
+                    worldXs.forEach(xs => xs.forEach(xid => {
+                        let x = portals.get(xid);
+                        let p = x.position;
+                        if (!p) return; // Stub portal.
+                        currentXAxis.push({kind: 'x', id: xid, val: p[0]});
+                        currentYAxis.push({kind: 'x', id: xid, val: p[1]});
+                        currentZAxis.push({kind: 'x', id: xid, val: p[2]});
+                    }));
                 }
 
                 currentXAxis.sort(sorter);
@@ -129,21 +136,23 @@ class Orderer {
 
                 // Initialized => must be sorted.
                 let completeAxis = kind => (entity, eid) => {
+                    // [Thought] really don't run orderObjects for other reasons than initial loading.
+                    if (kind === 'x') entity = portals.get(entity);
                     let p = entity.position;
                     if (!p) return; // Stub portals.
                     let x = p[0], y = p[1], z = p[2];
 
                     // Dichotomy search, insert after.
                     let indexX = dichotomyLowerBound(currentXAxis, entity.position[0], 'val');
-                    let indexY = dichotomyLowerBound(currentXAxis, entity.position[1], 'val');
-                    let indexZ = dichotomyLowerBound(currentXAxis, entity.position[2], 'val');
+                    let indexY = dichotomyLowerBound(currentYAxis, entity.position[1], 'val');
+                    let indexZ = dichotomyLowerBound(currentZAxis, entity.position[2], 'val');
                     if (!currentXAxis[indexX]) return; // Not found.
 
                     while (currentXAxis[indexX].val <= x && currentXAxis[indexX].id !== eid)
                         ++indexX;
                     if (currentXAxis[indexX].id !== eid) {
                         currentXAxis.splice(indexX + 1, 0, {kind: kind, id: eid, val: x});
-                        object.indexX = indexX + 1;
+                        entity.indexX = indexX + 1;
                         minAffectedX = indexX + 2;
                     }
                     else return; // Opt. Others shouldn't be present if first one (x axis) is absent
@@ -153,7 +162,7 @@ class Orderer {
                     if (currentYAxis[indexY].id !== eid) // Should be useless.
                     {
                         currentYAxis.splice(indexY + 1, 0, {kind: kind, id: eid, val: y});
-                        object.indexY = indexY + 1;
+                        entity.indexY = indexY + 1;
                         minAffectedY = indexY + 2;
                     }
 
@@ -162,7 +171,7 @@ class Orderer {
                     if (currentZAxis[indexZ].id !== eid) // Should be useless as well.
                     {
                         currentZAxis.splice(indexZ + 1, 0, {kind: kind, id: eid, val: z});
-                        object.indexZ = indexZ + 1;
+                        entity.indexZ = indexZ + 1;
                         minAffectedZ = indexZ + 2;
                     }
                 };
@@ -182,7 +191,7 @@ class Orderer {
         });
         
         // Independent: sort xs for unvisited worlds.
-        worldToCsToXs.forEach((csToXs, wid) => {
+        worldToCsToXs.forEach((worldXs, wid) => {
             if (markedWorlds.has(wid)) return;
 
             let currentXAxis = xAxis.get(wid),
@@ -196,13 +205,15 @@ class Orderer {
                 currentYAxis = [];
                 currentZAxis = [];
 
-                csToXs.forEach((x, xid) => {
+                worldXs.forEach(xs => xs.forEach(xid => {
+                    let x = portals.get(xid);
+                    if (!x) throw Error('[Physics/Orderer]: x model inconsistency (chks vs xs).');
                     let p = x.position;
-                    if (!p) return; // Stub poral.
+                    if (!p) return; // Stub portal.
                     currentXAxis.push({kind: 'x', id: xid, val: p[0]});
                     currentYAxis.push({kind: 'x', id: xid, val: p[1]});
                     currentZAxis.push({kind: 'x', id: xid, val: p[2]});
-                });
+                }));
 
                 let sorter = (a, b) => a.val > b.val;
                 
@@ -241,7 +252,10 @@ class Orderer {
                 };
                 
                 // Add missing xs.
-                csToXs.forEach((x, xid) => {
+                worldXs.forEach(xs => xs.forEach(xid => {
+                    let x = portals.get(xid);
+                    if (!x) throw Error('[Physics/Orderer]: inconsistency in x model (chks vs xs).');
+                    
                     let indexX = search(currentXAxis, xid, 'id');
                     if (indexX > -1)
                     {
@@ -266,7 +280,7 @@ class Orderer {
                         x.indexZ = indexZ + 1;
                         minAffectedZ = indexZ + 2;
                     }
-                });
+                }));
                 
                 orderCache(currentXAxis, entities, portals, minAffectedX, 'indexX');
                 orderCache(currentYAxis, entities, portals, minAffectedY, 'indexY');
@@ -275,13 +289,11 @@ class Orderer {
             }
             
         });
-
-        console.log(xAxis);
-        console.log(yAxis);
-        console.log(zAxis);
     
     }
     
+    // [Thought] could be optimised by axis prealloc, dichotomy insertion,
+    // keeping track of active elements, and realloc when necessary (gc).
     addObject(object) {
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;
@@ -360,6 +372,8 @@ class Orderer {
         }
     }
     
+    // [Thought] could be optimised by garbage collection.
+    // Keeping a list of active objects for each axis.
     removeObject(object) {
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;

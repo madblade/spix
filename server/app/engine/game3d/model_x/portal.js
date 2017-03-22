@@ -20,7 +20,7 @@ class Portal {
         this._worldId = worldId;
         this._block1 = c1;
         this._block2 = c2;
-        this._position = position;
+        this._position = position; // Ratio. TODO [MEDIUM] use different name.
         this._orientation = orientation;
         this._chunk = chunk;
         
@@ -34,7 +34,6 @@ class Portal {
     get portalId()  { return this._portalId; }
     get worldId()   { return this._worldId; }
     get chunkId()   { return this._chunk.chunkId; }
-    get position()  { return this._position; }
     get state()     { return [...this._block1, ...this._block2, this._position, this._orientation]; }
     get chunk()     { return this._chunk; }
 
@@ -45,6 +44,19 @@ class Portal {
     get indexY()        { return this._indexY; }
     set indexZ(indexZ)  { this._indexZ = indexZ; }
     get indexZ()        { return this._indexZ; }
+    
+    // Position! Not ratio!
+    get position()  { 
+        let b1 = this._block1;
+        let b2 = this._block2;
+        if (!b1 || !b2) return;
+        
+        var p = [0, 0, 0];
+        for (let i = 0; i < 3; ++i) 
+            p[i] = (b1[i] + b2[i]) * .5;
+        
+        return p; 
+    } 
 }
 
 export default Portal;

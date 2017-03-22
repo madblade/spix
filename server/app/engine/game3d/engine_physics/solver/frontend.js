@@ -33,6 +33,9 @@ class FrontEnd {
         // Compute adaptive time step.
         let Δt = process.hrtime(this._stamp)[1];
         
+        // TODO [CRIT] debug.
+        orderer.orderObjects();
+        
         // Solve physics constraints with basic ordering optimization.
         rigidBodies.solve(orderer, em, wm, xm, ob, Δt);
         
