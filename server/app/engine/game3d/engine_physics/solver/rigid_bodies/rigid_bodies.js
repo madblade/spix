@@ -25,38 +25,6 @@ class RigidBodies {
     get globalTimeDilatation() { return this._globalTimeDilatation; }
     
     solve(orderer, em, wm, xm, o, Δt) {
-
-        // 1. Sum inertia, inputs/impulses, fields.
-        
-        // 2. Compute (x_i+1, a_i+1, v_i+1), order Leapfrog's incremental term.
-        //    Computation takes into account local time dilatation.
-        
-        // 3. Snap x_i+1 with terrain collide, save non-integrated residuals.
-        
-        // 4. Compute islands, cross world.
-        
-        // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
-        //    check neighbours for min distance in linearized trajectory
-        //    detect and push PROBABLY COLLIDING PAIRS.
-        
-        // 6. Narrow phase, part 1: for all probably colliding pairs,
-        //    solve X² leapfrog, save first all valid Ts
-        //    keep list of ordered Ts across pairs.
-        
-        // 7. Narrow phase, part 2: for all Ts in order,
-        //    set bodies as in contact or terminal (terrain), 
-        //    compute new paths (which are not more than common two previous) while compensating forces 
-        //    so as to project the result into directions that are not occluded
-        //      -> bouncing will be done in next iteration to ensure convergence
-        //      -> possible to keep track of the energy as unsatisfied work of forces
-        //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)      
-        //    End when there is no more collision to be solved.
-        
-        // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
-        //    smoothly slice along constrained boundaries until component is extinct.
-        
-        // 8. Perform updates in optimization structures.
-        //    Perform updates in consistency maps.
         
         let dt = Δt / this.globalTimeDilatation;
         if (dt > 5.0) {
@@ -65,25 +33,75 @@ class RigidBodies {
         
         // Decouple entities from worlds.
         // A given entity can span across multiple worlds.
-        let worldEntities = em.worldEntities;
-        worldEntities.forEach((entityMap, worldId) => {
+        let entities = em.entities;
+        let axes = orderer.axes;
+        
+        // TODO [CRIT] remove temporary lookup copy
+        let aaxs = new Map();
+        axes.forEach((axis, worldId) => {
+            var xs = [], ys = [], zs = [];
+            axis[0].forEach(a => xs.push({id:a.id}));
+            axis[1].forEach(a => ys.push({id:a.id}));
+            axis[2].forEach(a => zs.push({id:a.id}));
+            aaxs.set(worldId, [xs, ys, zs]);
+        });
+        
+        aaxs.forEach((axis, worldId) => {
+            // TODO [CRIT] use more cache-friendly arrays.
+            let world = wm.getWorld(worldId);
+            let xAxis = axis[0];
+            console.log(worldId + ' : ' + xAxis.length);
             
-            const world = wm.getWorld(worldId);
-
-            entityMap.forEach((entity, entityId) => {
-                const entityUpdated = this.linearSolve(entity, em, wm, xm, world, dt);
-
+            for (let i = 0, l = xAxis.length; i < l; ++i) {
+                let entity = entities[xAxis[i].id];
+                if (!entity) throw Error('[Physics/Rigid bodies]: ' +
+                    'processing undefined entities, abort.');
+                
+                let entityId = entity.entityId;
+            
+                // 1. Sum inertia, inputs/impulses, fields.
+                     
+                // 2. Compute (x_i+1, a_i+1, v_i+1), order Leapfrog's incremental term.
+                //    Computation takes into account local time dilatation.
+            
+                // 3. Snap x_i+1 with terrain collide, save non-integrated residuals.
+                const entityUpdated = this.linearSolve(orderer, entity, em, wm, xm, world, dt);
+                
+                // 4. Compute islands, cross world.
+            
+                // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
+                //    check neighbours for min distance in linearized trajectory
+                //    detect and push PROBABLY COLLIDING PAIRS.
+            
+                // 6. Narrow phase, part 1: for all probably colliding pairs,
+                //    solve X² leapfrog, save first all valid Ts
+                //    keep list of ordered Ts across pairs.
+            
+                // 7. Narrow phase, part 2: for all Ts in order,
+                //    set bodies as in contact or terminal (terrain), 
+                //    compute new paths (which are not more than common two previous) while compensating forces 
+                //    so as to project the result into directions that are not occluded
+                //      -> bouncing will be done in next iteration to ensure convergence
+                //      -> possible to keep track of the energy as unsatisfied work of forces
+                //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)      
+                //    End when there is no more collision to be solved.
+            
+                // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
+                //    smoothly slice along constrained boundaries until component is extinct.
+            
+                // 8. Perform updates in optimization structures.
+                //    Perform updates in consistency maps.
                 if (entityUpdated) {
                     o.entityUpdated(entityId);
                 }
-                
-            });
+            
+            }
             
         });
         
     }
 
-    linearSolve(entity, em, wm, xm, world, dt) {
+    linearSolve(orderer, entity, em, wm, xm, world, dt) {
         if (!entity || !entity.rotation) return;
 
         const theta = entity.rotation[0];
@@ -99,7 +117,7 @@ class RigidBodies {
 
         // RigidBodies.sumLocalFields(force, pos, EM);
 
-        var hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, wm, xm, world);
+        var hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
 
         return hasUpdated;
     }

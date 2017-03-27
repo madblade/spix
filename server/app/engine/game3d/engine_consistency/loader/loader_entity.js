@@ -27,7 +27,7 @@ class EntityLoader {
         // let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
         // TODO [LACKS] optim O(n²) -> O(Cn)
-        entityModel.forEach(e => { let eid = e.entityId; if (eid !== aid) {
+        entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
                 entities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
         }});
@@ -55,7 +55,8 @@ class EntityLoader {
         // TODO [LACKS]: O(n²) -> O(Cn).
         // TODO [HIGH]: also use for AABB phase in physics.
         let aid = avatar.entityId;
-        entityModel.forEach(e => { let eid = e.entityId; if (eid !== aid) { // For all different entities.
+        // For all different entities.
+        entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid) { 
 
             // Compute distance & find in OLD consistency model.
             let isInRange = distance(e, avatar) < thresh;

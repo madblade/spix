@@ -18,7 +18,7 @@ class Integrator {
     }
 
     // Returns true when an entity has updated.
-    static updatePosition(dt, impulseSpeed, force, entity, em, wm, xm, world) {
+    static updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world) {
 
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
@@ -35,7 +35,9 @@ class Integrator {
                 // xCrossed.chunkId;
                 // xCrossed.state;
                 let newWorldId = xCrossed.worldId;
-                em.setWorldForEntity(entity, newWorldId);
+                
+                orderer.switchEntityToWorld(entity, newWorldId, newPosition);
+                // em.setWorldForEntity(entity, newWorldId);
             }
 
             // Update properties, phase 2.
@@ -51,9 +53,11 @@ class Integrator {
             let xCrossed = XCollider.xCollide(entity.position, newPosition, world, xm);
             if (xCrossed) {
                 let newWorldId = xCrossed.worldId;
-                em.setWorldForEntity(entity, newWorldId);
+                //em.setWorldForEntity(entity, newWorldId);
+                orderer.switchEntityToWorld(entity, newWorldId, newPosition);
             }
 
+            // TODO [CRIT] UGLY, DESTROY IT. EXTERMINATE.
             let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
             return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, em, world, hasCollided);
 

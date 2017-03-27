@@ -17,7 +17,13 @@ class FrontEnd {
         this._rigidBodies   = new RigidBodies();
         this._orderer       = new Orderer(physicsEngine.entityModel, physicsEngine.xModel);
         this._stamp         = process.hrtime();
+        
+        // Note! this must be done before the first physics pass,
+        // when entities are just loaded from the disk during a (to be implemented) resume.
+        this._orderer.orderObjects();
     }
+    
+    get orderer() { return this._orderer; }
 
     solve() {
         
@@ -32,9 +38,6 @@ class FrontEnd {
         
         // Compute adaptive time step.
         let Δt = process.hrtime(this._stamp)[1];
-        
-        // TODO [CRIT] debug.
-        orderer.orderObjects();
         
         // Solve physics constraints with basic ordering optimization.
         rigidBodies.solve(orderer, em, wm, xm, ob, Δt);

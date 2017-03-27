@@ -8,9 +8,8 @@ import Entity from './entity';
 
 class Avatar extends Entity {
 
-    constructor(id, entityModel) {
+    constructor(id) {
         super(id);
-        //this._entityModel = entityModel;
 
         this._kind = 'player';
 

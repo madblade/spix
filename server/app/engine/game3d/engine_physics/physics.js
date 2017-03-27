@@ -57,13 +57,24 @@ class PhysicsEngine {
     /** ######################## **/
     
     flushOutput() {
-        this._outputBuffer.flushOutput(this._entityModel.entities);
+        this._outputBuffer.flushOutput();
     }
 
     shuffleGravity() {
         this._frontend.shuffleGravity();
     }
 
+    /** **/
+    
+    spawnPlayer(player) {
+        this._frontend.orderer.addObject(player.avatar);
+    }
+    
+    removePlayer(playerId) {
+        let entity = this._entityModel.entities[playerId];
+        this._frontend.orderer.removeObject(entity);
+    }
+    
 }
 
 export default PhysicsEngine;

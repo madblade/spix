@@ -31,12 +31,16 @@ class Entity {
         this._worldId       = -1;
         // When crossing multiple portals...
         // 1 state = Object { position:p, rotation:r }
-        this._otherStates = new Map();
+        this._otherWorlds = new Map(); // TODO [LONG-TERM]
         
-        // Physics properties and optimization.
+        // Physics/consistency optimization.
         this._indexX      = -1;
         this._indexY      = -1;
         this._indexZ      = -1;
+        // Hit box.
+        this._widthX      = .25; // -> .5 
+        this._widthY      = .25; // -> .5
+        this._widthZ      = .8;  // -> 1.6
     }
 
     get entityId()          { return this._entityId; }
@@ -49,7 +53,7 @@ class Entity {
     get acceleration()      { return this._acceleration; }
     get mass()              { return this._mass; }
     get adherence()         { return this._adherence; }
-    get otherStates()       { return this._otherStates; }
+    get otherWorlds()       { return this._otherWorlds; }
     get _impulseSpeed()     { return this._impulseSpeedStamp; }
     
     set adherence(na)       { this._adherence = na; }

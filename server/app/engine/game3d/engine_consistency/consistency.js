@@ -56,11 +56,13 @@ class ConsistencyEngine {
         this._entityModel.spawnPlayer(player);
         this._consistencyModel.spawnPlayer(player);
         this._entityBuffer.spawnPlayer(player);
+        this._physicsEngine.spawnPlayer(player);
     }
 
     despawnPlayer(playerId) {
         this._entityBuffer.removePlayer(playerId);
         this._consistencyModel.removePlayer(playerId);
+        this._physicsEngine.removePlayer(playerId);
         this._entityModel.removePlayer(playerId);
     }
 

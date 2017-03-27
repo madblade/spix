@@ -4,7 +4,8 @@
 
 'use strict';
 
-import EntityFactory from './factory';
+import Avatar from './avatar';
+import Entity from './entity';
 import CollectionUtil from '../../math/collections';
 
 class EntityModel {
@@ -13,18 +14,18 @@ class EntityModel {
         this._game = game;
 
         // Fast register for all entities.
-        // TODO [MEDIUM] accessor: LACKS.
-        // TODO [OPT] use arrays
-        this._entities = new Map();
-
-        // Entity registers are duplicated and refined here.
-        // An entity can be present in distinct worlds.
-        this._worldEntities = new Map();
+        // TODO [CRIT] accessor: LACKS.
+        // TODO [CRIT] use arrays
+        //this._entities = new Map();
+        // TODO [CRIT] cache optimization.
+        this._entities = []; // Entity id <-> position in entity array.
+        // new Array(10);
+        this._freedEntities = []; // Indexes of deleted entities.
+        this._entitiesLength = 0; // Length of entity array.
     }
 
     get entities() { return this._entities; }
-    get worldEntities() { return this._worldEntities; }
-
+    
     forEach(callback) {
         let entities = this._entities;
         entities.forEach((entity, id) => {
@@ -32,92 +33,73 @@ class EntityModel {
         });
     }
 
-    setWorldForEntity(entity, newWorldId) {
-        let entityId = entity.entityId;
-        let worldId = entity.worldId;
-        entity.worldId = newWorldId;
-
-        let worldIdToEntities = this._worldEntities.get(worldId);
-        if (worldIdToEntities) worldIdToEntities.delete(entityId);
-
-        let newWorldIdToEntities = this._worldEntities.get(newWorldId);
-        if (newWorldIdToEntities) {
-            newWorldIdToEntities.set(entityId, entity);
-        } else {
-            newWorldIdToEntities = new Map();
-            newWorldIdToEntities.set(entityId, entity);
-            this._worldEntities.set(newWorldId, newWorldIdToEntities);
-        }
-    }
-
     spawnPlayer(p) {
-        let entities = this._entities;
-        let worldModel = this._game.worldModel;
-        let playerId = CollectionUtil.generateId(entities);
-        p.avatar = EntityFactory.createAvatar(playerId, this);
-        let avatar = p.avatar;
+        let avatar = this.createEntity('avatar');
+        p.avatar = avatar;
 
         // TODO [MEDIUM] custom spawn world and location.
-        let world = worldModel.getWorld();
+        let world = this._game.worldModel.getWorld();
         let worldId = world.worldId;
         avatar.spawn(world.getFreePosition(), worldId);
 
-        let worldEntities = this._worldEntities.get(worldId);
-        if (!worldEntities) {
-            worldEntities = new Map();
-            worldEntities.set(playerId, avatar);
-            this._worldEntities.set(worldId, worldEntities);
+    }
+
+    // World to be set at spawn time.
+    createEntity(kind) {
+        let entities = this._entities;
+        //let entitiesLength = this._entitiesLength;
+        let freedEntities = this._freedEntities;
+        
+        let entityId;
+        if (freedEntities.length > 0) {
+            entityId = freedEntities[0]; 
+            freedEntities.shift();
         } else {
-            worldEntities.set(playerId, avatar);
+            entityId = entities.length;
+            //if (entityId >= entitiesLength) resizeAugment();
+            //++entitiesLength;
         }
-        entities.set(playerId, avatar);
+        // console.log('Entity shall have id ' + entityId);
+        
+        var e;
+        switch(kind) {
+            case 'avatar':
+                e = new Avatar(entityId);
+                break;
+            case 'mob':
+                e = new Entity(entityId);
+                break;
+            default:
+                throw Error('Invalid entity type.');
+        }
+
+        entities[entityId] = e;
+        return e;
     }
 
     removePlayer(playerId) {
-        let worldEntities = this._worldEntities;
-        let entity = this._entities.get(playerId);
-        let worldId = entity.worldId;
-        let otherStates = entity.otherStates;
-
-        otherStates.forEach((state, wid) => worldEntities.get(wid).delete(playerId));
-        let worldEntitiesInWorld = this._worldEntities.get(worldId);
-        if (worldEntitiesInWorld) worldEntitiesInWorld.delete(playerId);
-        this._entities.delete(playerId);
+        this.removeEntity(playerId);
+    }
+    
+    removeEntity(entityId) {
+        this._entities[entityId] = undefined;
+        this._freedEntities.push(entityId);
     }
 
     anEntityIsPresentOn(worldId, x, y, z) {
-        //let entities = this._entities;
-        // TODO [MEDIUM] optimize with LACKS structure.
-        let entities = this._worldEntities.get(worldId);
+        // TODO [CRIT] optimize with LACKS structure.
+        let entities = this._entities;
         let result = false;
         if (!entities) return result;
-        entities.forEach((entity, id) => {
+        // O(n) -> not good -> REFACTOR QUIIICK
+        entities.forEach(entity => {
+            if (entity.worldId !== worldId) return;
             let p = entity.position;
             if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)
                 result = true;
         });
 
         return result;
-    }
-
-    appearInWorld(worldId, entityId) {
-        // All entities are kept in a global register.
-        let currentEntity = this._entities.get(entityId);
-        let entitiesInWorld = this._worldEntities.get(worldId);
-
-        if (!entitiesInWorld) {
-            entitiesInWorld = new Map();
-            entitiesInWorld.set(entityId, currentEntity);
-            this._worldEntities.set(worldId, entitiesInWorld);
-        } else {
-            entitiesInWorld.set(entityId, currentEntity);
-        }
-    }
-
-    disappearFromWorld(worldId, entityId) {
-        let entitiesInWorld = this._worldEntities.get(worldId);
-        if (!entitiesInWorld) return;
-        entitiesInWorld.delete(entityId);
     }
 
 }

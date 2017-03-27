@@ -111,6 +111,7 @@ class Updater {
             let pid = p.avatar.entityId;
 
             // Compute change for entities in range.
+            // TODO [CRIT] heavily optimize by adding data
             let addedEntities, removedEntities,
                 u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
 

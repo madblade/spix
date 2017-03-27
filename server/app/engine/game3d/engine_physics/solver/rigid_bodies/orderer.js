@@ -16,15 +16,12 @@ class Orderer {
         this._xModel        = xModel;
         
         // Internals.
-        this._xAxis = new Map();
-        this._yAxis = new Map();
-        this._zAxis = new Map();
+        this._axes = new Map(); // world id -> [ [{k,v,i}]x, []y, []z ]
         
+        this._islands = [];
     }
 
-    get xAxis() { return this._xAxis; }
-    get yAxis() { return this._yAxis; }
-    get zAxis() { return this._zAxis; }
+    get axes()  { return this._axes; }
     
     static dichotomyLowerBound(a, value, prop) {
         var lo = 0, hi = a.length - 1, mid;
@@ -43,250 +40,86 @@ class Orderer {
     static orderCache(array, entities, portals, start, prop) {
         for (let i = start, l = array.length; i < l; ++i)
             if (array[i].kind === 'e')
-                entities.get(array[i].id)[prop] = i;
+                entities[array[i].id][prop] = i;    // Array.
             else if (array[i].kind === 'x')
-                portals.get(array[i].id)[prop] = i;
+                portals.get(array[i].id)[prop] = i; // Map.
     };
     
-    // Compute sorted axes from scratch or from partial (valid)
-    // ordered entity arrays.
+    // Compute sorted axes from scratch entity arrays.
     // Xs are taken into account to achieve efficient physics.
         // N.B. Chunk caches and specific x storage has nothing 
         // to do with physics specifically.
+        // Disclaimer: inefficient, but done at startup.
     orderObjects() {
         
-        let worldToEntities = this._entityModel.worldEntities;
-        let worldToCsToXs = this._xModel.worldToChunksToPortals;
         let portals = this._xModel.portals;
+        let entities = this._entityModel.entities;
+        let axes = this._axes;
         
-        let xAxis = this._xAxis,
-            yAxis = this._yAxis,
-            zAxis = this._zAxis;
-        
-        let markedWorlds = new Set();
-        let dichotomyLowerBound = Orderer.dichotomyLowerBound;
-
         let orderCache = Orderer.orderCache;
-        
-        // Sort entities.
-        // Disclaimer: inefficient, but done at startup.
-        let sorter = (a, b) => a.val > b.val;
-        
-        worldToEntities.forEach((entities, wid) => {  
-            // Set world as processed.
-            markedWorlds.add(wid);
-            
-            // Get xs.
-            let worldXs = worldToCsToXs.get(wid);
-            
-            // Get axes.
-            let currentXAxis = xAxis.get(wid),
-                currentYAxis,
-                currentZAxis;
-            
-            if (!currentXAxis) {
-                currentXAxis = [];
-                currentYAxis = [];
-                currentZAxis = [];
 
-                // Fill axes.
-                entities.forEach((entity, eid) => {
-                    currentXAxis.push({kind: 'e', id: eid, val: entity.position[0]});
-                    currentYAxis.push({kind: 'e', id: eid, val: entity.position[1]});
-                    currentZAxis.push({kind: 'e', id: eid, val: entity.position[2]});
-                });
-
-                if (worldXs) {
-                    worldXs.forEach(xs => xs.forEach(xid => {
-                        let x = portals.get(xid);
-                        let p = x.position;
-                        if (!p) return; // Stub portal.
-                        currentXAxis.push({kind: 'x', id: xid, val: p[0]});
-                        currentYAxis.push({kind: 'x', id: xid, val: p[1]});
-                        currentZAxis.push({kind: 'x', id: xid, val: p[2]});
-                    }));
-                }
-
-                currentXAxis.sort(sorter);
-                currentYAxis.sort(sorter);
-                currentZAxis.sort(sorter);
-                
-                // Cache rank in each entity.
-                orderCache(currentXAxis, entities, portals, 0, 'indexX');
-                orderCache(currentYAxis, entities, portals, 0, 'indexY');
-                orderCache(currentZAxis, entities, portals, 0, 'indexZ');
-                
-                xAxis.set(wid, currentXAxis);
-                yAxis.set(wid, currentYAxis);
-                zAxis.set(wid, currentZAxis);
+        // Fill axes with entities.
+        for (let i = 0, l = entities.length; i < l; ++i) {
+            if (!entities) continue;
+            let e = entities[i], wid = e.worldId, p = e.position;
+            let axis = axes.get(wid); // Most inefficient call.
             
-            } 
-            
+            if (!axis)
+                axes.set(wid, [
+                    [{kind: 'e', id: i, val:p[0]}], 
+                    [{kind: 'e', id: i, val:p[1]}],
+                    [{kind: 'e', id: i, val:p[2]}]
+                ]);
             else {
-                // console.log('[Physics/Orderer]: warn, ordering xs/entities without having flushed.');
-                
-                currentYAxis = yAxis.get(wid);
-                currentZAxis = zAxis.get(wid);
-                if (!currentYAxis || !currentZAxis)
-                    throw Error('[Physics/Orderer]: axis inconsistency');
-
-                let minAffectedX = currentXAxis.length; // Last element after current addition.
-                let minAffectedY = currentYAxis.length; // Same.
-                let minAffectedZ = currentZAxis.length;
-
-                // Initialized => must be sorted.
-                let completeAxis = kind => (entity, eid) => {
-                    // [Thought] really don't run orderObjects for other reasons than initial loading.
-                    if (kind === 'x') entity = portals.get(entity);
-                    let p = entity.position;
-                    if (!p) return; // Stub portals.
-                    let x = p[0], y = p[1], z = p[2];
-
-                    // Dichotomy search, insert after.
-                    let indexX = dichotomyLowerBound(currentXAxis, entity.position[0], 'val');
-                    let indexY = dichotomyLowerBound(currentYAxis, entity.position[1], 'val');
-                    let indexZ = dichotomyLowerBound(currentZAxis, entity.position[2], 'val');
-                    if (!currentXAxis[indexX]) return; // Not found.
-
-                    while (currentXAxis[indexX].val <= x && currentXAxis[indexX].id !== eid)
-                        ++indexX;
-                    if (currentXAxis[indexX].id !== eid) {
-                        currentXAxis.splice(indexX + 1, 0, {kind: kind, id: eid, val: x});
-                        entity.indexX = indexX + 1;
-                        minAffectedX = indexX + 2;
-                    }
-                    else return; // Opt. Others shouldn't be present if first one (x axis) is absent
-
-                    while (currentYAxis[indexY].val <= y && currentYAxis[indexY].id !== eid)
-                        ++indexY;
-                    if (currentYAxis[indexY].id !== eid) // Should be useless.
-                    {
-                        currentYAxis.splice(indexY + 1, 0, {kind: kind, id: eid, val: y});
-                        entity.indexY = indexY + 1;
-                        minAffectedY = indexY + 2;
-                    }
-
-                    while (currentZAxis[indexZ].val <= z && currentZAxis[indexZ].id !== eid)
-                        ++indexZ;
-                    if (currentZAxis[indexZ].id !== eid) // Should be useless as well.
-                    {
-                        currentZAxis.splice(indexZ + 1, 0, {kind: kind, id: eid, val: z});
-                        entity.indexZ = indexZ + 1;
-                        minAffectedZ = indexZ + 2;
-                    }
-                };
-
-                // Complete axes.
-                entities.forEach(completeAxis('e'));
-
-                if (worldXs)
-                    worldXs.forEach(xs => xs.forEach(completeAxis('x')));
-
-                orderCache(currentXAxis, entities, portals, minAffectedX, 'indexX');
-                orderCache(currentYAxis, entities, portals, minAffectedY, 'indexY');
-                orderCache(currentZAxis, entities, portals, minAffectedZ, 'indexZ');
-                
+                axis[0].push({kind: 'e', id: i, val:p[0]});
+                axis[1].push({kind: 'e', id: i, val:p[1]});
+                axis[2].push({kind: 'e', id: i, val:p[2]});
             }
+        }
+        
+        // TODO [CRIT] Fill axes with portals.
+        /*
+        portals.forEach((portal, i) => {
+            let wid = portal.worldId, p = portal.position;
+            let axis = axes.get(wid); // Most inefficient call.
             
+            if (!axis)
+                axes.set(wid, [
+                    [{kind: 'x', id: i, val:p[0]}], 
+                    [{kind: 'x', id: i, val:p[1]}],
+                    [{kind: 'x', id: i, val:p[2]}]
+                ]);
+            else {
+                axis[0].push({kind: 'x', id: i, val:p[0]});
+                axis[1].push({kind: 'x', id: i, val:p[1]});
+                axis[2].push({kind: 'x', id: i, val:p[2]});
+            }
         });
+        */
         
-        // Independent: sort xs for unvisited worlds.
-        worldToCsToXs.forEach((worldXs, wid) => {
-            if (markedWorlds.has(wid)) return;
-
-            let currentXAxis = xAxis.get(wid),
-                currentYAxis,
-                currentZAxis;
+        // Order axes.
+        axes.forEach((xyzEntities, wid) => {
+            let xAxis = xyzEntities[0],
+                yAxis = xyzEntities[1],
+                zAxis = xyzEntities[2];
             
-            let entities = worldToEntities.get(wid);
-            
-            if (!currentXAxis) {
-                currentXAxis = [];
-                currentYAxis = [];
-                currentZAxis = [];
-
-                worldXs.forEach(xs => xs.forEach(xid => {
-                    let x = portals.get(xid);
-                    if (!x) throw Error('[Physics/Orderer]: x model inconsistency (chks vs xs).');
-                    let p = x.position;
-                    if (!p) return; // Stub portal.
-                    currentXAxis.push({kind: 'x', id: xid, val: p[0]});
-                    currentYAxis.push({kind: 'x', id: xid, val: p[1]});
-                    currentZAxis.push({kind: 'x', id: xid, val: p[2]});
-                }));
-
-                let sorter = (a, b) => a.val > b.val;
-                
-                currentXAxis.sort(sorter);
-                currentYAxis.sort(sorter);
-                currentZAxis.sort(sorter);
-
-                orderCache(currentXAxis, entities, portals, 0, 'indexX');
-                orderCache(currentYAxis, entities, portals, 0, 'indexY');
-                orderCache(currentZAxis, entities, portals, 0, 'indexZ');
-
-                xAxis.set(wid, currentXAxis);
-                yAxis.set(wid, currentYAxis);
-                zAxis.set(wid, currentZAxis);
+            if (!xAxis || !yAxis || !zAxis ||
+                xAxis.length !== yAxis.length ||
+                xAxis.length !== zAxis.length) 
+            {
+                throw Error('[Physics/Orderer]: axis inconsistency.');
             }
             
-            else {
-                // console.log('[Physics/Orderer]: warn, ordering xs without having flushed.');
-                
-                currentYAxis = yAxis.get(wid);
-                currentZAxis = zAxis.get(wid);
-                if (!currentYAxis || !currentZAxis)
-                    throw Error('[Physics/Orderer]: axis inconsistency');
-
-                let minAffectedX = currentXAxis.length;
-                let minAffectedY = currentYAxis.length;
-                let minAffectedZ = currentZAxis.length;
-                
-                // Unoptimized searcher.
-                let search = (a, id, prop) => {
-                    let length = a.length;
-                    for (let i = 0; i < length; ++i) {
-                        if (a[prop] === id) return i;
-                    }
-                    return -1;
-                };
-                
-                // Add missing xs.
-                worldXs.forEach(xs => xs.forEach(xid => {
-                    let x = portals.get(xid);
-                    if (!x) throw Error('[Physics/Orderer]: inconsistency in x model (chks vs xs).');
-                    
-                    let indexX = search(currentXAxis, xid, 'id');
-                    if (indexX > -1)
-                    {
-                        currentXAxis.splice(indexX + 1, 0, {kind: 'x', id: xid, val: x.position[0]});
-                        x.indexX = indexX + 1;
-                        minAffectedX = indexX + 2;
-                    }
-                    else return; // Nothing to do. Others should follow.
-                    
-                    let indexY = search(currentYAxis, xid, 'id');
-                    if (indexY > -1) // Check if useless.
-                    {
-                        currentYAxis.splice(indexY + 1, 0, {kind: 'x', id: xid, val: x.position[1]});
-                        x.indexY = indexY + 1;
-                        minAffectedY = indexY + 2;
-                    }
-                    
-                    let indexZ = search(currentZAxis, xid, 'id');
-                    if (indexZ > -1)
-                    {
-                        currentZAxis.splice(indexZ + 1, 0, {kind: 'x', id: xid, val: x.position[2]});
-                        x.indexZ = indexZ + 1;
-                        minAffectedZ = indexZ + 2;
-                    }
-                }));
-                
-                orderCache(currentXAxis, entities, portals, minAffectedX, 'indexX');
-                orderCache(currentYAxis, entities, portals, minAffectedY, 'indexY');
-                orderCache(currentZAxis, entities, portals, minAffectedZ, 'indexZ');
-                
-            }
+            // Perform ordering.
+            xAxis.sort((a, b) => a.val > b.val);
+            yAxis.sort((a, b) => a.val > b.val);
+            zAxis.sort((a, b) => a.val > b.val);
+            
+            // Write position in objects.
+            // Using reflection.
+            orderCache(xAxis, entities, portals, 0, 'indexX');
+            orderCache(yAxis, entities, portals, 0, 'indexY');
+            orderCache(zAxis, entities, portals, 0, 'indexZ');
             
         });
     
@@ -306,26 +139,16 @@ class Orderer {
         let eid = kind === 'e' ? object.entityId : object.portalId;
         
         let wid = object.worldId;
-
-        let worldToEntities = this._entityModel.worldEntities;
         let portals = this._xModel.portals;
-        let entities = worldToEntities.get(wid);
+        let entities = this._entityModel.entities;
+        let axis = this._axes.get(wid);
         
-        let xAxis = this._xAxis.get(wid),
-            yAxis = this._yAxis.get(wid),
-            zAxis = this._zAxis.get(wid);
-        
-        let dichotomyLowerBound = Orderer.dichotomyLowerBound;
-        
-        let orderCache = Orderer.orderCache;
-        
-        if (!xAxis) {
-            if (yAxis || zAxis) 
-                throw Error('[Physics/Orderer]: axis inconsistency.');
-            
-            this._xAxis.set(wid, [{kind: kind, id: eid, val: x}]);
-            this._yAxis.set(wid, [{kind: kind, id: eid, val: y}]);
-            this._zAxis.set(wid, [{kind: kind, id: eid, val: z}]);
+        if (!axis) {
+            this._axes.set(wid, [
+                [{kind: kind, id: eid, val: x}],
+                [{kind: kind, id: eid, val: y}],
+                [{kind: kind, id: eid, val: z}]
+            ]);
             
             object.indexX = 0;
             object.indexY = 0;
@@ -333,42 +156,32 @@ class Orderer {
         }
         
         else {
+            let dichotomyLowerBound = Orderer.dichotomyLowerBound;
+            let orderCache = Orderer.orderCache;
+            let xAxis = axis[0],
+                yAxis = axis[1],
+                zAxis = axis[2];
+            
             // Dichotomy search, insert after.
             let indexX = dichotomyLowerBound(xAxis, x, 'val');
             let indexY = dichotomyLowerBound(yAxis, y, 'val');
             let indexZ = dichotomyLowerBound(zAxis, z, 'val');
-            if (!xAxis[indexX]) return; // Not found
+            if (!xAxis[indexX]) // Not found
+                throw Error('[Physics/Orderer]: element not found.');
             
-            while (xAxis[indexX].val <= x && xAxis[indexX].id !== eid)
-                ++indexX;
-            if (xAxis[indexX].id !== eid)
-            {
-                xAxis.splice(indexX + 1, 0, {kind: kind, id: eid, val: x});
-                object.indexX = (indexX + 1);
-            }
-            else return; // Opt. Others shouldn't be present if first one (x axis) is absent
+            while (xAxis[indexX] && xAxis[indexX].val <= x) ++indexX;
+            xAxis.splice(indexX, 0, {kind: kind, id: eid, val: x});
 
-            while (yAxis[indexY].val <= y && yAxis[indexY].id !== eid)
-                ++indexY;
-            if (yAxis[indexY].id !== eid) // Should be useless.
-            {
-                yAxis.splice(indexY + 1, 0, {kind: kind, id: eid, val: y});
-                object.indexY = (indexY + 1);
-            }
+            while (yAxis[indexY] && yAxis[indexY].val <= y) ++indexY;
+            yAxis.splice(indexY, 0, {kind: kind, id: eid, val: y});
 
-            while (zAxis[indexZ].val <= z && zAxis[indexZ].id !== eid)
-                ++indexZ;
-            if (zAxis[indexZ].id !== eid) // Should be useless as well.
-            {
-                zAxis.splice(indexZ + 1, 0, {kind: kind, id: eid, val: z});
-                object.indexZ = (indexZ + 1);
-            }
+            while (zAxis[indexZ] && zAxis[indexZ].val <= z) ++indexZ;
+            zAxis.splice(indexZ, 0, {kind: kind, id: eid, val: z});
             
             // Reorder last entities.
-
-            orderCache(xAxis, entities, portals, indexX + 2, 'indexX');
-            orderCache(yAxis, entities, portals, indexY + 2, 'indexY');
-            orderCache(zAxis, entities, portals, indexZ + 2, 'indexZ');
+            orderCache(xAxis, entities, portals, indexX, 'indexX');
+            orderCache(yAxis, entities, portals, indexY, 'indexY');
+            orderCache(zAxis, entities, portals, indexZ, 'indexZ');
         }
     }
     
@@ -380,36 +193,98 @@ class Orderer {
         if (!kind)
             throw Error('[Physics/Orderer]: invalid object kind.');
 
-        let worldToEntities = this._entityModel.worldEntities;
         let portals = this._xModel.portals;
-        
-        // Get properties.
-        let p = object.position;
-        let x = p[0], y = p[1], z = p[2];
-        let eid = kind === 'e' ? object.entityId : object.portalId;
+        let entities = this._entityModel.entities;
         let wid = object.worldId;
-        let entities = worldToEntities.get(wid);
-            
+        let axis = this._axes.get(wid);
         let indexX = object.indexX,
             indexY = object.indexY,
             indexZ = object.indexZ;
         
-        let xAxis = this._xAxis.get(wid);
-        let yAxis = this._yAxis.get(wid);
-        let zAxis = this._zAxis.get(wid);
+        let xAxis = axis[0],
+            yAxis = axis[1],
+            zAxis = axis[2];
         
         xAxis.splice(indexX, 1);
         yAxis.splice(indexY, 1);
         zAxis.splice(indexZ, 1);
         
-        orderCache(xAxis, entities, portals, indexX, 'indexX');
-        orderCache(xAxis, entities, portals, indexY, 'indexY');
-        orderCache(xAxis, entities, portals, indexZ, 'indexZ');
+        // 1 shift -> O(n)
+        if (xAxis.length > 0) {
+            let orderCache = Orderer.orderCache;
+            orderCache(xAxis, entities, portals, indexX, 'indexX');
+            orderCache(xAxis, entities, portals, indexY, 'indexY');
+            orderCache(xAxis, entities, portals, indexZ, 'indexZ');
+        } else {
+            this._axes.delete(wid);
+        }
     }
     
-    flush() {
-        this._xAxis = new Map();
+    switchEntityToWorld(entity, newWorldId, coordinates) {
+        let oldWorldId = entity.worldId;
+        let eid = entity.entityId;
+        //entity.position = coordinates;
+       
+        let x = coordinates[0],
+            y = coordinates[1],
+            z = coordinates[2];
+        let xid = entity.indexX,
+            yid = entity.indexY,
+            zid = entity.indexZ;
+        
+        // Old axes?
+        let oldAxis = this._axes.get(oldWorldId);
+        if (oldAxis) {
+            // Remove from old set of axes.
+            oldAxis[0].splice(xid, 1);
+            oldAxis[1].splice(yid, 1);
+            oldAxis[2].splice(zid, 1);
+            if (oldAxis[0].length < 1) this._axes.delete(oldWorldId);
+        } else console.log('ERROR');
+        
+        // Insert into new set of axes.
+        let newAxis = this._axes.get(newWorldId);
+        if (!newAxis) {
+            this._axes.set(newWorldId, [
+                [{kind:'e', id:eid, val:x}],
+                [{kind:'e', id:eid, val:y}],
+                [{kind:'e', id:eid, val:z}]
+            ]);
+            entity.indexX = 0;
+            entity.indexY = 0;
+            entity.indexZ = 0;
+            
+        } else {
+            let xAxis = newAxis[0], xLow,
+                yAxis = newAxis[1], yLow,
+                zAxis = newAxis[2], zLow;
+            
+            let dichotomyLowerBound = Orderer.dichotomyLowerBound;
+            let portals = this._xModel.portals;
+            let entities = this._entityModel.entities;
+            
+            xLow = dichotomyLowerBound(xAxis, x, 'val');
+            yLow = dichotomyLowerBound(yAxis, y, 'val');
+            zLow = dichotomyLowerBound(zAxis, z, 'val');
+            
+            if (xLow) xAxis.splice(xLow + 1, 0, {kind:'e', id:eid, val:x});
+            if (yLow) xAxis.splice(yLow + 1, 0, {kind:'e', id:eid, val:y});
+            if (zLow) xAxis.splice(zLow + 1, 0, {kind:'e', id:eid, val:z});
+
+            // 1 shift -> O(n)
+            let orderCache = Orderer.orderCache;
+            orderCache(xAxis, entities, portals, xLow, 'indexX');
+            orderCache(xAxis, entities, portals, xLow, 'indexY');
+            orderCache(xAxis, entities, portals, xLow, 'indexZ');
+        }
+
+        // Set new world.
+        entity.worldId = newWorldId;
     }
+    
+    //flush() {
+    //    this._xAxis = new Map();
+    //}
     
 }
 
