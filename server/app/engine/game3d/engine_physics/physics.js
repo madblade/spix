@@ -24,7 +24,7 @@ class PhysicsEngine {
 
         // Engine.
         this._updater       = new Updater(this); // Parses input and updates model constraints.
-        this._frontend      = new FrontEnd(this);  // Updates physical model.
+        this._frontend      = new FrontEnd(this, game.refreshRate);  // Updates physical model.
     }
 
     get entityModel()   { return this._entityModel; }
@@ -67,12 +67,12 @@ class PhysicsEngine {
     /** **/
     
     spawnPlayer(player) {
-        this._frontend.orderer.addObject(player.avatar);
+        this._frontend.objectOrderer.addObject(player.avatar);
     }
     
     removePlayer(playerId) {
         let entity = this._entityModel.entities[playerId];
-        this._frontend.orderer.removeObject(entity);
+        this._frontend.objectOrderer.removeObject(entity);
     }
     
 }

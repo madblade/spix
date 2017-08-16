@@ -69,7 +69,7 @@ class UserInput {
             this.pushToEngine('move',   avatar, physicsEngine),
             this.pushToEngine('rotate', avatar, physicsEngine),
             this.pushToEngine('block',  avatar, topologyEngine),
-            this.pushToEngine('gate',  avatar, consistencyEngine),
+            this.pushToEngine('gate',   avatar, consistencyEngine),
             this.pushToEngine('action', avatar, physicsEngine),
 
             this._chat.playerInput(player)

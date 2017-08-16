@@ -18,7 +18,9 @@ extend(App.Engine.UI.prototype, {
             // TODO [MEDIUM] differentiate controls type in graphics
             
             //var rotation = graphics.cameraManager.moveCameraFromMouse(movementX, movementY);
-            graphics.cameraManager.addCameraRotationEvent(movementX, movementY);
+            // TODO [CRIT] 3Dize
+            
+            graphics.cameraManager.addCameraRotationEvent(movementX, movementY, 0, 0);
         };
 
         return {

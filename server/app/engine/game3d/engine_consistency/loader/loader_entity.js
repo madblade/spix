@@ -23,10 +23,10 @@ class EntityLoader {
         thresh *= thresh; // Squared distance.
 
         let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
-        // TODO [HIGH] compute entity distance as chunk distance
+        // TODO [CRIT] compute entity distance as chunk distance
         // let distance = GeometryUtils.entitySquaredEuclideanDistance;
 
-        // TODO [LACKS] optim O(n²) -> O(Cn)
+        // TODO [CRIT] optim O(n²) -> O(Cn)
         entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid) {
             if (distance(e, avatar) < thresh)
                 entities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
@@ -52,8 +52,8 @@ class EntityLoader {
         var addedEntities = {};
         var removedEntities = {};
 
-        // TODO [LACKS]: O(n²) -> O(Cn).
-        // TODO [HIGH]: also use for AABB phase in physics.
+        // TODO [CRIT]: O(n²) -> O(Cn).
+        // TODO [CRIT]: also use for AABB phase in physics.
         let aid = avatar.entityId;
         // For all different entities.
         entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid) { 

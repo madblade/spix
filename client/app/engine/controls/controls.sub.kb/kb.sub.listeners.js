@@ -57,6 +57,20 @@ extend(App.Engine.UI.prototype, {
                     // TODO debug here
                     break;
 
+                // TODO [HIGH] up rotation testing
+                case k.padFour:     // Left
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, -Math.PI/2, 0);
+                    break;
+                case k.padSix:      // Right
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, Math.PI/2, 0);
+                    break;
+                case k.padFive:     // Down
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, 0, -Math.PI/2);
+                    break;
+                case k.padEight:    // Up
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, 0, Math.PI/2);
+                    break;
+
                 case k.enter:
                     /*
                      TODO for chat:
@@ -85,7 +99,9 @@ extend(App.Engine.UI.prototype, {
      */
     registerKeyUp: function() {
         var app = this.app;
+        var graphics = app.engine.graphics;
 
+        // TODO [CRIT] 3Dize
         $(window).keyup(function(event) {
             event.preventDefault();
             if (!event.keyCode) return;

@@ -70,6 +70,7 @@ class Game3D extends Game {
     get consistencyEngine() { return this._consistencyEngine; }
 
     get chat()              { return this._chat; }
+    get refreshRate()       { return this._refreshRate; }
 
     static bench = false;
 

@@ -28,6 +28,10 @@ extend(App.Model.Server.EntityModel.prototype, {
             case 'player':
                 this.loadPlayer(id, updatedEntity, graphics, entities);
                 break;
+            
+            case 'cube':
+                this.loadCube(id, updatedEntity, graphics, entities);
+                break;
 
             default:
                 console.log('ServerModel::addEntity: Unknown entity type.');

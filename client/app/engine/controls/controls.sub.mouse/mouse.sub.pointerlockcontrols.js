@@ -63,6 +63,7 @@ extend(App.Engine.UI.prototype, {
 
         controlsEngine.startKeyboardListeners();
         controlsEngine.startMouseListeners();
+        controlsEngine.startWindowListeners();
     },
 
     pointerLockChanged: function(isPointerLocked) {

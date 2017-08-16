@@ -12,8 +12,10 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     camera.rotation.set(0, 0, 0);
     var pitch = new THREE.Object3D();
     var yaw = new THREE.Object3D();
+    var up = new THREE.Object3D();
     pitch.add(camera);
     yaw.add(pitch);
+    up.add(yaw);
 
     // 4D logic
     this.worldId = worldId;
@@ -24,6 +26,7 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     ];
 
     // Don't expose these internal variables.
+    this.up = up;                   // 3D 'gravity' constraint (full rotation)
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
     this.pitch = pitch;             // Intermediate (rotation.x)
     this.cameraObject = camera;     // Explicit     (constant)
@@ -52,11 +55,11 @@ extend(App.Engine.Graphics.Camera.prototype, {
     },
 
     get3DObject: function() {
-        return this.yaw;
+        return this.up;
     },
 
     getCameraPosition: function() {
-        return this.yaw.position;
+        return this.up.position;
     },
 
     rotateX: function(deltaX) {
@@ -68,6 +71,13 @@ extend(App.Engine.Graphics.Camera.prototype, {
     rotateZ: function(deltaZ) {
         var yaw = this.yaw;
         yaw.rotation.z += deltaZ;
+    },
+    
+    setUpRotation: function(x, y, z) {
+        var up = this.up;
+        up.rotation.x = x;
+        up.rotation.y = y;
+        up.rotation.z = z;
     },
 
     getXRotation: function() {
@@ -87,10 +97,10 @@ extend(App.Engine.Graphics.Camera.prototype, {
     },
 
     setCameraPosition: function(x, y, z) {
-        var yaw = this.yaw;
-        yaw.position.x = x;
-        yaw.position.y = y;
-        yaw.position.z = z;
+        var up = this.up;
+        up.position.x = x;
+        up.position.y = y;
+        up.position.z = z;
     },
     
     setCameraTransform: function(cameraTransform) {

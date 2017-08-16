@@ -32,6 +32,7 @@ extend(App.Engine.UI.prototype, {
         this.setupKeyboard();
         this.setupMouse();
         this.setupTouch();
+        this.setupWindowListeners();
 
         $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
     },
@@ -44,6 +45,7 @@ extend(App.Engine.UI.prototype, {
         this.stopKeyboardListeners();
         this.stopMouseListeners();
         this.stopTouchListeners();
+        this.stopWindowListeners();
     }
 
 });

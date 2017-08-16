@@ -146,33 +146,63 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         }
     },
     
-    addCameraRotationEvent: function(eventX, eventY) {
-        this.incomingRotationEvents.push([eventX, eventY]);
+    // TODO [CRIT] 3Dize
+    addCameraRotationEvent: function(relX, relY, absX, absY) {
+        this.incomingRotationEvents.push([relX, relY, absX, absY]);
     },
     
     refresh: function() {
         var incoming = this.incomingRotationEvents;
-        var rotation;
+        if (incoming.length < 1) return;
+        
+        var rotation = [0, 0, 0, 0];
         for (var i = 0, l = incoming.length; i < l; ++i) {
-            rotation = this.moveCameraFromMouse(incoming[i][0], incoming[i][1]);
+            var inc = incoming[i];
+            var rot = [0, 0, 0, 0];
+            rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
+            rotation[0] = rot[0];
+            rotation[1] = rot[1];
+            rotation[2] = rot[2];
+            rotation[3] = rot[3];
         }
         this.incomingRotationEvents = [];
 
-        // TODO [CRIT] perform additional fitlering
+        // TODO [MEDIUM] perform additional filtering
         if (rotation) {
+            /*
+            console.log(
+                rotation[0].toFixed(4) + ', ' + 
+                rotation[1].toFixed(4) + ' ; ' + 
+                rotation[2].toFixed(4) + ', ' + 
+                rotation[3].toFixed(4)
+            );
+            */
+            
             var clientModel = this.graphicsEngine.app.model.client;
-            clientModel.triggerEvent('r', [rotation[0], rotation[1]]);
+            clientModel.triggerEvent('r', rotation);
         }
     },
 
-    moveCameraFromMouse: function(movementX, movementY) {
+    moveCameraFromMouse: function(relX, relY, absX, absY) {
         // Rotate main camera.
         var camera = this.mainCamera;
-        camera.rotateZ(-movementX * 0.002);
-        camera.rotateX(-movementY * 0.002);
+        camera.rotateZ(-relX * 0.002);
+        camera.rotateX(-relY * 0.002);
         var rotationZ = camera.getZRotation();
         var rotationX = camera.getXRotation();
 
+        // Current up vector -> angles.
+        var up = camera.get3DObject().rotation;
+        var theta0 = up.z;
+        var theta1 = up.x;
+        
+        if (absX != 0 || absY != 0) {
+            // Add angles.
+            theta0 = theta0 + absX;
+            theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
+            camera.setUpRotation(theta1, 0, theta0);
+        }
+        
         // Rotate raycaster camera.
         var raycasterCamera = this.mainRaycasterCamera;
         raycasterCamera.setZRotation(rotationZ);
@@ -183,12 +213,13 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             // TODO [CRIT] update camera position, rotation rel. to portal position.
             subCamera.setZRotation(rotationZ);
             subCamera.setXRotation(rotationX);
+            subCamera.setUpRotation(theta1, 0, theta0)
         });
 
         // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
         // camera.quaternion.multiply(tmpQuaternion);
         // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
-        return [rotationZ, rotationX];
+        return [rotationZ, rotationX, theta0, theta1];
     },
 
     resize: function(width, height) {

@@ -58,14 +58,20 @@ class Updater {
 
     // Unconstrained => direct update, then notify output.
     rotate(meta, avatar) {
-        if (avatar.rotation === null) return;
+        let rotation = avatar.rotation;
+        if (rotation === null) return;
 
         let outputBuffer = this._physicsEngine.outputBuffer;
 
-        let p = meta[0], y = meta[1];
+        let relPitch = meta[0], // Represents self rotation.
+            relYaw = meta[1],
+            absPitch = meta[2], // Represents gravity.
+            absYaw = meta[3];
 
-        if (p !== avatar.rotation[0] || y !== avatar.rotation[1]) {
-            avatar.rotate(p, y);
+        if (relPitch !== rotation[0] || relYaw !== rotation[1] ||
+            absPitch !== rotation[2] || absYaw !== rotation[3])
+        {
+            avatar.rotate(relPitch, relYaw, absPitch, absYaw);
             outputBuffer.entityUpdated(avatar.entityId);
         }
     }

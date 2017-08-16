@@ -5,6 +5,7 @@
 'use strict';
 
 import Avatar from './avatar';
+import Cube   from './cube';
 import Entity from './entity';
 import CollectionUtil from '../../math/collections';
 
@@ -41,7 +42,6 @@ class EntityModel {
         let world = this._game.worldModel.getWorld();
         let worldId = world.worldId;
         avatar.spawn(world.getFreePosition(), worldId);
-
     }
 
     // World to be set at spawn time.
@@ -66,8 +66,8 @@ class EntityModel {
             case 'avatar':
                 e = new Avatar(entityId);
                 break;
-            case 'mob':
-                e = new Entity(entityId);
+            case 'cube':
+                e = new Cube(entityId);
                 break;
             default:
                 throw Error('Invalid entity type.');
@@ -87,7 +87,7 @@ class EntityModel {
     }
 
     anEntityIsPresentOn(worldId, x, y, z) {
-        // TODO [CRIT] optimize with LACKS structure.
+        // TODO [CRIT] optimize with chunks structure.
         let entities = this._entities;
         let result = false;
         if (!entities) return result;

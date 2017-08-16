@@ -62,8 +62,9 @@ class World {
 
         const chunkId = i+','+j+','+k;
         let chunk = this._chunks.get(chunkId);
-        if (!chunk || chunk === undefined) {console.log('ChkMgr@whatBlock: could not find chunk ' + chunkId +
-            ' from ' + x+','+y+','+z);
+        if (!chunk || chunk === undefined) {
+            console.log('ChkMgr@whatBlock: could not find chunk ' + 
+                chunkId + ' from ' + x+','+y+','+z);
             // TODO [MEDIUM] load concerned chunk.
             // TODO [MEDIUM] check minus
             return;
@@ -74,7 +75,7 @@ class World {
 
     getFreePosition() {
         let zLimit = this._zSize;
-        let z = zLimit - 2;
+        let z = 0;
         while (this.whatBlock(4, 4, z) !== 0 && z < zLimit) ++z;
         return [4.5, 4.5, z];
     }

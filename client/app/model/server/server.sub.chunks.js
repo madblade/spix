@@ -52,8 +52,12 @@ extend(App.Model.Server.ChunkModel.prototype, {
         var graphics = this.app.engine.graphics;
 
         var chunkUpdates = this.chunkUpdates;
+        var reportedUpdates = [];
+        var mustReport = false;
+        
         for (var cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
             var updates = chunkUpdates[cu];
+            var rup = {};
 
             if ('worlds' in updates) {
                 //console.log('World metadata:');
@@ -80,6 +84,8 @@ extend(App.Model.Server.ChunkModel.prototype, {
                 }
 
                 var subdates = updates[worldId];
+                var sup = {};
+                
                 for (var chunkId in subdates) {
                     var update = subdates[chunkId];
 
@@ -103,15 +109,33 @@ extend(App.Model.Server.ChunkModel.prototype, {
                             console.log(update);
                             return;
                         } else {
-                            this.initializeChunk(worldId, chunkId, update);
+                            // One per iteration...
+                            console.log('one more time');
+                            if (!mustReport) {
+                                console.log('initing');
+                                this.initializeChunk(worldId, chunkId, update);
+                                mustReport = true;
+                            } else {
+                                console.log('reporting');
+                                sup[chunkId] = update;
+                            }
                         }
                     }
                 }
+                
+                if (Object.keys(sup).length > 0) {
+                    rup[worldId] = sup;
+                }
+            }
+            
+            if (Object.keys(rup).length > 0) {
+                reportedUpdates.push(rup);
             }
         }
 
-        this.chunkUpdates = [];
-        this.needsUpdate = false;
+        this.chunkUpdates = reportedUpdates;
+        if (reportedUpdates.length < 1)
+            this.needsUpdate = false;
     },
 
     updateChunks: function(updates) {

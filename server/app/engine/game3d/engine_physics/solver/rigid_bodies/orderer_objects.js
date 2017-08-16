@@ -7,7 +7,7 @@
 import Entity from '../../../model_entity/entity';
 import Portal from '../../../model_x/portal';
 
-class Orderer {
+class ObjectOrderer {
     
     constructor(entityModel, xModel) {
         
@@ -18,7 +18,8 @@ class Orderer {
         // Internals.
         this._axes = new Map(); // world id -> [ [{k,v,i}]x, []y, []z ]
         
-        this._islands = [];
+        this._islands = []; // 1 island: [entity/x id, ...]
+        this._isEntity = []; // 1 island: [is entity or x]
     }
 
     get axes()  { return this._axes; }
@@ -56,8 +57,8 @@ class Orderer {
         let entities = this._entityModel.entities;
         let axes = this._axes;
         
-        let orderCache = Orderer.orderCache;
-
+        let orderCache = ObjectOrderer.orderCache;
+        
         // Fill axes with entities.
         for (let i = 0, l = entities.length; i < l; ++i) {
             if (!entities) continue;
@@ -77,15 +78,17 @@ class Orderer {
             }
         }
         
+            
+        
+        
         // TODO [CRIT] Fill axes with portals.
-        /*
         portals.forEach((portal, i) => {
             let wid = portal.worldId, p = portal.position;
             let axis = axes.get(wid); // Most inefficient call.
             
             if (!axis)
                 axes.set(wid, [
-                    [{kind: 'x', id: i, val:p[0]}], 
+                    [{kind: 'x', id: i, val:p[0]}],
                     [{kind: 'x', id: i, val:p[1]}],
                     [{kind: 'x', id: i, val:p[2]}]
                 ]);
@@ -95,7 +98,6 @@ class Orderer {
                 axis[2].push({kind: 'x', id: i, val:p[2]});
             }
         });
-        */
         
         // Order axes.
         axes.forEach((xyzEntities, wid) => {
@@ -156,8 +158,8 @@ class Orderer {
         }
         
         else {
-            let dichotomyLowerBound = Orderer.dichotomyLowerBound;
-            let orderCache = Orderer.orderCache;
+            let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
+            let orderCache = ObjectOrderer.orderCache;
             let xAxis = axis[0],
                 yAxis = axis[1],
                 zAxis = axis[2];
@@ -211,7 +213,7 @@ class Orderer {
         
         // 1 shift -> O(n)
         if (xAxis.length > 0) {
-            let orderCache = Orderer.orderCache;
+            let orderCache = ObjectOrderer.orderCache;
             orderCache(xAxis, entities, portals, indexX, 'indexX');
             orderCache(xAxis, entities, portals, indexY, 'indexY');
             orderCache(xAxis, entities, portals, indexZ, 'indexZ');
@@ -259,7 +261,7 @@ class Orderer {
                 yAxis = newAxis[1], yLow,
                 zAxis = newAxis[2], zLow;
             
-            let dichotomyLowerBound = Orderer.dichotomyLowerBound;
+            let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
             let portals = this._xModel.portals;
             let entities = this._entityModel.entities;
             
@@ -272,7 +274,7 @@ class Orderer {
             if (zLow) xAxis.splice(zLow + 1, 0, {kind:'e', id:eid, val:z});
 
             // 1 shift -> O(n)
-            let orderCache = Orderer.orderCache;
+            let orderCache = ObjectOrderer.orderCache;
             orderCache(xAxis, entities, portals, xLow, 'indexX');
             orderCache(xAxis, entities, portals, xLow, 'indexY');
             orderCache(xAxis, entities, portals, xLow, 'indexZ');
@@ -282,10 +284,6 @@ class Orderer {
         entity.worldId = newWorldId;
     }
     
-    //flush() {
-    //    this._xAxis = new Map();
-    //}
-    
 }
 
-export default Orderer;
+export default ObjectOrderer;
