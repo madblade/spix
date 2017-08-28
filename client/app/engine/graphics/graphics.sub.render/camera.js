@@ -16,6 +16,7 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     pitch.add(camera);
     yaw.add(pitch);
     up.add(yaw);
+    up.rotation.reorder('ZYX');
 
     // 4D logic
     this.worldId = worldId;
@@ -30,8 +31,6 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
     this.pitch = pitch;             // Intermediate (rotation.x)
     this.cameraObject = camera;     // Explicit     (constant)
-    
-    this.up.rotation.reorder('ZYX');
 };
 
 extend(App.Engine.Graphics.Camera.prototype, {
@@ -118,7 +117,10 @@ extend(App.Engine.Graphics.Camera.prototype, {
     },
 
     setThirdPerson: function() {
-        this.cameraObject.position.z = 4;
+        var p = this.cameraObject.position;
+        p.x = 0;
+        p.y = 0;
+        p.z = 4;
     }
 
 });

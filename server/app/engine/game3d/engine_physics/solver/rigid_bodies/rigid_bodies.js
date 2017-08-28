@@ -336,19 +336,24 @@ class RigidBodies {
                 let a0 = currentEntity.a0;
                 let a1 = currentEntity.a1;
                 
-                // TODO [MEDIUM] optimise
+                // First, cast on current world to prevent x crossing through matter.
+                const dtr = currentEntity.dtr;
+                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, dtr);
+                // TODO remove this 'Nevermind' thing.
+                // console.log(hasCollided);
+                
+                // Then, cast through potential x
                 let xCrossed = XCollider.xCollide(p0, p1, world, xm);
                 let oldWorldId = currentEntity.worldId;
                 if (xCrossed) {
                     let newWorldId = xCrossed.worldId;
                     objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
-                    o.entityUpdated(currentEntity);
+                    
+                    // Collide with terrain on the other side (no second x crossing enabled)
+                    // TODO [HIGH] translate [p0, p1] to [x.position, x.transform(p1, newWorldId)]
+                    let hasCollidedAfterwards = 
+                        TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
                 }
-                
-                const dtr = currentEntity.dtr;
-                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, dtr);
-                // console.log(hasCollided);
-                    // TODO remove that 'Nevermind' ugliest of things.
                 
                 // Update object.
                 let entityUpdated = false;
@@ -369,10 +374,9 @@ class RigidBodies {
                     currentEntity.a0 = currentEntity.a1;
                     entityUpdated = true;
                 }
-                    
                 
                 if (entityUpdated)
-                    o.entityUpdated(currentEntity);
+                    o.entityUpdated(entityIndex);
                 
                 currentEntity.p1 = [0, 0, 0];
                 currentEntity.v1 = [0, 0, 0];

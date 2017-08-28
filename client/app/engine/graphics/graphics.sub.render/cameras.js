@@ -127,9 +127,11 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
 
         var i = this.graphicsEngine.getCameraInteraction();
 
+        // TODO [HIGH] generalize (server-side, comes with collision cross-p)
         var x = vector[0];
         var y = vector[1];
         var z = vector[2] + 1.6;
+        //var z = vector[2];
 
         if (i.isFirstPerson()) {
             cams.forEach(function(cam, cameraId) {
@@ -140,7 +142,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
 
         else if (i.isThirdPerson()) {
             cams.forEach(function(cam, cameraId) {
-                cam.setCameraPosition(x, y, z+0.2);
+                cam.setCameraPosition(x, y, z);
                 cam.setThirdPerson();
             });
         }
@@ -196,17 +198,19 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         var theta0 = up.z;
         var theta1 = up.x;
         
+        // Rotate raycaster camera.
+        var raycasterCamera = this.mainRaycasterCamera;
+        raycasterCamera.setZRotation(rotationZ);
+        raycasterCamera.setXRotation(rotationX);
+        
         if (absX != 0 || absY != 0) {
             // Add angles.
             theta0 = theta0 + absX;
             theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
             camera.setUpRotation(theta1, 0, theta0);
+            raycasterCamera.setUpRotation(theta1, 0, theta0);
         }
         
-        // Rotate raycaster camera.
-        var raycasterCamera = this.mainRaycasterCamera;
-        raycasterCamera.setZRotation(rotationZ);
-        raycasterCamera.setXRotation(rotationX);
 
         // Apply transform to portals.
         this.subCameras.forEach(function(subCamera, cameraId) {

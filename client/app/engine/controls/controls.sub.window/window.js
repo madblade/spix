@@ -27,13 +27,14 @@ extend(App.Engine.UI.prototype, {
             return;
         }
         
+        // TODO [MEDIUM] check for double-deactivation
         var handlerVisibilityChange = function() {
             if (document[hidden]) {
                 this.stopKeyboardListeners();
             } else {
                 this.startKeyboardListeners();
             }
-        };
+        }.bind(this);
         
         this.windowListeners = {
             start: function() {

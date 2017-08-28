@@ -56,7 +56,11 @@ extend(App.Model.Server.EntityModel.prototype, {
         p.x = up[0];
         p.y = up[1];
         p.z = up[2];
-        object3D.rotation.y = Math.PI + updatedEntity.r[0];
+        
+        var ur = updatedEntity.r;
+        object3D.rotation.x = ur[3];
+        object3D.rotation.z = ur[2];
+        object3D.getWrapper().rotation.y = Math.PI + ur[0];
 
         // Update animation
         if (animate) graphics.updateAnimation(id);

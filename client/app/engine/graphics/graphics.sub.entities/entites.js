@@ -30,12 +30,15 @@ extend(App.Engine.Graphics.prototype, {
     // For composite entities, wrap heavy model parts in higher level structure.
     finalizeEntity: function(id, createdEntity) {
         // First only manage avatars.
+        var up = new THREE.Object3D();
         var wrapper = new THREE.Object3D();
         var head = this.createMesh(
             this.createGeometry('box'),
             this.createMaterial('flat-phong')
         );
 
+        up.rotation.reorder('ZYX');
+        up.add(wrapper);
         wrapper.add(createdEntity); // Body.
         wrapper.add(head);
 
@@ -43,10 +46,16 @@ extend(App.Engine.Graphics.prototype, {
         wrapper.rotation.x = Math.PI/2;
         wrapper.rotation.y = Math.PI;
 
-        wrapper._id = id;
+        // wrapper._id = id;
+        up._id = id;
         //delete createdEntity._id;
+        
+        up.getWrapper = function() {
+            return wrapper;
+        };
 
-        return wrapper;
+        //return wrapper;
+        return up;
     }
 
 });
