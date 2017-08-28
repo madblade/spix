@@ -59,10 +59,10 @@ extend(App.Engine.UI.prototype, {
 
                 // TODO [HIGH] up rotation testing
                 case k.padFour:     // Left
-                    graphics.cameraManager.addCameraRotationEvent(0, 0, -Math.PI/2, 0);
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, Math.PI/2, 0);
                     break;
                 case k.padSix:      // Right
-                    graphics.cameraManager.addCameraRotationEvent(0, 0, Math.PI/2, 0);
+                    graphics.cameraManager.addCameraRotationEvent(0, 0, -Math.PI/2, 0);
                     break;
                 case k.padFive:     // Down
                     graphics.cameraManager.addCameraRotationEvent(0, 0, 0, -Math.PI/2);

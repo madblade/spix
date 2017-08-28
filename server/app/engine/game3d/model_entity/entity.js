@@ -136,7 +136,7 @@ class Entity {
     }
 
     stop() {
-        this._directions = [!1, !1, !1, !1, !1, !1];
+        //this._directions = [!1, !1, !1, !1, !1, !1];
         this._d = [!1, !1, !1, !1, !1, !1];
         this._impulseSpeedStamp = [0, 0, 0];
         console.log("Entity stopping.");

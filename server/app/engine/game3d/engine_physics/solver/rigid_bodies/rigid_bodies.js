@@ -26,7 +26,6 @@ class RigidBodies {
         
         //
         
-        
     }
 
     get gravity() { return this._gravity; }
@@ -65,6 +64,10 @@ class RigidBodies {
         let entities = em.entities;
         let events = eventOrderer.events;
         let abs = Math.abs;
+        
+        // TODO [HIGH] fill islands spanning in several worlds
+        // TODO keep islands on place with double map (join/split islands)
+        let crossWorldObjectAxes = new Map();
         
         // For each world,
         let eventUniverseAxes = eventOrderer.axes;
@@ -214,8 +217,8 @@ class RigidBodies {
                 const maxV = currentEntity.getVelocity();
                 const factor = Math.sqrt(maxV);
                 let g = this.getGravity(worldId, p0[0], p0[1], p0[2]);
-                // let vector = RigidBodies.getEntityForwardVector(d, r, factor, true); // Project 2D
-                let vector = RigidBodies.getEntityForwardVector(d, r, factor, false); // 3D
+                //let vector = RigidBodies.getEntityForwardVector(d, r, factor, false); // 3D
+                let vector = RigidBodies.getEntityForwardVector(d, r, factor, true); // Project 2D
                 let abs = Math.abs, sgn = Math.sign;
                 let adh = currentEntity.adherence;
                 
@@ -272,7 +275,7 @@ class RigidBodies {
                 
                 // Apply velocity formula with absolute time 
                 // (lag would undesirably change topologies).
-                // v_i+1 = v_i + T*(a_i + a_i+1)/2
+                // v_i+1 = v_i< + T*(a_i + a_i+1)/2
                 sum = 0;
                 for (let i = 0; i < 3; ++i)
                 {
@@ -478,31 +481,7 @@ class RigidBodies {
             up = d[4] && !d[5], dn = !d[4] && d[5];
         
         if (project2D) {
-            
-            if (up !== dn) {
-                let relTheta0Impulse = relTheta0;
-                let relTheta1Impulse = relTheta1;
-                if (up)  relTheta1Impulse += PI2;
-                else if (dn)  relTheta1Impulse -= PI2;
-
-                let cosAbs0Impulse = cos(absTheta0); let cosRel0Impulse = cos(relTheta0Impulse);
-                let cosAbs1Impulse = cos(absTheta1); let cosRel1Impulse = cos(relTheta1Impulse);
-                let sinAbs0Impulse = sin(absTheta0); let sinRel0Impulse = sin(relTheta0Impulse);
-                let sinAbs1Impulse = sin(absTheta1); let sinRel1Impulse = sin(relTheta1Impulse);
-                
-                // TODO [CRIT] account for impulse vector to jump.
-                let selfImpulseVector =    [
-                    (-sinRel1Impulse*sinRel0Impulse*cosAbs0Impulse         
-                        - sinRel1Impulse*cosRel0Impulse*sinAbs0Impulse),
-                    (-sinRel1Impulse*sinRel0Impulse*cosAbs1Impulse*sinAbs0Impulse 
-                        + sinRel1Impulse*cosRel0Impulse*cosAbs1Impulse*cosAbs0Impulse + cosRel1Impulse*sinAbs1Impulse),
-                    (-sinRel1Impulse*sinRel0Impulse*sinAbs1Impulse*sinAbs0Impulse 
-                        + sinRel1Impulse*cosRel0Impulse*sinAbs1Impulse*cosAbs0Impulse - cosRel1Impulse*cosAbs1Impulse)
-                ];
-            }
-            
-            up = false;
-            dn = false;
+            relTheta1 = PI2;
         }
         
         let nb0 = (fw || bw) + (rg || lf) + (up || dn);
@@ -674,12 +653,38 @@ class RigidBodies {
         //    (/* 0 + */                + sinRel1*cosRel0*sinAbs1         - cosRel1*cosAbs1)
         //];
         
+        let relFrontVector;
+        
         // Rx(theta1) times Rz(theta0) times Forward [-sinRel1*sinRel0, sinRel1*cosRel0, -cosRel1]
         // N.B. Plane normal is Rx(theta1).Rz(theta0).(0,0,-1).
-        let relFrontVector =    [
-            (-sinRel1*sinRel0*cosAbs0         - sinRel1*cosRel0*sinAbs0                          ),
-            (-sinRel1*sinRel0*cosAbs1*sinAbs0 + sinRel1*cosRel0*cosAbs1*cosAbs0 + cosRel1*sinAbs1),
-            (-sinRel1*sinRel0*sinAbs1*sinAbs0 + sinRel1*cosRel0*sinAbs1*cosAbs0 - cosRel1*cosAbs1)
+        // Rx(1)             Rz(0)
+        // ( 1   0   0 )     ( c  -s   0 )     ( c0    -s0    0  )
+        // ( 0   c  -s )  X  ( s   c   0 )  =  ( c1s0  c1c0  -s1 )
+        // ( 0   s   c )     ( 0   0   1 )     ( s1s0  s1c0   c1 )
+        // =>
+        // ( c0(-S1S0) - s0(S1C0 )
+        // ( c1c0(-S1S0) + c1c0(S1C0) + s1C1 )
+        // ( s1s0(-S1S0) + s1c0(S1C0) - c1C1 )
+        //relFrontVector =    [
+        //    (-sinRel1*sinRel0*cosAbs0         - sinRel1*cosRel0*sinAbs0                          ),
+        //    (-sinRel1*sinRel0*cosAbs1*sinAbs0 + sinRel1*cosRel0*cosAbs1*cosAbs0 + cosRel1*sinAbs1),
+        //    (-sinRel1*sinRel0*sinAbs1*sinAbs0 + sinRel1*cosRel0*sinAbs1*cosAbs0 - cosRel1*cosAbs1)
+        //];
+
+        // Rz(theta0) times Rx(theta1) times Forward [-sinRel1*sinRel0, sinRel1*cosRel0, -cosRel1]
+        // N.B. Plane normal is Rz(theta0).Rx(theta1).(0,0,-1).
+        // Rz(0)             Rx(1)
+        // ( c  -s   0 )     ( 1   0   0 )     ( c0   -s0c1   s0s1 )
+        // ( s   c   0 )  X  ( 0   c  -s )  =  ( s0    c0c1  -c0s1 )
+        // ( 0   0   1 )     ( 0   s   c )     ( 0     s1     c1   )
+        // =>
+        // ( c0(-S1S0) - s0c1(S1C0) - s0s1C1 )
+        // ( s0(-S1S0) + c0c1(S1C0) - c0s1C1 )
+        // ( s1(S1C0) - c1C1 )
+        relFrontVector =    [
+            (-sinRel1*sinRel0*cosAbs0 - sinRel1*cosRel0*sinAbs0*cosAbs1 - cosRel1*sinAbs0*sinAbs1),
+            (-sinRel1*sinRel0*sinAbs0 + sinRel1*cosRel0*cosAbs0*cosAbs1 + cosRel1*cosAbs0*sinAbs1),
+            (                           sinRel1*cosRel0*sinAbs1         - cosRel1*cosAbs1)
         ];
         
         // TODO [CRIT] compute contributions in relTheta

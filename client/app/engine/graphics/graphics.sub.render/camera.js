@@ -30,6 +30,8 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
     this.pitch = pitch;             // Intermediate (rotation.x)
     this.cameraObject = camera;     // Explicit     (constant)
+    
+    this.up.rotation.reorder('ZYX');
 };
 
 extend(App.Engine.Graphics.Camera.prototype, {
