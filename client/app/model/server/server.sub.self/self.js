@@ -77,8 +77,6 @@ extend(App.Model.Server.SelfModel.prototype, {
             avatar.rotation.z = r[2];
             avatar.getWrapper().rotation.y = Math.PI + r[0];
 
-            // TODO [CRIT] wrap av in structure for up vector.
-            
             // Update animation.
             if (animate) graphics.updateAnimation(id);
 

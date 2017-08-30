@@ -130,9 +130,9 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         // TODO [HIGH] generalize (server-side, comes with collision cross-p)
         var x = vector[0];
         var y = vector[1];
-        var z = vector[2] + 1.6;
-        //var z = vector[2];
-
+        var z = vector[2] + 1.6; 
+        //var z = vector[2]; 
+        
         if (i.isFirstPerson()) {
             cams.forEach(function(cam, cameraId) {
                 cam.setCameraPosition(x, y, z);

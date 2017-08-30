@@ -67,7 +67,7 @@ class RigidBodies {
         
         // TODO [HIGH] fill islands spanning in several worlds
         // TODO keep islands on place with double map (join/split islands)
-        let crossWorldObjectAxes = new Map();
+        let crossWorldIslands = new Map();
         
         // For each world,
         let eventUniverseAxes = eventOrderer.axes;
@@ -161,7 +161,6 @@ class RigidBodies {
             
             // GLOBAL EVENTS, INPUTS & COMPUTATIONS.
             let leapfrogArray = new Array(oxAxis.length);
-            let reverseLeapfrogArray = new Array(oxAxis.length);
             for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) 
             {
                 if (oxAxis[oi].kind !== 'e') continue;
@@ -178,7 +177,7 @@ class RigidBodies {
                 currentEntity.dtr = dtr;
                 
                 // REAL PHYSICS, PART 1
-                // Rules: the only physics entry point should be
+                // Rules: the only non-gp physics entry point should be
                 // acceleration. Speed might be accessed for lookup,
                 // but should never be directly modified.
                 // New positions are computed internally and cropped
@@ -208,7 +207,7 @@ class RigidBodies {
                     p1[i] = p0[i] + inc[i];
                 
                 // Associate incremental term with entity index.
-                leapfrogArray[oi] = inc;
+                leapfrogArray[oi] = [...inc, oi];
                 
                 // Apply globals and inputs.
                 // a_i+1 = sum(constraints)
@@ -244,10 +243,7 @@ class RigidBodies {
                     }
                     
                     nu[i] = vi;
-                    // TODO [CRIT] impulses.
-                    // TODO [CRIT] account for true 3D orientations...
                     
-                    // TODO [CRIT] CORRECT THIS
                     //if (abs(v0[i]) < vector[i]) { a1[i] = .1; }
                     
                     // TEST 1: converge until compensating speed.
@@ -298,13 +294,15 @@ class RigidBodies {
             // is probably better than sorting a potentially huge array.
             leapfrogArray.sort((a, b) => 
                 abs(a[0]) + abs(a[1]) + abs(a[2]) > abs(b[0]) + abs(b[1]) + abs(b[2]));
-            for (let i = 0, l = oxAxis.length; i < l; ++i)
-                reverseLeapfrogArray[leapfrogArray[i]] = i; 
             
             // 3. Snap x_i+1 with terrain collide, save non-integrated residuals 
             // as bounce components with coefficient & threshold (heat).
             
-            // 4. Compute islands, cross world.
+            // 4. Compute islands, cross world, by axis order.
+            let leapfrogDone = new Uint8Array(leapfrogArray.length);
+            let islands = [];
+            // crossWorldIslands;
+            // add leapfrog term
             
             // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
             //    check neighbours for min distance in linearized trajectory
@@ -314,8 +312,8 @@ class RigidBodies {
             //    solve X² leapfrog, save first all valid Ts
             //    keep list of ordered Ts across pairs.
             
-            // 7. Narrow phase, part 2: for all Ts in order,
             // REAL PHYSICS, PART 2
+            // 7. Narrow phase, part 2: for all Ts in order,
             //    set bodies as in contact or terminal (terrain), 
             //    compute new paths (which are not more than common two previous) while compensating forces 
             //    so as to project the result into directions that are not occluded
@@ -345,23 +343,22 @@ class RigidBodies {
                 // Then, cast through potential x
                 let xCrossed = XCollider.xCollide(p0, p1, world, xm);
                 let oldWorldId = currentEntity.worldId;
+                
+                // Integration.
+
+                let entityUpdated = false;
+                
                 if (xCrossed) {
                     let newWorldId = xCrossed.worldId;
                     objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
                     
                     // Collide with terrain on the other side (no second x crossing enabled)
                     // TODO [HIGH] translate [p0, p1] to [x.position, x.transform(p1, newWorldId)]
-                    let hasCollidedAfterwards = 
-                        TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
-                }
-                
-                // Update object.
-                let entityUpdated = false;
-                
-                if (xCrossed) {
-                    objectOrderer.switchEntityToWorld(currentEntity, oldWorldId, p1);
+                    //let hasCollidedAfterwards = 
+                    //    TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
                     entityUpdated = true;
                 }
+                
                 if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2]) {
                     currentEntity.p0 = currentEntity.p1;
                     entityUpdated = true;

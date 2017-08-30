@@ -186,11 +186,11 @@ class Entity {
     set indexZ(indexZ)      { this._indexZ = indexZ; }
     get indexZ()            { return this._indexZ; }
     
-    get widthX()            { return this._indexX; }
+    get widthX()            { return this._widthX; }
     set widthX(widthX)      { this._widthX = widthX; }
-    get widthY()            { return this._indexY; }
+    get widthY()            { return this._widthY; }
     set widthY(widthY)      { this._widthY = widthY; }
-    get widthZ()            { return this._indexZ; }
+    get widthZ()            { return this._widthZ; }
     set widthZ(widthZ)      { this._widthZ = widthZ; }
     
     get a0()                { return this._a0; }

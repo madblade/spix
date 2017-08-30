@@ -50,7 +50,7 @@ class XCollider {
                        )
                     {
                         // Do collide & change world
-                        // TODO [CRIT] Manage collisions with things on the other side.
+                        // TODO [HIGH] Manage collisions with things on the other side.
                         return xModel.getOtherSide(xId);
                     }
 
