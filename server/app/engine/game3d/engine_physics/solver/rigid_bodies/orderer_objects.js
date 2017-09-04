@@ -35,7 +35,6 @@ class ObjectOrderer {
         return lo;
     };
 
-
     // Impact entities cached indices.
     // Each entity knows its position in axis arrays.
     static orderCache(array, entities, portals, start, prop) {
@@ -62,7 +61,7 @@ class ObjectOrderer {
         // Fill axes with entities.
         for (let i = 0, l = entities.length; i < l; ++i) {
             if (!entities) continue;
-            let e = entities[i], wid = e.worldId, p = e.position;
+            let e = entities[i], wid = e.worldId, p = e.p0;
             let axis = axes.get(wid); // Most inefficient call.
             
             if (!axis)
@@ -77,9 +76,6 @@ class ObjectOrderer {
                 axis[2].push({kind: 'e', id: i, val:p[2]});
             }
         }
-        
-            
-        
         
         // TODO [CRIT] Fill axes with portals.
         portals.forEach((portal, i) => {
@@ -136,7 +132,7 @@ class ObjectOrderer {
             throw Error('[Physics/Orderer]: invalid object kind.');
         
         // Get properties.
-        let p = object.position;
+        let p = object.p0;
         let x = p[0], y = p[1], z = p[2];
         let eid = kind === 'e' ? object.entityId : object.portalId;
         
@@ -168,8 +164,8 @@ class ObjectOrderer {
             let indexX = dichotomyLowerBound(xAxis, x, 'val');
             let indexY = dichotomyLowerBound(yAxis, y, 'val');
             let indexZ = dichotomyLowerBound(zAxis, z, 'val');
-            if (!xAxis[indexX]) // Not found
-                throw Error('[Physics/Orderer]: element not found.');
+            if (!xAxis[indexX] && indexX !== xAxis.length) // Not found
+                throw Error('[Physics/Orderer]: element not found. ' + indexX);
             
             while (xAxis[indexX] && xAxis[indexX].val <= x) ++indexX;
             xAxis.splice(indexX, 0, {kind: kind, id: eid, val: x});
@@ -185,6 +181,36 @@ class ObjectOrderer {
             orderCache(yAxis, entities, portals, indexY, 'indexY');
             orderCache(zAxis, entities, portals, indexZ, 'indexZ');
         }
+    }
+    
+    // TODO [HIGH] portals
+    moveObject(object) {
+        let kind = object instanceof Entity ? 'e' :
+            object instanceof Portal ? 'x' : null;
+        if (!kind)
+            throw Error('[Physics/Orderer]: invalid object kind.');
+
+        // Get properties.
+        let p0 = object.p0;
+        //let eid = kind === 'e' ? object.entityId : object.portalId;
+
+        let wid = object.worldId;
+        //let portals = this._xModel.portals;
+        //let entities = this._entityModel.entities;
+        let axis = this._axes.get(wid);
+        
+        let x = p0[0], y = p0[1], z = p0[2];
+        let indexX = object.indexX;
+        let indexY = object.indexY;
+        let indexZ = object.indexZ;
+        
+        let axisX = axis[0];
+        let axisY = axis[1];
+        let axisZ = axis[2];
+        
+        axisX[indexX].val = x;
+        axisY[indexY].val = y;
+        axisZ[indexZ].val = z;
     }
     
     // [Thought] could be optimised by garbage collection.

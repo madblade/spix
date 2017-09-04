@@ -27,6 +27,8 @@ class Entity {
         //this._rrel          = [0, 0];
         //this._rabs          = [0, 0];
         
+        this._metaX         = null;
+        
         this._capS          = .005;
         this._capW          = .01;
         this._capR          = .03;
@@ -192,6 +194,9 @@ class Entity {
     set widthY(widthY)      { this._widthY = widthY; }
     get widthZ()            { return this._widthZ; }
     set widthZ(widthZ)      { this._widthZ = widthZ; }
+    
+    get metaX()             { return this._metaX; }
+    set metaX(metaX)        { this._metaX = metaX; }
     
     get a0()                { return this._a0; }
     set a0(a0)              { this._a0 = a0; }

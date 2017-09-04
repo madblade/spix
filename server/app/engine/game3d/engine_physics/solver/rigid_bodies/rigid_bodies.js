@@ -12,6 +12,7 @@ import Entity from '../../../model_entity/entity';
 
 import TerrainCollider from '../collision/terrain';
 import XCollider from '../collision/x';
+import Searcher from '../collision/searcher';
 
 class RigidBodies {
 
@@ -44,7 +45,7 @@ class RigidBodies {
     }
     
     solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs) {
-        
+
         const passId = Math.random();
         let timeDilatation = this.globalTimeDilatation;
         let absoluteDt = this.refreshRate / timeDilatation;
@@ -81,6 +82,7 @@ class RigidBodies {
                 ozAxis = objectWorldAxes[2],
                 currentEntity;
             let maxWidth = Entity.maxWidth;
+            let searcher = new Searcher(entities, oxAxis, oyAxis, ozAxis);
             
             // console.log(worldId + ' : ' + oxAxis.length);
             if (oxAxis.length !== oyAxis.length || oxAxis.length !== ozAxis.length)
@@ -195,13 +197,8 @@ class RigidBodies {
                 }
                 
                 // Max speed correction.
-                //if (sum > maxSpeed2 * dtr)
-                //    for (let i = 0; i < 3; ++i)
-                //    {
-                        //console.log(v0);
-                //inc[i] *= (maxSpeed * dtr) / sum;
-                        //inc[i] = i < 2 ? 0 : -(maxSpeed * dtr);
-                //}
+                // if (sum > maxSpeed2 * dtr)
+                //     for (let i = 0; i < 3; ++i) inc[i] *= (maxSpeed * dtr) / sum;
                 
                 for (let i = 0; i < 3; ++i)
                     p1[i] = p0[i] + inc[i];
@@ -224,46 +221,28 @@ class RigidBodies {
                 // TODO [CRIT] compute acc.: impulses with speed constraints, gravity.
                 // Compute the exact acceleration which is necessary
                 // to get to the cap speed at the next iteration.
-                //console.log(adh);
-                //console.log(vector);
                 for (let i = 0; i < 3; ++i)
                 {
                     let vi = vector[i];
                     if (adh[i] && vi > 0.05 && g[i] < 0) {
                         console.log("jump " + passId);
                         //vi = 0.1;
-                        a1[i] += 0.2;
+                        a1[i] += 0.22;
                         adh[i] = false; // TODO [CRIT] FIX ADHERENCE SETUP
                     }
                     else if (adh[3+i] && vi < -0.05 && g[i] > 0) {
                         console.log("antijump");
                         //vi = -.1;
-                        a1[i] -= 0.2;
+                        a1[i] -= 0.22;
                         adh[3+i] = false;
                     }
                     
                     nu[i] = vi;
-                    
-                    //if (abs(v0[i]) < vector[i]) { a1[i] = .1; }
-                    
-                    // TEST 1: converge until compensating speed.
-                    //let v1t = v0[i] + dtr * .5 * (a0[i] + a1[i]);
-                    
-                    //if (abs(vector[i]) === 0 && abs(v1t) > 1e-7)
-                    //{
-                      //  a1[i] = (vector[i] - v0[i]) / dtr - a0[i];
-                        //console.log('static');
-                        //if (sgn(a1[i]) != sgn(a0[i])) {
-                            //console.log('div2');
-                          //  a1[i] = 0.01 * a1[i];
-                        //}
-                    //} else if (abs(v1t) < abs(vector[i]) || sgn(v1t) !== sgn(vector[i])) {
-                        //console.log('max speed');
-                      //  a1[i] = (vector[i] - v0[i]) / dtr - a0[i];
-                    //} else if (abs(v1t) > abs(vector[i])) {
-                    //    a1[i] = 0;
-                    //    a1[i] = (vector[i] - v0[i]) / dtr - a0[i];
-                    //}
+                }
+            
+                // TODO [HIGH] gp calibration (velocity++, curved jmp, gen3D)
+                if (!adh[2] && g[2] < 0) {
+                    nu[2] = 0;
                 }
                 
                 for (let i = 0; i < 3; ++i)
@@ -281,38 +260,158 @@ class RigidBodies {
                 }
                 
                 // Velocity correction.
-                //if (sum > maxSpeed * dtr)
-                //    for (let i = 0; i < 3; ++i)
-                //    {
-                //        v1[i] *= (maxSpeed * dtr / sum);
-                //    }
+                // if (sum > maxSpeed * dtr)
+                //     for (let i = 0; i < 3; ++i) v1[i] *= (maxSpeed * dtr / sum);
             }
             
             // Sort entities according to incremental term.
-            // TODO [HIGH] don't do that here! :0
+            // TODO [OPT] ideally, use states
             // Remember leapfrogs within objects, reordering them within islands
             // is probably better than sorting a potentially huge array.
-            leapfrogArray.sort((a, b) => 
-                abs(a[0]) + abs(a[1]) + abs(a[2]) > abs(b[0]) + abs(b[1]) + abs(b[2]));
+            let inf = (x) => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
+            leapfrogArray.sort((a, b) =>
+                inf(b) - inf(a) 
+            );
+            // Note: a-b natural order, b-a reverse order
+            // abs(b[0]) + abs(b[1]) + abs(b[2]) - abs(a[0]) + abs(a[1]) + abs(a[2])
+            
+            // Rebuild mapping after having sorted leapfrogs.
+            let reverseLeapfrogArray = new Int32Array(leapfrogArray.length);
+            for (let i = 0, l = leapfrogArray.length; i < l; ++i) {
+                reverseLeapfrogArray[leapfrogArray[i][3]] = i;
+            }
+
             
             // 3. Snap x_i+1 with terrain collide, save non-integrated residuals 
             // as bounce components with coefficient & threshold (heat).
+            for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+                if (oxAxis[oi].kind !== 'e') continue;
+                let entityIndex = oxAxis[oi].id;
+                currentEntity = entities[entityIndex];
+                let p0 = currentEntity.p0;
+                let p1 = currentEntity.p1;
+
+                // Cast on current world to prevent x crossing through matter.
+                const dtr = currentEntity.dtr;
+                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, dtr);
+                // TODO [MEDIUM] report bounce components. 
+            }
             
             // 4. Compute islands, cross world, by axis order.
-            let leapfrogDone = new Uint8Array(leapfrogArray.length);
+            let numberOfEntities = leapfrogArray.length;
+            let oxToIslandIndex = new Int32Array(numberOfEntities);
+            oxToIslandIndex.fill(-2); // -2 unaffected, -1 isolated, 0+ index of island
             let islands = [];
-            // crossWorldIslands;
+            let islandIndex = 0;
+            //console.log(numberOfEntities + " entities");
+            for (let i = 0; i < numberOfEntities; ++i) {
+                //console.log('\t'+i);
+                let xIndex = leapfrogArray[i][3];
+                let inheritedIslandIndex = oxToIslandIndex[xIndex];
+                let newIsland = searcher.computeIsland(leapfrogArray, i);
+                let il = newIsland.length;
+                
+                if (inheritedIslandIndex !== -2) {
+                    if (inheritedIslandIndex === -1)
+                        throw Error('[RigidBodies] @ islands: I think ' +
+                            'no item present in an 1-island should be rediscovered ' +
+                            'by the algorithm. (?)');
+                    switch (il) {
+                        case 0:
+                            // throw Error('[RigidBodies] got a 0-length island.');
+                            break;
+                        case 1:
+                            if (oxToIslandIndex[newIsland[0]] !== inheritedIslandIndex)
+                                throw Error('[RigidBodies] @ islands: verification failed ' +
+                                    'on basic 1-island criterion.');
+                            break;
+                        default:
+                            let toAugmentIsland = islands[inheritedIslandIndex];
+                            for (let j = 0; j < il; ++j) {
+                                let nij = newIsland[j];
+                                oxToIslandIndex[nij] = inheritedIslandIndex;
+                                toAugmentIsland.push(nij);
+                            }
+                            break;
+                    }
+                    
+                } else {
+                    switch (il) {
+                        case 0:
+                            // throw Error('[RigidBodies] got a 0-length island.');
+                            break;
+                        case 1:
+                            oxToIslandIndex[newIsland[0]] = -1; // May move freely.
+                            break;
+                        default:
+                            for (let j = 0; j < il; ++j)
+                                oxToIslandIndex[newIsland[j]] = islandIndex;
+                            islands.push(newIsland);
+                            islandIndex++;
+                            break;
+                    }
+                }
+                
+                // TODO [DBG] check new island and former for redundancy.
+            }
+            //console.log(islands);
+            
+                //console.log(oxToIslandIndex);
+            
+            //for (let i = 0; i < islands.length; ++i) {
+            //    let islandI = islands[i];
+            //    for (let j = 0; j < islands.length; ++j) {
+            //        if ()
+            //    }
+            //}
+            
+            // TODO [CRIT] merge islands.
+            /*
+            let mergedIslands = [];
+            let isll = islands.length;
+            let arrayIslDone = new Uint8Array(isll);
+            arrayIslDone.fill(0);
+            for (let i = 0; i < isll; ++i) {
+                if (arrayIslDone[i]) continue;
+                let currentPartialIsland = islands[i];
+                var currentIsland = [];
+                let stack = [];
+                currentPartialIsland.forEach(isl=>stack.push(isl));
+                
+                // BFS
+                while (stack.length > 0) {
+                    let currentElement = stack.pop();
+                    arrayIslDone[currentElement] = true;
+                    let islandIndex = oxToIslandIndex[currentElement];
+                    if (islandIndex === -2) 
+                        throw Error('[RigidBodies] @ merge islands, got -2 index.');
+                    if (islandIndex !== -1) {
+                        
+                        let otherIsland = islands[islandIndex];
+                    }
+                    currentIsland.push(currentElement);
+                    
+                }
+                
+                mergedIslands.push(currentIsland);   
+            }
+            */
+            
+            //let stack = islands[0];
+            
+            // TODO [MEDIUM] crossWorldIslands;
             // add leapfrog term
+            // get array of all xs sorted by axis
             
             // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
             //    check neighbours for min distance in linearized trajectory
             //    detect and push PROBABLY COLLIDING PAIRS.
             
+            // REAL PHYSICS, PART 2
             // 6. Narrow phase, part 1: for all probably colliding pairs,
             //    solve X² leapfrog, save first all valid Ts
             //    keep list of ordered Ts across pairs.
             
-            // REAL PHYSICS, PART 2
             // 7. Narrow phase, part 2: for all Ts in order,
             //    set bodies as in contact or terminal (terrain), 
             //    compute new paths (which are not more than common two previous) while compensating forces 
@@ -325,33 +424,41 @@ class RigidBodies {
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
             //    smoothly slice along constrained boundaries until component is extinct.
 
-            for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
-                if (oxAxis[oi].kind !== 'e') continue;
-                let entityIndex = oxAxis[oi].id;
-                currentEntity = entities[entityIndex];
-                let p1 = currentEntity.p1; let v0 = currentEntity.v0;
-                let p0 = currentEntity.p0; let v1 = currentEntity.v1;
-                let a0 = currentEntity.a0;
-                let a1 = currentEntity.a1;
+            // Integration.
+            //for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+            entities.forEach(currentEntity => {
+                if (!currentEntity) return;
                 
-                // First, cast on current world to prevent x crossing through matter.
-                const dtr = currentEntity.dtr;
-                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, dtr);
-                // TODO remove this 'Nevermind' thing.
-                // console.log(hasCollided);
+                let oi = currentEntity.indexX;
+                let entityIndex = currentEntity.entityId;
                 
-                // Then, cast through potential x
+                //if (oxAxis[oi].kind !== 'e') continue;
+                
+                // Temporarily discard insulated objects.
+                if (oxToIslandIndex[oi] !== -1) return; 
+                
+                //let entityIndex = oxAxis[oi].id;
+                //currentEntity = entities[entityIndex];
+                let p0 = currentEntity.p0; let p1 = currentEntity.p1;
+                let v0 = currentEntity.v0; let v1 = currentEntity.v1;
+                let a0 = currentEntity.a0; let a1 = currentEntity.a1;
+
+                // Cast through potential x.
                 let xCrossed = XCollider.xCollide(p0, p1, world, xm);
                 let oldWorldId = currentEntity.worldId;
-                
-                // Integration.
 
+                // TODO [CRIT] 1. if free (pyr, terrain) at gate, switch wld, else snap to gate
+                // TODO [CRIT] 2. cast from gate to transform(p1)
+                // TODO [CRIT] 3. think recursion
+                //currentEntity.metaX = xCrossed;
+                //let xCrossed = currentEntity.metaX;
+                
                 let entityUpdated = false;
                 
                 if (xCrossed) {
                     let newWorldId = xCrossed.worldId;
                     objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
-                    
+
                     // Collide with terrain on the other side (no second x crossing enabled)
                     // TODO [HIGH] translate [p0, p1] to [x.position, x.transform(p1, newWorldId)]
                     //let hasCollidedAfterwards = 
@@ -361,6 +468,12 @@ class RigidBodies {
                 
                 if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2]) {
                     currentEntity.p0 = currentEntity.p1;
+                    if (!xCrossed) {
+                        searcher.updateObjectAxis(entityIndex);
+                        objectOrderer.moveObject(currentEntity);
+                    } else {
+                        // TODO [HIGH] objectOrderer.switchEntityToWorld(...)
+                    }
                     entityUpdated = true;
                 }
                 if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {
@@ -371,15 +484,18 @@ class RigidBodies {
                     currentEntity.a0 = currentEntity.a1;
                     entityUpdated = true;
                 }
-                
+
                 if (entityUpdated)
+                {
                     o.entityUpdated(entityIndex);
+                }
                 
-                currentEntity.p1 = [0, 0, 0];
+                currentEntity.p1 = [p0[0], p0[1], p0[2]];
                 currentEntity.v1 = [0, 0, 0];
                 currentEntity.a1 = [0, 0, 0];
                 // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
-            }
+                currentEntity.metaX = 0;
+            });
             
             // 8. Perform updates in optimization structures.
             //    Perform updates in consistency maps.
@@ -394,29 +510,22 @@ class RigidBodies {
             //     const entityUpdated = this.linearSolve(objectOrderer, entity, em, wm, xm, world, relativeDt);
             //     if (entityUpdated) o.entityUpdated(entityId);
             // }
-            
         });
         
     }
 
+    // Legacy.
     linearSolve(orderer, entity, em, wm, xm, world, dt) {
         if (!entity || !entity.rotation) return;
-
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
-
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
-
         this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-
         this.sumGlobalFields(force, pos, entity);
-
         // RigidBodies.sumLocalFields(force, pos, EM);
-
         var hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
-
         return hasUpdated;
     }
 
@@ -424,21 +533,14 @@ class RigidBodies {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
-
         var impulseSpeed = [0, 0, 0];
         var force = [0, 0, 0];
         var hasUpdated = false;
-
         this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-
         this.sumGlobalFields(force, pos, entity);
-
         this.sumLocalFields(force, pos, em);
-
-        // TODO [HIGH] manage collisions
-
+        // TODO [TEST] n^2 engine
         hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, world, xm);
-
         return hasUpdated;
     }
 
@@ -645,14 +747,7 @@ class RigidBodies {
         // let absUpVector = [sinAbs1 * cosAbs0, sinAbs1 * sinAbs0, cosAbs1];
         // let absFrontVector = [cosAbs1 * cosAbs0, cosAbs1 * sinAbs0, -sinAbs1];
         // let relUpVector =       [sinRel1 * cosRel0, sinRel1 * sinRel0, cosRel1];
-        
         // let relFrontVector =    [- sinRel1 * sinRel0, sinRel1 * cosRel0, -cosRel1];
-        
-        //let relFrontVector =    [
-        //    (-sinRel1*sinRel0*cosAbs0 - sinRel1*cosRel0*cosAbs1*sinAbs0 - cosRel1*sinAbs1*sinAbs0),
-        //    (-sinRel1*sinRel0*sinAbs0 + sinRel1*cosRel0*cosAbs1*cosAbs0 + cosRel1*sinAbs1*cosAbs0),
-        //    (/* 0 + */                + sinRel1*cosRel0*sinAbs1         - cosRel1*cosAbs1)
-        //];
         
         let relFrontVector;
         
@@ -666,11 +761,13 @@ class RigidBodies {
         // ( c0(-S1S0) - s0(S1C0 )
         // ( c1c0(-S1S0) + c1c0(S1C0) + s1C1 )
         // ( s1s0(-S1S0) + s1c0(S1C0) - c1C1 )
-        //relFrontVector =    [
-        //    (-sinRel1*sinRel0*cosAbs0         - sinRel1*cosRel0*sinAbs0                          ),
-        //    (-sinRel1*sinRel0*cosAbs1*sinAbs0 + sinRel1*cosRel0*cosAbs1*cosAbs0 + cosRel1*sinAbs1),
-        //    (-sinRel1*sinRel0*sinAbs1*sinAbs0 + sinRel1*cosRel0*sinAbs1*cosAbs0 - cosRel1*cosAbs1)
-        //];
+        /*
+        relFrontVector =    [
+            (-sinRel1*sinRel0*cosAbs0         - sinRel1*cosRel0*sinAbs0                          ),
+            (-sinRel1*sinRel0*cosAbs1*sinAbs0 + sinRel1*cosRel0*cosAbs1*cosAbs0 + cosRel1*sinAbs1),
+            (-sinRel1*sinRel0*sinAbs1*sinAbs0 + sinRel1*cosRel0*sinAbs1*cosAbs0 - cosRel1*cosAbs1)
+        ];
+        */
 
         // Rz(theta0) times Rx(theta1) times Forward [-sinRel1*sinRel0, sinRel1*cosRel0, -cosRel1]
         // N.B. Plane normal is Rz(theta0).Rx(theta1).(0,0,-1).

@@ -41,7 +41,9 @@ extend(App.Model.Server.EntityModel.prototype, {
 
     removeEntity: function(id, graphics, entities) {
         var entity = entities.get(id);
-        graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
+        if (entity) {
+            graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
+        }
         entities.delete(id);
     },
 

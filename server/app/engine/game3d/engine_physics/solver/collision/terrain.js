@@ -9,11 +9,23 @@ class TerrainCollider {
     static eps = .00001;
     
     /**
+     * Network casting: 
+     * 1. Define a 2D network of 1-spaced points on the entity's 3 forward-moving faces.
+     * 2. Parallel cast from seeds using Amandites-Woo's algorithm.
+     * 3. Crop to nearest resulting positions.
+     * 
+     * I know (highly suspect) it can be done way more efficiently.
+     * The first thing to optimise is the BSP lookup phase: world.isFree([x, y, z]).
+     * Some suggestions:
+     * - TODO [OPT] flag empty chunks
+     * - TODO [OPT] fast integer chunk lookup
+     * - TODO [OPT] chunk caching
+     * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
+     * 
      * @returns 'has collided'
      */
     static linearCollide(entity, world, position, newPosition, dt) {
 
-        // Network casting
         let p0 = position;
         let p1 = newPosition;
         let x0 = p0[0], y0 = p0[1], z0 = p0[2];
@@ -22,9 +34,7 @@ class TerrainCollider {
             yW = entity.widthY,
             zW = entity.widthZ;
         
-        let hasCollided = false;
         let cropX = x1, cropY = y1, cropZ = z1;
-        //let ncropX = x1, ncropY = y1, ncropZ = z1;
         let epsilon = TerrainCollider.eps;
         
         if (x0 !== x1) {
@@ -40,35 +50,23 @@ class TerrainCollider {
                 if (currentY >= lastY) break;
                 currentY = (currentY+1) > lastY ? lastY : currentY+1;
             }
-            // console.log('x ' + xNetwork.length);
             
             // Do intersect.
-            //console.log("###\non X");
             for (let i = 0; i < xNetwork.length; ++i) {
                 let newCrops = xArrival[i];
                 let net = xNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
-                //console.log(newCrops);
                 if (c) {
                     if (x1 > x0 && newCrops[0]-xW < cropX-epsilon) {
-                        //console.log('\traycast x0 < x1, old(' + cropX + "), new(" + (newCrops[0]-xW) +'), ' +
-                        //    'cropY(' + (newCrops[1]+y0-net[1]) + ')');
                         cropX = newCrops[0]-xW;
-                        cropY = newCrops[1]+y0-net[1]; // -yW;
-                        cropZ = newCrops[2]+z0-net[2]; // -zW;
+                        cropY = newCrops[1]+y0-net[1];
+                        cropZ = newCrops[2]+z0-net[2];
                     }
                     else if (x1 < x0 && newCrops[0]+xW > cropX+epsilon) {
                         cropX = newCrops[0]+xW;
-                        cropY = newCrops[1]+y0-net[1]; // +yW;
-                        cropZ = newCrops[2]+z0-net[2]; // +zW;
+                        cropY = newCrops[1]+y0-net[1];
+                        cropZ = newCrops[2]+z0-net[2];
                     }
-                    /*
-                    if ( ((y1 < y0 && y1 < ncropY && cropY < ncropY) ||
-                        (y0 < y1 && ncropY < y1 && ncropY < cropY) ||
-                        y0 === y1) &&
-                        ((z1 < z0 && z1 < ncropZ && cropZ < ncropZ) ||
-                        (z0 < z1 && ncropZ < z1 && ncropZ < cropZ) ||
-                        z0 === z1) )*/
                 }
             }
         }
@@ -86,64 +84,38 @@ class TerrainCollider {
                 if (currentX >= lastX) break;
                 currentX = (currentX+1) > lastX ? lastX : currentX+1;
             }
-            // console.log('y ' + yNetwork.length);
             // Do intersect.
-            //console.log("###\non Y");
             for (let i = 0; i < yNetwork.length; ++i) {
                 let newCrops = yArrival[i];
                 let net = yNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
-                //console.log(newCrops);
 
                 if (c) {
                     if (y1 > y0 && newCrops[1]-yW < cropY-epsilon) {
-                        let nx = newCrops[0]+x0-net[0];  // -xW;
-                        let ny = newCrops[1]-yW;         // -yW;
-                        let nz = newCrops[2]+z0-net[2];  // -zW;
-                        //if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        //    (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        //    x0 === x1) &&
-                        //    ((z1 < z0 && z1 < ncropZ && cropZ < ncropZ) ||
-                        //    (z0 < z1 && ncropZ < z1 && ncropZ < cropZ) ||
-                        //    z0 === z1) ) {
+                        let nx = newCrops[0]+x0-net[0];
+                        let ny = newCrops[1]-yW;
+                        let nz = newCrops[2]+z0-net[2];
                         if ((x1 < x0 && x1 < nx && cropX < nx) || (x0 < x1 && nx < x1 && nx < cropX) || x0 === x1)
                             cropX = nx;
-                        cropY = ny;         // -yW;
+                        cropY = ny;
                         if ((z1 < z0 && z1 < nz && cropZ < nz) || (z0 < z1 && nz < z1 && nz < cropZ) || z0 === z1)
-                            cropZ = nz;  // -zW;
-                        //}
+                            cropZ = nz;
                     }
                     else if (y1 < y0 && newCrops[1]+yW > cropY+epsilon) {
-                        //console.log('\traycast y1 < y0, old(' + cropX + "), new(" + (newCrops[0]+x0-net[0]) +')');
-                        //console.log('\t\tcropY old(' + cropY + '), new(' + (newCrops[1]+yW) + ')');
                         let nx = newCrops[0]+x0-net[0];
                         let ny = newCrops[1]+yW;
                         let nz = newCrops[2]+z0-net[2];
-                        //if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        //    (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        //    x0 === x1) &&
-                        //    ((z1 < z0 && z1 < ncropZ && cropZ < ncropZ) ||
-                        //    (z0 < z1 && ncropZ < z1 && ncropZ < cropZ) ||
-                        //    z0 === z1) ) {
                         if ((x1 < x0 && x1 < nx && cropX < nx) || (x0 < x1 && nx < x1 && nx < cropX) || x0 === x1)
-                            cropX = nx;  // +xW;
-                        cropY = ny;         // +yW;
+                            cropX = nx;
+                        cropY = ny;
                         if ((z1 < z0 && z1 < nz && cropZ < nz) || (z0 < z1 && nz < z1 && nz < cropZ) || z0 === z1)
-                            cropZ = nz;  // +zW;
-                        //}
+                            cropZ = nz;
                     }
-                    /* if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        x0 === x1) &&
-                        ((z1 < z0 && z1 < ncropZ && cropZ < ncropZ) ||
-                        (z0 < z1 && ncropZ < z1 && ncropZ < cropZ) ||
-                        z0 === z1) ) */
                 }
             }
         }
         
         if (z0 !== z1) {
-            // console.log('z');
             let zNetwork = [];
             let zArrival = [];
             for (let currentX = x0-xW, lastX = x0+xW;;) {
@@ -156,7 +128,6 @@ class TerrainCollider {
                 if (currentX >= lastX) break;
                 currentX = (currentX+1) > lastX ? lastX : currentX+1;
             }
-            // console.log('z ' + zNetwork.length);
             
             // Do intersect.
             for (let i = 0; i < zNetwork.length; ++i) {
@@ -164,54 +135,27 @@ class TerrainCollider {
                 let net = zNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
                 if (c) {
-                    // console.log(zArrival[i]);
-                    // console.log((newCrops[2]+zW) + " : " + cropZ);
                     if (z1 > z0 && newCrops[2]-zW < cropZ-epsilon) {
                         let nx = newCrops[0]+x0-net[0];
                         let ny = newCrops[1]+y0-net[1];
                         let nz = newCrops[2]-zW;
-                        //if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        //    (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        //    x0 === x1) &&
-                        //    ((y1 < y0 && y1 < ncropY && cropY < ncropY) ||
-                        //    (y0 < y1 && ncropY < y1 && ncropY < cropY) ||
-                        //    y0 === y1) ) {
                         if ((x1 < x0 && x1 < nx && cropX < nx) || (x0 < x1 && nx < x1 && nx < cropX) || x0 === x1)
-                            cropX = nx; // -xW;
+                            cropX = nx;
                         if ((y1 < y0 && y1 < ny && cropY < ny) || (y0 < y1 && ny < y1 && ny < cropY) || y0 === y1)
-                            cropY = ny; // -yW;
+                            cropY = ny;
                         cropZ = nz;
-                        //}
-                        
                     }
                     else if (z1 < z0 && newCrops[2]+zW > cropZ+epsilon) {
-                        //console.log('\traycast z0 > z1, old(' + cropZ + "), new(" + (newCrops[2]+zW) +"), new x("
-                        //+ (newCrops[0]+x0-net[0]) + ")");
                         let nx = newCrops[0]+x0-net[0];
                         let ny = newCrops[1]+y0-net[1];
                         let nz = newCrops[2]+zW;
-                        //if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        //    (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        //    x0 === x1) &&
-                        //    ((y1 < y0 && y1 < ncropY && cropY < ncropY) ||
-                        //    (y0 < y1 && ncropY < y1 && ncropY < cropY) ||
-                        //    y0 === y1) ) {
                         if ((x1 < x0 && x1 < nx && cropX < nx) || (x0 < x1 && nx < x1 && nx < cropX) || x0 === x1)
-                            cropX = nx; // +xW;
+                            cropX = nx;
                         if ((y1 < y0 && y1 < ny && cropY < ny) || (y0 < y1 && ny < y1 && ny < cropY) || y0 === y1)
-                            cropY = ny; // +yW;
-                        
-                        cropZ = nz; // +zW;
-                        //}
-                        // console.log(cropZ);
+                            cropY = ny;
+                        cropZ = nz;
                     }
                     
-                    /* if ( ((x1 < x0 && x1 < ncropX && cropX < ncropX) ||
-                        (x0 < x1 && ncropX < x1 && ncropX < cropX) ||
-                        x0 === x1) &&
-                        ((y1 < y0 && y1 < ncropY && cropY < ncropY) ||
-                        (y0 < y1 && ncropY < y1 && ncropY < cropY) ||
-                        y0 === y1) ) */
                 }
             }
         }

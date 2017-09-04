@@ -31,6 +31,7 @@ class Game3D extends Game {
         // Utility parameters
         this._kind = 'game3d';
         this._refreshRate = 16;
+        //this._refreshRate = 1000;
         this._tt = 0;
 
         // Misc.
