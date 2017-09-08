@@ -16,6 +16,8 @@ import Searcher from '../collision/searcher';
 
 class RigidBodies {
 
+    static eps = 0;// .00001;
+    
     constructor(refreshRate) {
         
         // 
@@ -204,7 +206,7 @@ class RigidBodies {
                     p1[i] = p0[i] + inc[i];
                 
                 // Associate incremental term with entity index.
-                leapfrogArray[oi] = [...inc, oi];
+                leapfrogArray[oi] = [inc[0], inc[1], inc[2], oi];
                 
                 // Apply globals and inputs.
                 // a_i+1 = sum(constraints)
@@ -280,22 +282,6 @@ class RigidBodies {
             for (let i = 0, l = leapfrogArray.length; i < l; ++i) {
                 reverseLeapfrogArray[leapfrogArray[i][3]] = i;
             }
-
-            
-            // 3. Snap x_i+1 with terrain collide, save non-integrated residuals 
-            // as bounce components with coefficient & threshold (heat).
-            for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
-                if (oxAxis[oi].kind !== 'e') continue;
-                let entityIndex = oxAxis[oi].id;
-                currentEntity = entities[entityIndex];
-                let p0 = currentEntity.p0;
-                let p1 = currentEntity.p1;
-
-                // Cast on current world to prevent x crossing through matter.
-                const dtr = currentEntity.dtr;
-                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, dtr);
-                // TODO [MEDIUM] report bounce components. 
-            }
             
             // 4. Compute islands, cross world, by axis order.
             let numberOfEntities = leapfrogArray.length;
@@ -329,8 +315,10 @@ class RigidBodies {
                             let toAugmentIsland = islands[inheritedIslandIndex];
                             for (let j = 0; j < il; ++j) {
                                 let nij = newIsland[j];
-                                oxToIslandIndex[nij] = inheritedIslandIndex;
-                                toAugmentIsland.push(nij);
+                                if (toAugmentIsland.indexOf(nij) < 0) {
+                                    oxToIslandIndex[nij] = inheritedIslandIndex;
+                                    toAugmentIsland.push(nij);
+                                }
                             }
                             break;
                     }
@@ -354,18 +342,9 @@ class RigidBodies {
                 
                 // TODO [DBG] check new island and former for redundancy.
             }
-            //console.log(islands);
+            // console.log(islands);
+            //console.log(oxToIslandIndex);
             
-                //console.log(oxToIslandIndex);
-            
-            //for (let i = 0; i < islands.length; ++i) {
-            //    let islandI = islands[i];
-            //    for (let j = 0; j < islands.length; ++j) {
-            //        if ()
-            //    }
-            //}
-            
-            // TODO [CRIT] merge islands.
             /*
             let mergedIslands = [];
             let isll = islands.length;
@@ -396,8 +375,25 @@ class RigidBodies {
                 mergedIslands.push(currentIsland);   
             }
             */
-            
-            //let stack = islands[0];
+
+
+            // 3. Snap x_i+1 with terrain collide, save non-integrated residuals 
+            // as bounce components with coefficient & threshold (heat).
+            for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+                if (oxAxis[oi].kind !== 'e') continue;
+                let entityIndex = oxAxis[oi].id;
+                currentEntity = entities[entityIndex];
+                let p0 = currentEntity.p0;
+                let p1 = currentEntity.p1;
+
+                // Cast on current world to prevent x crossing through matter.
+                const dtr = currentEntity.dtr; //TODO [HIGH] use dtr
+                
+                let islandId = oxToIslandIndex[oi];
+                let doProject = islandId === -1 || islandId === -2;
+                let hasCollided = TerrainCollider.linearCollide(currentEntity, world, p0, p1, true);
+                // TODO [MEDIUM] report bounce components. 
+            }
             
             // TODO [MEDIUM] crossWorldIslands;
             // add leapfrog term
@@ -406,20 +402,317 @@ class RigidBodies {
             // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
             //    check neighbours for min distance in linearized trajectory
             //    detect and push PROBABLY COLLIDING PAIRS.
-            
-            // REAL PHYSICS, PART 2
+
             // 6. Narrow phase, part 1: for all probably colliding pairs,
             //    solve X² leapfrog, save first all valid Ts
             //    keep list of ordered Ts across pairs.
-            
-            // 7. Narrow phase, part 2: for all Ts in order,
-            //    set bodies as in contact or terminal (terrain), 
-            //    compute new paths (which are not more than common two previous) while compensating forces 
-            //    so as to project the result into directions that are not occluded
-            //      -> bouncing will be done in next iteration to ensure convergence
-            //      -> possible to keep track of the energy as unsatisfied work of forces
-            //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)      
-            //    End when there is no more collision to be solved.
+            let sqrt = Math.sqrt;
+            if (islands.length > 0) {
+                //console.log('Islands: ');
+                //console.log(islands);
+            }
+            islands.forEach(island => {
+                // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
+                let nbI = island.length;
+                let mapCollidingPossible = []; 
+                for (let i = 0; i < nbI; ++i) {
+                    let xIndex1 = island[i];
+                    // let lfa1 = leapfrogArray[xIndex1];
+                    let id1 = oxAxis[xIndex1].id;
+                    let e1 = entities[id1];
+                    let p1_0 = e1.p0; let p10x = p1_0[0], p10y = p1_0[1], p10z = p1_0[2];
+                    let p1_1 = e1.p1; let p11x = p1_1[0], p11y = p1_1[1], p11z = p1_1[2];
+                    //e1.p2 = [p11x, p11y, p11z];
+                    //let p1_2 = e1.p2;
+                    let p1_v0 = e1.v0; let p1_a0 = e1.a0; let p1_n0 = e1.nu;
+                    let w1x = e1.widthX, w1y = e1.widthY, w1z = e1.widthZ;
+                    let ltd1 = e1.dtr; // this.getTimeDilatation(worldId, p1_0[0], p1_0[1], p1_0[2]);
+                    const dta1 = absoluteDt * ltd1;
+                    const dtr1 = relativeDt * ltd1;
+                    
+                    for (let j = i+1; j < nbI; ++j) {
+                        let xIndex2 = island[j];
+                        //let lfa2 = leapfrogArray[xIndex2];
+                        let id2 = oxAxis[xIndex2].id;
+                        let e2 = entities[id2];
+                        let p2_0 = e2.p0; let p20x = p2_0[0], p20y = p2_0[1], p20z = p2_0[2];
+                        let p2_1 = e2.p1; let p21x = p2_1[0], p21y = p2_1[1], p21z = p2_1[2];
+                        //e2.p2 = [p21x, p21y, p21z];
+                        //let p2_2 = e2.p2;
+                        let p2_v0 = e2.v0; let p2_a0 = e2.a0; let p2_n0 = e2.nu;
+                        let w2x = e2.widthX, w2y = e2.widthY, w2z = e2.widthZ;
+                        let ltd2 = e2.dtr; // this.getTimeDilatation(worldId, p2_0[0], p2_0[1], p2_0[2]);
+                        // TODO [OPT] verify integration with time dilatation.
+                        const dta2 = absoluteDt * ltd2;
+                        const dtr2 = relativeDt * ltd2;
+
+                        //for (let k = 0; k < 3; ++k) {
+                            //const cxm = 
+                        let x0l = p10x+w1x <= p20x-w2x; let y0l = p10y+w1y <= p20y-w2y; let z0l = p10z+w1z <= p20z-w2z;
+                        let x1l = p11x+w1x <= p21x-w2x; let y1l = p11y+w1y <= p21y-w2y; let z1l = p11z+w1z <= p21z-w2z;
+                        let x0r = p10x-w1x >= p20x+w2x; let y0r = p10y-w1y >= p20y+w2y; let z0r = p10z-w1z >= p20z+w2z;
+                        let x1r = p11x-w1x >= p21x+w2x; let y1r = p11y-w1y >= p21y+w2y; let z1r = p11z-w1z >= p21z+w2z;
+                        
+                        if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
+                        {
+                            // console.log('Nope. ' + [x0l, x1l, x0r, x1r, y0l, y1l, y0r, y1r, z0l, z1l, z0r, z1r]);
+                            // console.log('\t' + (p11x+w1x) + ',' + (p21x-w2x));
+                            continue;
+                        }
+                        
+                        let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
+                        let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
+                        let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
+                        let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
+                        
+                        if (xm && ym && zm) {
+                            console.log('[RigidBodies/ComputeIslands] two bodies clipped.');
+                            // mapCollidingPossible.push([i, j, 0]);
+                            continue;
+                        }
+                        
+                        //if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {
+                        if (xw && yw && zw) {
+                            // TODO [] push into colliding pairs
+                            // console.log('Collision');
+                            //let min_dtr1 = dtr1;
+                            //let min_dtr2 = dtr2;
+                            let rrel = relativeDt;
+                            
+                            // Quadratic solve thrice
+                            if (!xm) {
+                                //console.log('colx');
+                                let fw = xl ? 1 : -1;
+                                let a1 = ltd1*ltd1 * .5 * p1_a0[0];
+                                let a2 = ltd2*ltd2 * .5 * p2_a0[0];
+                                let b1 = ltd1 * p1_v0[0] + p1_n0[0]; 
+                                let b2 = ltd1 * p2_v0[0] + p2_n0[0];
+                                
+                                let r = 0;
+                                if (a1 !== a2) {
+                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1x+fw*w2x+p10x-p20x);
+                                    if (delta > 0) {
+                                        console.log("delta > 0");
+                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
+                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
+                                    } else if (delta === 0) {
+                                        console.log("delta = 0");
+                                        r = (b2-b1)/(2*(a1-a2));
+                                    }
+                                } else if (b1 !== b2) {
+                                    // console.log("deg 1 " + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+                                    r = (fw*w1x + fw*w2x+p10x-p20x) / (b2-b1);
+                                }
+                                
+                                // console.log('r=' + r + ', reldt=' + relativeDt);
+                                
+                                if (r >= 0) {
+                                    //min_dtr1 = r * ltd1;
+                                    //min_dtr2 = r * ltd2;
+                                    if (r < rrel)
+                                        rrel = r;
+                                }
+                            }
+                            
+                            if (!ym) {
+                                //console.log('coly');
+                                let fw = yl ? 1 : -1;
+                                let a1 = ltd1*ltd1 * .5 * p1_a0[1];
+                                let a2 = ltd2*ltd2 * .5 * p2_a0[1];
+                                let b1 = ltd1 * p1_v0[1] + p1_n0[1];
+                                let b2 = ltd1 * p2_v0[1] + p2_n0[1];
+
+                                // TODO [Refactor] extract method.
+                                let r = 0;
+                                if (a1 !== a2) {
+                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1y+fw*w2y+p10y-p20y);
+                                    if (delta > 0) {
+                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
+                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
+                                    } else if (delta === 0) {
+                                        r = (b2-b1)/(2*(a1-a2));
+                                    }
+                                } else if (b1 !== b2) {
+                                    r = (fw*w1y + fw*w2y+p10y-p20y) / (b2-b1);
+                                }
+                                
+                                // console.log('r=' + r + ', reldt=' + relativeDt);
+
+                                if (r >= 0) {
+                                    //let ndtr1 = r * ltd1;
+                                    //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
+                                    //let ndtr2 = r * ltd2;
+                                    //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
+                                    //rrel = r;
+                                    if (r < rrel)
+                                        rrel = r;
+                                }
+                            }
+                            
+                            if (!zm) {
+                                //console.log('colz');
+                                let fw = zl ? 1 : -1;
+                                let a1 = ltd1*ltd1 * .5 * p1_a0[2];
+                                let a2 = ltd2*ltd2 * .5 * p2_a0[2];
+                                let b1 = ltd1 * p1_v0[2] + p1_n0[2];
+                                let b2 = ltd1 * p2_v0[2] + p2_n0[2];
+
+                                // TODO [Refactor] extract method.
+                                let r = 0;
+                                if (a1 !== a2) {
+                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1z+fw*w2z+p10z-p20z);
+                                    if (delta > 0) {
+                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
+                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
+                                    } else if (delta === 0) {
+                                        r = (b2-b1)/(2*(a1-a2));
+                                    }
+                                } else if (b1 !== b2) {
+                                    r = (fw*w1z + fw*w2z+p10z-p20z) / (b2-b1);
+                                }
+
+                                if (r >= 0) {
+                                    //let ndtr1 = r * ltd1;
+                                    //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
+                                    //let ndtr2 = r * ltd2;
+                                    //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
+                                    if (r < rrel)
+                                        rrel = r;
+                                    //if (rrel < 0) rrel = r;
+                                }
+                            }
+                            
+                            //if (min_dtr1 < dtr1 || min_dtr2 < dtr2)
+                            if (rrel < relativeDt)
+                                mapCollidingPossible.push([i, j, rrel]);
+                            
+                            // }
+                        }
+                        
+                    }
+                }
+                
+                // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
+
+                // 7. Narrow phase, part 2: for all Ts in order,
+                //    set bodies as "in contact" or "terminal" (terrain), 
+                //    compute new paths (which are not more than common two previous) while compensating forces 
+                //    so as to project the result into directions that are not occluded
+                //      -> bouncing will be done in next iteration to ensure convergence
+                //      -> possible to keep track of the energy as unsatisfied work of forces
+                //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)      
+                //    End when there is no more collision to be solved.
+                mapCollidingPossible.sort((a, b) => a[2] - b[2]);
+                for (let k = 0, l = mapCollidingPossible.length; k < l; ++k) {
+                    let i = mapCollidingPossible[k][0];
+                    let j = mapCollidingPossible[k][1];
+                    let r = mapCollidingPossible[k][2];
+                    
+                    let xIndex1 = island[i];
+                    //let lfa1 = leapfrogArray[xIndex1];
+                    let id1 = oxAxis[xIndex1].id;
+                    let e1 = entities[id1];
+                    let p1_0 = e1.p0; let p10x = p1_0[0], p10y = p1_0[1], p10z = p1_0[2];
+                    let p1_1 = e1.p1; let p11x = p1_1[0], p11y = p1_1[1], p11z = p1_1[2];
+                    //e1.p2 = [p11x, p11y, p11z];
+                    //let p1_2 = e1.p2;
+                    let p1_v0 = e1.v0; let p1_a0 = e1.a0; let p1_n0 = e1.nu;
+                    let w1x = e1.widthX, w1y = e1.widthY, w1z = e1.widthZ;
+                    let ltd1 = e1.dtr; // this.getTimeDilatation(worldId, p1_0[0], p1_0[1], p1_0[2]);
+                    const dta1 = absoluteDt * ltd1;
+                    const dtr1 = relativeDt * ltd1;
+                    const sndtr1 = r * ltd1;
+                    
+                    let xIndex2 = island[j];
+                    //let lfa2 = leapfrogArray[xIndex2];
+                    let id2 = oxAxis[xIndex2].id;
+                    let e2 = entities[id2];
+                    let p2_0 = e2.p0; let p20x = p2_0[0], p20y = p2_0[1], p20z = p2_0[2];
+                    let p2_1 = e2.p1; let p21x = p2_1[0], p21y = p2_1[1], p21z = p2_1[2];
+                    //e2.p2 = [p21x, p21y, p21z];
+                    //let p2_2 = e2.p2;
+                    let p2_v0 = e2.v0; let p2_a0 = e2.a0; let p2_n0 = e2.nu;
+                    let w2x = e2.widthX, w2y = e2.widthY, w2z = e2.widthZ;
+                    let ltd2 = e2.dtr; // this.getTimeDilatation(worldId, p2_0[0], p2_0[1], p2_0[2]);
+                    const dta2 = absoluteDt * ltd2;
+                    const dtr2 = relativeDt * ltd2;
+                    const sndtr2 = r * ltd2;
+                    
+                    // Snap p1.
+                    
+                    let x0l = p10x+w1x <= p20x-w2x; let y0l = p10y+w1y <= p20y-w2y; let z0l = p10z+w1z <= p20z-w2z;
+                    let x1l = p11x+w1x <= p21x-w2x; let y1l = p11y+w1y <= p21y-w2y; let z1l = p11z+w1z <= p21z-w2z;
+                    let x0r = p10x-w1x >= p20x+w2x; let y0r = p10y-w1y >= p20y+w2y; let z0r = p10z-w1z >= p20z+w2z;
+                    let x1r = p11x-w1x >= p21x+w2x; let y1r = p11y-w1y >= p21y+w2y; let z1r = p11z-w1z >= p21z+w2z;
+                    
+                    if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
+                        continue;
+                    
+                    let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
+                    let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
+                    let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
+                    let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
+
+                    // if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {
+                    if (xm && ym && zm) console.log('[RigidBodies/Solve] two bodies clipped.');
+                    if (xw && yw && zw) {
+                        console.log('[RigidBodies/RPSolve] Solving collision');
+                        let m2 = [];
+                        let wm1 = [w1x, w1y, w1z];
+                        let wm2 = [w2x, w2y, w2z];
+                        let nep1 = [];
+                        let nep2 = [];
+                        for (let m = 0; m < 3; ++m) // Account for server congestion / lag with relative dilatation.
+                        {
+                            let e1p1i = e1.p1[m];
+                            let e1p0i = e1.p0[m];
+                            let e1p1n = e1p0i + (p1_v0[m] + p1_n0[m]) * sndtr1 + .5 * p1_a0[m] * sndtr1 * sndtr1;
+                            nep1[m] = 
+                                (e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n) ?
+                                    (e1p1n - RigidBodies.eps) :
+                                (e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i) ?
+                                    (e1p1n + RigidBodies.eps) : e1p1i;
+                            
+                            let e2p1i = e2.p1[m];
+                            let e2p0i = e2.p0[m];
+                            let e2p1n = e2p0i + (p2_v0[m] + p2_n0[m]) * sndtr2 + .5 * p2_a0[m] * sndtr2 * sndtr2;
+                            nep2[m] = (e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n) ?
+                                (e2p1n - RigidBodies.eps) : 
+                                (e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i) ?
+                                    (e2p1n + RigidBodies.eps) : e2p1i;
+                            
+                            m2[m] = (nep1[m]+wm1[m] > nep2[m]-wm2[m] && nep1[m]-wm1[m] < nep2[m]+wm2[m]);
+                            // !x1l && !x1r
+                            // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
+                        }
+                        // Temporary security measure.
+                        // TODO [CRIT] check solver
+                        if (m2[0] && m2[1] && m2[2]) {
+                            console.log('[RigidBodies]: clipping detected at integration.');
+                            for (let m = 0; m < 3; ++m) {
+                                e1.p1[m] = e1.p0[m];
+                                e2.p1[m] = e2.p0[m];
+                            }
+                        } else {
+                            for (let m = 0; m < 3; ++m) {
+                                e1.p1[m] = nep1[m];
+                                e2.p1[m] = nep2[m];
+                            }
+                        }
+                        // TODO [CRIT] bug: don't perform projections from within islands.
+                        // TODO contact -> force de frottement, accélération à l'impact
+
+                        // Max speed correction.
+                        // if (sum > maxSpeed2 * dtr)
+                        //     for (let i = 0; i < 3; ++i) inc[i] *= (maxSpeed * dtr) / sum;
+                    }
+                    
+                    // leapfrogarray[ox][i] = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
+                }
+            });
             
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
             //    smoothly slice along constrained boundaries until component is extinct.
@@ -431,11 +724,10 @@ class RigidBodies {
                 
                 let oi = currentEntity.indexX;
                 let entityIndex = currentEntity.entityId;
-                
-                //if (oxAxis[oi].kind !== 'e') continue;
+                if (oxAxis[oi].kind !== 'e') return;
                 
                 // Temporarily discard insulated objects.
-                if (oxToIslandIndex[oi] !== -1) return; 
+                // // if (oxToIslandIndex[oi] !== -1) return; 
                 
                 //let entityIndex = oxAxis[oi].id;
                 //currentEntity = entities[entityIndex];

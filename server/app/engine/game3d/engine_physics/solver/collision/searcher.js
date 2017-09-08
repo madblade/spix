@@ -181,7 +181,7 @@ class Searcher {
         }
         
         let element = iterator.next();
-        let it = 0;
+        // let it = 0;
         // console.log('Begin search.');
         while (element !== null && element !== undefined) {
             let iX = element.indexX;
@@ -235,10 +235,11 @@ class ObjectsIterator {
         this.iZ = o.indexZ;
 
         // Others not moving faster than current.
-        let maxT = Math.max(thresholdX, thresholdY, thresholdZ); 
-        this.tx = thresholdX + maxT + 2 * xW;
-        this.ty = thresholdY + maxT + 2 * yW;
-        this.tz = thresholdZ + maxT + 2 * zW;
+        let abs = Math.abs;
+        let maxT = Math.max(abs(thresholdX), abs(thresholdY), abs(thresholdZ)); 
+        this.tx = abs(thresholdX) + maxT + 2 * xW;
+        this.ty = abs(thresholdY) + maxT + 2 * yW;
+        this.tz = abs(thresholdZ) + maxT + 2 * zW;
         // TODO [HIGH] account for max width when objects are huge.
 
         this.onX = true;
@@ -307,6 +308,7 @@ class ObjectsIterator {
         
         // Search on X axis.
         if (onX && toPlus && !locked[0]) {
+            //console.log('\t\tx+');
             if (iX + s >= max) {
                 locked[0] = true;
                 this.toPlus = false;
@@ -322,7 +324,7 @@ class ObjectsIterator {
 
             debugObject(id);
             let object = objects[id];
-            if (abs(object.p0[0] - x) <= tx) {
+            if (abs(object.p0[0] - x) <= tx) { // TODO use lfarray instead of tx
                 if (abs(object.p0[1] - y) <= ty && abs(object.p0[2] - z) <= tz)
                     return object;
                 else {
@@ -335,6 +337,7 @@ class ObjectsIterator {
             }
         }
         if (onX && !toPlus && !locked[1]) {
+            //console.log('\t\tx-');
             if (iX - s < 0) {
                 locked[1] = true;
                 this.toPlus = true;
@@ -353,6 +356,7 @@ class ObjectsIterator {
             
             debugObject(id);
             let object = objects[id];
+            // console.log(x + ',' + object.p0[0] + ' < - > ' + tx);
             if (abs(object.p0[0] - x) <= tx) {
                 if (abs(object.p0[1] - y) <= ty && abs(object.p0[2] - z) <= tz)
                     return object;
@@ -370,6 +374,7 @@ class ObjectsIterator {
         // Search on Y axis.
         let onY = this.onY;
         if (onY && toPlus && !locked[2]) {
+            // console.log('\t\ty+');
             if (iY + s >= max) {
                 locked[2] = true;
                 this.toPlus = false;

@@ -87,13 +87,14 @@ class EntityModel {
     }
 
     anEntityIsPresentOn(worldId, x, y, z) {
-        // TODO [CRIT] optimize with chunks structure.
+        // TODO [HIGH] optimize with chunks structure.
         let entities = this._entities;
         let result = false;
         if (!entities) return result;
         // O(n) -> not good -> REFACTOR QUIIICK
         entities.forEach(entity => {
-            if (entity.worldId !== worldId) return;
+            if (!entity || entity.worldId !== worldId) return;
+            // TODO [HIGH] use width
             let p = entity.position;
             if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)
                 result = true;

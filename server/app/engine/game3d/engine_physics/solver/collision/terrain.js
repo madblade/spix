@@ -24,7 +24,7 @@ class TerrainCollider {
      * 
      * @returns 'has collided'
      */
-    static linearCollide(entity, world, position, newPosition, dt) {
+    static linearCollide(entity, world, position, newPosition, doProject) {
 
         let p0 = position;
         let p1 = newPosition;
@@ -55,7 +55,7 @@ class TerrainCollider {
             for (let i = 0; i < xNetwork.length; ++i) {
                 let newCrops = xArrival[i];
                 let net = xNetwork[i];
-                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
+                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     if (x1 > x0 && newCrops[0]-xW < cropX-epsilon) {
                         cropX = newCrops[0]-xW;
@@ -88,7 +88,7 @@ class TerrainCollider {
             for (let i = 0; i < yNetwork.length; ++i) {
                 let newCrops = yArrival[i];
                 let net = yNetwork[i];
-                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
+                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
                     if (y1 > y0 && newCrops[1]-yW < cropY-epsilon) {
@@ -133,7 +133,7 @@ class TerrainCollider {
             for (let i = 0; i < zNetwork.length; ++i) {
                 let newCrops = zArrival[i];
                 let net = zNetwork[i];
-                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity);
+                let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     if (z1 > z0 && newCrops[2]-zW < cropZ-epsilon) {
                         let nx = newCrops[0]+x0-net[0];
@@ -188,7 +188,9 @@ class TerrainCollider {
         return false;
     }
 
-    static intersectAmanditesWoo(p1, p2, world, entity) {
+    // Warning: linear raycasting.
+    // Does not account for exact X² leapfrog integration
+    static intersectAmanditesWoo(p1, p2, world, entity, doProject) {
 
         let sgn = x => (x > 0 ? 1 : (x < 0 ? -1 : 0));
         let frac0 = x => x - Math.floor(x);
@@ -255,7 +257,8 @@ class TerrainCollider {
                 x1, y1, z1,                 // starting point
                 x2, y2, z2,                 // ending point
                 ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
-                p2 // Crop arrival position.
+                p2, // Crop arrival position.
+                doProject // apply projection effect (stable if object is not in an island)
             )) return true;
 
         }
@@ -272,7 +275,8 @@ class TerrainCollider {
                         x1, y1, z1,                 // starting point
                         x2, y2, z2,                 // ending point
                         ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
-                        newPosition)    // position to be cropped to
+                        newPosition, // position to be cropped to
+                        doProject) // use free projection for slippin along cubes
         {
 
         if (world.isFree([i, j, k])) return false;
@@ -294,35 +298,39 @@ class TerrainCollider {
             const ddx = dx < 0 ? 1 : -1;
 
             // Projections
-            let ny = y1+(y2-y1);
             let nyt = y1+(y2-y1)*t;
-            let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
-            if (dby < 2) {
-                if (dy < 0) {
-                    const free = world.isFree([i+ddx, j-1, k]);
-                    if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; adherence[1] = false; }
-                    else { nyt = ny0-1; if (dby > 0 && !free) adherence[1] = true; }
-                }
-                if (dy > 0) {
-                    const free = world.isFree([i+ddx, j+1, k]);
-                    if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; adherence[4] = false; }
-                    else { nyt = ny0+1; if (dby > 0 && !free) adherence[4] = true; }
+            if (doProject) {
+                let ny = y1+(y2-y1);
+                let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
+                if (dby < 2) {
+                    if (dy < 0) {
+                        const free = world.isFree([i+ddx, j-1, k]);
+                        if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; adherence[1] = false; }
+                        else { nyt = ny0-1; if (dby > 0 && !free) adherence[1] = true; }
+                    }
+                    if (dy > 0) {
+                        const free = world.isFree([i+ddx, j+1, k]);
+                        if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; adherence[4] = false; }
+                        else { nyt = ny0+1; if (dby > 0 && !free) adherence[4] = true; }
+                    }
                 }
             }
 
-            let nz = z1+(z2-z1);
             let nzt = z1+(z2-z1)*t;
-            let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
-            if (dbz < 2) {
-                if (dz < 0) {
-                    const free = world.isFree([i+ddx, j, k-1]);
-                    if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; adherence[2] = false; }
-                    else { nzt = nz0-1; if (dbz > 0 && !free) adherence[2] = true; }
-                }
-                if (dz > 0) {
-                    const free = world.isFree([i+ddx, j, k+1]);
-                    if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; adherence[5] = false; }
-                    else { nzt = nz0+1; if (dbz > 0 && !free) adherence[5] = true; }
+            if (doProject) {
+                let nz = z1+(z2-z1);
+                let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
+                if (dbz < 2) {
+                    if (dz < 0) {
+                        const free = world.isFree([i+ddx, j, k-1]);
+                        if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; adherence[2] = false; }
+                        else { nzt = nz0-1; if (dbz > 0 && !free) adherence[2] = true; }
+                    }
+                    if (dz > 0) {
+                        const free = world.isFree([i+ddx, j, k+1]);
+                        if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; adherence[5] = false; }
+                        else { nzt = nz0+1; if (dbz > 0 && !free) adherence[5] = true; }
+                    }
                 }
             }
 
@@ -336,44 +344,49 @@ class TerrainCollider {
             }
             
             // entity.acceleration[0] = 0;
-            entity.speed[0] = 0;
-            entity.speed[1] = entity._impulseSpeed[1];
-            if (entity.acceleration[2] === 0) entity.speed[2] = 0;
+            //entity.speed[0] = 0;
+            //entity.speed[1] = entity._impulseSpeed[1];
+            //if (entity.acceleration[2] === 0) entity.speed[2] = 0;
         }
 
         else if (nty) {
             const t = tMaxY-tDeltaY;
             const ddy = dy < 0 ? 1 : -1;
 
-            let nx = x1+(x2-x1);
+            // Projections
             let nxt = x1+(x2-x1)*t;
-            let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
-            if (dbx < 2) {
-                if (dx < 0) {
-                    const free = world.isFree([i-1, j+ddy, k]);
-                    if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; adherence[0] = false; }
-                    else { nxt = nx0-1; if (dbx > 0 && !free) adherence[0] = true; }
-                }
-                if (dx > 0) {
-                    const free = world.isFree([i+1, j+ddy, k]);
-                    if ((!free && dbx < 1 && nx < nx0+1) || free) { nxt = nx; adherence[3] = false; }
-                    else { nxt = nx0+1; if (dbx > 0 && !free) adherence[3] =  true; }
+            if (doProject) {
+                let nx = x1+(x2-x1);
+                let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
+                if (dbx < 2) {
+                    if (dx < 0) {
+                        const free = world.isFree([i-1, j+ddy, k]);
+                        if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; adherence[0] = false; }
+                        else { nxt = nx0-1; if (dbx > 0 && !free) adherence[0] = true; }
+                    }
+                    if (dx > 0) {
+                        const free = world.isFree([i+1, j+ddy, k]);
+                        if ((!free && dbx < 1 && nx < nx0+1) || free) { nxt = nx; adherence[3] = false; }
+                        else { nxt = nx0+1; if (dbx > 0 && !free) adherence[3] =  true; }
+                    }
                 }
             }
 
-            let nz = z1+(z2-z1);
             let nzt = z1+(z2-z1)*t;
-            let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
-            if (dbz < 2) {
-                if (dz < 0) {
-                    const free = world.isFree([i, j+ddy, k-1]);
-                    if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; adherence[2] = false;}
-                    else { nzt = nz0-1; if (dbz > 0 && !free) adherence[2] = true; }
-                }
-                if (dz > 0) {
-                    const free = world.isFree([i, j+ddy, k+1]);
-                    if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; adherence[5] = false; }
-                    else { nzt = nz0+1; if (dbz > 0 && !free) adherence[5] = true; }
+            if (doProject) {
+                let nz = z1+(z2-z1);
+                let dbz = Math.abs(Math.floor(nz)-Math.floor(nzt));
+                if (dbz < 2) {
+                    if (dz < 0) {
+                        const free = world.isFree([i, j+ddy, k-1]);
+                        if ((!free && dbz < 1 && nz > nz0-1) || free) { nzt = nz; adherence[2] = false;}
+                        else { nzt = nz0-1; if (dbz > 0 && !free) adherence[2] = true; }
+                    }
+                    if (dz > 0) {
+                        const free = world.isFree([i, j+ddy, k+1]);
+                        if ((!free && dbz < 1 && nz < nz0+1) || free) { nzt = nz; adherence[5] = false; }
+                        else { nzt = nz0+1; if (dbz > 0 && !free) adherence[5] = true; }
+                    }
                 }
             }
 
@@ -387,44 +400,49 @@ class TerrainCollider {
             }
             
             // entity.acceleration[1] = 0;
-            entity.speed[0] = entity._impulseSpeed[0];
-            entity.speed[1] = 0;
-            if (entity.acceleration[2] === 0) entity.speed[2] = 0;
+            //entity.speed[0] = entity._impulseSpeed[0];
+            //entity.speed[1] = 0;
+            //if (entity.acceleration[2] === 0) entity.speed[2] = 0;
         }
 
         else if (ntz) {
             const t = tMaxZ-tDeltaZ;
             const ddz = dz < 0 ? 1 : -1;
 
-            let nx = x1+(x2-x1);
+            // Projections
             let nxt = x1+(x2-x1)*t;
-            let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
-            if (dbx < 2) {
-                if (dx < 0) {
-                    const free = world.isFree([i-1, j, k+ddz]);
-                    if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; adherence[0] = false; }
-                    else { nxt = nx0-1; if (dbx > 0 && !free) adherence[0] = true; }
-                }
-                if (dx > 0) {
-                    const free = world.isFree([i+1, j, k+ddz]);
-                    if ((!free && dbx < 1 && nx < nx0+1) || free ) { nxt = nx; adherence[3] = false; }
-                    else { nxt = nx0+1; if (dbx > 0 && !free) adherence[3] = true; }
+            if (doProject) {
+                let nx = x1+(x2-x1);
+                let dbx = Math.abs(Math.floor(nx)-Math.floor(nxt));
+                if (dbx < 2) {
+                    if (dx < 0) {
+                        const free = world.isFree([i-1, j, k+ddz]);
+                        if ((!free && dbx < 1 && nx > nx0-1) || free) { nxt = nx; adherence[0] = false; }
+                        else { nxt = nx0-1; if (dbx > 0 && !free) adherence[0] = true; }
+                    }
+                    if (dx > 0) {
+                        const free = world.isFree([i+1, j, k+ddz]);
+                        if ((!free && dbx < 1 && nx < nx0+1) || free ) { nxt = nx; adherence[3] = false; }
+                        else { nxt = nx0+1; if (dbx > 0 && !free) adherence[3] = true; }
+                    }
                 }
             }
 
-            let ny = y1+(y2-y1);
             let nyt = y1+(y2-y1)*t;
-            let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
-            if (dby < 2) {
-                if (dy < 0) {
-                    const free = world.isFree([i, j-1, k+ddz]);
-                    if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; adherence[1] = false; }
-                    else { nyt = ny0-1; if (dby > 0 && !free) adherence[1] = true; }
-                }
-                if (dy > 0) {
-                    const free = world.isFree([i, j+1, k+ddz]);
-                    if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; adherence[4] = false; }
-                    else { nyt = ny0+1; if (dby > 0 && !free) adherence[4] = true; }
+            if (doProject) {
+                let ny = y1+(y2-y1);
+                let dby = Math.abs(Math.floor(ny)-Math.floor(nyt));
+                if (dby < 2) {
+                    if (dy < 0) {
+                        const free = world.isFree([i, j-1, k+ddz]);
+                        if ((!free && dby < 1 && ny > ny0-1) || free) { nyt = ny; adherence[1] = false; }
+                        else { nyt = ny0-1; if (dby > 0 && !free) adherence[1] = true; }
+                    }
+                    if (dy > 0) {
+                        const free = world.isFree([i, j+1, k+ddz]);
+                        if ((!free && dby < 1 && ny < ny0+1) || free) { nyt = ny; adherence[4] = false; }
+                        else { nyt = ny0+1; if (dby > 0 && !free) adherence[4] = true; }
+                    }
                 }
             }
 
@@ -445,8 +463,8 @@ class TerrainCollider {
             }
             
             // entity.acceleration[2] = 0;
-            entity.speed = entity._impulseSpeed;
-            entity.speed[2] = 0;
+            //entity.speed = entity._impulseSpeed;
+            //entity.speed[2] = 0;
         }
 
         // Bounce
