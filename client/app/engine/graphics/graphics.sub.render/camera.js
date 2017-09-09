@@ -101,7 +101,7 @@ extend(App.Engine.Graphics.Camera.prototype, {
         var up = this.up;
         up.position.x = x;
         up.position.y = y;
-        up.position.z = z;
+        up.position.z = z-.7999;
     },
     
     setCameraTransform: function(cameraTransform) {

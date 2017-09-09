@@ -45,6 +45,7 @@ extend(App.Engine.Graphics.prototype, {
         head.position.y = 1.6;
         wrapper.rotation.x = Math.PI/2;
         wrapper.rotation.y = Math.PI;
+        wrapper.position.z = -0.7999;
 
         up._id = id;
         //delete createdEntity._id;

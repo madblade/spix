@@ -17,7 +17,6 @@ class Entity {
         // NEW physics engine
         this._p0            = [0, 0, 0];
         this._p1            = [0, 0, 0];
-        this._p2            = [0, 0, 0]; // for RigidBodies
         this._v0            = [0, 0, 0];
         this._v1            = [0, 0, 0];
         this._a0            = [0, 0, 0];
@@ -211,8 +210,6 @@ class Entity {
     set p0(p0)              { this._p0 = p0; }
     get p1()                { return this._p1; }
     set p1(p1)              { this._p1 = p1; }
-    get p2()                { return this._p2; }
-    set p2(p2)              { this._p2 = p2; }
     
     get nu()                { return this._nu; }
     set nu(nu)              { this._nu = nu; }

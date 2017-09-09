@@ -588,8 +588,6 @@ class RigidBodies {
                             //if (min_dtr1 < dtr1 || min_dtr2 < dtr2)
                             if (rrel < relativeDt)
                                 mapCollidingPossible.push([i, j, rrel]);
-                            
-                            // }
                         }
                         
                     }
