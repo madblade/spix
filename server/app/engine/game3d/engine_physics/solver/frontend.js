@@ -46,7 +46,22 @@ class FrontEnd {
         let relativeDt = process.hrtime(this._stamp)[1] / 1e6;
         
         // Solve physics constraints with basic ordering optimization.
-        rigidBodies.solve(objectOrderer, eventOrderer, em, wm, xm, ob, relativeDt);
+        let maxTimeStepDuration = rigidBodies.refreshRate;
+        let numberOfEntirePasses = relativeDt > maxTimeStepDuration ? Math.floor(relativeDt/maxTimeStepDuration) : 0;
+        for (let t = 0; t < numberOfEntirePasses; ++t) {
+            rigidBodies.solve(objectOrderer, eventOrderer, em, wm, xm, ob, maxTimeStepDuration);
+        }
+        
+        let remainder = relativeDt - numberOfEntirePasses*maxTimeStepDuration;
+        if (remainder < 0) {
+            throw Error('[Physics/FrontEnd] Time sub-quantization error.');
+        }
+        if (remainder > relativeDt*.75) {
+            rigidBodies.solve(objectOrderer, eventOrderer, em, wm, xm, ob, remainder);
+            ++numberOfEntirePasses;
+        }
+        
+        // console.log('######### Current physics passes: ' + numberOfEntirePasses + ' #########');
         
         // Stamp.
         this._stamp = process.hrtime();

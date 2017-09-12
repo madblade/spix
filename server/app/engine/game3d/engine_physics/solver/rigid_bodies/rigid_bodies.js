@@ -48,6 +48,8 @@ class RigidBodies {
     
     solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs) {
 
+        // TODO [HIGH] solve several times according to delta timestep
+        
         const passId = Math.random();
         let timeDilatation = this.globalTimeDilatation;
         let absoluteDt = this.refreshRate / timeDilatation;
@@ -213,10 +215,11 @@ class RigidBodies {
                 let d = currentEntity.d; // Directions.
                 let r = currentEntity.r; // Rotation.
                 const maxV = currentEntity.getVelocity();
-                const factor = Math.sqrt(maxV);
+                const factor = Math.sqrt(maxV*1.05);
                 let g = this.getGravity(worldId, p0[0], p0[1], p0[2]);
                 //let vector = RigidBodies.getEntityForwardVector(d, r, factor, false); // 3D
                 let vector = RigidBodies.getEntityForwardVector(d, r, factor, true); // Project 2D
+                // console.log(vector);
                 let abs = Math.abs, sgn = Math.sign;
                 let adh = currentEntity.adherence;
                 
@@ -875,6 +878,7 @@ class RigidBodies {
         
         if (project2D) {
             relTheta1 = PI2;
+            // TODO [CRIT] THIS IS WRONG!!!!!!!!!!!!!!!!!!!!!!!
         }
         
         let nb0 = (fw || bw) + (rg || lf) + (up || dn);

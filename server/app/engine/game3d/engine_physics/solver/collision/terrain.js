@@ -343,6 +343,14 @@ class TerrainCollider {
                 newPosition[2] = nzt;
             }
             
+            let acc = entity.a0;
+            if (adherence[0] && acc[0] || adherence[3] && acc[3]) {
+                entity.v1[1] = 0;
+                entity.v1[2] = 0;
+            }
+            //if (adherence[0] || adherence[3]) {
+            //}
+            
             // entity.acceleration[0] = 0;
             //entity.speed[0] = 0;
             //entity.speed[1] = entity._impulseSpeed[1];
@@ -399,6 +407,15 @@ class TerrainCollider {
                 newPosition[2] = nzt;
             }
             
+            let acc = entity.a0;
+            
+            if (adherence[1] && acc[1] || adherence[4] && acc[4]) {
+                entity.v1[0] = 0;
+                entity.v1[2] = 0;
+            }
+            //if (adherence[1] || adherence[4]) {
+            //}
+            
             // entity.acceleration[1] = 0;
             //entity.speed[0] = entity._impulseSpeed[0];
             //entity.speed[1] = 0;
@@ -447,6 +464,7 @@ class TerrainCollider {
             }
 
             // One impulse allowed
+            // TODO eliucidate why
             if (dz < 0) {
                 adherence[2] = true;
                 adherence[5] = false;
@@ -461,6 +479,14 @@ class TerrainCollider {
                 newPosition[1] = nyt;
                 newPosition[2] = nz0; entity.v1[2] = 0;
             }
+            
+            let acc = entity.a0;
+            if (adherence[2] && acc[2] || adherence[5] && acc[5]) {
+                entity.v1[0] = 0;
+                entity.v1[1] = 0;
+            }
+            //if (adherence[2] || adherence[5]) {
+            //}
             
             // entity.acceleration[2] = 0;
             //entity.speed = entity._impulseSpeed;
