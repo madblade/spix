@@ -140,9 +140,25 @@ extend(App.Engine.UI.prototype, {
 
     onMiddleMouseDown: function() {
     },
+    
+    registerMouseWheel: function() {
+        var clientModel = this.app.model.client;
+        
+        $(window).mousewheel(function(event) {
+            var ex = event.deltaX;
+            var ey = event.deltaY;
+            var df = event.deltaFactor;
+            
+            clientModel.triggerChange('interaction', ['item', ey]);
+        });
+    },
 
     unregisterMouseDown: function() {
         $(window).off('mousedown');
-    }
+    },
 
+    unregisterMouseWheel: function() {
+        $(window).off('mousewheel');
+    }
+    
 });

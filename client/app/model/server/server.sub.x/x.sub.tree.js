@@ -98,7 +98,7 @@ XGraph = function(rootId) {
 // Arcs for portals.
 extend(XGraph.prototype, {
 
-    setArc(arcId, arc) {
+    setArc: function(arcId, arc) {
         if (this.arcs.has(arcId)) console.log('XGraph: adding an existing arc to the graph.');
         this.arcs.set(arcId, arc);
     },

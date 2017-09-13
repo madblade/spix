@@ -44,10 +44,10 @@ extend(App.Engine.UI.prototype, {
                     clientModel.triggerEvent('m', 'u');
                     break;
                 case k.leftHandEast2: // F
-                    clientModel.triggerChange('camera', 'toggle');
+                    clientModel.triggerChange('camera', ['toggle']);
                     break;
                 case k.leftHandNorthEast2: // R
-                    clientModel.triggerChange('interaction', 'toggle');
+                    clientModel.triggerChange('interaction', ['toggle']);
                     break;
                 case k.leftHandEast3: // (G)ravity.
                     clientModel.triggerEvent('a', 'g');

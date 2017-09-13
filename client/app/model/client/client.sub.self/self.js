@@ -25,6 +25,10 @@ App.Model.Client.SelfComponent = function(clientModel) {
 
     // Inventory.
     this.currentItem = 0; // Index of current item in inventory.
+    
+    this._itemOrientations = [0, 1]; // In case of ambiguity.
+    this._itemOrientation = this._itemOrientations[0];
+    this._itemPlacementRatio = 0;
 
     /** Dynamic **/
 
@@ -67,10 +71,10 @@ extend(App.Model.Client.SelfComponent.prototype, {
                     var avatar = serverSelfModel.avatar;
                     var worldId = serverSelfModel.worldId;
                     var display;
-                    if (data === 'toggle')
+                    if (data[0] === 'toggle')
                         display = !serverSelfModel.displayAvatar;
                     else
-                        display = data;
+                        display = false;
 
                     serverSelfModel.displayAvatar = display;
 
@@ -84,12 +88,23 @@ extend(App.Model.Client.SelfComponent.prototype, {
                     break;
 
                 case 'interaction':
-                    if (scope._clickInteraction === 'block') {
-                        scope._clickInteraction = 'x';
-                    } else if (scope._clickInteraction === 'x') {
-                        scope._clickInteraction = 'block';
+                    var actionType = data[0];
+                    if (actionType === 'toggle') {
+                        if (scope._clickInteraction === 'block') {
+                            scope._clickInteraction = 'x';
+                        } else if (scope._clickInteraction === 'x') {
+                            scope._clickInteraction = 'block';
+                        }
+                        register.updateSelfState({'active_item': scope._clickInteraction});
+                    } else if (actionType === 'item') {
+                        var deltaY = data[1];
+                        if (deltaY>0) {
+                            // Previous
+                        } else if (deltaY<0) {
+                            // Next
+                        }
+                        register.updateSelfState({'active_item': scope._clickInteraction});
                     }
-                    register.updateSelfState({'active_item': scope._clickInteraction});
 
                     break;
 

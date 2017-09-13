@@ -18,6 +18,7 @@ module.exports = function (config) {
             'client/bower_components/Hyphenator/Hyphenator.js',
             'client/bower_components/three.js/three.min.js',
             'client/bower_components/stats.js/build/stats.js',
+            'client/bower_components/jquery-mousewheel/jquery.mousewheel.js',
             // endbower
             'node_modules/socket.io-client/socket.io.js',
             'client/!(bower_components)/**/*.js',
