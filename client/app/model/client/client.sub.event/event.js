@@ -37,9 +37,12 @@ extend(App.Model.Client.EventComponent.prototype, {
                 var i = clientSelfModel.clickInteraction;
                 if (i.isBlock()) {
                     // From inventory, select block to be added.
+                    data.pop();
                     data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
                     this.triggerBlock('b', data);
                 } else if (i.isX()) {
+                    data.push(clientSelfModel.getItemOffset());
+                    data.push(clientSelfModel.getItemOrientation());
                     this.triggerBlock('x', data);
                 } else {
                     // TODO [MEDIUM] object, skill...

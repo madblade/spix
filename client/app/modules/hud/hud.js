@@ -18,7 +18,7 @@ extend(App.Modules.Hud.prototype, {
             $("#position").text(text).css('color', 'orange');
         }
 
-        else if (newState.hasOwnProperty('diagram')) {
+        if (newState.hasOwnProperty('diagram')) {
             var d = newState['diagram'];
 
             var s = d.split(/\r?\n/g);
@@ -42,9 +42,19 @@ extend(App.Modules.Hud.prototype, {
             $('#diagram').html(s); // .css('color', 'cyan');
         }
 
-        else if (newState.hasOwnProperty('active_item')) {
+        if (newState.hasOwnProperty('active_item')) {
             var h = newState['active_item'];
             $('#items').text(h).css('color', 'orange');
+        }
+        
+        if (newState.hasOwnProperty('item_orientation')) {
+            var or = newState['item_orientation'];
+            $('#item_orientation').text(or).css('color', 'orange');
+        }
+        
+        if (newState.hasOwnProperty('item_offset')) {
+            var of = newState['item_offset'];
+            $('#item_offset').text(of).css('color', 'orange');
         }
 
     }

@@ -142,6 +142,8 @@ class ConsistencyEngine {
         // Updates must be transmitted after this call.
         return entityOutput;
     }
+    
+    // TODO [CRIT] init x output for player
 
     generateWorld() {
         return this._generator.generateWorld();

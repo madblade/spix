@@ -25,9 +25,11 @@ class XUpdater {
         if (portalToLink) portalToLink = parseInt(portalToLink);
 
         let x = meta[1], y = meta[2], z = meta[3];
+        let normal = meta[4];
+        let offset = meta[5];
 
         if (meta[0] === 'add') {
-            xModel.addPortal(originWorld, x, y, z, x, y, z+1, 0.999, 'both', portalToLink);
+            xModel.addPortal(originWorld, x, y, z, x, y, z+1, 0.999, 'first', portalToLink);
         } else if (meta[0] === 'del') {
             xModel.removePortalFromPosition(originWorld, x, y, z);
         }

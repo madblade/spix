@@ -25,10 +25,10 @@ App.Model.Client.SelfComponent = function(clientModel) {
 
     // Inventory.
     this.currentItem = 0; // Index of current item in inventory.
-    
     this._itemOrientations = [0, 1]; // In case of ambiguity.
     this._itemOrientation = this._itemOrientations[0];
     this._itemPlacementRatio = 0;
+    this._itemOffset = 0.999;
 
     /** Dynamic **/
 
@@ -41,11 +41,21 @@ extend(App.Model.Client.SelfComponent.prototype, {
 
     init: function() {
         register.updateSelfState({'active_item': this._clickInteraction});
+        register.updateSelfState({'item_orientation': this._itemOrientation});
+        register.updateSelfState({'item_offset': this._itemOffset});
     },
 
     // TODO [MEDIUM] implement items
     getCurrentItem: function() {
         return this.currentItem;
+    },
+    
+    getItemOrientation: function() {
+        return this._itemOrientation;
+    },
+    
+    getItemOffset: function() {
+        return this._itemOffset;
     },
 
     triggerChange: function(type, data) {
@@ -96,14 +106,26 @@ extend(App.Model.Client.SelfComponent.prototype, {
                             scope._clickInteraction = 'block';
                         }
                         register.updateSelfState({'active_item': scope._clickInteraction});
-                    } else if (actionType === 'item') {
+                    } else if (actionType === 'item_orientation') {
+                        var newOrientation = scope._itemOrientation;
+                        var orientations = scope._itemOrientations;
+                        var newOrientationId = orientations.indexOf(newOrientation);
+                        var nbOrientations = orientations.length;
+                        newOrientationId++; newOrientationId%=nbOrientations;
+                        scope._itemOrientation = orientations[newOrientationId];
+                        
+                        register.updateSelfState({'item_orientation': scope._itemOrientation});
+                    } else if (actionType === 'item_offset') {
                         var deltaY = data[1];
-                        if (deltaY>0) {
-                            // Previous
-                        } else if (deltaY<0) {
-                            // Next
+                        var offset = Number(scope._itemOffset);
+                        var d = Math.abs(deltaY);
+                        if (deltaY>0) { // Previous
+                            scope._itemOffset = Math.min(offset+(d/100), 0.999).toFixed(3);
+                        } else if (deltaY<0) { // Next
+                            scope._itemOffset = Math.max(offset-(d/100), 0.001).toFixed(3);
                         }
-                        register.updateSelfState({'active_item': scope._clickInteraction});
+                        
+                        register.updateSelfState({'item_offset': scope._itemOffset});
                     }
 
                     break;

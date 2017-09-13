@@ -41,7 +41,9 @@ class XLoader {
             // Manage other end as a whole.
             if (partial) {
                 if (array) {
-                    addedPortals[portalId] = [...array]; // Other end id, chunk, xyzp, orientation, world id.
+                    addedPortals[portalId] = [...array]; 
+                        // API: Other end id, chunk id, world id, xyzp, orientation, world id,
+                        // x1,y1,z1, x2,y2,z2, partial position, orientation
                     cm.unsetPartialX(avatarId, portalId);
                 } // Else, nothing to do still.
             } else {

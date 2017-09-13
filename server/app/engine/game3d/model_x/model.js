@@ -43,7 +43,7 @@ class XModel {
 
     // One knows it must link parts of this knots before it opens...
     // OtherPortalId: if null, spawns an empty portal; otherwise, links an existing portal and forge it into a knot.
-    addPortal(worldId, x1, y1, z1, x2, y2, z2, position, orientation, otherPortalId) {
+    addPortal(worldId, x1, y1, z1, x2, y2, z2, offset, orientation, otherPortalId) {
         let world = this._worldModel.getWorld(worldId);
         let portals = this._portals;
         let worldToChunksToPortals = this._worldToChunksToPortals;
@@ -56,7 +56,7 @@ class XModel {
 
         // Check parameters.
         // Orientation should be correct.
-        if (orientation !== '+' && orientation !== '-' && orientation !== 'both') return;
+        if (orientation !== 'first' && orientation !== 'next') return;
         // Portal must be orthogonal an axis: exactly one block coordinate in common.
         let bx = x1 === x2, by = y1 === y2, bz = z1 === z2;
         let sum = bx + by + bz;
@@ -75,7 +75,7 @@ class XModel {
         if (chunk1 && chunk1 !== chunk2) return;
 
         let portalId = CollectionUtils.generateId(portals);
-        var portal = new Portal(worldId, portalId, [x1, y1, z1], [x2, y2, z2], position, orientation, chunk1);
+        var portal = new Portal(worldId, portalId, [x1, y1, z1], [x2, y2, z2], offset, orientation, chunk1);
 
         let chunkId = chunk1.chunkId;
         portals.set(portalId, portal);
@@ -113,7 +113,7 @@ class XModel {
             let ijk = chunkId.split(',');
             let newChunk = WorldGenerator.generateFlatChunk(xS, yS, zS, ...ijk, newWorld);
             newWorld.addChunk(newChunk.chunkId, newChunk);
-            this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, position, orientation, portalId);
+            this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, offset, orientation, portalId);
         }
 
         this._cachedConnectivity = [new Map(), new Map()];

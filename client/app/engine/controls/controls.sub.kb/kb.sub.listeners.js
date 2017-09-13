@@ -49,6 +49,10 @@ extend(App.Engine.UI.prototype, {
                 case k.leftHandNorthEast2: // R
                     clientModel.triggerChange('interaction', ['toggle']);
                     break;
+                case k.pageUp: // Change item orientation
+                case k.pageDown: // Same as there are only 2 possible item orientation ATM.
+                    clientModel.triggerChange('interaction', ['item_orientation', 1]);
+                    break;
                 case k.leftHandEast3: // (G)ravity.
                     clientModel.triggerEvent('a', 'g');
                     break;

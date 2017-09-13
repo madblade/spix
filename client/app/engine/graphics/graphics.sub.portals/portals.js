@@ -22,6 +22,8 @@ extend(App.Engine.Graphics.prototype, {
         var screen = this.getScreen(portalId);
         if (!screen) {
             var tempPosition = portal.tempPosition;
+            var tempOffset = portal.tempOffset;
+            var tempOrientation = portal.tempOrientation;
             var tempWidth = portal.tempWidth;
             var tempHeight = portal.tempHeight;
 
@@ -54,7 +56,8 @@ extend(App.Engine.Graphics.prototype, {
             });
             var mesh = new THREE.Mesh(geometry, material);
 
-            mesh.position.x = tempPosition[0] + 0.999;
+            // TODO [CRIT] orientations
+            mesh.position.x = tempPosition[0] + tempOffset;
             mesh.position.y = tempPosition[1] + 0.5;
             mesh.position.z = tempPosition[2] + 1;
             mesh.rotation.x = Math.PI/2;

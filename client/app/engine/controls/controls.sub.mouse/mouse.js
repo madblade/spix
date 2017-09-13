@@ -31,12 +31,14 @@ extend(App.Engine.UI.prototype, {
         var graphicsEngine = this.app.engine.graphics;
         graphicsEngine.startListeners();
         this.registerMouseDown();
+        this.registerMouseWheel();
     },
 
     stopMouseListeners: function() {
         var graphicsEngine = this.app.engine.graphics;
         graphicsEngine.stopListeners();
         this.unregisterMouseDown();
+        this.unregisterMouseWheel();
     }
 
 });

@@ -57,11 +57,11 @@ extend(App.Model.Server.XModel.prototype, {
                     var worldId         = meta[2];
                     var end1            = [meta[3], meta[4], meta[5]];
                     var end2            = [meta[6], meta[7], meta[8]];
-                    var position        = meta[9];
+                    var offset          = meta[9];
                     var orientation     = meta[10];
 
                     // Do add portal (not that world map is recomputed in process)
-                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, position, orientation);
+                    this.addPortal(portalId, otherPortalId, chunkId, worldId, end1, end2, offset, orientation);
                     refreshWorldMap = true;
                     
                 } else {
