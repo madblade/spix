@@ -63,15 +63,17 @@ extend(App.Engine.Graphics.prototype, {
             var x1 = parseInt(top[0]), y1 = parseInt(top[1]), z1 = parseInt(top[2]);
             
             if (z0 !== z1) {
-                mesh.rotation.x = Math.PI/2;
-                mesh.rotation.y = Math.PI/2;
                 if (tempOrientation === 'first') {
+                    mesh.rotation.x = Math.PI/2;
+                    mesh.rotation.y = Math.PI/2;
                     mesh.position.x = pos[0] + parseFloat(tempOffset);
                     mesh.position.y = pos[1] + 0.5;
                     mesh.position.z = pos[2] + 1;
                 } else if (tempOrientation === 'next') {
-                    mesh.position.x = pos[0];
-                    mesh.position.y = pos[1] + 0.5 + parseFloat(tempOffset);
+                    mesh.rotation.x = Math.PI/2;
+                    mesh.rotation.y = Math.PI/2;
+                    mesh.position.x = pos[0] + 0.5;
+                    mesh.position.y = pos[1] + parseFloat(tempOffset);
                     mesh.position.z = pos[2] + 1;
                     mesh.rotation.y += Math.PI/2;
                 }
@@ -81,11 +83,11 @@ extend(App.Engine.Graphics.prototype, {
                     mesh.rotation.y = Math.PI/2;
                     mesh.rotation.z = Math.PI/2;
                     mesh.position.x = pos[0] + parseFloat(tempOffset);
-                    mesh.position.y = pos[1];
+                    mesh.position.y = pos[1] + 1;
                     mesh.position.z = pos[2] + 0.5;
                 } else if (tempOrientation === 'next') {
                     mesh.position.x = pos[0] + 0.5;
-                    mesh.position.y = pos[1];
+                    mesh.position.y = pos[1] + 1;
                     mesh.position.z = pos[2] + parseFloat(tempOffset);
                 }
             } else if (x0 !== x1) {

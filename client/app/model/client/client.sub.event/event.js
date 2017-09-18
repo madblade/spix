@@ -43,6 +43,11 @@ extend(App.Model.Client.EventComponent.prototype, {
                     }
                     this.triggerBlock('b', data);
                 } else if (i.isX()) {
+                    var fx1 = data[1], fy1 = data[2], fz1 = data[3];
+                    var fx2 = data[4], fy2 = data[5], fz2 = data[6];
+                    if (fx2 < fx1) { data[1] = fx2; data[4] = fx1; }
+                    if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
+                    if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
                     data.push(clientSelfModel.getItemOffset());
                     data.push(clientSelfModel.getItemOrientation());
                     this.triggerBlock('x', data);
