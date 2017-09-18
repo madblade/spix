@@ -38,15 +38,42 @@ class XCollider {
                 switch (axis) {
                     case 'x': // Warn! for 'x', 'first' is z.
                         if (o === 'first') { // Z
+                            fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
+                            fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
+                            fz0 = z0 + p;               fz1 = fz0;
+                            if ((op[2] > fz0 && np[2] < fz1 || op[2] < fz0 && np[2] > fz1) &&
+                                op[1] > fy0 && op[1] < fy1 && np[1] > fy0 && np[1] < fy1 &&
+                                op[0]+.5 > fx0 && op[0]+.5 < fx1 && np[0]+.5 > fx0 && np[0]+.5 < fx1
+                            ) return xModel.getOtherSide(xId);
                             
                         } else if (o === 'next') { // Y
-                            
+                            fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
+                            fy0 = y0 + p;               fy1 = fy0;
+                            fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
+                            if ((op[1] > fy0 && np[1] < fy1 || op[1] < fy0 && np[1] > fy1) &&
+                                op[2] > fz0 && op[2] < fz1 && np[2] > fz0 && np[2] < fz1 &&
+                                op[0]+.5 > fx0 && op[0]+.5 < fx1 && np[0]+.5 > fx0 && np[0]+.5 < fx1
+                            ) return xModel.getOtherSide(xId);
                         } else console.log('[XCollide/Core] Unmanaged.');
                         break;
                     case 'y':
                         if (o === 'first') { // X
+                            fx0 = x0 + p;               fx1 = fx0;
+                            fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
+                            fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
+                            if ((op[0] > fx0 && np[0] < fx1 || op[0] < fx0 && np[0] > fx1) &&
+                                op[2] > fz0 && op[2] < fz1 && np[2] > fz0 && np[2] < fz1 &&
+                                op[1]+.5 > fy0 && op[1]+.5 < fy1 && np[1]+.5 > fy0 && np[1]+.5 < fy1
+                            ) return xModel.getOtherSide(xId);
                             
                         } else if (o === 'next') { // Z
+                            fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
+                            fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
+                            fz0 = z0 + p;               fz1 = fz0;
+                            if ((op[2] > fz0 && np[1] < fz1 || op[1] < fz0 && np[1] > fz1) &&
+                                op[0] > fx0 && op[0] < fx1 && np[0] > fx0 && np[0] < fx1 &&
+                                op[1]+.5 > fy0 && op[1]+.5 < fy1 && np[1]+.5 > fy0 && np[1]+.5 < fy1
+                            ) return xModel.getOtherSide(xId);
                             
                         } else console.log('[XCollide/Core] Unmanaged.');
                         break;
@@ -64,10 +91,7 @@ class XCollider {
                             fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
                             fy0 = y0 + p;               fy1 = fy0;
                             fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
-                            if (
-                                //(op[0] > fx0 && np[0] < fx1 || op[0] < fx0 && np[0] > fx1) &&
-                                (op[1] > fy0 && np[1] < fy1 || op[1] < fy0 && np[1] > fy1) &&
-                                //op[1] > fy0 && op[1] < fy1 && np[1] > fy0 && np[1] < fy1 &&
+                            if ((op[1] > fy0 && np[1] < fy1 || op[1] < fy0 && np[1] > fy1) &&
                                 op[0] > fx0 && op[0] < fx1 && np[0] > fx0 && np[0] < fx1 &&
                                 op[2]+.5 > fz0 && op[2]+.5 < fz1 && np[2]+.5 > fz0 && np[2]+.5 < fz1
                             ) return xModel.getOtherSide(xId);
