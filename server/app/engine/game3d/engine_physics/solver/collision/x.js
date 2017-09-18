@@ -25,7 +25,7 @@ class XCollider {
             let state = portal.state; 
             let x0 = state[0], y0 = state[1], z0 = state[2];
             let x1 = state[3], y1 = state[4], z1 = state[5];
-            let p = state[6]; // Ratio towards +
+            let p = parseFloat(state[6]); // Ratio towards +
 
             let sum = 0 + (x1 === x0) + (y1 === y0) + (z1 === z0);
             // TODO [CRIT] fix that asap.

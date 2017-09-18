@@ -61,7 +61,7 @@ class UpdaterAccess {
         function failure(reason) { console.log('Request denied: ' + reason); }
 
         if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z)) {
-            failure('requested location is too far away.');
+            failure('Requested location is too far away.');
             return;
         }
 

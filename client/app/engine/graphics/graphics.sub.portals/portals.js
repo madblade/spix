@@ -57,11 +57,17 @@ extend(App.Engine.Graphics.prototype, {
             var mesh = new THREE.Mesh(geometry, material);
 
             // TODO [CRIT] orientations
-            mesh.position.x = tempPosition[0] + tempOffset;
+            // console.log(tempOffset);
+            mesh.position.x = tempPosition[0] + parseFloat(tempOffset);
             mesh.position.y = tempPosition[1] + 0.5;
             mesh.position.z = tempPosition[2] + 1;
             mesh.rotation.x = Math.PI/2;
             mesh.rotation.y = Math.PI/2;
+            if (tempOrientation === 'first') {
+                
+            } else if (tempOrientation === 'next') {
+                mesh.rotation.y += Math.PI/2;
+            }
 
             screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture, worldId);
             this.addScreen(portalId, screen);

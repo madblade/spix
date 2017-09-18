@@ -84,8 +84,8 @@ extend(App.Engine.UI.prototype, {
             }
         }
 
-        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : (_=>{throw Error('Precision')})();
-        clientModel.triggerEvent('ray', ['add', fx, fy, fz, normal]);
+        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : '';
+        clientModel.triggerEvent('ray', ['add', fx, fy, fz]);
     },
 
     onRightMouseDown: function() {
@@ -136,8 +136,8 @@ extend(App.Engine.UI.prototype, {
             }
         }
 
-        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : (_=>{throw Error('Precision')})();
-        clientModel.triggerEvent('ray', ['del', fx, fy, fz, normal]);
+        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : '';
+        clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 
     onMiddleMouseDown: function() {

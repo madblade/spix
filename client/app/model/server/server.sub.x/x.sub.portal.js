@@ -16,7 +16,9 @@ App.Model.Server.XModel.Portal = function(portalId, otherPortalId,
     var y0 = end1[1]; var y1 = end2[1];
     var z0 = end1[2]; var z1 = end2[2];
 
-    this.tempOffset = (offset>=0 && offset <1) ? offset : 0.999;
+    if (offset) {
+        this.tempOffset = (offset>=0.001 && offset <=0.999) ? offset : 0.999;
+    }
     this.tempOrientation = orientation;
     this.tempPosition = [x0, y0, z0];
     this.tempWidth = 1;
