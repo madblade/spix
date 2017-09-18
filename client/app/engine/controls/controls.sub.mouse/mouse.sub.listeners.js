@@ -36,6 +36,7 @@ extend(App.Engine.UI.prototype, {
 
     onLeftMouseDown: function() {
         var clientModel = this.app.model.client;
+        //var serverModel = this.app.model.server;
         var graphicsEngine = this.app.engine.graphics;
 
         // Perform intersection.
@@ -50,9 +51,12 @@ extend(App.Engine.UI.prototype, {
         // Compute blocks.
         var flo = Math.floor;
         var abs = Math.abs;
-        var mainCamera = graphicsEngine.getCameraCoordinates();
-        var px = mainCamera.x, py = mainCamera.y, pz = mainCamera.z;
-
+        //var p1 = serverModel.getSelfModel().getSelfPosition();
+        //var p2 = serverModel.getSelfModel().getHeadPosition();
+        //var px = p1[0]+p2.x, py = p1[1]+p2.y, pz = p1[2]+p2.z;
+        var p = graphicsEngine.getCameraCoordinates();
+        var px = p.x, py = p.y, pz = p.z;
+        
         var rx = point.x, ry = point.y, rz = point.z;
         var dx = abs(abs(flo(rx))-abs(rx)), dy = abs(abs(flo(ry))-abs(ry)), dz = abs(abs(flo(rz))-abs(rz));
         var ex = dx < 0.0000001, ey = dy < 0.0000001, ez = dz < 0.0000001;
@@ -63,33 +67,52 @@ extend(App.Engine.UI.prototype, {
             return;
         }
 
-        var fx, fy, fz;
+        var fx1, fy1, fz1;
+        var positiveIsFree = true; // direct + axis is empty
         if (ex) {
-            if (px < rx) {
-                fx = rx - 1; fy = flo(ry); fz = flo(rz);
-            } else if (px > rx) {
-                fx = rx; fy = flo(ry); fz = flo(rz);
-            }
+            positiveIsFree = px > rx;
+            if (positiveIsFree) {
+                fx1 = rx; fy1 = flo(ry); fz1 = flo(rz);
+            } else if (px < rx) {
+                fx1 = rx - 1; fy1 = flo(ry); fz1 = flo(rz);
+            } 
         } else if (ey) {
-            if (py < ry) {
-                fx = flo(rx); fy = ry - 1; fz = flo(rz);
-            } else if (py > ry) {
-                fx = flo(rx); fy = ry; fz = flo(rz);
+            positiveIsFree = py > ry;
+            if (positiveIsFree) {
+                fx1 = flo(rx); fy1 = ry; fz1 = flo(rz);
+            } else if (py < ry) {
+                fx1 = flo(rx); fy1 = ry - 1; fz1 = flo(rz);
             }
         } else if (ez) {
-            if (pz < rz) {
-                fx = flo(rx); fy = flo(ry); fz = rz - 1;
-            } else if (pz > rz) {
-                fx = flo(rx); fy = flo(ry); fz = rz;
+            positiveIsFree = pz > rz;
+            if (positiveIsFree) {
+                fx1 = flo(rx); fy1 = flo(ry); fz1 = rz;
+            } else if (pz < rz) {
+                fx1 = flo(rx); fy1 = flo(ry); fz1 = rz - 1;
             }
         }
 
-        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : '';
-        clientModel.triggerEvent('ray', ['add', fx, fy, fz]);
+        var fx2, fy2, fz2;
+        if (ex) {
+            fx2 = positiveIsFree ? fx1+1 : fx1-1;
+            fy2 = fy1;
+            fz2 = fz1;
+        } else if (ey) {
+            fx2 = fx1;
+            fy2 = positiveIsFree ? fy1+1 : fy1-1;
+            fz2 = fz1;
+        } else if (ez) {
+            fx2 = fx1;
+            fy2 = fy1;
+            fz2 = positiveIsFree ? fz1+1 : fz1-1;
+        }
+        
+        clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2]);
     },
 
     onRightMouseDown: function() {
         var clientModel = this.app.model.client;
+        var serverModel = this.app.model.server;
         var graphicsEngine = this.app.engine.graphics;
 
         var intersects = graphicsEngine.cameraManager.performRaycast();
@@ -103,8 +126,8 @@ extend(App.Engine.UI.prototype, {
         // Compute blocks.
         var flo = Math.floor;
         var abs = Math.abs;
-        var mainCamera = graphicsEngine.getCameraCoordinates();
-        var px = mainCamera.x, py = mainCamera.y, pz = mainCamera.z;
+        var p = graphicsEngine.getCameraCoordinates();
+        var px = p.x, py = p.y, pz = p.z;
 
         var rx = point.x, ry = point.y, rz = point.z;
         var dx = abs(abs(flo(rx))-abs(rx)), dy = abs(abs(flo(ry))-abs(ry)), dz = abs(abs(flo(rz))-abs(rz));
@@ -136,7 +159,6 @@ extend(App.Engine.UI.prototype, {
             }
         }
 
-        var normal = ex ? 'x' : ey ? 'y' : ez ? 'z' : '';
         clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 

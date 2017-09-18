@@ -21,11 +21,12 @@ extend(App.Engine.Graphics.prototype, {
         // Create screen.
         var screen = this.getScreen(portalId);
         if (!screen) {
-            var tempPosition = portal.tempPosition;
+            var pos = portal.tempPosition;
+            var top = portal.tempOtherPosition;
             var tempOffset = portal.tempOffset;
             var tempOrientation = portal.tempOrientation;
-            var tempWidth = portal.tempWidth;
-            var tempHeight = portal.tempHeight;
+            var portalWidth = portal.tempWidth;
+            var portalHeight = portal.tempHeight;
 
             var width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
             var height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
@@ -34,7 +35,7 @@ extend(App.Engine.Graphics.prototype, {
                 { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat }
             );
 
-            var geometry = new THREE.PlaneBufferGeometry(tempWidth, tempHeight);
+            var geometry = new THREE.PlaneBufferGeometry(portalWidth, portalHeight);
             // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
             //var uvs = geometry.attributes.uv.array;
             //var uvi = 0;
@@ -58,15 +59,47 @@ extend(App.Engine.Graphics.prototype, {
 
             // TODO [CRIT] orientations
             // console.log(tempOffset);
-            mesh.position.x = tempPosition[0] + parseFloat(tempOffset);
-            mesh.position.y = tempPosition[1] + 0.5;
-            mesh.position.z = tempPosition[2] + 1;
-            mesh.rotation.x = Math.PI/2;
-            mesh.rotation.y = Math.PI/2;
-            if (tempOrientation === 'first') {
-                
-            } else if (tempOrientation === 'next') {
-                mesh.rotation.y += Math.PI/2;
+            var x0 = parseInt(pos[0]), y0 = parseInt(pos[1]), z0 = parseInt(pos[2]);
+            var x1 = parseInt(top[0]), y1 = parseInt(top[1]), z1 = parseInt(top[2]);
+            
+            if (z0 !== z1) {
+                mesh.rotation.x = Math.PI/2;
+                mesh.rotation.y = Math.PI/2;
+                if (tempOrientation === 'first') {
+                    mesh.position.x = pos[0] + parseFloat(tempOffset);
+                    mesh.position.y = pos[1] + 0.5;
+                    mesh.position.z = pos[2] + 1;
+                } else if (tempOrientation === 'next') {
+                    mesh.position.x = pos[0];
+                    mesh.position.y = pos[1] + 0.5 + parseFloat(tempOffset);
+                    mesh.position.z = pos[2] + 1;
+                    mesh.rotation.y += Math.PI/2;
+                }
+            } else if (y0 !== y1) {
+                if (tempOrientation === 'first') {
+                    mesh.rotation.x = Math.PI/2;
+                    mesh.rotation.y = Math.PI/2;
+                    mesh.rotation.z = Math.PI/2;
+                    mesh.position.x = pos[0] + parseFloat(tempOffset);
+                    mesh.position.y = pos[1];
+                    mesh.position.z = pos[2] + 0.5;
+                } else if (tempOrientation === 'next') {
+                    mesh.position.x = pos[0] + 0.5;
+                    mesh.position.y = pos[1];
+                    mesh.position.z = pos[2] + parseFloat(tempOffset);
+                }
+            } else if (x0 !== x1) {
+                mesh.rotation.z = Math.PI/2;
+                if (tempOrientation === 'first') {
+                    mesh.position.x = pos[0] + 1;
+                    mesh.position.y = pos[1] + 0.5;
+                    mesh.position.z = pos[2] + parseFloat(tempOffset);
+                } else if (tempOrientation === 'next') {
+                    mesh.position.x = pos[0] + 1;
+                    mesh.position.y = pos[1] + parseFloat(tempOffset);
+                    mesh.position.z = pos[2] + 0.5;
+                    mesh.rotation.x += Math.PI/2;
+                }
             }
 
             screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture, worldId);

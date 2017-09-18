@@ -53,6 +53,10 @@ extend(App.Engine.Graphics.prototype, {
         up.getWrapper = function() {
             return wrapper;
         };
+        
+        up.getHead = function() {
+            return head;
+        };
 
         //return wrapper;
         return up;

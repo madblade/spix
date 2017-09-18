@@ -33,6 +33,10 @@ extend(App.Engine.Graphics.prototype, {
         var scalingHD = 8; // depends on texture resolution
         var ɛ = 0.00390625/scalingHD; // remove 1 pixel (prevent from texture interpolation on edges)
         var txCoords = this.getTexture(nature);
+        if (!txCoords) {
+            console.log('Texture not found for index ' + nature);
+            return;
+        }
         var offsetU, offsetV;
 
         if (faceId < ijkS) // I

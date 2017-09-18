@@ -100,6 +100,7 @@ class XModel {
 
         if (otherPortalId) {
             this.addKnot(portalId, otherPortalId);
+            console.log('world present ' + otherPortalId);
         } else {
             let newWorld = this._worldModel.addWorld();
             if (!newWorld) {
@@ -114,9 +115,11 @@ class XModel {
             let newChunk = WorldGenerator.generateFlatChunk(xS, yS, zS, ...ijk, newWorld);
             newWorld.addChunk(newChunk.chunkId, newChunk);
             this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, offset, orientation, portalId);
+            console.log('added world');
         }
 
         this._cachedConnectivity = [new Map(), new Map()];
+        console.log('added portal');
     }
 
     // (x1, y1, z1): first block

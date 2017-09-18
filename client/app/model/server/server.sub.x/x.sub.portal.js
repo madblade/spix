@@ -21,6 +21,7 @@ App.Model.Server.XModel.Portal = function(portalId, otherPortalId,
     }
     this.tempOrientation = orientation;
     this.tempPosition = [x0, y0, z0];
+    this.tempOtherPosition = [x1, y1, z1];
     this.tempWidth = 1;
     this.tempHeight = 2;
 

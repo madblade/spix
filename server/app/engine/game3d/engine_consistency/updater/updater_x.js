@@ -21,18 +21,19 @@ class XUpdater {
         let meta = data.meta;
 
         let originWorld = parseInt(avatar.worldId);
-        let portalToLink = meta[4];
-        if (portalToLink) portalToLink = parseInt(portalToLink);
 
-        let x = meta[1], y = meta[2], z = meta[3];
-        let offset = meta[4];
-        let o = meta[5];
-        let orientation = (o === 0) ? 'first': 'next';
+        let x1 = parseInt(meta[1]), y1 = parseInt(meta[2]), z1 = parseInt(meta[3]);
 
         if (meta[0] === 'add') {
-            xModel.addPortal(originWorld, x, y, z, x, y, z+1, offset, orientation, portalToLink);
+            let x2 = parseInt(meta[4]), y2 = parseInt(meta[5]), z2 = parseInt(meta[6]);
+            let offset = parseFloat(meta[7]);
+            let o = meta[8];
+            let orientation = (o === 0) ? 'first': 'next';
+            let portalToLink = meta[9];
+            if (portalToLink) portalToLink = parseInt(portalToLink);
+            xModel.addPortal(originWorld, x1, y1, z1, x2, y2, z2, offset, orientation, portalToLink);
         } else if (meta[0] === 'del') {
-            xModel.removePortalFromPosition(originWorld, x, y, z);
+            xModel.removePortalFromPosition(originWorld, x1, y1, z1);
         }
 
     }

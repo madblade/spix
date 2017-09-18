@@ -36,9 +36,11 @@ extend(App.Model.Client.EventComponent.prototype, {
             case 'ray': // Ray casted.
                 var i = clientSelfModel.clickInteraction;
                 if (i.isBlock()) {
-                    // From inventory, select block to be added.
-                    // data.pop();
-                    data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
+                    if (data[0] == 'add') {
+                        // From inventory, select block to be added.
+                        data.splice(-3, 3);
+                        data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
+                    }
                     this.triggerBlock('b', data);
                 } else if (i.isX()) {
                     data.push(clientSelfModel.getItemOffset());

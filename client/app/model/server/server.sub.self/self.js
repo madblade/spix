@@ -122,6 +122,16 @@ extend(App.Model.Server.SelfModel.prototype, {
             if (this.displayAvatar) graphics.addToScene(object3d, worldId);
         }.bind(this));
 
+    },
+    
+    getSelfPosition: function() {
+        return this.position;
+    },
+    
+    getHeadPosition: function() {
+        var head = this.avatar.getHead();
+        if (!head) return null;
+        return head.position;
     }
 
 });

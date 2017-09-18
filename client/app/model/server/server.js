@@ -36,6 +36,10 @@ extend(App.Model.Server.prototype, {
         this.chunkModel.refresh();
         this.entityModel.refresh();
         this.xModel.refresh();
+    },
+    
+    getSelfModel: function() {
+        return this.selfModel;
     }
 
 });
