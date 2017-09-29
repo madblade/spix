@@ -271,6 +271,7 @@ class RigidBodies {
             
             // Sort entities according to incremental term.
             // TODO [OPT] ideally, use states
+            // TODO [OPT] ignore leapfrog == 0
             // Remember leapfrogs within objects, reordering them within islands
             // is probably better than sorting a potentially huge array.
             let inf = (x) => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
@@ -418,6 +419,22 @@ class RigidBodies {
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let nbI = island.length;
                 let mapCollidingPossible = []; 
+                let bannedPairs = [];
+                
+                // TODO [CRIT] wiping: solve, find min leapfrog, average colliding pairs, ban collided pairs
+                // TODO [CRIT] move (to collision) and remember time offset for each collided pair,
+                // TODO [CRIT] ban insulated particles, continue until everyone is banned.
+                
+                // 1. Sort colliding possible.
+                // 2. First colliding -> 
+                //      join
+                //      move to collision point
+                //      compute new trajectory (leapfrog²)
+                //      collide again with terrain
+                //      compute colliding possible with all others
+                //      (invalidate collision with others) -> optional (discarded afterwards anyway)
+                
+                // Solve leapfrog and sort according to time.
                 for (let i = 0; i < nbI; ++i) {
                     let xIndex1 = island[i];
                     // let lfa1 = leapfrogArray[xIndex1];
@@ -594,6 +611,7 @@ class RigidBodies {
                         }
                         
                     }
+                    
                 }
                 
                 // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
@@ -713,6 +731,7 @@ class RigidBodies {
                     
                     // leapfrogarray[ox][i] = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
                 }
+                
             });
             
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,

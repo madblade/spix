@@ -31,6 +31,8 @@ App.Engine.Graphics.Camera = function(fov, aspect, nearPlane, farPlane, worldId)
     this.yaw = yaw;                 // Top-level    (rotation.z, position)
     this.pitch = pitch;             // Intermediate (rotation.x)
     this.cameraObject = camera;     // Explicit     (constant)
+    
+    this.screen = null;
 };
 
 extend(App.Engine.Graphics.Camera.prototype, {
@@ -102,6 +104,14 @@ extend(App.Engine.Graphics.Camera.prototype, {
         up.position.x = x;
         up.position.y = y;
         up.position.z = z-.7999;
+    },
+    
+    setScreen: function(screen) {
+        if (screen) this.screen = screen;
+    },
+
+    getScreen: function() {
+        return this.screen; // || (function() {throw Error('Screen ' + this.getCameraId + ' undefined')})();
     },
     
     setCameraTransform: function(cameraTransform) {

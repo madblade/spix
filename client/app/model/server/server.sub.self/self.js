@@ -39,6 +39,7 @@ extend(App.Model.Server.SelfModel.prototype, {
 
         var register = this.app.register;
         var graphics = this.app.engine.graphics;
+        var clientModel = this.app.model.client;
 
         var avatar = this.avatar;
         var up = this.position;
@@ -81,6 +82,7 @@ extend(App.Model.Server.SelfModel.prototype, {
             if (animate) graphics.updateAnimation(id);
 
             // Update camera.
+            clientModel.pushForLaterUpdate('camera-position');
             graphics.cameraManager.updateCameraPosition(up);
         }
 

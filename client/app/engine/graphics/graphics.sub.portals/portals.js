@@ -32,7 +32,11 @@ extend(App.Engine.Graphics.prototype, {
             var height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
             var rtTexture = new THREE.WebGLRenderTarget(
                 width, height,
-                { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat }
+                { 
+                    minFilter: THREE.LinearFilter, 
+                    magFilter: THREE.NearestFilter, 
+                    format: THREE.RGBFormat 
+                }
             );
 
             var geometry = new THREE.PlaneBufferGeometry(portalWidth, portalHeight);
@@ -133,8 +137,8 @@ extend(App.Engine.Graphics.prototype, {
         // TODO [CRIT] compute all paths.
         // TODO [CRIT] DON'T ACCOUNT for portals that are too far away!
         // TODO [CRIT] that's how many camera paths I'll have to add until the leaves.
-        this.cameraManager.addCamera(portal, otherPortal, cameraPath, cameraTransform);
-        this.cameraManager.addCameraToScene(cameraPath, worldId);
+        this.cameraManager.addCamera(portal, otherPortal, cameraPath, cameraTransform, screen);
+        this.cameraManager.addCameraToScene(cameraPath, worldId, screen);
     },
 
     processPortalUpdates: function() {

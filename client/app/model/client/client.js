@@ -28,6 +28,10 @@ extend(App.Model.Client.prototype, {
         this.eventComponent.pushEvents();
     },
 
+    pushForLaterUpdate: function() {
+        this.selfComponent.triggerChange('camera-update');
+    },
+    
     triggerEvent: function(type, data) {
         this.eventComponent.triggerEvent(type, data);
     },

@@ -77,6 +77,10 @@ extend(App.Model.Client.SelfComponent.prototype, {
             var data = event[1];
             if (!type || !data) return;
             switch (type) {
+                case 'camera-update':
+                    console.log('update camera');
+                    graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+                    break;
                 case 'camera':
                     var avatar = serverSelfModel.avatar;
                     var worldId = serverSelfModel.worldId;

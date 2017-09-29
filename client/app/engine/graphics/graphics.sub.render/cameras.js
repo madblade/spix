@@ -21,6 +21,8 @@ App.Engine.Graphics.CameraManager = function(graphicsEngine) {
     this.mainRaycasterCamera = this.createCamera(true, -1);
     this.raycaster = this.createRaycaster();
     
+    this.screen = null;
+    
     this.incomingRotationEvents = [];
 };
 
@@ -40,7 +42,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             worldId);
     },
 
-    addCamera: function(frameSource, frameDestination, cameraPath, cameraTransform) {
+    addCamera: function(frameSource, frameDestination, cameraPath, cameraTransform, screen) {
         var cameraId = cameraPath;
 
         // TODO [CRIT] compute relative positions and rotations.
@@ -55,6 +57,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         var camera = this.createCamera(false);
         camera.setCameraId(cameraId);
         camera.setCameraTransform(cameraTransform);
+        if (screen) camera.setScreen(screen);
         this.subCameras.set(cameraId, camera);
 
         var mainPosition = mainCamera.getCameraPosition();
@@ -63,7 +66,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         camera.setXRotation(mainCamera.getXRotation());
     },
 
-    addCameraToScene: function(cameraId, worldId) {
+    addCameraToScene: function(cameraId, worldId, screen) {
         worldId = parseInt(worldId);
         
         var camera = this.subCameras.get(cameraId);
@@ -75,6 +78,7 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         }
         
         camera.setWorldId(worldId);
+        if (screen) camera.setScreen(screen);
         this.graphicsEngine.addToScene(camera.get3DObject(), worldId);
     },
 
@@ -119,11 +123,13 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         //this.mainCamera = newMainCamera;
         //this.subCameras.set(oldMainCameraId, oldMainCamera);
     },
-
+    
     // Update.
     updateCameraPosition: function(vector) {
+        // TODO remove berk ugly
         var cams = [this.mainCamera, this.mainRaycasterCamera];
         this.subCameras.forEach(function(cam) { cams.push(cam); });
+        var localRecorder = this.mainCamera.getRecorder();
 
         var i = this.graphicsEngine.getCameraInteraction();
 
@@ -137,14 +143,30 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             cams.forEach(function(cam, cameraId) {
                 cam.setCameraPosition(x, y, z);
                 cam.setFirstPerson();
-            });
+                var mirrorCamera = cam.getRecorder();
+                if (mirrorCamera) {
+                    var screen = cam.getScreen();
+                    if (screen) {
+                        var mirror = screen.getMesh();
+                        this.clipOblique(mirror, mirrorCamera, localRecorder);
+                    }
+                }
+            }.bind(this));
         }
 
         else if (i.isThirdPerson()) {
             cams.forEach(function(cam, cameraId) {
                 cam.setCameraPosition(x, y, z);
                 cam.setThirdPerson();
-            });
+                var mirrorCamera = cam.getRecorder();
+                if (mirrorCamera) {
+                    var screen = cam.getScreen();
+                    if (screen) {
+                        var mirror = screen.getMesh();
+                        this.clipOblique(mirror, mirrorCamera, localRecorder);
+                    }
+                }
+            }.bind(this));
         }
     },
     
@@ -184,6 +206,86 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             clientModel.triggerEvent('r', rotation);
         }
     },
+    
+    // TODO fix clipping planes
+    clipOblique: function(mirror, mirrorCamera, localRecorder) {
+        var matrix = new THREE.Matrix4();
+        matrix.extractRotation(mirror.matrix);
+        
+        // Reversal criterion: vector(pos(x)-pos(cam)) dot vector(x normal)
+        
+        // x normal
+        var vec1 = new THREE.Vector3(0, 0, 1);
+        vec1.applyMatrix4(matrix);
+        
+        // pos(x)-pos(camera)
+        var posX = mirror.position;
+        //var  = localRecorder.position;
+        var posC = new THREE.Vector3();
+        posC.setFromMatrixPosition(localRecorder.matrixWorld);
+        var vec2 = new THREE.Vector3();
+        {
+            vec2.x = posX.x - posC.x;
+            vec2.y = posX.y - posC.y;
+            vec2.z = posX.z - posC.z;
+        }
+        
+        // mirrorCamera.getWorldDirection(vec2);
+        
+        //var camPosition = new THREE.Vector3();
+        //camPosition.setFromMatrixPosition(mirrorCamera.matrixWorld);
+        //var vec1 = mirror.normal;
+        //var vec2 = new THREE.Vector3(0,0, -1);
+        //vec2.applyQuaternion(mirrorCamera.quaternion);
+        //var vec2 = new THREE.Vector3(mirrorCamera.matrix[8], mirrorCamera.matrix[9], mirrorCamera.matrix[10]);
+        
+        if (!vec1 || !vec2) {
+            console.log('[XCam] Dot product error.');
+            return;
+        }
+        
+        //var dot = mirror.position.dot(camPosition);
+        var dot = vec1.dot(vec2);
+        var s = Math.sign(dot);
+        //console.log(s);
+        //console.log(dot);
+        var N = new THREE.Vector3(0, 0, s*1);
+        N.applyMatrix4(matrix);
+
+        //update mirrorCamera matrices!!
+        //mirrorCamera.
+        mirrorCamera.updateProjectionMatrix();
+        mirrorCamera.updateMatrixWorld();
+        mirrorCamera.matrixWorldInverse.getInverse(mirrorCamera.matrixWorld);
+
+        // now update projection matrix with new clip plane
+        // implementing code from: http://www.terathon.com/code/oblique.html
+        // paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+        var clipPlane = new THREE.Plane();
+        clipPlane.setFromNormalAndCoplanarPoint(N, mirror.position);
+        clipPlane.applyMatrix4(mirrorCamera.matrixWorldInverse);
+
+        clipPlane = new THREE.Vector4(clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z, clipPlane.constant);
+
+        var q = new THREE.Vector4();
+        var projectionMatrix = mirrorCamera.projectionMatrix;
+
+        var sgn = Math.sign;
+        q.x = (sgn(clipPlane.x) + projectionMatrix.elements[8]) / projectionMatrix.elements[0];
+        q.y = (sgn(clipPlane.y) + projectionMatrix.elements[9]) / projectionMatrix.elements[5];
+        q.z = -1.0;
+        q.w = (1.0 + projectionMatrix.elements[10]) / mirrorCamera.projectionMatrix.elements[14];
+
+        // Calculate the scaled plane vector
+        var c = new THREE.Vector4();
+        c = clipPlane.multiplyScalar(2.0 / clipPlane.dot(q));
+
+        // Replace the third row of the projection matrix
+        projectionMatrix.elements[2] = c.x;
+        projectionMatrix.elements[6] = c.y;
+        projectionMatrix.elements[10] = c.z + 1.0;
+        projectionMatrix.elements[14] = c.w;
+    },
 
     moveCameraFromMouse: function(relX, relY, absX, absY) {
         // Rotate main camera.
@@ -210,20 +312,32 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
             camera.setUpRotation(theta1, 0, theta0);
             raycasterCamera.setUpRotation(theta1, 0, theta0);
         }
-        
 
         // Apply transform to portals.
-        this.subCameras.forEach(function(subCamera, cameraId) {
-            // TODO [CRIT] update camera position, rotation rel. to portal position.
-            subCamera.setZRotation(rotationZ);
-            subCamera.setXRotation(rotationX);
-            subCamera.setUpRotation(theta1, 0, theta0)
-        });
+        this.updateCameraPortals(camera, rotationZ, rotationX, theta1, theta0);
 
         // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
         // camera.quaternion.multiply(tmpQuaternion);
         // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
         return [rotationZ, rotationX, theta0, theta1];
+    },
+    
+    updateCameraPortals: function(camera, rotationZ, rotationX, theta1, theta0) {
+        var localRecorder = camera.getRecorder();
+        this.subCameras.forEach(function(subCamera, cameraId) {
+            // TODO [CRIT] update camera position, rotation rel. to portal position.
+
+            var mirrorCamera = subCamera.getRecorder();
+            var mirror = subCamera.getScreen().getMesh();
+            //var camera = mirrorCamera;
+            if (mirrorCamera) {
+                this.clipOblique(mirror, mirrorCamera, localRecorder);
+            }
+
+            subCamera.setZRotation(rotationZ);
+            subCamera.setXRotation(rotationX);
+            subCamera.setUpRotation(theta1, 0, theta0);
+        }.bind(this));
     },
 
     resize: function(width, height) {

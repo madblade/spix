@@ -15,6 +15,7 @@ extend(App.Engine.Graphics.SceneManager.prototype, {
     createScene: function(newSceneId) {
         var scene = new THREE.Scene();
         scene.sceneId = newSceneId;
+        scene.autoUpdate = false;
         return scene;
     },
 

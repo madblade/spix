@@ -12,6 +12,8 @@ App.Engine.Graphics.RendererManager = function() {
 
     // Lightweight screen, camera and scene manager for portals.
     this.renderRegister = [];
+    
+    this.corrupted = 0;
 };
 
 extend(App.Engine.Graphics.RendererManager.prototype, {
@@ -65,7 +67,12 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
             bufferCamera = camera.getRecorder();
             bufferTexture = screen1.getRenderTarget();
             
-            if (!bufferScene)   { console.log('Could not get buffer scene.'); 
+            if (!bufferScene)   { 
+                if (this.corrupted < 5) {
+                    console.log('[Renderer] Could not get buffer scene ' + currentPass.sceneId + '.');
+                    this.corrupted++;
+                }
+                
                 // Sometimes the x model would be initialized before the w model.
                 if (currentPass.sceneId) { currentPass.scene = sceneManager.getScene(currentPass.sceneId); }
                 continue;
@@ -78,8 +85,12 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
                 otherEnd = screen2.getMesh();
                 sceneManager.removeObject(otherEnd, otherSceneId);
             }
-            
+
             renderer.render(bufferScene, bufferCamera, bufferTexture);
+            //bufferCamera.updateProjectionMatrix();
+            //bufferCamera.updateMatrixWorld();
+            //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
+            //bufferScene.updateMatrixWorld();
             
             if (screen2) {
                 sceneManager.addObject(otherEnd, otherSceneId);
@@ -87,6 +98,11 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         }
 
         renderer.render(mainScene, mainCamera);
+        
+        mainCamera.updateProjectionMatrix();
+        mainCamera.updateMatrixWorld();
+        mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
+        mainScene.updateMatrixWorld();
     },
 
     resize: function(width, height) {
