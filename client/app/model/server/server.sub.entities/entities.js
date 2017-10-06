@@ -69,6 +69,7 @@ extend(App.Model.Server.EntityModel.prototype, {
 
         // Switch worlds.
         var worldId = parseInt(updatedEntity.w);
+        console.log(worldId + ' vs ' + currentEntity.getWorldId());
         if (currentEntity.getWorldId() !== worldId) {
             graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
             currentEntity.setWorldId(worldId);

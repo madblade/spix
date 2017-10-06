@@ -343,8 +343,8 @@ class TerrainCollider {
                 newPosition[2] = nzt;
             }
             
-            let acc = entity.a0;
-            if (adherence[0] && acc[0] || adherence[3] && acc[3]) {
+            let acc0 = entity.a0;
+            if (adherence[0] && acc0[0] || adherence[3] && acc0[3]) {
                 entity.v1[1] = 0;
                 entity.v1[2] = 0;
             }
@@ -407,9 +407,8 @@ class TerrainCollider {
                 newPosition[2] = nzt;
             }
             
-            let acc = entity.a0;
-            
-            if (adherence[1] && acc[1] || adherence[4] && acc[4]) {
+            let acc0 = entity.a0;
+            if (adherence[1] && acc0[1] || adherence[4] && acc0[4]) {
                 entity.v1[0] = 0;
                 entity.v1[2] = 0;
             }
@@ -480,8 +479,8 @@ class TerrainCollider {
                 newPosition[2] = nz0; entity.v1[2] = 0;
             }
             
-            let acc = entity.a0;
-            if (adherence[2] && acc[2] || adherence[5] && acc[5]) {
+            let acc0 = entity.a0;
+            if (adherence[2] && acc0[2] || adherence[5] && acc0[5]) {
                 entity.v1[0] = 0;
                 entity.v1[1] = 0;
             }

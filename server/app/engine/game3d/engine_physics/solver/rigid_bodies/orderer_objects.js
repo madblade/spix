@@ -38,11 +38,13 @@ class ObjectOrderer {
     // Impact entities cached indices.
     // Each entity knows its position in axis arrays.
     static orderCache(array, entities, portals, start, prop) {
-        for (let i = start, l = array.length; i < l; ++i)
+        for (let i = start, l = array.length; i < l; ++i) {
+            const id = parseInt(array[i].id);
             if (array[i].kind === 'e')
-                entities[array[i].id][prop] = i;    // Array.
+                entities[id][prop] = i;    // Array.
             else if (array[i].kind === 'x')
-                portals.get(array[i].id)[prop] = i; // Map.
+                portals.get(id)[prop] = i; // Map.
+        }
     };
     
     // Compute sorted axes from scratch entity arrays.
@@ -241,14 +243,18 @@ class ObjectOrderer {
         if (xAxis.length > 0) {
             let orderCache = ObjectOrderer.orderCache;
             orderCache(xAxis, entities, portals, indexX, 'indexX');
-            orderCache(xAxis, entities, portals, indexY, 'indexY');
-            orderCache(xAxis, entities, portals, indexZ, 'indexZ');
+            orderCache(yAxis, entities, portals, indexY, 'indexY');
+            orderCache(zAxis, entities, portals, indexZ, 'indexZ');
         } else {
             this._axes.delete(wid);
         }
     }
     
     switchEntityToWorld(entity, newWorldId, coordinates) {
+
+        let portals = this._xModel.portals;
+        let entities = this._entityModel.entities;
+        
         let oldWorldId = entity.worldId;
         let eid = entity.entityId;
         //entity.position = coordinates;
@@ -268,6 +274,12 @@ class ObjectOrderer {
             oldAxis[1].splice(yid, 1);
             oldAxis[2].splice(zid, 1);
             if (oldAxis[0].length < 1) this._axes.delete(oldWorldId);
+            else {
+                let orderCache = ObjectOrderer.orderCache;
+                orderCache(oldAxis[0], entities, portals, xid, 'indexX');
+                orderCache(oldAxis[1], entities, portals, yid, 'indexY');
+                orderCache(oldAxis[2], entities, portals, zid, 'indexZ');
+            }
         } else console.log('ERROR');
         
         // Insert into new set of axes.
@@ -288,22 +300,20 @@ class ObjectOrderer {
                 zAxis = newAxis[2], zLow;
             
             let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
-            let portals = this._xModel.portals;
-            let entities = this._entityModel.entities;
             
             xLow = dichotomyLowerBound(xAxis, x, 'val');
             yLow = dichotomyLowerBound(yAxis, y, 'val');
             zLow = dichotomyLowerBound(zAxis, z, 'val');
             
-            if (xLow) xAxis.splice(xLow + 1, 0, {kind:'e', id:eid, val:x});
-            if (yLow) xAxis.splice(yLow + 1, 0, {kind:'e', id:eid, val:y});
-            if (zLow) xAxis.splice(zLow + 1, 0, {kind:'e', id:eid, val:z});
+            if (xLow >= 0) xAxis.splice(xLow/* + 1*/, 0, {kind:'e', id:eid, val:x});
+            if (yLow >= 0) yAxis.splice(yLow/* + 1*/, 0, {kind:'e', id:eid, val:y});
+            if (zLow >= 0) zAxis.splice(zLow/* + 1*/, 0, {kind:'e', id:eid, val:z});
 
             // 1 shift -> O(n)
             let orderCache = ObjectOrderer.orderCache;
             orderCache(xAxis, entities, portals, xLow, 'indexX');
-            orderCache(xAxis, entities, portals, xLow, 'indexY');
-            orderCache(xAxis, entities, portals, xLow, 'indexZ');
+            orderCache(yAxis, entities, portals, yLow, 'indexY');
+            orderCache(zAxis, entities, portals, zLow, 'indexZ');
         }
 
         // Set new world.

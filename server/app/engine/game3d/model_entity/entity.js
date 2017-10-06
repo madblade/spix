@@ -22,6 +22,11 @@ class Entity {
         this._a0            = [0, 0, 0];
         this._a1            = [0, 0, 0];
         
+        this._p01           = [0, 0, 0];
+        this._v01           = [0, 0, 0];
+        this._a01           = [0, 0, 0];
+        this._delta01       = 0;
+        
         this._d             = [!0, !0, !0, !0, !0, !0];
         this._r             = [0, 0, 0, 0]; // rel, abs
         //this._rrel          = [0, 0];
@@ -210,6 +215,22 @@ class Entity {
     set p0(p0)              { this._p0 = p0; }
     get p1()                { return this._p1; }
     set p1(p1)              { this._p1 = p1; }
+    
+    get p01()               { return this._p01; }
+    get v01()               { return this._v01; }
+    get a01()               { return this._a01; }
+    set p01(p01)            { this._p01 = p01; }
+    set v01(v01)            { this._v01 = v01; }
+    set a01(a01)            { this._a01 = a01; }
+    get delta01()           { return this._delta01; }
+    set delta01(delta01)    { this._delta01 = delta01; }
+    copyP01() {
+        for (let i = 0; i < 0; ++i) {
+            this._p01[i] = this._p0[i];
+            this._v01[i] = this._v0[i];
+            this._a01[i] = this._a0[i];
+        }
+    }
     
     get nu()                { return this._nu; }
     set nu(nu)              { this._nu = nu; }

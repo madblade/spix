@@ -47,7 +47,7 @@ class Searcher {
 
         let hasSwapped = false;
         let log = axis=>{
-            console.log('\tswap performed on axis ' + axis);
+            //console.log('\tswap performed on axis ' + axis);
             hasSwapped = true;
         };
         
@@ -92,8 +92,8 @@ class Searcher {
         
         if (hasSwapped)
         {
-            console.log('Updated object axis for ' + entityId);
-            console.log(this.objectsAxisX);
+            //console.log('Updated object axis for ' + entityId);
+            //console.log(this.objectsAxisX);
         }
     }
 
