@@ -28,8 +28,8 @@ extend(App.Model.Client.prototype, {
         this.eventComponent.pushEvents();
     },
 
-    pushForLaterUpdate: function() {
-        this.selfComponent.triggerChange('camera-update', 'camera-update');
+    pushForLaterUpdate: function(position) {
+        this.selfComponent.triggerChange('camera-update', position);
     },
     
     triggerEvent: function(type, data) {

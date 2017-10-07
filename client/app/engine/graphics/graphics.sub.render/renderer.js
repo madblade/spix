@@ -4,7 +4,9 @@
 
 'use strict';
 
-App.Engine.Graphics.RendererManager = function() {
+App.Engine.Graphics.RendererManager = function(graphicsEngine) {
+    this.graphics = graphicsEngine;
+    
     // Cap number of passes.
     this.renderMax = Number.POSITIVE_INFINITY;
     
@@ -14,6 +16,9 @@ App.Engine.Graphics.RendererManager = function() {
     this.renderRegister = [];
     
     this.corrupted = 0;
+    
+    this.stop = false;
+    this.thenstop = false;
 };
 
 extend(App.Engine.Graphics.RendererManager.prototype, {
@@ -40,6 +45,7 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
     },
 
     render: function(sceneManager, cameraManager) {
+        if (this.stop) return;
         var renderer = this.renderer;
         var renderRegister = this.renderRegister;
 
@@ -50,7 +56,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         // Render every portal.
         var renderCount = 0;
         var renderMax = this.renderMax;
-        
+
+        mainScene.updateMatrixWorld();
         var currentPass, screen1, screen2, scene, camera;
         var bufferScene, bufferCamera, bufferTexture;
         var otherEnd, otherSceneId;
@@ -85,32 +92,72 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
                 otherEnd = screen2.getMesh();
                 sceneManager.removeObject(otherEnd, otherSceneId);
             }
-
-            renderer.render(bufferScene, bufferCamera, bufferTexture);
+            //console.log('[Renderer] Rendering.');
+            //screen1.getMesh().updateMatrixWorld();
+            //if (screen2) screen2.getMesh().updateMatrixWorld();
+            //bufferCamera.updateProjectionMatrix();
+            
             //bufferCamera.updateProjectionMatrix();
             //bufferCamera.updateMatrixWorld();
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
+            this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
             //bufferScene.updateMatrixWorld();
+            renderer.render(bufferScene, bufferCamera, bufferTexture);
+            
+            //if (true) {
+                //var rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
+                //rec.updateProjectionMatrix();
+                //rec.updateMatrixWorld();
+                //rec.matrixWorldInverse.getInverse(rec.matrixWorld);
+            //}
+            
+            //if (this.thenstop) {
+                //var posX = screen1.getMesh().position;
+                //var  = localRecorder.position;
+                //var posC = new THREE.Vector3();
+                //posC.setFromMatrixPosition(mainCamera.matrixWorld);
+                
+                //var me = this.graphics.app.model.server.selfModel.position;
+                
+                //console.log('#####\nCAM POSITION');
+                //console.log(posC);
+                //console.log(cameraManager.mainCamera.get3DObject().position);
+                //console.log('X POSITION');
+                //console.log(posX);
+                //console.log('ME POSITION');
+                //console.log(me);
+            //}
             
             if (screen2) {
                 sceneManager.addObject(otherEnd, otherSceneId);
+                //otherEnd.updateMatrixWorld();
             }
         }
-
-        renderer.render(mainScene, mainCamera);
+        
+        //console.log(renderCount);
         
         mainCamera.updateProjectionMatrix();
         mainCamera.updateMatrixWorld();
         mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
-        mainScene.updateMatrixWorld();
+        renderer.render(mainScene, mainCamera);
+        
+        
+        //if (this.thenstop) {
+            //this.stop = true;
+        //}
     },
 
     resize: function(width, height) {
         if (!width) width = window.innerWidth;
         if (!height) height = window.innerHeight;
         this.renderer.setSize(width, height);
-    }
+    },
 
+    switchAvatarToScene: function(sceneId) {
+        // TODO [CRIT] update render register.
+        this.renderRegister;
+    }
+    
 });
 
 /** Interface with graphics engine. **/
@@ -118,7 +165,7 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
 extend(App.Engine.Graphics.prototype, {
 
     createRendererManager: function() {
-        return new App.Engine.Graphics.RendererManager();
+        return new App.Engine.Graphics.RendererManager(this);
     }
 
 });

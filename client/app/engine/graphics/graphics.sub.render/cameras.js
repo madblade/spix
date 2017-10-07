@@ -49,7 +49,9 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
 
         if (this.subCameras.has(cameraId)) {
             //console.log('Camera ' + cameraId + ' cannot be added a second time.');
-            console.log('Skipping camera addition.');
+            console.log('[CameraManager] Skipping camera addition.');
+            //var err = new Error();
+            //console.log(err.stack);
             return;
         }
 
@@ -80,6 +82,11 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         camera.setWorldId(worldId);
         if (screen) camera.setScreen(screen);
         this.graphicsEngine.addToScene(camera.get3DObject(), worldId);
+        
+        camera.getRecorder().updateProjectionMatrix();
+        camera.getRecorder().updateMatrixWorld();
+        camera.getRecorder().matrixWorldInverse.getInverse(camera.getRecorder().matrixWorld);
+        console.log('Successfully added side camera to scene ' + worldId);
     },
 
     // TODO [HIGH] investigate the Camera Path Problem.

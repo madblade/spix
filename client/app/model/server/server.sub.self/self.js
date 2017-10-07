@@ -48,25 +48,26 @@ extend(App.Model.Server.SelfModel.prototype, {
 
         if (!(graphics.controls) || !avatar) return;
 
+        var p = avatar.position;
+
         if (this.worldNeedsUpdate && this.oldWorldId) {
+            console.log('Updating world!');
+            console.log(this.worldId);
             var xModel = this.xModel;
             var worldId = this.worldId;
             var oldWorldId = this.oldWorldId;
             var displayAvatar = this.displayAvatar;
-                
+
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
             if (displayAvatar) graphics.addToScene(avatar, worldId);
-
-            if (this.xModel) {
-                this.xModel.forceUpdate = true;
-            }
+            xModel.forceUpdate = true;
         }
-
-        var p = avatar.position;
-
+        
         if (up !== null && r !== null && p !== null) {
+            //console.log('Updating position!');
+            //console.log(up);
 
             var animate = p.x !== up[0] || p.y !== up[1];
             p.x = up[0]; p.y = up[1]; p.z = up[2];
@@ -82,8 +83,9 @@ extend(App.Model.Server.SelfModel.prototype, {
             if (animate) graphics.updateAnimation(id);
 
             // Update camera.
-            clientModel.pushForLaterUpdate('camera-position');
-            graphics.cameraManager.updateCameraPosition(up);
+            clientModel.pushForLaterUpdate('camera-position', this.position);
+            //clientModel.selfComponent.processChanges();
+            graphics.cameraManager.updateCameraPosition(this.position);
         }
 
         this.worldNeedsUpdate = false;

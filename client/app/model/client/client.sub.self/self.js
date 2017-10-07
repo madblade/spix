@@ -79,7 +79,8 @@ extend(App.Model.Client.SelfComponent.prototype, {
             switch (type) {
                 case 'camera-update':
                     // TODO [LOW] only once per iteration.
-                    console.log('camera autoupdate');
+                    //console.log('camera autoupdate');
+                    //graphicsEngine.cameraManager.updateCameraPosition(data);
                     graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
                     break;
                 case 'camera':

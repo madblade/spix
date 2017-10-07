@@ -112,13 +112,13 @@ extend(App.Model.Server.ChunkModel.prototype, {
                             return;
                         } else {
                             // One per iteration...
-                            console.log('[Server/Chunk] One more time');
+                            //console.log('[Server/Chunk] One more time');
                             if (!mustReport) {
-                                console.log('[Server/Chunk] Initing');
+                                //console.log('[Server/Chunk] Initing');
                                 this.initializeChunk(worldId, chunkId, update);
                                 mustReport = true;
                             } else {
-                                console.log('[Server/Chunk] Reporting');
+                                //console.log('[Server/Chunk] Reporting');
                                 sup[chunkId] = update;
                             }
                         }

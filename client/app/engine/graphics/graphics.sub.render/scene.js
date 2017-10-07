@@ -164,6 +164,8 @@ extend(App.Engine.Graphics.prototype, {
     switchToScene: function(oldSceneId, newSceneId, avatar) {
         console.log('Switching from ' + oldSceneId + ' to ' + newSceneId);
         this.sceneManager.switchToScene(newSceneId, this.cameraManager);
+        this.rendererManager.switchAvatarToScene(newSceneId);
+        this.rendererManager.thenstop = true;
     }
 
 });

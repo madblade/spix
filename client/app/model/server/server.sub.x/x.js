@@ -73,6 +73,7 @@ extend(App.Model.Server.XModel.prototype, {
         }
 
         if (refreshWorldMap || this.forceUpdate) {
+            console.log('[X] Updating world graph render force force.');
             var s = worldMap.invalidate().computeWorldMap().computeFlatGraph().toString();
             register.updateSelfState({'diagram': s});
             // TODO [HIGH] this should be heavily optimized.
@@ -105,9 +106,11 @@ extend(App.Model.Server.XModel.prototype, {
     },
 
     switchAvatarToWorld: function(oldWorldId, newWorldId) {
+        console.log('[X] Switching avatar to other world');
         oldWorldId = parseInt(oldWorldId);
         newWorldId = parseInt(newWorldId);
         this.worldMap.switchRoot(oldWorldId, newWorldId);
+        //this.forceUpdate = true;
     }
 
 });

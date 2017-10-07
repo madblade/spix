@@ -108,6 +108,7 @@ extend(App.Engine.Graphics.prototype, {
                 }
             }
 
+            // mesh.updateMatrixWorld();
             screen = new App.Engine.Graphics.Screen(portalId, mesh, rtTexture, worldId);
             this.addScreen(portalId, screen);
         }
@@ -121,6 +122,10 @@ extend(App.Engine.Graphics.prototype, {
     completeStubPortalObject: function(portal, otherPortal, cameraPath, cameraTransform) {
         var worldId = portal.worldId;
         var portalId = portal.portalId;
+        var otherEndId = worldId;
+        if (otherPortal) {
+            otherEndId = otherPortal.worldId;
+        }
 
         // Affect linked portal.
         portal.portalLinkedForward = otherPortal.portalId;
@@ -142,6 +147,7 @@ extend(App.Engine.Graphics.prototype, {
     },
 
     processPortalUpdates: function() {
+        //console.log('[X] Processing portal graphical updates.');
         var portalUpdates = this.portalUpdates;
         if (portalUpdates.length < 1) return;
         var u = portalUpdates.shift();
