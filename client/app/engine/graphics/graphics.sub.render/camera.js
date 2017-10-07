@@ -64,6 +64,10 @@ extend(App.Engine.Graphics.Camera.prototype, {
     getCameraPosition: function() {
         return this.up.position;
     },
+    
+    getUpRotation: function() {
+        return this.up.rotation;
+    },
 
     rotateX: function(deltaX) {
         var pitch = this.pitch;
@@ -97,6 +101,26 @@ extend(App.Engine.Graphics.Camera.prototype, {
 
     setZRotation: function(rotationZ) {
         this.yaw.rotation.z = rotationZ;
+    },
+    
+    copyCameraPosition: function(otherCamera) {
+        if (otherCamera) {
+            var up = this.up.position;
+            var oup = otherCamera.getCameraPosition();
+            up.x = oup.x;
+            up.y = oup.y;
+            up.z = oup.z;
+        }  
+    },
+    
+    copyCameraUpRotation: function(otherCamera) {
+        if (otherCamera) {
+            var ur = this.up.rotation;
+            var our = otherCamera.getUpRotation();
+            ur.x = our.x;
+            ur.y = our.y;
+            ur.z = our.z;
+        }
     },
 
     setCameraPosition: function(x, y, z) {

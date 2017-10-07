@@ -60,8 +60,8 @@ extend(App.Engine.Graphics.CameraManager.prototype, {
         if (screen) camera.setScreen(screen);
         this.subCameras.set(cameraId, camera);
 
-        var mainPosition = mainCamera.getCameraPosition();
-        camera.setCameraPosition(mainPosition.x, mainPosition.y, mainPosition.z);
+        camera.copyCameraPosition(mainCamera);
+        camera.copyCameraUpRotation(mainCamera);
         camera.setZRotation(mainCamera.getZRotation());
         camera.setXRotation(mainCamera.getXRotation());
     },

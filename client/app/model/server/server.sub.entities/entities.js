@@ -63,13 +63,13 @@ extend(App.Model.Server.EntityModel.prototype, {
         object3D.rotation.x = ur[3];
         object3D.rotation.z = ur[2];
         object3D.getWrapper().rotation.y = Math.PI + ur[0];
+        object3D.updateMatrixWorld();
 
         // Update animation
         if (animate) graphics.updateAnimation(id);
 
         // Switch worlds.
         var worldId = parseInt(updatedEntity.w);
-        console.log(worldId + ' vs ' + currentEntity.getWorldId());
         if (currentEntity.getWorldId() !== worldId) {
             graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
             currentEntity.setWorldId(worldId);

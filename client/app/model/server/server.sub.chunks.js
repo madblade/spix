@@ -50,6 +50,7 @@ extend(App.Model.Server.ChunkModel.prototype, {
     refresh: function() {
         if (!this.needsUpdate) return;
         var graphics = this.app.engine.graphics;
+        var clientModel = this.app.model.client;
 
         var chunkUpdates = this.chunkUpdates;
         var reportedUpdates = [];
@@ -74,6 +75,7 @@ extend(App.Model.Server.ChunkModel.prototype, {
                         graphics.addScene(wid);
                         var light = graphics.createLight('hemisphere');
                         light.position.set(0.5, 1, 0.75);
+                        light.updateMatrixWorld();
                         graphics.addToScene(light, wid);
                     }
                 }
