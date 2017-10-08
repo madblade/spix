@@ -44,6 +44,7 @@ App.Engine.Graphics = function(app) {
     this.portalUpdates = [];
     this.lastRenderPaths = new Set();
     this.lastRenderGates = new Set();
+    this.previousFrameWorld = null;
 };
 
 extend(App.Engine.Graphics.prototype, {

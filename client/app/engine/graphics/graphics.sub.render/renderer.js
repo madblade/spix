@@ -56,14 +56,13 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         // Render every portal.
         var renderCount = 0;
         var renderMax = this.renderMax;
-
         mainScene.updateMatrixWorld();
         var currentPass, screen1, screen2, scene, camera;
         var bufferScene, bufferCamera, bufferTexture;
         var otherEnd, otherSceneId;
         
-        for (var i = 0, n = renderRegister.length; i < n; ++i) {
-            currentPass = renderRegister[i];
+        for (var j = 0, m = renderRegister.length; j < m; ++j) {
+            currentPass = renderRegister[j];
             bufferScene = currentPass.scene;
             if (!bufferScene) continue;
             bufferScene.updateMatrixWorld();
@@ -146,6 +145,8 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         mainCamera.updateProjectionMatrix();
         mainCamera.updateMatrixWorld();
         mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
+        //this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+        //mainScene.updateMatrixWorld();
         renderer.render(mainScene, mainCamera);
         
         

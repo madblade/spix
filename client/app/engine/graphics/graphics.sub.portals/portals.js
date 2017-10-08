@@ -150,9 +150,31 @@ extend(App.Engine.Graphics.prototype, {
         //console.log('[X] Processing portal graphical updates.');
         var portalUpdates = this.portalUpdates;
         if (portalUpdates.length < 1) return;
-        var u = portalUpdates.shift();
-        this.addPortalGraphics(u.portal, u.otherPortal, u.cameraPath, u.cameraTransform,
-            u.depth, u.originPid, u.destinationPid, u.destinationWid, u.pidPathString);
+        var u;
+        var hasAddedSomething = false;
+        
+        // TODO [ALG] Add portal I just crossed first (closest to destinationWid).
+        var addedFirst = [];
+        for (var i = 0; i < portalUpdates.length; ++i) {
+            u = portalUpdates[i];
+            // Do I know?
+            if (u.destinationWid == this.previousFrameWorld) {
+                //console.log('Added ' + this.previousFrameWorld + ', ' + u.destinationWid);
+                this.addPortalGraphics(u.portal, u.otherPortal, u.cameraPath, u.cameraTransform,
+                    u.depth, u.originPid, u.destinationPid, u.destinationWid, u.pidPathString);
+                addedFirst.push(i);
+                hasAddedSomething = true;
+            }
+        }
+        for (var j = addedFirst.length-1; j >= 0; --j) {
+            portalUpdates.splice(addedFirst[j], 1);
+        }
+        
+        if (!hasAddedSomething) {
+            u = portalUpdates.shift();
+            this.addPortalGraphics(u.portal, u.otherPortal, u.cameraPath, u.cameraTransform,
+                u.depth, u.originPid, u.destinationPid, u.destinationWid, u.pidPathString);
+        }
     },
     
     flushPortalUpdates: function() {
