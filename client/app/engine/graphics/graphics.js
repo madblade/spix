@@ -45,6 +45,7 @@ App.Engine.Graphics = function(app) {
     this.lastRenderPaths = new Set();
     this.lastRenderGates = new Set();
     this.previousFrameWorld = null;
+    this.currentFrameWorld = null;
 };
 
 extend(App.Engine.Graphics.prototype, {

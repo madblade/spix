@@ -165,7 +165,8 @@ extend(App.Engine.Graphics.prototype, {
         console.log('Switching from ' + oldSceneId + ' to ' + newSceneId);
         this.sceneManager.switchToScene(newSceneId, this.cameraManager);
         this.rendererManager.switchAvatarToScene(newSceneId);
-        this.previousFrameWorld = oldSceneId;
+        this.previousFrameWorld = parseInt(oldSceneId);
+        this.currentFrameWorld = parseInt(newSceneId);
         this.rendererManager.thenstop = true;
     }
 

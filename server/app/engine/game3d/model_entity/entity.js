@@ -69,7 +69,7 @@ class Entity {
         // Hit box.
         this._widthX      = .25; // -> .5 
         this._widthY      = .25; // -> .5
-        this._widthZ      = .8;  // -> 1.6
+        this._widthZ      = .9;  // -> 1.6
     }
     
     static maxWidth = 10.; // 10 blocks.

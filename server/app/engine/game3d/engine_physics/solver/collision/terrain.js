@@ -6,7 +6,7 @@
 
 class TerrainCollider {
 
-    static eps = .00001;
+    static eps = .00000001;
     
     /**
      * Network casting: 

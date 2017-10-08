@@ -157,8 +157,10 @@ extend(App.Engine.Graphics.prototype, {
         var addedFirst = [];
         for (var i = 0; i < portalUpdates.length; ++i) {
             u = portalUpdates[i];
-            // Do I know?
-            if (u.destinationWid == this.previousFrameWorld) {
+            console.log(u.destinationWid + ', ' + u.portal.worldId + ', ' + this.previousFrameWorld);
+            var dwid = u.destinationWid, owid = u.portal.worldId;
+            var pwid = this.previousFrameWorld, cwid = this.currentFrameWorld;
+            if (dwid == pwid || dwid == cwid || owid == pwid || owid == cwid) {
                 //console.log('Added ' + this.previousFrameWorld + ', ' + u.destinationWid);
                 this.addPortalGraphics(u.portal, u.otherPortal, u.cameraPath, u.cameraTransform,
                     u.depth, u.originPid, u.destinationPid, u.destinationWid, u.pidPathString);

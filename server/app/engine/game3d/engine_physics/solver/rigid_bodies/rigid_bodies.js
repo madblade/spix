@@ -56,6 +56,7 @@ class RigidBodies {
         let timeDilatation = this.globalTimeDilatation;
         let absoluteDt = this.refreshRate / timeDilatation;
         let relativeDt = relativeDtMs / timeDilatation;
+        //if (relativeDt !== 0.64) console.log(relativeDt);
         //let relativeDt = absoluteDt;
         let maxSpeed = Entity.maxSpeed;
         let maxSpeed2 = maxSpeed * maxSpeed;
@@ -510,7 +511,7 @@ class RigidBodies {
                             
                             // Quadratic solve thrice
                             if (!xm) {
-                                console.log('colx');
+                                //console.log('colx');
                                 let fw = xl ? 1 : -1;
                                 
                                 let adh10 = p1_adh[0]; let adh11 = p1_adh[3];
@@ -521,14 +522,14 @@ class RigidBodies {
                                 let a2 = ltd2*ltd2 * .5 * p2_a0[0];
                                 if ((p20x <= p21x && adh21) || (p20x >= p21x && adh20)) a2 = 0;
 
-                                console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                                //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
                                 
                                 let b1 = ltd1 * (p1_v0[0] + p1_n0[0]); 
                                 let b2 = ltd2 * (p2_v0[0] + p2_n0[0]);
                                 
                                 let r = 0;
                                 if (a1 !== a2) {
-                                    console.log('deg2');
+                                    //console.log('deg2');
                                     // TODO [CRIT] solve same for leapfrog version.
                                     let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1x+fw*w2x+p10x-p20x);
                                     if (delta > 0) {
@@ -553,11 +554,13 @@ class RigidBodies {
                                             '\tp01x, p02x = ' + p10x + ', ' + p20x + '\n' +
                                             '\tp11x, p12x = ' + p11x + ', ' + p21x + '\n' +
                                             '\tfw = ' + fw + '\n');
+                                        console.log('r=' + r + ' (z), reldt=' + relativeDt);
+                                        r = 0;
                                     }
                                     // console.log("deg 1 " + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
                                 }
                                 
-                                console.log('r=' + r + ' (x), reldt=' + relativeDt);
+                                //console.log('r=' + r + ' (x), reldt=' + relativeDt);
                                 
                                 if (r >= 0) {
                                     //min_dtr1 = r * ltd1;
@@ -570,7 +573,7 @@ class RigidBodies {
                             }
                             
                             if (!ym) {
-                                console.log('coly');
+                                //console.log('coly');
                                 let fw = yl ? 1 : -1;
                                 
                                 let adh10 = p1_adh[1]; let adh11 = p1_adh[4];
@@ -581,7 +584,7 @@ class RigidBodies {
                                 let a2 = ltd2*ltd2 * .5 * p2_a0[1];
                                 if ((p20y <= p21y && adh21) || (p20y >= p21y && adh20)) a2 = 0;
 
-                                console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                                //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
                                 
                                 let b1 = ltd1 * (p1_v0[1] + p1_n0[1]);
                                 let b2 = ltd2 * (p2_v0[1] + p2_n0[1]);
@@ -589,7 +592,7 @@ class RigidBodies {
                                 // TODO [Refactor] extract method.
                                 let r = 0;
                                 if (a1 !== a2) {
-                                    console.log('deg2');
+                                    //console.log('deg2');
                                     let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1y+fw*w2y+p10y-p20y);
                                     if (delta > 0) {
                                         let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
@@ -611,10 +614,12 @@ class RigidBodies {
                                             '\tp01y, p02y = ' + p10y + ', ' + p20y + '\n' +
                                             '\tp11y, p12y = ' + p11y + ', ' + p21y + '\n' +
                                             '\tfw = ' + fw + '\n');
+                                        console.log('r=' + r + ' (z), reldt=' + relativeDt);
+                                        r = 0;
                                     }
                                 }
                                 
-                                console.log('r=' + r + ' (y), reldt=' + relativeDt);
+                                //console.log('r=' + r + ' (y), reldt=' + relativeDt);
                                 
                                 if (abs(r) < 1e-7) r = 0;
                                 if (r >= 0) {
@@ -631,7 +636,7 @@ class RigidBodies {
                             }
                             
                             if (!zm) {
-                                console.log('colz');
+                                //console.log('colz');
                                 let fw = zl ? 1 : -1;
                                 
                                 let adh10 = p1_adh[2]; let adh11 = p1_adh[5];
@@ -642,7 +647,7 @@ class RigidBodies {
                                 let a2 = ltd2*ltd2 * .5 * p2_a0[2];
                                 if ((p20z <= p21z && adh21) || (p20z >= p21z && adh20)) a2 = 0;
                                 
-                                console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                                //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
                                 
                                 let b1 = ltd1 * (p1_v0[2] + p1_n0[2]);
                                 let b2 = ltd2 * (p2_v0[2] + p2_n0[2]);
@@ -650,7 +655,7 @@ class RigidBodies {
                                 // TODO [Refactor] extract method.
                                 let r = 0;
                                 if (a1 !== a2) {
-                                    console.log('deg2');
+                                    //console.log('deg2');
                                     let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1z+fw*w2z+p10z-p20z);
                                     if (delta > 0) {
                                         let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
@@ -660,7 +665,8 @@ class RigidBodies {
                                         r = (b2-b1)/(2*(a1-a2));
                                     }
                                 } else if (b1 !== b2) {
-                                    console.log('deg1');
+                                    //console.log('deg1');
+                                   
                                     if (abs(b2-b1) < 1e-7) r= 0;
                                     else r = (fw*w1z + fw*w2z + p10z-p20z) / (b2-b1);
                                     
@@ -671,10 +677,12 @@ class RigidBodies {
                                             '\tp01z, p02z = ' + p10z + ', ' + p20z + '\n' +
                                             '\tp11z, p12z = ' + p11z + ', ' + p21z + '\n' +
                                             '\tfw = ' + fw + '\n');
+                                        console.log('r=' + r + ' (z), reldt=' + relativeDt);
+                                        r = 0;
                                     }
                                 }
                                 
-                                console.log('r=' + r + ' (z), reldt=' + relativeDt);
+                                //console.log('r=' + r + ' (z), reldt=' + relativeDt);
 
                                 if (r >= 0) {
                                     //let ndtr1 = r * ltd1;
@@ -875,7 +883,7 @@ class RigidBodies {
                     // if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {
                     if (xm && ym && zm) console.log('[RigidBodies/Solve] two bodies clipped.');
                     if (xw && yw && zw) {
-                        console.log('[RigidBodies/RPSolve] Solving collision');
+                        //console.log('[RigidBodies/RPSolve] Solving collision');
                         let m2 = [];
                         let wm1 = [w1x, w1y, w1z];
                         let wm2 = [w2x, w2y, w2z];
@@ -922,16 +930,27 @@ class RigidBodies {
                             m2[m] = (nep1[m]+wm1[m] > nep2[m]-wm2[m] && nep1[m]-wm1[m] < nep2[m]+wm2[m]);
                             // !x1l && !x1r
                             // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
+                            if (m === ax) {
+                                if ((e2p1i < e2p0i && e2.a1[m] < 0) || (e2p1i > e2p0i && e2.a1[m] > 0)) { 
+                                    e2.a1[m] = 0;
+                                    e2.v1[m] = e1.v1[m];
+                                }
+                                if ((e1p1i < e1p0i && e1.a1[m] < 0) || (e1p1i > e1p0i && e1.a1[m] > 0)) { 
+                                    e1.a1[m] = 0;
+                                    e1.v1[m] = e2.v1[m];
+                                }
+                            }
                         }
                         // Temporary security measure.
                         // TODO [CRIT] check solver
-                        if (m2[0] && m2[1] && m2[2] && false) {
-                            console.log('[RigidBodies]: clipping detected at integration.');
-                            for (let m = 0; m < 3; ++m) {
-                                e1.p1[m] = e1.p0[m];
-                                e2.p1[m] = e2.p0[m];
-                            }
-                        } else {
+                        //if (m2[0] && m2[1] && m2[2] && false) {
+                        //    console.log('[RigidBodies]: clipping detected at integration.');
+                        //    for (let m = 0; m < 3; ++m) {
+                        //        e1.p1[m] = e1.p0[m];
+                        //        e2.p1[m] = e2.p0[m];
+                        //    }
+                        //} else 
+                        {
                             let numberOfObjects = newSubIsland.length;
                             for (let m = 0; m < 3; ++m) {
                                 //if (m === ax) {
@@ -943,7 +962,7 @@ class RigidBodies {
                             }
                         }
                         if (m2[ax]) {
-                            console.log('[RigidBodies] Rollback from clipping.');
+                            //console.log('[RigidBodies] Rollback from clipping.');
                             e1.p1[ax] = e1.p0[ax];
                             e2.p1[ax] = e2.p0[ax];
                         }
