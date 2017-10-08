@@ -61,9 +61,16 @@ extend(App.Engine.Graphics.RendererManager.prototype, {
         var currentPass, screen1, screen2, scene, camera;
         var bufferScene, bufferCamera, bufferTexture;
         var otherEnd, otherSceneId;
+        
+        for (var i = 0, n = renderRegister.length; i < n; ++i) {
+            currentPass = renderRegister[i];
+            bufferScene = currentPass.scene;
+            if (!bufferScene) continue;
+            bufferScene.updateMatrixWorld();
+        }
+        
         for (var i = 0, n = renderRegister.length; i < n; ++i) {
             if (renderCount++ > renderMax) break;
-            
             currentPass = renderRegister[i];
             screen1 = currentPass.screen1;
             screen2 = currentPass.screen2;
