@@ -1,13 +1,20 @@
-### bower/npm/yo/grunt ###
+### bower/npm/yo/grunt/gulp ###
 
-node_modules
-.tmp
 client/bower_components
+node_modules
+
+.tmp
 dist
+public
+
 /server/config/local.env.js
-npm-debug.log
+
 .yo-rc.json
+npm-debug.log
+dependencies.txt
 coverage
+
+client/index.html
 
 
 ### WebStorm ###

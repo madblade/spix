@@ -4,13 +4,22 @@
 
 'use strict';
 
-App.Engine.Settings = function(app) {
+import { $ }                from '../../modules/polyfills/dom.js';
+
+import extend               from '../../extend.js';
+
+import { AudioModule }      from './settings.audio.js';
+import { ControlsModule }   from './settings.controls.js';
+import { GraphicsModule }   from './settings.graphics.js';
+import { HomeModule }       from './settings.home.js';
+
+var Settings = function(app) {
     this.app = app;
 
     this.listeners = [];
 };
 
-extend(App.Engine.Settings.prototype, {
+extend(Settings.prototype, {
 
     run: function() {
         var app = this.app;
@@ -23,7 +32,12 @@ extend(App.Engine.Settings.prototype, {
         this.audioSettings =    app.engine.audio.settings;
 
         // Add content, then fade in and add listeners.
-        $("#announce").addClass('settings').append(this.getHomeHTML()).center().fadeIn();
+        $('#announce')
+            .addClass('settings')
+            .append(this.getHomeHTML())
+            .center()
+            .fadeIn();
+
         this.listenHome();
 
         $(document).keydown(function(event) {
@@ -40,7 +54,7 @@ extend(App.Engine.Settings.prototype, {
     stop: function() {
         // Fade out settings menu.
         return new Promise(function(resolve) {
-            var settings = $("#announce");
+            var settings = $('#announce');
             settings.fadeOut(200, function() {
                 settings.empty().removeClass('settings');
                 resolve();
@@ -50,7 +64,7 @@ extend(App.Engine.Settings.prototype, {
 
     unlisten: function() {
         this.listeners.forEach(function(listener) {
-            var element = $('#'+listener);
+            var element = $('#' + listener);
             element.off('click');
             element.off('keydown');
         });
@@ -59,3 +73,10 @@ extend(App.Engine.Settings.prototype, {
     }
 
 });
+
+extend(Settings.prototype, AudioModule);
+extend(Settings.prototype, ControlsModule);
+extend(Settings.prototype, GraphicsModule);
+extend(Settings.prototype, HomeModule);
+
+export { Settings };

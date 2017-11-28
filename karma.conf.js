@@ -1,80 +1,91 @@
 // Karma configuration
-// http://karma-runner.github.io/0.10/config/configuration-file.html
+// http://karma-runner.github.io/0.13/config/configuration-file.html
+/*eslint-env node*/
 
-module.exports = function (config) {
-    config.set({
-        // base path, that will be used to resolve files and exclude
-        basePath: '',
+import makeWebpackConfig from './webpack.make';
 
-        // testing framework to use (jasmine/mocha/qunit/...)
-        frameworks: ['jasmine'],
+module.exports = function(config) {
+  config.set({
+    // base path, that will be used to resolve files and exclude
+    basePath: '',
 
-        // list of files / patterns to load in the browser
-        files: [
-            // bower:js
-            'client/bower_components/jquery/dist/jquery.js',
-            'client/bower_components/angular/angular.js',
-            'client/bower_components/angular-socket-io/socket.js',
-            'client/bower_components/Hyphenator/Hyphenator.js',
-            'client/bower_components/three.js/three.min.js',
-            'client/bower_components/stats.js/build/stats.js',
-            'client/bower_components/jquery-mousewheel/jquery.mousewheel.js',
-            // endbower
-            'node_modules/socket.io-client/socket.io.js',
-            'client/!(bower_components)/**/*.js',
-            'client/index.html'
-        ],
+    // testing framework to use (jasmine/mocha/qunit/...)
+    frameworks: ['jasmine'],
 
-        preprocessors: {
-            'client/{app,components}/**/*.js': 'babel'
-        },
+    // list of files / patterns to load in the browser
+    files: ['spec.js'],
 
-        babelPreprocessor: {
-            options: {
-                sourceMap: 'inline'
-            },
-            filename: function (file) {
-                return file.originalPath.replace(/\.js$/, '.es5.js');
-            },
-            sourceFileName: function (file) {
-                return file.originalPath;
-            }
-        },
+    preprocessors: {
+      'spec.js': ['webpack']
+    },
 
-        // list of files / patterns to exclude
-        exclude: [],
+    webpack: makeWebpackConfig({ TEST: true }),
 
-        // web server port
-        port: 8080,
+    webpackMiddleware: {
+      // webpack-dev-middleware configuration
+      // i. e.
+      noInfo: true
+    },
 
-        // level of logging
-        // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-        logLevel: config.LOG_INFO,
+    coverageReporter: {
+      reporters: [{
+        type: 'html', //produces a html document after code is run
+        subdir: 'client'
+      }, {
+        type: 'json',
+        subdir: '.',
+        file: 'client-coverage.json'
+      }],
+      dir: 'coverage/' //path to created html doc
+    },
 
-        // reporter types:
-        // - dots
-        // - progress (default)
-        // - spec (karma-spec-reporter)
-        // - junit
-        // - growl
-        // - coverage
-        reporters: ['spec'],
+    plugins: [
+      require('karma-chrome-launcher'),
+      require('karma-coverage'),
+      require('karma-firefox-launcher'),
 
-        // enable / disable watching file and executing tests whenever any file changes
-        autoWatch: false,
+      require('karma-jasmine'),
+      require('karma-spec-reporter'),
+      require('karma-phantomjs-launcher'),
+      require('karma-script-launcher'),
+      require('karma-webpack'),
+      require('karma-sourcemap-loader')
+    ],
 
-        // Start these browsers, currently available:
-        // - Chrome
-        // - ChromeCanary
-        // - Firefox
-        // - Opera
-        // - Safari (only Mac)
-        // - PhantomJS
-        // - IE (only Windows)
-        browsers: ['PhantomJS'],
+    // list of files / patterns to exclude
+    exclude: [],
 
-        // Continuous Integration mode
-        // if true, it capture browsers, run tests and exit
-        singleRun: false
-    });
+    // web server port
+    port: 9000,
+
+    // level of logging
+    // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
+    logLevel: config.LOG_INFO,
+
+    // reporter types:
+    // - dots
+    // - progress (default)
+    // - spec (karma-spec-reporter)
+    // - junit
+    // - growl
+    // - coverage
+    reporters: ['spec', 'coverage'],
+
+    // enable / disable watching file and executing tests whenever any file changes
+    autoWatch: false,
+
+    // Start these browsers, currently available:
+    // - Chrome
+    // - ChromeCanary
+    // - Firefox
+    // - Opera
+    // - Safari (only Mac)
+    // - PhantomJS
+    // - IE (only Windows)
+    browsers: ['PhantomJS'],
+
+    // Continuous Integration mode
+    // if true, it capture browsers, run tests and exit
+    singleRun: false
+  });
 };

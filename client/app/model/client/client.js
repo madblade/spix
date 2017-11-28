@@ -6,17 +6,22 @@
 
 'use strict';
 
-App.Model.Client = function(app) {
+import extend               from '../../extend.js';
+
+import { SelfComponent }    from './self/self.js';
+import { EventComponent }   from './event/event.js';
+
+var Client = function(app) {
     this.app = app;
 
     // Client model component.
-    this.selfComponent = new App.Model.Client.SelfComponent(this);
+    this.selfComponent = new SelfComponent(this);
 
     // Event component.
-    this.eventComponent = new App.Model.Client.EventComponent(this);
+    this.eventComponent = new EventComponent(this);
 };
 
-extend(App.Model.Client.prototype, {
+extend(Client.prototype, {
 
     init: function() {
         this.selfComponent.init();
@@ -31,7 +36,7 @@ extend(App.Model.Client.prototype, {
     pushForLaterUpdate: function(position) {
         this.selfComponent.triggerChange('camera-update', position);
     },
-    
+
     triggerEvent: function(type, data) {
         this.eventComponent.triggerEvent(type, data);
     },
@@ -45,3 +50,5 @@ extend(App.Model.Client.prototype, {
     }
 
 });
+
+export { Client };

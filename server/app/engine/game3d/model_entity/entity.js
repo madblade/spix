@@ -70,6 +70,8 @@ class Entity {
         this._widthX      = .25; // -> .5 
         this._widthY      = .25; // -> .5
         this._widthZ      = .9;  // -> 1.6
+        // Physical properties
+        this._mass        = 1;
     }
     
     static maxWidth = 10.; // 10 blocks.
@@ -215,6 +217,9 @@ class Entity {
     set p0(p0)              { this._p0 = p0; }
     get p1()                { return this._p1; }
     set p1(p1)              { this._p1 = p1; }
+    
+    get mass()              { return this._mass; }
+    set mass(m)             { this._mass = m; }
     
     get p01()               { return this._p01; }
     get v01()               { return this._v01; }

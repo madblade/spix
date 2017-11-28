@@ -4,19 +4,30 @@
 
 'use strict';
 
-App.Model.Server = function(app) {
+import extend           from '../../extend.js';
+
+import { ChunkModel }   from './chunks.js';
+import { EntityModel }  from './entities/entities.js';
+import { SelfModel }    from './self/self.js';
+import { XModel }       from './x/x.js';
+
+import { UpdateModule } from './updates.js';
+
+var Server = function(app) {
     this.app = app;
 
-    this.selfModel      = new App.Model.Server.SelfModel(app);
-    this.chunkModel     = new App.Model.Server.ChunkModel(app);
-    this.entityModel    = new App.Model.Server.EntityModel(app);
-    this.xModel         = new App.Model.Server.XModel(app, this.selfModel);
+    this.selfModel      = new SelfModel(app);
+    this.chunkModel     = new ChunkModel(app);
+    this.entityModel    = new EntityModel(app);
+    this.xModel         = new XModel(app, this.selfModel);
     this.selfModel.xModel = this.xModel;
 
     this.isRunning = false;
 };
 
-extend(App.Model.Server.prototype, {
+extend(Server.prototype, UpdateModule);
+
+extend(Server.prototype, {
 
     init: function() {
         this.isRunning = true;
@@ -37,9 +48,11 @@ extend(App.Model.Server.prototype, {
         this.entityModel.refresh();
         this.xModel.refresh();
     },
-    
+
     getSelfModel: function() {
         return this.selfModel;
     }
 
 });
+
+export { Server };

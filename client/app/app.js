@@ -4,64 +4,68 @@
 
 'use strict';
 
-// Utility function to extend a prototype.
-// Useful when it spawns across multiple files.
-function extend(prototype, functions) {
-    if (typeof prototype !== 'object' || typeof functions !== 'object')
-        throw Error('Could not extend ' + prototype + ' with ' + functions);
+import                  '../style/app.css';
 
-    for (var property in functions) {
-        if (prototype.hasOwnProperty(property))
-            throw Error('Tried to override existing property ' + property);
+import extend           from './extend.js';
 
-        if (functions.hasOwnProperty(property)) {
-            var f = functions[property];
-            if (typeof f !== 'function')
-                throw Error('Could not extend prototype with ' + f);
+// State
+import { StateManager } from './state/states.js';
 
-            else
-                prototype[property] = functions[property];
-        }
-    }
-}
+// Engine
+import { Connection }   from './engine/connection/connection.js';
+import { Graphics }     from './engine/graphics/graphics.js';
+import { Audio }        from './engine/audio/audio.js';
+
+import { UI }           from './engine/controls/controls.js';
+import { Settings }     from './engine/settings/settings.js';
+
+// Model
+import { Hub }          from './model/hub/hub.js';
+import { Server }       from './model/server/server.js';
+import { Client }       from './model/client/client.js';
+
+// Modules
+import { Register }     from './modules/register/register.js';
+// import { Polyfills }    from 'modules/polyfills/polyfills.js';
 
 // Global application structure.
-var App = App || {
-    'State': {},
-    'Core': {},
-    'Engine': {},
-    'Model': {},
-    'Modules': {}
-};
+var App = App || {Core : {}};
+// var App = App || {
+//     State: {},
+//     Core: {},
+//     Engine: {},
+//     Model: {},
+//     Modules: {}
+// };
 
 // Main entry point.
 App.Core = function() {
-
     // State pattern manages in-game, loading, menus.
     // Also acts as a Mediator between engine, model(s) and modules
-    this.state =        new App.State.StateManager(this);
+    this.state =      new StateManager(this);
 
     // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {
-        'connection':   new App.Engine.Connection(this),
-        'graphics':     new App.Engine.Graphics(this),
-        'audio':        new App.Engine.Audio(this),
-        'controls':     new App.Engine.UI(this),
-        'settings':     new App.Engine.Settings(this)
+        connection:   new Connection(this),
+        graphics:     new Graphics(this),
+        audio:        new Audio(this),
+        controls:     new UI(this),
+        settings:     new Settings(this)
     };
 
     // Model buffers server and client objects
     this.model = {
-        'hub':          new App.Model.Hub(this),
-        'server':       new App.Model.Server(this),
-        'client':       new App.Model.Client(this)
+        hub:          new Hub(this),
+        server:       new Server(this),
+        client:       new Client(this)
     };
 
     // Modules can be registered to add custom behaviours
-    this.register = new App.Modules.Register(this);
+    this.register = new Register(this);
     this.register.registerDefaultModules();
 };
 
+// Application entry point.
 extend(App.Core.prototype, {
 
     start: function() {
@@ -76,3 +80,115 @@ extend(App.Core.prototype, {
     }
 
 });
+
+// Application utility.
+extend(App.Core.prototype, {
+
+    getState: function() {
+        return this.state.state;
+    },
+
+    setState: function(state, opt) {
+        this.state.setState(state, opt);
+    },
+
+    isLoading: function() {
+        return this.getState() === 'loading';
+    },
+
+    isFocused: function() {
+        return this.state.focus;
+    },
+
+    setFocused: function(isFocused) {
+        // Ensure output type.
+        this.state.focus = !!isFocused;
+    },
+
+    // Called when the socket is connected.
+    connectionEstablished: function() {
+        console.log('Connected.');
+
+        // TODO splash screen.
+        setTimeout(
+            function() {
+                this.engine.connection.requestHubState();
+            }.bind(this),
+            1500
+        );
+    },
+
+    // Called when a 'creation' request is emitted from Hub state.
+    requestGameCreation: function(gameType) {
+        if (this.getState() !== 'hub')
+            throw Error('Could not request game creation outside of Hub.');
+
+        this.engine.connection.requestGameCreation(gameType);
+        // TODO single-page without reloading every time a new game is asked...
+        //location.reload();
+    },
+
+    // Called when a 'join' request is emitted from Hub state.
+    join: function(gameType, gameId) {
+        if (this.getState() !== 'hub')
+            throw Error('Could not request game joining outside of Hub.');
+
+        console.log('Join request...');
+
+        // Configuration.
+        this.setState('ingame');
+        this.engine.connection.configureGame(gameType, gameId);
+
+        // Start model loop.
+        this.model.client.init(gameType);
+        this.model.server.init(gameType);
+        console.log('Game effectively started.');
+
+        // Try to join specified game.
+        this.engine.connection.join(gameType, gameId);
+    },
+
+    // Run game when joining confirmed.
+    joinedServer: function() {
+        console.log('Joined server.');
+
+        // Run game
+        this.runGame();
+    },
+
+    runGame: function() {
+        this.engine.graphics.run();
+        this.engine.controls.run();
+        this.engine.audio.run();
+    },
+
+    stopGame: function() {
+        this.engine.graphics.stop();
+        this.engine.controls.stop();
+        this.engine.audio.stop();
+    },
+
+});
+
+// Modules.
+// TODO register/reload modules
+// TODO error reporting
+// TODO wrapping DOM queries
+extend(App.Core.prototype, {
+
+    registerModule: function() {
+
+    },
+
+    restartModule: function() {
+
+    }
+});
+
+window.register = (function() {
+    var app = new App.Core();
+    app.start();
+    return app.register;
+}());
+
+// module.exports = App.Core;

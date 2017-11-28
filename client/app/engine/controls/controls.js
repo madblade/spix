@@ -4,7 +4,16 @@
 
 'use strict';
 
-App.Engine.UI = function(app) {
+import $                    from 'jquery';
+
+import extend               from '../../extend.js';
+
+import { KeyboardModule }   from './keyboard/keyboard.js';
+import { MouseModule }      from './mouse/mouse.js';
+import { TouchModule }      from './touch/touch.js';
+import { WindowModule }     from './window/window.js';
+
+var UI = function(app) {
     this.app = app;
 
     // User customizable settings.
@@ -23,7 +32,7 @@ App.Engine.UI = function(app) {
     this.touch = {};
 };
 
-extend(App.Engine.UI.prototype, {
+extend(UI.prototype, {
 
     run: function() {
         var graphicsEngine = this.app.engine.graphics;
@@ -49,3 +58,10 @@ extend(App.Engine.UI.prototype, {
     }
 
 });
+
+extend(UI.prototype, KeyboardModule);
+extend(UI.prototype, MouseModule);
+extend(UI.prototype, TouchModule);
+extend(UI.prototype, WindowModule);
+
+export { UI };

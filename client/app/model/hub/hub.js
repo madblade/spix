@@ -4,16 +4,18 @@
 
 'use strict';
 
-App.Model.Hub = function(app) {
+import extend       from '../../extend.js';
+
+var Hub = function(app) {
     this.app = app;
 
     this.games = new Map();
 };
 
-extend(App.Model.Hub.prototype, {
+extend(Hub.prototype, {
 
     update: function(data) {
-        console.log("Hub fetched.");
+        console.log('Hub fetched.');
         data = JSON.parse(data);
 
         var app = this.app;
@@ -29,7 +31,7 @@ extend(App.Model.Hub.prototype, {
             } else {
                 for (var id = 0; id < games.length; ++id) {
                     var g = games[id];
-                    if (thisGames.indexOf(g)<0) thisGames.push(g);
+                    if (thisGames.indexOf(g) < 0) thisGames.push(g);
                 }
             }
         }
@@ -37,7 +39,6 @@ extend(App.Model.Hub.prototype, {
         if (app.isLoading()) {
             // Update state.
             app.setState('hub', map);
-
         } else if (app.getState() === 'hub') {
             // Bypass endHub.
             app.setState('hub', map);
@@ -45,3 +46,5 @@ extend(App.Model.Hub.prototype, {
     }
 
 });
+
+export { Hub };

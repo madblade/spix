@@ -4,11 +4,13 @@
 
 'use strict';
 
-App.Modules.Chat = function(register) {
+import extend           from '../../extend.js';
+
+var Chat = function(register) {
     this.register = register;
 };
 
-extend(App.Modules.Chat.prototype, {
+extend(Chat.prototype, {
 
     /**
      * Called on socket 'chat' receive.
@@ -26,3 +28,5 @@ extend(App.Modules.Chat.prototype, {
     }
 
 });
+
+export { Chat };
