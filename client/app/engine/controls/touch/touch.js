@@ -8,9 +8,9 @@ import extend from '../../../extend.js';
 
 import { ListenerModule } from './listeners.js';
 
-var TouchModule = {
+let TouchModule = {
 
-    setupTouch: function() {
+    setupTouch() {
         // var startX,
         //     startY,
         //     dX, dY, daX, daY,
@@ -22,11 +22,11 @@ var TouchModule = {
         // this.startTouchListeners();
     },
 
-    startTouchListeners: function() {
+    startTouchListeners() {
         this.registerTouch();
     },
 
-    stopTouchListeners: function() {
+    stopTouchListeners() {
         this.unregisterTouch();
     }
 

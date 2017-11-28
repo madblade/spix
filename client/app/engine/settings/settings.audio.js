@@ -6,21 +6,21 @@
 
 import $ from 'jquery';
 
-var AudioModule = {
+let AudioModule = {
 
-    getAudioHTML: function(audioSettings) {
-        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+    getAudioHTML(audioSettings) {
+        let content = '<table class="table table-bordered" style="width:100%" class="noselect">';
         content += '<tr id="return"><td>Return</td></tr>';
 
-        for (var s in audioSettings) {
-            content += '<tr><td>' + audioSettings[s] + '</td></tr>';
+        for (let s in audioSettings) {
+            content += `<tr><td>${audioSettings[s]}</td></tr>`;
         }
 
         content += '</table>';
         return content;
     },
 
-    goAudio: function() {
+    goAudio() {
         this.unlistenHome();
         $('#announce')
             .empty()
@@ -28,7 +28,7 @@ var AudioModule = {
         this.listenReturn();
     },
 
-    listenAudio: function() {
+    listenAudio() {
 
     }
 

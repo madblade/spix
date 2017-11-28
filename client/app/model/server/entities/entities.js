@@ -8,7 +8,7 @@ import extend           from '../../../extend.js';
 
 import { PlayerModule } from './player.js';
 
-var EntityModel = function(app) {
+let EntityModel = function(app) {
     this.app = app;
 
     // Model component
@@ -24,9 +24,9 @@ extend(EntityModel.prototype, PlayerModule);
 
 extend(EntityModel.prototype, {
 
-    init: function() {},
+    init() {},
 
-    addEntity: function(id, updatedEntity, graphics, entities) {
+    addEntity(id, updatedEntity, graphics, entities) {
         this.entitiesLoading.add(id);
 
         switch (updatedEntity.k) {
@@ -44,8 +44,8 @@ extend(EntityModel.prototype, {
         }
     },
 
-    removeEntity: function(id, graphics, entities) {
-        var entity = entities.get(id);
+    removeEntity(id, graphics, entities) {
+        let entity = entities.get(id);
         if (entity) {
             graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
         }
@@ -53,18 +53,18 @@ extend(EntityModel.prototype, {
     },
 
     // TODO [HIGH] an entity model...
-    updateEntity: function(id, currentEntity, updatedEntity, graphics, entities) {
+    updateEntity(id, currentEntity, updatedEntity, graphics, entities) {
         // Update positions and rotation
-        var object3D = currentEntity.getObject3D();
+        let object3D = currentEntity.getObject3D();
 
-        var p = object3D.position;
-        var up = updatedEntity.p;
-        var animate = p.x !== up[0] || p.y !== up[1];
+        let p = object3D.position;
+        let up = updatedEntity.p;
+        let animate = p.x !== up[0] || p.y !== up[1];
         p.x = up[0];
         p.y = up[1];
         p.z = up[2];
 
-        var ur = updatedEntity.r;
+        let ur = updatedEntity.r;
         object3D.rotation.x = ur[3];
         object3D.rotation.z = ur[2];
         object3D.getWrapper().rotation.y = Math.PI + ur[0];
@@ -74,7 +74,7 @@ extend(EntityModel.prototype, {
         if (animate) graphics.updateAnimation(id);
 
         // Switch worlds.
-        var worldId = parseInt(updatedEntity.w, 10);
+        let worldId = parseInt(updatedEntity.w, 10);
         if (currentEntity.getWorldId() !== worldId) {
             graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
             currentEntity.setWorldId(worldId);
@@ -85,18 +85,18 @@ extend(EntityModel.prototype, {
         entities.set(id, currentEntity);
     },
 
-    refresh: function() {
+    refresh() {
         if (!this.needsUpdate) return;
-        var graphics = this.app.engine.graphics;
+        let graphics = this.app.engine.graphics;
 
-        var entities = this.entitiesIngame;
-        var pushes = this.entitiesOutdated;
+        let entities = this.entitiesIngame;
+        let pushes = this.entitiesOutdated;
 
         pushes.forEach(
             function(updatedEntity, id) {
                 if (this.entitiesLoading.has(id)) return;
 
-                var currentEntity = entities.get(id);
+                let currentEntity = entities.get(id);
                 if (!updatedEntity)
                     this.removeEntity(id, graphics, entities);
                 else if (!currentEntity)
@@ -113,11 +113,11 @@ extend(EntityModel.prototype, {
         this.needsUpdate = false;
     },
 
-    updateEntities: function(entities) {
+    updateEntities(entities) {
         if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
 
-        var pushes = this.entitiesOutdated;
-        for (var eid in entities) {
+        let pushes = this.entitiesOutdated;
+        for (let eid in entities) {
             pushes.set(eid, entities[eid]);
         }
 

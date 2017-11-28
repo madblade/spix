@@ -6,21 +6,21 @@
 
 import $ from 'jquery';
 
-var ListenerModule = {
+let ListenerModule = {
     /**
      * Keyboard behaviour when a key is pressed.
      */
-    registerKeyDown: function() {
-        var app = this.app;
+    registerKeyDown() {
+        let app = this.app;
 
         $(window).keydown(function(event) {
             event.preventDefault();
             if (!event.keyCode) { return; }
             if (app.getState() !== 'ingame') return;
 
-            var k = this.keyControls;
-            var clientModel = app.model.client;
-            var graphics = app.engine.graphics;
+            let k = this.keyControls;
+            let clientModel = app.model.client;
+            let graphics = app.engine.graphics;
 
             switch (event.keyCode) {
                 case k.arrowUp:
@@ -53,7 +53,7 @@ var ListenerModule = {
                     break;
                 case k.pageUp: // Change item orientation
                 case k.pageDown: // Same as there are only 2 possible item orientation ATM.
-                    clientModel.triggerChange('interaction', ['item_orientation', 1]);
+                    clientModel.triggerChange('interaction', ['itemOrientation', 1]);
                     break;
                 case k.leftHandEast3: // (G)ravity.
                     clientModel.triggerEvent('a', 'g');
@@ -95,17 +95,17 @@ var ListenerModule = {
     },
 
     // Manage alt-tab like border effects
-    stopKeyboardInteraction: function() {
-        var clientModel = this.app.model.client;
+    stopKeyboardInteraction() {
+        let clientModel = this.app.model.client;
         clientModel.triggerEvent('m', 'xx');
     },
 
     /**
      * Keyboard behaviour when a key is released.
      */
-    registerKeyUp: function() {
-        var app = this.app;
-        // var graphics = app.engine.graphics;
+    registerKeyUp() {
+        let app = this.app;
+        // let graphics = app.engine.graphics;
 
         // TODO [CRIT] 3Dize
         $(window).keyup(function(event) {
@@ -113,8 +113,8 @@ var ListenerModule = {
             if (!event.keyCode) return;
             if (app.getState() !== 'ingame') return;
 
-            var k = this.keyControls;
-            var clientModel = app.model.client;
+            let k = this.keyControls;
+            let clientModel = app.model.client;
 
             switch (event.keyCode) {
                 case k.arrowUp:
@@ -144,11 +144,11 @@ var ListenerModule = {
         }.bind(this));
     },
 
-    unregisterKeyDown: function() {
+    unregisterKeyDown() {
         $(window).off('keydown');
     },
 
-    unregisterKeyUp: function() {
+    unregisterKeyUp() {
         $(window).off('keyup');
     }
 

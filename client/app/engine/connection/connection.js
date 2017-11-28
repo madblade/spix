@@ -8,20 +8,20 @@ import extend           from '../../extend.js';
 import io               from 'socket.io-client';
 // var io =            require('socket.io-client');
 
-var Connection = function(app) {
+let Connection = function(app) {
     this.app = app;
     this.socket = {};
 };
 
 extend(Connection.prototype, {
 
-    connect: function(autoconfig) {
-        var socketAddress = '';
-        var app = this.app;
-        var hub = app.model.hub;
+    connect(autoconfig) {
+        let socketAddress = '';
+        let app = this.app;
+        let hub = app.model.hub;
 
         if (!autoconfig && location.hostname !== 'localhost') {
-            socketAddress = 'ws://' + location.hostname + ':8000';
+            socketAddress = `ws://${location.hostname}:8000`;
         }
 
         this.socket = io(socketAddress, {
@@ -44,8 +44,8 @@ extend(Connection.prototype, {
         this.socket.on('reconnect_error',   function() {console.log('Reconnection failed! :(');});
     },
 
-    disconnect: function() {
-        var scope = this;
+    disconnect() {
+        let scope = this;
         scope.unregisterSocketForGame3D();
 
         ['hub', 'joined', 'cantjoin', 'connected', 'connect', 'disconnect',
@@ -53,31 +53,31 @@ extend(Connection.prototype, {
             .forEach(function(e) {this.removeCustomListener(e);}.bind(this));
     },
 
-    addCustomListener: function(message, func) {
+    addCustomListener(message, func) {
         this.socket.on(message, func);
     },
 
-    removeCustomListener: function(message) {
+    removeCustomListener(message) {
         this.socket.removeAllListeners(message);
     },
 
-    send: function(kind, message) {
+    send(kind, message) {
         this.socket.emit(kind, message);
     },
 
-    join: function(gameType, gid) {
-        this.send('util', {request:'joinGame', gameType: gameType, gameId:gid});
+    join(gameType, gid) {
+        this.send('util', {request:'joinGame', gameType, gameId:gid});
     },
 
-    requestHubState: function() {
+    requestHubState() {
         this.send('util', {request: 'hub'});
     },
 
-    requestGameCreation: function(gameType) {
-        this.send('util', {request: 'createGame', gameType: gameType});
+    requestGameCreation(gameType) {
+        this.send('util', {request: 'createGame', gameType});
     },
 
-    configureGame: function(gameType, gid) {
+    configureGame(gameType, gid) {
         switch (gameType) {
             case 'game3d':
                 this.registerSocketForGame3D();
@@ -85,16 +85,16 @@ extend(Connection.prototype, {
             default:
                 throw Error('Could not configure ' +
                     'socket listeners for an unknown game type' +
-                    'on game ' + gid + '.');
+                    `on game ${gid}.`);
         }
     }
 });
 
 extend(Connection.prototype, {
 
-    registerSocketForGame3D: function() {
-        var serverModel = this.app.model.server;
-        var register = this.app.register;
+    registerSocketForGame3D() {
+        let serverModel = this.app.model.server;
+        let register = this.app.register;
 
         this.addCustomListener('chk', serverModel.updateChunks.bind(serverModel));
         this.addCustomListener('ent', serverModel.updateEntities.bind(serverModel));
@@ -103,7 +103,7 @@ extend(Connection.prototype, {
         this.addCustomListener('chat', register.updateChat.bind(register));
     },
 
-    unregisterSocketForGame3D: function() {
+    unregisterSocketForGame3D() {
         this.removeCustomListener('chk');
         this.removeCustomListener('ent');
         this.removeCustomListener('me');

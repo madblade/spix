@@ -4,21 +4,21 @@
 
 'use strict';
 
-var LayoutCustom = {
+let LayoutCustom = {
 
-    setupCustomLayout: function(newBinding) {
+    setupCustomLayout(newBinding) {
         if (!newBinding || newBinding.length !== 2) {
-            console.log('Binding ' + newBinding + ' not supported.');
+            console.log(`Binding ${newBinding} not supported.`);
             return;
         }
 
-        var k = this.keyControls;
-        var action = newBinding[0];
-        var keyCode = newBinding[1];
+        let k = this.keyControls;
+        let action = newBinding[0];
+        let keyCode = newBinding[1];
 
         if (k.hasOwnProperty(action)) {
             // Determine whether key is already used.
-            for (var _action in k) {
+            for (let _action in k) {
                 if (_action === action) continue;
                 if (k[_action] === keyCode) {
                     // Switch.
@@ -33,7 +33,7 @@ var LayoutCustom = {
         }
 
         else {
-            console.log('Binding ' + newBinding + ' not supported.');
+            console.log(`Binding ${newBinding} not supported.`);
         }
     }
 

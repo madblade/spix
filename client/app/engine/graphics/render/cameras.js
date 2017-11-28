@@ -6,9 +6,9 @@
 
 import * as THREE from 'three';
 import extend from '../../../extend.js';
-import Camera from './camera.js';
+import { Camera } from './camera.js';
 
-var CameraManager = function(graphicsEngine) {
+let CameraManager = function(graphicsEngine) {
     this.graphicsEngine = graphicsEngine;
 
     // Camera properties.
@@ -34,35 +34,36 @@ var CameraManager = function(graphicsEngine) {
 
 extend(CameraManager.prototype, {
 
-    createCamera: function(forRaycaster, worldId) {
+    createCamera(forRaycaster, worldId) {
         // Resize (when window is resized on hub, portals are not affected)
         this.mainAspect = window.innerWidth / window.innerHeight;
 
         return new Camera(
             this.mainFOV,
             this.mainAspect,
-            (forRaycaster ? 1 : this.mainNear), // TODO [LOW] check security.
+            forRaycaster ? 1 : this.mainNear, // TODO [LOW] check security.
             this.mainFar,
             worldId);
     },
 
-    addCamera: function(frameSource, frameDestination,
-                        cameraPath, cameraTransform, screen)
+    addCamera(
+        frameSource, frameDestination,
+        cameraPath, cameraTransform, screen)
     {
-        var cameraId = cameraPath;
+        let cameraId = cameraPath;
 
         // TODO [CRIT] compute relative positions and rotations.
 
         if (this.subCameras.has(cameraId)) {
             //console.log('Camera ' + cameraId + ' cannot be added a second time.');
             console.log('[CameraManager] Skipping camera addition.');
-            //var err = new Error();
+            //let err = new Error();
             //console.log(err.stack);
             return;
         }
 
-        var mainCamera = this.mainCamera;
-        var camera = this.createCamera(false);
+        let mainCamera = this.mainCamera;
+        let camera = this.createCamera(false);
         camera.setCameraId(cameraId);
         camera.setCameraTransform(cameraTransform);
         if (screen) camera.setScreen(screen);
@@ -74,15 +75,14 @@ extend(CameraManager.prototype, {
         camera.setXRotation(mainCamera.getXRotation());
     },
 
-    addCameraToScene: function(cameraId, worldId, screen) {
+    addCameraToScene(cameraId, worldId, screen) {
         worldId = parseInt(worldId, 10);
 
-        var camera = this.subCameras.get(cameraId);
+        let camera = this.subCameras.get(cameraId);
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
         if (!camera) {
-            console.log('@addCamera: could not get wrapper for camera ' +
-                cameraId);
+            console.log(`@addCamera: could not get wrapper for camera ${cameraId}`);
             return;
         }
 
@@ -94,23 +94,21 @@ extend(CameraManager.prototype, {
         camera.getRecorder().updateMatrixWorld();
         camera.getRecorder().matrixWorldInverse
             .getInverse(camera.getRecorder().matrixWorld);
-        console.log('Successfully added side camera to scene ' +
-            worldId);
+        console.log(`Successfully added side camera to scene ${worldId}`);
     },
 
     // TODO [HIGH] investigate the Camera Path Problem.
-    removeCamera: function(cameraId) {
-        console.log('TODO: remove camera ' + cameraId);
+    removeCamera(cameraId) {
+        console.log(`TODO: remove camera ${cameraId}`);
     },
 
-    removeCameraFromScene: function(cameraId, worldId) {
+    removeCameraFromScene(cameraId, worldId) {
         worldId = parseInt(worldId, 10);
-        var camera = this.subCameras.get(cameraId);
+        let camera = this.subCameras.get(cameraId);
         if (!camera && cameraId === this.mainCamera.getCameraId())
             camera = this.mainCamera;
         if (!camera) {
-            console.log('@removeCamera: could not get wrapper for camera ' +
-                cameraId);
+            console.log(`@removeCamera: could not get wrapper for camera ${cameraId}.`);
             return;
         }
 
@@ -119,10 +117,10 @@ extend(CameraManager.prototype, {
         this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId);
     },
 
-    switchMainCameraToWorld: function(oldMainSceneId, sceneId) {
-        var mainCamera = this.mainCamera;
-        var mainRaycasterCamera = this.mainRaycasterCamera;
-        var graphics = this.graphicsEngine;
+    switchMainCameraToWorld(oldMainSceneId, sceneId) {
+        let mainCamera = this.mainCamera;
+        let mainRaycasterCamera = this.mainRaycasterCamera;
+        let graphics = this.graphicsEngine;
 
         graphics.removeFromScene(mainCamera.get3DObject(), oldMainSceneId);
         graphics.removeFromScene(mainRaycasterCamera.get3DObject(),
@@ -133,40 +131,40 @@ extend(CameraManager.prototype, {
     },
 
     // TODO [HIGH] passify, dont forget raycaster
-    switchToCamera: function(oldWorldId, newWorldId) {
-        //var newMainCamera = this.subCameras.get(newMainCameraId);
+    switchToCamera(oldWorldId, newWorldId) {
+        //let newMainCamera = this.subCameras.get(newMainCameraId);
         //if (!newMainCamera) { console.log('Failed to switch with camera ' + newMainCameraId); return; }
-        //var oldMainCamera = this.mainCamera;
+        //let oldMainCamera = this.mainCamera;
 
         //this.mainCamera = newMainCamera;
         //this.subCameras.set(oldMainCameraId, oldMainCamera);
-        console.log('Deprecated call to switchToCamera ' + newWorldId);
+        console.log(`Deprecated call to switchToCamera ${newWorldId}.`);
     },
 
     // Update.
-    updateCameraPosition: function(vector) {
+    updateCameraPosition(vector) {
         // TODO remove berk ugly
-        var cams = [this.mainCamera, this.mainRaycasterCamera];
+        let cams = [this.mainCamera, this.mainRaycasterCamera];
         this.subCameras.forEach(function(cam) { cams.push(cam); });
-        var localRecorder = this.mainCamera.getRecorder();
+        let localRecorder = this.mainCamera.getRecorder();
 
-        var i = this.graphicsEngine.getCameraInteraction();
+        let i = this.graphicsEngine.getCameraInteraction();
 
         // TODO [HIGH] generalize (server-side, comes with collision cross-p)
-        var x = vector[0];
-        var y = vector[1];
-        var z = vector[2] + 1.6;
-        //var z = vector[2];
+        let x = vector[0];
+        let y = vector[1];
+        let z = vector[2] + 1.6;
+        //let z = vector[2];
 
         if (i.isFirstPerson()) {
             cams.forEach(function(cam/*, cameraId*/) {
                 cam.setCameraPosition(x, y, z);
                 cam.setFirstPerson();
-                var mirrorCamera = cam.getRecorder();
+                let mirrorCamera = cam.getRecorder();
                 if (mirrorCamera) {
-                    var screen = cam.getScreen();
+                    let screen = cam.getScreen();
                     if (screen) {
-                        var mirror = screen.getMesh();
+                        let mirror = screen.getMesh();
                         this.clipOblique(mirror, mirrorCamera, localRecorder);
                     }
                 }
@@ -177,11 +175,11 @@ extend(CameraManager.prototype, {
             cams.forEach(function(cam/*, cameraId*/) {
                 cam.setCameraPosition(x, y, z);
                 cam.setThirdPerson();
-                var mirrorCamera = cam.getRecorder();
+                let mirrorCamera = cam.getRecorder();
                 if (mirrorCamera) {
-                    var screen = cam.getScreen();
+                    let screen = cam.getScreen();
                     if (screen) {
-                        var mirror = screen.getMesh();
+                        let mirror = screen.getMesh();
                         this.clipOblique(mirror, mirrorCamera, localRecorder);
                     }
                 }
@@ -190,18 +188,18 @@ extend(CameraManager.prototype, {
     },
 
     // TODO [CRIT] 3Dize
-    addCameraRotationEvent: function(relX, relY, absX, absY) {
+    addCameraRotationEvent(relX, relY, absX, absY) {
         this.incomingRotationEvents.push([relX, relY, absX, absY]);
     },
 
-    refresh: function() {
-        var incoming = this.incomingRotationEvents;
+    refresh() {
+        let incoming = this.incomingRotationEvents;
         if (incoming.length < 1) return;
 
-        var rotation = [0, 0, 0, 0];
-        for (var i = 0, l = incoming.length; i < l; ++i) {
-            var inc = incoming[i];
-            var rot = [0, 0, 0, 0];
+        let rotation = [0, 0, 0, 0];
+        for (let i = 0, l = incoming.length; i < l; ++i) {
+            let inc = incoming[i];
+            let rot = [0, 0, 0, 0];
             rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
             rotation[0] = rot[0];
             rotation[1] = rot[1];
@@ -221,53 +219,54 @@ extend(CameraManager.prototype, {
             );
             */
 
-            var clientModel = this.graphicsEngine.app.model.client;
+            let clientModel = this.graphicsEngine.app.model.client;
             clientModel.triggerEvent('r', rotation);
         }
     },
 
     // TODO fix clipping planes
-    clipOblique: function(mirror, mirrorCamera, localRecorder) {
-        var matrix = new THREE.Matrix4();
+    clipOblique(mirror, mirrorCamera, localRecorder) {
+        let matrix = new THREE.Matrix4();
         matrix.extractRotation(mirror.matrix);
 
         // Reversal criterion: vector(pos(x)-pos(cam)) dot vector(x normal)
 
         // x normal
-        var vec1 = new THREE.Vector3(0, 0, 1);
+        let vec1 = new THREE.Vector3(0, 0, 1);
         vec1.applyMatrix4(matrix);
 
         // pos(x)-pos(camera)
-        var posX = mirror.position;
-        //var  = localRecorder.position;
-        var posC = new THREE.Vector3();
+        let posX = mirror.position;
+        //let  = localRecorder.position;
+        let posC = new THREE.Vector3();
         posC.setFromMatrixPosition(localRecorder.matrixWorld);
 
-        var vec2 = new THREE.Vector3();
+        let vec2 = new THREE.Vector3();
         vec2.x = posX.x - posC.x;
         vec2.y = posX.y - posC.y;
         vec2.z = posX.z - posC.z;
 
         // mirrorCamera.getWorldDirection(vec2);
 
-        //var camPosition = new THREE.Vector3();
+        //let camPosition = new THREE.Vector3();
         //camPosition.setFromMatrixPosition(mirrorCamera.matrixWorld);
-        //var vec1 = mirror.normal;
-        //var vec2 = new THREE.Vector3(0,0, -1);
+        //let vec1 = mirror.normal;
+        //let vec2 = new THREE.Vector3(0,0, -1);
         //vec2.applyQuaternion(mirrorCamera.quaternion);
-        //var vec2 = new THREE.Vector3(mirrorCamera.matrix[8], mirrorCamera.matrix[9], mirrorCamera.matrix[10]);
+        //let vec2 = new THREE.Vector3(mirrorCamera.matrix[8], mirrorCamera.matrix[9], mirrorCamera.matrix[10]);
 
         if (!vec1 || !vec2) {
             console.log('[XCam] Dot product error.');
             return;
         }
 
-        //var dot = mirror.position.dot(camPosition);
-        var dot = vec1.dot(vec2);
-        var s = Math.sign(dot);
+        //let dot = mirror.position.dot(camPosition);
+        let dot = vec1.dot(vec2);
+        let s = Math.sign(dot);
         //console.log(s);
         //console.log(dot);
-        var N = new THREE.Vector3(0, 0, s * 1);
+        let normalFactor = 1; // [Expert] replace with -1 to invert normal.
+        let N = new THREE.Vector3(0, 0, s * normalFactor);
         N.applyMatrix4(matrix);
 
         //update mirrorCamera matrices!!
@@ -279,7 +278,7 @@ extend(CameraManager.prototype, {
         // now update projection matrix with new clip plane
         // implementing code from: http://www.terathon.com/code/oblique.html
         // paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-        var clipPlane = new THREE.Plane();
+        let clipPlane = new THREE.Plane();
         clipPlane.setFromNormalAndCoplanarPoint(N, mirror.position);
         clipPlane.applyMatrix4(mirrorCamera.matrixWorldInverse);
 
@@ -289,10 +288,10 @@ extend(CameraManager.prototype, {
             clipPlane.normal.z,
             clipPlane.constant);
 
-        var q = new THREE.Vector4();
-        var projectionMatrix = mirrorCamera.projectionMatrix;
+        let q = new THREE.Vector4();
+        let projectionMatrix = mirrorCamera.projectionMatrix;
 
-        var sgn = Math.sign;
+        let sgn = Math.sign;
         q.x = (sgn(clipPlane.x) +
             projectionMatrix.elements[8]) / projectionMatrix.elements[0];
         q.y = (sgn(clipPlane.y) +
@@ -302,7 +301,7 @@ extend(CameraManager.prototype, {
             mirrorCamera.projectionMatrix.elements[14];
 
         // Calculate the scaled plane vector
-        var c = new THREE.Vector4();
+        let c = new THREE.Vector4();
         c = clipPlane.multiplyScalar(2.0 / clipPlane.dot(q));
 
         // Replace the third row of the projection matrix
@@ -312,25 +311,25 @@ extend(CameraManager.prototype, {
         projectionMatrix.elements[14] = c.w;
     },
 
-    moveCameraFromMouse: function(relX, relY, absX, absY) {
+    moveCameraFromMouse(relX, relY, absX, absY) {
         // Rotate main camera.
-        var camera = this.mainCamera;
+        let camera = this.mainCamera;
         camera.rotateZ(-relX * 0.002);
         camera.rotateX(-relY * 0.002);
-        var rotationZ = camera.getZRotation();
-        var rotationX = camera.getXRotation();
+        let rotationZ = camera.getZRotation();
+        let rotationX = camera.getXRotation();
 
         // Current up vector -> angles.
-        var up = camera.get3DObject().rotation;
-        var theta0 = up.z;
-        var theta1 = up.x;
+        let up = camera.get3DObject().rotation;
+        let theta0 = up.z;
+        let theta1 = up.x;
 
         // Rotate raycaster camera.
-        var raycasterCamera = this.mainRaycasterCamera;
+        let raycasterCamera = this.mainRaycasterCamera;
         raycasterCamera.setZRotation(rotationZ);
         raycasterCamera.setXRotation(rotationX);
 
-        if (absX != 0 || absY != 0) {
+        if (absX !== 0 || absY !== 0) {
             // Add angles.
             theta0 = theta0 + absX;
             theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
@@ -347,14 +346,14 @@ extend(CameraManager.prototype, {
         return [rotationZ, rotationX, theta0, theta1];
     },
 
-    updateCameraPortals: function(camera, rotationZ, rotationX, theta1, theta0) {
-        var localRecorder = camera.getRecorder();
+    updateCameraPortals(camera, rotationZ, rotationX, theta1, theta0) {
+        let localRecorder = camera.getRecorder();
         this.subCameras.forEach(function(subCamera/*, cameraId*/) {
             // TODO [CRIT] update camera position, rotation rel. to portal position.
 
-            var mirrorCamera = subCamera.getRecorder();
-            var mirror = subCamera.getScreen().getMesh();
-            //var camera = mirrorCamera;
+            let mirrorCamera = subCamera.getRecorder();
+            let mirror = subCamera.getScreen().getMesh();
+            //let camera = mirrorCamera;
             if (mirrorCamera) {
                 this.clipOblique(mirror, mirrorCamera, localRecorder);
             }
@@ -365,40 +364,40 @@ extend(CameraManager.prototype, {
         }.bind(this));
     },
 
-    resize: function(width, height) {
+    resize(width, height) {
         // TODO [HIGH] apply to other cameras AND RENDER TARGETS (DONT FORGET).
-        var aspect = width / height;
+        let aspect = width / height;
 
-        var camera = this.mainCamera.getRecorder();
+        let camera = this.mainCamera.getRecorder();
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
 
-        var raycasterCamera = this.mainRaycasterCamera.getRecorder();
+        let raycasterCamera = this.mainRaycasterCamera.getRecorder();
         raycasterCamera.aspect = aspect;
         raycasterCamera.updateProjectionMatrix();
 
         this.subCameras.forEach(function(currentCamera/*, cameraId*/) {
-            var recorder = currentCamera.getRecorder();
+            let recorder = currentCamera.getRecorder();
             recorder.aspect = aspect;
             recorder.updateProjectionMatrix();
         });
     },
 
     // Raycasting.
-    createRaycaster: function() {
+    createRaycaster() {
         return new THREE.Raycaster();
     },
 
-    performRaycast: function() {
-        var graphicsEngine = this.graphicsEngine;
-        var chunkModel = graphicsEngine.app.model.server.chunkModel;
-        var selfModel = graphicsEngine.app.model.server.selfModel;
+    performRaycast() {
+        let graphicsEngine = this.graphicsEngine;
+        let chunkModel = graphicsEngine.app.model.server.chunkModel;
+        let selfModel = graphicsEngine.app.model.server.selfModel;
 
-        var raycaster = this.raycaster;
-        var camera = this.mainRaycasterCamera.getRecorder();
-        var terrain = chunkModel.getCloseTerrain(selfModel.worldId);
+        let raycaster = this.raycaster;
+        let camera = this.mainRaycasterCamera.getRecorder();
+        let terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
-        var intersects;
+        let intersects;
         raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
         intersects = raycaster.intersectObjects(terrain);
 
@@ -409,17 +408,17 @@ extend(CameraManager.prototype, {
 
 /** Interface with graphics engine. **/
 
-var CamerasModule = {
+let CamerasModule = {
 
-    createCameraManager: function() {
+    createCameraManager() {
         return new CameraManager(this);
     },
 
-    getCameraCoordinates: function() {
+    getCameraCoordinates() {
         return this.cameraManager.mainCamera.getCameraPosition();
     },
 
-    switchToCamera: function(oldId, newId) {
+    switchToCamera(oldId, newId) {
         return this.cameraManager.switchToCamera(oldId, newId);
     }
 

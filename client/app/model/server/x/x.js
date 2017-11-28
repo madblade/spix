@@ -10,7 +10,7 @@ import extend               from '../../../extend.js';
 import { WorldMap }         from './worldmap.js';
 import { UpdateModule }     from './update.js';
 
-var XModel = function(app, selfModel) {
+let XModel = function(app, selfModel) {
     this.app = app;
     this.selfModel = selfModel;
 
@@ -35,36 +35,36 @@ var XModel = function(app, selfModel) {
 
 extend(XModel.prototype, {
 
-    init: function() {},
+    init() {},
 
     // Should always be called AFTER worldModel.refresh()
     // So there is no more world to be added, all possible worlds
     // are available for display in their portals texture renderer.
-    refresh: function() {
+    refresh() {
         if (!this.needsUpdate && !this.forceUpdate) return;
 
-        var register = this.app.register;
-        var worldMap = this.worldMap;
-        var updates = this.xUpdates;
-        var refreshWorldMap = false;
-        var graphics = this.app.engine.graphics;
+        let register = this.app.register;
+        let worldMap = this.worldMap;
+        let updates = this.xUpdates;
+        let refreshWorldMap = false;
+        let graphics = this.app.engine.graphics;
 
-        for (var i = 0, l = updates.length; i < l; ++i) {
-            var data = updates[i];
+        for (let i = 0, l = updates.length; i < l; ++i) {
+            let data = updates[i];
 
-            for (var portalId in data) {
-                var meta = data[portalId];
-                var isArray = meta instanceof Array;
+            for (let portalId in data) {
+                let meta = data[portalId];
+                let isArray = meta instanceof Array;
 
                 if (isArray && meta.length > 0) {
                     // Full portal.
-                    var otherPortalId   = meta[0];
-                    var chunkId         = meta[1];
-                    var worldId         = meta[2];
-                    var end1            = [meta[3], meta[4], meta[5]];
-                    var end2            = [meta[6], meta[7], meta[8]];
-                    var offset          = meta[9];
-                    var orientation     = meta[10];
+                    let otherPortalId   = meta[0];
+                    let chunkId         = meta[1];
+                    let worldId         = meta[2];
+                    let end1            = [meta[3], meta[4], meta[5]];
+                    let end2            = [meta[6], meta[7], meta[8]];
+                    let offset          = meta[9];
+                    let orientation     = meta[10];
 
                     // Do add portal (not that world map is recomputed in process)
                     this.addPortal(portalId,
@@ -83,7 +83,7 @@ extend(XModel.prototype, {
         if (refreshWorldMap || this.forceUpdate) {
             console.log('[X] Updating world graph render force force.');
 
-            var s = worldMap
+            let s = worldMap
                 .invalidate()
                 .computeWorldMap()
                 .computeFlatGraph()
@@ -114,12 +114,12 @@ extend(XModel.prototype, {
      10:"both"   -> orientation ("+", "-" or "both")
      * null -> removed portal
      **/
-    updateX: function(data) {
+    updateX(data) {
         this.xUpdates.push(data);
         this.needsUpdate = true;
     },
 
-    switchAvatarToWorld: function(oldWorldId, newWorldId) {
+    switchAvatarToWorld(oldWorldId, newWorldId) {
         console.log('[X] Switching avatar to other world');
         oldWorldId = parseInt(oldWorldId, 10);
         newWorldId = parseInt(newWorldId, 10);

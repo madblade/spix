@@ -6,22 +6,22 @@
 
 import * as THREE from 'three';
 
-var EntitiesModule = {
+let EntitiesModule = {
 
-    initializeEntity: function(entityId, model, callbackOnMesh) {
-        var loader = new THREE.JSONLoader();
-        var mixers = this.mixers;
+    initializeEntity(entityId, model, callbackOnMesh) {
+        let loader = new THREE.JSONLoader();
+        let mixers = this.mixers;
 
-        loader.load('app/assets/models/' + model + '.json', function(geometry) {
-            var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+        loader.load(`app/assets/models/${model}.json`, function(geometry) {
+            let mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
                 vertexColors: THREE.FaceColors,
                 morphTargets: true
             }));
 
             mesh.scale.set(1.0, 1.0, 1.0);
 
-            var mixer = new THREE.AnimationMixer(mesh);
-            var clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
+            let mixer = new THREE.AnimationMixer(mesh);
+            let clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run', geometry.morphTargets, 30);
             mixer.clipAction(clip)
                 .setDuration(1)
                 .play();
@@ -32,11 +32,11 @@ var EntitiesModule = {
     },
 
     // For composite entities, wrap heavy model parts in higher level structure.
-    finalizeEntity: function(id, createdEntity) {
+    finalizeEntity(id, createdEntity) {
         // First only manage avatars.
-        var up = new THREE.Object3D();
-        var wrapper = new THREE.Object3D();
-        var head = this.createMesh(
+        let up = new THREE.Object3D();
+        let wrapper = new THREE.Object3D();
+        let head = this.createMesh(
             this.createGeometry('box'),
             this.createMaterial('flat-phong')
         );

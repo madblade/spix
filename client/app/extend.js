@@ -4,16 +4,16 @@
 // Can be used to concatenate objects of functions.
 export default function(prototype, functions) {
     if (typeof prototype !== 'object' || typeof functions !== 'object')
-        throw Error('Could not extend ' + prototype + ' with ' + functions);
+        throw Error(`Could not extend ${prototype} with ${functions}.`);
 
-    for (var property in functions) {
+    for (let property in functions) {
         if (prototype.hasOwnProperty(property))
-            throw Error('Tried to override existing property ' + property);
+            throw Error(`Tried to override existing property ${property}`);
 
         if (functions.hasOwnProperty(property)) {
-            var f = functions[property];
+            let f = functions[property];
             if (typeof f !== 'function')
-                throw Error('Could not extend prototype with ' + f);
+                throw Error(`Could not extend prototype with ${f}`);
 
             else
                 prototype[property] = functions[property];

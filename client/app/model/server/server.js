@@ -13,7 +13,7 @@ import { XModel }       from './x/x.js';
 
 import { UpdateModule } from './updates.js';
 
-var Server = function(app) {
+let Server = function(app) {
     this.app = app;
 
     this.selfModel      = new SelfModel(app);
@@ -29,7 +29,7 @@ extend(Server.prototype, UpdateModule);
 
 extend(Server.prototype, {
 
-    init: function() {
+    init() {
         this.isRunning = true;
         this.selfModel.init();
         this.chunkModel.init();
@@ -37,19 +37,19 @@ extend(Server.prototype, {
         this.xModel.init();
     },
 
-    stop: function() {
+    stop() {
         this.isRunning = false;
     },
 
     // Update graphics.
-    refresh: function() {
+    refresh() {
         this.selfModel.refresh();
         this.chunkModel.refresh();
         this.entityModel.refresh();
         this.xModel.refresh();
     },
 
-    getSelfModel: function() {
+    getSelfModel() {
         return this.selfModel;
     }
 

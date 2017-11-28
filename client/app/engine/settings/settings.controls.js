@@ -6,19 +6,19 @@
 
 import $ from 'jquery';
 
-var ControlsModule = {
+let ControlsModule = {
 
-    getControlsHTML: function(controlsSettings) {
-        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+    getControlsHTML(controlsSettings) {
+        let content = '<table class="table table-bordered" style="width:100%" class="noselect">';
 
         if (controlsSettings.hasOwnProperty('language')) {
-            var language =  '<select id="language" class="form-control">' +
+            let language =  '<select id="language" class="form-control">' +
                 '<option value="default">Choose your layout:</option>' +
                 '<option value="en">en</option>' +
                 '<option value="fr">fr</option>' +
                 '</select>';
 
-            content += '<tr><td>Keyboard layout</td><td>' + language + '</td></tr>';
+            content += `<tr><td>Keyboard layout</td><td>${language}</td></tr>`;
         }
 
         content += '<tr id="return"><td colspan="2">Return</td></tr>';
@@ -27,7 +27,7 @@ var ControlsModule = {
         return content;
     },
 
-    goControls: function() {
+    goControls() {
         this.unlistenHome();
         $('#announce')
             .empty()
@@ -36,17 +36,17 @@ var ControlsModule = {
         this.listenControls();
     },
 
-    listenControls: function() {
-        var controlsEngine = this.app.engine.controls;
+    listenControls() {
+        let controlsEngine = this.app.engine.controls;
 
-        var l = $('#language');
+        let l = $('#language');
         l.change(function() {
-            var selected = l.find('option:selected').val();
+            let selected = l.find('option:selected').val();
             controlsEngine.changeLayout(selected, true); // Don't restart listeners.
         });
     },
 
-    unlistenControls: function() {
+    unlistenControls() {
         $('#language').off('change');
     }
 

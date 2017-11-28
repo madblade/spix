@@ -4,31 +4,31 @@
 
 'use strict';
 
-var UpdateModule = {
+let UpdateModule = {
 
-    updateMe: function(data) {
+    updateMe(data) {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 
-        var mainState = data[0];
+        let mainState = data[0];
         this.selfModel.updateSelf(mainState[0], mainState[1], mainState[2]);
     },
 
-    updateEntities: function(data) {
+    updateEntities(data) {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 
         this.entityModel.updateEntities(data);
     },
 
-    updateChunks: function(data) {
+    updateChunks(data) {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 
         this.chunkModel.updateChunks(data);
     },
 
-    updateX: function(data) {
+    updateX(data) {
         if (!this.isRunning) return;
         data = JSON.parse(data);
 

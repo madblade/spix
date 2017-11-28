@@ -6,18 +6,18 @@
 
 import * as THREE from 'three';
 
-var TexturesModule = {
+let TexturesModule = {
 
-    loadTextures: function() {
+    loadTextures() {
         this.texture = this.loadTexture('3.png');
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
     },
 
-    loadTexture: function(whatTexture) {
-        var loader = new THREE.TextureLoader();
-        var maxAnisotropy = this.rendererManager.renderer.getMaxAnisotropy();
+    loadTexture(whatTexture) {
+        let loader = new THREE.TextureLoader();
+        let maxAnisotropy = this.rendererManager.renderer.getMaxAnisotropy();
 
-        var texture = loader.load('app/assets/textures/' + whatTexture);
+        let texture = loader.load(`app/assets/textures/${whatTexture}`);
 
         // TODO [MEDIUM] propose different anisotropy filtering
         //texture.anisotropy = maxAnisotropy;
@@ -27,20 +27,20 @@ var TexturesModule = {
         // TODO [MEDIUM] graphical effects
         //texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-        console.log('Max anisotropy = ' + maxAnisotropy);
+        console.log(`Max anisotropy = ${maxAnisotropy}`);
 
         // Mipmapping...
-        // var p = 512;
-        // for (var i = 0; i<10; ++i) {
+        // let p = 512;
+        // for (let i = 0; i<10; ++i) {
         //     console.log(p + " " + i);
-        //     var current = 'atlas_' + p + '.png';
+        //     let current = 'atlas_' + p + '.png';
         //     const j = i;
         //     loader.load("app/assets/textures/" + current, function(tex) {texture.mipmaps[j] = tex.image;} );
         //     p/=2;
         // }
 
         // Idea #1: use THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
-        // then, var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+        // then, let mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
         // Where materials is an [] of materials and the faces use a materialIndex parameter to get appointed the right mat.
         // Idea #2: shader
 
@@ -51,8 +51,8 @@ var TexturesModule = {
      * Gives
      * i+, j+, k+, i-, j-, k-
      */
-    getTextureCoordinates: function(modelType) {
-        var coordinates;
+    getTextureCoordinates(modelType) {
+        let coordinates;
         if (modelType === 'minecraft>1.5') {
             coordinates = {
                 1: [[3, 15], [3, 15], [0, 15], [3, 15], [3, 15], [2, 15]], // Grass

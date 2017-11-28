@@ -6,8 +6,8 @@
 
 import { sigma } from 'sigma';
 
-var CoreModule = {
-    run: function() {
+let CoreModule = {
+    run() {
         // Controls are tightly linked to camera.
         this.initializeControls();
 
@@ -20,8 +20,8 @@ var CoreModule = {
         this.runSigma();
     },
 
-    runSigma: function() {
-        var data = {
+    runSigma() {
+        let data = {
             nodes: [
                 {
                     id: 'n0',
@@ -71,7 +71,7 @@ var CoreModule = {
             ]
         };
 
-        var s = new sigma({
+        let s = new sigma({
             graph: data,
             container: 'network-graph',
             settings: {
@@ -85,9 +85,9 @@ var CoreModule = {
 
     /** Main loop. **/
 
-    animate: function() {
-        var clientModel = this.app.model.client;
-        var serverModel = this.app.model.server;
+    animate() {
+        let clientModel = this.app.model.client;
+        let serverModel = this.app.model.server;
 
         // Request animation frame.
         this.requestId = requestAnimationFrame(this.animate.bind(this));
@@ -107,11 +107,11 @@ var CoreModule = {
         //clientModel.refresh();
     },
 
-    render: function() {
-        var sceneManager = this.sceneManager;
-        var cameraManager = this.cameraManager;
-        var rendererManager = this.rendererManager;
-        var portals = this.app.model.server.xModel.portals;
+    render() {
+        let sceneManager = this.sceneManager;
+        let cameraManager = this.cameraManager;
+        let rendererManager = this.rendererManager;
+        let portals = this.app.model.server.xModel.portals;
 
         // Refresh portals.
         this.processPortalUpdates();
@@ -123,15 +123,15 @@ var CoreModule = {
         rendererManager.render(sceneManager, cameraManager, portals);
     },
 
-    stop: function() {
+    stop() {
         if (this.requestId) {
             cancelAnimationFrame(this.requestId);
         }
     },
 
-    resize: function() {
-        var width = window.innerWidth;
-        var height = window.innerHeight;
+    resize() {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
 
         // Update aspects.
         this.cameraManager.resize(width, height);
@@ -143,7 +143,7 @@ var CoreModule = {
         this.sceneManager.resize(width, height);
     },
 
-    getCameraInteraction: function() {
+    getCameraInteraction() {
         return this.app.model.client.getCameraInteraction();
     }
 };

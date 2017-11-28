@@ -7,14 +7,14 @@
 import extend               from '../../extend.js';
 import { $ }                from '../../modules/polyfills/dom.js';
 
-var LoadingState = function(stateManager) {
+let LoadingState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'loading';
 };
 
 extend(LoadingState.prototype, {
 
-    start: function() {
+    start() {
         $('#announce')
             .append('<div style="" class="title noselect">' +
                 '<p>spix<br/>engineering version</p>' +
@@ -28,7 +28,7 @@ extend(LoadingState.prototype, {
             .center();
     },
 
-    end: function() {
+    end() {
         return new Promise(function(resolve) {
             var loader = $('#announce');
             loader.fadeOut(200, function() {

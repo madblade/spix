@@ -8,18 +8,18 @@ import extend           from '../../extend.js';
 import { Chat }         from '../chat/chat.js';
 import { Hud }          from '../hud/hud.js';
 
-var Register = function(/*app*/) {
+let Register = function(/*app*/) {
     this.modules = {};
 };
 
 extend(Register.prototype, {
 
-    registerDefaultModules: function() {
+    registerDefaultModules() {
         this.registerModule('chat', new Chat(this));
         this.registerModule('hud', new Hud(this));
     },
 
-    registerModule: function(moduleName, module) {
+    registerModule(moduleName, module) {
         if (this.modules.hasOwnProperty(moduleName)) {
             throw Error('Error: module already registered.');
         }
@@ -27,15 +27,15 @@ extend(Register.prototype, {
         this.modules[moduleName] = module;
     },
 
-    updateSelfState: function(data) {
+    updateSelfState(data) {
         this.modules.hud.updateSelfState(data);
     },
 
-    updateChat: function(data) {
+    updateChat(data) {
         this.modules.chat.updateChat(data);
     },
 
-    sendMessage: function(/*message*/) {
+    sendMessage(/*message*/) {
         console.log('Sending message.');
     }
 

@@ -6,12 +6,12 @@
 
 import $ from 'jquery';
 
-var ListenerModule = {
+let ListenerModule = {
 
-    registerTouch: function() {
+    registerTouch() {
         // Low-level swipe manipulation
         $(window).on('touchstart', function(ev) {
-            var e = ev.originalEvent;
+            let e = ev.originalEvent;
             console.log(e);
 
             /** Usage:
@@ -27,7 +27,7 @@ var ListenerModule = {
         });
 
         $(window).on('touchmove', function(ev) {
-            var e = ev.originalEvent;
+            let e = ev.originalEvent;
             console.log(e);
 
             /** Usage:
@@ -39,7 +39,7 @@ var ListenerModule = {
         });
 
         $(window).on('touchend', function(ev) {
-            var e = ev.originalEvent;
+            let e = ev.originalEvent;
             console.log(e);
 
             /** Example:
@@ -66,7 +66,7 @@ var ListenerModule = {
         $(window).on('swiperight', function(ev) {console.log(ev);});
     },
 
-    unregisterTouch: function() {
+    unregisterTouch() {
         $(window).off('touchstart');
         $(window).off('touchend');
         $(window).off('touchmove');

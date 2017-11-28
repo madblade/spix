@@ -13,7 +13,7 @@ import { MouseModule }      from './mouse/mouse.js';
 import { TouchModule }      from './touch/touch.js';
 import { WindowModule }     from './window/window.js';
 
-var UI = function(app) {
+let UI = function(app) {
     this.app = app;
 
     // User customizable settings.
@@ -34,8 +34,8 @@ var UI = function(app) {
 
 extend(UI.prototype, {
 
-    run: function() {
-        var graphicsEngine = this.app.engine.graphics;
+    run() {
+        let graphicsEngine = this.app.engine.graphics;
 
         // TODO detect device (PC, tablet, smartphone, VR <- lol)
         this.setupKeyboard();
@@ -46,11 +46,11 @@ extend(UI.prototype, {
         $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
     },
 
-    stop: function() {
+    stop() {
         this.stopListeners();
     },
 
-    stopListeners: function() {
+    stopListeners() {
         this.stopKeyboardListeners();
         this.stopMouseListeners();
         this.stopTouchListeners();

@@ -6,7 +6,7 @@
 
 import extend           from '../../../extend.js';
 
-var Portal = function(
+let Portal = function(
     portalId, otherPortalId,
     chunkId, worldId, end1, end2, offset, orientation)
 {
@@ -15,13 +15,14 @@ var Portal = function(
     this.chunkId = chunkId;
     this.worldId = worldId;
 
-    var x0 = end1[0]; var x1 = end2[0];
-    var y0 = end1[1]; var y1 = end2[1];
-    var z0 = end1[2]; var z1 = end2[2];
+    let x0 = end1[0]; let x1 = end2[0];
+    let y0 = end1[1]; let y1 = end2[1];
+    let z0 = end1[2]; let z1 = end2[2];
 
     if (offset) {
-        this.tempOffset = (offset >= 0.001 && offset <= 0.999) ? offset : 0.999;
+        this.tempOffset = offset >= 0.001 && offset <= 0.999 ? offset : 0.999;
     }
+
     this.tempOrientation = orientation;
     this.tempPosition = [x0, y0, z0];
     this.tempOtherPosition = [x1, y1, z1];

@@ -4,9 +4,9 @@
 
 'use strict';
 
-var LayoutQWERTY = {
+let LayoutQWERTY = {
 
-    getQWERTY: function() {
+    getQWERTY() {
         return {
             // Arrow directional controls.
             arrowUp: 38,

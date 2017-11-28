@@ -7,63 +7,65 @@
 import extend           from '../../extend.js';
 import $                from 'jquery';
 
-var Hud = function(register) {
+let Hud = function(register) {
     this.register = register;
 };
 
 extend(Hud.prototype, {
 
-    updateSelfState: function(newState) {
+    updateSelfState(newState) {
         if (newState.hasOwnProperty('position')) {
-            var f = Math.floor;
-            var p = newState.position;
-            var text = f(p[0]) + ', ' + f(p[1]) + ', ' + f(p[2]);
+            let f = Math.floor;
+            let p = newState.position;
+            let text = `${f(p[0])}, ${f(p[1])}, ${f(p[2])}`;
             $('#position')
                 .text(text)
                 .css('color', 'orange');
         }
 
         if (newState.hasOwnProperty('diagram')) {
-            var d = newState.diagram;
+            let d = newState.diagram;
 
-            var s = d.split(/\r?\n/g);
-            var colors = ['lime', 'orange', 'red', 'cyan'];
-            for (var is = 0, il = s.length; is < il; ++is) {
+            let s = d.split(/\r?\n/g);
+            let colors = ['lime', 'orange', 'red', 'cyan'];
+            for (let is = 0, il = s.length; is < il; ++is) {
                 // Display
-                var color = 'white';
-                // colors.forEach(function(c) {
-                for (var c in colors)
-                    if (s[is].indexOf(c) > -1) color = c;
-                // });
+                let color = 'white';
+
+                for (let ic = 0; ic < colors.length; ++ic)
+                    if (s[is].indexOf(colors[ic]) > -1) {
+                        color = colors[ic];
+                        break;
+                    }
 
                 s[is] = s[is].replace(color, '');
-                s[is] = s[is].replace('{', '<span style="color:' + color + ';">');
+                s[is] = s[is].replace('{', `<span style="color:${color};">`);
                 s[is] = s[is].replace('}', '</span>');
             }
 
             s = s.join('<br />');
 
             // Wrap
-            s = '<p style="color:white;">' + s + '</p>';
+            s = `<p style="color:white;">${s}</p>`;
             $('#diagram').html(s); // .css('color', 'cyan');
         }
 
-        if (newState.hasOwnProperty('active_item')) {
-            var h = newState.active_item;
+        if (newState.hasOwnProperty('activeItem')) {
+            let h = newState.activeItem;
             $('#items')
                 .text(h)
                 .css('color', 'orange');
         }
 
-        if (newState.hasOwnProperty('item_orientation')) {
-            var or = newState.item_orientation;
+        if (newState.hasOwnProperty('itemOrientation')) {
+            let or = newState.itemOrientation;
             $('#item_orientation')
                 .text(or)
                 .css('color', 'orange');
         }
 
-        if (newState.hasOwnProperty('item_offset')) {
-            var of = newState.item_offset;
+        if (newState.hasOwnProperty('itemOffset')) {
+            let of = newState.itemOffset;
             $('#item_offset')
                 .text(of)
                 .css('color', 'orange');

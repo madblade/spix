@@ -11,7 +11,7 @@ import { LoadingState }     from './states/loading.js';
 import { SettingsState }    from './states/settings.js';
 import { HubState }         from './states/hub.js';
 
-var StateManager = function(app) {
+let StateManager = function(app) {
     this.app = app;
 
     // States
@@ -32,10 +32,10 @@ StateManager.prototype.register = [];
 // TODO [MEDIUM] refactor states strategy & dom handling
 extend(StateManager.prototype, {
 
-    registerState: function(state) {
-        var stateId = state.stateName;
-        var start = state.start;
-        var  end = state.end;
+    registerState(state) {
+        let stateId = state.stateName;
+        let start = state.start;
+        let  end = state.end;
         if (!this.states.hasOwnProperty(stateId)) {
             this.states[stateId] = {
                 start: start.bind(this),
@@ -45,7 +45,7 @@ extend(StateManager.prototype, {
     },
 
     // Low-level setState must handle every kind of state modification
-    setState: function(state, opt) {
+    setState(state, opt) {
         this.previousState = this.state;
         this.state = state;
 

@@ -29,7 +29,7 @@ import { Register }     from './modules/register/register.js';
 // import { Polyfills }    from 'modules/polyfills/polyfills.js';
 
 // Global application structure.
-var App = App || {Core : {}};
+let App = App || {Core : {}};
 // var App = App || {
 //     State: {},
 //     Core: {},
@@ -68,12 +68,12 @@ App.Core = function() {
 // Application entry point.
 extend(App.Core.prototype, {
 
-    start: function() {
+    start() {
         this.setState('loading');
         this.engine.connection.connect();
     },
 
-    stop: function() {
+    stop() {
         this.setState('loading');
         this.engine.connection.disconnect();
         this.stopGame();
@@ -84,29 +84,29 @@ extend(App.Core.prototype, {
 // Application utility.
 extend(App.Core.prototype, {
 
-    getState: function() {
+    getState() {
         return this.state.state;
     },
 
-    setState: function(state, opt) {
+    setState(state, opt) {
         this.state.setState(state, opt);
     },
 
-    isLoading: function() {
+    isLoading() {
         return this.getState() === 'loading';
     },
 
-    isFocused: function() {
+    isFocused() {
         return this.state.focus;
     },
 
-    setFocused: function(isFocused) {
+    setFocused(isFocused) {
         // Ensure output type.
         this.state.focus = !!isFocused;
     },
 
     // Called when the socket is connected.
-    connectionEstablished: function() {
+    connectionEstablished() {
         console.log('Connected.');
 
         // TODO splash screen.
@@ -119,7 +119,7 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'creation' request is emitted from Hub state.
-    requestGameCreation: function(gameType) {
+    requestGameCreation(gameType) {
         if (this.getState() !== 'hub')
             throw Error('Could not request game creation outside of Hub.');
 
@@ -129,7 +129,7 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'join' request is emitted from Hub state.
-    join: function(gameType, gameId) {
+    join(gameType, gameId) {
         if (this.getState() !== 'hub')
             throw Error('Could not request game joining outside of Hub.');
 
@@ -149,20 +149,20 @@ extend(App.Core.prototype, {
     },
 
     // Run game when joining confirmed.
-    joinedServer: function() {
+    joinedServer() {
         console.log('Joined server.');
 
         // Run game
         this.runGame();
     },
 
-    runGame: function() {
+    runGame() {
         this.engine.graphics.run();
         this.engine.controls.run();
         this.engine.audio.run();
     },
 
-    stopGame: function() {
+    stopGame() {
         this.engine.graphics.stop();
         this.engine.controls.stop();
         this.engine.audio.stop();
@@ -176,17 +176,17 @@ extend(App.Core.prototype, {
 // TODO wrapping DOM queries
 extend(App.Core.prototype, {
 
-    registerModule: function() {
+    registerModule() {
 
     },
 
-    restartModule: function() {
+    restartModule() {
 
     }
 });
 
 window.register = (function() {
-    var app = new App.Core();
+    let app = new App.Core();
     app.start();
     return app.register;
 }());

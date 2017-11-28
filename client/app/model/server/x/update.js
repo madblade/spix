@@ -7,27 +7,27 @@
 import { Portal }       from './portal.js';
 // import {}
 
-var UpdateModule = {
+let UpdateModule = {
 
-    addPortal: function(portalId, otherPortalId,
+    addPortal(portalId, otherPortalId,
                         chunkId, worldId, end1, end2, offset, orientation)
     {
-        console.log('Adding portal ' + portalId + ' and linking to ' + otherPortalId);
+        console.log(`Adding portal ${portalId} and linking to ${otherPortalId}`);
         portalId = parseInt(portalId, 10);
 
         // Build portal model.
         if (this.portals.has(portalId)) {
-            console.log('Portal ' + portalId + ' was here already...');
+            console.log(`Portal ${portalId} was here already...`);
         }
 
-        var portal = new Portal(portalId, otherPortalId,
+        let portal = new Portal(portalId, otherPortalId,
             chunkId, worldId, end1, end2, offset, orientation);
 
         // Add portal to model.
         this.portals.set(portalId, portal);
 
         // Add to world-portal model.
-        var worldPortals = this.worldToPortals.get(worldId);
+        let worldPortals = this.worldToPortals.get(worldId);
         if (worldPortals) worldPortals.add(portalId);
         else {
             worldPortals = new Set();
@@ -36,18 +36,18 @@ var UpdateModule = {
         }
     },
 
-    removePortal: function(portalId)
+    removePortal(portalId)
     {
         portalId = parseInt(portalId, 10);
 
-        var modelPortals = this.portals;
-        var worldToPortals = this.worldToPortals;
+        let modelPortals = this.portals;
+        let worldToPortals = this.worldToPortals;
 
-        console.log('Removing portal ' + portalId + ' ' + typeof portalId);
+        console.log(`Removing portal ${portalId}  ${typeof portalId}`);
 
-        var portal = modelPortals.get(portalId);
+        let portal = modelPortals.get(portalId);
         if (!portal) {
-            console.log('\t... portal ' + portalId + ' not present in model.');
+            console.log(`\t... portal ${portalId} not present in model.`);
         }
 
         // Impact model.
@@ -55,8 +55,8 @@ var UpdateModule = {
 
         // Impact world-portal model.
         if (portal) {
-            var worldId = portal.worldId;
-            var worldPortals = worldToPortals.get(worldId);
+            let worldId = portal.worldId;
+            let worldPortals = worldToPortals.get(worldId);
             worldPortals.delete(portalId);
             if (worldPortals.size < 1) worldToPortals.delete(worldId);
         }

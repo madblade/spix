@@ -6,7 +6,7 @@
 
 import extend       from '../../../extend.js';
 
-var SelfComponent = function(clientModel) {
+let SelfComponent = function(clientModel) {
     this.clientModel = clientModel;
 
     /** Model **/
@@ -41,43 +41,43 @@ var SelfComponent = function(clientModel) {
 
 extend(SelfComponent.prototype, {
 
-    init: function() {
-        var register = this.clientModel.app.register;
-        register.updateSelfState({active_item: this._clickInteraction});
-        register.updateSelfState({item_orientation: this._itemOrientation});
-        register.updateSelfState({item_offset: this._itemOffset});
+    init() {
+        let register = this.clientModel.app.register;
+        register.updateSelfState({activeItem: this._clickInteraction});
+        register.updateSelfState({itemOrientation: this._itemOrientation});
+        register.updateSelfState({itemOffset: this._itemOffset});
     },
 
     // TODO [MEDIUM] implement items
-    getCurrentItem: function() {
+    getCurrentItem() {
         return this.currentItem;
     },
 
-    getItemOrientation: function() {
+    getItemOrientation() {
         return this._itemOrientation;
     },
 
-    getItemOffset: function() {
+    getItemOffset() {
         return this._itemOffset;
     },
 
-    triggerChange: function(type, data) {
+    triggerChange(type, data) {
         this.changes.push([type, data]);
     },
 
-    processChanges: function() {
-        var changes = this.changes;
+    processChanges() {
+        let changes = this.changes;
         if (changes.length < 1) return;
 
-        var scope = this;
-        var serverSelfModel = this.clientModel.app.model.server.selfModel;
-        var graphicsEngine = this.clientModel.app.engine.graphics;
-        var register = this.clientModel.app.register;
+        let scope = this;
+        let serverSelfModel = this.clientModel.app.model.server.selfModel;
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+        let register = this.clientModel.app.register;
 
         // ENHANCEMENT [LOW]: filter & simplify
         changes.forEach(function(event) {
-            var type = event[0];
-            var data = event[1];
+            let type = event[0];
+            let data = event[1];
             if (!type || !data) return;
             switch (type) {
                 case 'camera-update':
@@ -87,9 +87,9 @@ extend(SelfComponent.prototype, {
                     graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
                     break;
                 case 'camera':
-                    var avatar = serverSelfModel.avatar;
-                    var worldId = serverSelfModel.worldId;
-                    var display;
+                    let avatar = serverSelfModel.avatar;
+                    let worldId = serverSelfModel.worldId;
+                    let display;
                     if (data[0] === 'toggle')
                         display = !serverSelfModel.displayAvatar;
                     else
@@ -107,34 +107,34 @@ extend(SelfComponent.prototype, {
                     break;
 
                 case 'interaction':
-                    var actionType = data[0];
+                    let actionType = data[0];
                     if (actionType === 'toggle') {
                         if (scope._clickInteraction === 'block') {
                             scope._clickInteraction = 'x';
                         } else if (scope._clickInteraction === 'x') {
                             scope._clickInteraction = 'block';
                         }
-                        register.updateSelfState({active_item: scope._clickInteraction});
-                    } else if (actionType === 'item_orientation') {
-                        var newOrientation = scope._itemOrientation;
-                        var orientations = scope._itemOrientations;
-                        var newOrientationId = orientations.indexOf(newOrientation);
-                        var nbOrientations = orientations.length;
+                        register.updateSelfState({activeItem: scope._clickInteraction});
+                    } else if (actionType === 'itemOrientation') {
+                        let newOrientation = scope._itemOrientation;
+                        let orientations = scope._itemOrientations;
+                        let newOrientationId = orientations.indexOf(newOrientation);
+                        let nbOrientations = orientations.length;
                         newOrientationId++; newOrientationId %= nbOrientations;
                         scope._itemOrientation = orientations[newOrientationId];
 
-                        register.updateSelfState({item_orientation: scope._itemOrientation});
-                    } else if (actionType === 'item_offset') {
-                        var deltaY = data[1];
-                        var offset = Number(scope._itemOffset);
-                        var d = Math.abs(deltaY);
+                        register.updateSelfState({itemOrientation: scope._itemOrientation});
+                    } else if (actionType === 'itemOffset') {
+                        let deltaY = data[1];
+                        let offset = Number(scope._itemOffset);
+                        let d = Math.abs(deltaY);
                         if (deltaY > 0) { // Previous
-                            scope._itemOffset = Math.min(offset + (d / 100), 0.999).toFixed(3);
+                            scope._itemOffset = Math.min(offset + d / 100, 0.999).toFixed(3);
                         } else if (deltaY < 0) { // Next
-                            scope._itemOffset = Math.max(offset - (d / 100), 0.001).toFixed(3);
+                            scope._itemOffset = Math.max(offset - d / 100, 0.001).toFixed(3);
                         }
 
-                        register.updateSelfState({item_offset: scope._itemOffset});
+                        register.updateSelfState({itemOffset: scope._itemOffset});
                     }
 
                     break;

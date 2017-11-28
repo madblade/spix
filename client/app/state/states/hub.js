@@ -7,16 +7,16 @@
 import extend               from '../../extend.js';
 import { $ }                from '../../modules/polyfills/dom.js';
 
-var HubState = function(stateManager) {
+let HubState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'hub';
 };
 
 extend(HubState.prototype, {
 
-    start: function(map) {
-        var app = this.app;
-        var content = '';
+    start(map) {
+        let app = this.app;
+        let content = '';
 
         content +=
             '<table ' +
@@ -25,11 +25,11 @@ extend(HubState.prototype, {
             'class="noselect">';
 
         map.forEach(function(value, key) {
-            for (var id = 0; id < value.length; ++id) {
+            for (let id = 0; id < value.length; ++id) {
                 content +=
                     '<tr>' +
-                        '<td>' + key + '</td>' +
-                        '<td>' + value[id] + '</td>' +
+                        `<td>${key}</td>` +
+                        `<td>${value[id]}</td>` +
                     '</tr>';
             }
         });
@@ -39,7 +39,7 @@ extend(HubState.prototype, {
             'Request 3D game creation</button></div>';
 
         // Add content then fade in.
-        var hub = $('#announce');
+        let hub = $('#announce');
         hub.empty()
             .removeClass()
             .addClass('hub')
@@ -49,9 +49,9 @@ extend(HubState.prototype, {
 
         // Add listeners.
         $('tr').click(function() {
-            var gameType = $(this).find('td:first')
+            let gameType = $(this).find('td:first')
                 .text();
-            var gid = $(this).find('td:last')
+            let gid = $(this).find('td:last')
                 .text();
 
             // Send a connection request.
@@ -68,14 +68,14 @@ extend(HubState.prototype, {
         });
     },
 
-    end: function() {
+    end() {
         // Remove jQuery listeners.
         $('tr').off('click');
         $('.game-creator').off('click');
 
         // Fade out hub announce.
         return new Promise(function(resolve) {
-            var hub = $('#announce');
+            let hub = $('#announce');
             hub.fadeOut(200, function() {
                 hub.empty().removeClass('hub');
                 resolve();

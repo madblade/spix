@@ -7,36 +7,35 @@
 import * as THREE from 'three';
 import { Screen } from './screen.js';
 
-var PortalsModule = {
+let PortalsModule = {
 
-    addStubPortalObject: function(portal) {
-        var worldId = portal.worldId; // World this portal stands in.
-        var portalId = portal.portalId;
+    addStubPortalObject(portal) {
+        let worldId = portal.worldId; // World this portal stands in.
+        let portalId = portal.portalId;
         //console.log('Adding stub: p(' + portalId + '), w(' + worldId + ')');
 
         // Get scene.
-        var scene = this.getScene(worldId, true);
+        let scene = this.getScene(worldId, true);
         // Force scene manager to create a scene.
 
         if (!scene) { // Still possible.
-            console.log('Could not load scene from ' +
-                worldId + ' (' + (typeof worldId) + ')');
+            console.log(`Could not load scene from ${worldId} (${typeof worldId}).`);
             return;
         }
 
         // Create screen.
-        var screen = this.getScreen(portalId);
+        let screen = this.getScreen(portalId);
         if (!screen) {
-            var pos = portal.tempPosition;
-            var top = portal.tempOtherPosition;
-            var tempOffset = portal.tempOffset;
-            var tempOrientation = portal.tempOrientation;
-            var portalWidth = portal.tempWidth;
-            var portalHeight = portal.tempHeight;
+            let pos = portal.tempPosition;
+            let top = portal.tempOtherPosition;
+            let tempOffset = portal.tempOffset;
+            let tempOrientation = portal.tempOrientation;
+            let portalWidth = portal.tempWidth;
+            let portalHeight = portal.tempHeight;
 
-            var width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
-            var height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
-            var rtTexture = new THREE.WebGLRenderTarget(
+            let width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
+            let height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
+            let rtTexture = new THREE.WebGLRenderTarget(
                 width, height,
                 {
                     minFilter: THREE.LinearFilter,
@@ -45,19 +44,19 @@ var PortalsModule = {
                 }
             );
 
-            var geometry = new THREE.PlaneBufferGeometry(portalWidth, portalHeight);
+            let geometry = new THREE.PlaneBufferGeometry(portalWidth, portalHeight);
             // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-            //var uvs = geometry.attributes.uv.array;
-            //var uvi = 0;
+            //let uvs = geometry.attributes.uv.array;
+            //let uvi = 0;
             // Quad 1
             //uvs[uvi++] = 1.0; uvs[uvi++] = 1.0; // 1, 1 -> top right
             //uvs[uvi++] = 0.;  uvs[uvi++] = 1.0; // 0, 1 -> top left
             //uvs[uvi++] = 1.0; uvs[uvi++] = 0.;  // 1, 0 -> bottom right
             //uvs[uvi++] = 0.;  uvs[uvi++] = 0.;  // 0, 0 -> bottom left
 
-            var portalVShader = this.getPortalVertexShader();
-            var portalFShader = this.getPortalFragmentShader();
-            var material = new THREE.ShaderMaterial({
+            let portalVShader = this.getPortalVertexShader();
+            let portalFShader = this.getPortalFragmentShader();
+            let material = new THREE.ShaderMaterial({
                 side: THREE.DoubleSide,
                 uniforms: {
                     texture1: { type:'t', value:rtTexture.texture }
@@ -65,19 +64,19 @@ var PortalsModule = {
                 vertexShader: portalVShader,
                 fragmentShader: portalFShader
             });
-            var mesh = new THREE.Mesh(geometry, material);
+            let mesh = new THREE.Mesh(geometry, material);
 
             // TODO [CRIT] orientations
             // console.log(tempOffset);
-            var x0 = parseInt(pos[0], 10);
-            var y0 = parseInt(pos[1], 10);
-            var z0 = parseInt(pos[2], 10);
+            let x0 = parseInt(pos[0], 10);
+            let y0 = parseInt(pos[1], 10);
+            let z0 = parseInt(pos[2], 10);
 
-            var x1 = parseInt(top[0], 10);
-            var y1 = parseInt(top[1], 10);
-            var z1 = parseInt(top[2], 10);
+            let x1 = parseInt(top[0], 10);
+            let y1 = parseInt(top[1], 10);
+            let z1 = parseInt(top[2], 10);
 
-            var PI2 = Math.PI / 2;
+            let PI2 = Math.PI / 2;
             if (z0 !== z1) {
                 if (tempOrientation === 'first') {
                     mesh.rotation.x = PI2;
@@ -131,10 +130,10 @@ var PortalsModule = {
     },
 
     // portal linked forward to otherPortal
-    completeStubPortalObject: function(portal, otherPortal, cameraPath, cameraTransform) {
-        var worldId = portal.worldId;
-        var portalId = portal.portalId;
-        // var otherEndId = worldId;
+    completeStubPortalObject(portal, otherPortal, cameraPath, cameraTransform) {
+        let worldId = portal.worldId;
+        let portalId = portal.portalId;
+        // let otherEndId = worldId;
         // if (otherPortal) {
         //     otherEndId = otherPortal.worldId;
         // }
@@ -145,9 +144,9 @@ var PortalsModule = {
         // w(' + worldId + '), f(' + otherPortal.portalId + ')');
 
         // Create and configure renderer, camera.
-        var screen = this.getScreen(portalId);
+        let screen = this.getScreen(portalId);
         if (!screen) {
-            console.log('Could not get screen to complete: ' + portalId);
+            console.log(`Could not get screen to complete: ${portalId}.`);
             return;
         }
 
@@ -159,26 +158,25 @@ var PortalsModule = {
         this.cameraManager.addCameraToScene(cameraPath, worldId, screen);
     },
 
-    processPortalUpdates: function() {
+    processPortalUpdates() {
         //console.log('[X] Processing portal graphical updates.');
-        var portalUpdates = this.portalUpdates;
+        let portalUpdates = this.portalUpdates;
         if (portalUpdates.length < 1) return;
-        var u;
-        var hasAddedSomething = false;
+        let u;
+        let hasAddedSomething = false;
 
         // TODO [ALG] Add portal I just crossed first (closest to destinationWid).
-        var addedFirst = [];
-        for (var i = 0; i < portalUpdates.length; ++i) {
+        let addedFirst = [];
+        for (let i = 0; i < portalUpdates.length; ++i) {
             u = portalUpdates[i];
-            console.log(u.destinationWid + ', ' + u.portal.worldId + ', '
-                + this.previousFrameWorld);
+            console.log(`${u.destinationWid}, ${u.portal.worldId}, ${this.previousFrameWorld}`);
 
-            var dwid = u.destinationWid;
-            var owid = u.portal.worldId;
-            var pwid = this.previousFrameWorld;
-            var cwid = this.currentFrameWorld;
+            let dwid = parseInt(u.destinationWid, 10);
+            let owid = parseInt(u.portal.worldId, 10);
+            let pwid = parseInt(this.previousFrameWorld, 10);
+            let cwid = parseInt(this.currentFrameWorld, 10);
 
-            if (dwid == pwid || dwid == cwid || owid == pwid || owid == cwid) {
+            if (dwid === pwid || dwid === cwid || owid === pwid || owid === cwid) {
                 //console.log('Added ' + this.previousFrameWorld + ', '
                 // + u.destinationWid);
                 this.addPortalGraphics(u.portal, u.otherPortal,
@@ -189,7 +187,7 @@ var PortalsModule = {
                 hasAddedSomething = true;
             }
         }
-        for (var j = addedFirst.length - 1; j >= 0; --j) {
+        for (let j = addedFirst.length - 1; j >= 0; --j) {
             portalUpdates.splice(addedFirst[j], 1);
         }
 
@@ -202,24 +200,24 @@ var PortalsModule = {
         }
     },
 
-    flushPortalUpdates: function() {
+    flushPortalUpdates() {
         this.portalUpdates = [];
     },
 
-    unflushPortalUpdates: function() {
-        var portalUpdates = this.portalUpdates;
-        var lastRenderPaths = this.lastRenderPaths;
-        var lastRenderGates = this.lastRenderGates;
+    unflushPortalUpdates() {
+        let portalUpdates = this.portalUpdates;
+        let lastRenderPaths = this.lastRenderPaths;
+        let lastRenderGates = this.lastRenderGates;
 
         // Remove only screens and cameras that need to be.
-        var cameraManager = this.cameraManager;
-        var sceneManager = this.sceneManager;
+        let cameraManager = this.cameraManager;
+        let sceneManager = this.sceneManager;
 
-        var rp = new Set();
-        var rg = new Set();
+        let rp = new Set();
+        let rg = new Set();
 
-        for (var i = 0, l = portalUpdates.length; i < l; ++i) {
-            var currentUpdate = portalUpdates[i];
+        for (let i = 0, l = portalUpdates.length; i < l; ++i) {
+            let currentUpdate = portalUpdates[i];
             rp.add(currentUpdate.pidPathString);
             rg.add(currentUpdate.originPid);
         }
@@ -237,11 +235,11 @@ var PortalsModule = {
         this.lastRenderGates = new Set();
     },
 
-    addPortalGraphics: function(portal, otherPortal, cameraPath, cameraTransform,
+    addPortalGraphics(portal, otherPortal, cameraPath, cameraTransform,
                                 depth, originPid, destinationPid, destinationWid, pidPathString)
     {
-        var renderRegister = this.rendererManager.getRenderRegister();
-        for (var i in renderRegister)
+        let renderRegister = this.rendererManager.getRenderRegister();
+        for (let i in renderRegister)
             if (renderRegister.hasOwnProperty(i) &&
                 renderRegister[i].id === pidPathString)
                 return; // already added.
@@ -249,9 +247,9 @@ var PortalsModule = {
         this.addStubPortalObject(portal);
         this.completeStubPortalObject(portal, otherPortal, cameraPath, cameraTransform);
 
-        var screens = this.sceneManager.screens;
-        var cameras = this.cameraManager.subCameras;
-        var scenes = this.sceneManager.subScenes;
+        let screens = this.sceneManager.screens;
+        let cameras = this.cameraManager.subCameras;
+        let scenes = this.sceneManager.subScenes;
 
         // For each camera, remember its path.
         // When rendering is performed,
@@ -260,7 +258,7 @@ var PortalsModule = {
         renderRegister.push({
             id: pidPathString,
 
-            depth: depth,
+            /*depth: */depth,
             screen1: screens.get(originPid),
             screen2: screens.get(destinationPid),
             sceneId: destinationWid,
@@ -278,36 +276,36 @@ var PortalsModule = {
         this.rendererManager.setRenderRegister(renderRegister);
     },
 
-    addPortalObject: function(portal, otherPortal, cameraPath, cameraTransform,
+    addPortalObject(portal, otherPortal, cameraPath, cameraTransform,
                               depth, originPid, destinationPid, destinationWid,
                               pidPathString)
     {
         this.portalUpdates.push({
-            portal: portal,
-            otherPortal: otherPortal,
-            cameraPath: cameraPath,
-            cameraTransform: cameraTransform,
+            /*portal: */portal,
+            /*otherPortal: */otherPortal,
+            /*cameraPath: */cameraPath,
+            /*cameraTransform: */cameraTransform,
 
-            depth: depth,
-            originPid: originPid,
-            destinationPid: destinationPid,
-            destinationWid: destinationWid,
-            pidPathString: pidPathString
+            /*depth: */depth,
+            /*originPid: */originPid,
+            /*destinationPid: */destinationPid,
+            /*destinationWid: */destinationWid,
+            /*pidPathString: */pidPathString
         });
     },
 
     // Remove link between portal (which is still present) and otherPortal
     // which is to be removed. Portal used to lead to otherPortal.
-    removePartOfPortalObject: function(portal, otherPortal/*, worldMap*/) {
-        // var worldId = portal.worldId;
+    removePartOfPortalObject(portal, otherPortal/*, worldMap*/) {
+        // let worldId = portal.worldId;
 
         //console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
 
         // Remove screen and subCameras.
-        var currentPortalId = portal.portalId;
-        var otherPortalId = otherPortal.portalId;
-        var screenToBeRemoved = this.getScreen(otherPortalId);
-        var screenToBeAltered = this.getScreen(currentPortalId);
+        let currentPortalId = portal.portalId;
+        let otherPortalId = otherPortal.portalId;
+        let screenToBeRemoved = this.getScreen(otherPortalId);
+        let screenToBeAltered = this.getScreen(currentPortalId);
 
         // 1 portal <=> 1 screen
         // But beware! 1 portal <=> multiple cameras.
@@ -335,16 +333,16 @@ var PortalsModule = {
     },
 
     // Remove the aforementioned portal.
-    removePortalObject: function(portal/*, worldMap*/) {
-        // var worldId = portal.worldId;
+    removePortalObject(portal/*, worldMap*/) {
+        // let worldId = portal.worldId;
 
-        var currentPortalId = portal.portalId;
+        let currentPortalId = portal.portalId;
 
-        console.log('Removing full portal: p(' + portal.portalId + ')');
+        console.log(`Removing full portal: p(${portal.portalId})`);
         // TODO [CRIT] search in depth and remove every portal in the chain.
 
         // 1 screen <-> 1 portal
-        var screenToBeRemoved = this.getScreen(currentPortalId);
+        let screenToBeRemoved = this.getScreen(currentPortalId);
 
         this.removeScreen(screenToBeRemoved.screenId);
     }

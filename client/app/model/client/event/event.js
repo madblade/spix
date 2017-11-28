@@ -9,7 +9,7 @@ import extend                   from '../../../extend.js';
 import { TriggersModule }       from './event.triggers.js';
 import { ActiveControlsModule } from './event.activecontrols.js';
 
-var EventComponent = function(clientModel) {
+let EventComponent = function(clientModel) {
     this.clientModel = clientModel;
 
     this.eventsToPush = [];
@@ -20,13 +20,13 @@ var EventComponent = function(clientModel) {
 
 extend(EventComponent.prototype, {
 
-    init: function() {
+    init() {
         this.activeControls = this.getActiveControls(); // TODO put in self model
     },
 
-    triggerEvent: function(type, data) {
-        var clientSelfModel = this.clientModel.selfComponent;
-        var serverSelfModel = this.clientModel.app.model.server.selfModel;
+    triggerEvent(type, data) {
+        let clientSelfModel = this.clientModel.selfComponent;
+        let serverSelfModel = this.clientModel.app.model.server.selfModel;
 
         switch (type) {
             case 'm':
@@ -39,17 +39,17 @@ extend(EventComponent.prototype, {
                 this.triggerRotation(type, data);
                 break;
             case 'ray': // Ray casted.
-                var i = clientSelfModel.clickInteraction;
+                let i = clientSelfModel.clickInteraction;
                 if (i.isBlock()) {
-                    if (data[0] == 'add') {
+                    if (data[0] === 'add') {
                         // From inventory, select block to be added.
                         data.splice(-3, 3);
                         data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
                     }
                     this.triggerBlock('b', data);
                 } else if (i.isX()) {
-                    var fx1 = data[1]; var fy1 = data[2]; var fz1 = data[3];
-                    var fx2 = data[4]; var fy2 = data[5]; var fz2 = data[6];
+                    let fx1 = data[1]; let fy1 = data[2]; let fz1 = data[3];
+                    let fx2 = data[4]; let fy2 = data[5]; let fz2 = data[6];
                     if (fx2 < fx1) { data[1] = fx2; data[4] = fx1; }
                     if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
                     if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
@@ -70,20 +70,20 @@ extend(EventComponent.prototype, {
         this.numberOfEvents++;
     },
 
-    pushEvents: function() {
-        var connectionEngine = this.clientModel.app.engine.connection;
-        var events = this.eventsToPush;
-        var currentEvent;
+    pushEvents() {
+        let connectionEngine = this.clientModel.app.engine.connection;
+        let events = this.eventsToPush;
+        let currentEvent;
 
-        var maxNumberOfEvents = this.maxNumberOfEventsPer16ms;
+        let maxNumberOfEvents = this.maxNumberOfEventsPer16ms;
         if (this.numberOfEvents > maxNumberOfEvents) {
             this.filterEvents(); // Remove unnecessary events.
-            console.log('Calm down, user... ' + this.numberOfEvents);
+            console.log(`Calm down, user... ${this.numberOfEvents} unstacked events detected.`);
         }
 
         // Push to server
         // TODO [PERF] simplify and aggregate per client.
-        for (var eventId = 0, length = events.length; eventId < length; ++eventId) {
+        for (let eventId = 0, length = events.length; eventId < length; ++eventId) {
             currentEvent = events[eventId];
             connectionEngine.send(currentEvent[0], currentEvent[1]);
         }
@@ -93,13 +93,13 @@ extend(EventComponent.prototype, {
         this.numberOfEvents = 0;
     },
 
-    getEventsOfType: function(type) {
-        var events = this.eventsToPush;
-        var result = [];
+    getEventsOfType(type) {
+        let events = this.eventsToPush;
+        let result = [];
 
         // N.B. prefer straight cache-friendly traversals
-        for (var eventId = 0, length = events.length; eventId < length; ++eventId) {
-            var currentEvent = events[eventId];
+        for (let eventId = 0, length = events.length; eventId < length; ++eventId) {
+            let currentEvent = events[eventId];
 
             if (currentEvent[0] === type) {
                 result.push(currentEvent);
@@ -109,14 +109,14 @@ extend(EventComponent.prototype, {
         return result;
     },
 
-    filterEvents: function() {
-        var events = this.eventsToPush;
-        var filteredEvents = [];
-        var lastRotation;
+    filterEvents() {
+        let events = this.eventsToPush;
+        let filteredEvents = [];
+        let lastRotation;
 
         // Remove all rotations except the last.
-        for (var i = 0, l = events.length; i < l; ++i) {
-            var currentEvent = events[i];
+        for (let i = 0, l = events.length; i < l; ++i) {
+            let currentEvent = events[i];
             if (currentEvent[0] !== 'r') {
                 lastRotation = events[i];
             }

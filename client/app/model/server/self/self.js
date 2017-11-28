@@ -8,7 +8,7 @@ import extend               from '../../../extend.js';
 
 import { InventoryModule }  from './inventory.js';
 
-var SelfModel = function(app) {
+let SelfModel = function(app) {
     this.app = app;
     this.xModel = null;
 
@@ -20,10 +20,10 @@ var SelfModel = function(app) {
     // Model component.
     this.position = null;
     this.rotation = null;
-    this.inventory = this.getInventory();
+    // this.inventory = this.getInventory();
 
     // Graphical component.
-    // var graphics = app.engine.graphics;
+    // let graphics = app.engine.graphics;
     this.worldNeedsUpdate = false;
     this.needsUpdate = false;
     this.displayAvatar = false;
@@ -35,34 +35,34 @@ extend(SelfModel.prototype, InventoryModule);
 
 extend(SelfModel.prototype, {
 
-    init: function() {
-        var graphics = this.app.engine.graphics;
+    init() {
+        let graphics = this.app.engine.graphics;
         this.loadSelf(graphics);
     },
 
-    refresh: function() {
+    refresh() {
         if (!this.needsUpdate) return;
 
-        var register = this.app.register;
-        var graphics = this.app.engine.graphics;
-        var clientModel = this.app.model.client;
+        let register = this.app.register;
+        let graphics = this.app.engine.graphics;
+        let clientModel = this.app.model.client;
 
-        var avatar = this.avatar;
-        var up = this.position;
-        var r = this.rotation;
-        var id = this.entityId;
+        let avatar = this.avatar;
+        let up = this.position;
+        let r = this.rotation;
+        let id = this.entityId;
 
-        if (!(graphics.controls) || !avatar) return;
+        if (!graphics.controls || !avatar) return;
 
-        var p = avatar.position;
+        let p = avatar.position;
 
         if (this.worldNeedsUpdate && this.oldWorldId) {
             console.log('Updating world!');
             console.log(this.worldId);
-            var xModel = this.xModel;
-            var worldId = this.worldId;
-            var oldWorldId = this.oldWorldId;
-            var displayAvatar = this.displayAvatar;
+            let xModel = this.xModel;
+            let worldId = this.worldId;
+            let oldWorldId = this.oldWorldId;
+            let displayAvatar = this.displayAvatar;
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
             graphics.switchToScene(oldWorldId, worldId);
@@ -75,7 +75,7 @@ extend(SelfModel.prototype, {
             //console.log('Updating position!');
             //console.log(up);
 
-            var animate = p.x !== up[0] || p.y !== up[1];
+            let animate = p.x !== up[0] || p.y !== up[1];
             p.x = up[0]; p.y = up[1]; p.z = up[2];
 
             // Notify modules.
@@ -98,15 +98,15 @@ extend(SelfModel.prototype, {
         this.needsUpdate = false;
     },
 
-    updateSelf: function(p, r, w) {
+    updateSelf(p, r, w) {
         w = w.toString();
 
-        var pos = this.position;
-        var rot = this.rotation;
-        var wid = this.worldId;
+        let pos = this.position;
+        let rot = this.rotation;
+        let wid = this.worldId;
         if (!pos || !rot ||
-            pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2]
-            || rot[0] !== r[0] || rot[1] !== r[1])
+            pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2] ||
+            rot[0] !== r[0] || rot[1] !== r[1])
         {
             this.position = p;
             this.rotation = r;
@@ -120,24 +120,24 @@ extend(SelfModel.prototype, {
         }
     },
 
-    loadSelf: function(graphics) {
+    loadSelf(graphics) {
         // Player id '-1' never used by any other entity.
-        var entityId = this.entityId;
-        var worldId = this.worldId;
+        let entityId = this.entityId;
+        let worldId = this.worldId;
 
         graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
-            var object3d = graphics.finalizeEntity(entityId, createdEntity);
+            let object3d = graphics.finalizeEntity(entityId, createdEntity);
             this.avatar = object3d;
             if (this.displayAvatar) graphics.addToScene(object3d, worldId);
         }.bind(this));
     },
 
-    getSelfPosition: function() {
+    getSelfPosition() {
         return this.position;
     },
 
-    getHeadPosition: function() {
-        var head = this.avatar.getHead();
+    getHeadPosition() {
+        let head = this.avatar.getHead();
         if (!head) return null;
         return head.position;
     }

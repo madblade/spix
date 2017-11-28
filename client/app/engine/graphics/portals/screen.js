@@ -6,7 +6,7 @@
 
 import extend from '../../../extend.js';
 
-var Screen = function(screenId, mesh, renderTarget, worldId) {
+let Screen = function(screenId, mesh, renderTarget, worldId) {
     this.screenId = screenId;
     this.mesh = mesh;
     this.renderTarget = renderTarget;
@@ -20,32 +20,32 @@ var Screen = function(screenId, mesh, renderTarget, worldId) {
 
 extend(Screen.prototype, {
 
-    getId: function() {
+    getId() {
         return this.screenId;
     },
 
-    getMesh: function() {
+    getMesh() {
         return this.mesh;
     },
 
-    getRenderTarget: function() {
+    getRenderTarget() {
         return this.renderTarget;
     },
 
-    getWorldId: function() {
+    getWorldId() {
         return this.worldId;
     },
 
-    getOtherWorldId: function() {
+    getOtherWorldId() {
         return this.otherWorldId;
     },
 
-    setOtherWorldId: function(otherWorldId) {
+    setOtherWorldId(otherWorldId) {
         this.otherWorldId = otherWorldId;
     },
 
-    isLinked: function() {
-        return (this.otherWorldId !== null || this.otherWorldId !== undefined);
+    isLinked() {
+        return this.otherWorldId !== null || this.otherWorldId !== undefined;
     }
 
 });

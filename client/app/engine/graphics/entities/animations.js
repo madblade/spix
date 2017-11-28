@@ -4,17 +4,17 @@
 
 'use strict';
 
-var AnimationsModule = {
+let AnimationsModule = {
 
-    initializeAnimations: function() {
+    initializeAnimations() {
         this.prevTime = Date.now();
         this.mixers = new Map();
     },
 
-    updateAnimation: function(entityId) {
-        var mixer = this.mixers.get(entityId);
+    updateAnimation(entityId) {
+        let mixer = this.mixers.get(entityId);
         if (mixer !== undefined) {
-            var time = Date.now();
+            let time = Date.now();
             mixer.update((time - this.prevTime) * 0.001);
             this.prevTime = time;
         }

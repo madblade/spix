@@ -28,7 +28,7 @@ import extend           from '../../../extend.js';
 
 import { XGraph }       from './tree.js';
 
-var WorldMap = function(xModel) {
+let WorldMap = function(xModel) {
     this.xModel = xModel;
 
     this.xGraph = null;
@@ -38,21 +38,21 @@ var WorldMap = function(xModel) {
 
 extend(WorldMap.prototype, {
 
-    switchRoot: function(oldRootId, newRootId) {
+    switchRoot(oldRootId, newRootId) {
         this.xGraph.switchRoot(oldRootId, newRootId);
         this.invalidate();
     },
 
-    computeWorldMap: function() {
-        var portals = this.xModel.portals;
-        var starterWorldId = this.xModel.selfModel.worldId;
+    computeWorldMap() {
+        let portals = this.xModel.portals;
+        let starterWorldId = this.xModel.selfModel.worldId;
 
-        var xGraph = new XGraph(parseInt(starterWorldId, 10));
+        let xGraph = new XGraph(parseInt(starterWorldId, 10));
 
-        var forwardPortalId;
-        var forwardPortal;
-        var forwardWorldId;
-        var currentWorldId;
+        let forwardPortalId;
+        let forwardPortal;
+        let forwardWorldId;
+        let currentWorldId;
 
         portals.forEach(function(portal, portalId) {
             currentWorldId = portal.worldId;
@@ -74,28 +74,28 @@ extend(WorldMap.prototype, {
         return this;
     },
 
-    computeFlatGraph: function() {
+    computeFlatGraph() {
         return this.xGraph.computeFlatGraph();
     },
 
-    computeRenderingGraph: function(graphicsEngine) {
+    computeRenderingGraph(graphicsEngine) {
         return this.xGraph.computeRenderingGraph(graphicsEngine, this.xModel);
     },
 
-    invalidate: function() {
+    invalidate() {
         this.needsUpdate = true;
         return this;
     },
 
     // Representation
-    renderString: function() {
+    renderString() {
         this.computeWorldMap();
         this.string = this.xGraph.computeFlatGraph().toString();
         this.needsUpdate = false;
         return this.string;
     },
 
-    toString: function() {
+    toString() {
         if (this.needsUpdate) this.renderString();
         return this.string;
     }

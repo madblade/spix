@@ -13,7 +13,7 @@ import { ControlsModule }   from './settings.controls.js';
 import { GraphicsModule }   from './settings.graphics.js';
 import { HomeModule }       from './settings.home.js';
 
-var Settings = function(app) {
+let Settings = function(app) {
     this.app = app;
 
     this.listeners = [];
@@ -21,8 +21,8 @@ var Settings = function(app) {
 
 extend(Settings.prototype, {
 
-    run: function() {
-        var app = this.app;
+    run() {
+        let app = this.app;
 
         this.controlsEngine =   app.engine.controls;
         this.stateManager =     app.state;
@@ -51,10 +51,10 @@ extend(Settings.prototype, {
         }.bind(this));
     },
 
-    stop: function() {
+    stop() {
         // Fade out settings menu.
         return new Promise(function(resolve) {
-            var settings = $('#announce');
+            let settings = $('#announce');
             settings.fadeOut(200, function() {
                 settings.empty().removeClass('settings');
                 resolve();
@@ -62,9 +62,9 @@ extend(Settings.prototype, {
         });
     },
 
-    unlisten: function() {
+    unlisten() {
         this.listeners.forEach(function(listener) {
-            var element = $('#' + listener);
+            let element = $(`#${listener}`);
             element.off('click');
             element.off('keydown');
         });

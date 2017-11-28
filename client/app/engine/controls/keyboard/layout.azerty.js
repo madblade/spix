@@ -4,9 +4,9 @@
 
 'use strict';
 
-var LayoutAZERTY = {
+let LayoutAZERTY = {
 
-    getAZERTY: function() {
+    getAZERTY() {
         return {
             // Arrow directional controls.
             arrowUp: 38,

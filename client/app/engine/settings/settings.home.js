@@ -6,9 +6,9 @@
 
 import $ from 'jquery';
 
-var HomeModule = {
+let HomeModule = {
 
-    getHomeHTML: function() {
+    getHomeHTML() {
         return  '<table class="table table-bordered" style="width:100%" class="noselect">' +
             '<tr id="graphics"><td>Graphics</td></tr>' +
             '<tr id="gameplay"><td>Gameplay</td></tr>' +
@@ -17,11 +17,11 @@ var HomeModule = {
             '</table>';
     },
 
-    goHome: function() {
+    goHome() {
 
     },
 
-    listenHome: function() {
+    listenHome() {
         $('#graphics').click(function() { this.goGraphics(); }.bind(this));
         $('#gameplay').click(function() { this.goControls(); }.bind(this));
         $('#audio').click(function() { this.goAudio(); }.bind(this));
@@ -36,13 +36,13 @@ var HomeModule = {
         this.listeners.push('graphics', 'gameplay', 'audio', 'return');
     },
 
-    unlistenHome: function() {
+    unlistenHome() {
         $('#graphics').off('click');
         $('#gameplay').off('click');
         $('#audio').off('click');
     },
 
-    listenReturn: function() {
+    listenReturn() {
         $('#return').click(function() {
             $('#return').off('click');
             $('#announce')

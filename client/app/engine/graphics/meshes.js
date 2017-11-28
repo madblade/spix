@@ -6,10 +6,10 @@
 
 import * as THREE from 'three';
 
-var MeshesModule = {
+let MeshesModule = {
 
-    createGeometry: function(whatGeometry) {
-        var geometry;
+    createGeometry(whatGeometry) {
+        let geometry;
 
         switch (whatGeometry) {
             case 'plane':
@@ -27,7 +27,7 @@ var MeshesModule = {
         return geometry;
     },
 
-    createMesh: function(geometry, material) {
+    createMesh(geometry, material) {
         return new THREE.Mesh(geometry, material);
     }
 

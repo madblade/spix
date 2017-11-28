@@ -2,22 +2,22 @@
 
 import extend           from '../../../extend.js';
 
-var Entity = function(graphicalComponent, worldId) {
+let Entity = function(graphicalComponent, worldId) {
     this.graphicalComponent = graphicalComponent;
     this.worldId = worldId;
 };
 
 extend(Entity.prototype, {
 
-    getObject3D: function() {
+    getObject3D() {
         return this.graphicalComponent;
     },
 
-    getWorldId: function() {
+    getWorldId() {
         return this.worldId;
     },
 
-    setWorldId: function(worldId) {
+    setWorldId(worldId) {
         this.worldId = worldId;
     }
 

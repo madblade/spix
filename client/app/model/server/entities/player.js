@@ -8,13 +8,13 @@ import * as THREE from 'three';
 
 import { Entity } from './entity.js';
 
-var PlayerModule = {
+let PlayerModule = {
 
-    loadCube: function(id, updatedEntity, graphics, entities)
+    loadCube(id, updatedEntity, graphics, entities)
     {
         // TODO [LOW] do it in graphics
-        var wrapper = new THREE.Object3D();
-        var cube = graphics.createMesh(
+        let wrapper = new THREE.Object3D();
+        let cube = graphics.createMesh(
             graphics.createGeometry('box'),
             graphics.createMaterial('flat-phong')
         );
@@ -23,20 +23,20 @@ var PlayerModule = {
         wrapper.rotation.y = Math.PI;
         wrapper._id = id;
 
-        var entity = new Entity(wrapper,
+        let entity = new Entity(wrapper,
             parseInt(updatedEntity.w, 10));
         graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
         this.updateEntity(id, entity, updatedEntity, graphics, entities);
     },
 
-    loadPlayer: function(id, updatedEntity, graphics, entities)
+    loadPlayer(id, updatedEntity, graphics, entities)
     {
         graphics.initializeEntity(id, 'steve',
             function(createdEntity) {
-                var object3D = graphics.finalizeEntity(id, createdEntity);
+                let object3D = graphics.finalizeEntity(id, createdEntity);
 
-                var entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
+                let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
                 graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
                 this.updateEntity(id, entity, updatedEntity, graphics, entities);

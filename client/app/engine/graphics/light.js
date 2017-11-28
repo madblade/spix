@@ -6,10 +6,10 @@
 
 import * as THREE from 'three';
 
-var LightModule = {
+let LightModule = {
 
-    createLight: function(whatLight) {
-        var light;
+    createLight(whatLight) {
+        let light;
 
         switch (whatLight) {
             case 'hemisphere':

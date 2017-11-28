@@ -8,34 +8,38 @@ import $ from 'jquery';
 
 $.fn.center = function() {
     this.css('position', 'absolute');
-    this.css('top', Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
-            $(window).scrollTop()) + 'px');
-    this.css('left', Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
-            $(window).scrollLeft()) + 'px');
+    let topPx = Math.max(0, ($(window).height() - $(this).outerHeight()) / 2 +
+        $(window).scrollTop());
+    let leftPx = Math.max(0, ($(window).width() - $(this).outerWidth()) / 2 +
+        $(window).scrollLeft());
+
+    this.css('left', `${leftPx}px`);
+    this.css('top', `${topPx}px`);
+
     return this;
 };
 
 $(window).resize(function() {$('#announce').center();});
 
 (function(jQuery) {
-    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
-    var toBind = ('onwheel' in document || document.documentMode >= 9) ?
+    let toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
+    let toBind = 'onwheel' in document || document.documentMode >= 9 ?
             ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'];
-    var slice  = Array.prototype.slice;
-    var nullLowestDeltaTimeout; var lowestDelta;
+    let slice  = Array.prototype.slice;
+    let nullLowestDeltaTimeout; let lowestDelta;
 
     if (jQuery.event.fixHooks) {
-        for (var i = toFix.length; i;) {
+        for (let i = toFix.length; i;) {
             jQuery.event.fixHooks[toFix[--i]] = jQuery.event.mouseHooks;
         }
     }
 
-    var special = jQuery.event.special.mousewheel = {
+    let special = jQuery.event.special.mousewheel = {
         version: '3.1.12',
 
-        setup: function() {
+        setup() {
             if (this.addEventListener) {
-                for (var j = toBind.length; j;) {
+                for (let j = toBind.length; j;) {
                     this.addEventListener(toBind[--j], handler, false);
                 }
             } else {
@@ -46,9 +50,9 @@ $(window).resize(function() {$('#announce').center();});
             jQuery.data(this, 'mousewheel-page-height', special.getPageHeight(this));
         },
 
-        teardown: function() {
+        teardown() {
             if (this.removeEventListener) {
-                for (var j = toBind.length; j;) {
+                for (let j = toBind.length; j;) {
                     this.removeEventListener(toBind[--j], handler, false);
                 }
             } else {
@@ -59,16 +63,16 @@ $(window).resize(function() {$('#announce').center();});
             jQuery.removeData(this, 'mousewheel-page-height');
         },
 
-        getLineHeight: function(elem) {
-            var $elem = jQuery(elem);
-            var $parent = $elem['offsetParent' in jQuery.fn ? 'offsetParent' : 'parent']();
+        getLineHeight(elem) {
+            let $elem = jQuery(elem);
+            let $parent = $elem['offsetParent' in jQuery.fn ? 'offsetParent' : 'parent']();
             if (!$parent.length) {
                 $parent = jQuery('body');
             }
             return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
         },
 
-        getPageHeight: function(elem) {
+        getPageHeight(elem) {
             return jQuery(elem).height();
         },
 
@@ -79,24 +83,25 @@ $(window).resize(function() {$('#announce').center();});
     };
 
     jQuery.fn.extend({
-        mousewheel: function(fn) {
+        mousewheel(fn) {
             return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
         },
 
-        unmousewheel: function(fn) {
+        unmousewheel(fn) {
             return this.unbind('mousewheel', fn);
         }
     });
 
-    function handler(event) {
-        var orgEvent   = event || window.event;
-        var args       = slice.call(arguments, 1);
-        var delta      = 0;
-        var deltaX     = 0;
-        var deltaY     = 0;
-        var absDelta   = 0;
-        var offsetX    = 0;
-        var offsetY    = 0;
+    function handler(...argts) {
+        let event = argts[0];
+        let orgEvent   = event || window.event;
+        let args       = slice.call(argts, 1);
+        let delta      = 0;
+        let deltaX     = 0;
+        let deltaY     = 0;
+        let absDelta   = 0;
+        let offsetX    = 0;
+        let offsetY    = 0;
         event = jQuery.event.fix(orgEvent);
         event.type = 'mousewheel';
 
@@ -134,12 +139,12 @@ $(window).resize(function() {$('#announce').center();});
         //   * deltaMode 1 is by lines
         //   * deltaMode 2 is by pages
         if (orgEvent.deltaMode === 1) {
-            var lineHeight = jQuery.data(this, 'mousewheel-line-height');
+            let lineHeight = jQuery.data(this, 'mousewheel-line-height');
             delta  *= lineHeight;
             deltaY *= lineHeight;
             deltaX *= lineHeight;
         } else if (orgEvent.deltaMode === 2) {
-            var pageHeight = jQuery.data(this, 'mousewheel-page-height');
+            let pageHeight = jQuery.data(this, 'mousewheel-page-height');
             delta  *= pageHeight;
             deltaY *= pageHeight;
             deltaX *= pageHeight;
@@ -172,7 +177,7 @@ $(window).resize(function() {$('#announce').center();});
 
         // Normalise offsetX and offsetY properties
         if (special.settings.normalizeOffset && this.getBoundingClientRect) {
-            var boundingRect = this.getBoundingClientRect();
+            let boundingRect = this.getBoundingClientRect();
             offsetX = event.clientX - boundingRect.left;
             offsetY = event.clientY - boundingRect.top;
         }

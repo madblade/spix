@@ -7,7 +7,7 @@
 import extend from '../../extend.js';
 import { Sound } from './sound.js';
 
-var Audio = function(app) {
+let Audio = function(app) {
     this.app = app;
 
     // User customizable settings.
@@ -23,14 +23,14 @@ var Audio = function(app) {
 
 extend(Audio.prototype, {
 
-    run: function() {
-        var audioContext;
+    run() {
+        let audioContext;
         function loadSound(name, callback) {
-            var xObj = new XMLHttpRequest();
-            xObj.open('GET', 'audio/' + name + '.mp3', true);
+            let xObj = new XMLHttpRequest();
+            xObj.open('GET', `audio/${name}.mp3`, true);
             xObj.responseType = 'arraybuffer';
             xObj.onreadystatechange = function() {
-                if (xObj.readyState == 4 && xObj.status == '200') {
+                if (parseInt(xObj.readyState, 10) === 4 && parseInt(xObj.status, 10) === 200) {
                     audioContext.decodeAudioData(xObj.response, function(buffer) {
                         callback(buffer);
                     });
@@ -43,7 +43,7 @@ extend(Audio.prototype, {
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
             this.audioContext = new AudioContext();
 
-            var sounds = this.sounds;
+            let sounds = this.sounds;
             sounds.all.forEach(function(sound) {
                 loadSound(sound, function(buffer) {
                     sounds[sound] = new Sound(sound, buffer);
@@ -58,12 +58,12 @@ extend(Audio.prototype, {
         }
     },
 
-    stop: function() {
+    stop() {
         this.stopAllSounds();
     },
 
-    stopAllSounds: function() {
-        var sounds = this.sounds;
+    stopAllSounds() {
+        let sounds = this.sounds;
         sounds.all.forEach(function(sound) {
             if (sounds[sound].source !== null && sounds[sound].playing) {
                 sounds[sound].source.stop();

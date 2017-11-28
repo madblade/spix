@@ -4,14 +4,14 @@
 
 'use strict';
 
-var TriggersModule = {
+let TriggersModule = {
 
-    triggerMovement: function(type, data) {
-        var ak = this.activeControls;
-        var events = this.eventsToPush;
-        var addEvent = function() { events.push([type, data]); };
+    triggerMovement(type, data) {
+        let ak = this.activeControls;
+        let events = this.eventsToPush;
+        let addEvent = function() { events.push([type, data]); };
 
-        var sameTypeEvents = this.getEventsOfType(type);
+        let sameTypeEvents = this.getEventsOfType(type);
         if (sameTypeEvents.length > 0) {
             // TODO compress events
         }
@@ -80,8 +80,8 @@ var TriggersModule = {
         }
     },
 
-    triggerAction: function(type, data) {
-        var events = this.eventsToPush;
+    triggerAction(type, data) {
+        let events = this.eventsToPush;
 
         switch (data) {
             case 'g':
@@ -92,13 +92,13 @@ var TriggersModule = {
         }
     },
 
-    triggerRotation: function(type, data) {
-        var events = this.eventsToPush;
+    triggerRotation(type, data) {
+        let events = this.eventsToPush;
         events.push([type, data]);
     },
 
-    triggerBlock: function(type, data) {
-        var events = this.eventsToPush;
+    triggerBlock(type, data) {
+        let events = this.eventsToPush;
         events.push([type, data]);
     }
 

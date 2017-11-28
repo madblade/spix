@@ -4,33 +4,33 @@
 
 'use strict';
 
-var FirstPersonModule = {
+let FirstPersonModule = {
 
-    getFirstPersonControls: function() {
-        var graphics = this.app.engine.graphics;
+    getFirstPersonControls() {
+        let graphics = this.app.engine.graphics;
 
-        var scope = this;
-        var onMouseMove = function(event) {
+        let scope = this;
+        let onMouseMove = function(event) {
             if (!scope.threeControlsEnabled) return;
-            var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+            let movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+            let movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
             // TODO [MEDIUM] differentiate controls type in graphics
 
-            //var rotation = graphics.cameraManager.moveCameraFromMouse(movementX, movementY);
+            //let rotation = graphics.cameraManager.moveCameraFromMouse(movementX, movementY);
             // TODO [CRIT] 3Dize
 
             graphics.cameraManager.addCameraRotationEvent(movementX, movementY, 0, 0);
         };
 
         return {
-            stopListeners : function() { document.removeEventListener('mousemove', onMouseMove, false); },
-            startListeners : function() { document.addEventListener('mousemove', onMouseMove, false); }
+            stopListeners() { document.removeEventListener('mousemove', onMouseMove, false); },
+            startListeners() { document.addEventListener('mousemove', onMouseMove, false); }
             /*
-             , getDirection : function () {
+             , getDirection() {
              // assumes the camera itself is not rotated
-             var direction = new THREE.Vector3(0, 0, -1);
-             var rotation = new THREE.Euler(0, 0, 0, "XYZ");
+             let direction = new THREE.Vector3(0, 0, -1);
+             let rotation = new THREE.Euler(0, 0, 0, "XYZ");
              return function (v) {
              rotation.set(pitchObject.rotation.x, yawObject.rotation.z, 0);
              v.copy(direction).applyEuler(rotation);

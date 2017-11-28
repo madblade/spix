@@ -6,9 +6,9 @@
 
 import extend           from '../../../extend.js';
 
-var XNode;
-var XArc;
-var XGraph;
+let XNode;
+let XArc;
+let XGraph;
 
 XNode = function(nodeId, parentArc) {
     this.nodeId = nodeId;
@@ -22,42 +22,42 @@ XNode = function(nodeId, parentArc) {
 
 extend(XNode.prototype, {
 
-    getNodeId: function() {
+    getNodeId() {
         return this.nodeId;
     },
 
-    getNumberOfChildren: function() {
+    getNumberOfChildren() {
         return this.childrenArcs.length;
     },
 
-    addExistingChild: function(arcId, node, xgraph) {
-        var arc = new XArc(this, node, arcId);
+    addExistingChild(arcId, node, xgraph) {
+        let arc = new XArc(this, node, arcId);
         xgraph.setArc(arcId, this);
         node.parentArcs.push(arc);
         this.childrenArcs.push(arc);
         return node;
     },
 
-    addNewChild: function(arcId, nodeId, xgraph) {
-        var node = new XNode(nodeId);
-        var arc = new XArc(this, node, arcId);
+    addNewChild(arcId, nodeId, xgraph) {
+        let node = new XNode(nodeId);
+        let arc = new XArc(this, node, arcId);
         xgraph.setArc(arcId, arc);
         node.parentArcs.push(arc);
         this.childrenArcs.push(arc);
         return node;
     },
 
-    getParentArcs: function() {
+    getParentArcs() {
         if (this.parentArcs === null)
             throw Error('Root has no parent.');
         return this.parentArcs;
     },
 
-    getChildrenArcs: function() {
+    getChildrenArcs() {
         return this.childrenArcs;
     },
 
-    forEachChild: function(callback) {
+    forEachChild(callback) {
         this.childrenArcs.forEach(function(arc) {
             callback(arc);
         });
@@ -73,15 +73,15 @@ XArc = function(parentNode, childNode, arcId) {
 
 extend(XArc.prototype, {
 
-    getChild: function() {
+    getChild() {
         return this.childNode;
     },
 
-    getParent: function() {
+    getParent() {
         return this.parentNode;
     },
 
-    getArcId: function() {
+    getArcId() {
         return this.arcId;
     }
 
@@ -101,21 +101,21 @@ XGraph = function(rootId) {
 // Arcs for portals.
 extend(XGraph.prototype, {
 
-    setArc: function(arcId, arc) {
+    setArc(arcId, arc) {
         if (this.arcs.has(arcId)) console.log('XGraph: adding an existing arc to the graph.');
         this.arcs.set(arcId, arc);
     },
 
-    insertNode: function(newArcId, forwardArcId, newNodeId, parentNodeId) {
-        newArcId = newArcId + ',' + forwardArcId;
+    insertNode(newArcId, forwardArcId, newNodeId, parentNodeId) {
+        newArcId = `${newArcId},${forwardArcId}`;
 
-        var node = this.nodes.get(parentNodeId);
+        let node = this.nodes.get(parentNodeId);
         if (!node) {
             node = new XNode(parentNodeId, null);
             this.nodes.set(parentNodeId, node);
         }
 
-        var newNode = this.nodes.get(newNodeId);
+        let newNode = this.nodes.get(newNodeId);
         if (newNode) {
             // N.B. graph passed to add arc to model
             node.addExistingChild(newArcId, newNode, this);
@@ -127,27 +127,27 @@ extend(XGraph.prototype, {
         return newNode;
     },
 
-    hasNode: function(nodeId) {
+    hasNode(nodeId) {
         return this.nodes.has(nodeId);
     },
 
-    getNode: function(nodeId) {
+    getNode(nodeId) {
         return this.nodes.get(nodeId);
     },
 
-    switchRoot: function(oldRootId, newRootId) {
+    switchRoot(oldRootId, newRootId) {
         // Allow only 1-length switch at a time.
-        var oldRoot = this.root;
+        let oldRoot = this.root;
         if (oldRoot.getNodeId() !== oldRootId) {
             console.log('XGraph Error: trying to switch from invalid root.');
             return;
         }
 
-        var children = oldRoot.getChildrenArcs();
+        let children = oldRoot.getChildrenArcs();
         if (!children) return; // No other world.
 
-        var currentArc; var currentNode; var currentNodeId;
-        for (var cid = 0, nbc = children.length; cid < nbc; ++cid) {
+        let currentArc; let currentNode; let currentNodeId;
+        for (let cid = 0, nbc = children.length; cid < nbc; ++cid) {
             currentArc = children[cid];
             currentNode = currentArc.getChild();
             if (!currentNode) continue;
@@ -164,59 +164,59 @@ extend(XGraph.prototype, {
     // Given an arc (portal), breadth-first apply a function
     // that go from it (or the root) to the leaves or to a specified arc id.
     // Generic BFS.
-    applyFromPosition: function(starterArcId, deepestArcId, callback) {
-        var starterNode = this.root;
+    applyFromPosition(starterArcId, deepestArcId, callback) {
+        let starterNode = this.root;
         if (starterArcId) {
-            var starterArc = this.arcs.get(starterArcId);
+            let starterArc = this.arcs.get(starterArcId);
             if (!starterArc) { console.log('Error at XGraph: starter arc not found.'); return; }
             starterNode = starterArc.getChild();
         }
 
-        var arcMarkers = new Set();
-        var nodeMarkers = new Map();
+        let arcMarkers = new Set();
+        let nodeMarkers = new Map();
         nodeMarkers.set(starterNode.getNodeId(), 0); // node id, depth
 
-        var stack = [];
-        var paths = []; // Arc paths. Nodes are easily deduced.
-        var depths = [];
+        let stack = [];
+        let paths = []; // Arc paths. Nodes are easily deduced.
+        let depths = [];
 
-        var starterArcs = starterNode.childrenArcs;
+        let starterArcs = starterNode.childrenArcs;
         if (!starterArcs) { console.log('XGraph: no arc found.'); return; }
         starterArcs.forEach(function(arc) {
             stack.push(arc);
-            paths.push('' + arc.getArcId());
+            paths.push(`${arc.getArcId()}`);
             depths.push(1);
         });
 
-        var maxDepth = Number.POSITIVE_INFINITY;
+        let maxDepth = Number.POSITIVE_INFINITY;
 
-        var head; var depth; var path;
+        let head; let depth; let path;
         while (stack.length > 0) {
             // Get current element.
             head = stack.pop();
             path = paths.pop();
             depth = depths.pop();
 
-            var currentId = head.getArcId();
+            let currentId = head.getArcId();
             arcMarkers.add(currentId);
             if (currentId === deepestArcId) {
                 maxDepth = depth;
             }
 
-            var childNode = head.getChild();
+            let childNode = head.getChild();
             if (childNode && nodeMarkers.get(childNode.getNodeId()) < depth) continue;
 
             // Do callback.
             callback(head, path, depth);
 
             // Prepare next elements.
-            var newDepth = depth + 1;
+            let newDepth = depth + 1;
             if (newDepth > maxDepth) continue;
             // No other arc to process?
             if (!childNode) continue;
             // Node was already processed?
-            var testNodeId = childNode.getNodeId();
-            var testRecursedNode = nodeMarkers.get(testNodeId);
+            let testNodeId = childNode.getNodeId();
+            let testRecursedNode = nodeMarkers.get(testNodeId);
             if (testRecursedNode < newDepth) {
                 // Here, node was already encountered,
                 // so it is marked to avoid 1-step recursion.
@@ -224,26 +224,26 @@ extend(XGraph.prototype, {
             }
             nodeMarkers.set(testNodeId, newDepth);
 
-            var childrenArcs = childNode.getChildrenArcs();
-            for (var i = 0, l = childrenArcs.length; i < l; ++i) {
-                var arc = childrenArcs[i];
+            let childrenArcs = childNode.getChildrenArcs();
+            for (let i = 0, l = childrenArcs.length; i < l; ++i) {
+                let arc = childrenArcs[i];
 
-                var addedArcId = arc.getArcId();
+                let addedArcId = arc.getArcId();
                 if (!arcMarkers.has(addedArcId)) {
                     stack.push(arc);
                     depths.push(newDepth);
-                    paths.push(path + ',' + addedArcId);
+                    paths.push(`${path},${addedArcId}`);
                 }
             }
         }
     },
 
-    toString: function() {
-        var string = '';
-        var flatGraph = this.flatGraph;
+    toString() {
+        let string = '';
+        let flatGraph = this.flatGraph;
 
-        var currentStep;
-        for (var i = 0, l = flatGraph.length; i < l; ++i) {
+        let currentStep;
+        for (let i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];
             // 0: depth
             // 1: type
@@ -256,32 +256,33 @@ extend(XGraph.prototype, {
             // 3: wid origin
             // 4: wid destination
 
-            var dep = currentStep.depth;
-            var mod = currentStep.type;
-            var por = currentStep.pid;
-            var ori = currentStep.origin;
-            var ele = currentStep.destination;
-            var pat = currentStep.path;
-            var wpt = currentStep.wpath;
+            let dep = currentStep.depth;
+            let mod = currentStep.type;
+            let por = currentStep.pid;
+            let ori = currentStep.origin;
+            let ele = currentStep.destination;
+            let pat = currentStep.path;
+            let wpt = currentStep.wpath;
 
-            for (var j = 0, d = dep; j < d; ++j) string += '\u00a0\u00a0\u00a0';
-            string += mod + ' w.' + ori + 'w.{' + ele + '} p.' + por + ' // ' + pat + '|' + wpt;
+            for (let j = 0, d = dep; j < d; ++j) string += '\u00a0\u00a0\u00a0';
+            string +=
+                `${mod} w.${ori} w.{${ele}} p.${por} // ${pat}|${wpt}`;
             string += '\n';
         }
 
         return string;
     },
 
-    computeCameraTransform: function(pidPath/*, portals, cameraManager*/) {
-        // var root = cameraManager.mainCamera;
-        var cameraTransform = [
+    computeCameraTransform(pidPath/*, portals, cameraManager*/) {
+        // let root = cameraManager.mainCamera;
+        let cameraTransform = [
             0, 0, 0, // Position
             0, 0, 0  // Rotation
         ];
 
-        for (var pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
-            // var currentPid = parseInt(pidPath[pathId][0], 10);
-            // var currentP = portals.get(currentPid);
+        for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
+            // let currentPid = parseInt(pidPath[pathId][0], 10);
+            // let currentP = portals.get(currentPid);
 
             // TODO [CRIT] compute transform
         }
@@ -290,21 +291,21 @@ extend(XGraph.prototype, {
     },
 
     // Add cameras and everything and so on.
-    computeRenderingGraph: function(graphicsEngine, xModel) {
-        var flatGraph = this.flatGraph;
+    computeRenderingGraph(graphicsEngine, xModel) {
+        let flatGraph = this.flatGraph;
         if (flatGraph.length < 1) return;
         graphicsEngine.flushPortalUpdates();
 
-        var cameraManager = graphicsEngine.cameraManager;
-        // var worldToPortals = xModel.worldToPortals;
+        let cameraManager = graphicsEngine.cameraManager;
+        // let worldToPortals = xModel.worldToPortals;
 
-        var portals = xModel.portals; // Fixed by xModel
+        let portals = xModel.portals; // Fixed by xModel
 
-        var currentStep; var destinationWid; var originPid; var destinationPid;
-        // var originWid; var widPath;
-        var pidPathString; var pidPath; var depth;
-        var cameraTransform;
-        for (var i = 0, l = flatGraph.length; i < l; ++i) {
+        let currentStep; let destinationWid; let originPid; let destinationPid;
+        // let originWid; let widPath;
+        let pidPathString; let pidPath; let depth;
+        let cameraTransform;
+        for (let i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];
             // originWid       = currentStep.origin;
             destinationWid  = currentStep.destination;
@@ -321,12 +322,12 @@ extend(XGraph.prototype, {
                     // Add screen.
                     // Add camera.
                     // Add path to camera.
-                    var p1 = portals.get(originPid);
-                    var p2 = portals.get(destinationPid);
+                    let p1 = portals.get(originPid);
+                    let p2 = portals.get(destinationPid);
                     if (!p1 || !p2) {
-                        console.log('Problem while adding portal ' + originPid +
-                            ' / ' + destinationPid);
-                        console.log('Origin: ' + p1 + ', Destination ' + p2); continue;
+                        console.log(`Problem while adding portal ${originPid}` +
+                            ` / ${destinationPid}`);
+                        console.log(`Origin: ${p1}, Destination ${p2}`); continue;
                     }
 
                     cameraTransform = this.computeCameraTransform(pidPath, portals, cameraManager);
@@ -372,30 +373,30 @@ extend(XGraph.prototype, {
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.
-    computeFlatGraph: function() {
-        var flatGraph = [];
-        var currentStep;
+    computeFlatGraph() {
+        let flatGraph = [];
+        let currentStep;
 
-        var currentElement;
-        var currentElementId;
-        var currentArc;
-        var currentArcId;
-        var currentOtherEnd;
+        let currentElement;
+        let currentElementId;
+        let currentArc;
+        let currentArcId;
+        let currentOtherEnd;
 
-        var currentPidPath; var currentWidPath;
-        var marks = new Set(); // Verification.
-        var markedPaths = new Set();
-        var queueNodes = [this.root];
-        var queueOtherEnds = [null];
+        let currentPidPath; let currentWidPath;
+        let marks = new Set(); // Verification.
+        let markedPaths = new Set();
+        let queueNodes = [this.root];
+        let queueOtherEnds = [null];
 
-        var currentDepth = 0;
-        var queueWidPaths = [''];
-        var queuePidPaths = [''];
-        var queueDepth = [currentDepth];
-        var queueArcs = [null];
-        var elementDepths = new Map();
-        var elementPaths = new Map();
-        var elementProcessed = false;
+        let currentDepth = 0;
+        let queueWidPaths = [''];
+        let queuePidPaths = [''];
+        let queueDepth = [currentDepth];
+        let queueArcs = [null];
+        let elementDepths = new Map();
+        let elementPaths = new Map();
+        let elementProcessed = false;
 
         // DFS.
         while (queueNodes.length > 0) {
@@ -409,14 +410,14 @@ extend(XGraph.prototype, {
 
             elementProcessed = marks.has(currentElementId);
             //
-            var b = currentPidPath.split(';');
-            var c = b.pop().split(',')
+            let b = currentPidPath.split(';');
+            let c = b.pop().split(',')
                 .reverse();
             b.pop(); b.push(c);
-            var directInvolutionPath = b.join(';');
+            let directInvolutionPath = b.join(';');
             //
-            var e = currentPidPath.split(';'); e.pop(); e.join(';');
-            var widArray = currentWidPath.split(';');
+            let e = currentPidPath.split(';'); e.pop(); e.join(';');
+            let widArray = currentWidPath.split(';');
 
             if (currentArc) {
                 currentArcId = currentArc.getArcId();
@@ -474,14 +475,14 @@ extend(XGraph.prototype, {
                 marks.add(currentElementId);
                 markedPaths.add(currentPidPath);
 
-                var nextDepth = currentDepth + 1;
-                var childrenArcs = currentElement.getChildrenArcs();
-                for (var i = 0, l = childrenArcs.length; i < l; ++i) {
-                    var arc = childrenArcs[i];
+                let nextDepth = currentDepth + 1;
+                let childrenArcs = currentElement.getChildrenArcs();
+                for (let i = 0, l = childrenArcs.length; i < l; ++i) {
+                    let arc = childrenArcs[i];
                     queueArcs.push(arc);
                     queueNodes.push(arc.getChild());
 
-                    var sep = '';
+                    let sep = '';
                     if (currentPidPath.length > 0 && arc.getArcId()) sep = ';';
                     queuePidPaths.push(currentPidPath + sep + arc.getArcId());
 

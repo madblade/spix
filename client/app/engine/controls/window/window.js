@@ -5,11 +5,11 @@
 'use strict';
 
 // Legacy
-var WindowModule = {
+let WindowModule = {
 
-    setupWindowListeners: function() {
-        var visibilityChange;
-        var hidden;
+    setupWindowListeners() {
+        let visibilityChange;
+        let hidden;
 
         if (typeof document.hidden !== 'undefined') {
             // Opera 12.10 and Firefox 18 and later support
@@ -29,7 +29,7 @@ var WindowModule = {
         }
 
         // TODO [MEDIUM] check for double-deactivation
-        var handlerVisibilityChange = function() {
+        let handlerVisibilityChange = function() {
             if (document[hidden]) {
                 this.stopKeyboardListeners();
             } else {
@@ -38,20 +38,20 @@ var WindowModule = {
         }.bind(this);
 
         this.windowListeners = {
-            start: function() {
+            start() {
                 document.addEventListener(visibilityChange, handlerVisibilityChange, false);
             },
-            stop: function() {
+            stop() {
                 document.removeEventListener(visibilityChange, handlerVisibilityChange);
             }
         };
     },
 
-    startWindowListeners: function() {
+    startWindowListeners() {
         this.windowListeners.start();
     },
 
-    stopWindowListeners: function() {
+    stopWindowListeners() {
         this.windowListeners.stop();
     }
 

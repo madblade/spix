@@ -6,13 +6,13 @@
 
 import $ from 'jquery';
 
-var GraphicsModule = {
+let GraphicsModule = {
 
-    getGraphicsHTML: function(graphicsSettings) {
-        var content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+    getGraphicsHTML(graphicsSettings) {
+        let content = '<table class="table table-bordered" style="width:100%" class="noselect">';
 
-        for (var s in graphicsSettings) {
-            content += '<tr><td>' + graphicsSettings[s] + '</td></tr>';
+        for (let s in graphicsSettings) {
+            content += `<tr><td>${graphicsSettings[s]}</td></tr>`;
         }
 
         content += '<tr id="return"><td>Return</td></tr>';
@@ -20,7 +20,7 @@ var GraphicsModule = {
         return content;
     },
 
-    goGraphics: function() {
+    goGraphics() {
         this.unlistenHome();
         $('#announce')
             .empty()
@@ -28,7 +28,7 @@ var GraphicsModule = {
         this.listenReturn();
     },
 
-    listenGraphics: function() {
+    listenGraphics() {
 
     }
 

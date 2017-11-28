@@ -7,15 +7,15 @@
 import * as THREE from 'three';
 import extend from '../../../extend.js';
 
-var Camera = function(fov, aspect, nearPlane, farPlane, worldId)
+let Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 {
     // Wrap for primitive manipulation simplicity.
-    var camera = new THREE.PerspectiveCamera(fov, aspect, nearPlane, farPlane);
+    let camera = new THREE.PerspectiveCamera(fov, aspect, nearPlane, farPlane);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
-    var pitch = new THREE.Object3D();
-    var yaw = new THREE.Object3D();
-    var up = new THREE.Object3D();
+    let pitch = new THREE.Object3D();
+    let yaw = new THREE.Object3D();
+    let up = new THREE.Object3D();
     pitch.add(camera);
     yaw.add(pitch);
     up.add(yaw);
@@ -40,121 +40,121 @@ var Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 
 extend(Camera.prototype, {
 
-    setCameraId: function(cameraId) {
+    setCameraId(cameraId) {
         this.cameraId = cameraId;
     },
 
-    getCameraId: function() {
+    getCameraId() {
         return this.cameraId;
     },
 
-    setWorldId: function(worldId) {
+    setWorldId(worldId) {
         this.worldId = worldId;
     },
 
-    getWorldId: function() {
+    getWorldId() {
         return this.worldId;
     },
 
-    getRecorder: function() {
+    getRecorder() {
         return this.cameraObject;
     },
 
-    get3DObject: function() {
+    get3DObject() {
         return this.up;
     },
 
-    getCameraPosition: function() {
+    getCameraPosition() {
         return this.up.position;
     },
 
-    getUpRotation: function() {
+    getUpRotation() {
         return this.up.rotation;
     },
 
-    rotateX: function(deltaX) {
-        var pitch = this.pitch;
+    rotateX(deltaX) {
+        let pitch = this.pitch;
         pitch.rotation.x += deltaX;
         pitch.rotation.x = Math.max(0, Math.min(Math.PI, pitch.rotation.x));
     },
 
-    rotateZ: function(deltaZ) {
-        var yaw = this.yaw;
+    rotateZ(deltaZ) {
+        let yaw = this.yaw;
         yaw.rotation.z += deltaZ;
     },
 
-    setUpRotation: function(x, y, z) {
-        var up = this.up;
+    setUpRotation(x, y, z) {
+        let up = this.up;
         up.rotation.x = x;
         up.rotation.y = y;
         up.rotation.z = z;
     },
 
-    getXRotation: function() {
+    getXRotation() {
         return this.pitch.rotation.x;
     },
 
-    setXRotation: function(rotationX) {
+    setXRotation(rotationX) {
         this.pitch.rotation.x = rotationX;
     },
 
-    getZRotation: function() {
+    getZRotation() {
         return this.yaw.rotation.z;
     },
 
-    setZRotation: function(rotationZ) {
+    setZRotation(rotationZ) {
         this.yaw.rotation.z = rotationZ;
     },
 
-    copyCameraPosition: function(otherCamera) {
+    copyCameraPosition(otherCamera) {
         if (otherCamera) {
-            var up = this.up.position;
-            var oup = otherCamera.getCameraPosition();
+            let up = this.up.position;
+            let oup = otherCamera.getCameraPosition();
             up.x = oup.x;
             up.y = oup.y;
             up.z = oup.z;
         }
     },
 
-    copyCameraUpRotation: function(otherCamera) {
+    copyCameraUpRotation(otherCamera) {
         if (otherCamera) {
-            var ur = this.up.rotation;
-            var our = otherCamera.getUpRotation();
+            let ur = this.up.rotation;
+            let our = otherCamera.getUpRotation();
             ur.x = our.x;
             ur.y = our.y;
             ur.z = our.z;
         }
     },
 
-    setCameraPosition: function(x, y, z) {
-        var up = this.up;
+    setCameraPosition(x, y, z) {
+        let up = this.up;
         up.position.x = x;
         up.position.y = y;
         up.position.z = z - .7999;
     },
 
-    setScreen: function(screen) {
+    setScreen(screen) {
         if (screen) this.screen = screen;
     },
 
-    getScreen: function() {
+    getScreen() {
         return this.screen; // || (function() {throw Error('Screen ' + this.getCameraId + ' undefined')})();
     },
 
-    setCameraTransform: function(cameraTransform) {
+    setCameraTransform(cameraTransform) {
         this.cameraTransform = cameraTransform;
     },
 
-    getCameraTransform: function() {
+    getCameraTransform() {
         return this.cameraTransform;
     },
 
-    setFirstPerson: function() {
+    setFirstPerson() {
         this.cameraObject.position.z = 0;
     },
 
-    setThirdPerson: function() {
-        var p = this.cameraObject.position;
+    setThirdPerson() {
+        let p = this.cameraObject.position;
         p.x = 0;
         p.y = 0;
         p.z = 4;
@@ -162,4 +162,4 @@ extend(Camera.prototype, {
 
 });
 
-module.exports = Camera;
+export { Camera };

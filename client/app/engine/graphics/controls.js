@@ -4,12 +4,12 @@
 
 'use strict';
 
-var ControlsModule = {
+let ControlsModule = {
 
-    initializeControls: function() {
-        var controlsEngine = this.app.engine.controls;
-        var selfModel = this.app.model.server.selfModel;
-        var worldId = selfModel.worldId;
+    initializeControls() {
+        let controlsEngine = this.app.engine.controls;
+        let selfModel = this.app.model.server.selfModel;
+        let worldId = selfModel.worldId;
 
         this.controls = controlsEngine.getControls('first-person');
 
@@ -17,15 +17,15 @@ var ControlsModule = {
         this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
     },
 
-    startListeners: function() {
+    startListeners() {
         this.controls.startListeners();
     },
 
-    stopListeners: function() {
+    stopListeners() {
         this.controls.stopListeners();
     },
 
-    changeAvatarVisibility: function(display, avatar, worldId) {
+    changeAvatarVisibility(display, avatar, worldId) {
         if (display)
             this.addToScene(avatar, worldId);
         else

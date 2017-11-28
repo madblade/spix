@@ -11,9 +11,9 @@ import { LayoutAZERTY }     from './layout.azerty.js';
 import { LayoutQWERTY }     from './layout.qwerty.js';
 import { LayoutCustom }     from './layout.custom.js';
 
-var KeyboardModule = {
+let KeyboardModule = {
 
-    setupKeyboard: function() {
+    setupKeyboard() {
         // Try to detect user language
         this.settings.language = window.navigator.userLanguage || window.navigator.language || 'en-US';
 
@@ -24,15 +24,15 @@ var KeyboardModule = {
         this.keyControls = this.getKeyControls(this.settings.language);
 
         // Tweak for filtering some events...
-        this.tweak = 0;
+        // this.tweak = 0;
     },
 
-    startKeyboardListeners: function() {
+    startKeyboardListeners() {
         this.registerKeyDown();
         this.registerKeyUp();
     },
 
-    stopKeyboardListeners: function() {
+    stopKeyboardListeners() {
         this.stopKeyboardInteraction();
         this.unregisterKeyDown();
         this.unregisterKeyUp();
@@ -46,7 +46,7 @@ var KeyboardModule = {
      * @param newBinding
      *      Optional. For custom layouts, a new [action, key] binding.
      */
-    changeLayout: function(newLayout, dontRestartListeners, newBinding) {
+    changeLayout(newLayout, dontRestartListeners, newBinding) {
         // Prevent keys from being fired when configuring.
         this.stopKeyboardListeners();
 

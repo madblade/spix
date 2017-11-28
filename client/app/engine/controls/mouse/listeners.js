@@ -6,11 +6,11 @@
 
 import { $ }                from '../../../modules/polyfills/dom.js';
 
-var ListenerModule = {
+let ListenerModule = {
 
-    registerMouseDown: function() {
-        var scope = this;
-        var app = this.app;
+    registerMouseDown() {
+        let scope = this;
+        let app = this.app;
 
         $(window).mousedown(function(event) {
             if (app.getState() !== 'ingame') return;
@@ -36,34 +36,34 @@ var ListenerModule = {
         });
     },
 
-    onLeftMouseDown: function() {
-        var clientModel = this.app.model.client;
-        //var serverModel = this.app.model.server;
-        var graphicsEngine = this.app.engine.graphics;
+    onLeftMouseDown() {
+        let clientModel = this.app.model.client;
+        //let serverModel = this.app.model.server;
+        let graphicsEngine = this.app.engine.graphics;
 
         // Perform intersection.
-        var intersects = graphicsEngine.cameraManager.performRaycast();
+        let intersects = graphicsEngine.cameraManager.performRaycast();
         if (intersects.length <= 0) {
             console.log('Nothing intersected.');
             return;
         }
         intersects.sort(function(a, b) { return a.distance > b.distance; });
-        var point = intersects[0].point;
+        let point = intersects[0].point;
 
         // Compute blocks.
-        var flo = Math.floor;
-        var abs = Math.abs;
-        //var p1 = serverModel.getSelfModel().getSelfPosition();
-        //var p2 = serverModel.getSelfModel().getHeadPosition();
-        //var px = p1[0]+p2.x, py = p1[1]+p2.y, pz = p1[2]+p2.z;
-        var p = graphicsEngine.getCameraCoordinates();
-        var px = p.x; var py = p.y; var pz = p.z;
+        let flo = Math.floor;
+        let abs = Math.abs;
+        //let p1 = serverModel.getSelfModel().getSelfPosition();
+        //let p2 = serverModel.getSelfModel().getHeadPosition();
+        //let px = p1[0]+p2.x, py = p1[1]+p2.y, pz = p1[2]+p2.z;
+        let p = graphicsEngine.getCameraCoordinates();
+        let px = p.x; let py = p.y; let pz = p.z;
 
-        var rx = point.x; var ry = point.y; var rz = point.z;
-        var dx = abs(abs(flo(rx)) - abs(rx));
-        var dy = abs(abs(flo(ry)) - abs(ry));
-        var dz = abs(abs(flo(rz)) - abs(rz));
-        var ex = dx < 0.0000001; var ey = dy < 0.0000001; var ez = dz < 0.0000001;
+        let rx = point.x; let ry = point.y; let rz = point.z;
+        let dx = abs(abs(flo(rx)) - abs(rx));
+        let dy = abs(abs(flo(ry)) - abs(ry));
+        let dz = abs(abs(flo(rz)) - abs(rz));
+        let ex = dx < 0.0000001; let ey = dy < 0.0000001; let ez = dz < 0.0000001;
 
         if (ex + ey + ez !== 1) {
             // TODO [HIGH] how do I remove an X?
@@ -71,8 +71,8 @@ var ListenerModule = {
             return;
         }
 
-        var fx1; var fy1; var fz1;
-        var positiveIsFree = true; // direct + axis is empty
+        let fx1; let fy1; let fz1;
+        let positiveIsFree = true; // direct + axis is empty
         if (ex) {
             positiveIsFree = px > rx;
             if (positiveIsFree) {
@@ -96,7 +96,7 @@ var ListenerModule = {
             }
         }
 
-        var fx2; var fy2; var fz2;
+        let fx2; let fy2; let fz2;
         if (ex) {
             fx2 = positiveIsFree ? fx1 + 1 : fx1 - 1;
             fy2 = fy1;
@@ -114,37 +114,37 @@ var ListenerModule = {
         clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2]);
     },
 
-    onRightMouseDown: function() {
-        var clientModel = this.app.model.client;
-        // var serverModel = this.app.model.server;
-        var graphicsEngine = this.app.engine.graphics;
+    onRightMouseDown() {
+        let clientModel = this.app.model.client;
+        // let serverModel = this.app.model.server;
+        let graphicsEngine = this.app.engine.graphics;
 
-        var intersects = graphicsEngine.cameraManager.performRaycast();
+        let intersects = graphicsEngine.cameraManager.performRaycast();
         if (intersects.length <= 0) {
             console.log('Nothing intersected.');
             return;
         }
         intersects.sort(function(a, b) { return a.distance > b.distance; });
-        var point = intersects[0].point;
+        let point = intersects[0].point;
 
         // Compute blocks.
-        var flo = Math.floor;
-        var abs = Math.abs;
-        var p = graphicsEngine.getCameraCoordinates();
-        var px = p.x; var py = p.y; var pz = p.z;
+        let flo = Math.floor;
+        let abs = Math.abs;
+        let p = graphicsEngine.getCameraCoordinates();
+        let px = p.x; let py = p.y; let pz = p.z;
 
-        var rx = point.x; var ry = point.y; var rz = point.z;
-        var dx = abs(abs(flo(rx)) - abs(rx));
-        var dy = abs(abs(flo(ry)) - abs(ry));
-        var dz = abs(abs(flo(rz)) - abs(rz));
-        var ex = dx < 0.0000001; var ey = dy < 0.0000001; var ez = dz < 0.0000001;
+        let rx = point.x; let ry = point.y; let rz = point.z;
+        let dx = abs(abs(flo(rx)) - abs(rx));
+        let dy = abs(abs(flo(ry)) - abs(ry));
+        let dz = abs(abs(flo(rz)) - abs(rz));
+        let ex = dx < 0.0000001; let ey = dy < 0.0000001; let ez = dz < 0.0000001;
 
         if (ex + ey + ez !== 1) {
             console.log('Error: precision on intersection @addBlock');
             return;
         }
 
-        var fx; var fy; var fz;
+        let fx; let fy; let fz;
         if (ex) {
             if (px < rx) {
                 fx = rx; fy = flo(ry); fz = flo(rz);
@@ -168,26 +168,26 @@ var ListenerModule = {
         clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 
-    onMiddleMouseDown: function() {
+    onMiddleMouseDown() {
     },
 
-    registerMouseWheel: function() {
-        var clientModel = this.app.model.client;
+    registerMouseWheel() {
+        let clientModel = this.app.model.client;
 
         $(window).mousewheel(function(event) {
-            // var ex = event.deltaX;
-            var ey = event.deltaY;
-            // var df = event.deltaFactor;
+            // let ex = event.deltaX;
+            let ey = event.deltaY;
+            // let df = event.deltaFactor;
 
-            clientModel.triggerChange('interaction', ['item_offset', ey]);
+            clientModel.triggerChange('interaction', ['itemOffset', ey]);
         });
     },
 
-    unregisterMouseDown: function() {
+    unregisterMouseDown() {
         $(window).off('mousedown');
     },
 
-    unregisterMouseWheel: function() {
+    unregisterMouseWheel() {
         $(window).off('mousewheel');
     }
 

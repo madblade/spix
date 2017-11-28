@@ -4,14 +4,14 @@
 
 'use strict';
 
-var KeysModule = {
+let KeysModule = {
 
     /**
      * Get key codes (internationalization required).
      * @param layout
      */
-    getKeyControls: function(layout) {
-        var keyControls;
+    getKeyControls(layout) {
+        let keyControls;
 
         switch (layout) {
             case 'en':
@@ -20,7 +20,7 @@ var KeysModule = {
                 keyControls = this.getQWERTY();
                 break;
 
-            case ('fr'):
+            case 'fr':
                 keyControls = this.getAZERTY();
                 break;
 

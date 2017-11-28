@@ -6,18 +6,18 @@
 
 import * as THREE from 'three';
 
-var ChunksModule = {
+let ChunksModule = {
 
-    createChunk: function(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
+    createChunk(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
     {
         // TODO don't discriminate components
         // TODO discriminate components server-side
-        var components = all[0];
-        var natures = all[1];
+        let components = all[0];
+        let natures = all[1];
 
-        var currentComponent;
-        var currentNatures;
-        for (var cid in components) {
+        let currentComponent;
+        let currentNatures;
+        for (let cid in components) {
             currentComponent = components[cid];
             currentNatures = natures[cid];
             break;
@@ -27,45 +27,46 @@ var ChunksModule = {
             console.log('Warn: missed an update'); return;
         }
 
-        var chunkIndices = chunkId.split(',');
-        var chunkI = parseInt(chunkIndices[0], 10); var iChunkOffset = chunkI * chunkSizeX;
-        var chunkJ = parseInt(chunkIndices[1], 10); var jChunkOffset = chunkJ * chunkSizeY;
-        var chunkK = parseInt(chunkIndices[2], 10); var kChunkOffset = chunkK * chunkSizeZ;
+        let chunkIndices = chunkId.split(',');
+        let chunkI = parseInt(chunkIndices[0], 10); let iChunkOffset = chunkI * chunkSizeX;
+        let chunkJ = parseInt(chunkIndices[1], 10); let jChunkOffset = chunkJ * chunkSizeY;
+        let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
 
-        var iS = chunkSizeX;
-        var ijS = chunkSizeX * chunkSizeY;
-        var ijkS = ijS * chunkSizeZ;
+        let iS = chunkSizeX;
+        let ijS = chunkSizeX * chunkSizeY;
+        let ijkS = ijS * chunkSizeZ;
 
-        var triangles = 2 * currentComponent.length;
-        var sunCapacity = Math.floor(3 / 2 * triangles);
-        sunCapacity += (sunCapacity % 2); // Make it pair
-        if (this.debug) console.log('On chunk ' + chunkId + ', init geometry will be ' + sunCapacity * 3 * 3 + '-capable.');
+        let triangles = 2 * currentComponent.length;
+        let sunCapacity = Math.floor(3 / 2 * triangles);
+        sunCapacity += sunCapacity % 2; // Make it pair
+        if (this.debug)
+            console.log(`On chunk ${chunkId}, init geometry will be ${sunCapacity * 3 * 3}-capable.`);
 
-        var positions = new Float32Array(sunCapacity * 3 * 3);
-        var normals = new Float32Array(sunCapacity * 3 * 3);
-        var colors = new Float32Array(sunCapacity * 3 * 3);
-        var uvs = new Float32Array(sunCapacity * 3 * 2);
+        let positions = new Float32Array(sunCapacity * 3 * 3);
+        let normals = new Float32Array(sunCapacity * 3 * 3);
+        let colors = new Float32Array(sunCapacity * 3 * 3);
+        let uvs = new Float32Array(sunCapacity * 3 * 2);
 
-        var pA = new THREE.Vector3(); var pB = new THREE.Vector3();
-        var pC = new THREE.Vector3(); var cb = new THREE.Vector3();
-        var ab = new THREE.Vector3(); var color = new THREE.Color();
+        let pA = new THREE.Vector3(); let pB = new THREE.Vector3();
+        let pC = new THREE.Vector3(); let cb = new THREE.Vector3();
+        let ab = new THREE.Vector3(); let color = new THREE.Color();
 
-        var whereToFindFace = new Map();
-        var whichFaceIs = new Map();
+        let whereToFindFace = new Map();
+        let whichFaceIs = new Map();
 
-        var i = 0;
-        for (var f = 0; f < currentComponent.length; ++f) {
-            var faceId = Math.abs(currentComponent[f]);
+        let i = 0;
+        for (let f = 0; f < currentComponent.length; ++f) {
+            let faceId = Math.abs(currentComponent[f]);
 
             whereToFindFace.set(faceId, [0, f]); // [In which geometry a given face is, at which position]
-            var wf0 = whichFaceIs.get(0);
+            let wf0 = whichFaceIs.get(0);
             if (wf0 === undefined) {
                 wf0 = new Map();
                 whichFaceIs.set(0, wf0);
             }
             wf0.set(f, faceId);
 
-            var normal = currentNatures[f] > 0;
+            let normal = currentNatures[f] > 0;
 
             this.addFace(faceId, i, iS, ijS, ijkS,
                 positions, normals, colors, uvs, Math.abs(currentNatures[f]),
@@ -76,42 +77,42 @@ var ChunksModule = {
             i += 18;
         }
 
-        var geometry = new THREE.BufferGeometry();
+        let geometry = new THREE.BufferGeometry();
         geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
         geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
         geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
         geometry.computeBoundingSphere();
 
-        var material = this.createMaterial('textured-phong', 0xaaaaaa);
+        let material = this.createMaterial('textured-phong', 0xaaaaaa);
 
         return {
-            geometries:       [geometry],
-            materials:        [material],
-            meshes:           [new THREE.Mesh(geometry, material)],
+            geometries:         [geometry],
+            materials:          [material],
+            meshes:             [new THREE.Mesh(geometry, material)],
 
-            capacities:       [sunCapacity / 2],
-            sizes:            [triangles / 2],
+            capacities:         [sunCapacity / 2],
+            sizes:              [triangles / 2],
 
-            whereToFindFace:  whereToFindFace,
-            whichFaceIs:      whichFaceIs
+            /*whereToFindFace:*/whereToFindFace,
+            /*whichFaceIs:    */whichFaceIs
         };
     },
 
-    updateChunk: function(worldId, chunk, chunkId, components,
+    updateChunk(worldId, chunk, chunkId, components,
                            chunkSizeX, chunkSizeY, chunkSizeZ)
     {
-        var geometries =        chunk.geometries;
-        var materials =         chunk.materials;
-        var meshes =            chunk.meshes;
-        var capacities =        chunk.capacities;
-        var sizes =             chunk.sizes;
-        var whereToFindFace =   chunk.whereToFindFace;
-        var whichFaceIs =       chunk.whichFaceIs;
+        let geometries =        chunk.geometries;
+        let materials =         chunk.materials;
+        let meshes =            chunk.meshes;
+        let capacities =        chunk.capacities;
+        let sizes =             chunk.sizes;
+        let whereToFindFace =   chunk.whereToFindFace;
+        let whichFaceIs =       chunk.whichFaceIs;
 
-        var removed =   components[0];
-        var added =     components[1];
-        var updated =   components[2];
+        let removed =   components[0];
+        let added =     components[1];
+        let updated =   components[2];
 
         this.removeChunkFaces(
             worldId, removed,
@@ -124,24 +125,24 @@ var ChunksModule = {
         this.updateChunkFaces(worldId, updated, geometries);
     },
 
-    removeChunkFaces: function(worldId, removed,
+    removeChunkFaces(worldId, removed,
                                 geometries, materials, meshes, capacities, sizes,
                                 whereToFindFace, whichFaceIs)
     {
-        var geometry; var vertices; var colors; var normals; var uvs;
-        var meshId;
+        let geometry; let vertices; let colors; let normals; let uvs;
+        let meshId;
 
-        for (var rid in removed) {
-            rid = parseInt(rid, 10);
+        for (let rrid in removed) {
+            let rid = parseInt(rrid, 10);
             // Get graphic data
             if (!whereToFindFace.has(rid)) {
-                console.log('Trying to remove a face that is not present in chunk: ' + rid);
+                console.log(`Trying to remove a face that is not present in chunk: ${rid}`);
                 continue;
             }
 
-            var wtffrid = whereToFindFace.get(rid);
+            let wtffrid = whereToFindFace.get(rid);
             meshId = wtffrid[0];
-            var position = wtffrid[1];
+            let position = wtffrid[1];
 
             geometry = geometries[meshId];
 
@@ -149,11 +150,11 @@ var ChunksModule = {
             colors =    geometry.attributes.color.array;
             normals =   geometry.attributes.normal.array;
             uvs =       geometry.attributes.uv.array;
-            var lastPosition = sizes[meshId] - 1;
-            var isLast = lastPosition === position;
+            let lastPosition = sizes[meshId] - 1;
+            let isLast = lastPosition === position;
 
             // Update
-            var i; var p;
+            let i; let p;
             if (isLast) {
                 for (i = 0; i < 18; ++i) {
                     p = 18 * position + i;
@@ -167,7 +168,7 @@ var ChunksModule = {
                 for (i = 0; i < 18; ++i) {
                     p = 18 * position + i;
                     // Swap current with last
-                    var lp = 18 * lastPosition + i;
+                    let lp = 18 * lastPosition + i;
                     vertices[p] = vertices[lp];
                     normals[p]  = normals[lp];
                     colors[p]   = colors[lp];
@@ -176,7 +177,7 @@ var ChunksModule = {
                 }
                 for (i = 0; i < 12; ++i) {
                     p = 12 * position + i;
-                    var lp1 = 12 * lastPosition + i;
+                    let lp1 = 12 * lastPosition + i;
                     uvs[p] = uvs[lp1];
                     uvs[lp1] = 0;
                 }
@@ -184,11 +185,12 @@ var ChunksModule = {
 
             // Update helpers (swap last if applicable).
             if (!isLast) {
-                var whichFaceIsMeshId = whichFaceIs.get(meshId);
+                let whichFaceIsMeshId = whichFaceIs.get(meshId);
                 if (whichFaceIsMeshId.get(lastPosition) === undefined) {
                     console.log('WARN: swapping');
-                    console.log(whichFaceIs[meshId][lastPosition] + ' @mesh ' + meshId + ' @lastposition ' +
-                        lastPosition + ' @position ' + position);
+                    console.log(
+                        `${whichFaceIs[meshId][lastPosition]} @mesh ${meshId} ` +
+                        `@lastposition ${lastPosition} @position ${position}`);
                 }
 
                 whereToFindFace.set(whichFaceIsMeshId.get(lastPosition), [meshId, position]);
@@ -221,26 +223,26 @@ var ChunksModule = {
         }
     },
 
-    addChunkFaces: function(worldId, added,
+    addChunkFaces(worldId, added,
                              geometries, materials, meshes, capacities, sizes,
                              whereToFindFace, whichFaceIs,
                              chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
     {
-        var geometry; var vertices; var colors; var normals; var uvs;
-        var meshId; var faceId;
+        let geometry; let vertices; let colors; let normals; let uvs;
+        let meshId; let faceId;
 
-        var iS = chunkSizeX;
-        var ijS = chunkSizeX * chunkSizeY;
-        var ijkS = ijS * chunkSizeZ;
+        let iS = chunkSizeX;
+        let ijS = chunkSizeX * chunkSizeY;
+        let ijkS = ijS * chunkSizeZ;
 
-        var chunkIndices = chunkId.split(',');
-        var chunkI = parseInt(chunkIndices[0], 10); var iChunkOffset = chunkI * chunkSizeX;
-        var chunkJ = parseInt(chunkIndices[1], 10); var jChunkOffset = chunkJ * chunkSizeY;
-        var chunkK = parseInt(chunkIndices[2], 10); var kChunkOffset = chunkK * chunkSizeZ;
-        var defaultGeometrySize = this.defaultGeometrySize;
+        let chunkIndices = chunkId.split(',');
+        let chunkI = parseInt(chunkIndices[0], 10); let iChunkOffset = chunkI * chunkSizeX;
+        let chunkJ = parseInt(chunkIndices[1], 10); let jChunkOffset = chunkJ * chunkSizeY;
+        let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
+        let defaultGeometrySize = this.defaultGeometrySize;
 
-        for (var aid in added) {
-            aid = parseInt(aid, 10);
+        for (let aaid in added) {
+            let aid = parseInt(aaid, 10);
 
             // Get graphic data
             faceId = Math.abs(aid);
@@ -251,22 +253,22 @@ var ChunksModule = {
 
             // Compute mesh id.
             meshId = 0;
-            var meshHasToBeAdded = false;
+            let meshHasToBeAdded = false;
             while (sizes[meshId] !== undefined && sizes[meshId] === capacities[meshId]) ++meshId;
 
             // Add new mesh if necessary.
             meshHasToBeAdded = sizes[meshId] === undefined;
 
             if (this.debug) {
-                var progress = Math.floor((sizes[meshId] / capacities[meshId]) * 100);
-                if (progress % 20 === 0) console.log('INFO: Geometry ' + meshId + ' at ' + progress + '% capacity.');
+                let progress = Math.floor(100 * sizes[meshId] / capacities[meshId]);
+                if (progress % 20 === 0) console.log(`INFO: Geometry ${meshId} at ${progress}% capacity.`);
             }
 
             if (meshHasToBeAdded) {
                 if (this.debug) {
                     console.log('INFO: Geometry addition: ' +
-                        meshId +
-                        (meshId % 10 === 1 ? 'st' : meshId % 10 === 2 ? 'nd' : meshId % 10 === 3 ? 'rd' : 'th') +
+                        `${meshId}` +
+                        `${(meshId % 10 === 1 ? 'st' : meshId % 10 === 2 ? 'nd' : meshId % 10 === 3 ? 'rd' : 'th')}` +
                         ' geometry.');
                 }
 
@@ -277,8 +279,8 @@ var ChunksModule = {
                 sizes[meshId] = 1;
                 whichFaceIs.set(meshId, new Map());
 
-                var triangles = 2 * defaultGeometrySize;
-                var sunCapacity = Math.floor(3 / 2 * triangles);
+                let triangles = 2 * defaultGeometrySize;
+                let sunCapacity = Math.floor(3 / 2 * triangles);
                 capacities[meshId] = sunCapacity / 2;
 
                 vertices = new Float32Array(sunCapacity * 3 * 3);
@@ -287,7 +289,7 @@ var ChunksModule = {
                 uvs = new Float32Array(sunCapacity * 3 * 2);
 
                 if (this.debug) {
-                    console.log('New capacity will be ' + sunCapacity * 3 * 3 + '.');
+                    console.log(`New capacity will be ${sunCapacity * 3 * 3}.`);
                 }
             } else {
                 geometry = geometries[meshId];
@@ -299,17 +301,17 @@ var ChunksModule = {
             }
 
             // Add face.
-            var pA = new THREE.Vector3();
-            var pB = new THREE.Vector3();
-            var pC = new THREE.Vector3();
-            var cb = new THREE.Vector3();
-            var ab = new THREE.Vector3();
-            var n = 800;
-            var color = new THREE.Color();
-            var pos = sizes[meshId] - 1;
+            let pA = new THREE.Vector3();
+            let pB = new THREE.Vector3();
+            let pC = new THREE.Vector3();
+            let cb = new THREE.Vector3();
+            let ab = new THREE.Vector3();
+            let n = 800;
+            let color = new THREE.Color();
+            let pos = sizes[meshId] - 1;
 
-            var nature = added[aid]; // Corresponds to block id.
-            var normal = nature > 0;
+            let nature = added[aid]; // Corresponds to block id.
+            let normal = nature > 0;
             whereToFindFace.set(aid, [meshId, pos]);
             whichFaceIs.get(meshId).set(pos, aid);
 
@@ -339,8 +341,8 @@ var ChunksModule = {
     },
 
     // TODO [LONG-TERM] manage changes
-    updateChunkFaces: function(worldId, updated, geometries) {
-        // for (var uid in updated) {
+    updateChunkFaces(worldId, updated, geometries) {
+        // for (let uid in updated) {
         // }
         if (window.debug) {
             console.log(worldId);

@@ -4,9 +4,9 @@
 
 'use strict';
 
-var ActiveControlsModule = {
+let ActiveControlsModule = {
 
-    getActiveControls: function() {
+    getActiveControls() {
         return {
             forward: false,
             backwards: false,

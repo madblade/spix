@@ -6,10 +6,10 @@
 
 import * as THREE from 'three';
 
-var MaterialsModule = {
+let MaterialsModule = {
 
-    createMaterial: function(whatMaterial, meta) {
-        var material;
+    createMaterial(whatMaterial, meta) {
+        let material;
 
         switch (whatMaterial) {
             case 'flat-phong':

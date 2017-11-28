@@ -6,7 +6,7 @@
 
 import extend       from '../../extend.js';
 
-var Hub = function(app) {
+let Hub = function(app) {
     this.app = app;
 
     this.games = new Map();
@@ -14,23 +14,23 @@ var Hub = function(app) {
 
 extend(Hub.prototype, {
 
-    update: function(data) {
+    update(data) {
         console.log('Hub fetched.');
         data = JSON.parse(data);
 
-        var app = this.app;
-        var map = this.games;
+        let app = this.app;
+        let map = this.games;
 
         // For all kinds.
-        for (var property in data) {
-            var games = data[property];
-            var thisGames = map.get(property);
+        for (let property in data) {
+            let games = data[property];
+            let thisGames = map.get(property);
 
             if (!thisGames) {
                 map.set(property, games);
             } else {
-                for (var id = 0; id < games.length; ++id) {
-                    var g = games[id];
+                for (let id = 0; id < games.length; ++id) {
+                    let g = games[id];
                     if (thisGames.indexOf(g) < 0) thisGames.push(g);
                 }
             }

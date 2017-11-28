@@ -6,18 +6,18 @@
 
 import $ from 'jquery';
 
-var PointerLockModule = {
+let PointerLockModule = {
 
-    setupPointerLock: function() {
-        var app = this.app;
+    setupPointerLock() {
+        let app = this.app;
 
         if (!('webkitPointerLockElement' in document) &&
             !('mozPointerLockElement' in document) &&
             !('pointerLockElement' in document)) return;
 
-        var scope = this;
-        var d = document;
-        var b = document.body;
+        let scope = this;
+        let d = document;
+        let b = document.body;
 
         if ('webkitPointerLockElement' in d) {
             b.requestPointerLock = b.webkitRequestPointerLock;
@@ -55,9 +55,9 @@ var PointerLockModule = {
         });
     },
 
-    requestPointerLock: function() {
-        var controlsEngine = this.app.engine.controls;
-        var b = document.body;
+    requestPointerLock() {
+        let controlsEngine = this.app.engine.controls;
+        let b = document.body;
         b.requestPointerLock();
 
         controlsEngine.startKeyboardListeners();
@@ -65,8 +65,8 @@ var PointerLockModule = {
         controlsEngine.startWindowListeners();
     },
 
-    pointerLockChanged: function(isPointerLocked) {
-        var app = this.app;
+    pointerLockChanged(isPointerLocked) {
+        let app = this.app;
         app.engine.controls.threeControlsEnabled = isPointerLocked;
 
         if (!isPointerLocked) {

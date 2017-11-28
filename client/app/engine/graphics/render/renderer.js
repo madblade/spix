@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import extend from '../../../extend.js';
 
-var RendererManager = function(graphicsEngine) {
+let RendererManager = function(graphicsEngine) {
     this.graphics = graphicsEngine;
 
     // Cap number of passes.
@@ -26,9 +26,9 @@ var RendererManager = function(graphicsEngine) {
 
 extend(RendererManager.prototype, {
 
-    createRenderer: function() {
+    createRenderer() {
         // Configure renderer
-        var renderer = new THREE.WebGLRenderer({
+        let renderer = new THREE.WebGLRenderer({
             // TODO [MEDIUM] propose different antialiasing strategy
             //antialias: true,
             alpha: true
@@ -39,40 +39,40 @@ extend(RendererManager.prototype, {
         return renderer;
     },
 
-    getRenderRegister: function() {
+    getRenderRegister() {
         return this.renderRegister;
     },
 
-    setRenderRegister: function(renderRegister) {
+    setRenderRegister(renderRegister) {
         this.renderRegister = renderRegister;
     },
 
-    render: function(sceneManager, cameraManager) {
+    render(sceneManager, cameraManager) {
         if (this.stop) return;
-        var renderer = this.renderer;
-        var renderRegister = this.renderRegister;
+        let renderer = this.renderer;
+        let renderRegister = this.renderRegister;
 
         // Render first pass.
-        var mainScene = sceneManager.mainScene;
-        var mainCamera = cameraManager.mainCamera.getRecorder();
+        let mainScene = sceneManager.mainScene;
+        let mainCamera = cameraManager.mainCamera.getRecorder();
 
         // Render every portal.
-        var renderCount = 0;
-        var renderMax = this.renderMax;
+        let renderCount = 0;
+        let renderMax = this.renderMax;
         mainScene.updateMatrixWorld();
 
-        var currentPass; var screen1; var screen2; var camera;
-        var bufferScene; var bufferCamera; var bufferTexture;
-        var otherEnd; var otherSceneId;
+        let currentPass; let screen1; let screen2; let camera;
+        let bufferScene; let bufferCamera; let bufferTexture;
+        let otherEnd; let otherSceneId;
 
-        for (var j = 0, m = renderRegister.length; j < m; ++j) {
+        for (let j = 0, m = renderRegister.length; j < m; ++j) {
             currentPass = renderRegister[j];
             bufferScene = currentPass.scene;
             if (!bufferScene) continue;
             bufferScene.updateMatrixWorld();
         }
 
-        for (var i = 0, n = renderRegister.length; i < n; ++i) {
+        for (let i = 0, n = renderRegister.length; i < n; ++i) {
             if (renderCount++ > renderMax) break;
             currentPass = renderRegister[i];
             screen1 = currentPass.screen1;
@@ -86,7 +86,7 @@ extend(RendererManager.prototype, {
 
             if (!bufferScene)   {
                 if (this.corrupted < 5) {
-                    console.log('[Renderer] Could not get buffer scene ' + currentPass.sceneId + '.');
+                    console.log(`[Renderer] Could not get buffer scene ${currentPass.sceneId}.`);
                     this.corrupted++;
                 }
 
@@ -115,19 +115,19 @@ extend(RendererManager.prototype, {
             renderer.render(bufferScene, bufferCamera, bufferTexture);
 
             //if (true) {
-                //var rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
+                //let rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
                 //rec.updateProjectionMatrix();
                 //rec.updateMatrixWorld();
                 //rec.matrixWorldInverse.getInverse(rec.matrixWorld);
             //}
 
             //if (this.thenstop) {
-                //var posX = screen1.getMesh().position;
-                //var  = localRecorder.position;
-                //var posC = new THREE.Vector3();
+                //let posX = screen1.getMesh().position;
+                //let  = localRecorder.position;
+                //let posC = new THREE.Vector3();
                 //posC.setFromMatrixPosition(mainCamera.matrixWorld);
 
-                //var me = this.graphics.app.model.server.selfModel.position;
+                //let me = this.graphics.app.model.server.selfModel.position;
 
                 //console.log('#####\nCAM POSITION');
                 //console.log(posC);
@@ -159,24 +159,24 @@ extend(RendererManager.prototype, {
         //}
     },
 
-    resize: function(width, height) {
+    resize(width, height) {
         if (!width) width = window.innerWidth;
         if (!height) height = window.innerHeight;
         this.renderer.setSize(width, height);
     },
 
-    switchAvatarToScene: function(/*sceneId*/) {
+    switchAvatarToScene(/*sceneId*/) {
         // TODO [CRIT] update render register.
-        this.renderRegister;
+        // this.renderRegister;
     }
 
 });
 
 /** Interface with graphics engine. **/
 
-var RenderersModule = {
+let RenderersModule = {
 
-    createRendererManager: function() {
+    createRendererManager() {
         return new RendererManager(this);
     }
 
