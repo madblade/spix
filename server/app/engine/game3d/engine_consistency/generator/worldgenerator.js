@@ -9,7 +9,7 @@ import ChunkGenerator from './chunkgenerator';
 class WorldGenerator {
 
     static generateFlatWorld(chunkSizeX, chunkSizeY, chunkSizeZ, world) {
-        var worldMap = new Map();
+        let worldMap = new Map();
         worldMap.set('0,0,0', WorldGenerator.generateFlatChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, world));
         return worldMap;
         /*return {
@@ -22,7 +22,7 @@ class WorldGenerator {
     }
 
     static generateFlatChunk(x, y, z, i, j, k, world) {
-        let id = i+','+j+','+k;
+        let id = `${i},${j},${k}`;
         return ChunkGenerator.createRawChunk(x, y, z, id, world);
     }
 

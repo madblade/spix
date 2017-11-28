@@ -42,10 +42,10 @@ class User {
 
     // Join a specific game.
     join(kind, gameId) {
-        gameId = parseInt(gameId);
+        gameId = parseInt(gameId, 10);
 
         this._ingame = true;
-        var game = this._hub.getGame(kind, gameId);
+        let game = this._hub.getGame(kind, gameId);
         if (!game) return false;
 
         // Stop listening for general game management events...
@@ -53,7 +53,7 @@ class User {
         this._userConnection.idle();
 
         // Create a player associated to this game and spawn it
-        var player = Factory.createPlayer(this, game);
+        let player = Factory.createPlayer(this, game);
         this._player = player;
         game.addPlayer(player);
         return true;
@@ -72,7 +72,6 @@ class User {
                 return;
             }
         }
-
     }
 
     // Leave all games (current game). Stay idle.

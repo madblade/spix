@@ -19,24 +19,24 @@ class CSFX {
 
     static inbounds(d, b, iS, ijS, capacity) {
         switch (d) {
-            case 0: return (b-1) % iS === b%iS-1; // iM
-            case 1: return (b-iS) % ijS === b%ijS-iS; // jM
-            case 2: return (b-ijS) >= 0; // kM
-            case 3: return (b+1) % iS !== 0; // iP
-            case 4: return (b+iS-(b%iS)) % ijS !== 0; // jP
-            case 5: return b+ijS < capacity; // kP
+            case 0: return (b - 1) % iS === b % iS - 1; // iM
+            case 1: return (b - iS) % ijS === b % ijS - iS; // jM
+            case 2: return b - ijS >= 0; // kM
+            case 3: return (b + 1) % iS !== 0; // iP
+            case 4: return (b + iS - b % iS) % ijS !== 0; // jP
+            case 5: return b + ijS < capacity; // kP
             default: return false;
         }
     }
 
     static empty(d, b, bs, iS, ijS) {
         switch (d) {
-            case 0: return bs[b-1] === 0; // iM
-            case 1: return bs[(b-iS)] === 0; // jM
-            case 2: return bs[b-ijS] === 0; // kM
-            case 3: return bs[b+1] === 0; // iP
-            case 4: return bs[b+iS] === 0; // jP
-            case 5: return bs[b+ijS] === 0; // kP
+            case 0: return bs[b - 1] === 0; // iM
+            case 1: return bs[b - iS] === 0; // jM
+            case 2: return bs[b - ijS] === 0; // kM
+            case 3: return bs[b + 1] === 0; // iP
+            case 4: return bs[b + iS] === 0; // jP
+            case 5: return bs[b + ijS] === 0; // kP
             default: return false;
         }
     }
@@ -79,19 +79,19 @@ class CSFX {
         const jS = dims[1];
         const kS = dims[2];
 
-        const ijS = iS*jS;
-        const capacity = ijS*kS;
+        const ijS = iS * jS;
+        const capacity = ijS * kS;
 
         let nbX = neighbourBlocks[0]; // On x+ boundary.
         let nbY = neighbourBlocks[2]; // On y+ boundary.
         let nbZ = neighbourBlocks[4]; // On z+ boundary.
 
         // Extract faces.
-        for (let z in surfaceBlocks) {
-
+        for (let z in surfaceBlocks)
+        {
             let layer = surfaceBlocks[z];
             for (let b = 0, length = layer.length; b < length; ++b) {
-                let offset = z*ijS;
+                let offset = z * ijS;
                 let idOnCurrentLayer = layer[b];
 
                 let blockId = idOnCurrentLayer + offset;
@@ -104,65 +104,65 @@ class CSFX {
                                 encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
                             ccid++;
                         }
-                    } else {
-                        if (direction >= 3) { // x+, y+, z+
-                            if (direction === 3) {
-                                const xblock = nbX[blockId-iS+1];
-                                if (block !== 0 && xblock === 0) { // i+
-                                    CSFX.setFace(3, blockId, block, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                    ccid++;
-                                }
-                                else if (block === 0 && xblock !== 0 && xblock !== undefined) { // i+
-                                    CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                    ccid++;
-                                }
-
+                    } else if (direction >= 3) { // x+, y+, z+
+                        if (direction === 3) {
+                            const xblock = nbX[blockId - iS + 1];
+                            if (block !== 0 && xblock === 0) { // i+
+                                CSFX.setFace(3, blockId, block, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                                ccid++;
                             }
-                            if (direction === 4) { // j+
-                                const yblock = nbY[blockId-ijS+iS];
-                                if (block !== 0 && yblock === 0) {
-                                    CSFX.setFace(4, blockId, block, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                    ccid++;
-                                }
-                                else if (block === 0 && yblock !== 0 && yblock !== undefined) {
-                                    CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                    ccid++;
-                                }
+                            else if (block === 0 && xblock !== 0 && xblock !== undefined) { // i+
+                                CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                                ccid++;
                             }
-                            // TODO [HIGH] check z
-                            if (direction === 5) { // k+
-                                const zblock = nbZ[blockId-capacity+ijS];
-                                if (block !== 0 && zblock === 0) {
-                                    CSFX.setFace(5, blockId, block, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                    ccid++;
-                                }
-                                else if (block === 0 && zblock !== 0 && zblock !== undefined) { // TODO [LOW] properly manage loading
-                                    CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
-                                        encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                    ccid++;
-                                }
+                        }
+                        if (direction === 4) { // j+
+                            const yblock = nbY[blockId - ijS + iS];
+                            if (block !== 0 && yblock === 0) {
+                                CSFX.setFace(4, blockId, block, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                                ccid++;
+                            }
+                            else if (block === 0 && yblock !== 0 && yblock !== undefined) {
+                                CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                                ccid++;
+                            }
+                        }
+                        // TODO [HIGH] check z
+                        if (direction === 5) { // k+
+                            const zblock = nbZ[blockId - capacity + ijS];
+                            if (block !== 0 && zblock === 0) {
+                                CSFX.setFace(5, blockId, block, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
+                                ccid++;
+                            }
+                            else if (block === 0 && zblock !== 0 && zblock !== undefined) {
+                                // TODO [LOW] properly manage loading
+                                CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
+                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
+                                ccid++;
                             }
                         }
                     }
                 }
             }
-
         }
 
         if (CSFX.debug) {
-            console.log("Surface block layers " + Object.keys(surfaceBlocks).length + ", surface faces: (" +
-                surfaceFaces[0].length + ',' + surfaceFaces[1].length + ',' + surfaceFaces[2].length+')');
-            //faces
+            console.log(
+                `Surface block layers ${Object.keys(surfaceBlocks).length} surface faces: (` +
+                `${surfaceFaces[0].length},${surfaceFaces[1].length},${surfaceFaces[2].length}`
+            );
         }
     }
 
-    static preMerge(surfaceFaces, connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk) {
-
+    static preMerge(
+        surfaceFaces, connectedComponents, encounteredFaces,
+        faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk)
+    {
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
         const ck = chunk.chunkK;
@@ -179,14 +179,14 @@ class CSFX {
         let jayCurrent = 0;
         let kayCurrent = 0;
 
-        ayes.sort(function(a, b) {return a-b});
-        jays.sort(function(a, b) {return a-b});
-        kays.sort(function(a, b) {return a-b});
+        ayes.sort(function(a, b) {return a - b;});
+        jays.sort(function(a, b) {return a - b;});
+        kays.sort(function(a, b) {return a - b;});
 
         if (CSFX.debugIJKRecursion) {
-            console.log(ayesLength + " is");
-            console.log(jaysLength + " js");
-            console.log(kaysLength + " ks");
+            console.log(`${ayesLength} is`);
+            console.log(`${jaysLength} js`);
+            console.log(`${kaysLength} ks`);
         }
         //console.log(kays);
 
@@ -195,24 +195,25 @@ class CSFX {
         if (jaysLength > 0) currentBlock = Math.min(currentBlock, jays[jayCurrent]);
         if (kaysLength > 0) currentBlock = Math.min(currentBlock, kays[kayCurrent]);
 
-        while ((ayeCurrent<ayesLength || jayCurrent<jaysLength || kayCurrent<kaysLength) && currentBlock<capacity) {
-
+        while ((ayeCurrent < ayesLength || jayCurrent < jaysLength || kayCurrent < kaysLength) &&
+            currentBlock < capacity)
+        {
             if (ayes[ayeCurrent] === currentBlock) {
-                if (CSFX.debugIJKRecursion) console.log('i ' + ayeCurrent + ' ' + ayes[ayeCurrent]);
+                if (CSFX.debugIJKRecursion) console.log(`i ${ayeCurrent} ${ayes[ayeCurrent]}`);
                 FaceLinker.linkI(ayes[ayeCurrent], connectedComponents, encounteredFaces, faces,
                     merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck);
                 ayeCurrent++;
             }
 
-            if (jays[jayCurrent] === currentBlock){
-                if (CSFX.debugIJKRecursion) console.log('j ' + jayCurrent + ' ' + jays[jayCurrent]);
+            if (jays[jayCurrent] === currentBlock) {
+                if (CSFX.debugIJKRecursion) console.log(`j ${jayCurrent} ${jays[jayCurrent]}`);
                 FaceLinker.linkJ(jays[jayCurrent], connectedComponents, encounteredFaces, faces,
                     merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck);
                 jayCurrent++;
             }
 
             if (kays[kayCurrent] === currentBlock) {
-                if (CSFX.debugIJKRecursion) console.log('k ' + kayCurrent + ' ' + kays[kayCurrent]);
+                if (CSFX.debugIJKRecursion) console.log(`k ${kayCurrent} ${kays[kayCurrent]}`);
                 FaceLinker.linkK(kays[kayCurrent], connectedComponents, encounteredFaces, faces,
                     merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck);
                 kayCurrent++;
@@ -221,9 +222,12 @@ class CSFX {
             ++currentBlock;
         }
 
-        if (kayCurrent !== kaysLength) console.log("WARN. kays not recursed: " + kayCurrent + " out of " + kaysLength);
-        if (jayCurrent !== jaysLength) console.log("WARN. jays not recursed: " + jayCurrent + " out of " + jaysLength);
-        if (ayeCurrent !== ayesLength) console.log("WARN. ayes not recursed: " + ayeCurrent + " out of " + ayesLength);
+        if (kayCurrent !== kaysLength)
+            console.log(`WARN. kays not recursed: ${kayCurrent} out of ${kaysLength}`);
+        if (jayCurrent !== jaysLength)
+            console.log(`WARN. jays not recursed: ${jayCurrent} out of ${jaysLength}`);
+        if (ayeCurrent !== ayesLength)
+            console.log(`WARN. ayes not recursed: ${ayeCurrent} out of ${ayesLength}`);
 
         if (CSFX.debug) console.log('PreMerge successufl! PreMerger state:');
         if (CSFX.debug) console.log(merger);
@@ -240,14 +244,14 @@ class CSFX {
 
     static postMerge(merger, fastCC, connectedComponents) {
         function mergeArrays(a, b) {
-            var result = a;
-            for (let i = 0; i<b.length; ++i) {
+            let result = a;
+            for (let i = 0; i < b.length; ++i) {
                 if (a.indexOf(b[i]) < 0) a.push(b[i]);
             }
             return result;
         }
 
-        var fastMerger = [];
+        let fastMerger = [];
         if (merger.length > 0) fastMerger.push([merger[0][0], merger[0][1]]);
         for (let c = 1; c < merger.length; ++c) {
             let min = Math.min(merger[c][0], merger[c][1]);
@@ -280,39 +284,40 @@ class CSFX {
         if (CSFX.debug) console.log('PostMerger initialized... PostMerger state:');
         if (CSFX.debug) console.log(fastMerger);
 
-        if (CSFX.debugPostMerger) console.log("Merger:");
+        if (CSFX.debugPostMerger) console.log('Merger:');
         if (CSFX.debugPostMerger) console.log(merger);
-        if (CSFX.debugPostMerger) console.log("Fast merger:");
+        if (CSFX.debugPostMerger) console.log('Fast merger:');
         if (CSFX.debugPostMerger) console.log(fastMerger);
-        if (CSFX.debugPostMerger) console.log("Initial components:");
+        if (CSFX.debugPostMerger) console.log('Initial components:');
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
 
         if (CSFX.forceOneComponentPerChunk) {
             fastMerger = [[]];
             let ks = Object.keys(fastCC);
-            for (let i = 0; i<ks.length; ++i) {
-                fastMerger[0].push(parseInt(ks[i]));
+            for (let i = 0; i < ks.length; ++i) {
+                fastMerger[0].push(parseInt(ks[i], 10));
             }
         }
 
         for (let k = 0, fmLength = fastMerger.length; k < fmLength; ++k) {
-            fastMerger[k].sort(function(a, b) {return a-b});
+            fastMerger[k].sort(function(a, b) {return a - b;});
             let id = fastMerger[k][0];
             if (!fastCC.hasOwnProperty(id)) {
-                console.log('PostMerger failed because of id inconsistency: ' + id);
+                console.log(`PostMerger failed because of id inconsistency: ${id}.`);
                 continue;
             }
             let componentsToMerge = fastMerger[k];
 
-            if (CSFX.debug) console.log('Merging ' +componentsToMerge.length+ ' component(s) ' + ' to ' + id +':');
+            if (CSFX.debug) console.log(
+                `Merging ${componentsToMerge.length} component(s) to ${id}:`);
             if (CSFX.debug) console.log(componentsToMerge);
 
             for (let i = 1, ctmLength = componentsToMerge.length; i < ctmLength; ++i) {
                 let toMerge = componentsToMerge[i];
-                if (CSFX.debug) console.log('\t'+toMerge);
+                if (CSFX.debug) console.log(`\t${toMerge}`);
                 if (!fastCC.hasOwnProperty(toMerge)) {
                     if (CSFX.debugPostMerger) console.log('WARN. ' +
-                        'PostMerger failed during sub-merge because of id inconsistency: ' + toMerge);
+                        `PostMerger failed during sub-merge because of id inconsistency: ${toMerge}`);
                     continue;
                 }
                 let ccToMerge = fastCC[toMerge];
@@ -330,7 +335,7 @@ class CSFX {
             }
         }
 
-        if (CSFX.debugPostMerger) console.log("Final components:");
+        if (CSFX.debugPostMerger) console.log('Final components:');
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
     }
 
@@ -374,23 +379,27 @@ class CSFX {
         const capacity = blocks.length;
 
         // Temporary variables
-        var surfaceFaces = {'0':[],'1':[],'2':[]};
-        var faces = [new Int32Array(capacity), new Int32Array(capacity), new Int32Array(capacity)];
-        var encounteredFaces = new Uint16Array(3 * capacity); // initializes all to 0
+        let surfaceFaces = {0:[], 1:[], 2:[]};
+        let faces = [new Int32Array(capacity), new Int32Array(capacity), new Int32Array(capacity)];
+        let encounteredFaces = new Uint16Array(3 * capacity); // initializes all to 0
 
         // Results
-        var connectedComponents = new Uint16Array(3 * capacity); // ditto
-        var fastCC = {};
-        var fastCCIds = {};
+        let connectedComponents = new Uint16Array(3 * capacity); // ditto
+        let fastCC = {};
+        let fastCCIds = {};
 
         // Compute raw faces.
-        CSFX.extractRawFaces(blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces, connectedComponents, dims);
+        CSFX.extractRawFaces(
+            blocks, neighbourBlocks, surfaceBlocks,
+            faces, surfaceFaces, encounteredFaces, connectedComponents, dims);
 
         // Post merger.
         let merger = [];
 
         // Triple PreMerge.
-        CSFX.preMerge(surfaceFaces, connectedComponents, encounteredFaces, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk);
+        CSFX.preMerge(
+            surfaceFaces, connectedComponents, encounteredFaces, faces,
+            merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk);
 
         // Compute fast connected components.
         CSFX.precomputeFastConnectedComponents(connectedComponents, fastCC);
@@ -405,16 +414,18 @@ class CSFX {
 
         // Debugging fastCC
         for (let i in fastCC) {
-            for (let faceId = 0; faceId < fastCC[i].length; ++faceId) {
-
+            for (let faceId = 0; faceId < fastCC[i].length; ++faceId)
+            {
                 if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId)
-                    console.log("Detected duplicate face.");
+                    console.log('Detected duplicate face.');
 
-                let dir = fastCC[i][faceId]<capacity ? 0 : fastCC[i][faceId]<2*capacity ? 1 : 2;
+                let dir = fastCC[i][faceId] < capacity ? 0 : fastCC[i][faceId] < 2 * capacity ? 1 : 2;
 
-                if (CSFX.debugFastCC) if (faces[dir][fastCC[i][faceId] % capacity] == 0)
-                    console.log("Face " + fastCC[i][faceId] + " null: "
-                    + faces[dir][fastCC[i][faceId] % capacity]);
+                if (CSFX.debugFastCC)
+                    if (faces[dir][fastCC[i][faceId] % capacity] === 0)
+                        console.log(
+                            `Face ${fastCC[i][faceId]} null: ${faces[dir][fastCC[i][faceId] % capacity]}`
+                        );
             }
         }
 
@@ -430,7 +441,8 @@ class CSFX {
             //console.log(fastCC);
             //console.log(fastCCIds);
         }
-        if (CSFX.debug) console.log(Object.keys(fastCC).length + " connected components extracted...");
+        if (CSFX.debug)
+            console.log(`${Object.keys(fastCC).length} connected components extracted...`);
     }
 
 }

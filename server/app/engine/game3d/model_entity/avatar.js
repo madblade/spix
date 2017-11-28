@@ -6,7 +6,7 @@
 
 import Entity from './entity';
 
-class Avatar extends Entity 
+class Avatar extends Entity
 {
 
     constructor(id) {
@@ -20,7 +20,7 @@ class Avatar extends Entity
         this._portalRenderDistance = 3;
 
         // Counted as a number of blocks.
-        this._entityRenderDistance = 2*8;
+        this._entityRenderDistance = 2 * 8;
 
         this._role = 0;
 

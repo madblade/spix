@@ -6,8 +6,8 @@
 
 import Avatar from './avatar';
 import Cube   from './cube';
-import Entity from './entity';
-import CollectionUtil from '../../math/collections';
+// import Entity from './entity';
+// import CollectionUtil from '../../math/collections';
 
 class EntityModel {
 
@@ -26,10 +26,10 @@ class EntityModel {
     }
 
     get entities() { return this._entities; }
-    
+
     forEach(callback) {
         let entities = this._entities;
-        entities.forEach((entity, id) => {
+        entities.forEach(entity/*, id)*/ => {
             callback(entity);
         });
     }
@@ -49,10 +49,10 @@ class EntityModel {
         let entities = this._entities;
         //let entitiesLength = this._entitiesLength;
         let freedEntities = this._freedEntities;
-        
+
         let entityId;
         if (freedEntities.length > 0) {
-            entityId = freedEntities[0]; 
+            entityId = freedEntities[0];
             freedEntities.shift();
         } else {
             entityId = entities.length;
@@ -60,9 +60,9 @@ class EntityModel {
             //++entitiesLength;
         }
         // console.log('Entity shall have id ' + entityId);
-        
+
         var e;
-        switch(kind) {
+        switch (kind) {
             case 'avatar':
                 e = new Avatar(entityId);
                 break;
@@ -80,7 +80,7 @@ class EntityModel {
     removePlayer(playerId) {
         this.removeEntity(playerId);
     }
-    
+
     removeEntity(entityId) {
         this._entities[entityId] = undefined;
         this._freedEntities.push(entityId);
@@ -96,7 +96,7 @@ class EntityModel {
             if (!entity || entity.worldId !== worldId) return;
             // TODO [HIGH] use width
             let p = entity.position;
-            if (p[0] >= x && p[0] <= x+1 && p[1] >= y && p[1] <= y+1 && p[2] >= z && p[2] <= z+1)
+            if (p[0] >= x && p[0] <= x + 1 && p[1] >= y && p[1] <= y + 1 && p[2] >= z && p[2] <= z + 1)
                 result = true;
         });
 

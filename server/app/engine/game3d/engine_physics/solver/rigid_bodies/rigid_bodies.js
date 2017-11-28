@@ -18,17 +18,15 @@ class RigidBodies {
 
     static eps = 0;// .00001;
 
-    constructor(refreshRate) {
-
+    constructor(refreshRate)
+    {
         //
         this._gravity = [0, 0, 2 * -0.00980665];
         //this._gravity = [0, 0, 0];
         this._globalTimeDilatation = 25;
         //this._globalTimeDilatation = 0.05;
         this._refreshRate = refreshRate;
-
         //
-
     }
 
     get gravity() { return this._gravity; }
@@ -46,8 +44,8 @@ class RigidBodies {
         return 1;
     }
 
-    solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs) {
-
+    solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs)
+    {
         // TODO [HIGH] solve several times according to delta timestep
 
         const epsilon = RigidBodies.eps;
@@ -83,10 +81,10 @@ class RigidBodies {
         objectUniverseAxes.forEach((objectWorldAxes, worldId) => {
             let world = wm.getWorld(worldId);
             let eventWorldAxes = eventUniverseAxes.get(world);
-            let oxAxis = objectWorldAxes[0],
-                oyAxis = objectWorldAxes[1],
-                ozAxis = objectWorldAxes[2],
-                currentEntity;
+            let oxAxis = objectWorldAxes[0];
+            let oyAxis = objectWorldAxes[1];
+            let ozAxis = objectWorldAxes[2];
+            let currentEntity;
             let maxWidth = Entity.maxWidth;
             let searcher = new Searcher(entities, oxAxis, oyAxis, ozAxis);
 
@@ -104,15 +102,17 @@ class RigidBodies {
 
             // LOCAL EVENTS.
             if (eventWorldAxes) {
-                let exAxis = eventWorldAxes[0],
-                    // TODO [MEDIUM] use other axes for faster solving.
-                    eyAxis = eventWorldAxes[1],
-                    ezAxis = eventWorldAxes[2];
-                let lastEX = 0, lastEY, lastEZ;
-                let eventIndex, entityIndex, currentEvent;
-                let op, ep;
-                let ox, oy, oz, ex, range;
-                let wx, wy, wz;
+                let exAxis = eventWorldAxes[0];
+                // TODO [MEDIUM] use other axes for faster solving.
+                // let eyAxis = eventWorldAxes[1];
+                // let ezAxis = eventWorldAxes[2];
+                let lastEX = 0;
+                // let lastEY;
+                // let lastEZ;
+                let eventIndex; let entityIndex; let currentEvent;
+                let op; let ep;
+                let ox; let oy; let oz; let ex; let range;
+                let wx; let wy; let wz;
                 let maxRange = EventOrderer.maxRange;
 
                 // For all entities.
@@ -156,23 +156,21 @@ class RigidBodies {
 
                         // Apply effect to entity.
                         let a = currentEvent.effect.acceleration;
-                        if (a) {
-                            const dx = (ep[0]-op[0]),
-                                  dy = (ep[1]-op[1]),
-                                  dz = (ep[2]-op[2]);
-                            const rat = Math.sqrt(a/(dx*dx+dy*dy+dz*dz));
+                        if (as) {
+                            const dx = ep[0] - op[0];
+                            const dy = ep[1] - op[1];
+                            const dz = ep[2] - op[2];
+                            const rat = Math.sqrt(a / (dx * dx + dy * dy + dz * dz));
                             let a1 = currentEntity.a1;
-                            a1[0] += rat*dx;
-                            a1[1] += rat*dy;
-                            a1[2] += rat*dz;
+                            a1[0] += rat * dx;
+                            a1[1] += rat * dy;
+                            a1[2] += rat * dz;
                         }
-
                     }
                 }
 
                 // Decrease event counters.
                 eventOrderer.applyEventsInWorld(worldId);
-
             }
 
             // GLOBAL EVENTS, INPUTS & COMPUTATIONS.
@@ -227,12 +225,13 @@ class RigidBodies {
                 let d = currentEntity.d; // Directions.
                 let r = currentEntity.r; // Rotation.
                 const maxV = currentEntity.getVelocity();
-                const factor = Math.sqrt(maxV*1.05);
+                const factor = Math.sqrt(maxV * 1.05);
                 let g = this.getGravity(worldId, p0[0], p0[1], p0[2]);
                 //let vector = RigidBodies.getEntityForwardVector(d, r, factor, false); // 3D
                 let vector = RigidBodies.getEntityForwardVector(d, r, factor, true); // Project 2D
                 // console.log(vector);
-                let abs = Math.abs, sgn = Math.sign;
+                // let abs = Math.abs;
+                // let sgn = Math.sign;
                 let adh = currentEntity.adherence;
 
                 // TODO [CRIT] compute acc.: impulses with speed constraints, gravity.
@@ -242,16 +241,16 @@ class RigidBodies {
                 {
                     let vi = vector[i];
                     if (adh[i] && vi > 0.05 && g[i] < 0) {
-                        console.log("jump " + passId);
+                        console.log(`jump ${passId}`);
                         //vi = 0.1;
                         a1[i] += 0.22;
                         adh[i] = false; // TODO [CRIT] FIX ADHERENCE SETUP
                     }
-                    else if (adh[3+i] && vi < -0.05 && g[i] > 0) {
-                        console.log("antijump");
+                    else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
+                        console.log('antijump');
                         //vi = -.1;
                         a1[i] -= 0.22;
-                        adh[3+i] = false;
+                        adh[3 + i] = false;
                     }
 
                     nu[i] = vi;
@@ -273,7 +272,7 @@ class RigidBodies {
                 {
                     let v1i = v0[i] + dtr * .5 * (a0[i] + a1[i]);
                     v1[i] = v1i;
-                    sum += (v1i * v1i);
+                    sum += v1i * v1i;
                 }
 
                 // Velocity correction.
@@ -286,7 +285,7 @@ class RigidBodies {
             // TODO [OPT] ignore leapfrog == 0
             // Remember leapfrogs within objects, reordering them within islands
             // is probably better than sorting a potentially huge array.
-            let inf = (x) => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
+            let inf = x => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
             leapfrogArray.sort((a, b) =>
                 inf(b) - inf(a)
             );
@@ -304,7 +303,7 @@ class RigidBodies {
             oxToIslandIndex.fill(-2); // -2 unaffected, -1 isolated, 0+ index of island
             let islands = [];
             let islandIndex = 0;
-            //console.log(numberOfEntities + " entities");
+            //console.log(numberOfEntities + ' entities');
             for (let i = 0; i < numberOfEntities; ++i) {
                 let xIndex = leapfrogArray[i][3];
                 let inheritedIslandIndex = oxToIslandIndex[xIndex];
@@ -336,8 +335,8 @@ class RigidBodies {
                             }
                             break;
                     }
-
-                } else {
+                }
+                else {
                     switch (il) {
                         case 0:
                             // throw Error('[RigidBodies] got a 0-length island.');
@@ -399,7 +398,7 @@ class RigidBodies {
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let nbI = island.length;
                 let mapCollidingPossible = [];
-                let bannedPairs = [];
+                // let bannedPairs = [];
 
                 // 1. Sort colliding possible.
 
@@ -409,40 +408,58 @@ class RigidBodies {
                     // let lfa1 = leapfrogArray[xIndex1];
                     let id1 = oxAxis[xIndex1].id;
                     let e1 = entities[id1];
-                    let p1_0 = e1.p0; let p10x = p1_0[0], p10y = p1_0[1], p10z = p1_0[2];
-                    let p1_1 = e1.p1; let p11x = p1_1[0], p11y = p1_1[1], p11z = p1_1[2];
-                    let p1_adh = e1.adherence;
+                    let p10 = e1.p0;
+                    let p10x = p10[0];
+                    let p10y = p10[1];
+                    let p10z = p10[2];
+                    let p11 = e1.p1;
+                    let p11x = p11[0];
+                    let p11y = p11[1];
+                    let p11z = p11[2];
+                    let p1adh = e1.adherence;
                     //e1.p2 = [p11x, p11y, p11z];
                     //let p1_2 = e1.p2;
-                    let p1_v0 = e1.v0; let p1_a0 = e1.a0; let p1_n0 = e1.nu;
-                    let w1x = e1.widthX, w1y = e1.widthY, w1z = e1.widthZ;
+                    let p1v0 = e1.v0;
+                    let p1a0 = e1.a0;
+                    let p1n0 = e1.nu;
+                    let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
                     let ltd1 = e1.dtr; // this.getTimeDilatation(worldId, p1_0[0], p1_0[1], p1_0[2]);
-                    const dta1 = absoluteDt * ltd1;
-                    const dtr1 = relativeDt * ltd1;
+                    // const dta1 = absoluteDt * ltd1;
+                    // const dtr1 = relativeDt * ltd1;
 
-                    for (let j = i+1; j < nbI; ++j) {
+                    for (let j = i + 1; j < nbI; ++j) {
                         let xIndex2 = island[j];
                         //let lfa2 = leapfrogArray[xIndex2];
                         let id2 = oxAxis[xIndex2].id;
                         let e2 = entities[id2];
-                        let p2_0 = e2.p0; let p20x = p2_0[0], p20y = p2_0[1], p20z = p2_0[2];
-                        let p2_1 = e2.p1; let p21x = p2_1[0], p21y = p2_1[1], p21z = p2_1[2];
-                        let p2_adh = e2.adherence;
+                        let p20 = e2.p0;
+                        let p20x = p20[0];
+                        let p20y = p20[1];
+                        let p20z = p20[2];
+                        let p21 = e2.p1;
+                        let p21x = p21[0];
+                        let p21y = p21[1];
+                        let p21z = p21[2];
+                        let p2adh = e2.adherence;
                         //e2.p2 = [p21x, p21y, p21z];
                         //let p2_2 = e2.p2;
-                        let p2_v0 = e2.v0; let p2_a0 = e2.a0; let p2_n0 = e2.nu;
-                        let w2x = e2.widthX, w2y = e2.widthY, w2z = e2.widthZ;
+                        let p2v0 = e2.v0;
+                        let p2a0 = e2.a0;
+                        let p2n0 = e2.nu;
+                        let w2x = e2.widthX;
+                        let w2y = e2.widthY;
+                        let w2z = e2.widthZ;
                         let ltd2 = e2.dtr; // this.getTimeDilatation(worldId, p2_0[0], p2_0[1], p2_0[2]);
                         // TODO [OPT] verify integration with time dilatation.
-                        const dta2 = absoluteDt * ltd2;
-                        const dtr2 = relativeDt * ltd2;
+                        // const dta2 = absoluteDt * ltd2;
+                        // const dtr2 = relativeDt * ltd2;
 
                         //for (let k = 0; k < 3; ++k) {
                             //const cxm =
-                        let x0l = p10x+w1x <= p20x-w2x; let y0l = p10y+w1y <= p20y-w2y; let z0l = p10z+w1z <= p20z-w2z;
-                        let x1l = p11x+w1x <= p21x-w2x; let y1l = p11y+w1y <= p21y-w2y; let z1l = p11z+w1z <= p21z-w2z;
-                        let x0r = p10x-w1x >= p20x+w2x; let y0r = p10y-w1y >= p20y+w2y; let z0r = p10z-w1z >= p20z+w2z;
-                        let x1r = p11x-w1x >= p21x+w2x; let y1r = p11y-w1y >= p21y+w2y; let z1r = p11z-w1z >= p21z+w2z;
+                        let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
+                        let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
+                        let x0r = p10x - w1x >= p20x + w2x; let y0r = p10y - w1y >= p20y + w2y; let z0r = p10z - w1z >= p20z + w2z;
+                        let x1r = p11x - w1x >= p21x + w2x; let y1r = p11y - w1y >= p21y + w2y; let z1r = p11z - w1z >= p21z + w2z;
 
                         if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
                         {
@@ -452,7 +469,7 @@ class RigidBodies {
                         }
 
                         let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
-                        let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
+                        // let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
                         let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                         let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
@@ -462,7 +479,7 @@ class RigidBodies {
                             continue;
                         }
 
-                        if ((!xm) + (!ym) + (!zm) !== 1) {
+                        if (!xm + !ym + !zm !== 1) {
                             console.log('[RigidBodies/ComputeIslands] Corner 2D clip detected.')
                         }
 
@@ -480,38 +497,40 @@ class RigidBodies {
                                 //console.log('colx');
                                 let fw = xl ? 1 : -1;
 
-                                let adh10 = p1_adh[0]; let adh11 = p1_adh[3];
-                                let a1 = ltd1*ltd1 * .5 * p1_a0[0];
-                                if ((p10x <= p11x && adh11) || (p10x >= p11x && adh10)) a1 = 0;
+                                let adh10 = p1adh[0];
+                                let adh11 = p1adh[3];
+                                let a1 = ltd1 * ltd1 * .5 * p1a0[0];
+                                if (p10x <= p11x && adh11 || p10x >= p11x && adh10) a1 = 0;
 
-                                let adh20 = p2_adh[0]; let adh21 = p2_adh[3];
-                                let a2 = ltd2*ltd2 * .5 * p2_a0[0];
-                                if ((p20x <= p21x && adh21) || (p20x >= p21x && adh20)) a2 = 0;
+                                let adh20 = p2adh[0];
+                                let adh21 = p2adh[3];
+                                let a2 = ltd2 * ltd2 * .5 * p2a0[0];
+                                if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
 
                                 //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                                let b1 = ltd1 * (p1_v0[0] + p1_n0[0]);
-                                let b2 = ltd2 * (p2_v0[0] + p2_n0[0]);
+                                let b1 = ltd1 * (p1v0[0] + p1n0[0]);
+                                let b2 = ltd2 * (p2v0[0] + p2n0[0]);
 
                                 let r = 0;
                                 if (a1 !== a2) {
                                     //console.log('deg2');
                                     // TODO [CRIT] solve same for leapfrog version.
-                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1x+fw*w2x+p10x-p20x);
+                                    let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1x + fw * w2x + p10x - p20x);
                                     if (delta > 0) {
-                                        console.log("delta > 0");
-                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
-                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        console.log('delta > 0');
+                                        let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
+                                        let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
                                         r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
                                     } else if (delta === 0) {
-                                        console.log("delta = 0");
-                                        r = (b2-b1)/(2*(a1-a2));
+                                        console.log('delta = 0');
+                                        r = (b2 - b1) / (2 * (a1 - a2));
                                     }
                                 }
-                                else if (b1 !== b2) {
-
-                                    if (abs(b2-b1) < 1e-7) r= 0;
-                                    else r = (fw*w1x + fw*w2x + p10x-p20x) / (b2-b1);
+                                else if (b1 !== b2)
+                                {
+                                    if (abs(b2 - b1) < 1e-7) r = 0;
+                                    else r = (fw * w1x + fw * w2x + p10x - p20x) / (b2 - b1);
 
                                     if (r < 0 || r >= relativeDt) {
                                         console.log('r computation error');
@@ -523,7 +542,7 @@ class RigidBodies {
                                         console.log('r=' + r + ' (z), reldt=' + relativeDt);
                                         r = 0;
                                     }
-                                    // console.log("deg 1 " + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+                                    // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
                                 }
 
                                 //console.log('r=' + r + ' (x), reldt=' + relativeDt);
@@ -542,36 +561,38 @@ class RigidBodies {
                                 //console.log('coly');
                                 let fw = yl ? 1 : -1;
 
-                                let adh10 = p1_adh[1]; let adh11 = p1_adh[4];
-                                let a1 = ltd1*ltd1 * .5 * p1_a0[1];
-                                if ((p10y <= p11y && adh11) || (p10y >= p11y && adh10)) a1 = 0;
+                                let adh10 = p1adh[1];
+                                let adh11 = p1adh[4];
+                                let a1 = ltd1 * ltd1 * .5 * p1a0[1];
+                                if (p10y <= p11y && adh11 || p10y >= p11y && adh10) a1 = 0;
 
-                                let adh20 = p2_adh[1]; let adh21 = p2_adh[4];
-                                let a2 = ltd2*ltd2 * .5 * p2_a0[1];
-                                if ((p20y <= p21y && adh21) || (p20y >= p21y && adh20)) a2 = 0;
+                                let adh20 = p2adh[1];
+                                let adh21 = p2adh[4];
+                                let a2 = ltd2 * ltd2 * .5 * p2a0[1];
+                                if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
 
                                 //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                                let b1 = ltd1 * (p1_v0[1] + p1_n0[1]);
-                                let b2 = ltd2 * (p2_v0[1] + p2_n0[1]);
+                                let b1 = ltd1 * (p1v0[1] + p1n0[1]);
+                                let b2 = ltd2 * (p2v0[1] + p2n0[1]);
 
                                 // TODO [Refactor] extract method.
                                 let r = 0;
                                 if (a1 !== a2) {
                                     //console.log('deg2');
-                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1y+fw*w2y+p10y-p20y);
+                                    let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1y + fw * w2y + p10y - p20y);
                                     if (delta > 0) {
-                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
-                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
+                                        let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
                                         r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
                                     } else if (delta === 0) {
-                                        r = (b2-b1)/(2*(a1-a2));
+                                        r = (b2 - b1) / (2 * (a1 - a2));
                                     }
                                 }
-                                else if (b1 !== b2) {
-
-                                    if (abs(b2-b1) < 1e-7) r= 0;
-                                    else r = (fw*w1y + fw*w2y+p10y-p20y) / (b2-b1);
+                                else if (b1 !== b2)
+                                {
+                                    if (abs(b2 - b1) < 1e-7) r = 0;
+                                    else r = (fw * w1y + fw * w2y + p10y - p20y) / (b2 - b1);
 
                                     if (r < 0 || r >= relativeDt) {
                                         console.log('r computation error');
@@ -605,36 +626,36 @@ class RigidBodies {
                                 //console.log('colz');
                                 let fw = zl ? 1 : -1;
 
-                                let adh10 = p1_adh[2]; let adh11 = p1_adh[5];
-                                let a1 = ltd1*ltd1 * .5 * p1_a0[2];
-                                if ((p10z <= p11z && adh11) || (p10z >= p11z && adh10)) a1 = 0;
+                                let adh10 = p1adh[2]; let adh11 = p1adh[5];
+                                let a1 = ltd1 * ltd1 * .5 * p1a0[2];
+                                if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0;
 
-                                let adh20 = p2_adh[2]; let adh21 = p2_adh[5];
-                                let a2 = ltd2*ltd2 * .5 * p2_a0[2];
-                                if ((p20z <= p21z && adh21) || (p20z >= p21z && adh20)) a2 = 0;
+                                let adh20 = p2adh[2]; let adh21 = p2adh[5];
+                                let a2 = ltd2 * ltd2 * .5 * p2a0[2];
+                                if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
 
                                 //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                                let b1 = ltd1 * (p1_v0[2] + p1_n0[2]);
-                                let b2 = ltd2 * (p2_v0[2] + p2_n0[2]);
+                                let b1 = ltd1 * (p1v0[2] + p1n0[2]);
+                                let b2 = ltd2 * (p2v0[2] + p2n0[2]);
 
                                 // TODO [Refactor] extract method.
                                 let r = 0;
                                 if (a1 !== a2) {
                                     //console.log('deg2');
-                                    let delta = (b1-b2)*(b1-b2)-4*(a1-a2)*(fw*w1z+fw*w2z+p10z-p20z);
+                                    let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1z + fw * w2z + p10z - p20z);
                                     if (delta > 0) {
-                                        let r1 = ((b2-b1)+sqrt(delta))/(2*(a1-a2));
-                                        let r2 = ((b2-b1)-sqrt(delta))/(2*(a1-a2));
+                                        let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
+                                        let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
                                         r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
                                     } else if (delta === 0) {
-                                        r = (b2-b1)/(2*(a1-a2));
+                                        r = (b2 - b1) / (2 * (a1 - a2));
                                     }
                                 } else if (b1 !== b2) {
                                     //console.log('deg1');
 
-                                    if (abs(b2-b1) < 1e-7) r= 0;
-                                    else r = (fw*w1z + fw*w2z + p10z-p20z) / (b2-b1);
+                                    if (abs(b2 - b1) < 1e-7) r = 0;
+                                    else r = (fw * w1z + fw * w2z + p10z - p20z) / (b2 - b1);
 
                                     if (r < 0 || r >= relativeDt) {
                                         console.log('r computation error');
@@ -670,15 +691,13 @@ class RigidBodies {
                                 mapCollidingPossible.push([i, j, rrel, axis]);
                             }
                         }
-
                     }
-
                 }
 
                 // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
 
                 // Narrow phase, part 2: for all Ts in order,
-                //    set bodies as "in contact" or "terminal" (terrain),
+                //    set bodies as 'in contact' or 'terminal' (terrain),
                 //    compute new paths (which are not more than common two previous) while compensating forces
                 //    so as to project the result into directions that are not occluded
                 //      -> bouncing will be done in next iteration to ensure convergence
@@ -734,13 +753,13 @@ class RigidBodies {
                 };
 
                 let mergeSubIslands = function(indexI, indexJ, subIslandI, subIslandJ, axis) {
-                    if (axis !== 'x' && axis !== 'y' && axis !=='z') {
+                    if (axis !== 'x' && axis !== 'y' && axis !== 'z') {
                         console.log('Undefined axis.'); return;
                     }
 
                     let toSubIslandIndex = null;
-                    var subIslandArray;
-                    var newSubIsland;
+                    let subIslandArray;
+                    let newSubIsland;
                     switch (axis) {
                         case 'x':
                             toSubIslandIndex = objectIndexInIslandToSubIslandXIndex;
@@ -759,7 +778,7 @@ class RigidBodies {
                         const lj = subIslandJ.length;
                         if (li < lj) {
                             newSubIsland = subIslandJ;
-                            for (let i = li-1; i >= 0; --i) {
+                            for (let i = li - 1; i >= 0; --i) {
                                 let element = subIslandI[i];
                                 subIslandJ.push(element);
                                 toSubIslandIndex[element] = toSubIslandIndex[indexJ];
@@ -767,7 +786,7 @@ class RigidBodies {
                             }
                         } else {
                             newSubIsland = subIslandI;
-                            for (let j = lj-1; j >= 0; --j) {
+                            for (let j = lj - 1; j >= 0; --j) {
                                 let element = subIslandJ[j];
                                 subIslandI.push(element);
                                 toSubIslandIndex[element] = toSubIslandIndex[indexI];
@@ -795,39 +814,57 @@ class RigidBodies {
                 };
 
                 let applyCollision = function(i, j, r, axis, newSubIsland,
-                                              island, oxAxis, entities, relativeDt) {
-
+                                              island, oxAxis, entities, relativeDt)
+                {
                     let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
                     let id1 = oxAxis[xIndex1].id;
                     let e1 = entities[id1];
-                    let p1_0 = e1.p0;  let p10x = p1_0[0], p10y = p1_0[1], p10z = p1_0[2];
-                    let p1_1 = e1.p1;   let p11x = p1_1[0], p11y = p1_1[1], p11z = p1_1[2];
-                    let p1_v0 = e1.v0; let p1_a0 = e1.a0; let p1_n0 = e1.nu;
-                    let w1x = e1.widthX, w1y = e1.widthY, w1z = e1.widthZ;
+                    let p10 = e1.p0;
+                    let p10x = p10[0];
+                    let p10y = p10[1];
+                    let p10z = p10[2];
+                    let p11 = e1.p1;
+                    let p11x = p11[0];
+                    let p11y = p11[1];
+                    let p11z = p11[2];
+                    let p1v0 = e1.v0;
+                    let p1a0 = e1.a0;
+                    let p1n0 = e1.nu;
+                    let w1x = e1.widthX;
+                    let w1y = e1.widthY;
+                    let w1z = e1.widthZ;
                     let ltd1 = e1.dtr;
                     const sndtr1 = r * relativeDt; // * ltd1;
 
                     let xIndex2 = island[j]; // let lfa2 = leapfrogArray[xIndex2];
                     let id2 = oxAxis[xIndex2].id;
                     let e2 = entities[id2];
-                    let p2_0 = e2.p0;  let p20x = p2_0[0], p20y = p2_0[1], p20z = p2_0[2];
-                    let p2_1 = e2.p1;   let p21x = p2_1[0], p21y = p2_1[1], p21z = p2_1[2];
-                    let p2_v0 = e2.v0; let p2_a0 = e2.a0; let p2_n0 = e2.nu;
-                    let w2x = e2.widthX, w2y = e2.widthY, w2z = e2.widthZ;
+                    let p20 = e2.p0;
+                    let p20x = p20[0];
+                    let p20y = p20[1];
+                    let p20z = p20[2];
+                    let p21 = e2.p1;
+                    let p21x = p21[0];
+                    let p21y = p21[1];
+                    let p21z = p21[2];
+                    let p2v0 = e2.v0;
+                    let p2a0 = e2.a0;
+                    let p2n0 = e2.nu;
+                    let w2x = e2.widthX; let w2y = e2.widthY; let w2z = e2.widthZ;
                     let ltd2 = e2.dtr;
                     const sndtr2 = r * relativeDt; // * ltd2;
 
                     // Snap p1.
-                    let x0l = p10x+w1x <= p20x-w2x; let y0l = p10y+w1y <= p20y-w2y; let z0l = p10z+w1z <= p20z-w2z;
-                    let x1l = p11x+w1x <= p21x-w2x; let y1l = p11y+w1y <= p21y-w2y; let z1l = p11z+w1z <= p21z-w2z;
-                    let x0r = p10x-w1x >= p20x+w2x; let y0r = p10y-w1y >= p20y+w2y; let z0r = p10z-w1z >= p20z+w2z;
-                    let x1r = p11x-w1x >= p21x+w2x; let y1r = p11y-w1y >= p21y+w2y; let z1r = p11z-w1z >= p21z+w2z;
+                    let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
+                    let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
+                    let x0r = p10x - w1x >= p20x + w2x; let y0r = p10y - w1y >= p20y + w2y; let z0r = p10z - w1z >= p20z + w2z;
+                    let x1r = p11x - w1x >= p21x + w2x; let y1r = p11y - w1y >= p21y + w2y; let z1r = p11z - w1z >= p21z + w2z;
 
                     if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
                         return;
 
-                    let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
-                    let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
+                    // let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
+                    // let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
                     let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                     let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
@@ -859,30 +896,30 @@ class RigidBodies {
 
                             let e1p1i = e1.p1[m];
                             let e1p0i = e1.p0[m];
-                            let e1p1n = e1p0i + (p1_v0[m] + p1_n0[m]) * timestep1 + .5 * p1_a0[m] * timestep1 * timestep1;
+                            let e1p1n = e1p0i + (p1v0[m] + p1n0[m]) * timestep1 + .5 * p1a0[m] * timestep1 * timestep1;
                             nep1[m] =
-                                (e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n) ?
-                                    (e1p1n - epsilon) :
-                                    (e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i) ?
-                                        (e1p1n + epsilon) : e1p1i;
+                                e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n ?
+                                    e1p1n - epsilon :
+                                    e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i ?
+                                        e1p1n + epsilon : e1p1i;
 
                             let e2p1i = e2.p1[m];
                             let e2p0i = e2.p0[m];
-                            let e2p1n = e2p0i + (p2_v0[m] + p2_n0[m]) * timestep2 + .5 * p2_a0[m] * timestep2 * timestep2;
-                            nep2[m] = (e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n) ?
-                                (e2p1n - epsilon) :
-                                (e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i) ?
-                                    (e2p1n + epsilon) : e2p1i;
+                            let e2p1n = e2p0i + (p2v0[m] + p2n0[m]) * timestep2 + .5 * p2a0[m] * timestep2 * timestep2;
+                            nep2[m] = e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n ?
+                                e2p1n - epsilon :
+                                e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
+                                    e2p1n + epsilon : e2p1i;
 
-                            m2[m] = (nep1[m]+wm1[m] > nep2[m]-wm2[m] && nep1[m]-wm1[m] < nep2[m]+wm2[m]);
+                            m2[m] = nep1[m] + wm1[m] > nep2[m] - wm2[m] && nep1[m] - wm1[m] < nep2[m] + wm2[m];
                             // !x1l && !x1r
                             // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
                             if (m === ax) {
-                                if ((e2p1i < e2p0i && e2.a1[m] < 0) || (e2p1i > e2p0i && e2.a1[m] > 0)) {
+                                if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
                                     e2.a1[m] = 0;
                                     e2.v1[m] = e1.v1[m];
                                 }
-                                if ((e1p1i < e1p0i && e1.a1[m] < 0) || (e1p1i > e1p0i && e1.a1[m] > 0)) {
+                                if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
                                     e1.a1[m] = 0;
                                     e1.v1[m] = e2.v1[m];
                                 }
@@ -890,7 +927,7 @@ class RigidBodies {
                         }
                         // Temporary security measure.
                         {
-                            let l = newSubIsland.length;
+                            // let l = newSubIsland.length;
                             for (let m = 0; m < 3; ++m) {
                                 e1.p1[m] = nep1[m];
                                 e2.p1[m] = nep2[m];
@@ -935,12 +972,12 @@ class RigidBodies {
                     let sub2Vel = [0, 0, 0];
 
                     // Sum mass.
-                    {
-                        for (let idInSub1 = 0, sub1Length = subIslandI.length; idInSub1 < sub1Length; ++idInSub1)
-                            sub1Mass += entities[oxAxis[island[subIslandI[idInSub1]]].id].mass;
-                        for (let idInSub2 = 0, sub2Length = subIslandJ.length; idInSub2 < sub2Length; ++idInSub2)
-                            sub2Mass += entities[oxAxis[island[subIslandJ[idInSub2]]].id].mass;
-                    }
+                    // {
+                    for (let idInSub1 = 0, sub1Length = subIslandI.length; idInSub1 < sub1Length; ++idInSub1)
+                        sub1Mass += entities[oxAxis[island[subIslandI[idInSub1]]].id].mass;
+                    for (let idInSub2 = 0, sub2Length = subIslandJ.length; idInSub2 < sub2Length; ++idInSub2)
+                        sub2Mass += entities[oxAxis[island[subIslandJ[idInSub2]]].id].mass;
+                    // }
 
                     // Compute uniform speed.
                     {
@@ -1226,7 +1263,6 @@ class RigidBodies {
             //     if (entityUpdated) o.entityUpdated(entityId);
             // }
         });
-
     }
 
     // Legacy.
@@ -1235,12 +1271,12 @@ class RigidBodies {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
-        var impulseSpeed = [0, 0, 0];
-        var force = [0, 0, 0];
+        let impulseSpeed = [0, 0, 0];
+        let force = [0, 0, 0];
         this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
         this.sumGlobalFields(force, pos, entity);
         // RigidBodies.sumLocalFields(force, pos, EM);
-        var hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
+        let hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
         return hasUpdated;
     }
 
@@ -1248,9 +1284,9 @@ class RigidBodies {
         const theta = entity.rotation[0];
         const ds = entity.directions;
         const pos = entity.position;
-        var impulseSpeed = [0, 0, 0];
-        var force = [0, 0, 0];
-        var hasUpdated = false;
+        let impulseSpeed = [0, 0, 0];
+        let force = [0, 0, 0];
+        let hasUpdated = false;
         this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
         this.sumGlobalFields(force, pos, entity);
         this.sumLocalFields(force, pos, em);
@@ -1270,21 +1306,21 @@ class RigidBodies {
 
     static getEntityForwardVector(d, rotation, factor, project2D)
     {
-        let PI  = Math.PI,
-            cos = Math.cos,
-            sin = Math.sin,
-            acos = Math.acos,
-            abs = Math.abs,
-            sgn = Math.sign,
-            atan = Math.atan,
-            sqrt = Math.sqrt,
-            square = x => x*x;
-        let PI2 = PI/2;
-        let PI4 = PI/4;
-        let PI34 = 3*PI4;
+        let PI  = Math.PI;
+        let cos = Math.cos;
+        let sin = Math.sin;
+        let acos = Math.acos;
+        // let abs = Math.abs;
+        let sgn = Math.sign;
+        // let atan = Math.atan;
+        let sqrt = Math.sqrt;
+        let square = x => x * x;
+        let PI2 = PI / 2;
+        let PI4 = PI / 4;
+        let PI34 = 3 * PI4;
 
-        let relTheta0 = rotation[0], relTheta1 = rotation[1];
-        let absTheta0 = rotation[2], absTheta1 = rotation[3];
+        let relTheta0 = rotation[0]; let relTheta1 = rotation[1];
+        let absTheta0 = rotation[2]; let absTheta1 = rotation[3];
 
         //if (absTheta0 != 0 || absTheta1 != 0)
         //    console.log(relTheta0.toFixed(4) + ', ' + relTheta1.toFixed(4) + ' ; ' +
@@ -1294,9 +1330,9 @@ class RigidBodies {
         // d[2], d[3]: rg, lf
         // d[4], d[5]: up, dn
 
-        let fw = d[0] && !d[1], bw = !d[0] && d[1],
-            rg = d[2] && !d[3], lf = !d[2] && d[3],
-            up = d[4] && !d[5], dn = !d[4] && d[5];
+        let fw = d[0] && !d[1]; let bw = !d[0] && d[1];
+        let rg = d[2] && !d[3]; let lf = !d[2] && d[3];
+        let up = d[4] && !d[5]; let dn = !d[4] && d[5];
 
         if (project2D) {
             relTheta1 = PI2;
@@ -1307,31 +1343,34 @@ class RigidBodies {
         if (nb0 === 0) return [0, 0, 0];
 
         let getPsy1 = function(theta0, theta1, phi0, phi1) {
-            let st0 = sin(theta0), st1 = sin(theta1), ct0 = cos(theta0),
-                ct1 = cos(theta1),
-                sp0 = sin(phi0), sp1 = sin(phi1), cp0 = cos(phi0),
-                cp1 = cos(phi1);
-            return acos( (ct1 + cp1) /
-                (sqrt(square(st1*st0 + sp1*sp0) + square(st1*ct0 + sp1*cp0) + square(ct1 + cp1))) );
+            let st0 = sin(theta0); let st1 = sin(theta1); let ct0 = cos(theta0);
+            let ct1 = cos(theta1);
+            let sp0 = sin(phi0); let sp1 = sin(phi1); let cp0 = cos(phi0);
+            let cp1 = cos(phi1);
+            return acos((ct1 + cp1) /
+                sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0) + square(ct1 + cp1))
+            );
         };
 
         let getPsy0 = function(theta0, theta1, phi0, phi1) {
-            let st0 = sin(theta0), st1 = sin(theta1),
-                ct0 = cos(theta0), // ct1 = cos(theta1),
-                sp0 = sin(phi0), sp1 = sin(phi1),
-                cp0 = cos(phi0); // , cp1 = cos(phi1);
+            let st0 = sin(theta0); let st1 = sin(theta1);
+            let ct0 = cos(theta0); // ct1 = cos(theta1),
+            let sp0 = sin(phi0); let sp1 = sin(phi1);
+            let cp0 = cos(phi0); // , cp1 = cos(phi1);
 
-            let s = sgn(st1*st0 + sp1*sp0);
+            let s = sgn(st1 * st0 + sp1 * sp0);
             return s *
-                acos( (st1*ct0 + sp1*cp0) / (sqrt(square(st1*st0 + sp1*sp0) + square(st1*ct0 + sp1*cp0))) );
+                acos((st1 * ct0 + sp1 * cp0) /
+                    sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0))
+                );
         };
 
         let getPsy = function() {
             // TODO [HIGH] refactor
         };
 
-        if (nb0 === 1) {
-
+        if (nb0 === 1)
+        {
             if (fw) {}
             else if (bw)  relTheta1 += PI;
             else if (up)  relTheta1 += PI2;
@@ -1342,62 +1381,62 @@ class RigidBodies {
                 console.log('[RigidBodies] Undefined direction (1).');
                 return [0, 0, 0];
             }
-
-        } else if (nb0 === 2) {
-
+        }
+        else if (nb0 === 2)
+        {
             let t0 = relTheta0;
             let t1 = relTheta1;
 
             switch (true) {
 
-                case (fw && up): relTheta1 += PI4; break;
-                case (fw && dn): relTheta1 -= PI4; break;
-                case (bw && up): relTheta1 += PI34; break;
-                case (bw && dn): relTheta1 -= PI34; break;
+                case fw && up: relTheta1 += PI4; break;
+                case fw && dn: relTheta1 -= PI4; break;
+                case bw && up: relTheta1 += PI34; break;
+                case bw && dn: relTheta1 -= PI34; break;
 
                 // TODO Debug send forward arrow object
-                case (fw && rg):
+                case fw && rg:
                     // Faster.
                     //relTheta0 = relTheta0 - (PI2 - PI4*sin(relTheta1));
                     //relTheta1 = PI2 - PI4*cos(relTheta1);
 
                     // More accurate.
-                    relTheta0 = getPsy0(t0, t1, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1, t0-PI2, PI2) || 0;
+                    relTheta0 = getPsy0(t0, t1, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1, t0 - PI2, PI2) || 0;
                     break;
-                case (fw && lf):
-                    relTheta0 = getPsy0(t0, t1, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1, t0+PI2, PI2) || 0;
-                    break;
-
-                case (bw && rg):
-                    relTheta0 = getPsy0(t0, t1+PI, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI, t0-PI2, PI2) || 0;
+                case fw && lf:
+                    relTheta0 = getPsy0(t0, t1, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1, t0 + PI2, PI2) || 0;
                     break;
 
-                case (bw && lf):
-                    relTheta0 = getPsy0(t0, t1+PI, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI, t0+PI2, PI2) || 0;
+                case bw && rg:
+                    relTheta0 = getPsy0(t0, t1 + PI, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI, t0 - PI2, PI2) || 0;
                     break;
 
-                case (rg && up):
-                    relTheta0 = getPsy0(t0, t1+PI2, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI2, t0-PI2, PI2) || 0;
+                case bw && lf:
+                    relTheta0 = getPsy0(t0, t1 + PI, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI, t0 + PI2, PI2) || 0;
                     break;
 
-                case (rg && dn):
-                    relTheta0 = getPsy0(t0, t1-PI2, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI2, t0-PI2, PI2) || 0;
+                case rg && up:
+                    relTheta0 = getPsy0(t0, t1 + PI2, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI2, t0 - PI2, PI2) || 0;
                     break;
 
-                case (lf && up):
-                    relTheta0 = getPsy0(t0, t1+PI2, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI2, t0+PI2, PI2) || 0;
+                case rg && dn:
+                    relTheta0 = getPsy0(t0, t1 - PI2, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI2, t0 - PI2, PI2) || 0;
                     break;
 
-                case (lf && dn):
-                    relTheta0 = getPsy0(t0, t1-PI2, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI2, t0+PI2, PI2) || 0;
+                case lf && up:
+                    relTheta0 = getPsy0(t0, t1 + PI2, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI2, t0 + PI2, PI2) || 0;
+                    break;
+
+                case lf && dn:
+                    relTheta0 = getPsy0(t0, t1 - PI2, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI2, t0 + PI2, PI2) || 0;
                     break;
 
                 default:
@@ -1412,40 +1451,40 @@ class RigidBodies {
 
             switch (true) {
 
-                case (fw && up && rg):
-                    relTheta0 = getPsy0(t0, t1+PI4, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI4, t0-PI2, PI2) || 0;
+                case fw && up && rg:
+                    relTheta0 = getPsy0(t0, t1 + PI4, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI4, t0 - PI2, PI2) || 0;
                     break;
-                case (fw && dn && rg):
-                    relTheta0 = getPsy0(t0, t1-PI4, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI4, t0-PI2, PI2) || 0;
-                    break;
-
-                case (fw && up && lf):
-                    relTheta0 = getPsy0(t0, t1+PI4, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI4, t0+PI2, PI2) || 0;
-                    break;
-                case (fw && dn && lf):
-                    relTheta0 = getPsy0(t0, t1-PI4, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI4, t0+PI2, PI2) || 0;
+                case fw && dn && rg:
+                    relTheta0 = getPsy0(t0, t1 - PI4, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI4, t0 - PI2, PI2) || 0;
                     break;
 
-                case (bw && up && rg):
-                    relTheta0 = getPsy0(t0, t1+PI34, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI34, t0-PI2, PI2) || 0;
+                case fw && up && lf:
+                    relTheta0 = getPsy0(t0, t1 + PI4, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI4, t0 + PI2, PI2) || 0;
                     break;
-                case (bw && dn && rg):
-                    relTheta0 = getPsy0(t0, t1-PI34, t0-PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI34, t0-PI2, PI2) || 0;
+                case fw && dn && lf:
+                    relTheta0 = getPsy0(t0, t1 - PI4, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI4, t0 + PI2, PI2) || 0;
                     break;
 
-                case (bw && up && lf):
-                    relTheta0 = getPsy0(t0, t1+PI34, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1+PI34, t0+PI2, PI2) || 0;
+                case bw && up && rg:
+                    relTheta0 = getPsy0(t0, t1 + PI34, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI34, t0 - PI2, PI2) || 0;
                     break;
-                case (bw && dn && lf):
-                    relTheta0 = getPsy0(t0, t1-PI34, t0+PI2, PI2) || 0;
-                    relTheta1 = getPsy1(t0, t1-PI34, t0+PI2, PI2) || 0;
+                case bw && dn && rg:
+                    relTheta0 = getPsy0(t0, t1 - PI34, t0 - PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI34, t0 - PI2, PI2) || 0;
+                    break;
+
+                case bw && up && lf:
+                    relTheta0 = getPsy0(t0, t1 + PI34, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 + PI34, t0 + PI2, PI2) || 0;
+                    break;
+                case bw && dn && lf:
+                    relTheta0 = getPsy0(t0, t1 - PI34, t0 + PI2, PI2) || 0;
+                    relTheta1 = getPsy1(t0, t1 - PI34, t0 + PI2, PI2) || 0;
                     break;
 
                 default:
@@ -1496,9 +1535,9 @@ class RigidBodies {
         // ( s0(-S1S0) + c0c1(S1C0) - c0s1C1 )
         // ( s1(S1C0) - c1C1 )
         relFrontVector =    [
-            (-sinRel1*sinRel0*cosAbs0 - sinRel1*cosRel0*sinAbs0*cosAbs1 - cosRel1*sinAbs0*sinAbs1),
-            (-sinRel1*sinRel0*sinAbs0 + sinRel1*cosRel0*cosAbs0*cosAbs1 + cosRel1*cosAbs0*sinAbs1),
-            (                           sinRel1*cosRel0*sinAbs1         - cosRel1*cosAbs1)
+            -sinRel1 * sinRel0 * cosAbs0   -   sinRel1 * cosRel0 * sinAbs0 * cosAbs1   -   cosRel1 * sinAbs0 * sinAbs1,
+            -sinRel1 * sinRel0 * sinAbs0   +   sinRel1 * cosRel0 * cosAbs0 * cosAbs1   +   cosRel1 * cosAbs0 * sinAbs1,
+            /**/                               sinRel1 * cosRel0 * sinAbs1             -   cosRel1 * cosAbs1
         ];
 
         // TODO [CRIT] compute contributions in relTheta
@@ -1517,7 +1556,7 @@ class RigidBodies {
         let sq = 0;
         for (let i = 0; i < 3; ++i) {
             let c = relFrontVector[i];
-            sq += (c*c);
+            sq += c * c;
             frontVector3D[i] = relFrontVector[i] * factor;
         }
         // console.log(sqrt(sq)); // Must be 1
@@ -1533,9 +1572,9 @@ class RigidBodies {
     }
 
     computeDesiredSpeed(entity, speed, theta, ds, dt) {
-        var desiredSpeed = [0, 0, 0];
+        let desiredSpeed = [0, 0, 0];
         const gravity = this.gravity;
-        const pi4 = Math.PI/4;
+        const pi4 = Math.PI / 4;
 
         if (ds[0] && !ds[3]) // forward quarter
         {
@@ -1570,23 +1609,24 @@ class RigidBodies {
 
         let godMode = false;
         if (godMode) {
-            desiredSpeed[2] = (ds[4]&&!ds[5])?1:(ds[5]&&!ds[4])?-1:0;
-        } else {
-            if (ds[4]&&!ds[5]) {
-                for (let i = 0; i<3; ++i) {
+            desiredSpeed[2] = ds[4] && !ds[5] ?
+                1 :
+                ds[5] && !ds[4] ? -1 : 0;
+        } else
+            if (ds[4] && !ds[5]) {
+                for (let i = 0; i < 3; ++i) {
                     if (gravity[i] < 0 && entity.adherence[i]) {
-                        entity.acceleration[i] = 3.3/dt;
+                        entity.acceleration[i] = 3.3 / dt;
                         entity.jump(i); // In which direction I jump
                     }
                 }
-                for (let i = 3; i<6; ++i) {
-                    if (gravity[i-3] > 0 && entity.adherence[i]) {
-                        entity.acceleration[i-3] = -3.3/dt;
+                for (let i = 3; i < 6; ++i) {
+                    if (gravity[i - 3] > 0 && entity.adherence[i]) {
+                        entity.acceleration[i - 3] = -3.3 / dt;
                         entity.jump(i); // In which direction I jump
                     }
                 }
             }
-        }
 
         desiredSpeed[0] *= 0.65;
         desiredSpeed[1] *= 0.65;
@@ -1599,7 +1639,7 @@ class RigidBodies {
         // Gravity
         let g = this.gravity;
         let m = entity.mass;
-        var sum = [g[0]*m, g[1]*m, g[2]*m];
+        let sum = [g[0] * m, g[1] * m, g[2] * m];
 
         // sum[2] = 0; // ignore grav
 
@@ -1607,7 +1647,7 @@ class RigidBodies {
     }
 
     sumLocalFields(force, pos, EM) {
-        var sum = [0, 0, 0];
+        let sum = [0, 0, 0];
         RigidBodies.add(force, sum);
     }
 

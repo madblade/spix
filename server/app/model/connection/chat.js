@@ -12,7 +12,7 @@ class Chat {
     }
 
     log(message) {
-        console.log('On ' + this._game.gameId + ': ' + message);
+        console.log(`On ${this._game.gameId}: ${message}`);
     }
 
     hasMessages() {
@@ -34,12 +34,12 @@ class Chat {
      */
     playerInput(player) {
         // TODO [LOW] log input into temporaryMessages.
-        return (data) => {
+        return data => {
             // Important: don't send responses immediately on input.
             // Store history of received messages in a temporary variable,
             // then wait for server to call 'updateOutput' method after it
             // has finished rendering current game state.
-            this.log('received message ' + data + ' from ' + player.user.id);
+            this.log(`received message ${data} from ${player.user.id}`);
         };
     }
 

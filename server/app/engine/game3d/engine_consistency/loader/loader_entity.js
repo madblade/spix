@@ -17,7 +17,7 @@ class EntityLoader {
         let entityModel = this._entityModel;
         let avatar = player.avatar;
         let aid = avatar.entityId;
-        var entities = {};
+        let entities = {};
 
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
@@ -49,15 +49,15 @@ class EntityLoader {
         //let distance = GeometryUtils.entitySquaredEuclideanDistance;
         let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
 
-        var addedEntities = {};
-        var removedEntities = {};
+        let addedEntities = {};
+        let removedEntities = {};
 
         // TODO [CRIT]: O(n²) -> O(Cn).
         // TODO [CRIT]: also use for AABB phase in physics.
         let aid = avatar.entityId;
         // For all different entities.
-        entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid) { 
-
+        entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid)
+        {
             // Compute distance & find in OLD consistency model.
             let isInRange = distance(e, avatar) < thresh;
 

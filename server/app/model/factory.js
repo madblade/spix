@@ -15,7 +15,7 @@ import Connection       from './connection/connection';
 import UserConnection   from './connection/user_connection';
 import PlayerConnection from './connection/player_connection';
 
-import Game             from './game/game';
+// import Game             from './game/game';
 import GameFactory      from '../engine/factory';
 
 class Factory {

@@ -6,12 +6,12 @@
 
 import XUpdater from './updater_x';
 import XLoader  from '../loader/loader_x';
-import XBuffer  from '../buffer_x'; 
+import XBuffer  from '../buffer_x';
 
 class Updater {
 
-    constructor(consistencyEngine) {
-
+    constructor(consistencyEngine)
+    {
         // Model.
         this._game              = consistencyEngine.game;
         this._worldModel        = consistencyEngine.worldModel;
@@ -48,13 +48,13 @@ class Updater {
     }
 
     processBuffer() {
-        var buffer = this._inputBuffer;
-        var xUpdater = this._xUpdater;
+        let buffer = this._inputBuffer;
+        let xUpdater = this._xUpdater;
 
         buffer.forEach(x => {
             // console.log(x[0]); // Avatar
             console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, portalToLinkId ] }
-            xUpdater.update(x[0], x[1])
+            xUpdater.update(x[0], x[1]);
         });
 
         // Flush X INPUT (BEFORE SEND UPDATE).
@@ -99,64 +99,71 @@ class Updater {
         let xLoader = this._xLoader;
 
         // Object iterator.
-        let forEach = (object, callback) => { for (let id in object) { callback(id) } };
+        let forEach = (object, callback) => { for (let id in object) { callback(id); } };
 
         // For each player...
         let t = process.hrtime();
         let dt1;
         let debugThresh = 1000;
         // TODO [OPT] use arrays
-        players.forEach(p => { if (p.avatar) {
-
+        players.forEach(p => { if (p.avatar)
+        {
             let pid = p.avatar.entityId;
 
             // Compute change for entities in range.
             // TODO [CRIT] heavily optimize by adding data
-            let addedEntities, removedEntities,
-                u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
+            let addedEntities;
+            let removedEntities;
+            let u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
 
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
-            dt1 = (process.hrtime(t)[1]/1000);
-            if (Updater.bench && dt1 > debugThresh) console.log('\t' + dt1 + ' computeNew Entities.');
+            dt1 = process.hrtime(t)[1] / 1000;
+            if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
             t = process.hrtime();
 
             // Compute change for chunks in range.
-            let addedChunks, removedChunks,
-                v = cLoader.computeNewChunksInRange(p);
+            let addedChunks;
+            let removedChunks;
+            let v = cLoader.computeNewChunksInRange(p);
             if (v) [addedChunks, removedChunks] = v;
 
-            dt1 = (process.hrtime(t)[1]/1000);
-            if (Updater.bench && dt1 > debugThresh) console.log('\t' + dt1 + ' computeNew Chunks.');
+            dt1 = process.hrtime(t)[1] / 1000;
+            if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Chunks.`);
             t = process.hrtime();
 
-            let addedX, removedX, addedW,
-                x = xLoader.computeNewXInRange(p);
+            let addedX;
+            let removedX;
+            let addedW;
+            let x = xLoader.computeNewXInRange(p);
             if (x) [addedX, removedX] = x;
 
             // Update consistency model.
             // WARN: updates will only be transmitted during next output pass.
             // BE CAREFUL HERE
-            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e)));
-            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e)));
+            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e, 10)));
+            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e, 10)));
 
-            if (addedX)             forEach(addedX, x => consistencyModel.setXLoaded(pid, parseInt(x)));
-            if (removedX)           forEach(removedX, x => consistencyModel.setXOutOfRange(pid, parseInt(x)));
+            if (addedX)             forEach(addedX, ax => consistencyModel.setXLoaded(pid, parseInt(ax, 10)));
+            if (removedX)           forEach(removedX, ax => consistencyModel.setXOutOfRange(pid, parseInt(ax, 10)));
 
             if (addedChunks)        {
                 addedW = {};
                 forEach(addedChunks, wid => {
                     if (!(wid in addedW)) {
-                        let w = worldModel.getWorld(parseInt(wid));
+                        let w = worldModel.getWorld(parseInt(wid, 10));
                         addedW[wid] = [w.xSize, w.ySize, w.zSize];
                     }
-                    forEach(addedChunks[wid], c => {consistencyModel.setChunkLoaded(pid, parseInt(wid), c)});
-                }) ;
+                    forEach(addedChunks[wid], c =>
+                        {consistencyModel.setChunkLoaded(pid, parseInt(wid, 10), c);});
+                });
             }
-            if (removedChunks)      forEach(removedChunks, wid => {
-                forEach(removedChunks[wid], c => consistencyModel.setChunkOutOfRange(pid, parseInt(wid), c))
-            });
+            if (removedChunks)
+                forEach(removedChunks, wid => {
+                    forEach(removedChunks[wid], c =>
+                        consistencyModel.setChunkOutOfRange(pid, parseInt(wid, 10), c));
+                });
 
             // Update output buffers.
             if (addedChunks || removedChunks)

@@ -6,8 +6,8 @@
 
 class BlockIterator {
 
-    constructor(chunk) {
-        this._dimensions = chunk.dimensions;
+    constructor(/*chunk*/) {
+        // this._dimensions = chunk.dimensions;
         this._currentFace = null;
     }
 
@@ -19,10 +19,10 @@ class BlockIterator {
 
     }
 
-    breadthFirstSearch() {
+    static breadthFirstSearch() {
         let queue = [];
-        let startingFace = this._currentFace;
-        let marks = {};
+        // let startingFace = this._currentFace;
+        // let marks = {};
         queue.shift();
 
         /*

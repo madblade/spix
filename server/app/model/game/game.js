@@ -50,7 +50,7 @@ class Game {
 
     // Server-render update function (abstract).
     update() {
-        console.log("Abstract loop.");
+        console.log('Abstract loop.');
     }
 
     // Start game loop.
@@ -60,20 +60,20 @@ class Game {
 
         // Launch
         this._isRunning = true;
-        console.log("Game running.");
-        this._jobId = setInterval(_ => {
+        console.log('Game running.');
+        this._jobId = setInterval(() => {
             this.update();
         }, this._refreshRate);
     }
 
     // Stop game loop.
     pause(doTimeout) {
-        console.log("Game stopping.");
+        console.log('Game stopping.');
         if (this._jobId !== undefined) clearInterval(this._jobId);
         this._isRunning = false;
 
         // Set idle time limit before despawning this game.
-        if (doTimeout) this._timeIdleId = setTimeout(_ => this.stop(), 30000);
+        if (doTimeout) this._timeIdleId = setTimeout(() => this.stop(), 30000);
     }
 
     /** Players **/
@@ -111,7 +111,7 @@ class Game {
 
     // Auto-destruction for being idle for too long. Internal use.
     stop() {
-        console.log("Game " + this._gameId + " ended for being idle for too long.");
+        console.log(`Game ${this._gameId} ended for being idle for too long.`);
         this._hub.endGame(this);
     }
 

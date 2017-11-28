@@ -23,14 +23,14 @@ class Connector {
     // When the user connects, register him
     setupUser(socket) {
         // Add user to app DB
-        var user = this._userDB.registerUser(socket);
+        let user = this._userDB.registerUser(socket);
 
         // A user knows its socket and reciprocally
         socket.user = user;
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
-        setTimeout(_ => socket.emit('connected', ''), 400);
+        setTimeout(() => socket.emit('connected', ''), 400);
     }
 
     setupDisconnect(socket) {
@@ -38,8 +38,8 @@ class Connector {
         socket.off = socket.removeListener;
 
         // Call onDisconnect.
-        socket.on('disconnect', _ => {
-            var user = socket.user;
+        socket.on('disconnect', () => {
+            let user = socket.user;
             if (user === undefined) return;
 
             // Leave from any running game.
@@ -55,8 +55,8 @@ class Connector {
     setupDebug(socket) {
         this._debug = true;
 
-        socket.address = socket.request.connection.remoteAddress +
-            ':' + socket.request.connection.remotePort;
+        socket.address =
+            `${socket.request.connection.remoteAddress}:${socket.request.connection.remotePort}`;
 
         socket.connectedAt = new Date();
 

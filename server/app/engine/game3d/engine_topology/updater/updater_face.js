@@ -17,20 +17,20 @@ class UpdaterFace {
         // Compute blocking edges.
         let blockingEdges = [];
         // x-
-        if (faces[0] && faces[2] && chunk.contains(x-1, y-1, z)) blockingEdges.push([0, 4]);
-        if (faces[0] && faces[3] && chunk.contains(x-1, y+1, z)) blockingEdges.push([3, 7]);
-        if (faces[0] && faces[4] && chunk.contains(x-1, y, z-1)) blockingEdges.push([4, 7]);
-        if (faces[0] && faces[5] && chunk.contains(x-1, y, z+1)) blockingEdges.push([0, 3]);
+        if (faces[0] && faces[2] && chunk.contains(x - 1, y - 1, z)) blockingEdges.push([0, 4]);
+        if (faces[0] && faces[3] && chunk.contains(x - 1, y + 1, z)) blockingEdges.push([3, 7]);
+        if (faces[0] && faces[4] && chunk.contains(x - 1, y, z - 1)) blockingEdges.push([4, 7]);
+        if (faces[0] && faces[5] && chunk.contains(x - 1, y, z + 1)) blockingEdges.push([0, 3]);
         // x+
-        if (faces[1] && faces[2] && chunk.contains(x+1, y-1, z)) blockingEdges.push([1, 5]);
-        if (faces[1] && faces[3] && chunk.contains(x+1, y+1, z)) blockingEdges.push([2, 6]);
-        if (faces[1] && faces[4] && chunk.contains(x+1, y, z-1)) blockingEdges.push([5, 6]);
-        if (faces[1] && faces[5] && chunk.contains(x+1, y, z+1)) blockingEdges.push([1, 2]);
+        if (faces[1] && faces[2] && chunk.contains(x + 1, y - 1, z)) blockingEdges.push([1, 5]);
+        if (faces[1] && faces[3] && chunk.contains(x + 1, y + 1, z)) blockingEdges.push([2, 6]);
+        if (faces[1] && faces[4] && chunk.contains(x + 1, y, z - 1)) blockingEdges.push([5, 6]);
+        if (faces[1] && faces[5] && chunk.contains(x + 1, y, z + 1)) blockingEdges.push([1, 2]);
         // y+-z
-        if (faces[2] && faces[4] && chunk.contains(x, y-1, z-1)) blockingEdges.push([4, 5]);
-        if (faces[2] && faces[5] && chunk.contains(x, y-1, z+1)) blockingEdges.push([0, 1]);
-        if (faces[3] && faces[4] && chunk.contains(x, y+1, z-1)) blockingEdges.push([6, 7]);
-        if (faces[3] && faces[5] && chunk.contains(x, y+1, z+1)) blockingEdges.push([2, 3]);
+        if (faces[2] && faces[4] && chunk.contains(x, y - 1, z - 1)) blockingEdges.push([4, 5]);
+        if (faces[2] && faces[5] && chunk.contains(x, y - 1, z + 1)) blockingEdges.push([0, 1]);
+        if (faces[3] && faces[4] && chunk.contains(x, y + 1, z - 1)) blockingEdges.push([6, 7]);
+        if (faces[3] && faces[5] && chunk.contains(x, y + 1, z + 1)) blockingEdges.push([2, 3]);
 
         // Detect loop.
         let ls = [];
@@ -48,8 +48,8 @@ class UpdaterFace {
                     ls[j].push(bi[0]);
                     found = true;
                 }
-                if (ls[j][0] === ls[j][last+1]) { // Loop detected.
-                    if (ls[j].length < 4) console.log("invalid detectProbableTopologyChangeAfterAddition algorithm");
+                if (ls[j][0] === ls[j][last + 1]) { // Loop detected.
+                    if (ls[j].length < 4) console.log('invalid detectProbableTopologyChangeAfterAddition algorithm');
                     return true;
                 }
             }
@@ -78,20 +78,20 @@ class UpdaterFace {
             false  // z+
         ];
 
-        if (x > 0 && !chunk.contains(x-1, y, z)) addedFaces[0] = true;
-        if (x < dimensions[0]-1 && !chunk.contains(x+1, y, z)) addedFaces[1] = true;
-        if (y > 0 && !chunk.contains(x, y-1, z)) addedFaces[2] = true;
-        if (y < dimensions[1]-1 && !chunk.contains(x, y+1, z)) addedFaces[3] = true;
-        if (z > 0 && !chunk.contains(x, y, z-1)) addedFaces[4] = true;
-        if (z < dimensions[2]-1 && !chunk.contains(x, y, z+1)) addedFaces[5] = true;
+        if (x > 0 && !chunk.contains(x - 1, y, z)) addedFaces[0] = true;
+        if (x < dimensions[0] - 1 && !chunk.contains(x + 1, y, z)) addedFaces[1] = true;
+        if (y > 0 && !chunk.contains(x, y - 1, z)) addedFaces[2] = true;
+        if (y < dimensions[1] - 1 && !chunk.contains(x, y + 1, z)) addedFaces[3] = true;
+        if (z > 0 && !chunk.contains(x, y, z - 1)) addedFaces[4] = true;
+        if (z < dimensions[2] - 1 && !chunk.contains(x, y, z + 1)) addedFaces[5] = true;
 
         let removedFaces = [
             !addedFaces[0] && x > 0,             // x-
-            !addedFaces[1] && x < dimensions[0]-1, // x+
+            !addedFaces[1] && x < dimensions[0] - 1, // x+
             !addedFaces[2] && y > 0,             // y-
-            !addedFaces[3] && y < dimensions[1]-1, // y+
+            !addedFaces[3] && y < dimensions[1] - 1, // y+
             !addedFaces[4] && z > 0,             // z-
-            !addedFaces[5] && z < dimensions[2]-1  // z+
+            !addedFaces[5] && z < dimensions[2] - 1  // z+
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
 
@@ -113,15 +113,21 @@ class UpdaterFace {
      * @param dimensions chunk size
      */
     static getFaceIdFromCoordinatesAndNormal(id, normal, dimensions) {
-        let ddd = dimensions[0]*dimensions[1]*dimensions[2];
+        let ddd = dimensions[0] * dimensions[1] * dimensions[2];
         switch (normal) { // TODO boundary management...
-            case 0: return id - 1;
-            case 2: return ddd + id - dimensions[0];
-            case 4: return 2*ddd + id - dimensions[0]*dimensions[1];
+            case 0:
+                return id - 1;
+            case 2:
+                return ddd + id - dimensions[0];
+            case 4:
+                return 2 * ddd + id - dimensions[0] * dimensions[1];
 
-            case 1: return id;
-            case 3: return ddd + id;
-            case 5: return 2*ddd + id;
+            case 1:
+                return id;
+            case 3:
+                return ddd + id;
+            case 5:
+                return 2 * ddd + id;
             default:
         }
     }
@@ -129,32 +135,32 @@ class UpdaterFace {
     // ADDITION ONLY
     static getFaceColorFromIdAndNormal(chunk, x, y, z, direction) {
         let _this = chunk.what(x, y, z);
-        let thisEmpty = (_this === 0);
+        let thisEmpty = _this === 0;
         let dimensions = chunk.dimensions;
         if (thisEmpty) {
             switch (direction) {
                 case 0: // x-
-                    if (x > 0) return chunk.what(x-1, y, z);
+                    if (x > 0) return chunk.what(x - 1, y, z);
                     break;
 
                 case 1: // x+
-                    if (x+1 < dimensions[0]) return chunk.what(x+1, y, z);
+                    if (x + 1 < dimensions[0]) return chunk.what(x + 1, y, z);
                     break;
 
                 case 2: // y-
-                    if (y > 0) return chunk.what(x, y-1, z);
+                    if (y > 0) return chunk.what(x, y - 1, z);
                     break;
 
                 case 3: // y+
-                    if (y+1 < dimensions[1]) return chunk.what(x, y+1, z);
+                    if (y + 1 < dimensions[1]) return chunk.what(x, y + 1, z);
                     break;
 
                 case 4: // z-
-                    if (z > 0) return chunk.what(x, y, z-1);
+                    if (z > 0) return chunk.what(x, y, z - 1);
                     break;
 
                 case 5: // z+
-                    if (z+1 < dimensions[2]) return chunk.what(x, y, z+1);
+                    if (z + 1 < dimensions[2]) return chunk.what(x, y, z + 1);
                     break;
 
                 default:
@@ -179,9 +185,9 @@ class UpdaterFace {
             }
             let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(id, normal, dimensions);
 
-            if (removedFaces[normal]) removedFaceIds[normal] = (faceId);
+            if (removedFaces[normal]) removedFaceIds[normal] = faceId;
             else removedFaceIds[normal] = -1;
-            if (addedFaces[normal]) addedFaceIds[normal] = (faceId);
+            if (addedFaces[normal]) addedFaceIds[normal] = faceId;
             else addedFaceIds[normal] = -1;
         }
 
@@ -203,8 +209,8 @@ class UpdaterFace {
             const componentId = connectedComponents[fid];
             if (componentId === undefined) console.log('Face id ' + fid);
             if (componentId < 1) {
-                console.log("WARN: trying to remove a face that is not registered as boundary: " +
-                    "component id = " + componentId + ".");
+                console.log('WARN: trying to remove a face that is not registered as boundary: ' +
+                    'component id = ' + componentId + '.');
                 continue;
             }
             oldComponent = componentId;
@@ -231,9 +237,9 @@ class UpdaterFace {
             const fid = addedFaceIds[i];
             if (fid === -1) continue;
 
-            // WARN this step is not topology-aware. Components are to be recomputed properly in the "divide" stage.
+            // WARN this step is not topology-aware. Components are to be recomputed properly in the 'divide' stage.
             const componentId = CSFX.forceOneComponentPerChunk ? 1 :
-                (oldComponent === null ? CollectionUtils.generateId(fastComponents): oldComponent);
+                (oldComponent === null ? CollectionUtils.generateId(fastComponents) : oldComponent);
 
             if (fastComponents[componentId] === undefined) {
                 // TODO check in divide...
@@ -249,16 +255,15 @@ class UpdaterFace {
                 oldComponent = componentId;
             }
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
-            var fastIds = fastComponentsIds[componentId];
+            let fastIds = fastComponentsIds[componentId];
 
             let faceColor = UpdaterFace.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
-            if (faceColor == 0) continue;
+            if (faceColor === 0) continue; // TODO [FIX] face color change hint
 
             if (isAddition) {
-                if (i%2 === 0) faceColor *= -1;
-            } else {
-                if (i%2 !== 0) faceColor *= -1;
-            }
+                if (i % 2 === 0) faceColor *= -1;
+            } else
+                if (i % 2 !== 0) faceColor *= -1;
 
             newColor[i] = faceColor;
             fastIds.splice(location, 0, faceColor);
@@ -278,7 +283,7 @@ class UpdaterFace {
         let addedUpdt = updates[1];
         let changedUpdt = updates[2];
 
-        var nbp = CollectionUtils.numberOfProperties;
+        let nbp = CollectionUtils.numberOfProperties;
         const updatesEmpty = nbp(removedUpdt) === 0 && nbp(addedUpdt) === 0 && nbp(changedUpdt) === 0;
 
         for (let i = 0, l = addedFaceIds.length; i < l; ++i) {
@@ -305,8 +310,8 @@ class UpdaterFace {
         }
     }
 
-    static divideConnectedComponents(chunk, id, x, y, z, addedFaces) {
-        var nbp = CollectionUtils.numberOfProperties;
+    static divideConnectedComponents(/*chunk, id, x, y, z, addedFaces*/) {
+        // let nbp = CollectionUtils.numberOfProperties;
         /**
          * Idea: breadth-first search. (breadth for early detection of neighbour faces)
          * 1 face -> 4 candidates (3 per edge). recurse clockwise.
@@ -329,7 +334,7 @@ class UpdaterFace {
         // and call detectProbableTopologyChangeAfterDeletion(chunk, id, x, y, z, removedFaces)
         // but it is computationally easier to check immediate neighborhoods for distinct CCs.
 
-        var connectedComponents = chunk.connectedComponents;
+        let connectedComponents = chunk.connectedComponents;
         const capacity = chunk.capacity;
         let dimensions = chunk.dimensions;
         const facePlusId = chunk._toId(x, y, z);
@@ -338,12 +343,12 @@ class UpdaterFace {
         if (x < dimensions[0]) ccids.push(connectedComponents[facePlusId]);
         if (y < dimensions[1]) ccids.push(connectedComponents[capacity + facePlusId]);
         if (z < dimensions[2]) ccids.push(connectedComponents[2 * capacity + facePlusId]);
-        if (x > 0) ccids.push(connectedComponents[chunk._toId(x-1, y, z)]);
-        if (y > 0) ccids.push(connectedComponents[capacity + chunk._toId(x, y-1, z)]);
-        if (z > 0) ccids.push(connectedComponents[2 * capacity + chunk._toId(x, y, z-1)]);
+        if (x > 0) ccids.push(connectedComponents[chunk._toId(x - 1, y, z)]);
+        if (y > 0) ccids.push(connectedComponents[capacity + chunk._toId(x, y - 1, z)]);
+        if (z > 0) ccids.push(connectedComponents[2 * capacity + chunk._toId(x, y, z - 1)]);
 
         let first = ccids[0];
-        for (let i = 1; i<ccids.length; ++i) {
+        for (let i = 1; i < ccids.length; ++i) {
             if (ccids[i] !== first) return true;
         }
         return false;
@@ -388,8 +393,8 @@ class UpdaterFace {
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
                 UpdaterFace.removeFaceFromModel(chunk, fid);
-
-            } else { // add face
+            }
+            else { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
                     updates[2][fid] = wOrigin;
@@ -398,8 +403,8 @@ class UpdaterFace {
                 UpdaterFace.addFaceToModel(chunk, fid, wOrigin);
             }
 
-        // Removing a block.
-        } else {
+            // Removing a block.
+        } else
             if (w !== 0) { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
@@ -407,20 +412,19 @@ class UpdaterFace {
                 }
                 else updates[1][fid] = w;
                 UpdaterFace.addFaceToModel(chunk, fid, w);
-
-            } else { // remove face
+            }
+            else { // remove face
                 if (updates[1].hasOwnProperty(fid)) delete updates[1][fid];
                 else updates[0][fid] = null;
                 UpdaterFace.removeFaceFromModel(chunk, fid);
             }
-        }
     }
 
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
 
-        var updatedChunks = new Set();
+        let updatedChunks = new Set();
 
         if (x === dimensions[0] - 1) {
             let wOrigin = chunk.what(x, y, z);
@@ -513,20 +517,20 @@ class UpdaterFace {
             false  // z+
         ];
 
-        if (x > 0 && chunk.contains(x-1, y, z)) addedFaces[0] = true;
-        if (x < dimensions[0]-1 && chunk.contains(x+1, y, z)) addedFaces[1] = true;
-        if (y > 0 && chunk.contains(x, y-1, z)) addedFaces[2] = true;
-        if (y < dimensions[1]-1 && chunk.contains(x, y+1, z)) addedFaces[3] = true;
-        if (z > 0 && chunk.contains(x, y, z-1)) addedFaces[4] = true;
-        if (z < dimensions[2]-1 && chunk.contains(x, y, z+1)) addedFaces[5] = true;
+        if (x > 0 && chunk.contains(x - 1, y, z)) addedFaces[0] = true;
+        if (x < dimensions[0] - 1 && chunk.contains(x + 1, y, z)) addedFaces[1] = true;
+        if (y > 0 && chunk.contains(x, y - 1, z)) addedFaces[2] = true;
+        if (y < dimensions[1] - 1 && chunk.contains(x, y + 1, z)) addedFaces[3] = true;
+        if (z > 0 && chunk.contains(x, y, z - 1)) addedFaces[4] = true;
+        if (z < dimensions[2] - 1 && chunk.contains(x, y, z + 1)) addedFaces[5] = true;
 
         let removedFaces = [
             !addedFaces[0] && x > 0,             // x-
-            !addedFaces[1] && x < dimensions[0]-1, // x+
+            !addedFaces[1] && x < dimensions[0] - 1, // x+
             !addedFaces[2] && y > 0,             // y-
-            !addedFaces[3] && y < dimensions[1]-1, // y+
+            !addedFaces[3] && y < dimensions[1] - 1, // y+
             !addedFaces[4] && z > 0,             // z-
-            !addedFaces[5] && z < dimensions[2]-1  // z+
+            !addedFaces[5] && z < dimensions[2] - 1  // z+
         ];
 
         UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
@@ -539,11 +543,11 @@ class UpdaterFace {
         return UpdaterFace.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
-    static mergeComponents(chunk, id, x, y, z) {
+    static mergeComponents(/*chunk, id, x, y, z*/) {
         // TODO deletion version (much easier)
         // Beware of !components in client.
     }
-    
+
 }
 
 export default UpdaterFace;

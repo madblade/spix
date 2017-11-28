@@ -31,7 +31,7 @@ class ChunkBuffer {
         }
         else if (removedChunks) addedChunks = removedChunks;
 
-        if (addedWorlds) addedChunks['worlds'] = addedWorlds;
+        if (addedWorlds) addedChunks.worlds = addedWorlds;
 
         // Output.
         this._outputBuffer.set(playerId, addedChunks);

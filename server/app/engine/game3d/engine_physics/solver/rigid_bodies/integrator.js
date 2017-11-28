@@ -18,8 +18,8 @@ class Integrator {
     }
 
     // Returns true when an entity has updated.
-    static updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world) {
-
+    static updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world)
+    {
         //console.log(entity.adherence);
         //console.log(entity.acceleration);
         let newPosition;
@@ -35,7 +35,7 @@ class Integrator {
                 // xCrossed.chunkId;
                 // xCrossed.state;
                 let newWorldId = xCrossed.worldId;
-                
+
                 orderer.switchEntityToWorld(entity, newWorldId, newPosition);
                 // em.setWorldForEntity(entity, newWorldId);
             }
@@ -44,8 +44,8 @@ class Integrator {
             TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
 
             return true;
-
-        } else {
+        }
+        else {
             //console.log('Leapfrog');
             newPosition = Integrator.integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, em, world);
             if (!newPosition) return false;
@@ -60,13 +60,12 @@ class Integrator {
             // TODO [CRIT] UGLY, DESTROY IT. EXTERMINATE.
             let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
             return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, em, world, hasCollided);
-
         }
     }
 
     // First-order integrator
     // @returns {boolean} whether entity has updated
-    static integrateEuler(dt, impulseSpeed, force, entity, EM, world) {
+    static integrateEuler(dt, impulseSpeed, force, entity/*, EM, world*/) {
         let mass = entity.mass;
 
         let position = entity.position;
@@ -88,8 +87,8 @@ class Integrator {
 
         // Filter, adherence
         let adherence = entity.adherence;
-        for (let i = 0; i<3; ++i) {
-            if (newSpeed[i] < 0 && adherence[i] || newSpeed[i] > 0 && adherence[3+i]) {
+        for (let i = 0; i < 3; ++i) {
+            if (newSpeed[i] < 0 && adherence[i] || newSpeed[i] > 0 && adherence[3 + i]) {
                 newSpeed[i] = 0;
             }
         }
@@ -113,11 +112,11 @@ class Integrator {
 
     // Higher order integrators induce heavier loads when solving in narrow phase.
     // More precisely, orders higher than 4 would need numerical solvers such as Newton-Raphson.
-    
+
     // Second-order integrator (time-reversible, symplectic)
     // @returns {boolean} whether entity has updated
     //static integrateLeapfrog(dt, impulseSpeed, force, entity, EM, world) {
-    static integrateLeapfrogPhase1(dt, impulseSpeed, force, entity, EM, world) {
+    static integrateLeapfrogPhase1(dt, impulseSpeed, force, entity/*, EM, world*/) {
         let position = entity.position;
         let speed = entity.speed;
         let acceleration = entity.acceleration;
@@ -147,9 +146,8 @@ class Integrator {
             //entity.acceleration = newAcceleration;
             entity.speed[0] = entity._impulseSpeed[0];
             entity.speed[1] = entity._impulseSpeed[1];
-
-        } else {
-
+        }
+        else {
             let mass = entity.mass;
             let speed = entity.speed;
             let acceleration = entity.acceleration;
@@ -166,7 +164,7 @@ class Integrator {
             if (!Integrator.areEqual(previousImpulseSpeed, impulseSpeed)) {
                 for (let i = 0; i < 3; ++i) newSpeed[i] = newSpeed[i] + impulseSpeed[i] - previousImpulseSpeed[i];
             }
-            for (let i = 0; i < 3; ++i) newSpeed[i] += dt * (newAcceleration[i]+acceleration[i])/2; // Leapfrog
+            for (let i = 0; i < 3; ++i) newSpeed[i] += dt * (newAcceleration[i] + acceleration[i]) / 2; // Leapfrog
 
             // Update properties
             entity.speed = newSpeed;

@@ -41,57 +41,59 @@ class Searcher {
         const y = p[1];
         const z = p[2];
 
-        let iXl = object.indexX-1, iXr = object.indexX+1;
-        let iYl = object.indexY-1, iYr = object.indexY+1;
-        let iZl = object.indexZ-1, iZr = object.indexZ+1;
+        let iXl = object.indexX - 1;
+        let iXr = object.indexX + 1;
+        let iYl = object.indexY - 1;
+        let iYr = object.indexY + 1;
+        let iZl = object.indexZ - 1;
+        let iZr = object.indexZ + 1;
 
         let hasSwapped = false;
-        let log = axis=>{
+        let log = /*axis*/() => {
             //console.log('\tswap performed on axis ' + axis);
             hasSwapped = true;
         };
-        
+
         // Resort left X.
-        while ((iXl > -1) && (objects[axisX[iXl].id].p0[0] > x)) {
+        while (iXl > -1 && objects[axisX[iXl].id].p0[0] > x) {
             log('x-');
-            this.swap(axisX, iXl, iXl+1);
+            this.swap(axisX, iXl, iXl + 1);
             --iXl;
         }
         // Resort right X.
-        while ((iXr < length) && (objects[axisX[iXr].id].p0[0] < x)) {
+        while (iXr < length && objects[axisX[iXr].id].p0[0] < x) {
             log('x+');
-            this.swap(axisX,iXr,iXr-1);
+            this.swap(axisX, iXr, iXr - 1);
             ++iXr;
         }
 
         // Resort left Y.
-        while ((iYl > -1) && (objects[axisY[iYl].id].p0[1] > y)) {
+        while (iYl > -1 && objects[axisY[iYl].id].p0[1] > y) {
             log('y-');
-            this.swap(axisY,iYl,iYl+1);
+            this.swap(axisY, iYl, iYl + 1);
             --iYl;
         }
         // Resort right Y.
-        while ((iYr < length) && (objects[axisY[iYr].id].p0[1] < y)) {
+        while (iYr < length && objects[axisY[iYr].id].p0[1] < y) {
             log('y+');
-            this.swap(axisY,iYr,iYr-1);
+            this.swap(axisY, iYr, iYr - 1);
             ++iYr;
         }
 
         // Resort left Z.
-        while ((iZl > -1) && (objects[axisZ[iZl].id].p0[2] > z)) {
+        while (iZl > -1 && objects[axisZ[iZl].id].p0[2] > z) {
             log('z-');
-            this.swap(axisZ,iZl,iZl+1);
+            this.swap(axisZ, iZl, iZl + 1);
             --iZl;
         }
         // Resort right Z.
-        while ((iZr < length) && (objects[axisZ[iZr].id].p0[2] < z)) {
+        while (iZr < length && objects[axisZ[iZr].id].p0[2] < z) {
             log('z+');
-            this.swap(axisZ,iZr,iZr-1);
+            this.swap(axisZ, iZr, iZr - 1);
             ++iZr;
         }
-        
-        if (hasSwapped)
-        {
+
+        if (hasSwapped) {
             //console.log('Updated object axis for ' + entityId);
             //console.log(this.objectsAxisX);
         }
@@ -121,7 +123,7 @@ class Searcher {
             objects[axisArray[i].id].indexZ = i;
             objects[axisArray[j].id].indexZ = j;
         }
-    };
+    }
 
     initObjects(objects) {
         this.entities = objects;
@@ -131,43 +133,43 @@ class Searcher {
         let axisZ = this.objectsAxisZ;
 
         // Init objects order on every axis.
-        for (var i=0; i<objects.length; ++i) {
+        for (let i = 0; i < objects.length; ++i) {
             axisX[i] = i;
             axisY[i] = i;
             axisZ[i] = i;
         }
 
-        axisX.sort((a,b) => {
+        axisX.sort((a, b) => {
             if (objects[a].position[0] < objects[b].position[0]) return -1;
             else if (objects[a].position[0] > objects[b].position[0]) return 1;
             else return 0;
         });
 
-        axisY.sort((a,b) => {
+        axisY.sort((a, b) => {
             if (objects[a].position[1] < objects[b].position[1]) return -1;
             else if (objects[a].position[1] > objects[b].position[1]) return 1;
             else return 0;
         });
 
-        axisZ.sort((a,b) => {
+        axisZ.sort((a, b) => {
             if (objects[a].position[2] < objects[b].position[2]) return -1;
             else if (objects[a].position[2] > objects[b].position[2]) return 1;
             else return 0;
         });
 
         // Init object indices on every axis.
-        var numberOfObjects = objects.length;
-        for (i=0; i<numberOfObjects; ++i) {
+        let numberOfObjects = objects.length;
+        for (let i = 0; i < numberOfObjects; ++i) {
             objects[axisX[i]].indexX = i;
             objects[axisY[i]].indexY = i;
             objects[axisZ[i]].indexZ = i;
         }
-    };
+    }
 
     // Works with x axis
     computeIsland(lArray, index) {
         let threshAndIndex = lArray[index];
-        
+
         let tx = threshAndIndex[0];
         let ty = threshAndIndex[1];
         let tz = threshAndIndex[2];
@@ -179,7 +181,7 @@ class Searcher {
         } catch (e) {
             return []; // TODO [MEDIUM] bld
         }
-        
+
         let element = iterator.next();
         // let it = 0;
         // console.log('Begin search.');
@@ -190,10 +192,10 @@ class Searcher {
             element = iterator.next();
         }
         // console.log('End search.');
-        
+
         return xAxisIsland;
     }
-    
+
 }
 
 /**
@@ -206,9 +208,9 @@ class Searcher {
  *
  */
 class ObjectsIterator {
-    
-    constructor(searcher, objectIndexX, thresholdX, thresholdY, thresholdZ) {
 
+    constructor(searcher, objectIndexX, thresholdX, thresholdY, thresholdZ)
+    {
         this.axisX = searcher.objectsAxisX;
         this.axisY = searcher.objectsAxisY;
         this.axisZ = searcher.objectsAxisZ;
@@ -221,22 +223,25 @@ class ObjectsIterator {
         const objectIndex = obj.id;
         this.object = objects[objectIndex];
         let o = this.object;
-        this.x = o.p0[0]; let xW = o.widthX;
-        this.y = o.p0[1]; let yW = o.widthY;
-        this.z = o.p0[2]; let zW = o.widthZ;
+        this.x = o.p0[0];
+        let xW = o.widthX;
+        this.y = o.p0[1];
+        let yW = o.widthY;
+        this.z = o.p0[2];
+        let zW = o.widthZ;
 
         if (objectIndexX !== o.indexX) {
             throw Error('[Searcher] Mismatch between ' +
                 'transmitted indexX and the object\'s x index.');
         }
-        
+
         this.iX = o.indexX;
         this.iY = o.indexY;
         this.iZ = o.indexZ;
 
         // Others not moving faster than current.
         let abs = Math.abs;
-        let maxT = Math.max(abs(thresholdX), abs(thresholdY), abs(thresholdZ)); 
+        let maxT = Math.max(abs(thresholdX), abs(thresholdY), abs(thresholdZ));
         this.tx = abs(thresholdX) + maxT + 2 * xW;
         this.ty = abs(thresholdY) + maxT + 2 * yW;
         this.tz = abs(thresholdZ) + maxT + 2 * zW;
@@ -265,32 +270,38 @@ class ObjectsIterator {
         // Do not reinit population!
         this.locked = [!1, !1, !1, !1, !1, !1];
     }
-    
+
     next(indexLocked) {
         this.stack++;
         if (this.stack > 100) {
-            console.log('EXPT: stack ' + this.stack + ', depth ' + this.step); 
+            console.log(`EXPT: stack ${this.stack}, depth ${this.step}`);
             console.log(this.locked);
             this.finalize();
             throw Error('Exploded stack');
         }
-        if (indexLocked%2 === 0) {
+        if (indexLocked % 2 === 0) {
             let l = this.locked;
-            if (l[indexLocked] && l[indexLocked+1]) {
+            if (l[indexLocked] && l[indexLocked + 1]) {
                 this.finalize();
                 return null;
             }
         }
-        
+
         let abs = Math.abs;
         let objects = this.objects;
         let axisX = this.axisX;
         let axisY = this.axisY;
         let axisZ = this.axisZ;
 
-        const x = this.x; const iX = this.iX; const tx = this.tx;
-        const y = this.y; const iY = this.iY; const ty = this.ty;
-        const z = this.z; const iZ = this.iZ; const tz = this.tz;
+        const x = this.x;
+        const iX = this.iX;
+        const tx = this.tx;
+        const y = this.y;
+        const iY = this.iY;
+        const ty = this.ty;
+        const z = this.z;
+        const iZ = this.iZ;
+        const tz = this.tz;
 
         const max = axisX.length;
 
@@ -299,13 +310,15 @@ class ObjectsIterator {
         let toPlus = this.toPlus;
         let done = this.done;
         let locked = this.locked;
-        let debugObject = id=>{if (!objects[id]) throw Error('[Searcher] Couldn\'t find object ' + id)};
+        let debugObject = id => {
+            if (!objects[id]) throw Error(`[Searcher] Couldn\'t find object ${id}`);
+        };
 
-        if (done.size >= axisX.length-1) {
+        if (done.size >= axisX.length - 1) {
             this.finalize();
             return null;
         }
-        
+
         // Search on X axis.
         if (onX && toPlus && !locked[0]) {
             //console.log('\t\tx+');
@@ -314,7 +327,7 @@ class ObjectsIterator {
                 this.toPlus = false;
                 return this.next(0);
             }
-            
+
             // TODO [OPT] replace id with indexX
             let id = axisX[iX + s].id;
             if (done.has(id)) {
@@ -353,7 +366,7 @@ class ObjectsIterator {
                 this.onY = true;
                 return this.next();
             } else done.add(id);
-            
+
             debugObject(id);
             let object = objects[id];
             // console.log(x + ',' + object.p0[0] + ' < - > ' + tx);
@@ -391,7 +404,7 @@ class ObjectsIterator {
             if (abs(object.p0[1] - y) <= ty) {
                 if (abs(object.p0[0] - x) <= tx && abs(object.p0[2] - z) <= tz)
                     return object;
-                else 
+                else
                     return this.next();
             } else {
                 locked[2] = true;
@@ -491,7 +504,6 @@ class ObjectsIterator {
                 return this.next(4);
             }
         }
-        
     }
 }
 

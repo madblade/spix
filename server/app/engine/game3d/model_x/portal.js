@@ -23,7 +23,7 @@ class Portal {
         this._offset = offset; // Ratio. TODO [MEDIUM] use different name.
         this._orientation = orientation;
         this._chunk = chunk;
-        
+
         // Physics properties and optimization.
         this._indexX = -1;
         this._indexY = -1;
@@ -43,19 +43,19 @@ class Portal {
     get indexY()        { return this._indexY; }
     set indexZ(indexZ)  { this._indexZ = indexZ; }
     get indexZ()        { return this._indexZ; }
-    
+
     // Position! Not ratio!
-    get position()  { 
+    get position()  {
         let b1 = this._block1;
         let b2 = this._block2;
         if (!b1 || !b2) return;
-        
-        var p = [0, 0, 0];
-        for (let i = 0; i < 3; ++i) 
+
+        let p = [0, 0, 0];
+        for (let i = 0; i < 3; ++i)
             p[i] = (b1[i] + b2[i]) * .5;
-        
-        return p; 
-    } 
+
+        return p;
+    }
 }
 
 export default Portal;

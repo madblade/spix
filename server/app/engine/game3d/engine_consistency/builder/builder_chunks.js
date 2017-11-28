@@ -4,7 +4,7 @@
 
 'use strict';
 
-import GeometryUtils        from '../../../math/geometry';
+// import GeometryUtils        from '../../../math/geometry';
 
 import ChunkGenerator       from './../generator/chunkgenerator';
 import BlockExtractor       from './surface_blocks_builder';
@@ -26,7 +26,7 @@ class ChunkBuilder {
         BlockExtractor.extractSurfaceBlocks(chunk);
 
         // Detect connected boundary face components.
-        if (ChunkBuilder.debug) console.log("\tComputing connected components...");
+        if (ChunkBuilder.debug) console.log('\tComputing connected components...');
         FaceExtractor.extractConnectedComponents(chunk);
 
         chunk.ready = true;
@@ -59,24 +59,24 @@ class ChunkBuilder {
         let world = chunk.world;
 
         switch (direction) {
-            case 0: return world.getChunk(i+1, j, k);      // x+
-            case 1:  return world.getChunk(i-1, j, k);     // x-
-            case 2:  return world.getChunk(i, j+1, k);     // y+
-            case 3:  return world.getChunk(i, j-1, k);     // y-
-            case 4:  return world.getChunk(i, j, k+1);     // z+
-            case 5:  return world.getChunk(i, j, k-1);     // z- (idem)
-            case 6:  return world.getChunk(i+1, j+1, k);
-            case 7:  return world.getChunk(i-1, j+1, k);
-            case 8:  return world.getChunk(i+1, j-1, k);
-            case 9:  return world.getChunk(i-1, j-1, k);
-            case 10: return world.getChunk(i+1, j, k-1);
-            case 11: return world.getChunk(i+1, j, k+1);
-            case 12: return world.getChunk(i-1, j, k-1);
-            case 13: return world.getChunk(i-1, j, k+1);
-            case 14: return world.getChunk(i, j+1, k+1);
-            case 15: return world.getChunk(i, j-1, k+1);
-            case 16: return world.getChunk(i, j+1, k-1);
-            case 17: return world.getChunk(i, j-1, k-1);
+            case 0: return world.getChunk(i + 1, j, k);      // x+
+            case 1:  return world.getChunk(i - 1, j, k);     // x-
+            case 2:  return world.getChunk(i, j + 1, k);     // y+
+            case 3:  return world.getChunk(i, j - 1, k);     // y-
+            case 4:  return world.getChunk(i, j, k + 1);     // z+
+            case 5:  return world.getChunk(i, j, k - 1);     // z- (idem)
+            case 6:  return world.getChunk(i + 1, j + 1, k);
+            case 7:  return world.getChunk(i - 1, j + 1, k);
+            case 8:  return world.getChunk(i + 1, j - 1, k);
+            case 9:  return world.getChunk(i - 1, j - 1, k);
+            case 10: return world.getChunk(i + 1, j, k - 1);
+            case 11: return world.getChunk(i + 1, j, k + 1);
+            case 12: return world.getChunk(i - 1, j, k - 1);
+            case 13: return world.getChunk(i - 1, j, k + 1);
+            case 14: return world.getChunk(i, j + 1, k + 1);
+            case 15: return world.getChunk(i, j - 1, k + 1);
+            case 16: return world.getChunk(i, j + 1, k - 1);
+            case 17: return world.getChunk(i, j - 1, k - 1);
 
             default:
         }
@@ -89,24 +89,24 @@ class ChunkBuilder {
         let world = chunk.world;
 
         switch (direction) {
-            case 0:  return world.hasChunk(i+1, j, k); // x+
-            case 1:  return world.hasChunk(i-1, j, k); // x-
-            case 2:  return world.hasChunk(i, j+1, k); // y+
-            case 3:  return world.hasChunk(i, j-1, k); // y-
-            case 4:  return world.hasChunk(i, j, k+1); // z+ (non-flat models)
-            case 5:  return world.hasChunk(i, j, k-1); // z-
-            case 6:  return world.hasChunk(i+1, j+1, k);
-            case 7:  return world.hasChunk(i-1, j+1, k);
-            case 8:  return world.hasChunk(i+1, j-1, k);
-            case 9:  return world.hasChunk(i-1, j-1, k);
-            case 10: return world.hasChunk(i+1, j, k-1);
-            case 11: return world.hasChunk(i+1, j, k+1);
-            case 12: return world.hasChunk(i-1, j, k-1);
-            case 13: return world.hasChunk(i-1, j, k+1);
-            case 14: return world.hasChunk(i, j+1, k+1);
-            case 15: return world.hasChunk(i, j-1, k+1);
-            case 16: return world.hasChunk(i, j+1, k-1);
-            case 17: return world.hasChunk(i, j-1, k-1);
+            case 0:  return world.hasChunk(i + 1, j, k); // x+
+            case 1:  return world.hasChunk(i - 1, j, k); // x-
+            case 2:  return world.hasChunk(i, j + 1, k); // y+
+            case 3:  return world.hasChunk(i, j - 1, k); // y-
+            case 4:  return world.hasChunk(i, j, k + 1); // z+ (non-flat models)
+            case 5:  return world.hasChunk(i, j, k - 1); // z-
+            case 6:  return world.hasChunk(i + 1, j + 1, k);
+            case 7:  return world.hasChunk(i - 1, j + 1, k);
+            case 8:  return world.hasChunk(i + 1, j - 1, k);
+            case 9:  return world.hasChunk(i - 1, j - 1, k);
+            case 10: return world.hasChunk(i + 1, j, k - 1);
+            case 11: return world.hasChunk(i + 1, j, k + 1);
+            case 12: return world.hasChunk(i - 1, j, k - 1);
+            case 13: return world.hasChunk(i - 1, j, k + 1);
+            case 14: return world.hasChunk(i, j + 1, k + 1);
+            case 15: return world.hasChunk(i, j - 1, k + 1);
+            case 16: return world.hasChunk(i, j + 1, k - 1);
+            case 17: return world.hasChunk(i, j - 1, k - 1);
             default:
         }
     }
@@ -115,27 +115,31 @@ class ChunkBuilder {
         let loadedChunks = world.allChunks;
         let c = chunk;
         let dims = c.dimensions;
-        let ci = c.chunkI, cj = c.chunkJ, ck = c.chunkK;
+        let ci = c.chunkI;
+        let cj = c.chunkJ;
+        let ck = c.chunkK;
 
         let neighbourIds = [
-            (ci+1)+','+cj+','+ck,           //  i+1,	j,		k
-            ci+','+(cj+1)+','+ck,           //  i-1,	j,		k
-            ci+','+cj+','+(ck+1),           //  i,		j+1,	k
-            (ci-1)+','+cj+','+ck,           //  i,		j-1,	k
-            ci+','+(cj-1)+','+ck,           //  i,		j,		k+1
-            ci+','+cj+','+(ck-1),           //  i,		j,		k-1
-            (ci+1)+','+(cj+1)+','+(ck),     //  i+1,	j+1,	k
-            (ci-1)+','+(cj+1)+','+(ck),     //  i-1,	j+1,	k
-            (ci+1)+','+(cj-1)+','+(ck),     //  i+1,	j-1,	k
-            (ci-1)+','+(cj-1)+','+(ck),     //  i-1,	j-1,	k
-            (ci+1)+','+(cj)+','+(ck-1),     //  i+1,	j,		k-1
-            (ci+1)+','+(cj)+','+(ck+1),     //  i+1,	j,		k+1
-            (ci-1)+','+(cj)+','+(ck-1),     //  i-1,	j,		k-1
-            (ci-1)+','+(cj)+','+(ck+1),     //  i-1,	j,		k+1
-            (ci)+','+(cj+1)+','+(ck+1),     //  i,		j+1,	k+1
-            (ci)+','+(cj-1)+','+(ck+1),     //  i,		j-1,	k+1
-            (ci)+','+(cj+1)+','+(ck-1),     //  i,		j+1,	k-1
-            (ci)+','+(cj-1)+','+(ck-1)      //  i,		j-1,	k-1
+            `${ci + 1},${cj},${ck}`,        //  i+1,	j,		k
+            `${ci},${cj + 1},${ck}`,        //  i-1,	j,		k
+            `${ci},${cj},${ck + 1}`,        //  i,		j+1,	k
+            `${ci - 1},${cj},${ck}`,        //  i,		j-1,	k
+            `${ci},${cj - 1},${ck}`,        //  i,		j,		k+1
+            `${ci},${cj},${ck - 1}`,        //  i,		j,		k-1
+
+            `${ci + 1},${cj + 1},${ck}`,    //  i+1,	j+1,	k
+            `${ci - 1},${cj + 1},${ck}`,    //  i-1,	j+1,	k
+            `${ci + 1},${cj - 1},${ck}`,    //  i+1,	j-1,	k
+            `${ci - 1},${cj - 1},${ck}`,    //  i-1,	j-1,	k
+            `${ci + 1},${cj},${ck - 1}`,    //  i+1,	j,		k-1
+            `${ci + 1},${cj},${ck + 1}`,    //  i+1,	j,		k+1
+            `${ci - 1},${cj},${ck - 1}`,    //  i-1,	j,		k-1
+            `${ci - 1},${cj},${ck + 1}`,    //  i-1,	j,		k+1
+
+            `${ci},${cj + 1},${ck + 1}`,    //  i,		j+1,	k+1
+            `${ci},${cj - 1},${ck + 1}`,    //  i,		j-1,	k+1
+            `${ci},${cj + 1},${ck - 1}`,    //  i,		j+1,	k-1
+            `${ci},${cj - 1},${ck - 1}`     //  i,		j-1,	k-1
         ];
 
         for (let i = 0, length = neighbourIds.length; i < length; ++i) {
@@ -157,12 +161,12 @@ class ChunkBuilder {
         let dims = c.dimensions;
 
         let neighbourIds = [
-            (ci+1)+','+cj+','+ck,
-            ci+','+(cj+1)+','+ck,
-            ci+','+cj+','+(ck+1),
-            (ci-1)+','+cj+','+ck,
-            ci+','+(cj-1)+','+ck,
-            ci+','+cj+','+(ck-1)
+            `${ci + 1},${cj},${ck}`,
+            `${ci},${cj + 1},${ck}`,
+            `${ci},${cj},${ck + 1}`,
+            `${ci - 1},${cj},${ck}`,
+            `${ci},${cj - 1},${ck}`,
+            `${ci},${cj},${ck - 1}`
         ];
 
         for (let i = 0, length = neighbourIds.length; i < length; ++i) {
@@ -183,8 +187,10 @@ class ChunkBuilder {
         return chunk;
     }
 
-    static loadNextChunk(player, startWid, startCid, worldModel, xModel, consistencyModel, serverLoadingRadius, forPlayer) {
-
+    static loadNextChunk(
+        player, startWid, startCid, worldModel, xModel,
+        consistencyModel, serverLoadingRadius, forPlayer)
+    {
         let avatar = player.avatar;
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
         threshold = Math.min(threshold, serverLoadingRadius);
@@ -195,7 +201,7 @@ class ChunkBuilder {
         if (!chunks) return;
         let aid = avatar.entityId;
 
-        let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, (ic+','+jc+','+kc));
+        let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, `${ic},${jc},${kc}`);
 
         for (let id = 0, l = chunks.length; id < l; ++id) {
             let current = chunks[id];
@@ -207,7 +213,9 @@ class ChunkBuilder {
                 let currentWorld = worldModel.getWorld(wid);
                 let currentChunks = currentWorld.allChunks;
                 let currentChunk = currentChunks.get(currentId);
-                const dx = currentWorld.xSize, dy = currentWorld.ySize, dz = currentWorld.zSize;
+                const dx = currentWorld.xSize;
+                const dy = currentWorld.ySize;
+                const dz = currentWorld.zSize;
 
                 if (!forPlayer) {
                     if (!currentChunk) {
@@ -243,13 +251,13 @@ class ChunkBuilder {
         let connectivity = xModel.getConnectivity(startWid, startCid, worldModel, thresh, true);
         let okChunks = connectivity[1];
         let marks = new Map();
-        okChunks.forEach(c => marks.set(c[0]+','+c[1], c[2]));
+        okChunks.forEach(okCurrent => marks.set(`${okCurrent[0]},${okCurrent[1]}`, okCurrent[2]));
 
         chunkIdsForEntity.forEach((chunkIds, worldId) => {
             chunkIds.forEach(chunkId => {
-                let distance = marks.get(worldId+','+chunkId);
+                let distance = marks.get(`${worldId},${chunkId}`);
                 if (distance === undefined || distance === null || distance > thresh)
-                    chunksToUnload.push([worldId, chunkId])
+                    chunksToUnload.push([worldId, chunkId]);
             });
         });
 

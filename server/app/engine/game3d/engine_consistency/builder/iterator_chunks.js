@@ -20,8 +20,8 @@ class ChunkIterator {
         let markers = [];
 
         queue.push(starterChunk);
-        while (!queue.empty()) {
-
+        while (!queue.empty())
+        {
             let current = queue.pop();
             markers.push(current);
 
@@ -36,11 +36,11 @@ class ChunkIterator {
             }
 
             let neighbours = ChunkIterator.get2DNeighbours(current, world);
-            for (let i = 0, l = neighbours.length; i < l; ++i) {
-
+            for (let i = 0, l = neighbours.length; i < l; ++i)
+            {
                 let neighbour = neighbours[i];
-                if (markers.indexOf(neighbour) < 0) {
-
+                if (markers.indexOf(neighbour) < 0)
+                {
                     markers.push(neighbour);
                     queue.push(neighbour);
                 }
@@ -55,13 +55,13 @@ class ChunkIterator {
         let chunks = world.allChunks;
 
         let neighboursIndices = [
-            (i+1)   +','+j      +','+k,
-            (i+1)   +','+(j+1)  +','+k,
-            i       +','+(j+1)  +','+k,
-            (i-1)   +','+(j+1)  +','+k,
-            (i-1)   +','+j      +','+k,
-            (i-1)   +','+(j-1)  +','+k,
-            i       +','+(j-1)  +','+k
+            `${i + 1},${j},${k}`,
+            `${i + 1},${j + 1},${k}`,
+            `${i},${j + 1},${k}`,
+            `${i - 1},${j + 1},${k}`,
+            `${i - 1},${j},${k}`,
+            `${i - 1},${j - 1},${k}`,
+            `${i},${j - 1},${k}`
         ];
 
         let neighbours = [];
@@ -69,7 +69,7 @@ class ChunkIterator {
         for (let id = 0, length = neighboursIndices.length; id < length; ++id) {
             let chunkId = neighboursIndices[id];
             let chunk = chunks.get(chunkId);
-            if (!chunk) console.log('Iterator: chunk ' + chunkId + ' undefined.');
+            if (!chunk) console.log(`Iterator: chunk ${chunkId} undefined.`);
             else neighbours.push(chunk);
         }
 
@@ -89,8 +89,8 @@ class ChunkIterator {
         return neighbours;
     }
 
-    static get3DNeighbours(currentChunk) {
-        let neighbours = [];
+    static get3DNeighbours(/*currentChunk*/) {
+        // let neighbours = [];
 
         /*
             i	j	k <- starter

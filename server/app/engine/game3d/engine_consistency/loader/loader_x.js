@@ -4,7 +4,7 @@
 
 'use strict';
 
-import GeometryUtils        from '../../../math/geometry';
+// import GeometryUtils        from '../../../math/geometry';
 
 class XLoader {
 
@@ -17,7 +17,7 @@ class XLoader {
     computeNewXInRange(player) {
         let a = player.avatar;
         let avatarId = a.entityId;
-        let p = a.position;
+        let pos = a.position;
         let worldId = a.worldId;
         let portalLoadingRadius = a.portalRenderDistance;
 
@@ -25,7 +25,7 @@ class XLoader {
         let xm = this._xModel;
         let cm = this._consistencyModel;
 
-        let chunk = wm.getWorld(worldId).getChunkByCoordinates(...p);
+        let chunk = wm.getWorld(worldId).getChunkByCoordinates(...pos);
         // Format:
         // Map (portal id -> [other portal id, other portal world])
 
@@ -41,12 +41,12 @@ class XLoader {
             // Manage other end as a whole.
             if (partial) {
                 if (array) {
-                    addedPortals[portalId] = [...array]; 
+                    addedPortals[portalId] = [...array];
                         // API: Other end id, chunk id, world id, xyzp, orientation, world id,
                         // x1,y1,z1, x2,y2,z2, partial position, orientation
                     cm.unsetPartialX(avatarId, portalId);
                 } // Else, nothing to do still.
-            } else {
+            } else
                 if (array) {
                     addedPortals[portalId] = [...array];
                 } else {
@@ -55,7 +55,6 @@ class XLoader {
                     // Then they are flagged as 'partial' in consistency model.
                     cm.setPartialX(avatarId, portalId);
                 }
-            }
         });
 
         // Update out of range portals.
@@ -66,11 +65,11 @@ class XLoader {
         let chunks = connectivity[1];
         if (chunks) {
             let marks = new Map();
-            chunks.forEach(c => marks.set(c[0]+','+c[1], c[2]));
+            chunks.forEach(c => marks.set(`${c[0]},${c[1]},${c[2]}`));
 
             playerXs.forEach(portalId => {
                 let p = xm.getPortal(portalId);
-                let i = p.worldId+','+p.chunkId;
+                let i = `${p.worldId},${p.chunkId}`;
                 let d = marks.get(i);
                 if (d === undefined || d === null || d > portalLoadingRadius)
                     removedPortals[portalId] = null;

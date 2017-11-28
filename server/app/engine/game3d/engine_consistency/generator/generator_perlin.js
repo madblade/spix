@@ -21,7 +21,7 @@
 
 'use strict';
 
-var seedrandom = require('seedrandom');
+let seedrandom = require('seedrandom');
 
 class Perlin {
 
@@ -29,15 +29,15 @@ class Perlin {
     static G2 = 0.21132486540518713;
     static F3 = (1.0 / 3.0);
     static G3 = (1.0 / 6.0);
-    static ASSIGN = (a, v0, v1, v2) => { (a)[0] = v0; (a)[1] = v1; (a)[2] = v2 };
-    static DOT3 = (v1, v2) => ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[1] + (v1)[2] * (v2)[2]);
+    static ASSIGN = (a, v0, v1, v2) => { a[0] = v0; a[1] = v1; a[2] = v2; };
+    static DOT3 = (v1, v2) => v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
     static RAND_MAX = 1.0;
 
     static GRAD3 = () => [
-        [ 1, 1, 0], [-1, 1, 0], [ 1,-1, 0], [-1,-1, 0],
-        [ 1, 0, 1], [-1, 0, 1], [ 1, 0,-1], [-1, 0,-1],
-        [ 0, 1, 1], [ 0,-1, 1], [ 0, 1,-1], [ 0,-1,-1],
-        [ 1, 0,-1], [-1, 0,-1], [ 0,-1, 1], [ 0, 1, 1]
+        [1, 1, 0],  [-1, 1, 0],  [1, -1, 0], [-1, -1, 0],
+        [1, 0, 1],  [-1, 0, 1],  [1, 0, -1], [-1, 0, -1],
+        [0, 1, 1],  [0, -1, 1],  [0, 1, -1], [0, -1, -1],
+        [1, 0, -1], [-1, 0, -1], [0, -1, 1], [0, 1, 1]
     ];
 
     static PERM = () => [ // unsigned char
@@ -85,8 +85,8 @@ class Perlin {
 
     static seed(handle, x) { // unsigned int
         let PERM = Perlin.PERM();
-        let RAND_MAX = 1.0;
-        var rng = seedrandom(x);
+        // let RAND_MAX = 1.0;
+        let rng = seedrandom(x);
 
         for (let i = 0; i < 256; i++) {
             PERM[i] = i;
@@ -94,7 +94,8 @@ class Perlin {
         for (let i = 255; i > 0; i--) {
             let j;
             let n = i + 1;
-            while (n <= (j = Math.floor( rng() * n ) )) {}
+            // TODO [FIX] check this no-body while
+            while (n <= (j = Math.floor(rng() * n)));
 
             let a = PERM[i];
             let b = PERM[j];
@@ -102,17 +103,17 @@ class Perlin {
             PERM[j] = a;
         }
 
-        for (let i = 0; i<256; ++i) {PERM[i+256] = PERM[i];}
+        for (let i = 0; i < 256; ++i) PERM[i + 256] = PERM[i];
 
         Perlin.setPerm(handle, PERM);
     }
 
     static noise2(handle, x, y) { // float, float, float
-        let floorf = x => parseInt(Math.floor(x));
+        let floorf = v => parseInt(Math.floor(v), 10);
         const PERM = Perlin.getPerm(handle);
         let GRAD3 = Perlin.GRAD3();
 
-        let i1, j1, I, J, c;
+        let i1; let j1; let I; let J; let c;
         let s = (x + y) * Perlin.F2;
         let i = floorf(x + s);
         let j = floorf(y + s);
@@ -142,7 +143,7 @@ class Perlin {
         g[2] = PERM[I + 1 + PERM[J + 1]] % 12;
 
         for (c = 0; c <= 2; c++) {
-            f[c] = 0.5 - xx[c]*xx[c] - yy[c]*yy[c];
+            f[c] = 0.5 - xx[c] * xx[c] - yy[c] * yy[c];
         }
 
         for (c = 0; c <= 2; c++) {
@@ -156,12 +157,19 @@ class Perlin {
     }
 
     static noise3(handle, x, y, z) {
-        let floorf = x => parseInt(Math.floor(x));
+        let floorf = v => parseInt(Math.floor(v), 10);
         const PERM = Perlin.getPerm(handle);
         const GRAD3 = Perlin.GRAD3();
 
-        let c, o1 = [0, 0, 0], o2 = [0, 0, 0], g = [0, 0, 0, 0], I, J, K;
-        let f = [0., 0., 0.], noise = [0., 0., 0., 0.];
+        let c;
+        let o1 = [0, 0, 0];
+        let o2 = [0, 0, 0];
+        let g = [0, 0, 0, 0];
+        let I;
+        let J;
+        let K;
+        let f = [0., 0., 0.];
+        let noise = [0., 0., 0., 0.];
         let s = (x + y + z) * Perlin.F3;
         let i = floorf(x + s);
         let j = floorf(y + s);
@@ -190,7 +198,7 @@ class Perlin {
                 Perlin.ASSIGN(o1, 0, 0, 1);
                 Perlin.ASSIGN(o2, 1, 0, 1);
             }
-        } else {
+        } else
             if (pos[0][1] < pos[0][2]) {
                 Perlin.ASSIGN(o1, 0, 0, 1);
                 Perlin.ASSIGN(o2, 0, 1, 1);
@@ -201,7 +209,6 @@ class Perlin {
                 Perlin.ASSIGN(o1, 0, 1, 0);
                 Perlin.ASSIGN(o2, 1, 1, 0);
             }
-        }
 
         for (c = 0; c <= 2; c++) {
             pos[3][c] = pos[0][c] - 1.0 + 3.0 * Perlin.G3;
@@ -279,10 +286,9 @@ class Perlin {
 
         let blocks = new Uint8Array(CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z);
         Perlin.seed(handle, 'SEEED');
-        let func = (x, y, z, w, arg) => {
+        let func = (x, y, z, w/*, arg*/) => {
             //console.log('posed ' + x+','+y+','+z+' ' +w);
             blocks[chunk._toId(x, y, z)] = w;
-
         };
 
         for (let dx = 0; dx < CHUNK_SIZE_X; dx++) {
@@ -297,7 +303,7 @@ class Perlin {
                 let f = Perlin.simplex2(handle, x * 0.01, y * 0.01, 4, 0.5, 2); // float
                 let g = Perlin.simplex2(handle, -x * 0.01, -y * 0.01, 2, 0.9, 2); // float
                 let mh = g * 32 + 16; // int
-                let h = parseInt(f * mh); // int
+                let h = parseInt(f * mh, 10); // int
                 let w = 1; // int
                 let t = 12; // int
                 if (h <= t) {
@@ -310,12 +316,12 @@ class Perlin {
                     func(x, y, z, w * flag, arg);
                 }
 
-                if (w == 1) {
-                    if (SHOW_PLANTS) {
-
+                if (w === 1) {
+                    if (SHOW_PLANTS)
+                    {
                         // grass
                         if (Perlin.simplex2(handle, -x * 0.1, y * 0.1, 4, 0.8, 2) > 0.6) {
-                            if (Math.floor(h)!=h) console.log('grass');
+                            if (Math.floor(h) !== h) console.log('grass');
                             func(x, y, h, 17 * flag, arg);
                         }
 
@@ -337,7 +343,7 @@ class Perlin {
                         for (let z = h + 3; z < h + 8; z++) {
                             for (let ox = -3; ox <= 3; ox++) {
                                 for (let oy = -3; oy <= 3; oy++) {
-                                    let d = (ox * ox) + (oy * oy) +
+                                    let d = ox * ox + oy * oy +
                                         (z - (h + 4)) * (z - (h + 4));
                                     if (d < 11) {
                                         func(x + ox, y + oy, z, 15, arg);

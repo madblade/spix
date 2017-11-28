@@ -33,29 +33,27 @@ class PhysicsEngine {
     get outputBuffer()  { return this._outputBuffer; }
 
     /** ######################## **/
-    
+
     addInput(meta, avatar) {
-        this._inputBuffer.addInput(meta, avatar)
+        this._inputBuffer.addInput(meta, avatar);
     }
 
     update() {
-        
         let input = this._inputBuffer.getInput();
-        
+
         this._updater.update(input);
 
         this._frontend.solve();
 
         this._inputBuffer.flush();
-    
     }
 
     getOutput() {
         return this._outputBuffer.getOutput();
     }
-    
+
     /** ######################## **/
-    
+
     flushOutput() {
         this._outputBuffer.flushOutput();
     }
@@ -65,16 +63,16 @@ class PhysicsEngine {
     }
 
     /** **/
-    
+
     spawnPlayer(player) {
         this._frontend.objectOrderer.addObject(player.avatar);
     }
-    
+
     removePlayer(playerId) {
         let entity = this._entityModel.entities[playerId];
         this._frontend.objectOrderer.removeObject(entity);
     }
-    
+
 }
 
 export default PhysicsEngine;

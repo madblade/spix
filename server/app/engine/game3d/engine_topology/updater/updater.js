@@ -29,9 +29,9 @@ class Updater {
             let action = meta[0];
 
             // Manage block addition.
-            if (action === "add") {
+            if (action === 'add') {
                 this.addBlock(avatar, meta[1], meta[2], meta[3], meta[4]);
-            } else if (action === "del") {
+            } else if (action === 'del') {
                 this.delBlock(avatar, meta[1], meta[2], meta[3]);
             }
         });
@@ -46,7 +46,7 @@ class Updater {
         let a = UpdaterAccess.addBlock(avatar, x, y, z, blockId, world, em);
         if (!a) return;
 
-        let $chunk, $x, $y, $z, $blockId;
+        let $chunk; let $x; let $y; let $z; let $blockId;
         [$chunk, $x, $y, $z, $blockId] = a;
 
         let $id = $chunk.add($x, $y, $z, $blockId);
@@ -67,7 +67,7 @@ class Updater {
         let a = UpdaterAccess.delBlock(avatar, x, y, z, world, em);
         if (!a) return;
 
-        let $chunk, $x, $y, $z;
+        let $chunk; let $x; let $y; let $z;
         [$chunk, $x, $y, $z] = a;
 
         let $id = $chunk.del($x, $y, $z);

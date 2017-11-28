@@ -8,7 +8,7 @@ import GeometryUtils        from '../../../math/geometry';
 
 import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
-import ChunkIterator        from '../builder/iterator_chunks';
+// import ChunkIterator        from '../builder/iterator_chunks';
 import ChunkBuilder         from '../builder/builder_chunks';
 
 class ChunkLoader {
@@ -30,26 +30,31 @@ class ChunkLoader {
         let world = this._worldModel.getWorld(worldId);
 
         // Object to be (JSON.stringify)-ed.
-        var chunksForNewPlayer = {};
+        let chunksForNewPlayer = {};
         let chunksInModel = world.allChunks;
 
         // From player position, find concerned chunks.
         const playerPosition = avatar.position;
         let coords = world.getChunkCoordinates(playerPosition[0], playerPosition[1], playerPosition[2]);
 
-        const i = coords[0], j = coords[1], k = coords[2];
-        const dx = world.xSize, dy = world.ySize, dz = world.zSize;
+        const i = coords[0];
+        const j = coords[1];
+        const k = coords[2];
+        const dx = world.xSize;
+        const dy = world.ySize;
+        const dz = world.zSize;
         let minChunkDistance = Number.POSITIVE_INFINITY;
 
         let chunkIds = [];
-        chunkIds.push((i+','+j+','+k));
+        chunkIds.push(`${i},${j},${k}`);
 
         for (let m = 0, length = chunkIds.length; m < length; ++m) {
             let currentChunkId = chunkIds[m];
 
             // Generate chunk.
             if (!chunksInModel.has(currentChunkId)) { // TODO [LOW] worldify or delegate to consistency updater (better).
-                if (ChunkLoader.debug) console.log("We should generate " + currentChunkId + " for the user.");
+                if (ChunkLoader.debug)
+                    console.log(`We should generate ${currentChunkId} for the user.`);
                 let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, world);
                 chunksInModel.set(currentChunkId, chunk);
             }
@@ -57,13 +62,18 @@ class ChunkLoader {
             // Extract surfaces.
             let currentChunk = chunksInModel.get(currentChunkId);
             if (!currentChunk.ready) {
-                if (ChunkLoader.debug) console.log("We should extract faces from " + currentChunkId + ".");
+                if (ChunkLoader.debug)
+                    console.log(`We should extract faces from ${currentChunkId}.`);
                 ChunkBuilder.computeChunkFaces(currentChunk);
             }
 
             // Test for distance.
             const ids = currentChunkId.split(',');
-            const chunkPosition = [parseInt(ids[0])*dx/2, parseInt(ids[1])*dy/2, parseInt(ids[2])*dz/2];
+            const chunkPosition = [
+                parseInt(ids[0], 10) * dx / 2,
+                parseInt(ids[1], 10) * dy / 2,
+                parseInt(ids[2], 10) * dz / 2
+            ];
             const distance = GeometryUtils.chunkSquaredEuclideanDistance(chunkPosition, playerPosition);
             if (distance < minChunkDistance) {
                 minChunkDistance = distance;
@@ -96,8 +106,8 @@ class ChunkLoader {
 
         // Has nearest chunk changed?
         let coords = world.getChunkCoordinates(pos[0], pos[1], pos[2]);
-        let nearestChunkId = coords[0]+','+coords[1]+','+coords[2];
-        let formerNearestChunkId = avatar.nearestChunkId;
+        let nearestChunkId = `${coords[0]},${coords[1]},${coords[2]}`;
+        // let formerNearestChunkId = avatar.nearestChunkId;
 
         // Get current chunk.
         let starterChunk = world.getChunkById(nearestChunkId);
@@ -107,8 +117,8 @@ class ChunkLoader {
         }
 
         // Return variables.
-        var newChunksForPlayer = {};
-        var unloadedChunksForPlayer = {};
+        let newChunksForPlayer = {};
+        let unloadedChunksForPlayer = {};
 
         // Case 1: need to load chunks up to R_i (inner circle)
         // and to unload from R_o (outer circle).
@@ -160,25 +170,26 @@ class ChunkLoader {
     }
 
     loadInnerSphere(player, starterChunk) {
-        let worldId = player.avatar.worldId;
+        // let worldId = player.avatar.worldId;
         let worldModel = this._worldModel;
         let xModel = this._xModel;
         let consistencyModel = this._consistencyModel;
         // TODO [HIGH] worldify think of another location for that
-        let world = worldModel.getWorld(worldId);
+        // let world = worldModel.getWorld(worldId);
         let sRadius = WorldModel.serverLoadingRadius;
 
-        var newChunksForPlayer = {};
+        let newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
         let t = process.hrtime();
 
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
-        ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, false);
+        ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
+            consistencyModel, sRadius, false);
 
-        let dt1 = (process.hrtime(t)[1]/1000);
-        if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForServer.');
+        let dt1 = process.hrtime(t)[1] / 1000;
+        if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
@@ -186,13 +197,14 @@ class ChunkLoader {
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
         t = process.hrtime();
 
-        var newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel, consistencyModel, sRadius, true);
+        let newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
+            consistencyModel, sRadius, true);
 
-        dt1 = (process.hrtime(t)[1]/1000);
-        if (ChunkLoader.bench && dt1 > 1000) console.log('\t\t' + dt1 + ' preLoad ForPlayer.');
+        dt1 = process.hrtime(t)[1] / 1000;
+        if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
         if (newChunk) {
-            if (ChunkLoader.debug) console.log("New chunk : " + newChunk.chunkId);
+            if (ChunkLoader.debug) console.log(`New chunk : ${newChunk.chunkId}`);
             // TODO [HIGH] not only one at a time
             newChunksForPlayer[newChunk.world.worldId] = {[newChunk.chunkId]: [newChunk.fastComponents, newChunk.fastComponentsIds]};
         }

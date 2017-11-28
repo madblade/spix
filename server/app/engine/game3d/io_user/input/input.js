@@ -8,7 +8,7 @@ class UserInput {
 
     constructor(game) {
         this._game = game;
-        
+
         this._physicsEngine     = game.physicsEngine;
         this._topologyEngine    = game.topologyEngine;
         this._consistencyEngine = game.consistencyEngine;
@@ -54,9 +54,9 @@ class UserInput {
     }
 
     pushToEngine(kind, avatar, engine) {
-        return (data => {
+        return data => {
             engine.addInput({action: kind, meta: data}, avatar);
-        });
+        };
     }
 
     listenPlayer(player) {
@@ -81,7 +81,7 @@ class UserInput {
         player.on('b', listener[i++]);
         player.on('x', listener[i++]);
         player.on('a', listener[i++]);
-        player.on('chat', listener[i++]);
+        player.on('chat', listener[i]);
     }
 
     unlistenPlayer(player) {
@@ -99,7 +99,7 @@ class UserInput {
         player.off('b', listener[i++]);
         player.off('x', listener[i++]);
         player.off('a', listener[i++]);
-        player.off('chat', listener[i++]);
+        player.off('chat', listener[i]);
 
         delete this._listeners[player];
     }

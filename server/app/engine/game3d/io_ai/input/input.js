@@ -6,9 +6,9 @@
 
 class AIInput {
 
-    constructor() {
+    // constructor() {
 
-    }
+    // }
 
     update() {
 

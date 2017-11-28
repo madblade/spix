@@ -10,8 +10,8 @@ class CollectionUtils {
     static _locationOf(element, array, start, end) {
         start = start || 0;
         end = end || array.length;
-        var pivot = parseInt(start + (end - start) / 2, 10);
-        if (end-start <= 1 || array[pivot] === element) return pivot;
+        let pivot = parseInt(start + (end - start) / 2, 10);
+        if (end - start <= 1 || array[pivot] === element) return pivot;
         if (array[pivot] < element) {
             return CollectionUtils._locationOf(element, array, pivot, end);
         } else {
@@ -25,9 +25,9 @@ class CollectionUtils {
             console.log(e.stack);
             return -1;
         }
-        var location = CollectionUtils._locationOf(element, array) + 1;
+        let location = CollectionUtils._locationOf(element, array) + 1;
         if (array[location] === element) {
-            console.log("Util.insert: element already in sorted array.");
+            console.log('Util.insert: element already in sorted array.');
             return location;
         }
         array.splice(location, 0, element);
@@ -41,7 +41,7 @@ class CollectionUtils {
             return -1;
         }
         if (array[location] === element) {
-            console.log("Util.insert: element already in sorted array.");
+            console.log('Util.insert: element already in sorted array.');
             return location;
         }
         array.splice(location, 0, element);
@@ -49,8 +49,8 @@ class CollectionUtils {
     }
 
     static generateId(collection, propertyIdName) {
-        var random = _ => Math.floor(Math.random() * 1000000);
-        var id = random();
+        let random = () => Math.floor(Math.random() * 1000000);
+        let id = random();
 
         if (collection instanceof Map) {
             while (collection.has(id)) id = random();
@@ -58,11 +58,11 @@ class CollectionUtils {
 
         else if (collection instanceof Array) { // Array
             // Unicity mandatory check
-            
+
             if (!propertyIdName) throw Error('@generateId: generating id for ' +
                 'array for unknown property identifier');
-            
-            var f = (e => e[propertyIdName] === id);
+
+            let f = e => e[propertyIdName] === id;
             while (collection.filter(f).length > 0) id = random();
         }
 

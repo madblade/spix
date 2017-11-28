@@ -25,10 +25,10 @@ class UserDataBase {
      */
     registerUser(socket) {
         let users = this._users;
-        let nick = "";
+        let nick = '';
         let id = CollectionUtils.generateId(users);
         let hub = this._connection.hub;
-        var user = Factory.createUser(hub, socket, nick, id);
+        let user = Factory.createUser(hub, socket, nick, id);
 
         users.set(id, user);
         return user;
@@ -45,12 +45,12 @@ class UserDataBase {
     }
 
     notifyGameCreation(kind, id) {
-        var game = {};
+        let game = {};
         game[kind] = [id];
 
         let users = this._users;
-        users.forEach((user, userId) => {
-           user.send('hub', JSON.stringify(game));
+        users.forEach(user/*, userId*/ => {
+            user.send('hub', JSON.stringify(game));
         });
     }
 

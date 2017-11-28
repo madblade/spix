@@ -4,8 +4,8 @@
 
 'use strict';
 
-import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
-import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
+// import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
+// import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
 class Chunk {
 
@@ -24,9 +24,9 @@ class Chunk {
         this._chunkId = chunkId;
         let ijk = chunkId.split(',');
 
-        this._chunkI = parseInt(ijk[0]);
-        this._chunkJ = parseInt(ijk[1]);
-        this._chunkK = parseInt(ijk[2]);
+        this._chunkI = parseInt(ijk[0], 10);
+        this._chunkJ = parseInt(ijk[1], 10);
+        this._chunkK = parseInt(ijk[2], 10);
 
         // Blocks.
         /** Flatten array. x, then y, then z. */
@@ -71,9 +71,9 @@ class Chunk {
     set ready(newReady) { this._ready = newReady; }
 
     _toId(x, y, z) {
-        var id = x + y * this._xSize + z * this._xSize * this._ySize;
+        let id = x + y * this._xSize + z * this._xSize * this._ySize;
         if (id >= this._capacity) {
-            console.log('chunk._toId: invalid request coordinates: ' + x + ',' + y + ',' + z + ' -> ' + id);
+            console.log(`chunk._toId: invalid request coordinates: ${x},${y},${z} -> ${id}`);
             let e = new Error();
             console.log(e.stack);
         }
@@ -81,8 +81,8 @@ class Chunk {
     }
 
     what(x, y, z) {
-        var id = this._toId(x, y, z);
-        if ((id >= this._capacity) || (id < 0)) return 0;
+        let id = this._toId(x, y, z);
+        if (id >= this._capacity || id < 0) return 0;
         return this._blocks[id];
     }
 
@@ -91,9 +91,15 @@ class Chunk {
     }
 
     getNeighbourChunkFromRelativeCoordinates(x, y, z) {
-        let neighbourChunkI, neighbourChunkJ, neighbourChunkK;
-        let xS = this._xSize, yS = this._ySize, zS = this._zSize;
-        let ci = this._chunkI, cj = this._chunkJ, ck = this._chunkK;
+        let neighbourChunkI;
+        let neighbourChunkJ;
+        let neighbourChunkK;
+        let xS = this._xSize;
+        let yS = this._ySize;
+        let zS = this._zSize;
+        let ci = this._chunkI;
+        let cj = this._chunkJ;
+        let ck = this._chunkK;
         let world = this._world;
 
         if (x < 0)          neighbourChunkI = ci - 1;
@@ -113,8 +119,12 @@ class Chunk {
 
     // Mustn't exceed negative [xyz] Size
     neighbourWhat(x, y, z) {
-        let localX, localY, localZ;
-        let xS = this._xSize, yS = this._ySize, zS = this._zSize;
+        let localX;
+        let localY;
+        let localZ;
+        let xS = this._xSize;
+        let yS = this._ySize;
+        let zS = this._zSize;
 
         if (x < 0)          localX = xS + x;
         else if (x >= xS)   localX = x % xS;
@@ -137,7 +147,7 @@ class Chunk {
     }
 
     add(x, y, z, blockId) {
-        var id = this._toId(x, y, z);
+        let id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
         // Update blocks, surface blocks, then surface faces.
@@ -146,7 +156,7 @@ class Chunk {
     }
 
     del(x, y, z) {
-        var id = this._toId(x, y, z);
+        let id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
         // Update blocks, surface blocks, then surface faces.

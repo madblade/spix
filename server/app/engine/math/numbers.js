@@ -7,7 +7,7 @@
 class NumberUtils {
 
     static isEpsilon(strictlyPositiveNumber) {
-        return (strictlyPositiveNumber < 0.000001);
+        return strictlyPositiveNumber < 0.000001;
     }
 
 }

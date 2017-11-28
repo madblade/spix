@@ -16,13 +16,13 @@ class Hub {
 
     static validateUser(user) {
         // Do validation
-        var res = user !== null;
+        let res = user !== null;
         if (!res) console.log('Invalid user requested new game.');
         return res;
     }
 
     static validateKind(kind) {
-        var res = false;
+        let res = false;
         switch (kind) {
             case 'game3d': case 'game2d':
                 res = true;
@@ -36,12 +36,12 @@ class Hub {
         let games = this._games;
 
         let nbGames = 0;
-        games.forEach((gamesForKind, kind) => {
+        games.forEach(gamesForKind/*, kind*/ => {
             nbGames += gamesForKind.size;
         });
 
         const validation = nbGames < 5;
-        console.log(nbGames>0?nbGames:'No' + ' game' + (nbGames>1?'s are':' is') + ' running or idle.');
+        console.log(nbGames > 0 ? nbGames : `No game${(nbGames > 1 ? 's are' : ' is')} running or idle.`);
         if (!validation) console.log('Invalid game creation request.');
         return validation;
     }
@@ -100,7 +100,7 @@ class Hub {
         let gid = CollectionUtils.generateId(games.get(kind));
 
         // Create matching game
-        var game = Factory.createGame(this, kind, gid, connection);
+        let game = Factory.createGame(this, kind, gid, connection);
 
         // Add to games.
         if (game) games.get(kind).set(gid, game);
@@ -110,7 +110,7 @@ class Hub {
 
     endGame(game) {
         if (game.isRunning) {
-            console.log("WARN! Trying to end a running game. Abort.");
+            console.log('WARN! Trying to end a running game. Abort.');
             return;
         }
 

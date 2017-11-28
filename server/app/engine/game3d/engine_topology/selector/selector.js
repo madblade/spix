@@ -6,8 +6,8 @@
 
 class Selector {
 
-    constructor(topologyEngine) {
-    }
+    // constructor(topologyEngine) {
+    // }
 
     selectUpdatedChunksForPlayer(player, worldModel, consistencyModel,
                                  modelUpdatedChunks,    // topology output      Map(world id -> set of updtd chks)
@@ -15,7 +15,7 @@ class Selector {
     ) {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
-        var chunksForPlayer = {};
+        let chunksForPlayer = {};
         let aid = player.avatar.entityId;
 
         modelUpdatedChunks.forEach((chunkIdSet, worldId) => {
@@ -26,10 +26,14 @@ class Selector {
             chunkIdSet.forEach(chunkId => {
                 if (!world.hasChunkById(chunkId)) return;
 
-                if (!consistencyModel.hasChunk(aid, worldId, chunkId) ||
+                if (
+                    !consistencyModel.hasChunk(aid, worldId, chunkId) ||
                     // not null, has {chunkId: !null}
-                    (addedOrDeletedChunksInWorld && addedOrDeletedChunksInWorld.hasOwnProperty(chunkId) && addedOrDeletedChunksInWorld[chunkId]
-                    )) {
+                    addedOrDeletedChunksInWorld &&
+                    addedOrDeletedChunksInWorld.hasOwnProperty(chunkId) &&
+                    addedOrDeletedChunksInWorld[chunkId]
+                )
+                {
                     // At this point, topology output is being accessed.
                     // So, topology engine has updated and its topology model is up-to-date.
                     // Therefore, there is no need to access updates concerning non-loaded chunks,
@@ -41,7 +45,7 @@ class Selector {
 
                 let currentChunk = world.getChunkById(chunkId);
                 if (chunksForPlayer.hasOwnProperty(worldId)) {
-                    chunksForPlayer[worldId][currentChunk.chunkId]= currentChunk.updates;
+                    chunksForPlayer[worldId][currentChunk.chunkId] = currentChunk.updates;
                 } else {
                     chunksForPlayer[worldId] = {[currentChunk.chunkId]: currentChunk.updates};
                 }
@@ -53,7 +57,7 @@ class Selector {
 
     playerConcernedByUpdatedChunks(player, chunks) {
         // TODO [LOW] extract connected subsurface.
-        return (chunks.size > 0);
+        return chunks.size > 0;
     }
 
 }

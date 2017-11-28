@@ -24,8 +24,8 @@ class PlayerConnection {
      * @param behaviour
      */
     on(message, behaviour) {
-        if (typeof behaviour !== "function")
-            console.log("WARN: invalid socket definition");
+        if (typeof behaviour !== 'function')
+            console.log('WARN: invalid socket definition.');
         else {
             this._listeners.push(message);
             this._socket.on(message, behaviour);

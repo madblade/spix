@@ -6,9 +6,9 @@
 
 class AIOutput {
 
-    constructor() {
+    // constructor() {
 
-    }
+    // }
 
     update() {
 

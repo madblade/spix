@@ -13,8 +13,8 @@ class Knot {
      * @param portal1 first portal
      * @param portal2 second (if not, generated) portal
      */
-    constructor(id, portal1, portal2) {
-
+    constructor(id, portal1, portal2)
+    {
         this._id = id;
         this._portal1 = portal1;
 

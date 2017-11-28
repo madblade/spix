@@ -10,9 +10,9 @@ class Simple {
 
     // Set all cubes until a given height to a given id.
     static fillChunk(chunk, toZ, blockId) {
-        if (typeof toZ !== "number") return;
-        if (typeof blockId !== "number") return;
-        if (ChunkGenerator.debug) console.log('Generating chunk ' + chunk.chunkId + ' to ' + toZ + '...');
+        if (typeof toZ !== 'number') return;
+        if (typeof blockId !== 'number') return;
+        if (ChunkGenerator.debug) console.log(`Generating chunk ${chunk.chunkId} to ${toZ}...`);
 
         const numberOfBlocksToFill = chunk.dimensions[0] * chunk.dimensions[1] * toZ;
         const numberOfBlocks = chunk.capacity;
@@ -32,12 +32,12 @@ class Simple {
          numberAdded++;
          }
          }
-         console.log(numberAdded + " different block(s) added.");
+         console.log(numberAdded + ' different block(s) added.');
          */
 
         chunk.blocks = blocks;
 
-        if (ChunkGenerator.debug) console.log("\t" + chunk.blocks.length + " blocks generated.");
+        if (ChunkGenerator.debug) console.log(`\t${chunk.blocks.length} blocks generated.`);
     }
 
 }

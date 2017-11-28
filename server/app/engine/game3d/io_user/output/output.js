@@ -24,32 +24,33 @@ class UserOutput {
 
     // TODO [HIGH] -> don't recurse over every player, rather over updates...
     update() {
-        let t1, t2;
+        let t1;
+        let t2;
 
         t1 = process.hrtime();
         //this.spawnPlayers();
-        t2 = (process.hrtime(t1)[1]/1000);
-        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to spawn players.");
+        t2 = process.hrtime(t1)[1] / 1000;
+        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to spawn players.`);
 
         t1 = process.hrtime();
         this.updateChunks();
-        t2 = (process.hrtime(t1)[1]/1000);
-        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send chunk updates.");
+        t2 = process.hrtime(t1)[1] / 1000;
+        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
 
         t1 = process.hrtime();
         this.updateEntities();
-        t2 = (process.hrtime(t1)[1]/1000);
-        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send entity updates.");
+        t2 = process.hrtime(t1)[1] / 1000;
+        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
 
         t1 = process.hrtime();
         this.updateX();
-        t2 = (process.hrtime(t1)[1]/1000);
-        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send x updates.");
+        t2 = process.hrtime(t1)[1] / 1000;
+        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send x updates.`);
 
         t1 = process.hrtime();
         this.updateMeta();
-        t2 = (process.hrtime(t1)[1]/1000);
-        if (UserOutput.bench && t2 > 1000) console.log(t2 + " µs to send other stuff.");
+        t2 = process.hrtime(t1)[1] / 1000;
+        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send other stuff.`);
 
         this._consistencyEngine.flushBuffers();
     }
@@ -65,7 +66,8 @@ class UserOutput {
         addedPlayers.forEach(pid => {
             let player = players.getPlayerFromId(pid);
             if (player) {
-                let p = player, a = p.avatar;
+                let p = player;
+                let a = p.avatar;
 
                 // Load chunks.
                 // Format: {worldId: {chunkId: [fastComps, fastCompIds]}}
@@ -77,7 +79,7 @@ class UserOutput {
                 let entities = consistencyEngine.initEntityOutputForPlayer(p);
                 p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
 
-                if (UserOutput.debug) console.log('Init a new player on game ' + game.gameId + '.');
+                if (UserOutput.debug) console.log(`Init a new player on game ${game.gameId}.`);
             }
         });
     }
@@ -92,17 +94,18 @@ class UserOutput {
 
         // TODO [OPT] use arrays
         game.players.forEach(p => { if (p.avatar) {
-            let hasNew, hasUpdated;
+            let hasNew;
+            let hasUpdated;
             let pid = p.avatar.entityId;
 
             // TODO [LOW] check 'player has updated position'
             // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
             // player id -> changes (world id -> chunk id -> changes)
             let addedOrRemovedChunks = consistencyOutput.get(pid);
-            hasNew = (addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0);
+            hasNew = addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0;
 
             let updatedChunksForPlayer = topologyEngine.getOutputForPlayer(p, updatedChunks, addedOrRemovedChunks);
-            hasUpdated = (updatedChunksForPlayer && Object.keys(updatedChunksForPlayer).length > 0);
+            hasUpdated = updatedChunksForPlayer && Object.keys(updatedChunksForPlayer).length > 0;
 
             if (hasNew) {
                 // New chunk + update => bundle updates with new chunks in one call.
@@ -180,7 +183,7 @@ class UserOutput {
             p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
             if (!av) return;
-            
+
             // Array of [1. position, 2. rotation, 3. worldId] for each world.
             // First one is the main world.
             let selfState = [[av.position, av.rotation, av.worldId]];

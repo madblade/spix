@@ -6,10 +6,10 @@
 
 import Chunk            from './../../model_world/chunk';
 
-import GenTest          from './generator_test.js';
-import GenAnalytic      from './generator_analytic.js';
-import GenSimple        from './generator_simple.js';
-import GenPerlin        from './generator_perlin.js';
+// import GenTest          from './generator_test.js';
+// import GenAnalytic      from './generator_analytic.js';
+// import GenSimple        from './generator_simple.js';
+// import GenPerlin        from './generator_perlin.js';
 import GenSimplePerlin  from './generator_simple_perlin.js';
 
 class ChunkGenerator {
@@ -22,8 +22,8 @@ class ChunkGenerator {
      * Then, call Extractor.computeFaces(chunk).
      */
     static createRawChunk(x, y, z, id, world) {
-        console.log('createRawChunk ' + id);
-        var c = new Chunk(x, y, z, id, world);
+        console.log(`createRawChunk ${id}`);
+        let c = new Chunk(x, y, z, id, world);
 
         //GenTest.testChunk(c);
         //GenTest.testMerge(c);
@@ -40,8 +40,8 @@ class ChunkGenerator {
         return c;
     }
 
-    static createChunk(x, y, z, id, world) {
-
+    static createChunk(x, y, z, id, world)
+    {
         var c = new Chunk(x, y, z, id, world);
 
         // let generationMethod = world.generationMethod;

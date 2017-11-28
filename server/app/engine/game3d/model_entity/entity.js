@@ -21,23 +21,23 @@ class Entity {
         this._v1            = [0, 0, 0];
         this._a0            = [0, 0, 0];
         this._a1            = [0, 0, 0];
-        
+
         this._p01           = [0, 0, 0];
         this._v01           = [0, 0, 0];
         this._a01           = [0, 0, 0];
         this._delta01       = 0;
-        
+
         this._d             = [!0, !0, !0, !0, !0, !0];
         this._r             = [0, 0, 0, 0]; // rel, abs
         //this._rrel          = [0, 0];
         //this._rabs          = [0, 0];
-        
+
         this._metaX         = null;
-        
+
         this._capS          = .005;
         this._capW          = .01;
         this._capR          = .03;
-        
+
         // LEGACY PhysicsEngine
         this._rotation      = null;
         this._directions    = null;
@@ -57,23 +57,23 @@ class Entity {
         // When crossing multiple portals...
         // 1 state = Object { position:p, rotation:r }
         this._otherWorlds = new Map(); // TODO [LONG-TERM]
-        
+
         // Linked events.
         this._events = [];
-        
+
         // Physics/consistency optimization.
         this._indexX      = -1;
         this._indexY      = -1;
         this._indexZ      = -1;
         this._dtr         = 1.;
         // Hit box.
-        this._widthX      = .25; // -> .5 
+        this._widthX      = .25; // -> .5
         this._widthY      = .25; // -> .5
         this._widthZ      = .9;  // -> 1.6
         // Physical properties
         this._mass        = 1;
     }
-    
+
     static maxWidth = 10.; // 10 blocks.
     static maxSpeed = 10.;  // 1 blocks per time unit.
 
@@ -81,34 +81,33 @@ class Entity {
     get kind()              { return this._kind; }
     get worldId()           { return this._worldId; }
     set worldId(nwi)        { this._worldId = nwi; }
-    
+
     get dtr()               { return this._dtr; }
     set dtr(dtr)            { this._dtr = dtr; }
-    
+
     //get rotation()          { return this._rotation; }
     get rotation()          { return this._r; }
     //get position()          { return this._position; }
     get position()          { return this._p0; }
-    
+
     get directions()        { return this._directions; }
     get speed()             { return this._speed; }
     get acceleration()      { return this._acceleration; }
-    get mass()              { return this._mass; }
     get adherence()         { return this._adherence; }
     get otherWorlds()       { return this._otherWorlds; }
     get _impulseSpeed()     { return this._impulseSpeedStamp; }
-    
+
     set adherence(na)       { this._adherence = na; }
-    
+
     //set rotation(nr)        { this._rotation = nr; }
     set rotation(nr)        { this._r = nr; }
     //set position(np)        { this._position = np; }
     set position(np)        { this._p0 = np; }
-    
+
     set speed(ns)           { this._speed = ns; }
-    
+
     set acceleration(na)    { this._acceleration = na; }
-    
+
     set _impulseSpeed(nis)  { this._impulseSpeedStamp = nis; }
 
     jump(direction) {
@@ -117,23 +116,23 @@ class Entity {
 
     spawn(position, worldId) {
         this._worldId           = worldId;
-        
+
         this._position          = position;
-        this._rotation          = [0, Math.PI/2];
+        this._rotation          = [0, Math.PI / 2];
         this._directions        = [!1, !1, !1, !1, !1, !1];
         this._speed             = [0, 0, 0];
         this._acceleration      = [0, 0, 0];
         this._impulseSpeedStamp = [0, 0, 0];
-        
+
         this._p                 = position;
-        this._r                 = [0, Math.PI/2, 0, 0];
+        this._r                 = [0, Math.PI / 2, 0, 0];
         this._d                 = [!1, !1, !1, !1, !1, !1];
-        
+
         this._p0 = [0, 0, 0];   this._p1 = [0, 0, 0];
         this._v0 = [0, 0, 0];   this._v1 = [0, 0, 0];
         this._a0 = [0, 0, 0];   this._a1 = [0, 0, 0];
         this._nu = [0, 0, 0];
-        
+
         this._p0 = position;
     }
 
@@ -148,7 +147,7 @@ class Entity {
         //this._directions = [!1, !1, !1, !1, !1, !1];
         this._d = [!1, !1, !1, !1, !1, !1];
         this._impulseSpeedStamp = [0, 0, 0];
-        console.log("Entity stopping.");
+        console.log('Entity stopping.');
     }
 
     //goForward()     { this._directions[0] = true; }
@@ -157,7 +156,7 @@ class Entity {
     //goBackwards()   { this._directions[3] = true; }
     //goUp()          { this._directions[4] = true; }
     //goDown()        { this._directions[5] = true; }
-    
+
     goForward()     { this._d[0] = !0; }
     goBackwards()   { this._d[1] = !0; }
     goRight()       { this._d[2] = !0; }
@@ -194,17 +193,17 @@ class Entity {
     get indexY()            { return this._indexY; }
     set indexZ(indexZ)      { this._indexZ = indexZ; }
     get indexZ()            { return this._indexZ; }
-    
+
     get widthX()            { return this._widthX; }
     set widthX(widthX)      { this._widthX = widthX; }
     get widthY()            { return this._widthY; }
     set widthY(widthY)      { this._widthY = widthY; }
     get widthZ()            { return this._widthZ; }
     set widthZ(widthZ)      { this._widthZ = widthZ; }
-    
+
     get metaX()             { return this._metaX; }
     set metaX(metaX)        { this._metaX = metaX; }
-    
+
     get a0()                { return this._a0; }
     set a0(a0)              { this._a0 = a0; }
     get a1()                { return this._a1; }
@@ -217,10 +216,10 @@ class Entity {
     set p0(p0)              { this._p0 = p0; }
     get p1()                { return this._p1; }
     set p1(p1)              { this._p1 = p1; }
-    
+
     get mass()              { return this._mass; }
     set mass(m)             { this._mass = m; }
-    
+
     get p01()               { return this._p01; }
     get v01()               { return this._v01; }
     get a01()               { return this._a01; }
@@ -236,13 +235,13 @@ class Entity {
             this._a01[i] = this._a0[i];
         }
     }
-    
+
     get nu()                { return this._nu; }
     set nu(nu)              { this._nu = nu; }
-    
+
     //get rabs()                { return this._rabs; }
     //set rabs(up)              { this._rabs = up; }
-    
+
     get d()                 { return this._d; }
     set d(d)                { this._d = d; }
     get r()                 { return this._r; }
@@ -253,11 +252,11 @@ class Entity {
     set stealthVelocity(v)  { this._capS = v; }
     set walkVelocity(v)     { this._capW = v; }
     set runVelocity(v)      { this._capR = v; }
-    
+
     getVelocity() {
         return this.walkVelocity;
     }
-    
+
 }
 
 export default Entity;
