@@ -65,7 +65,7 @@ class XLoader {
         let chunks = connectivity[1];
         if (chunks) {
             let marks = new Map();
-            chunks.forEach(c => marks.set(`${c[0]},${c[1]},${c[2]}`));
+            chunks.forEach(c => marks.set(`${c[0]},${c[1]}`, `${c[2]}`));
 
             playerXs.forEach(portalId => {
                 let p = xm.getPortal(portalId);

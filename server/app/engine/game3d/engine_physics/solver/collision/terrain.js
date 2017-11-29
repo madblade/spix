@@ -343,7 +343,7 @@ class TerrainCollider {
                 if (dbz < 2) {
                     if (dz < 0) {
                         const free = world.isFree([i + ddx, j, k - 1]);
-                        if ((!free && dbz < 1 && nz > nz0 - 1) || free) {
+                        if (!free && dbz < 1 && nz > nz0 - 1 || free) {
                             nzt = nz;
                             adherence[2] = false;
                         }
@@ -432,7 +432,7 @@ class TerrainCollider {
                 if (dbz < 2) {
                     if (dz < 0) {
                         const free = world.isFree([i, j + ddy, k - 1]);
-                        if ((!free && dbz < 1 && nz > nz0 - 1) || free) {
+                        if (!free && dbz < 1 && nz > nz0 - 1 || free) {
                             nzt = nz;
                             adherence[2] = false;
                         }

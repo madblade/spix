@@ -1,5 +1,5 @@
 /**
- *
+ * @deprecated
  */
 
 'use strict';

@@ -236,7 +236,7 @@ class ChunkBuilder {
 
     static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh) {
         let avatar = player.avatar;
-        var unloadedChunksForPlayer = {};
+        let unloadedChunksForPlayer = {};
         let chunksToUnload = [];
 
         let aid = avatar.entityId;

@@ -207,17 +207,17 @@ class UpdaterFace {
             if (fid === -1) continue;
 
             const componentId = connectedComponents[fid];
-            if (componentId === undefined) console.log('Face id ' + fid);
+            if (componentId === undefined) console.log(`Face id ${fid}`);
             if (componentId < 1) {
                 console.log('WARN: trying to remove a face that is not registered as boundary: ' +
-                    'component id = ' + componentId + '.');
+                    `component id = ${componentId}.`);
                 continue;
             }
             oldComponent = componentId;
 
             let currentComponent = fastComponents[componentId];
             if (currentComponent === undefined) {
-                let e = new Error('BLD: skipping removal on component ' + componentId);
+                let e = new Error(`BLD: skipping removal on component ${componentId}`);
                 console.log(e.stack);
                 continue;
             }
@@ -238,8 +238,9 @@ class UpdaterFace {
             if (fid === -1) continue;
 
             // WARN this step is not topology-aware. Components are to be recomputed properly in the 'divide' stage.
-            const componentId = CSFX.forceOneComponentPerChunk ? 1 :
-                (oldComponent === null ? CollectionUtils.generateId(fastComponents) : oldComponent);
+            const componentId = CSFX.forceOneComponentPerChunk ?
+                1 :
+                oldComponent === null ? CollectionUtils.generateId(fastComponents) : oldComponent;
 
             if (fastComponents[componentId] === undefined) {
                 // TODO check in divide...
@@ -247,7 +248,7 @@ class UpdaterFace {
                 // TODO provide non-topo approach
                 // Somehow getting here means that the added block isn't topologically linked to any other
                 // component. So we have to create a new component id.
-                let e = new Error('BLD: invalid component id: ' + componentId + ' for insertion... BLDing.');
+                let e = new Error(`BLD: invalid component id: ${componentId} for insertion... BLDing.`);
                 console.log(e.stack);
 
                 fastComponents[componentId] = [];
@@ -365,8 +366,8 @@ class UpdaterFace {
             fastComponents[cc].push(faceId);
             fastComponentsIds[cc].push(kind);
         } else {
-            console.log('ERROR @addFaceToModel: fastComponents doesnt have a ' + cc + ' component. ' +
-                'face id: ' + faceId + ' kind: ' + kind);
+            console.log(`ERROR @addFaceToModel: fastComponents doesnt have a ${cc} component. ` +
+                `face id: ${faceId} kind: ${kind}`);
             fastComponents[cc] = [faceId];
             fastComponentsIds[cc] = [kind];
         }
