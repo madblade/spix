@@ -25,12 +25,14 @@ import Chat             from './../../model/connection/chat';
 
 class Game3D extends Game {
 
+    static serverRefreshRate = 16;
+
     constructor(hub, gameId, connector) {
         super(hub, gameId, connector);
 
         // Utility parameters
         this._kind = 'game3d';
-        this._refreshRate = 16;
+        this._refreshRate = Game3D.serverRefreshRate;
         //this._refreshRate = 1000;
         this._tt = 0;
 
@@ -40,7 +42,7 @@ class Game3D extends Game {
         // Models (autonomous).
         this._worldModel        = new WorldModel(this);
         this._entityModel       = new EntityModel(this);
-        this._xModel            = new XModel(this);     // Needs world model.
+        this._xModel            = new XModel(this, this._worldModel);
         this._consistencyModel  = new ConsistencyModel(this);
 
         // Engines (need models).

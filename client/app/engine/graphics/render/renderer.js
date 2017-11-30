@@ -26,6 +26,10 @@ let RendererManager = function(graphicsEngine) {
 
 extend(RendererManager.prototype, {
 
+    cssToHex(cssColor) {
+        return 0 | cssColor.replace('#', '0x');
+    },
+
     createRenderer() {
         // Configure renderer
         let renderer = new THREE.WebGLRenderer({
@@ -34,7 +38,7 @@ extend(RendererManager.prototype, {
             alpha: true
         });
 
-        renderer.setClearColor(0x435D74, 1);
+        renderer.setClearColor(this.cssToHex('#4fb6d2'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         return renderer;
     },

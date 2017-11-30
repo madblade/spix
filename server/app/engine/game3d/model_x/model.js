@@ -14,9 +14,9 @@ import WorldGenerator   from '../engine_consistency/generator/worldgenerator';
 
 class XModel {
 
-    constructor(game) {
+    constructor(game, worldModel) {
         this._game = game;
-        this._worldModel = game.worldModel;
+        this._worldModel = worldModel;
 
         // Database
         this._knots = new Map();

@@ -19,6 +19,8 @@ class WorldModel {
         this._worlds.set(-1, new World(-1, this));
     }
 
+    get worlds() { return this._worlds; }
+
     addWorld(worldId) {
         let wid  = worldId || CollectionUtils.generateId(this._worlds);
 
@@ -32,6 +34,10 @@ class WorldModel {
     getWorld(worldId) {
         if (!worldId) worldId = -1;
         return this._worlds.get(worldId);
+    }
+
+    getFreeWorld() {
+        return this.getWorld(-1);
     }
 
 }

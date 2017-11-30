@@ -34,14 +34,12 @@ class EntityModel {
         });
     }
 
-    spawnPlayer(p) {
+    spawnPlayer(p, world, freePosition) {
         let avatar = this.createEntity('avatar');
         p.avatar = avatar;
 
-        // TODO [MEDIUM] custom spawn world and location.
-        let world = this._game.worldModel.getWorld();
         let worldId = world.worldId;
-        avatar.spawn(world.getFreePosition(), worldId);
+        avatar.spawn(freePosition, worldId);
     }
 
     // World to be set at spawn time.

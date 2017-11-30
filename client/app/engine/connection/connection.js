@@ -6,7 +6,6 @@
 
 import extend           from '../../extend.js';
 import io               from 'socket.io-client';
-// var io =            require('socket.io-client');
 
 let Connection = function(app) {
     this.app = app;

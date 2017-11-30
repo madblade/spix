@@ -53,7 +53,9 @@ class ConsistencyEngine {
 
     // On connection / disconnection.
     spawnPlayer(player) {
-        this._entityModel.spawnPlayer(player);
+        let world = this._worldModel.getFreeWorld();
+        let freePosition = world.getFreePosition();
+        this._entityModel.spawnPlayer(player, world, freePosition);
         this._consistencyModel.spawnPlayer(player);
         this._entityBuffer.spawnPlayer(player);
         this._physicsEngine.spawnPlayer(player);
