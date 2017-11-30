@@ -22,7 +22,6 @@ class TerrainCollider {
      * - TODO [OPT] chunk caching
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
      *
-     * @returns 'has collided'
      */
     static linearCollide(entity, world, position, newPosition, doProject) {
         let p0 = position;

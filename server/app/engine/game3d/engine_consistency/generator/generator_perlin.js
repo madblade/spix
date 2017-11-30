@@ -319,17 +319,7 @@ class Perlin {
                 if (w === 1) {
                     if (SHOW_PLANTS)
                     {
-                        // grass
-                        if (Perlin.simplex2(handle, -x * 0.1, y * 0.1, 4, 0.8, 2) > 0.6) {
-                            if (Math.floor(h) !== h) console.log('grass');
-                            func(x, y, h, 17 * flag, arg);
-                        }
-
-                        // flowers
-                        if (Perlin.simplex2(handle, x * 0.05, -y * 0.05, 4, 0.8, 2) > 0.7) {
-                            let ww = 18 + Perlin.simplex2(handle, x * 0.1, y * 0.1, 4, 0.8, 2) * 7;
-                            func(x, y, h, ww * flag, arg);
-                        }
+                        Perlin.makePlants(x, y, h, handle, func, flag, arg);
                     }
 
                     // Trees.
@@ -340,37 +330,59 @@ class Perlin {
                         ok = 0;
                     }
                     if (ok && Perlin.simplex2(handle, x, y, 6, 0.5, 2) > 0.84) {
-                        for (let z = h + 3; z < h + 8; z++) {
-                            for (let ox = -3; ox <= 3; ox++) {
-                                for (let oy = -3; oy <= 3; oy++) {
-                                    let d = ox * ox + oy * oy +
-                                        (z - (h + 4)) * (z - (h + 4));
-                                    if (d < 11) {
-                                        func(x + ox, y + oy, z, 15, arg);
-                                    }
-                                }
-                            }
-                        }
-                        for (let z = h; z < h + 7; z++) {
-                            func(x, y, z, 5, arg);
-                        }
+                        Perlin.makeTrees(x, y, h, func, arg);
                     }
                 }
 
                 // Clouds.
                 if (SHOW_CLOUDS) {
-                    for (let z = 64; z < 72; z++) {
-                        if (Perlin.simplex3(handle,
-                                x * 0.01, y * 0.01, z * 0.1, 8, 0.5, 2) > 0.75)
-                        {
-                            func(x, y, z, 16 * flag, arg);
-                        }
-                    }
+                    Perlin.makeClouds(x, y, handle, func, flag, arg);
                 }
             }
         }
 
         chunk.blocks = blocks;
+    }
+
+    static makePlants(x, y, h, handle, func, flag, arg) {
+        // grass
+        if (Perlin.simplex2(handle, -x * 0.1, y * 0.1, 4, 0.8, 2) > 0.6) {
+            if (Math.floor(h) !== h) console.log('grass');
+            func(x, y, h, 17 * flag, arg);
+        }
+
+        // flowers
+        if (Perlin.simplex2(handle, x * 0.05, -y * 0.05, 4, 0.8, 2) > 0.7) {
+            let ww = 18 + Perlin.simplex2(handle, x * 0.1, y * 0.1, 4, 0.8, 2) * 7;
+            func(x, y, h, ww * flag, arg);
+        }
+    }
+
+    static makeTrees(x, y, h, func, arg) {
+        for (let z = h + 3; z < h + 8; z++) {
+            for (let ox = -3; ox <= 3; ox++) {
+                for (let oy = -3; oy <= 3; oy++) {
+                    let d = ox * ox + oy * oy +
+                        (z - (h + 4)) * (z - (h + 4));
+                    if (d < 11) {
+                        func(x + ox, y + oy, z, 15, arg);
+                    }
+                }
+            }
+        }
+        for (let z = h; z < h + 7; z++) {
+            func(x, y, z, 5, arg);
+        }
+    }
+
+    static makeClouds(x, y, handle, func, flag, arg) {
+        for (let z = 64; z < 72; z++) {
+            if (Perlin.simplex3(handle,
+                    x * 0.01, y * 0.01, z * 0.1, 8, 0.5, 2) > 0.75)
+            {
+                func(x, y, z, 16 * flag, arg);
+            }
+        }
     }
 
 }

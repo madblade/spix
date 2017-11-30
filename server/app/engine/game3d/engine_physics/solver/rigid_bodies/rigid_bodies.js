@@ -185,6 +185,7 @@ class RigidBodies {
                 //console.log('Islands: ');
                 //console.log(islands);
             }
+
             islands.forEach(island => {
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];

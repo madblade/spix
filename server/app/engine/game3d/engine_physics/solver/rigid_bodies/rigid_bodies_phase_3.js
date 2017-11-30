@@ -4,6 +4,51 @@
 
 class RigidBodiesPhase3 {
 
+    static solveSecondOrder(
+        a1, a2,
+        b1, b2,
+        p10, p20,
+        p11, p21, // Unnecessary
+        w1, w2,
+        fw, relativeDt)
+    {
+        let abs = Math.abs;
+        let sqrt = Math.sqrt;
+        let r = 0;
+
+        if (a1 !== a2) {
+            //console.log('deg2');
+            let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1 + fw * w2 + p10 - p20);
+            if (delta > 0) {
+                console.log('delta > 0');
+                let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
+                let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
+                r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
+            } else if (delta === 0) {
+                console.log('delta = 0');
+                r = (b2 - b1) / (2 * (a1 - a2));
+            }
+        }
+        else if (b1 !== b2)
+        {
+            if (abs(b2 - b1) < 1e-7) r = 0;
+            else r = (fw * w1 + fw * w2 + p10 - p20) / (b2 - b1);
+
+            if (r < 0 || r >= relativeDt) {
+                console.log('r computation error');
+                console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
+                    `\tw1, w2 = ${w1}, ${w2}\n` +
+                    `\tp01, p02 = ${p10}, ${p20}\n` +
+                    `\tp11, p12 = ${p11}, ${p21}\n` +
+                    `\tfw = ${fw}\n`);
+                console.log(`r=${r} (z), reldt=${relativeDt}`);
+                r = 0;
+            }
+            // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+        }
+        return r;
+    }
+
     static solveLeapfrogQuadratic(
         island,
         oxAxis,
@@ -12,7 +57,6 @@ class RigidBodiesPhase3 {
         mapCollidingPossible)
     {
         let abs = Math.abs;
-        let sqrt = Math.sqrt;
         let nbI = island.length;
 
         for (let i = 0; i < nbI; ++i) {
@@ -96,212 +140,132 @@ class RigidBodiesPhase3 {
                 }
 
                 //if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {
-                if (xw && yw && zw) {
-                    // TODO [] push into colliding pairs
-                    // console.log('Collision');
-                    //let min_dtr1 = dtr1;
-                    //let min_dtr2 = dtr2;
-                    let rrel = relativeDt;
-                    let axis = 'none';
+                if (!(xw && yw && zw)) continue;
 
-                    // Quadratic solve thrice
-                    if (!xm) {
-                        //console.log('colx');
-                        let fw = xl ? 1 : -1;
+                // if (xw && yw && zw) {
+                // TODO [] push into colliding pairs
+                // console.log('Collision');
+                //let min_dtr1 = dtr1;
+                //let min_dtr2 = dtr2;
+                let rrel = relativeDt;
+                let axis = 'none';
 
-                        let adh10 = p1adh[0];
-                        let adh11 = p1adh[3];
-                        let a1 = ltd1 * ltd1 * .5 * p1a0[0];
-                        if (p10x <= p11x && adh11 || p10x >= p11x && adh10) a1 = 0;
+                // Quadratic solve thrice
+                if (!xm) {
+                    //console.log('colx');
+                    let fw = xl ? 1 : -1;
 
-                        let adh20 = p2adh[0];
-                        let adh21 = p2adh[3];
-                        let a2 = ltd2 * ltd2 * .5 * p2a0[0];
-                        if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
+                    let adh10 = p1adh[0];
+                    let adh11 = p1adh[3];
+                    let a1 = ltd1 * ltd1 * .5 * p1a0[0];
+                    if (p10x <= p11x && adh11 || p10x >= p11x && adh10) a1 = 0;
 
-                        //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                    let adh20 = p2adh[0];
+                    let adh21 = p2adh[3];
+                    let a2 = ltd2 * ltd2 * .5 * p2a0[0];
+                    if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
 
-                        let b1 = ltd1 * (p1v0[0] + p1n0[0]);
-                        let b2 = ltd2 * (p2v0[0] + p2n0[0]);
+                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                        let r = 0;
-                        if (a1 !== a2) {
-                            //console.log('deg2');
-                            // TODO [CRIT] solve same for leapfrog version.
-                            let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1x + fw * w2x + p10x - p20x);
-                            if (delta > 0) {
-                                console.log('delta > 0');
-                                let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
-                                let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
-                                r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
-                            } else if (delta === 0) {
-                                console.log('delta = 0');
-                                r = (b2 - b1) / (2 * (a1 - a2));
-                            }
-                        }
-                        else if (b1 !== b2)
-                        {
-                            if (abs(b2 - b1) < 1e-7) r = 0;
-                            else r = (fw * w1x + fw * w2x + p10x - p20x) / (b2 - b1);
+                    let b1 = ltd1 * (p1v0[0] + p1n0[0]);
+                    let b2 = ltd2 * (p2v0[0] + p2n0[0]);
 
-                            if (r < 0 || r >= relativeDt) {
-                                console.log('r computation error');
-                                console.log(`\tb1, b2 = ' + b1 + ', ' + b2 + '\n` +
-                                    `\tw1x, w2x = ${w1x}, ${w2x}\n` +
-                                    `\tp01x, p02x = ${p10x}, ${p20x}\n` +
-                                    `\tp11x, p12x = ${p11x}, ${p21x}\n` +
-                                    `\tfw = ${fw}\n`);
-                                console.log(`r=${r} (z), reldt=${relativeDt}`);
-                                r = 0;
-                            }
-                            // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
-                        }
+                    // TODO [CRIT] solve same for leapfrog version.
+                    let r = RigidBodiesPhase3.solveSecondOrder(
+                        a1, a2, b1, b2, p10x, p20x, p11x, p21x, w1x, w2x, fw, relativeDt);
 
-                        //console.log('r=' + r + ' (x), reldt=' + relativeDt);
+                    //console.log('r=' + r + ' (x), reldt=' + relativeDt);
 
-                        if (r >= 0) {
-                            //min_dtr1 = r * ltd1;
-                            //min_dtr2 = r * ltd2;
-                            if (r < rrel) {
-                                axis = 'x';
-                                rrel = r;
-                            }
-                        }
+                    if (r >= 0 && r < rrel) {
+                        //min_dtr1 = r * ltd1;
+                        //min_dtr2 = r * ltd2;
+                        axis = 'x';
+                        rrel = r;
+                        // if () {
+                        // }
                     }
+                }
 
-                    if (!ym) {
-                        //console.log('coly');
-                        let fw = yl ? 1 : -1;
+                if (!ym) {
+                    //console.log('coly');
+                    let fw = yl ? 1 : -1;
 
-                        let adh10 = p1adh[1];
-                        let adh11 = p1adh[4];
-                        let a1 = ltd1 * ltd1 * .5 * p1a0[1];
-                        if (p10y <= p11y && adh11 || p10y >= p11y && adh10) a1 = 0;
+                    let adh10 = p1adh[1];
+                    let adh11 = p1adh[4];
+                    let a1 = ltd1 * ltd1 * .5 * p1a0[1];
+                    if (p10y <= p11y && adh11 || p10y >= p11y && adh10) a1 = 0;
 
-                        let adh20 = p2adh[1];
-                        let adh21 = p2adh[4];
-                        let a2 = ltd2 * ltd2 * .5 * p2a0[1];
-                        if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
+                    let adh20 = p2adh[1];
+                    let adh21 = p2adh[4];
+                    let a2 = ltd2 * ltd2 * .5 * p2a0[1];
+                    if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
 
-                        //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                        let b1 = ltd1 * (p1v0[1] + p1n0[1]);
-                        let b2 = ltd2 * (p2v0[1] + p2n0[1]);
+                    let b1 = ltd1 * (p1v0[1] + p1n0[1]);
+                    let b2 = ltd2 * (p2v0[1] + p2n0[1]);
 
-                        // TODO [Refactor] extract method.
-                        let r = 0;
-                        if (a1 !== a2) {
-                            //console.log('deg2');
-                            let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1y + fw * w2y + p10y - p20y);
-                            if (delta > 0) {
-                                let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
-                                let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
-                                r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
-                            } else if (delta === 0) {
-                                r = (b2 - b1) / (2 * (a1 - a2));
-                            }
-                        }
-                        else if (b1 !== b2)
-                        {
-                            if (abs(b2 - b1) < 1e-7) r = 0;
-                            else r = (fw * w1y + fw * w2y + p10y - p20y) / (b2 - b1);
+                    // TODO [Refactor] extract method.
+                    let r = RigidBodiesPhase3.solveSecondOrder(
+                        a1, a2, b1, b2, p10y, p20y, p11y, p21y, w1y, w2y, fw, relativeDt);
 
-                            if (r < 0 || r >= relativeDt) {
-                                console.log('r computation error');
-                                console.log(`\tb1, b2 = ' + b1 + ', ' + b2 + '\n` +
-                                    `\tw1y, w2y = ${w1y}, ${w2y}\n` +
-                                    `\tp01y, p02y = ${p10y}, ${p20y}\n` +
-                                    `\tp11y, p12y = ${p11y}, ${p21y}\n` +
-                                    `\tfw = ${fw}\n`);
-                                console.log(`r=${r} (z), reldt=${relativeDt}`);
-                                r = 0;
-                            }
-                        }
+                    //console.log('r=' + r + ' (y), reldt=' + relativeDt);
 
-                        //console.log('r=' + r + ' (y), reldt=' + relativeDt);
-
-                        if (abs(r) < 1e-7) r = 0;
-                        if (r >= 0) {
-                            //let ndtr1 = r * ltd1;
-                            //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
-                            //let ndtr2 = r * ltd2;
-                            //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
-                            //rrel = r;
-                            if (r < rrel) {
-                                axis = 'y';
-                                rrel = r;
-                            }
-                        }
+                    if (abs(r) < 1e-7) r = 0;
+                    if (r >= 0 && r < rrel) {
+                        //let ndtr1 = r * ltd1;
+                        //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
+                        //let ndtr2 = r * ltd2;
+                        //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
+                        //rrel = r;
+                        axis = 'y';
+                        rrel = r;
+                        // if (r < rrel) {
+                        // }
                     }
+                }
 
-                    if (!zm) {
-                        //console.log('colz');
-                        let fw = zl ? 1 : -1;
+                if (!zm) {
+                    //console.log('colz');
+                    let fw = zl ? 1 : -1;
 
-                        let adh10 = p1adh[2]; let adh11 = p1adh[5];
-                        let a1 = ltd1 * ltd1 * .5 * p1a0[2];
-                        if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0;
+                    let adh10 = p1adh[2]; let adh11 = p1adh[5];
+                    let a1 = ltd1 * ltd1 * .5 * p1a0[2];
+                    if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0;
 
-                        let adh20 = p2adh[2]; let adh21 = p2adh[5];
-                        let a2 = ltd2 * ltd2 * .5 * p2a0[2];
-                        if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
+                    let adh20 = p2adh[2]; let adh21 = p2adh[5];
+                    let a2 = ltd2 * ltd2 * .5 * p2a0[2];
+                    if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
 
-                        //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
+                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                        let b1 = ltd1 * (p1v0[2] + p1n0[2]);
-                        let b2 = ltd2 * (p2v0[2] + p2n0[2]);
+                    let b1 = ltd1 * (p1v0[2] + p1n0[2]);
+                    let b2 = ltd2 * (p2v0[2] + p2n0[2]);
 
-                        // TODO [Refactor] extract method.
-                        let r = 0;
-                        if (a1 !== a2) {
-                            //console.log('deg2');
-                            let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1z + fw * w2z + p10z - p20z);
-                            if (delta > 0) {
-                                let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
-                                let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
-                                r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
-                            } else if (delta === 0) {
-                                r = (b2 - b1) / (2 * (a1 - a2));
-                            }
-                        } else if (b1 !== b2) {
-                            //console.log('deg1');
+                    // TODO [Refactor] extract method.
+                    let r = RigidBodiesPhase3.solveSecondOrder(
+                        a1, a2, b1, b2, p10z, p20z, p11z, p21z, w1z, w2z, fw, relativeDt);
 
-                            if (abs(b2 - b1) < 1e-7) r = 0;
-                            else r = (fw * w1z + fw * w2z + p10z - p20z) / (b2 - b1);
+                    //console.log('r=' + r + ' (z), reldt=' + relativeDt);
 
-                            if (r < 0 || r >= relativeDt) {
-                                console.log('r computation error');
-                                console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
-                                    `\tw1z, w2z = ${w1z}, ${w2z}\n` +
-                                    `\tp01z, p02z = ${p10z}, ${p20z}\n` +
-                                    `\tp11z, p12z = ${p11z}, ${p21z}\n` +
-                                    `\tfw = ${fw}\n`);
-                                console.log(`r=${r} (z), reldt=${relativeDt}`);
-                                r = 0;
-                            }
-                        }
-
-                        //console.log('r=' + r + ' (z), reldt=' + relativeDt);
-
-                        if (r >= 0) {
-                            //let ndtr1 = r * ltd1;
-                            //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
-                            //let ndtr2 = r * ltd2;
-                            //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
-                            if (r < rrel) {
-                                axis = 'z';
-                                rrel = r;
-                            }
-                            //if (rrel < 0) rrel = r;
-                        }
+                    if (r >= 0 && r < rrel) {
+                        //let ndtr1 = r * ltd1;
+                        //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
+                        //let ndtr2 = r * ltd2;
+                        //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
+                        axis = 'z';
+                        rrel = r;
+                        // if (r < rrel) {
+                        // }
+                        //if (rrel < 0) rrel = r;
                     }
+                }
 
-                    //if (min_dtr1 < dtr1 || min_dtr2 < dtr2)
-                    if (rrel < relativeDt) {
-                        //e1.copyP01();
-                        //e2.copyP01();
-                        mapCollidingPossible.push([i, j, rrel, axis]);
-                    }
+                //if (min_dtr1 < dtr1 || min_dtr2 < dtr2)
+                if (rrel < relativeDt) {
+                    //e1.copyP01();
+                    //e2.copyP01();
+                    mapCollidingPossible.push([i, j, rrel, axis]);
                 }
             }
         }
