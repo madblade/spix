@@ -2,95 +2,64 @@
  * Integration.
  */
 
-import XCollider from '../collision/x';
-
 class RigidBodiesPhase4 {
 
-    static applyIntegration(
-        entities, worldId, oxAxis, world,
-        xm, objectOrderer, searcher, o)
+    static solveIslandStepLinear(
+        mapCollidingPossible,
+        i, j, subIslandI, subIslandJ,
+        entities, oxAxis, island)
     {
-        entities.forEach(currentEntity => {
-            if (!currentEntity) return;
-            let oldWorldId = currentEntity.worldId;
-            if (oldWorldId !== worldId) return; // TODO [HIGH] make this pas afterwards
+        mapCollidingPossible.shift();
 
-            let oi = currentEntity.indexX;
-            let entityIndex = currentEntity.entityId;
-            let currentObject = oxAxis[oi];
-            if (!currentObject || currentObject.kind !== 'e') return;
+        if (!subIslandI) {
+            subIslandI = [i];
+        }
+        if (!subIslandJ) {
+            subIslandJ = [j];
+        }
 
-            // Temporarily discard insulated objects.
-            // // if (oxToIslandIndex[oi] !== -1) return;
+        // Compute island properties.
+        let sub1Mass = 0;
+        let sub2Mass = 0;
+        let sub1Vel = [0, 0, 0];
+        let sub2Vel = [0, 0, 0];
 
-            //let entityIndex = oxAxis[oi].id;
-            //currentEntity = entities[entityIndex];
-            let p0 = currentEntity.p0; let p1 = currentEntity.p1;
-            let v0 = currentEntity.v0; let v1 = currentEntity.v1;
-            let a0 = currentEntity.a0; let a1 = currentEntity.a1;
+        // Sum mass.
+        // {
+        for (let idInSub1 = 0, sub1Length = subIslandI.length; idInSub1 < sub1Length; ++idInSub1)
+            sub1Mass += entities[oxAxis[island[subIslandI[idInSub1]]].id].mass;
+        for (let idInSub2 = 0, sub2Length = subIslandJ.length; idInSub2 < sub2Length; ++idInSub2)
+            sub2Mass += entities[oxAxis[island[subIslandJ[idInSub2]]].id].mass;
+        // }
 
-            // Cast through potential x.
-            let xCrossed = XCollider.xCollide(p0, p1, world, xm);
-            //if (oldWorldId == -1) {
-            //    console.log('Position: ');
-            //    console.log(p0);
-            //    console.log('->');
-            //    console.log(p1);
-            //}
+        // Compute uniform speed.
+        {
+            let e1 = entities[oxAxis[island[subIslandI[0]]].id];
+            let vel1 = e1.v0;
+            // let nu1 = e1.nu;
+            for (let t = 0; t < 3; ++t) sub1Vel[t] = vel1[t];
 
-            // TODO [CRIT] 1. if free (pyr, terrain) at gate, switch wld, else snap to gate
-            // TODO [CRIT] 2. cast from gate to transform(p1)
-            // TODO [CRIT] 3. think recursion
-            //currentEntity.metaX = xCrossed;
-            //let xCrossed = currentEntity.metaX;
+            let e2 = entities[oxAxis[island[subIslandJ[0]]].id];
+            let vel2 = e2.v0;
+            // let nu2 = e2.nu;
+            for (let t = 0; t < 3; ++t) sub2Vel[t] = vel2[t];
+        }
 
-            let entityUpdated = false;
+        // 1. collision -> mettre p0 à p1 (t_collision)
+        // const sndtr1 = r * relativeDt;
 
-            if (xCrossed) {
-                let newWorldId = xCrossed.worldId;
-                objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
+        // 2. calculer le nouveau p1 (projected)
 
-                // Collide with terrain on the other side (no second x crossing enabled)
-                // TODO [HIGH] translate [p0, p1] to [x.position, x.transform(p1, newWorldId)]
-                //let hasCollidedAfterwards =
-                //    TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
-                entityUpdated = true;
-            }
+        // 2.1. retirer le couple collision de la map collidingPossible
 
-            if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2]) {
-                //console.log('LetsUpdate!');
-                //console.log(p0);
-                //console.log(p1);
-                //console.log(currentEntity.nu);
-                currentEntity.p0 = currentEntity.p1;
-                if (!xCrossed) {
-                    searcher.updateObjectAxis(entityIndex);
-                    objectOrderer.moveObject(currentEntity);
-                } else {
-                    // TODO [HIGH] objectOrderer.switchEntityToWorld(...)
-                }
-                entityUpdated = true;
-            }
-            if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {
-                currentEntity.v0 = currentEntity.v1;
-                entityUpdated = true;
-            }
-            if (a0[0] !== a1[0] || a0[1] !== a1[1] || a0[2] !== a1[2]) {
-                currentEntity.a0 = currentEntity.a1;
-                entityUpdated = true;
-            }
+        // 3. lancer le solving de p0 à p1 (terrain + x)
 
-            if (entityUpdated)
-            {
-                o.entityUpdated(entityIndex);
-            }
+        // 4. invalider les collisions entre l'entité courante et les autres entités (pas dans la sous-île).
+        // 4.1. décaler les collisions pour toutes les autres entités (r)
 
-            currentEntity.p1 = [p0[0], p0[1], p0[2]];
-            currentEntity.v1 = [0, 0, 0];
-            currentEntity.a1 = [0, 0, 0];
-            // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
-            currentEntity.metaX = 0;
-        });
+        // 5. lancer le solving de p0 à p1' (entités dans l'île mais pas dans la sous-île)
+
+        // 6. loop back
     }
 
 }

@@ -12,6 +12,7 @@ import Phase1 from './rigid_bodies_phase_1';
 import Phase2 from './rigid_bodies_phase_2';
 import Phase3 from './rigid_bodies_phase_3';
 import Phase4 from './rigid_bodies_phase_4';
+import Phase5 from './rigid_bodies_phase_5';
 
 class RigidBodies {
 
@@ -119,9 +120,8 @@ class RigidBodies {
             let ozAxis = objectWorldAxes[2];
             let searcher = new Searcher(entities, oxAxis, oyAxis, ozAxis);
 
-            // console.log(worldId + ' : ' + oxAxis.length);
-            //if (oxAxis.length !== oyAxis.length || oxAxis.length !== ozAxis.length)
-            //    throw Error('Inconsistent lengths among axes.');
+            if (oxAxis.length !== oyAxis.length || oxAxis.length !== ozAxis.length)
+                throw Error('Inconsistent lengths among axes.');
 
             // 1. Sum inputs/impulses, fields.
 
@@ -148,8 +148,8 @@ class RigidBodies {
             leapfrogArray.sort((a, b) =>
                 inf(b) - inf(a)
             );
-            // Note: a-b natural order, b-a reverse order
-            // abs(b[0]) + abs(b[1]) + abs(b[2]) - abs(a[0]) + abs(a[1]) + abs(a[2])
+            // Note: a - b natural order, b - a reverse order
+            // abs(b[0]) + abs(b[1]) + abs(b[2]) - abs(a[0]) - abs(a[1]) - abs(a[2])
 
             // Rebuild mapping after having sorted leapfrogs.
             let reverseLeapfrogArray = new Int32Array(leapfrogArray.length);
@@ -235,7 +235,6 @@ class RigidBodies {
                 // TODO [remember] no tunneling: use a temporary position for successively adjusting collisions
                 // TODO [remember] increase island widths with a possible displacement from a w-width impact object
                 // TODO [CRIT] account for last point!!!!!!!!
-                // TODO [CRIT] account for last point!!!!!!!!
 
                 // Pour chaque entité dans l'île courante:
                 while (mapCollidingPossible.length > 0) {
@@ -267,57 +266,9 @@ class RigidBodies {
                         i, j, r, axis, newSubIsland,
                         island, oxAxis, entities, relativeDt, epsilon);
 
-                    mapCollidingPossible.shift();
-
-                    if (!subIslandI) {
-                        subIslandI = [i];
-                    }
-                    if (!subIslandJ) {
-                        subIslandJ = [j];
-                    }
-
-                    // Compute island properties.
-                    let sub1Mass = 0;
-                    let sub2Mass = 0;
-                    let sub1Vel = [0, 0, 0];
-                    let sub2Vel = [0, 0, 0];
-
-                    // Sum mass.
-                    // {
-                    for (let idInSub1 = 0, sub1Length = subIslandI.length; idInSub1 < sub1Length; ++idInSub1)
-                        sub1Mass += entities[oxAxis[island[subIslandI[idInSub1]]].id].mass;
-                    for (let idInSub2 = 0, sub2Length = subIslandJ.length; idInSub2 < sub2Length; ++idInSub2)
-                        sub2Mass += entities[oxAxis[island[subIslandJ[idInSub2]]].id].mass;
-                    // }
-
-                    // Compute uniform speed.
-                    {
-                        let e1 = entities[oxAxis[island[subIslandI[0]]].id];
-                        let vel1 = e1.v0;
-                        // let nu1 = e1.nu;
-                        for (let t = 0; t < 3; ++t) sub1Vel[t] = vel1[t];
-
-                        let e2 = entities[oxAxis[island[subIslandJ[0]]].id];
-                        let vel2 = e2.v0;
-                        // let nu2 = e2.nu;
-                        for (let t = 0; t < 3; ++t) sub2Vel[t] = vel2[t];
-                    }
-
-                    // 1. collision -> mettre p0 à p1 (t_collision)
-                    // const sndtr1 = r * relativeDt;
-
-                    // 2. calculer le nouveau p1 (projected)
-
-                    // 2.1. retirer le couple collision de la map collidingPossible
-
-                    // 3. lancer le solving de p0 à p1 (terrain + x)
-
-                    // 4. invalider les collisions entre l'entité courante et les autres entités (pas dans la sous-île).
-                    // 4.1. décaler les collisions pour toutes les autres entités (r)
-
-                    // 5. lancer le solving de p0 à p1' (entités dans l'île mais pas dans la sous-île)
-
-                    // 6. recommencer
+                    Phase4.solveIslandStepLinear(
+                        mapCollidingPossible,
+                        i, j, subIslandI, subIslandJ, entities, oxAxis, island);
                 }
             });
 
@@ -325,7 +276,7 @@ class RigidBodies {
             //    smoothly slice along constrained boundaries until component is extinct.
 
             // Integration.
-            Phase4.applyIntegration(
+            Phase5.applyIntegration(
                 entities, worldId, oxAxis, world,
                 xm, objectOrderer, searcher, o);
 

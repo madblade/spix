@@ -38,7 +38,7 @@ extend(RendererManager.prototype, {
             alpha: true
         });
 
-        renderer.setClearColor(this.cssToHex('#4fb6d2'), 1);
+        renderer.setClearColor(this.cssToHex('#3159ab'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         return renderer;
     },

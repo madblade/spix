@@ -41,7 +41,7 @@ class Integrator {
             }
 
             // Update properties, phase 2.
-            TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
+            TerrainCollider.collideLinear(entity, world, entity.position, newPosition, dt);
 
             return true;
         }
@@ -58,7 +58,7 @@ class Integrator {
             }
 
             // TODO [CRIT] UGLY, DESTROY IT. EXTERMINATE.
-            let hasCollided = TerrainCollider.linearCollide(entity, world, entity.position, newPosition, dt);
+            let hasCollided = TerrainCollider.collideLinear(entity, world, entity.position, newPosition, dt);
             return Integrator.integrateLeapfrogPhase2(dt, impulseSpeed, force, entity, em, world, hasCollided);
         }
     }

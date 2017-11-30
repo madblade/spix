@@ -89,7 +89,7 @@ class RigidBodiesPhase2 {
             // TODO [HIGH] filter for lonely islands.
             // let islandId = oxToIslandIndex[oi];
             // let doProject = islandId === -1 || islandId === -2;
-            /*let hasCollided = */TerrainCollider.linearCollide(currentEntity, world, p0, p1, true);
+            /*let hasCollided = */TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             // TODO [MEDIUM] report bounce components.
         }
     }

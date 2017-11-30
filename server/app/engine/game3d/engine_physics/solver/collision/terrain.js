@@ -23,7 +23,7 @@ class TerrainCollider {
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
      *
      */
-    static linearCollide(entity, world, position, newPosition, doProject) {
+    static collideLinear(entity, world, position, newPosition, doProject) {
         let p0 = position;
         let p1 = newPosition;
         let x0 = p0[0]; let y0 = p0[1]; let z0 = p0[2];
