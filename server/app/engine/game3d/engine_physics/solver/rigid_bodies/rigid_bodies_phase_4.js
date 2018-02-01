@@ -6,17 +6,18 @@ class RigidBodiesPhase4 {
 
     static solveIslandStepLinear(
         mapCollidingPossible,
-        i, j, subIslandI, subIslandJ,
+            // island 1 index
+            // island 2 index
+            // time got by solver
+            // 'x', 'y', 'z' or 'none'
+        i, j,
+        subIslandI, subIslandJ, newSubIsland,
         entities, oxAxis, island)
     {
         mapCollidingPossible.shift();
 
-        if (!subIslandI) {
-            subIslandI = [i];
-        }
-        if (!subIslandJ) {
-            subIslandJ = [j];
-        }
+        if (!subIslandI) subIslandI = [i];
+        if (!subIslandJ) subIslandJ = [j];
 
         // Compute island properties.
         let sub1Mass = 0;
@@ -46,18 +47,24 @@ class RigidBodiesPhase4 {
         }
 
         // 1. collision -> mettre p0 à p1 (t_collision)
+        // (pour toute entité appartenant à newSubIsland) <- Approximation (explicit solving)
         // const sndtr1 = r * relativeDt;
 
         // 2. calculer le nouveau p1 (projected)
+        // (bilan des forces > intégration)
 
         // 2.1. retirer le couple collision de la map collidingPossible
 
         // 3. lancer le solving de p0 à p1 (terrain + x)
+        // (pour toute entité appartenant à newSubIsland) <- Approximation (explicit solving)
 
         // 4. invalider les collisions entre l'entité courante et les autres entités (pas dans la sous-île).
         // 4.1. décaler les collisions pour toutes les autres entités (r)
+        // intégrer la différence de la solution quadratique
 
-        // 5. lancer le solving de p0 à p1' (entités dans l'île mais pas dans la sous-île)
+        // 5. lancer le solving de p0 à p1' (pour toutes les entités dans l'île mais pas dans la sous-île)
+
+        //console.log(newSubIsland);
 
         // 6. loop back
     }

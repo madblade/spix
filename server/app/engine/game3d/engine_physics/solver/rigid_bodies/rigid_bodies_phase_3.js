@@ -20,7 +20,7 @@ class RigidBodiesPhase3 {
             //console.log('deg2');
             let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1 + fw * w2 + p10 - p20);
             if (delta > 0) {
-                console.log('delta > 0');
+                // console.log('delta > 0');
                 let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
                 let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
                 r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
@@ -111,7 +111,7 @@ class RigidBodiesPhase3 {
                 // const dtr2 = relativeDt * ltd2;
 
                 //for (let k = 0; k < 3; ++k) {
-                //const cxm =
+                //con-st cxm =
                 let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
                 let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
                 let x0r = p10x - w1x >= p20x + w2x; let y0r = p10y - w1y >= p20y + w2y; let z0r = p10z - w1z >= p20z + w2z;
@@ -373,7 +373,7 @@ class RigidBodiesPhase3 {
     }
 
     static applyCollision(
-        i, j, r, axis, newSubIsland,
+        i, j, r, axis,
         island, oxAxis, entities, relativeDt,
         epsilon)
     {
@@ -395,6 +395,7 @@ class RigidBodiesPhase3 {
         let w1y = e1.widthY;
         let w1z = e1.widthZ;
         let ltd1 = e1.dtr;
+        let mass1 = e1.mass;
         const sndtr1 = r * relativeDt; // * ltd1;
 
         let xIndex2 = island[j]; // let lfa2 = leapfrogArray[xIndex2];
@@ -413,6 +414,7 @@ class RigidBodiesPhase3 {
         let p2n0 = e2.nu;
         let w2x = e2.widthX; let w2y = e2.widthY; let w2z = e2.widthZ;
         let ltd2 = e2.dtr;
+        let mass2 = e2.mass;
         const sndtr2 = r * relativeDt; // * ltd2;
 
         // Snap p1.
@@ -460,18 +462,19 @@ class RigidBodiesPhase3 {
                 let e1p0i = e1.p0[m];
                 let e1p1n = e1p0i + (p1v0[m] + p1n0[m]) * timestep1 + .5 * p1a0[m] * timestep1 * timestep1;
                 nep1[m] =
-                    e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n ?
-                        e1p1n - epsilon :
+                    e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n ? // && e1p1n+e < e1p0i && e1p1i < e1p1n+e
+                        e1p1n + epsilon :
                         e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i ?
-                            e1p1n + epsilon : e1p1i;
+                            e1p1n - epsilon : e1p1i;
 
                 let e2p1i = e2.p1[m];
                 let e2p0i = e2.p0[m];
                 let e2p1n = e2p0i + (p2v0[m] + p2n0[m]) * timestep2 + .5 * p2a0[m] * timestep2 * timestep2;
-                nep2[m] = e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n ?
-                    e2p1n - epsilon :
-                    e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
-                        e2p1n + epsilon : e2p1i;
+                nep2[m] =
+                    e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n ?
+                        e2p1n + epsilon :
+                        e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
+                            e2p1n - epsilon : e2p1i;
 
                 m2[m] = nep1[m] + wm1[m] > nep2[m] - wm2[m] && nep1[m] - wm1[m] < nep2[m] + wm2[m];
                 // !x1l && !x1r
@@ -479,11 +482,15 @@ class RigidBodiesPhase3 {
                 if (m === ax) {
                     if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
                         e2.a1[m] = 0;
-                        e2.v1[m] = e1.v1[m];
+                        // e2.v1[m] = e1.v1[m];
+                        // TODO [HIGH] check that
+                        e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
                     }
                     if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
                         e1.a1[m] = 0;
-                        e1.v1[m] = e2.v1[m];
+                        // e1.v1[m] = e2.v1[m];
+                        // TODO [HIGH] check that
+                        e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
                     }
                 }
             }

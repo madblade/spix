@@ -16,7 +16,7 @@ import Phase5 from './rigid_bodies_phase_5';
 
 class RigidBodies {
 
-    static eps = 0;// .00001;
+    static eps = .00000001;// .00001;
 
     constructor(refreshRate)
     {
@@ -196,7 +196,9 @@ class RigidBodies {
                 // Solve leapfrog and sort according to time.
                 Phase3.solveLeapfrogQuadratic(
                     island,
-                    oxAxis, entities, relativeDt, mapCollidingPossible);
+                    oxAxis, entities, relativeDt,
+                    mapCollidingPossible);
+                // TODO [MEDIUM think order by mass
 
                 // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
 
@@ -238,10 +240,10 @@ class RigidBodies {
 
                 // Pour chaque entité dans l'île courante:
                 while (mapCollidingPossible.length > 0) {
-                    let i = mapCollidingPossible[0][0];
-                    let j = mapCollidingPossible[0][1];
-                    let r = mapCollidingPossible[0][2];
-                    let axis = mapCollidingPossible[0][3];
+                    let i = mapCollidingPossible[0][0];     // island 1 index
+                    let j = mapCollidingPossible[0][1];     // island 2 index
+                    let r = mapCollidingPossible[0][2];     // time got by solver
+                    let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
 
                     let subIslandI = Phase3.getSubIsland(i, axis,
                         objectIndexInIslandToSubIslandXIndex,
@@ -263,12 +265,41 @@ class RigidBodies {
                         subIslandsX, subIslandsY, subIslandsZ, axis);
 
                     Phase3.applyCollision(
-                        i, j, r, axis, newSubIsland,
+                        i, j, r, axis,
                         island, oxAxis, entities, relativeDt, epsilon);
 
+                    // 1. apply step to newSubIsland
+                    // 2.1. invalidate for each (newSubIslandMember)
+                    // 2.2. resolve for each (newSubIslandMember x anyother)
+                    // 3. update mapCollidingPossible
+
+                    // Warn: account for numerical errors.
+
+
+                    // TODO [CRIT] extract routine for Leapfrog computaiton.
+                    // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
+                    // et p1 = solve(dt = dt0-r, entité).
+                    // Si dt0-r = 0
+                    // TODO [CRIT] calculer dx(i),dy(i),dz(i) et dx(j),dy(j),dz(j)
+                    // puis pour tout x€Sub(i), y€Sub(j), appliquer le même différentiel.
+                    // -> optimisation dans le cas où d(dt) = 0.
+                    // sinon, si pour un certain (x,y,z), d(dt)(x,y,z) != 0, alors utiliser
+                    // la formule Leapfrog.
+
+                    // (*) On calcule v_newIsland et a_newIsland (additif).
+                    // (*) à t0 + r, toutes les entités dans island1 + island2
+                    // sont mises à p0(entité) = p0(entité) + solve(r, v_entité, a_entité).
+                    // (*) puis, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIslend).
+                    // (*) enfin, v0(entité) = v_newIsland et a0(entité) = a_newIsland
+                    // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
+                    // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
+                    // et stocker le résultat avec r inchangé dans mapCollidingPossible.
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
-                        i, j, subIslandI, subIslandJ, entities, oxAxis, island);
+                        i, j, subIslandI, subIslandJ, newSubIsland, entities,
+                        oxAxis, island);
+
+                    // TODO [MEDIUM] study island caching.
                 }
             });
 

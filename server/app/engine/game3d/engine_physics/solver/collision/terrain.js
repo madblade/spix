@@ -21,7 +21,7 @@ class TerrainCollider {
      * - TODO [OPT] fast integer chunk lookup
      * - TODO [OPT] chunk caching
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
-     *
+     * - TODO [HIGH] investigate acceleration resets (adherence to walls).
      */
     static collideLinear(entity, world, position, newPosition, doProject) {
         let p0 = position;
