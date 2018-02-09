@@ -278,7 +278,7 @@ class RigidBodies {
 
                     // TODO [CRIT] extract routine for Leapfrog computaiton.
                     // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
-                    // et p1 = solve(dt = dt0-r, entité).
+                    // TODO [CRIT] et p1 = solve(dt = dt0-r, entité).
                     // Si dt0-r = 0
                     // TODO [CRIT] calculer dx(i),dy(i),dz(i) et dx(j),dy(j),dz(j)
                     // puis pour tout x€Sub(i), y€Sub(j), appliquer le même différentiel.
@@ -289,7 +289,7 @@ class RigidBodies {
                     // (*) On calcule v_newIsland et a_newIsland (additif).
                     // (*) à t0 + r, toutes les entités dans island1 + island2
                     // sont mises à p0(entité) = p0(entité) + solve(r, v_entité, a_entité).
-                    // (*) puis, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIslend).
+                    // (*) puis, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIsland).
                     // (*) enfin, v0(entité) = v_newIsland et a0(entité) = a_newIsland
                     // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
                     // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
