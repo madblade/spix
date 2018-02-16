@@ -72,6 +72,7 @@ class Entity {
         this._widthZ      = .9;  // -> 1.6
         // Physical properties
         this._mass        = 1;
+        this._lastR       = -1;
     }
 
     static maxWidth = 10.; // 10 blocks.
@@ -84,6 +85,8 @@ class Entity {
 
     get dtr()               { return this._dtr; }
     set dtr(dtr)            { this._dtr = dtr; }
+    get lastR()             { return this._lastR; }
+    set lastR(r)            { this._lastR = r; }
 
     //get rotation()          { return this._rotation; }
     get rotation()          { return this._r; }

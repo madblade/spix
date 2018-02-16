@@ -20,6 +20,9 @@ class RigidBodiesPhase5 {
             let currentObject = oxAxis[oi];
             if (!currentObject || currentObject.kind !== 'e') return;
 
+            // Reset stamped collision.
+            currentEntity.lastR = -1;
+
             // Temporarily discard insulated objects.
             // // if (oxToIslandIndex[oi] !== -1) return;
 

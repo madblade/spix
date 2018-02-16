@@ -20,10 +20,10 @@ var all = {
     root: path.normalize(path.join(__dirname, '/../../..')),
 
     // Server port
-    port: process.env.PORT || 9000,
+    port: process.env.PORT || 8080,
 
     // Server IP
-    ip: process.env.IP || '0.0.0.0',
+    ip: process.env.IP || '127.0.0.1',
 
     // Should we populate the DB with sample data?
     seedDB: false,

@@ -296,8 +296,11 @@ class RigidBodies {
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
-                        i, j, subIslandI, subIslandJ, newSubIsland, entities,
-                        oxAxis, island);
+                        i, j, r, subIslandI, subIslandJ, newSubIsland, entities,
+                        objectIndexInIslandToSubIslandXIndex,
+                        objectIndexInIslandToSubIslandYIndex,
+                        objectIndexInIslandToSubIslandZIndex,
+                        oxAxis, island, world, relativeDt);
 
                     // TODO [MEDIUM] study island caching.
                 }
