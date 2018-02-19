@@ -56,7 +56,7 @@ class RigidBodiesPhase3 {
         oxAxis, entities, relativeDt, mapCollidingPossible)
     {
         let islandLength = island.length;
-        let newSubIslandLength = newSubIsland.length;
+        // let newSubIslandLength = newSubIsland.length;
         // let terrainLength = terrain.length;
 
         // Solve in newSubIsland x island\newSubIsland
@@ -70,14 +70,24 @@ class RigidBodiesPhase3 {
             let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
             let ltd1 = e1.dtr;
 
-            for (let j = 0; j < newSubIslandLength; ++j)
+            for (let j = i + 1; j < islandLength; ++j)
             {
-                let xIndexJ = newSubIsland[j];
+                let xIndexJ = island[j];
 
-                // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
+                let newSubIslandIndexI = newSubIsland.indexOf(xIndexI);
+                let newSubIslandIndexJ = newSubIsland.indexOf(xIndexJ);
+                let iInNewSubIsland = newSubIslandIndexI < 0;
+                let jInNewSubIsland = newSubIslandIndexJ < 0;
+
                 // TODO [HIGH] check my elementary set theory abilities
-                let terrainHasCurrentIndex = terrain.indexOf(xIndexJ);
-                if (xIndexI === xIndexJ && terrainHasCurrentIndex < 0) continue;
+                let goOn = !iInNewSubIsland && jInNewSubIsland;
+                if (!goOn) {
+                    // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
+                    let terrainHasCurrentIndex = terrain.indexOf(xIndexJ);
+                    let jInTerrainResolver = terrainHasCurrentIndex < 0;
+                    if (!jInTerrainResolver)
+                        continue;
+                }
 
                 let id2 = oxAxis[xIndexJ].id;
                 let e2 = entities[id2];
@@ -95,8 +105,8 @@ class RigidBodiesPhase3 {
                 let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
                 let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
-                if (xm && ym && zm) { console.log('[RigidBodies/ComputeIslands] Full 3D clip clipped.'); continue; }
-                if (!xm + !ym + !zm !== 1) { console.log('[RigidBodies/ComputeIslands] Corner 2D clip detected.'); }
+                if (xm && ym && zm) { console.log('[Phase III - PostCollision] Full 3D clip clipped.'); continue; }
+                if (!xm + !ym + !zm !== 1) { console.log('[Phase III - PostCollision] Corner 2D clip detected.'); }
                 if (!(xw && yw && zw)) continue;
                 let rrel = relativeDt;
                 let axis = 'none';
@@ -212,13 +222,13 @@ class RigidBodiesPhase3 {
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
                 if (xm && ym && zm) {
-                    console.log('[RigidBodies/ComputeIslands] Full 3D clip clipped.');
+                    console.log('[Phase III - PreCollision] Full 3D clip clipped.');
                     // mapCollidingPossible.push([i, j, 0]);
                     continue;
                 }
 
                 if (!xm + !ym + !zm !== 1) {
-                    console.log('[RigidBodies/ComputeIslands] Corner 2D clip detected.');
+                    console.log('[Phase III - PreCollision] Corner 2D clip detected.');
                 }
 
                 //if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {

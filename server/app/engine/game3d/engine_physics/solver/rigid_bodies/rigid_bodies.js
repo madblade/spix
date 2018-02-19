@@ -303,7 +303,14 @@ class RigidBodies {
                         oxAxis, island, world, relativeDt);
 
                     // TODO [MEDIUM] study island caching.
+                    let debuguette = '';
+                    debuguette = '\tPass ' + mapCollidingPossible.length;
+                    for (let m = 0; m < mapCollidingPossible.length; ++m) {
+                        debuguette += '(' + (mapCollidingPossible[m][0]) + ',' + mapCollidingPossible[m][1] + ') ; ';
+                    }
+                    console.log(debuguette);
                 }
+                console.log('Solveth!');
             });
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,

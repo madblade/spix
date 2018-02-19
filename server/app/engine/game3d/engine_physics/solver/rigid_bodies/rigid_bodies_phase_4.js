@@ -23,8 +23,8 @@ class RigidBodiesPhase4 {
     {
         mapCollidingPossible.shift();
 
-        if (!subIslandI) subIslandI = [i];
-        if (!subIslandJ) subIslandJ = [j];
+        if (!subIslandI || subIslandI.length === 0) subIslandI = [i];
+        if (!subIslandJ || subIslandJ.length === 0) subIslandJ = [j];
 
         // Compute island properties.
         let sub1Mass = 0;
