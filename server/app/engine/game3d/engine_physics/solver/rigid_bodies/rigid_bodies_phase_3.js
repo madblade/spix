@@ -589,6 +589,7 @@ class RigidBodiesPhase3 {
             // Temporary security measure.
             // {
             // let l = newSubIsland.length;
+            // TODO [HIGH] this is a projection... check collision
             for (let m = 0; m < 3; ++m) {
                 e1.p1[m] = nep1[m];
                 e2.p1[m] = nep2[m];

@@ -113,6 +113,7 @@ class RigidBodiesPhase1 {
             let v0 = currentEntity.v0; let v1 = currentEntity.v1;
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
             let nu = currentEntity.nu; // Instantaneous speed.
+            console.log(p0);
 
             let localTimeDilatation = rigidBodiesSolver.getTimeDilatation(worldId, p0[0], p0[1], p0[2]);
             // const dta = absoluteDt * localTimeDilatation;

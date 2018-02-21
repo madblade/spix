@@ -186,6 +186,7 @@ class RigidBodies {
                 //console.log(islands);
             }
 
+            // console.log(islands);
             islands.forEach(island => {
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];
@@ -239,6 +240,7 @@ class RigidBodies {
                 // TODO [CRIT] account for last point!!!!!!!!
 
                 // Pour chaque entité dans l'île courante:
+                // console.log(mapCollidingPossible);
                 while (mapCollidingPossible.length > 0) {
                     let i = mapCollidingPossible[0][0];     // island 1 index
                     let j = mapCollidingPossible[0][1];     // island 2 index
@@ -304,13 +306,13 @@ class RigidBodies {
 
                     // TODO [MEDIUM] study island caching.
                     let debuguette = '';
-                    debuguette = '\tPass ' + mapCollidingPossible.length;
+                    debuguette = `\tPass ${mapCollidingPossible.length} `;
                     for (let m = 0; m < mapCollidingPossible.length; ++m) {
-                        debuguette += '(' + (mapCollidingPossible[m][0]) + ',' + mapCollidingPossible[m][1] + ') ; ';
+                        debuguette += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}) ; `;
                     }
                     console.log(debuguette);
                 }
-                console.log('Solveth!');
+                // console.log('Solveth!');
             });
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
