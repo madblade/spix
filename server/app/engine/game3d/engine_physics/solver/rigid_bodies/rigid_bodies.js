@@ -82,7 +82,7 @@ class RigidBodies {
     {
         // TODO [HIGH] solve several times according to delta timestep
 
-        const epsilon = RigidBodies.eps;
+        // const epsilon = RigidBodies.eps;
 
         const passId = Math.random();
         let timeDilatation = this.globalTimeDilatation;
@@ -183,10 +183,9 @@ class RigidBodies {
             //    keep list of ordered Ts across pairs.
             if (islands.length > 0) {
                 //console.log('Islands: ');
-                //console.log(islands);
+                // console.log(islands);
             }
 
-            // console.log(islands);
             islands.forEach(island => {
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];
@@ -205,7 +204,7 @@ class RigidBodies {
 
                 // Narrow phase, part 2: for all Ts in order,
                 //    set bodies as 'in contact' or 'terminal' (terrain),
-                //    compute new paths (which are not more than common two previous) while compensating forces
+                //    compute new paths (which )are not more than common two previous) while compensating forces
                 //    so as to project the result into directions that are not occluded
                 //      -> bouncing will be done in next iteration to ensure convergence
                 //      -> possible to keep track of the energy as unsatisfied work of forces
@@ -241,7 +240,17 @@ class RigidBodies {
 
                 // Pour chaque entité dans l'île courante:
                 // console.log(mapCollidingPossible);
-                while (mapCollidingPossible.length > 0) {
+                while (mapCollidingPossible.length > 0)
+                {
+                    // TODO [MEDIUM] study island caching.
+                    let debuguette = '';
+                    debuguette = `\tPass ${mapCollidingPossible.length} `;
+                    for (let m = 0; m < mapCollidingPossible.length; ++m) {
+                        debuguette += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}) ; `;
+                    }
+                    //console.log(debuguette);
+                    // \DEBUG
+
                     let i = mapCollidingPossible[0][0];     // island 1 index
                     let j = mapCollidingPossible[0][1];     // island 2 index
                     let r = mapCollidingPossible[0][2];     // time got by solver
@@ -268,7 +277,7 @@ class RigidBodies {
 
                     Phase3.applyCollision(
                         i, j, r, axis,
-                        island, oxAxis, entities, relativeDt, epsilon);
+                        island, oxAxis, entities, relativeDt, 0);
 
                     // 1. apply step to newSubIsland
                     // 2.1. invalidate for each (newSubIslandMember)
@@ -303,14 +312,6 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         oxAxis, island, world, relativeDt);
-
-                    // TODO [MEDIUM] study island caching.
-                    let debuguette = '';
-                    debuguette = `\tPass ${mapCollidingPossible.length} `;
-                    for (let m = 0; m < mapCollidingPossible.length; ++m) {
-                        debuguette += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}) ; `;
-                    }
-                    console.log(debuguette);
                 }
                 // console.log('Solveth!');
             });

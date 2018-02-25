@@ -48,7 +48,8 @@ class FrontEnd {
         let ob = physicsEngine.outputBuffer;
 
         // Compute adaptive time step.
-        let relativeDt = process.hrtime(this._stamp)[1] / 1e6;
+        // TODO [CRIT] remember to reactivate lag correction.
+        let relativeDt = 16.667; // process.hrtime(this._stamp)[1] / 1e6;
 
         // Solve physics constraints with basic ordering optimization.
         let maxTimeStepDuration = rigidBodies.refreshRate;

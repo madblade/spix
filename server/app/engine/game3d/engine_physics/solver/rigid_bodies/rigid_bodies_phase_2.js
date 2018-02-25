@@ -66,6 +66,29 @@ class RigidBodiesPhase2 {
 
             // TODO [DBG] check new island and former for redundancy.
         }
+
+        // Merge islands.
+        // TODO [HIGH] this can be heavily optimised.
+        for (let i = 0; i < islands.length; ++i)
+        {
+            let islandI = islands[i];
+            for (let j = islands.length - 1; j > i; --j)
+            {
+                let islandJ = islands[j];
+                for (let k = 0; k < islandI.length; ++k) {
+                    if (islandJ.indexOf(islandI[k]) > 0) {
+                        // Merge within I and pop.
+                        for (let q = 0; q < islandJ.length; ++q) {
+                            let ijq = islandJ[q];
+                            if (islandI.indexOf(ijq) < 0)
+                                islandI.push(ijq);
+                        }
+                        islands.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**

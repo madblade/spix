@@ -102,6 +102,10 @@ class RigidBodiesPhase1 {
         passId,
         rigidBodiesSolver)
     {
+        let vS = [];
+        let aS = [];
+        const debug = false;
+
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
         {
             let currentObject = oxAxis[oi];
@@ -113,7 +117,7 @@ class RigidBodiesPhase1 {
             let v0 = currentEntity.v0; let v1 = currentEntity.v1;
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
             let nu = currentEntity.nu; // Instantaneous speed.
-            console.log(p0);
+            // console.log(p0);
 
             let localTimeDilatation = rigidBodiesSolver.getTimeDilatation(worldId, p0[0], p0[1], p0[2]);
             // const dta = absoluteDt * localTimeDilatation;
@@ -206,6 +210,16 @@ class RigidBodiesPhase1 {
             // Velocity correction.
             // if (sum > maxSpeed * dtr)
             //     for (let i = 0; i < 3; ++i) v1[i] *= (maxSpeed * dtr / sum);
+
+            if (debug) {
+                vS.push(v1[2]);
+                aS.push([a0[2], a1[2]]);
+            }
+        }
+
+        if (debug && (vS.length > 1 && vS[0] !== vS[1])) {
+            console.log(vS);
+            console.log(aS);
         }
     }
 

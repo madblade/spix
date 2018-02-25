@@ -103,6 +103,9 @@ class RigidBodiesPhase4 {
         for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
         {
             let entityIdInIsland = newSubIsland[idInNewSub];
+            if (entityIdInIsland === i || entityIdInIsland === j)
+                continue;
+
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
 
@@ -114,9 +117,7 @@ class RigidBodiesPhase4 {
             let a0 = currentEntity.a0;
 
             // Prevent from advancing i and j (already clipped)
-            if (entityIdInIsland !== i || entityIdInIsland !== j) {
-                add(currentEntity.p0, solve(deltaR, v0, nu, a0, maxDtr));
-            }
+            add(currentEntity.p0, solve(deltaR, v0, nu, a0, maxDtr));
         }
 
         // 2. calculer le nouveau p1 (projected)
@@ -133,18 +134,18 @@ class RigidBodiesPhase4 {
         for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
         {
             let entityIdInIsland = newSubIsland[idInNewSub];
-            if (entityIdInIsland !== i || entityIdInIsland !== j)
+            if (entityIdInIsland === i || entityIdInIsland === j)
                 continue;
 
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
 
             let nu = currentEntity.nu; // TODO [CRIT] check that.
-            let v0 = currentEntity.v0;
-            let a0 = currentEntity.a0;
+            let v0 = currentEntity.v0; // let v1 = currentEntity.v1;
+            let a0 = currentEntity.a0; // let a1 = currentEntity.a1;
             for (let k = 0; k < 3; ++k) {
-                v0[k] = newVel[k];
-                a0[k] = newAcc[k];
+                v0[k] = newVel[k]; // v1[k] = newVel[k];
+                a0[k] = newAcc[k]; // a1[k] = newAcc[k];
             }
 
             let lastR = currentEntity.lastR;
@@ -153,7 +154,9 @@ class RigidBodiesPhase4 {
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
             let newP1 = solve(deltaR, v0, nu, a0, dtr);
-            for (let k = 0; k < 3; ++k) p1[k] = newP1[k];
+            for (let k = 0; k < 3; ++k) {
+                p1[k] = newP1[k];
+            }
 
             let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             if (hasCollided) {
@@ -225,7 +228,9 @@ class RigidBodiesPhase4 {
         // et stocker le résultat avec r inchangé dans mapCollidingPossible.
         // append the result with r unchanged in mapCollidingPossible
         for (let k = 0, l = mapCollidingPossibleNew.length; k < l; ++k)
+        {
             mapCollidingPossible.push(mapCollidingPossibleNew[k]);
+        }
 
         mapCollidingPossible.sort((a, b) => a[2] - b[2]);
     }

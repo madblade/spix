@@ -4,6 +4,31 @@
 
 class RigidBodiesPhase3 {
 
+    static solveBabylon(a, b, c, sup, debug) {
+        if (a === 0) {
+            if (b === 0)
+                return 0;
+            else
+                return -c / b;
+        }
+        let r = 0;
+        let delta = b * b - 4 * a * c;
+        if (delta > 0) {
+            let r1 = (-b - Math.sqrt(delta)) / (2 * a);
+            let r2 = (-b + Math.sqrt(delta)) / (2 * a);
+            if (r1 >= 0 && r2 >= 0)
+                r = Math.min(r1, r2);
+            else if (r1 >= 0 || r2 >= 0)
+                r = Math.max(Math.max(r1, r2), 0);
+            else
+                r = sup;
+        } else if (delta === 0) {
+            if (debug) console.log('delta = 0');
+            r = -b / (2 * a);
+        }
+        return r;
+    }
+
     static solveSecondOrder(
         a1, a2,
         b1, b2,
@@ -12,41 +37,67 @@ class RigidBodiesPhase3 {
         w1, w2,
         fw, relativeDt)
     {
-        let abs = Math.abs;
-        let sqrt = Math.sqrt;
-        let r = 0;
+        // Check for snapping on first trajectory.
+        let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
 
-        if (a1 !== a2) {
-            //console.log('deg2');
-            let delta = (b1 - b2) * (b1 - b2) - 4 * (a1 - a2) * (fw * w1 + fw * w2 + p10 - p20);
-            if (delta > 0) {
-                // console.log('delta > 0');
-                let r1 = (b2 - b1 + sqrt(delta)) / (2 * (a1 - a2));
-                let r2 = (b2 - b1 - sqrt(delta)) / (2 * (a1 - a2));
-                r = Math.min(Math.max(r1, 0), Math.max(r2, 0));
-            } else if (delta === 0) {
-                console.log('delta = 0');
-                r = (b2 - b1) / (2 * (a1 - a2));
-            }
-        }
-        else if (b1 !== b2)
+        // Check for snapping on second trajectory.
+        let rp2 = RigidBodiesPhase3.solveBabylon(a2, b2, p20 - p21, 2 * relativeDt);
+
+        // Solve free 2-collision.
+        let rp12 = RigidBodiesPhase3.solveBabylon(a1 - a2, b1 - b2, fw * w1 + fw * w2 + p10 - p20, 2 * relativeDt, true);
+        // let rp12 = 2 * relativeDt;
+        // if (a1 !== a2)
+        // else if (b1 !== b2)
+        //     rp12 = (fw * w1 + fw * w2 + p10 - p20) / (b2 - b1);
+        const debug = false;
+        if (rp12 === 0)
         {
-            if (abs(b2 - b1) < 1e-7) r = 0;
-            else r = (fw * w1 + fw * w2 + p10 - p20) / (b2 - b1);
-
-            if (r < 0 || r >= relativeDt) {
-                console.log('r computation error');
-                console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
-                    `\tw1, w2 = ${w1}, ${w2}\n` +
-                    `\tp01, p02 = ${p10}, ${p20}\n` +
-                    `\tp11, p12 = ${p11}, ${p21}\n` +
-                    `\tfw = ${fw}\n`);
-                console.log(`r=${r} (z), reldt=${relativeDt}`);
-                r = 0;
-            }
-            // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+            if (debug) console.log('Unlikely zero output from babylon solver...');
         }
-        return r;
+
+        // Both trajectories should not be snapped at the same time.
+        if (rp12 > rp1 && relativeDt > rp1 && rp12 > rp2 && relativeDt > rp2) {
+            console.log('Two colliding bodies saw their trajectory snapped on the same axis... Think about it.');
+        }
+
+        // In case of (1)-snap.
+        if (rp12 > rp1 && relativeDt > rp1 && rp1 >= 0) {
+            // Solve constrained (1)-end-of-line collision.
+            console.log('Constrained (1).');
+            let rp3 = RigidBodiesPhase3.solveBabylon(a2, b2, -fw * w1 - fw * w2 + p20 - p11, 2 * relativeDt);
+            if (rp12 > rp3 && rp3 > 0) rp12 = rp3;
+        }
+
+        // In case of (2)-snap.
+        if (rp12 > rp2 && relativeDt > rp2 && rp2 >= 0) {
+            console.log('Constrained (2).');
+            // Solve constrained (2)-end-of-line collision.
+            let rp4 = RigidBodiesPhase3.solveBabylon(a1, b1, fw * w1 + fw * w2 + p10 - p21, 2 * relativeDt);
+            if (rp12 > rp4 && rp4 > 0) rp12 = rp4;
+        }
+
+
+        if (rp12 < 0 || rp12 >= relativeDt) {
+            // TODO [CRIT] reset this comment to enable debug
+            // console.log('r computation error');
+            // console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
+            //     `\tw1, w2 = ${w1}, ${w2}\n` +
+            //     `\tp01, p02 = ${p10}, ${p20}\n` +
+            //     `\tp11, p12 = ${p11}, ${p21}\n` +
+            //     `\tfw = ${fw}\n`);
+            // console.log(`r=${r} (z), reldt=${relativeDt}`);
+            rp12 = 2 * relativeDt;
+        }
+
+        // if (Math.abs(rp12) < 1e-7) rp12 = 0;
+
+        if (rp12 === 0)
+        {
+            if (debug) console.log('Zero-collision.');
+        }
+
+        // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+        return rp12;
     }
 
     static solveLeapfrogPostCollision(
@@ -105,8 +156,13 @@ class RigidBodiesPhase3 {
                 let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
                 let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
-                if (xm && ym && zm) { console.log('[Phase III - PostCollision] Full 3D clip clipped.'); continue; }
-                if (!xm + !ym + !zm !== 1) { console.log('[Phase III - PostCollision] Corner 2D clip detected.'); }
+                if (xm && ym && zm) {
+                    console.log('[Phase III - PostCollision] Full 3D clip clipped.');
+                    continue;
+                }
+                if (!xm + !ym + !zm !== 1) {
+                    console.log('[Phase III - PostCollision] Corner 2D clip detected.');
+                }
                 if (!(xw && yw && zw)) continue;
                 let rrel = relativeDt;
                 let axis = 'none';
@@ -136,7 +192,9 @@ class RigidBodiesPhase3 {
                     if (r >= 0 && r < rrel) { axis = 'z'; rrel = r;
                     }
                 }
-                if (rrel < relativeDt) mapCollidingPossible.push([i, j, rrel, axis]);
+                if (rrel < relativeDt) {
+                    mapCollidingPossible.push([i, j, rrel, axis]);
+                }
             }
         }
     }
@@ -148,7 +206,7 @@ class RigidBodiesPhase3 {
         relativeDt,
         mapCollidingPossible)
     {
-        let abs = Math.abs;
+        // let abs = Math.abs;
         let nbI = island.length;
 
         for (let i = 0; i < nbI; ++i) {
@@ -303,7 +361,7 @@ class RigidBodiesPhase3 {
 
                     //console.log('r=' + r + ' (y), reldt=' + relativeDt);
 
-                    if (abs(r) < 1e-7) r = 0;
+                    // if (abs(r) < 1e-7) r = 0;
                     if (r >= 0 && r < rrel) {
                         //let ndtr1 = r * ltd1;
                         //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
@@ -483,12 +541,11 @@ class RigidBodiesPhase3 {
         let p1v0 = e1.v0;
         let p1a0 = e1.a0;
         let p1n0 = e1.nu;
-        let w1x = e1.widthX;
-        let w1y = e1.widthY;
-        let w1z = e1.widthZ;
+        let w1 = [e1.widthX, e1.widthY, e1.widthZ];
+        let w1x = w1[0]; let w1y = w1[1]; let w1z = w1[2];
         let ltd1 = e1.dtr;
         let mass1 = e1.mass;
-        const sndtr1 = r * relativeDt; // * ltd1;
+        const sndtr1 = r; // * ltd1;
 
         let xIndex2 = island[j]; // let lfa2 = leapfrogArray[xIndex2];
         let id2 = oxAxis[xIndex2].id;
@@ -504,10 +561,11 @@ class RigidBodiesPhase3 {
         let p2v0 = e2.v0;
         let p2a0 = e2.a0;
         let p2n0 = e2.nu;
-        let w2x = e2.widthX; let w2y = e2.widthY; let w2z = e2.widthZ;
+        let w2 = [e2.widthX, e2.widthY, e2.widthZ];
+        let w2x = w1[0]; let w2y = w1[1]; let w2z = w1[2];
         let ltd2 = e2.dtr;
         let mass2 = e2.mass;
-        const sndtr2 = r * relativeDt; // * ltd2;
+        const sndtr2 = r; // * ltd2;
 
         // Snap p1.
         let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
@@ -571,20 +629,20 @@ class RigidBodiesPhase3 {
                 m2[m] = nep1[m] + wm1[m] > nep2[m] - wm2[m] && nep1[m] - wm1[m] < nep2[m] + wm2[m];
                 // !x1l && !x1r
                 // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
-                if (m === ax) {
-                    if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
-                        e2.a1[m] = 0;
+                // if (m === ax) {
+                //     if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
+                //         e2.a1[m] = 0;
                         // e2.v1[m] = e1.v1[m];
                         // TODO [HIGH] check that
-                        e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                    }
-                    if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
-                        e1.a1[m] = 0;
+                        // e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
+                    // }
+                    // if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
+                    //     e1.a1[m] = 0;
                         // e1.v1[m] = e2.v1[m];
                         // TODO [HIGH] check that
-                        e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                    }
-                }
+                        // e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
+                    // }
+                // }
             }
             // Temporary security measure.
             // {
@@ -597,8 +655,84 @@ class RigidBodiesPhase3 {
             // }
             if (m2[ax]) {
                 // console.log('Correction.');
-                e1.p1[ax] = e1.p0[ax];
-                e2.p1[ax] = e2.p0[ax];
+                let e1p0 = e1.p0[ax];
+                let e1p1 = e1.p1[ax];
+                let e2p0 = e2.p0[ax];
+                let e2p1 = e2.p1[ax];
+                let e1w = w1[ax];
+                let e2w = w2[ax];
+
+                let sgn = Math.sign;
+                let e1a1 = e1.a1[ax]; let e1v1 = e1.v1[ax];
+                let e2a1 = e2.a1[ax]; let e2v1 = e2.v1[ax];
+                let mv = (mass1 * e1v1 + mass2 * e2v1) / (mass1 + mass2);
+                let ma = (mass1 * e1a1 + mass2 * e2a1) / (mass1 + mass2);
+
+                if (e1p0 < e2p0) {
+                    e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e2.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e1.v1[ax] = mv;
+                    e2.v1[ax] = mv;
+                    RigidBodiesPhase3.correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon);
+                } else if (e1p0 > e2p0) {
+                    e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e2.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e1.v1[ax] = mv;
+                    e2.v1[ax] = mv;
+                    RigidBodiesPhase3.correctCollision(e2, e2p0, e2p1, e2w, e1, e1p0, e1p1, e1w, ax, epsilon);
+                } else {
+                    console.log('[Phase III] - on correction, e1p0 == e2p20; this is worrying.');
+                    e1.p1[ax] = e1p0;
+                    e2.p1[ax] = e2p0;
+                }
+
+                // e1.p1[ax] = e1p0;
+                // e2.p1[ax] = e2p0;
+            }
+        }
+    }
+
+    static correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon)
+    {
+        let min = Math.min;
+        let max = Math.max;
+        let abs = Math.abs;
+        let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon;
+        if (overlap >= max(e2p0, e2p1)) {
+            e1.p1[ax] = e1p0;
+            e2.p1[ax] = e2p0;
+        } else {
+            let d = abs((e1p1 + e1w) - (e2p1 - e2w));
+            let projP2 = e2p1 + (d + epsilon) / 2;
+            let projP1 = e1p1 - (d + epsilon) / 2;
+            // Test sign
+            let okProjP1 = (projP1 > min(e1p1, e1p0));
+            let okProjP2 = (projP2 < max(e2p0, e2p1));
+            if (okProjP1 && okProjP2) {
+                e1.p1[ax] = projP1;
+                e2.p1[ax] = projP2;
+            } else if (okProjP1) {
+                let proj2P1 = e1p1 - (d + epsilon);
+                if (proj2P1 > min(e1p1, e1p0)) {
+                    e1.p1[ax] = proj2P1;
+                } else {
+                    console.log('[Phase III] - Branching should have been discarded by overlap.');
+                    e1.p1[ax] = e1p0;
+                }
+                e2.p1[ax] = e2p0;
+            } else if (okProjP2) {
+                let proj2P2 = e2p1 + (d + epsilon);
+                if (proj2P2 < max(e2p0, e2p1)) {
+                    e2.p1[ax] = proj2P2;
+                } else {
+                    console.log('[Phase III] - Branching should have been discarded by overlap.');
+                    e2.p1[ax] = e2p0;
+                }
+                e1.p1[ax] = e1p0;
+            } else {
+                console.log('[Phase III] - Branching here should be prevented by overlap check.');
+                e1.p1[ax] = e1p0;
+                e2.p1[ax] = e2p0;
             }
         }
     }
