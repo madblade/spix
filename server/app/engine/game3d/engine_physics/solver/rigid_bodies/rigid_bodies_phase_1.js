@@ -210,6 +210,7 @@ class RigidBodiesPhase1 {
             // Velocity correction.
             // if (sum > maxSpeed * dtr)
             //     for (let i = 0; i < 3; ++i) v1[i] *= (maxSpeed * dtr / sum);
+            // console.log(p0);
 
             if (debug) {
                 vS.push(v1[2]);

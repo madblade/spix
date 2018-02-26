@@ -307,7 +307,7 @@ class RigidBodies {
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
-                        i, j, r, subIslandI, subIslandJ, newSubIsland, entities,
+                        i, j, r, axis, subIslandI, subIslandJ, newSubIsland, entities,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,

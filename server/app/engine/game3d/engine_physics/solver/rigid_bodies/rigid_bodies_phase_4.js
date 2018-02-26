@@ -13,7 +13,7 @@ class RigidBodiesPhase4 {
             // island 2 index
             // time got by solver
             // 'x', 'y', 'z' or 'none'
-        i, j, r,
+        i, j, r, axis,
         subIslandI, subIslandJ, newSubIsland,
         entities,
         objectIndexInIslandToSubIslandXIndex,
@@ -111,6 +111,8 @@ class RigidBodiesPhase4 {
 
             let lastR = currentEntity.lastR;
             let deltaR = lastR > 0 ? r - lastR : r;
+            if (deltaR === 0)
+                continue;
 
             let nu = currentEntity.nu; // TODO [CRIT] check that.
             let v0 = currentEntity.v0;
@@ -148,14 +150,30 @@ class RigidBodiesPhase4 {
                 a0[k] = newAcc[k]; // a1[k] = newAcc[k];
             }
 
-            let lastR = currentEntity.lastR;
-            let deltaR = lastR > 0 ? r : r - lastR;
-            let dtr = currentEntity.dtr; // TODO [LOW] should be extracted from time dilation field
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
+
+            let lastR = currentEntity.lastR;
+            let deltaR = lastR > 0 ? r : r - lastR;
+            if (deltaR === 0)
+            {
+                let ax;
+                switch (axis) {
+                    case 'x': ax = 0; break;
+                    case 'y': ax = 1; break;
+                    case 'z': ax = 2; break;
+                    default : console.log('[Phase IV] [BAD] invalid axis.'); break;
+                }
+
+                // TODO [MEDIUM] extract this to the 'applyCollision' solver
+                p1[ax] = p0[ax];
+                continue;
+            }
+
+            let dtr = currentEntity.dtr; // TODO [LOW] should be extracted from time dilation field
             let newP1 = solve(deltaR, v0, nu, a0, dtr);
             for (let k = 0; k < 3; ++k) {
-                p1[k] = newP1[k];
+                p1[k] += newP1[k];
             }
 
             let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
@@ -177,11 +195,11 @@ class RigidBodiesPhase4 {
             let current = mapCollidingPossible[k];
             let island1Index = current[0];
             let island2Index = current[1];
-            let axis = current[3];
+            let ax = current[3];
 
             let subIslandIndex1;
             let subIslandIndex2;
-            switch (axis) {
+            switch (ax) {
                 case 'x':
                     subIslandIndex1 = objectIndexInIslandToSubIslandXIndex[island1Index];
                     subIslandIndex2 = objectIndexInIslandToSubIslandXIndex[island2Index];

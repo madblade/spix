@@ -284,7 +284,7 @@ gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}));
 
 gulp.task('start:client', cb => {
     whenServerReady(() => {
-        open('http://localhost:' + '9000'); // config.browserSyncPort);
+        open('http://localhost:' + '9000', 'chrome'); // config.browserSyncPort);
         cb();
     });
 });

@@ -24,7 +24,10 @@ class RigidBodiesPhase3 {
                 r = sup;
         } else if (delta === 0) {
             if (debug) console.log('delta = 0');
-            r = -b / (2 * a);
+            if (a === 0)
+                r = sup;
+            else
+                r = -b / (2 * a);
         }
         return r;
     }
@@ -63,19 +66,20 @@ class RigidBodiesPhase3 {
         // In case of (1)-snap.
         if (rp12 > rp1 && relativeDt > rp1 && rp1 >= 0) {
             // Solve constrained (1)-end-of-line collision.
-            console.log('Constrained (1).');
             let rp3 = RigidBodiesPhase3.solveBabylon(a2, b2, -fw * w1 - fw * w2 + p20 - p11, 2 * relativeDt);
+            console.log(`Constrained (1): ${rp3} | ${rp12}`);
             if (rp12 > rp3 && rp3 > 0) rp12 = rp3;
         }
 
         // In case of (2)-snap.
         if (rp12 > rp2 && relativeDt > rp2 && rp2 >= 0) {
-            console.log('Constrained (2).');
             // Solve constrained (2)-end-of-line collision.
             let rp4 = RigidBodiesPhase3.solveBabylon(a1, b1, fw * w1 + fw * w2 + p10 - p21, 2 * relativeDt);
+            console.log(`Constrained (2): ${rp4} | ${rp12}`);
             if (rp12 > rp4 && rp4 > 0) rp12 = rp4;
         }
 
+        // if (rp12 < 0 && Math.abs(rp12) < 1e-8) rp12 = 0;
 
         if (rp12 < 0 || rp12 >= relativeDt) {
             // TODO [CRIT] reset this comment to enable debug
@@ -127,15 +131,15 @@ class RigidBodiesPhase3 {
 
                 let newSubIslandIndexI = newSubIsland.indexOf(xIndexI);
                 let newSubIslandIndexJ = newSubIsland.indexOf(xIndexJ);
-                let iInNewSubIsland = newSubIslandIndexI < 0;
-                let jInNewSubIsland = newSubIslandIndexJ < 0;
+                let iInNewSubIsland = newSubIslandIndexI > 0;
+                let jInNewSubIsland = newSubIslandIndexJ > 0;
 
                 // TODO [HIGH] check my elementary set theory abilities
                 let goOn = !iInNewSubIsland && jInNewSubIsland;
                 if (!goOn) {
                     // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
                     let terrainHasCurrentIndex = terrain.indexOf(xIndexJ);
-                    let jInTerrainResolver = terrainHasCurrentIndex < 0;
+                    let jInTerrainResolver = terrainHasCurrentIndex > 0;
                     if (!jInTerrainResolver)
                         continue;
                 }
@@ -626,6 +630,7 @@ class RigidBodiesPhase3 {
                         e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
                             e2p1n - epsilon : e2p1i;
 
+                //const eeps = 1e-30; // TODO [CRIT] quite important to beware of numerical errors here.
                 m2[m] = nep1[m] + wm1[m] > nep2[m] - wm2[m] && nep1[m] - wm1[m] < nep2[m] + wm2[m];
                 // !x1l && !x1r
                 // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
@@ -686,8 +691,8 @@ class RigidBodiesPhase3 {
                     e2.p1[ax] = e2p0;
                 }
 
-                // e1.p1[ax] = e1p0;
-                // e2.p1[ax] = e2p0;
+                e1.p1[ax] = e1p0;
+                e2.p1[ax] = e2p0;
             }
         }
     }
