@@ -183,7 +183,7 @@ class RigidBodies {
             //    keep list of ordered Ts across pairs.
             if (islands.length > 0) {
                 //console.log('Islands: ');
-                // console.log(islands);
+                //console.log(islands);
             }
 
             islands.forEach(island => {
@@ -200,6 +200,8 @@ class RigidBodies {
                     mapCollidingPossible);
                 // TODO [MEDIUM think order by mass
 
+                if (mapCollidingPossible.length < 1) return;
+
                 // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
 
                 // Narrow phase, part 2: for all Ts in order,
@@ -211,6 +213,7 @@ class RigidBodies {
                 //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)
                 //    End when there is no more collision to be solved.
                 mapCollidingPossible.sort((a, b) => a[2] - b[2]);
+                // console.log('first collision at ' + mapCollidingPossible[0][2]);
 
                 // TODO [CRIT] iterate
                 // 2. First colliding ->
@@ -275,9 +278,10 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ, axis);
 
+                    let eps = 1e-6;
                     Phase3.applyCollision(
                         i, j, r, axis,
-                        island, oxAxis, entities, relativeDt, 0);
+                        island, oxAxis, entities, relativeDt, eps);
 
                     // 1. apply step to newSubIsland
                     // 2.1. invalidate for each (newSubIslandMember)
