@@ -80,10 +80,10 @@ class World {
 
     getFreePosition() {
         let zLimit = this._zSize;
-        let z = 0;
+        let z = zLimit - 2;
         while (this.whatBlock(4, 4, z) !== 0 &&
             this.whatBlock(4, 4, z + 1) !== 0 && z + 1 < zLimit) ++z;
-        return [4.5, 4.5, z + 5];
+        return [4.5, 4.5, z];
     }
 
     getChunk(iCoordinate, jCoordinate, kCoordinate) {

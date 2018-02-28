@@ -118,6 +118,7 @@ class RigidBodiesPhase4 {
             let v0 = currentEntity.v0;
             let a0 = currentEntity.a0;
 
+            console.log(deltaR);
             // Prevent from advancing i and j (already clipped)
             add(currentEntity.p0, solve(deltaR, v0, nu, a0, maxDtr));
         }
@@ -172,6 +173,7 @@ class RigidBodiesPhase4 {
 
             let dtr = currentEntity.dtr; // TODO [LOW] should be extracted from time dilation field
             let newP1 = solve(deltaR, v0, nu, a0, dtr);
+            console.log('\t' + deltaR);
             for (let k = 0; k < 3; ++k) {
                 p1[k] += newP1[k];
             }

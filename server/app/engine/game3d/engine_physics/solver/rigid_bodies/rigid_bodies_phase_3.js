@@ -41,11 +41,12 @@ class RigidBodiesPhase3 {
         fw, relativeDt)
     {
         // Check for snapping on first trajectory.
+        let dbg = true; // TODO [HIGH] solve this farther entity problem.
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
         if (p10 < p11 && a1 * relativeDt * relativeDt + b1 * relativeDt + p10 < p11 ||
             p10 > p11 && p11 < a1 * relativeDt * relativeDt + b1 * relativeDt + p10)
         {
-            console.log('[SecondOrder] It seems the entity was told to move farther than it could have.');
+            if (dbg) console.log(`[SecondOrder] Farther entity (1): ${rp1}.`);
         }
 
         // Check for snapping on second trajectory.
@@ -53,7 +54,7 @@ class RigidBodiesPhase3 {
         if (p20 < p21 && a2 * relativeDt * relativeDt + b2 * relativeDt + p20 < p21 ||
             p20 > p21 && p21 < a2 * relativeDt * relativeDt + b2 * relativeDt + p20)
         {
-            console.log('[SecondOrder] It seems the entity was told to move farther than it could have.');
+            if (dbg) console.log(`[SecondOrder] Farther entity (2): ${rp2}.`);
         }
 
         // Solve free 2-collision.
@@ -70,7 +71,7 @@ class RigidBodiesPhase3 {
 
         // Both trajectories should not be snapped at the same time.
         if (rp12 > rp1 && relativeDt > rp1 && rp12 > rp2 && relativeDt > rp2) {
-            console.log('Two colliding bodies saw their trajectory snapped on the same axis... Think about it.');
+            // console.log('Two colliding bodies saw their trajectory snapped on the same axis... Think about it.');
         }
 
         // In case of (1)-snap.
@@ -291,8 +292,10 @@ class RigidBodiesPhase3 {
                 let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
+                let debugCollision = false;
+                // TODO [CRIT] reset this debug flag
                 if (xm && ym && zm) {
-                    console.log('[Phase III - PreCollision] Full 3D clip clipped.');
+                    if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip clipped.');
                     // mapCollidingPossible.push([i, j, 0]);
                     continue;
                 }
@@ -643,7 +646,7 @@ class RigidBodiesPhase3 {
                         e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
                             e2p1n - epsilon : e2p1i;
 
-                //const eeps = 1e-30; //   TODO [CRIT] quite important to beware of numerical errors here.
+                //const eeps = 1e-30; // TODO [LOW] quite important to beware of numerical errors here.
                 m2[m] = nep1[m] + wm1[m] + epsilon / 2.0 > nep2[m] - wm2[m] - epsilon / 2.0 &&
                         nep1[m] - wm1[m] - epsilon / 2.0 < nep2[m] + wm2[m] + epsilon / 2.0;
                 // !x1l && !x1r
@@ -667,6 +670,11 @@ class RigidBodiesPhase3 {
             // {
             // let l = newSubIsland.length;
             // TODO [HIGH] this is a projection... check collision
+
+            // TODO [CRIT] verify this lastR mechanism
+            e1.lastR = r;
+            e2.lastR = r;
+
             for (let m = 0; m < 3; ++m) {
                 // Check terrain...
                 let e1p1 = e1.p1[m];
@@ -681,18 +689,20 @@ class RigidBodiesPhase3 {
                     e2.p1[m] = nep2[m];
             }
             // }
-            console.log('collide?');
+
+            let collidedbg = false;
+            if (collidedbg) console.log('collide?');
             let abs = Math.abs;
             let e1a1 = e1.a1[ax]; let e1v1 = e1.v1[ax];
             let e2a1 = e2.a1[ax]; let e2v1 = e2.v1[ax];
             let mv = abs(e1v1) < abs(e2v1) ? e1v1 : e2v1; // min(, e2v1); // (mass1 * e1v1 + mass2 * e2v1) / (mass1 + mass2);
             let ma = abs(e1a1) < abs(e2a1) ? e1a1 : e2a1; // min(e1a1, e2a1); // (mass1 * e1a1 + mass2 * e2a1) / (mass1 + mass2);
-            console.log(e1v1 + ' | ' + e2v1);
+            if (collidedbg) console.log(`${e1v1} | ${e2v1}`);
             e1.v1[ax] = mv;
             e2.v1[ax] = mv;
 
             if (m2[ax]) {
-                console.log('\tyes!');
+                if (collidedbg) console.log('\tyes!');
                 // console.log('Correction.');
                 let e1p0 = e1.p0[ax];
                 let e1p1 = e1.p1[ax];
@@ -722,11 +732,13 @@ class RigidBodiesPhase3 {
         }
     }
 
+    // We have that e1p0 < e2p0.
     static correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon)
     {
         let min = Math.min;
         let max = Math.max;
         let abs = Math.abs;
+        let debg = false; // TODO [HIGH] debug this with branching.
         let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon;
         if (overlap >= max(e2p0, e2p1)) {
             e1.p1[ax] = e1p0;
@@ -746,7 +758,7 @@ class RigidBodiesPhase3 {
                 if (proj2P1 > min(e1p1, e1p0)) {
                     e1.p1[ax] = proj2P1;
                 } else {
-                    console.log('[Phase III] - Branching should have been discarded by overlap.');
+                    if (debg) console.log('[Phase III] - Branching [projP1] should have been discarded by overlap.');
                     e1.p1[ax] = e1p0;
                 }
                 e2.p1[ax] = e2p0;
@@ -755,12 +767,12 @@ class RigidBodiesPhase3 {
                 if (proj2P2 < max(e2p0, e2p1)) {
                     e2.p1[ax] = proj2P2;
                 } else {
-                    console.log('[Phase III] - Branching should have been discarded by overlap.');
+                    if (debg) console.log('[Phase III] - Branching [projP2] should have been discarded by overlap.');
                     e2.p1[ax] = e2p0;
                 }
                 e1.p1[ax] = e1p0;
             } else {
-                console.log('[Phase III] - Branching here should be prevented by overlap check.');
+                if (debg) console.log('[Phase III] - Branching [noProj] should be prevented by overlap check.');
                 e1.p1[ax] = e1p0;
                 e2.p1[ax] = e2p0;
             }

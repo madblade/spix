@@ -182,11 +182,14 @@ class RigidBodies {
             //    solve X² leapfrog, save first all valid Ts
             //    keep list of ordered Ts across pairs.
             if (islands.length > 0) {
-                //console.log('Islands: ');
-                //console.log(islands);
+                // console.log('Islands: ');
+                // console.log(islands);
             }
 
             islands.forEach(island => {
+                if (island.length > 2) {
+                    console.log(island);
+                }
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];
                 // let bannedPairs = [];
