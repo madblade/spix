@@ -187,9 +187,9 @@ class RigidBodies {
             }
 
             islands.forEach(island => {
-                if (island.length > 2) {
-                    console.log(island);
-                }
+                // if (island.length > 2) {
+                //     console.log(island);
+                // }
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];
                 // let bannedPairs = [];
@@ -248,13 +248,16 @@ class RigidBodies {
                 // console.log(mapCollidingPossible);
                 while (mapCollidingPossible.length > 0)
                 {
+                    if (mapCollidingPossible.length > 1) {
+                        console.log('Complicated collision solving.');
+                    }
                     // TODO [MEDIUM] study island caching.
                     let debuguette = '';
                     debuguette = `\tPass ${mapCollidingPossible.length} `;
                     for (let m = 0; m < mapCollidingPossible.length; ++m) {
                         debuguette += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}) ; `;
                     }
-                    //console.log(debuguette);
+                    console.log(debuguette);
                     // \DEBUG
 
                     let i = mapCollidingPossible[0][0];     // island 1 index
@@ -274,13 +277,6 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ);
 
-                    let newSubIsland = Phase3.mergeSubIslands(
-                        i, j, subIslandI, subIslandJ,
-                        objectIndexInIslandToSubIslandXIndex,
-                        objectIndexInIslandToSubIslandYIndex,
-                        objectIndexInIslandToSubIslandZIndex,
-                        subIslandsX, subIslandsY, subIslandsZ, axis);
-
                     let eps = 1e-6;
                     Phase3.applyCollision(
                         i, j, r, axis,
@@ -292,7 +288,6 @@ class RigidBodies {
                     // 3. update mapCollidingPossible
 
                     // Warn: account for numerical errors.
-
 
                     // TODO [CRIT] extract routine for Leapfrog computaiton.
                     // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
@@ -314,11 +309,20 @@ class RigidBodies {
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
-                        i, j, r, axis, subIslandI, subIslandJ, newSubIsland, entities,
+                        i, j, r, axis, subIslandI, subIslandJ, //newSubIsland,
+                        entities,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         oxAxis, island, world, relativeDt);
+
+                    // let newSubIsland =
+                    Phase3.mergeSubIslands(
+                        i, j, subIslandI, subIslandJ,
+                        objectIndexInIslandToSubIslandXIndex,
+                        objectIndexInIslandToSubIslandYIndex,
+                        objectIndexInIslandToSubIslandZIndex,
+                        subIslandsX, subIslandsY, subIslandsZ, axis);
                 }
                 // console.log('Solveth!');
             });

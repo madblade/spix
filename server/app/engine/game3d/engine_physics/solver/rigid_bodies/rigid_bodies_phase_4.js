@@ -14,7 +14,7 @@ class RigidBodiesPhase4 {
             // time got by solver
             // 'x', 'y', 'z' or 'none'
         i, j, r, axis,
-        subIslandI, subIslandJ, newSubIsland,
+        subIslandI, subIslandJ, // newSubIsland, // Beware! NewSubIsland is empty.
         entities,
         objectIndexInIslandToSubIslandXIndex,
         objectIndexInIslandToSubIslandYIndex,
@@ -26,6 +26,15 @@ class RigidBodiesPhase4 {
         if (!subIslandI || subIslandI.length === 0) subIslandI = [i];
         if (!subIslandJ || subIslandJ.length === 0) subIslandJ = [j];
 
+        // Get axis.
+        let ax;
+        switch (axis) {
+            case 'x': ax = 0; break;
+            case 'y': ax = 1; break;
+            case 'z': ax = 2; break;
+            default : console.log('[Phase IV] [BAD] invalid axis.'); break;
+        }
+
         // Compute island properties.
         let sub1Mass = 0;
         let sub2Mass = 0;
@@ -36,6 +45,8 @@ class RigidBodiesPhase4 {
         let sub2Acc = [0, 0, 0];
         let newVel = [0, 0, 0];
         let newAcc = [0, 0, 0];
+        let deltaP1 = [0, 0, 0];
+        let deltaP2 = [0, 0, 0];
 
         // Sum mass.
         // {
@@ -57,6 +68,7 @@ class RigidBodiesPhase4 {
                 sub1Vel[t] = vel1[t];
                 sub1Acc[t] = acc1[t];
             }
+            deltaP1[ax] = e1.p1[ax] - e1.p0[ax];
 
             let e2 = entities[oxAxis[island[subIslandJ[0]]].id];
             let vel2 = e2.v0;
@@ -67,6 +79,7 @@ class RigidBodiesPhase4 {
                 sub2Vel[t] = vel2[t];
                 sub2Acc[t] = acc2[t];
             }
+            deltaP2[ax] = e2.p1[ax] - e2.p0[ax];
 
             for (let t = 0; t < 3; ++t)
             {
@@ -90,38 +103,75 @@ class RigidBodiesPhase4 {
         let add = function(vec1, vec2) {
             for (let k = 0; k < 3; ++k) vec1[k] += vec2[k];
         };
+
         // Get max dtr.
-        let maxDtr = 1;
-        for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
+        let maxDtr1 = 1;
+        let maxDtr2 = 1;
+        for (let idSub1 = 0, subLength = subIslandI.length; idSub1 < subLength; ++idSub1)
         {
-            let entityIdInSubIslands = newSubIsland[idInNewSub];
+            let entityIdInSubIslands = subIslandI[idSub1];
             let entityId = oxAxis[island[entityIdInSubIslands]].id;
             let currentEntity = entities[entityId];
             let currentDtr = currentEntity.dtr;
-            if (currentDtr > maxDtr) maxDtr = currentDtr;
+            if (currentDtr > maxDtr1) maxDtr1 = currentDtr;
         }
-        for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
+
+        for (let idSub2 = 0, newSubLength = subIslandJ.length; idSub2 < newSubLength; ++idSub2)
         {
-            let entityIdInIsland = newSubIsland[idInNewSub];
-            if (entityIdInIsland === i || entityIdInIsland === j)
-                continue;
+            let entityIdInSubIslands = subIslandJ[idSub2];
+            let entityId = oxAxis[island[entityIdInSubIslands]].id;
+            let currentEntity = entities[entityId];
+            let currentDtr = currentEntity.dtr;
+            if (currentDtr > maxDtr2) maxDtr2 = currentDtr;
+        }
+
+        for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
+        {
+            let entityIdInIsland = subIslandI[idInSub1];
+            if (entityIdInIsland === i) continue;
 
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
-
             let lastR = currentEntity.lastR;
             let deltaR = lastR > 0 ? r - lastR : r;
-            if (deltaR === 0)
-                continue;
-
-            let nu = currentEntity.nu; // TODO [CRIT] check that.
-            let v0 = currentEntity.v0;
-            let a0 = currentEntity.a0;
-
+            if (deltaR === 0) continue;
             console.log(deltaR);
-            // Prevent from advancing i and j (already clipped)
-            add(currentEntity.p0, solve(deltaR, v0, nu, a0, maxDtr));
+
+            // Old-fashioned (but with numerical errors)
+            // let nu = currentEntity.nu;
+            // let v0 = currentEntity.v0;
+            // let a0 = currentEntity.a0;
+            // deltaP1 = solve(deltaR, v0, nu, a0, maxDtr1)
+
+            add(currentEntity.p0, deltaP1);
         }
+
+        // Approach island 1.
+        // Prevent from advancing i and j (already clipped)
+        // Approach island 2.
+        for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
+        {
+            let entityIdInIsland = subIslandJ[idInSub2];
+            if (entityIdInIsland === j) continue;
+
+            let entityId = oxAxis[island[entityIdInIsland]].id;
+            let currentEntity = entities[entityId];
+            let lastR = currentEntity.lastR;
+            let deltaR = lastR > 0 ? r - lastR : r;
+            if (deltaR === 0) continue;
+            console.log(deltaR);
+
+            // Old-fashioned (but with numerical errors)
+            // let nu = currentEntity.nu;
+            // let v0 = currentEntity.v0;
+            // let a0 = currentEntity.a0;
+            // deltaP2 = solve(deltaR, v0, nu, a0, maxDtr2);
+
+            add(currentEntity.p0, deltaP2);
+        }
+
+        // Concat indexes form both islands into newSubIsland
+        let newSubIsland = Array.from(subIslandI).concat(subIslandJ);
 
         // 2. calculer le nouveau p1 (projected)
         // (bilan des forces > intégration)
@@ -158,15 +208,7 @@ class RigidBodiesPhase4 {
             let deltaR = lastR > 0 ? r : r - lastR;
             if (deltaR === 0)
             {
-                let ax;
-                switch (axis) {
-                    case 'x': ax = 0; break;
-                    case 'y': ax = 1; break;
-                    case 'z': ax = 2; break;
-                    default : console.log('[Phase IV] [BAD] invalid axis.'); break;
-                }
-
-                // TODO [MEDIUM] extract this to the 'applyCollision' solver
+                // TODO [MEDIUM] extract this to  the 'applyCollision' solver
                 p1[ax] = p0[ax];
                 continue;
             }
@@ -197,11 +239,11 @@ class RigidBodiesPhase4 {
             let current = mapCollidingPossible[k];
             let island1Index = current[0];
             let island2Index = current[1];
-            let ax = current[3];
+            let currentAxis = current[3];
 
             let subIslandIndex1;
             let subIslandIndex2;
-            switch (ax) {
+            switch (currentAxis) {
                 case 'x':
                     subIslandIndex1 = objectIndexInIslandToSubIslandXIndex[island1Index];
                     subIslandIndex2 = objectIndexInIslandToSubIslandXIndex[island2Index];
@@ -217,9 +259,15 @@ class RigidBodiesPhase4 {
                 default: console.log('[RBP4] Invalid entry in map colliding possible.');
             }
 
-            for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
+            for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
             {
-                let entityIdInSubIslands = newSubIsland[idInNewSub];
+                let entityIdInSubIslands = subIslandI[idInSub1];
+                if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
+                    mapCollidingPossible.splice(k, 1);
+            }
+            for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
+            {
+                let entityIdInSubIslands = subIslandJ[idInSub2];
                 if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
                     mapCollidingPossible.splice(k, 1);
             }
@@ -235,8 +283,7 @@ class RigidBodiesPhase4 {
         // (TerrainK(NewIsland) \cross Complementaire(TerrainK(NewIsland)) \intersect NewIsland)
 
         let mapCollidingPossibleNew = [];
-        // let crossIsland = [];
-        // for (let k = )
+
         Phase3.solveLeapfrogPostCollision(
             island,
             newSubIsland,
