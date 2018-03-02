@@ -135,7 +135,7 @@ class RigidBodiesPhase4 {
             let lastR = currentEntity.lastR;
             let deltaR = lastR > 0 ? r - lastR : r;
             if (deltaR === 0) continue;
-            console.log(deltaR);
+            // console.log(deltaR);
 
             // Old-fashioned (but with numerical errors)
             // let nu = currentEntity.nu;
@@ -159,7 +159,7 @@ class RigidBodiesPhase4 {
             let lastR = currentEntity.lastR;
             let deltaR = lastR > 0 ? r - lastR : r;
             if (deltaR === 0) continue;
-            console.log(deltaR);
+            // console.log(deltaR);
 
             // Old-fashioned (but with numerical errors)
             // let nu = currentEntity.nu;
@@ -223,7 +223,8 @@ class RigidBodiesPhase4 {
             let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             if (hasCollided) {
                 entityIdsInIslandWhichNeedTerrainPostSolving.push(entityIdInIsland);
-                console.log('An entity needs resolving within its island because of a fixed terrain collision.');
+                console.log(`\t[Phase IV] Entity ${currentEntity.entityId} needs resolving ` +
+                    'within its island because of a fixed terrain collision.');
             }
 
             currentEntity.lastR = r;
@@ -256,7 +257,7 @@ class RigidBodiesPhase4 {
                     subIslandIndex1 = objectIndexInIslandToSubIslandZIndex[island1Index];
                     subIslandIndex2 = objectIndexInIslandToSubIslandZIndex[island2Index];
                     break;
-                default: console.log('[RBP4] Invalid entry in map colliding possible.');
+                default: console.log('\t[RBP4] Invalid entry in map colliding possible.');
             }
 
             for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)

@@ -66,7 +66,7 @@ class RigidBodiesPhase3 {
         const debug = false;
         if (rp12 === 0)
         {
-            if (debug) console.log('Unlikely zero output from babylon solver...');
+            if (debug) console.log('[SecondOrder] Unlikely zero output from babylon solver...');
         }
 
         // Both trajectories should not be snapped at the same time.
@@ -106,7 +106,7 @@ class RigidBodiesPhase3 {
 
         if (rp12 === 0)
         {
-            if (debug) console.log('Zero-collision.');
+            if (debug) console.log('[SecondOrder] Zero-collision.');
         }
 
         // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
@@ -140,16 +140,15 @@ class RigidBodiesPhase3 {
 
                 let newSubIslandIndexI = newSubIsland.indexOf(xIndexI);
                 let newSubIslandIndexJ = newSubIsland.indexOf(xIndexJ);
-                let iInNewSubIsland = newSubIslandIndexI > 0;
-                let jInNewSubIsland = newSubIslandIndexJ > 0;
+                let iInNewSubIsland = newSubIslandIndexI > -1;
+                let jInNewSubIsland = newSubIslandIndexJ > -1;
 
                 // TODO [HIGH] check my elementary set theory abilities
-                let goOn = !iInNewSubIsland && jInNewSubIsland;
+                let goOn = (!iInNewSubIsland && jInNewSubIsland) ||
+                            (iInNewSubIsland && !jInNewSubIsland);
                 if (!goOn) {
                     // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
-                    let terrainHasCurrentIndex = terrain.indexOf(xIndexJ);
-                    let jInTerrainResolver = terrainHasCurrentIndex > 0;
-                    if (!jInTerrainResolver)
+                    if (terrain.indexOf(xIndexJ) < 0 && terrain.indexOf(xIndexI))
                         continue;
                 }
 

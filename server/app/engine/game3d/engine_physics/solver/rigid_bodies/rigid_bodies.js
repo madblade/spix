@@ -168,7 +168,7 @@ class RigidBodies {
 
             // 3. Snap x_i+1 with terrain collide, save non-integrated residuals
             // as bounce components with coefficient & threshold (heat).
-            Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, world);
+            Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world);
 
             // TODO [MEDIUM] crossWorldIslands;
             // add leapfrog term
@@ -243,27 +243,37 @@ class RigidBodies {
                 // TODO [remember] no tunneling: use a temporary position for successively adjusting collisions
                 // TODO [remember] increase island widths with a possible displacement from a w-width impact object
                 // TODO [CRIT] account for last point!!!!!!!!
+                // TODO [MEDIUM] study island caching.
 
                 // Pour chaque entité dans l'île courante:
                 // console.log(mapCollidingPossible);
+                let complicatedFlag = mapCollidingPossible.length > 1;
+                let solverPassId = 1;
+                if (complicatedFlag) console.log('Complicated collision solving.');
                 while (mapCollidingPossible.length > 0)
                 {
-                    if (mapCollidingPossible.length > 1) {
-                        console.log('Complicated collision solving.');
-                    }
-                    // TODO [MEDIUM] study island caching.
-                    let debuguette = '';
-                    debuguette = `\tPass ${mapCollidingPossible.length} `;
-                    for (let m = 0; m < mapCollidingPossible.length; ++m) {
-                        debuguette += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}) ; `;
-                    }
-                    console.log(debuguette);
-                    // \DEBUG
-
                     let i = mapCollidingPossible[0][0];     // island 1 index
                     let j = mapCollidingPossible[0][1];     // island 2 index
                     let r = mapCollidingPossible[0][2];     // time got by solver
                     let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
+
+                    if (complicatedFlag) {
+                        let msg = `\tPass ${solverPassId++} : ${mapCollidingPossible.length} elements to process `;
+                        for (let m = 0; m < mapCollidingPossible.length; ++m) {
+                            msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
+                        }
+                        let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex2 = island[j]; // let lfa1 = leapfrogArray[xIndex1];
+                        let id1 = oxAxis[xIndex1].id;
+                        let id2 = oxAxis[xIndex2].id;
+                        let e1 = entities[id1];
+                        let e2 = entities[id2];
+                        msg += `\n\tEntity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
+                        msg += `\n\tEntity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
+                        msg += `\n\tColliding on ${axis} axis, at t = ${r.toFixed(10)}`;
+                        console.log(msg);
+                    }
+                    // \DEBUG
 
                     let subIslandI = Phase3.getSubIsland(i, axis,
                         objectIndexInIslandToSubIslandXIndex,
@@ -277,6 +287,8 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ);
 
+                    if (complicatedFlag)
+                        console.log('\tApplying collision...');
                     let eps = 1e-6;
                     Phase3.applyCollision(
                         i, j, r, axis,
@@ -307,6 +319,8 @@ class RigidBodies {
                     // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
                     // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
+                    if (complicatedFlag)
+                        console.log('\tSolving the island step...');
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
                         i, j, r, axis, subIslandI, subIslandJ, //newSubIsland,
@@ -315,14 +329,29 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         oxAxis, island, world, relativeDt);
+                    if (complicatedFlag) {
+                        let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex2 = island[j]; // let lfa1 = leapfrogArray[xIndex1];
+                        let id1 = oxAxis[xIndex1].id;
+                        let id2 = oxAxis[xIndex2].id;
+                        let e1 = entities[id1];
+                        let e2 = entities[id2];
+                        let msg = `\t\t/Entity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
+                        msg +=  `\n\t\t/Entity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
+                        console.log(msg);
+                    }
 
                     // let newSubIsland =
+                    if (complicatedFlag)
+                        console.log('\tMerging sub-islands...');
                     Phase3.mergeSubIslands(
                         i, j, subIslandI, subIslandJ,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ, axis);
+                    if (complicatedFlag)
+                        console.log('\tMerged!');
                 }
                 // console.log('Solveth!');
             });

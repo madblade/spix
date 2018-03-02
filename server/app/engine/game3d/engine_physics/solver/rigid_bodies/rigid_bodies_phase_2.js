@@ -95,9 +95,14 @@ class RigidBodiesPhase2 {
      * Solving terrain collisions globally at the moment.
      * Not only lonely islands.
      */
-    static collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, world)
+    static collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world)
     {
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+        // for (let islandId = 0, nbIslands = islands.length; islandId < nbIslands; ++islandId) {
+        //     let currentIsland = islands[islandId];
+        //     if (currentIsland.length !== 1) continue;
+        //     let oi = currentIsland[0];
+
             let currentObject = oxAxis[oi];
             if (!currentObject || currentObject.kind !== 'e') continue;
 
