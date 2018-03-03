@@ -103,6 +103,7 @@ class RigidBodiesPhase4 {
         let add = function(vec1, vec2) {
             for (let k = 0; k < 3; ++k) vec1[k] += vec2[k];
         };
+        let abs = Math.abs;
 
         // Get max dtr.
         let maxDtr1 = 1;
@@ -167,7 +168,7 @@ class RigidBodiesPhase4 {
             // let a0 = currentEntity.a0;
             // deltaP2 = solve(deltaR, v0, nu, a0, maxDtr2);
 
-            add(currentEntity.p0, deltaP2);
+            add(currentEntity.p0, deltaP2); // TODO [THINK] account for terrain collisions?
         }
 
         // Concat indexes form both islands into newSubIsland
@@ -183,12 +184,12 @@ class RigidBodiesPhase4 {
         //
         // (*) enfin, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIsland).
         // pour tout élément de la nouvelle ile
+        let correctionDelta = 0;
         let entityIdsInIslandWhichNeedTerrainPostSolving = [];
         for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
         {
             let entityIdInIsland = newSubIsland[idInNewSub];
-            if (entityIdInIsland === i || entityIdInIsland === j)
-                continue;
+            if (entityIdInIsland === i || entityIdInIsland === j) continue;
 
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
@@ -204,30 +205,47 @@ class RigidBodiesPhase4 {
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
 
-            let lastR = currentEntity.lastR;
-            let deltaR = lastR > 0 ? r : r - lastR;
+            // let lastR = currentEntity.lastR;
+            let deltaR = r; // lastR > 0 ? relativeDt - lastR : relativeDt;
             if (deltaR === 0)
             {
                 // TODO [MEDIUM] extract this to  the 'applyCollision' solver
-                p1[ax] = p0[ax];
+                //p1[ax] = p0[ax];
                 continue;
             }
 
+            // console.log('\t' + deltaR);
             let dtr = currentEntity.dtr; // TODO [LOW] should be extracted from time dilation field
             let newP1 = solve(deltaR, v0, nu, a0, dtr);
-            console.log('\t' + deltaR);
+            let newP1Test = [...newP1];
             for (let k = 0; k < 3; ++k) {
-                p1[k] += newP1[k];
+                //p1[k] += newP1[k];
+                //newP1Test[k] += p1[k];
             }
 
             let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             if (hasCollided) {
+                let currentDelta = p1[ax] - newP1Test[ax];
+                if (abs(currentDelta) > abs(correctionDelta)) correctionDelta = currentDelta;
+                // For later recorrection
+                //for (let k = 0; k < 3; ++k) p1[k] = newP1Test[k];
+
                 entityIdsInIslandWhichNeedTerrainPostSolving.push(entityIdInIsland);
                 console.log(`\t[Phase IV] Entity ${currentEntity.entityId} needs resolving ` +
                     'within its island because of a fixed terrain collision.');
             }
 
             currentEntity.lastR = r;
+        }
+        // Collision correction.
+        for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
+        {
+            let entityIdInIsland = newSubIsland[idInNewSub];
+            //if (entityIdInIsland === i || entityIdInIsland === j) continue;
+            let entityId = oxAxis[island[entityIdInIsland]].id;
+            let currentEntity = entities[entityId];
+            let p1 = currentEntity.p1;
+            //p1[ax] += correctionDelta;
         }
 
         // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
@@ -285,6 +303,10 @@ class RigidBodiesPhase4 {
 
         let mapCollidingPossibleNew = [];
 
+        console.log(`\t\tProcessing post-collision: ${entities[oxAxis[island[subIslandI[0]]].id].entityId} ` +
+                    `[${subIslandI}] vs ` +
+                    `${entities[oxAxis[island[subIslandJ[0]]].id].entityId} ` +
+                    `[${subIslandJ}] || [${newSubIsland}]`);
         Phase3.solveLeapfrogPostCollision(
             island,
             newSubIsland,

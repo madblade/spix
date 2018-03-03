@@ -25,8 +25,8 @@ import Chat             from './../../model/connection/chat';
 
 class Game3D extends Game {
 
-    // static serverRefreshRate = 16;
-    static serverRefreshRate = 280;
+    static serverRefreshRate = 16;
+    // static serverRefreshRate = 420; // blaze it
 
     constructor(hub, gameId, connector) {
         super(hub, gameId, connector);

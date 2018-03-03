@@ -7,7 +7,7 @@ class RigidBodiesPhase3 {
     static solveBabylon(a, b, c, sup, debug) {
         if (a === 0) {
             if (b === 0)
-                return 0;
+                return sup;
             else
                 return -c / b;
         }
@@ -41,12 +41,13 @@ class RigidBodiesPhase3 {
         fw, relativeDt)
     {
         // Check for snapping on first trajectory.
-        let dbg = true; // TODO [HIGH] solve this farther entity problem.
+        let dbg = false; // TODO [HIGH] solve this farther entity problem.
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
         if (p10 < p11 && a1 * relativeDt * relativeDt + b1 * relativeDt + p10 < p11 ||
             p10 > p11 && p11 < a1 * relativeDt * relativeDt + b1 * relativeDt + p10)
         {
-            if (dbg) console.log(`[SecondOrder] Farther entity (1): ${rp1}.`);
+            if (dbg) console.log(`[SecondOrder] Farther entity (1): ${rp1} | from ` +
+                `${a1 * relativeDt * relativeDt + b1 * relativeDt + p10} to ${p11}.`);
         }
 
         // Check for snapping on second trajectory.
@@ -54,7 +55,8 @@ class RigidBodiesPhase3 {
         if (p20 < p21 && a2 * relativeDt * relativeDt + b2 * relativeDt + p20 < p21 ||
             p20 > p21 && p21 < a2 * relativeDt * relativeDt + b2 * relativeDt + p20)
         {
-            if (dbg) console.log(`[SecondOrder] Farther entity (2): ${rp2}.`);
+            if (dbg) console.log(`[SecondOrder] Farther entity (2): ${rp2} | from ` +
+                `${a2 * relativeDt * relativeDt + b2 * relativeDt + p20} to ${p21}.`);
         }
 
         // Solve free 2-collision.
@@ -130,7 +132,7 @@ class RigidBodiesPhase3 {
             let id1 = oxAxis[xIndexI].id; let e1 = entities[id1];
             let p10 = e1.p0; let p10x = p10[0]; let p10y = p10[1]; let p10z = p10[2];
             let p11 = e1.p1; let p11x = p11[0]; let p11y = p11[1]; let p11z = p11[2];
-            let p1adh = e1.adherence; let p1v0 = e1.v0; let p1a0 = e1.a0; let p1n0 = e1.nu;
+            let p1adh = e1.adherence; let p1v0 = e1.v0; let p1a0 = e1.a0; let p1n0 = e1.nu1;
             let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
             let ltd1 = e1.dtr;
 
@@ -138,8 +140,8 @@ class RigidBodiesPhase3 {
             {
                 let xIndexJ = island[j];
 
-                let newSubIslandIndexI = newSubIsland.indexOf(xIndexI);
-                let newSubIslandIndexJ = newSubIsland.indexOf(xIndexJ);
+                let newSubIslandIndexI = newSubIsland.indexOf(i);
+                let newSubIslandIndexJ = newSubIsland.indexOf(j);
                 let iInNewSubIsland = newSubIslandIndexI > -1;
                 let jInNewSubIsland = newSubIslandIndexJ > -1;
 
@@ -156,9 +158,10 @@ class RigidBodiesPhase3 {
                 let e2 = entities[id2];
                 let p20 = e2.p0; let p20x = p20[0]; let p20y = p20[1]; let p20z = p20[2];
                 let p21 = e2.p1; let p21x = p21[0]; let p21y = p21[1]; let p21z = p21[2];
-                let p2adh = e2.adherence; let p2v0 = e2.v0; let p2a0 = e2.a0; let p2n0 = e2.nu;
+                let p2adh = e2.adherence; let p2v0 = e2.v0; let p2a0 = e2.a0; let p2n0 = e2.nu1;
                 let w2x = e2.widthX; let w2y = e2.widthY; let w2z = e2.widthZ;
                 let ltd2 = e2.dtr;
+                console.log(`\t\t\tTesting ${e1.entityId} vs ${e2.entityId}...`);
 
                 let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
                 let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
@@ -168,6 +171,7 @@ class RigidBodiesPhase3 {
                 let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
                 let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
+
                 if (xm && ym && zm) {
                     console.log('[Phase III - PostCollision] Full 3D clip clipped.');
                     continue;
@@ -196,7 +200,8 @@ class RigidBodiesPhase3 {
                     if (r >= 0 && r < rrel) { axis = 'y'; rrel = r; }
                 }
                 if (!zm) {
-                    let fw = zl ? 1 : -1; let adh10 = p1adh[2]; let adh11 = p1adh[5]; let a1 = ltd1 * ltd1 * .5 * p1a0[2];
+                    let fw = zl ? 1 : -1; let adh10 = p1adh[2]; let adh11 = p1adh[5];
+                    let a1 = ltd1 * ltd1 * .5 * p1a0[2];
                     if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0; let adh20 = p2adh[2]; let adh21 = p2adh[5];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[2]; if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
                     let b1 = ltd1 * (p1v0[2] + p1n0[2]); let b2 = ltd2 * (p2v0[2] + p2n0[2]);
@@ -204,7 +209,9 @@ class RigidBodiesPhase3 {
                     if (r >= 0 && r < rrel) { axis = 'z'; rrel = r;
                     }
                 }
+                console.log(`\t\t\t\tGot ${rrel}`);
                 if (rrel < relativeDt) {
+                    console.log(`\t\tRe-solving ${e1.entityId} vs ${e2.entityId} -> t = ${rrel}`);
                     mapCollidingPossible.push([i, j, rrel, axis]);
                 }
             }
@@ -239,7 +246,7 @@ class RigidBodiesPhase3 {
             //let p1_2 = e1.p2;
             let p1v0 = e1.v0;
             let p1a0 = e1.a0;
-            let p1n0 = e1.nu;
+            let p1n0 = e1.nu1;
             let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
             let ltd1 = e1.dtr; // this.getTimeDilatation(worldId, p1_0[0], p1_0[1], p1_0[2]);
             // const dta1 = absoluteDt * ltd1;
@@ -263,7 +270,7 @@ class RigidBodiesPhase3 {
                 //let p2_2 = e2.p2;
                 let p2v0 = e2.v0;
                 let p2a0 = e2.a0;
-                let p2n0 = e2.nu;
+                let p2n0 = e2.nu1;
                 let w2x = e2.widthX;
                 let w2y = e2.widthY;
                 let w2z = e2.widthZ;
@@ -403,6 +410,7 @@ class RigidBodiesPhase3 {
                     let adh20 = p2adh[2]; let adh21 = p2adh[5];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[2];
                     if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
+
 
                     //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
@@ -558,7 +566,7 @@ class RigidBodiesPhase3 {
         let p11z = p11[2];
         let p1v0 = e1.v0;
         let p1a0 = e1.a0;
-        let p1n0 = e1.nu;
+        let p1n0 = e1.nu1;
         let w1 = [e1.widthX, e1.widthY, e1.widthZ];
         let w1x = w1[0]; let w1y = w1[1]; let w1z = w1[2];
         let ltd1 = e1.dtr;
@@ -577,7 +585,7 @@ class RigidBodiesPhase3 {
         let p21z = p21[2];
         let p2v0 = e2.v0;
         let p2a0 = e2.a0;
-        let p2n0 = e2.nu;
+        let p2n0 = e2.nu1;
         let w2 = [e2.widthX, e2.widthY, e2.widthZ];
         let w2x = w1[0]; let w2y = w1[1]; let w2z = w1[2];
         let ltd2 = e2.dtr;
@@ -713,18 +721,19 @@ class RigidBodiesPhase3 {
                 let sgn = Math.sign;
                 if (e1p0 < e2p0) {
                     e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
-                    e2.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e2.a1[ax] = e1.a1[ax];
                     RigidBodiesPhase3.correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon);
                 } else if (e1p0 > e2p0) {
                     e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
-                    e2.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    e2.a1[ax] = e1.a1[ax];
                     RigidBodiesPhase3.correctCollision(e2, e2p0, e2p1, e2w, e1, e1p0, e1p1, e1w, ax, epsilon);
                 } else {
-                    console.log('[Phase III] - on correction, e1p0 == e2p20; this is worrying.');
+                    console.log('[Phase III] - on correction, e1p0 == e2p0; this is worrying.');
                     e1.p1[ax] = e1p0;
                     e2.p1[ax] = e2p0;
                 }
 
+                // TODO [CRIT] reset if collision stability problems.
                 // e1.p1[ax] = e1p0;
                 // e2.p1[ax] = e2p0;
             }
@@ -734,47 +743,64 @@ class RigidBodiesPhase3 {
     // We have that e1p0 < e2p0.
     static correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon)
     {
+        let seps = 1e-9;
         let min = Math.min;
         let max = Math.max;
-        let abs = Math.abs;
-        let debg = false; // TODO [HIGH] debug this with branching.
-        let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon;
+        // let abs = Math.abs;
+        // let debg = true; // TODO [HIGH] debug this with branching.
+        let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon + seps;
         if (overlap >= max(e2p0, e2p1)) {
             e1.p1[ax] = e1p0;
             e2.p1[ax] = e2p0;
         } else {
-            let d = abs((e1p1 + e1w) - (e2p1 - e2w));
-            let projP2 = e2p1 + (d + epsilon) / 2;
-            let projP1 = e1p1 - (d + epsilon) / 2;
-            // Test sign
-            let okProjP1 = (projP1 > min(e1p1, e1p0));
-            let okProjP2 = (projP2 < max(e2p0, e2p1));
-            if (okProjP1 && okProjP2) {
-                e1.p1[ax] = projP1;
-                e2.p1[ax] = projP2;
-            } else if (okProjP1) {
-                let proj2P1 = e1p1 - (d + epsilon);
-                if (proj2P1 > min(e1p1, e1p0)) {
-                    e1.p1[ax] = proj2P1;
-                } else {
-                    if (debg) console.log('[Phase III] - Branching [projP1] should have been discarded by overlap.');
-                    e1.p1[ax] = e1p0;
-                }
-                e2.p1[ax] = e2p0;
-            } else if (okProjP2) {
-                let proj2P2 = e2p1 + (d + epsilon);
-                if (proj2P2 < max(e2p0, e2p1)) {
-                    e2.p1[ax] = proj2P2;
-                } else {
-                    if (debg) console.log('[Phase III] - Branching [projP2] should have been discarded by overlap.');
-                    e2.p1[ax] = e2p0;
-                }
-                e1.p1[ax] = e1p0;
-            } else {
-                if (debg) console.log('[Phase III] - Branching [noProj] should be prevented by overlap check.');
+            let den = e1p1 - e1p0 - e2p1 + e2p0;
+            if (den === 0) {
                 e1.p1[ax] = e1p0;
                 e2.p1[ax] = e2p0;
+                return;
             }
+            let alpha = e1p1 - e1p0;
+            let beta  = e2p1 - e2p0;
+            let num = e2p0 - e1p0 - e1w - e2w - epsilon - seps;
+            let e1t = e1p0 + (num / den) * alpha;
+            let e2t = e2p0 + (num / den) * beta;
+
+            // console.log('[CUCURBITE]\t\t\t\t' + e1t + ', ' + e2t);
+            e1.p1[ax] = e1t;
+            e2.p1[ax] = e2t;
+
+            // let d = abs((e1p1 + e1w) - (e2p1 - e2w));
+            // let projP2 = e2p1 + (d + epsilon) / 2;
+            // let projP1 = e1p1 - (d + epsilon) / 2;
+            // // Test sign
+            // let okProjP1 = (projP1 >= min(e1p1, e1p0));
+            // let okProjP2 = (projP2 <= max(e2p0, e2p1));
+            // if (okProjP1 && okProjP2) {
+            //     e1.p1[ax] = projP1;
+            //     e2.p1[ax] = projP2;
+            // } else if (okProjP1) {
+            //     let proj2P1 = e1p1 - (d + epsilon);
+            //     if (proj2P1 > min(e1p1, e1p0)) {
+            //         e1.p1[ax] = proj2P1;
+            //     } else {
+            //         if (debg) console.log('[Phase III] - Branching [projP1] should have been discarded by overlap.');
+            //         e1.p1[ax] = e1p0;
+            //     }
+            //     e2.p1[ax] = e2p0;
+            // } else if (okProjP2) {
+            //     let proj2P2 = e2p1 + (d + epsilon);
+            //     if (proj2P2 < max(e2p0, e2p1)) {
+            //         e2.p1[ax] = proj2P2;
+            //     } else {
+            //         if (debg) console.log('[Phase III] - Branching [projP2] should have been discarded by overlap.');
+            //         e2.p1[ax] = e2p0;
+            //     }
+            //     e1.p1[ax] = e1p0;
+            // } else {
+            //     if (debg) console.log('[Phase III] - Branching [noProj] should be prevented by overlap check.');
+            //     e1.p1[ax] = e1p0;
+            //     e2.p1[ax] = e2p0;
+            // }
         }
     }
 

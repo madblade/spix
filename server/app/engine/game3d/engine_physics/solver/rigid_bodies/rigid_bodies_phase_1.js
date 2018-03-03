@@ -117,6 +117,7 @@ class RigidBodiesPhase1 {
             let v0 = currentEntity.v0; let v1 = currentEntity.v1;
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
             let nu = currentEntity.nu; // Instantaneous speed.
+            let nu1 = currentEntity.nu1;
             // console.log(p0);
 
             let localTimeDilatation = rigidBodiesSolver.getTimeDilatation(worldId, p0[0], p0[1], p0[2]);
@@ -137,6 +138,7 @@ class RigidBodiesPhase1 {
             let sum = 0;
             for (let i = 0; i < 3; ++i) // Account for server congestion / lag with relative dilatation.
             {
+                nu1[i] = nu[i];
                 let increment = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
                 inc[i] = increment;
                 sum += increment * increment;

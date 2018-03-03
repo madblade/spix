@@ -242,10 +242,10 @@ class ObjectsIterator {
         // Others not moving faster than current.
         let abs = Math.abs;
         let maxT = Math.max(abs(thresholdX), abs(thresholdY), abs(thresholdZ));
-        this.tx = abs(thresholdX) + maxT + 2 * xW;
-        this.ty = abs(thresholdY) + maxT + 2 * yW;
-        this.tz = abs(thresholdZ) + maxT + 2 * zW;
-        // TODO [HIGH] account for max width when objects are huge.
+        this.tx = abs(thresholdX) + maxT + 4 * xW;
+        this.ty = abs(thresholdY) + maxT + 4 * yW;
+        this.tz = abs(thresholdZ) + maxT + 4 * zW;
+        // TODO [LOW] account for max width when objects are huge.
 
         this.onX = true;
         this.onY = false;

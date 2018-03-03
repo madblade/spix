@@ -135,6 +135,7 @@ class Entity {
         this._v0 = [0, 0, 0];   this._v1 = [0, 0, 0];
         this._a0 = [0, 0, 0];   this._a1 = [0, 0, 0];
         this._nu = [0, 0, 0];
+        this._nu1 = [0, 0, 0];
 
         this._p0 = position;
     }
@@ -241,6 +242,9 @@ class Entity {
 
     get nu()                { return this._nu; }
     set nu(nu)              { this._nu = nu; }
+
+    get nu1()               { return this._nu1; }
+    set nu1(nu1)            { this._nu1 = nu1; }
 
     //get rabs()                { return this._rabs; }
     //set rabs(up)              { this._rabs = up; }

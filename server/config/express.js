@@ -93,6 +93,7 @@ export default function(app) {
         browserSync.init({
             open: false,
             logFileChanges: false,
+            ghostMode: false,
             proxy: `localhost:${config.port}`,
             ws: true,
             middleware: [

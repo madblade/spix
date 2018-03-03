@@ -184,6 +184,7 @@ class RigidBodies {
             if (islands.length > 0) {
                 // console.log('Islands: ');
                 // console.log(islands);
+                // console.log(islands[0]);
             }
 
             islands.forEach(island => {
@@ -249,7 +250,9 @@ class RigidBodies {
                 // console.log(mapCollidingPossible);
                 let complicatedFlag = mapCollidingPossible.length > 1;
                 let solverPassId = 1;
-                if (complicatedFlag) console.log('Complicated collision solving.');
+                if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
+                else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
+
                 while (mapCollidingPossible.length > 0)
                 {
                     let i = mapCollidingPossible[0][0];     // island 1 index
