@@ -5,6 +5,7 @@ class XCollider {
     static xCollide(oldPosition, newPosition, world, xModel)
     {
         let chk = world.getChunkByCoordinates(...oldPosition);
+        if (!chk) return;
 
         let xs = xModel.getPortalsFromChunk(world.worldId, chk.chunkId);
 

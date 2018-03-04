@@ -161,7 +161,9 @@ class RigidBodiesPhase3 {
                 let p2adh = e2.adherence; let p2v0 = e2.v0; let p2a0 = e2.a0; let p2n0 = e2.nu1;
                 let w2x = e2.widthX; let w2y = e2.widthY; let w2z = e2.widthZ;
                 let ltd2 = e2.dtr;
-                console.log(`\t\t\tTesting ${e1.entityId} vs ${e2.entityId}...`);
+                let debugFlag =  false;
+                if (debugFlag)
+                    console.log(`\t\t\tTesting ${e1.entityId} vs ${e2.entityId}...`);
 
                 let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
                 let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
@@ -209,9 +211,11 @@ class RigidBodiesPhase3 {
                     if (r >= 0 && r < rrel) { axis = 'z'; rrel = r;
                     }
                 }
-                console.log(`\t\t\t\tGot ${rrel}`);
+                if (debugFlag)
+                    console.log(`\t\t\t\tGot ${rrel}`);
                 if (rrel < relativeDt) {
-                    console.log(`\t\tRe-solving ${e1.entityId} vs ${e2.entityId} -> t = ${rrel}`);
+                    if (debugFlag)
+                        console.log(`\t\tRe-solving ${e1.entityId} vs ${e2.entityId} -> t = ${rrel}`);
                     mapCollidingPossible.push([i, j, rrel, axis]);
                 }
             }
@@ -743,7 +747,7 @@ class RigidBodiesPhase3 {
     // We have that e1p0 < e2p0.
     static correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon)
     {
-        let seps = 1e-9;
+        let seps = 1e-6;
         let min = Math.min;
         let max = Math.max;
         // let abs = Math.abs;
@@ -766,8 +770,16 @@ class RigidBodiesPhase3 {
             let e2t = e2p0 + (num / den) * beta;
 
             // console.log('[CUCURBITE]\t\t\t\t' + e1t + ', ' + e2t);
-            e1.p1[ax] = e1t;
-            e2.p1[ax] = e2t;
+            if (e1t <= max(e1p0, e1p1) && e1t >= min(e1p0, e1p1) &&
+                e2t <= max(e2p0, e2p1) && e2t >= min(e2p0, e1p1) &&
+                e1t + e1w + e2w + epsilon + seps <= e2t)
+            {
+                e1.p1[ax] = e1t;
+                e2.p1[ax] = e2t;
+            } else {
+                e1.p1[ax] = e1p0;
+                e2.p1[ax] = e2p0;
+            }
 
             // let d = abs((e1p1 + e1w) - (e2p1 - e2w));
             // let projP2 = e2p1 + (d + epsilon) / 2;

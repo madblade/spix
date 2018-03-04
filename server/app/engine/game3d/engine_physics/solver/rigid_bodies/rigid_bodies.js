@@ -250,17 +250,27 @@ class RigidBodies {
                 // console.log(mapCollidingPossible);
                 let complicatedFlag = mapCollidingPossible.length > 1;
                 let solverPassId = 1;
-                if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
-                else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
+                let debugFlag = false;
+                if (debugFlag)
+                {
+                    if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
+                    else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
+                }
+
+                console.log('New island pass');
+                console.log(island);
+                let reloop = false;
 
                 while (mapCollidingPossible.length > 0)
                 {
+                    console.log(`\t${mapCollidingPossible[0]} | ${reloop ? 'stacking' : 'shifting'}`);
+                    reloop = false;
                     let i = mapCollidingPossible[0][0];     // island 1 index
                     let j = mapCollidingPossible[0][1];     // island 2 index
                     let r = mapCollidingPossible[0][2];     // time got by solver
                     let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
 
-                    if (complicatedFlag) {
+                    if (debugFlag && complicatedFlag) {
                         let msg = `\tPass ${solverPassId++} : ${mapCollidingPossible.length} elements to process `;
                         for (let m = 0; m < mapCollidingPossible.length; ++m) {
                             msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
@@ -290,7 +300,7 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ);
 
-                    if (complicatedFlag)
+                    if (debugFlag && complicatedFlag)
                         console.log('\tApplying collision...');
                     let eps = 1e-6;
                     Phase3.applyCollision(
@@ -322,8 +332,9 @@ class RigidBodies {
                     // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
                     // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
-                    if (complicatedFlag)
+                    if (debugFlag && complicatedFlag)
                         console.log('\tSolving the island step...');
+                    let oldLength = mapCollidingPossible.length;
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
                         i, j, r, axis, subIslandI, subIslandJ, //newSubIsland,
@@ -332,7 +343,9 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         oxAxis, island, world, relativeDt);
-                    if (complicatedFlag) {
+                    if (mapCollidingPossible.length >= oldLength)
+                        reloop = true;
+                    if (debugFlag && complicatedFlag) {
                         let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
                         let xIndex2 = island[j]; // let lfa1 = leapfrogArray[xIndex1];
                         let id1 = oxAxis[xIndex1].id;
@@ -345,7 +358,7 @@ class RigidBodies {
                     }
 
                     // let newSubIsland =
-                    if (complicatedFlag)
+                    if (debugFlag && complicatedFlag)
                         console.log('\tMerging sub-islands...');
                     Phase3.mergeSubIslands(
                         i, j, subIslandI, subIslandJ,
@@ -353,7 +366,7 @@ class RigidBodies {
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ, axis);
-                    if (complicatedFlag)
+                    if (debugFlag && complicatedFlag)
                         console.log('\tMerged!');
                 }
                 // console.log('Solveth!');

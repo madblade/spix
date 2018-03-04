@@ -26,6 +26,10 @@ class XLoader {
         let cm = this._consistencyModel;
 
         let chunk = wm.getWorld(worldId).getChunkByCoordinates(...pos);
+        if (!chunk) {
+            console.log(`[LoaderX] Undefined chunk for pos ${pos} in wid ${worldId}.`);
+            return null;
+        }
         // Format:
         // Map (portal id -> [other portal id, other portal world])
 

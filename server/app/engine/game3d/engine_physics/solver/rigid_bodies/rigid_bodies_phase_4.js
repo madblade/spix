@@ -100,8 +100,22 @@ class RigidBodiesPhase4 {
                 vec[k] = (v[k] + nu[k]) * deltaT + .5 * a[k] * deltaT * deltaT;
             return vec;
         };
-        let add = function(vec1, vec2) {
-            for (let k = 0; k < 3; ++k) vec1[k] += vec2[k];
+        // let add = function(vec1, vec2) {
+        //     for (let k = 0; k < 3; ++k) vec1[k] += vec2[k];
+        // };
+        let copy = function(vec) {
+            return [...vec];
+        };
+        let sum = function(vec1, vec2) {
+            let vec3 = [0, 0, 0];
+            for (let k = 0; k < 3; ++k) vec3[k] = vec1[k] + vec2[k];
+            // vec3[a] = vec1[a] + vec2[a];
+            return vec3;
+        };
+        let minimize = function(delta, p0, p1, a) {
+            // for (let k = 0; k < 3; ++k)
+            //     if (abs(delta[k]) < abs(p1[k] - p0[k])) delta[k] = p1[k] - p0[k];
+            if (abs(delta[a]) < abs(p1[a] - p0[a])) delta[a] = p1[a] - p0[a];
         };
         let abs = Math.abs;
 
@@ -126,6 +140,8 @@ class RigidBodiesPhase4 {
             if (currentDtr > maxDtr2) maxDtr2 = currentDtr;
         }
 
+        // let reapply1 = false;
+        let newDelta1 = [...deltaP1];
         for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
         {
             let entityIdInIsland = subIslandI[idInSub1];
@@ -133,9 +149,9 @@ class RigidBodiesPhase4 {
 
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
-            let lastR = currentEntity.lastR;
-            let deltaR = lastR > 0 ? r - lastR : r;
-            if (deltaR === 0) continue;
+            // let lastR = currentEntity.lastR;
+            // let deltaR = lastR > 0 ? r - lastR : r;
+            // if (deltaR === 0) continue;
             // console.log(deltaR);
 
             // Old-fashioned (but with numerical errors)
@@ -144,12 +160,37 @@ class RigidBodiesPhase4 {
             // let a0 = currentEntity.a0;
             // deltaP1 = solve(deltaR, v0, nu, a0, maxDtr1)
 
-            add(currentEntity.p0, deltaP1);
+            let oldP0 = copy(currentEntity.p0);
+            // currentEntity.p0 = sum(currentEntity.p0, deltaP1);
+            let p0 = currentEntity.p0;
+            let p1 = currentEntity.p1;
+            let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            if (hasCollided) {
+                // reapply1 = true;
+                currentEntity.p0 = oldP0;
+                minimize(newDelta1, p0, p1);
+            }
+            // add(currentEntity.p0, deltaP1);
         }
+        // if (reapply1) {
+        //     for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
+        //     {
+        //         let entityIdInIsland = subIslandI[idInSub1];
+        //         if (entityIdInIsland === i) continue;
+        //         let entityId = oxAxis[island[entityIdInIsland]].id;
+        //         let currentEntity = entities[entityId];
+                // let lastR = currentEntity.lastR;
+                // let deltaR = lastR > 0 ? r - lastR : r;
+                // if (deltaR === 0) continue;
+                // currentEntity.p0 = sum(currentEntity.p0, newDelta1);
+            // }
+        // }
 
         // Approach island 1.
         // Prevent from advancing i and j (already clipped)
         // Approach island 2.
+        // let reapply2 = false;
+        let newDelta2 = [...deltaP2];
         for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
         {
             let entityIdInIsland = subIslandJ[idInSub2];
@@ -157,9 +198,9 @@ class RigidBodiesPhase4 {
 
             let entityId = oxAxis[island[entityIdInIsland]].id;
             let currentEntity = entities[entityId];
-            let lastR = currentEntity.lastR;
-            let deltaR = lastR > 0 ? r - lastR : r;
-            if (deltaR === 0) continue;
+            // let lastR = currentEntity.lastR;
+            // let deltaR = lastR > 0 ? r - lastR : r;
+            // if (deltaR === 0) continue;
             // console.log(deltaR);
 
             // Old-fashioned (but with numerical errors)
@@ -168,8 +209,31 @@ class RigidBodiesPhase4 {
             // let a0 = currentEntity.a0;
             // deltaP2 = solve(deltaR, v0, nu, a0, maxDtr2);
 
-            add(currentEntity.p0, deltaP2); // TODO [THINK] account for terrain collisions?
+            let oldP0 = copy(currentEntity.p0);
+            // currentEntity.p0 = sum(currentEntity.p0, deltaP2);
+            let p0 = currentEntity.p0;
+            let p1 = currentEntity.p1;
+            let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            if (hasCollided) {
+                 // TODO [] check on which axis...
+                // reapply2 = true;
+                currentEntity.p0 = oldP0;
+                minimize(newDelta2, p0, p1);
+            }
+            // add(currentEntity.p0, deltaP2); // TODO [THINK] account for terrain collisions?
         }
+        // if (reapply2) {
+        //     for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2) {
+        //         let entityIdInIsland = subIslandJ[idInSub2];
+        //         if (entityIdInIsland === j) continue;
+                // let entityId = oxAxis[island[entityIdInIsland]].id;
+                // let currentEntity = entities[entityId];
+                // let lastR = currentEntity.lastR;
+                // let deltaR = lastR > 0 ? r - lastR : r;
+                // if (deltaR === 0) continue;
+                // currentEntity.p0 = sum(currentEntity.p0, newDelta2);
+            // }
+        // }
 
         // Concat indexes form both islands into newSubIsland
         let newSubIsland = Array.from(subIslandI).concat(subIslandJ);
@@ -238,15 +302,15 @@ class RigidBodiesPhase4 {
             currentEntity.lastR = r;
         }
         // Collision correction.
-        for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
-        {
-            let entityIdInIsland = newSubIsland[idInNewSub];
+        // for (let idInNewSub = 0, newSubLength = newSubIsland.length; idInNewSub < newSubLength; ++idInNewSub)
+        // {
+            // let entityIdInIsland = newSubIsland[idInNewSub];
             //if (entityIdInIsland === i || entityIdInIsland === j) continue;
-            let entityId = oxAxis[island[entityIdInIsland]].id;
-            let currentEntity = entities[entityId];
-            let p1 = currentEntity.p1;
+            // let entityId = oxAxis[island[entityIdInIsland]].id;
+            // let currentEntity = entities[entityId];
+            // let p1 = currentEntity.p1;
             //p1[ax] += correctionDelta;
-        }
+        // }
 
         // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
         // 2.1. retirer le couple collision de la map collidingPossible
@@ -303,10 +367,12 @@ class RigidBodiesPhase4 {
 
         let mapCollidingPossibleNew = [];
 
-        console.log(`\t\tProcessing post-collision: ${entities[oxAxis[island[subIslandI[0]]].id].entityId} ` +
-                    `[${subIslandI}] vs ` +
-                    `${entities[oxAxis[island[subIslandJ[0]]].id].entityId} ` +
-                    `[${subIslandJ}] || [${newSubIsland}]`);
+        let debugFlag = false;
+        if (debugFlag)
+            console.log(`\t\tProcessing post-collision: ${entities[oxAxis[island[subIslandI[0]]].id].entityId} ` +
+                        `[${subIslandI}] vs ` +
+                        `${entities[oxAxis[island[subIslandJ[0]]].id].entityId} ` +
+                        `[${subIslandJ}] || [${newSubIsland}]`);
         Phase3.solveLeapfrogPostCollision(
             island,
             newSubIsland,
