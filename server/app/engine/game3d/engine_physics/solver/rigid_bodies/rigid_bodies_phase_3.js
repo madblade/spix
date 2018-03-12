@@ -40,6 +40,8 @@ class RigidBodiesPhase3 {
         w1, w2,
         fw, relativeDt)
     {
+        let abs = Math.abs;
+
         // Check for snapping on first trajectory.
         let dbg = false; // TODO [HIGH] solve this farther entity problem.
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
@@ -77,19 +79,19 @@ class RigidBodiesPhase3 {
         }
 
         // In case of (1)-snap.
-        if (rp12 > rp1 && relativeDt > rp1 && rp1 >= 0) {
+        if (abs(rp12) > rp1 && relativeDt > rp1 && rp1 >= 0) {
             // Solve constrained (1)-end-of-line collision.
             let rp3 = RigidBodiesPhase3.solveBabylon(a2, b2, -fw * w1 - fw * w2 + p20 - p11, 2 * relativeDt);
             // console.log(`Constrained (1): ${rp3} | ${rp12}`);
-            if (rp12 > rp3 && rp3 > 0) rp12 = rp3;
+            if ((rp12 < 0 || rp12 > rp3) && rp3 >= 0) rp12 = rp3;
         }
 
         // In case of (2)-snap.
-        if (rp12 > rp2 && relativeDt > rp2 && rp2 >= 0) {
+        if (abs(rp12) > rp2 && relativeDt > rp2 && rp2 >= 0) {
             // Solve constrained (2)-end-of-line collision.
             let rp4 = RigidBodiesPhase3.solveBabylon(a1, b1, fw * w1 + fw * w2 + p10 - p21, 2 * relativeDt);
             // console.log(`Constrained (2): ${rp4} | ${rp12}`);
-            if (rp12 > rp4 && rp4 > 0) rp12 = rp4;
+            if ((rp12 < 0 || rp12 > rp4) && rp4 >= 0) rp12 = rp4;
         }
 
         if (rp12 < 0 || rp12 >= relativeDt) {
@@ -112,6 +114,7 @@ class RigidBodiesPhase3 {
         }
 
         // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+        console.log(rp12);
         return rp12;
     }
 
@@ -136,21 +139,22 @@ class RigidBodiesPhase3 {
             let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
             let ltd1 = e1.dtr;
 
+            let newSubIslandIndexI = newSubIsland.indexOf(i);
+            let iInNewSubIsland = newSubIslandIndexI > -1;
+
             for (let j = i + 1; j < islandLength; ++j)
             {
                 let xIndexJ = island[j];
 
-                let newSubIslandIndexI = newSubIsland.indexOf(i);
                 let newSubIslandIndexJ = newSubIsland.indexOf(j);
-                let iInNewSubIsland = newSubIslandIndexI > -1;
                 let jInNewSubIsland = newSubIslandIndexJ > -1;
 
                 // TODO [HIGH] check my elementary set theory abilities
-                let goOn = (!iInNewSubIsland && jInNewSubIsland) ||
-                            (iInNewSubIsland && !jInNewSubIsland);
+                let goOn = !iInNewSubIsland && jInNewSubIsland ||
+                            iInNewSubIsland && !jInNewSubIsland;
                 if (!goOn) {
                     // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
-                    if (terrain.indexOf(xIndexJ) < 0 && terrain.indexOf(xIndexI))
+                    if (terrain.indexOf(xIndexJ) < 0 && terrain.indexOf(xIndexI) < 0)
                         continue;
                 }
 
@@ -465,16 +469,13 @@ class RigidBodiesPhase3 {
         switch (axis) {
             case 'x':
                 subIslandIndex = objectIndexInIslandToSubIslandXIndex[islandIndex];
-                if (subIslandIndex === -1) return null;
-                return subIslandsX[subIslandIndex];
+                return subIslandIndex === -1 ? null : subIslandsX[subIslandIndex];
             case 'y':
                 subIslandIndex = objectIndexInIslandToSubIslandYIndex[islandIndex];
-                if (subIslandIndex === -1) return null;
-                return subIslandsY[subIslandIndex];
+                return subIslandIndex === -1 ? null : subIslandsY[subIslandIndex];
             case 'z':
                 subIslandIndex = objectIndexInIslandToSubIslandZIndex[islandIndex];
-                if (subIslandIndex === -1) return null;
-                return subIslandsZ[subIslandIndex];
+                return subIslandIndex === -1 ? null : subIslandsZ[subIslandIndex];
             default: console.log('[SubIsland] Undefined axis.'); return null;
         }
     }
@@ -629,6 +630,8 @@ class RigidBodiesPhase3 {
             }
             for (let m = 0; m < 3; ++m) // Account for server congestion / lag with relative dilatation.
             {
+                if (m !== ax) continue;
+
                 let timestep1;
                 let timestep2;
                 if (m === ax) {
@@ -639,23 +642,92 @@ class RigidBodiesPhase3 {
                     timestep2 = ltd2;
                 }
 
+                let gamma = epsilon;
+
                 let e1p1i = e1.p1[m];
                 let e1p0i = e1.p0[m];
                 let e1p1n = e1p0i + (p1v0[m] + p1n0[m]) * timestep1 + .5 * p1a0[m] * timestep1 * timestep1;
                 nep1[m] =
                     e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n ? // && e1p1n+e < e1p0i && e1p1i < e1p1n+e
-                        e1p1n + epsilon :
+                        e1p1n + gamma :
                         e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i ?
-                            e1p1n - epsilon : e1p1i;
+                            e1p1n - gamma : e1p1i;
 
                 let e2p1i = e2.p1[m];
                 let e2p0i = e2.p0[m];
                 let e2p1n = e2p0i + (p2v0[m] + p2n0[m]) * timestep2 + .5 * p2a0[m] * timestep2 * timestep2;
                 nep2[m] =
                     e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n ?
-                        e2p1n + epsilon :
+                        e2p1n + gamma :
                         e2p0i < e2p1i && e2p0i < e2p1n && e2p1n < e2p1i ?
-                            e2p1n - epsilon : e2p1i;
+                            e2p1n - gamma : e2p1i;
+
+                if (e1p1i <= e1p0i && (nep1[m] < e1p1i || nep1[m] > e1p0i) ||
+                    e1p0i <= e1p1i && (nep1[m] > e1p1i || nep1[m] < e1p0i))
+                    nep1[m] = e1p0i;
+
+                if (e2p1i <= e2p0i && (nep2[m] < e2p1i || nep2[m] > e2p0i) ||
+                    e2p0i <= e2p1i && (nep2[m] > e2p1i || nep2[m] < e2p0i))
+                    nep2[m] = e2p0i;
+
+                // // Forward E1
+                // if (e1p0i <= e1p1n && e1p1n <= e1p1i && e1p0i < e2p0i) {
+                //     let e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
+                //     if (e2p1n2 > max(e2p0i, e2p1i)) {
+                //         // TODO [LOW] possible to do better than e2p1n - gamma
+                //         let e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         if (e1p1n2 < min(e1p0i, e1p1i))
+                //             nep1[m] = e1p0i;
+                //         else
+                //             nep1[m] = e1p1n2;
+                //         nep2[m] = e2p1n;
+                //     } else {
+                //         nep1[m] = e1p1n;
+                //         nep2[m] = e2p1n2;
+                //     }
+                // } else if (e1p0i <= e1p1n && e1p1n <= e1p1i && e2p0i < e1p0i) {
+                //     let e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
+                //     if (e1p1n2 > max(e1p0i, e1p1i)) {
+                //         let e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         if (e2p1n2 < min(e2p0i, e2p1i))
+                //             nep2[m] = e2p0i;
+                //         else
+                //             nep2[m] = e2p1n2;
+                //         nep1[m] = e1p1n;
+                //     } else {
+                //         nep2[m] = e2p1n;
+                //         nep1[m] = e1p1n2;
+                //     }
+                // }
+                // // Backwards E1
+                // else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e1p0i < e2p0i) {
+                //     let e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
+                //     if (e2p1n2 > max(e2p0i, e2p1i)) {
+                //         // TODO [LOW] possible to do better than e2p1n - gamma
+                //         let e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         if (e1p1n2 < min(e1p0i, e1p1i))
+                //             nep1[m] = e1p0i;
+                //         else
+                //             nep1[m] = e1p1n2;
+                //         nep2[m] = e2p1n;
+                //     } else {
+                //         nep1[m] = e1p1n;
+                //         nep2[m] = e2p1n2;
+                //     }
+                // } else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e2p0i < e1p0i) {
+                //     let e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
+                //     if (e1p1n2 > max(e1p0i, e1p1i)) {
+                //         let e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         if (e2p1n2 < min(e2p0i, e2p1i))
+                //             nep2[m] = e2p0i;
+                //         else
+                //             nep2[m] = e2p1n2;
+                //         nep1[m] = e1p1n;
+                //     } else {
+                //         nep2[m] = e2p1n;
+                //         nep1[m] = e1p1n2;
+                //     }
+                // }
 
                 //const eeps = 1e-30; // TODO [LOW] quite important to beware of numerical errors here.
                 m2[m] = nep1[m] + wm1[m] + epsilon / 2.0 > nep2[m] - wm2[m] - epsilon / 2.0 &&
@@ -683,10 +755,11 @@ class RigidBodiesPhase3 {
             // TODO [HIGH] this is a projection... check collision
 
             // TODO [CRIT] verify this lastR mechanism
-            e1.lastR = r;
-            e2.lastR = r;
+            // e1.lastR = r;
+            // e2.lastR = r;
 
             for (let m = 0; m < 3; ++m) {
+                if (m !== ax) continue;
                 // Check terrain...
                 let e1p1 = e1.p1[m];
                 let e2p1 = e2.p1[m];
@@ -741,6 +814,7 @@ class RigidBodiesPhase3 {
                 // e1.p1[ax] = e1p0;
                 // e2.p1[ax] = e2p0;
             }
+            console.log('\tz = ' + e1.p0[2] + ' -> ' + e1.p1[2] + ' , ' + e2.p0[2] + ' -> ' + e2.p1[2]);
         }
     }
 

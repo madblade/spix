@@ -263,7 +263,10 @@ class RigidBodies {
 
                 while (mapCollidingPossible.length > 0)
                 {
-                    console.log(`\t${mapCollidingPossible[0]} | ${reloop ? 'stacking' : 'shifting'}`);
+                    console.log(
+                        `\t${mapCollidingPossible[0]} ` +
+                        `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
+                    );
                     reloop = false;
                     let i = mapCollidingPossible[0][0];     // island 1 index
                     let j = mapCollidingPossible[0][1];     // island 2 index

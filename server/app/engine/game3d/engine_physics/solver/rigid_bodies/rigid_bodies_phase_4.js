@@ -106,12 +106,12 @@ class RigidBodiesPhase4 {
         let copy = function(vec) {
             return [...vec];
         };
-        let sum = function(vec1, vec2) {
-            let vec3 = [0, 0, 0];
-            for (let k = 0; k < 3; ++k) vec3[k] = vec1[k] + vec2[k];
+        // let sum = function(vec1, vec2) {
+        //     let vec3 = [0, 0, 0];
+        //     for (let k = 0; k < 3; ++k) vec3[k] = vec1[k] + vec2[k];
             // vec3[a] = vec1[a] + vec2[a];
-            return vec3;
-        };
+            // return vec3;
+        // };
         let minimize = function(delta, p0, p1, a) {
             // for (let k = 0; k < 3; ++k)
             //     if (abs(delta[k]) < abs(p1[k] - p0[k])) delta[k] = p1[k] - p0[k];
@@ -164,7 +164,7 @@ class RigidBodiesPhase4 {
             // currentEntity.p0 = sum(currentEntity.p0, deltaP1);
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
-            let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            let hasCollided = false; // TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             if (hasCollided) {
                 // reapply1 = true;
                 currentEntity.p0 = oldP0;
@@ -213,7 +213,7 @@ class RigidBodiesPhase4 {
             // currentEntity.p0 = sum(currentEntity.p0, deltaP2);
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
-            let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            let hasCollided = false; // TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             if (hasCollided) {
                  // TODO [] check on which axis...
                 // reapply2 = true;
@@ -342,18 +342,28 @@ class RigidBodiesPhase4 {
                 default: console.log('\t[RBP4] Invalid entry in map colliding possible.');
             }
 
+            let currentIsInvalid = false;
             for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
             {
                 let entityIdInSubIslands = subIslandI[idInSub1];
                 if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
+                {
                     mapCollidingPossible.splice(k, 1);
+                    currentIsInvalid = true;
+                    break;
+                }
             }
-            for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
-            {
-                let entityIdInSubIslands = subIslandJ[idInSub2];
-                if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
-                    mapCollidingPossible.splice(k, 1);
-            }
+
+            if (!currentIsInvalid)
+                for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
+                {
+                    let entityIdInSubIslands = subIslandJ[idInSub2];
+                    if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
+                    {
+                        mapCollidingPossible.splice(k, 1);
+                        break;
+                    }
+                }
         }
 
         // 3. lancer le solving de p0 à p1 (terrain + x)
