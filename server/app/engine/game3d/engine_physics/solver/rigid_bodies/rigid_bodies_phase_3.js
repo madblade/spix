@@ -40,8 +40,6 @@ class RigidBodiesPhase3 {
         w1, w2,
         fw, relativeDt)
     {
-        let abs = Math.abs;
-
         // Check for snapping on first trajectory.
         let dbg = false; // TODO [HIGH] solve this farther entity problem.
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
@@ -79,19 +77,21 @@ class RigidBodiesPhase3 {
         }
 
         // In case of (1)-snap.
-        if (abs(rp12) > rp1 && relativeDt > rp1 && rp1 >= 0) {
+        if ((rp12 > rp1 || rp12 < 0) && relativeDt > rp1 && rp1 >= 0) {
             // Solve constrained (1)-end-of-line collision.
             let rp3 = RigidBodiesPhase3.solveBabylon(a2, b2, -fw * w1 - fw * w2 + p20 - p11, 2 * relativeDt);
             // console.log(`Constrained (1): ${rp3} | ${rp12}`);
             if ((rp12 < 0 || rp12 > rp3) && rp3 >= 0) rp12 = rp3;
+            if (rp3 > relativeDt) rp12 = 0;
         }
 
         // In case of (2)-snap.
-        if (abs(rp12) > rp2 && relativeDt > rp2 && rp2 >= 0) {
+        if ((rp12 > rp2 || rp12 < 0) && relativeDt > rp2 && rp2 >= 0) {
             // Solve constrained (2)-end-of-line collision.
             let rp4 = RigidBodiesPhase3.solveBabylon(a1, b1, fw * w1 + fw * w2 + p10 - p21, 2 * relativeDt);
             // console.log(`Constrained (2): ${rp4} | ${rp12}`);
             if ((rp12 < 0 || rp12 > rp4) && rp4 >= 0) rp12 = rp4;
+            if (rp4 > relativeDt) rp12 = 0;
         }
 
         if (rp12 < 0 || rp12 >= relativeDt) {
