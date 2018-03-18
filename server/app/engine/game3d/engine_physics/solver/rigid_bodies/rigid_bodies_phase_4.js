@@ -115,7 +115,10 @@ class RigidBodiesPhase4 {
         let minimize = function(delta, p0, p1, a) {
             // for (let k = 0; k < 3; ++k)
             //     if (abs(delta[k]) < abs(p1[k] - p0[k])) delta[k] = p1[k] - p0[k];
-            if (abs(delta[a]) < abs(p1[a] - p0[a])) delta[a] = p1[a] - p0[a];
+            if (p0[a] < p1[a] && p0[a] + delta[a] >= p1[a] ||
+                p0[a] > p1[a] && p0[a] + delta[a] <= p1[a])
+                delta[a] = p1[a] - p0[a];
+            // if (abs(delta[a]) < abs(p1[a] - p0[a])) delta[a] = p1[a] - p0[a];
         };
         let abs = Math.abs;
 
@@ -168,9 +171,9 @@ class RigidBodiesPhase4 {
             if (hasCollided) {
                 // reapply1 = true;
                 currentEntity.p0 = oldP0;
-                minimize(newDelta1, p0, p1);
             }
-            // add(currentEntity.p0, deltaP1);
+            minimize(newDelta1, p0, p1);
+            // add(currentEntity.p0, newDelta1);
         }
         // if (reapply1) {
         //     for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
@@ -218,9 +221,9 @@ class RigidBodiesPhase4 {
                  // TODO [] check on which axis...
                 // reapply2 = true;
                 currentEntity.p0 = oldP0;
-                minimize(newDelta2, p0, p1);
             }
-            // add(currentEntity.p0, deltaP2); // TODO [THINK] account for terrain collisions?
+            minimize(newDelta2, p0, p1);
+            // add(currentEntity.p0, deltaP2);
         }
         // if (reapply2) {
         //     for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2) {
@@ -346,9 +349,11 @@ class RigidBodiesPhase4 {
             for (let idInSub1 = 0, subLength = subIslandI.length; idInSub1 < subLength; ++idInSub1)
             {
                 let entityIdInSubIslands = subIslandI[idInSub1];
-                if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
+                if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands
+                    // && currentAxis === axis
+                )
                 {
-                    mapCollidingPossible.splice(k, 1);
+                    // mapCollidingPossible.splice(k, 1);
                     currentIsInvalid = true;
                     break;
                 }
@@ -358,9 +363,11 @@ class RigidBodiesPhase4 {
                 for (let idInSub2 = 0, subLength = subIslandJ.length; idInSub2 < subLength; ++idInSub2)
                 {
                     let entityIdInSubIslands = subIslandJ[idInSub2];
-                    if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands)
+                    if (subIslandIndex1 === entityIdInSubIslands || subIslandIndex2 === entityIdInSubIslands
+                        // && currentAxis === axis
+                    )
                     {
-                        mapCollidingPossible.splice(k, 1);
+                        // mapCollidingPossible.splice(k, 1);
                         break;
                     }
                 }

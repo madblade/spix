@@ -187,7 +187,11 @@ class RigidBodies {
                 // console.log(islands[0]);
             }
 
-            islands.forEach(island => {
+            for (let currentIslandIndex = 0; currentIslandIndex  < islands.length; ++currentIslandIndex)
+            // islands.forEach(island =>
+            {
+                let island = islands[currentIslandIndex];
+
                 // if (island.length > 2) {
                 //     console.log(island);
                 // }
@@ -204,7 +208,7 @@ class RigidBodies {
                     mapCollidingPossible);
                 // TODO [MEDIUM think order by mass
 
-                if (mapCollidingPossible.length < 1) return;
+                if (mapCollidingPossible.length < 1) continue;
 
                 // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
 
@@ -259,6 +263,13 @@ class RigidBodies {
 
                 console.log('New island pass');
                 console.log(island);
+                let dbg = true;
+                if (dbg) {
+                    let eids = [];
+                    for (let isl = 0; isl < island.length; ++isl)
+                        eids.push(oxAxis[island[isl]].id);
+                    console.log(eids);
+                }
                 let reloop = false;
 
                 while (mapCollidingPossible.length > 0)
@@ -268,9 +279,9 @@ class RigidBodies {
                         `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
                     );
                     reloop = false;
-                    let i = mapCollidingPossible[0][0];     // island 1 index
-                    let j = mapCollidingPossible[0][1];     // island 2 index
-                    let r = mapCollidingPossible[0][2];     // time got by solver
+                    let ii = mapCollidingPossible[0][0];     // island 1 index
+                    let jj = mapCollidingPossible[0][1];     // island 2 index
+                    let rr = mapCollidingPossible[0][2];     // time got by solver
                     let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
 
                     if (debugFlag && complicatedFlag) {
@@ -278,26 +289,26 @@ class RigidBodies {
                         for (let m = 0; m < mapCollidingPossible.length; ++m) {
                             msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
                         }
-                        let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
-                        let xIndex2 = island[j]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
                         let id1 = oxAxis[xIndex1].id;
                         let id2 = oxAxis[xIndex2].id;
                         let e1 = entities[id1];
                         let e2 = entities[id2];
                         msg += `\n\tEntity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
                         msg += `\n\tEntity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
-                        msg += `\n\tColliding on ${axis} axis, at t = ${r.toFixed(10)}`;
+                        msg += `\n\tColliding on ${axis} axis, at t = ${rr.toFixed(10)}`;
                         console.log(msg);
                     }
                     // \DEBUG
 
-                    let subIslandI = Phase3.getSubIsland(i, axis,
+                    let subIslandI = Phase3.getSubIsland(ii, axis,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         subIslandsX, subIslandsY, subIslandsZ);
 
-                    let subIslandJ = Phase3.getSubIsland(j, axis,
+                    let subIslandJ = Phase3.getSubIsland(jj, axis,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
@@ -307,7 +318,7 @@ class RigidBodies {
                         console.log('\tApplying collision...');
                     let eps = 1e-6;
                     Phase3.applyCollision(
-                        i, j, r, axis,
+                        ii, jj, rr, axis,
                         island, oxAxis, entities, relativeDt, eps);
 
                     // 1. apply step to newSubIsland
@@ -340,7 +351,7 @@ class RigidBodies {
                     let oldLength = mapCollidingPossible.length;
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
-                        i, j, r, axis, subIslandI, subIslandJ, //newSubIsland,
+                        ii, jj, rr, axis, subIslandI, subIslandJ, //newSubIsland,
                         entities,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
@@ -349,8 +360,8 @@ class RigidBodies {
                     if (mapCollidingPossible.length >= oldLength)
                         reloop = true;
                     if (debugFlag && complicatedFlag) {
-                        let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
-                        let xIndex2 = island[j]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                        let xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
                         let id1 = oxAxis[xIndex1].id;
                         let id2 = oxAxis[xIndex2].id;
                         let e1 = entities[id1];
@@ -364,7 +375,7 @@ class RigidBodies {
                     if (debugFlag && complicatedFlag)
                         console.log('\tMerging sub-islands...');
                     Phase3.mergeSubIslands(
-                        i, j, subIslandI, subIslandJ,
+                        ii, jj, subIslandI, subIslandJ,
                         objectIndexInIslandToSubIslandXIndex,
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
@@ -373,7 +384,7 @@ class RigidBodies {
                         console.log('\tMerged!');
                 }
                 // console.log('Solveth!');
-            });
+            } // );
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
             //    smoothly slice along constrained boundaries until component is extinct.

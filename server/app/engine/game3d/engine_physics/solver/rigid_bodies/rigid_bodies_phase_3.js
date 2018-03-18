@@ -41,7 +41,7 @@ class RigidBodiesPhase3 {
         fw, relativeDt)
     {
         // Check for snapping on first trajectory.
-        let dbg = false; // TODO [HIGH] solve this farther entity problem.
+        let dbg = true; // TODO [HIGH] solve this farther entity problem.
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
         if (p10 < p11 && a1 * relativeDt * relativeDt + b1 * relativeDt + p10 < p11 ||
             p10 > p11 && p11 < a1 * relativeDt * relativeDt + b1 * relativeDt + p10)
@@ -65,10 +65,9 @@ class RigidBodiesPhase3 {
         // if (a1 !== a2)
         // else if (b1 !== b2)
         //     rp12 = (fw * w1 + fw * w2 + p10 - p20) / (b2 - b1);
-        const debug = false;
         if (rp12 === 0)
         {
-            if (debug) console.log('[SecondOrder] Unlikely zero output from babylon solver...');
+            if (dbg) console.log('[SecondOrder] Unlikely zero output from babylon solver...');
         }
 
         // Both trajectories should not be snapped at the same time.
@@ -110,7 +109,7 @@ class RigidBodiesPhase3 {
 
         if (rp12 === 0)
         {
-            if (debug) console.log('[SecondOrder] Zero-collision.');
+            if (dbg) console.log('[SecondOrder] Zero-collision.');
         }
 
         // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
@@ -179,7 +178,7 @@ class RigidBodiesPhase3 {
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
                 if (xm && ym && zm) {
-                    console.log('[Phase III - PostCollision] Full 3D clip clipped.');
+                    console.log('[Phase III - PostCollision] Full 3D clip detected.');
                     continue;
                 }
                 if (!xm + !ym + !zm !== 1) {
@@ -309,7 +308,7 @@ class RigidBodiesPhase3 {
                 let debugCollision = false;
                 // TODO [CRIT] reset this debug flag
                 if (xm && ym && zm) {
-                    if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip clipped.');
+                    if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip detected.');
                     // mapCollidingPossible.push([i, j, 0]);
                     continue;
                 }

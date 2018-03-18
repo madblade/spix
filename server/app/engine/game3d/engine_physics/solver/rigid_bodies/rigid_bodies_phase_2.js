@@ -89,6 +89,11 @@ class RigidBodiesPhase2 {
                 }
             }
         }
+
+        let dbg = true;
+        if (dbg)
+            for (let i = 0; i < islands.length; ++i)
+                islands[i].sort();
     }
 
     /**

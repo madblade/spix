@@ -74,12 +74,20 @@ class RigidBodiesPhase5 {
                 }
                 entityUpdated = true;
             }
+
             if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {
                 currentEntity.v0 = currentEntity.v1;
+                // Velocity updates not visible by clients.
                 entityUpdated = true;
             }
+
+            for (let axis = 0; axis < 3; ++axis)
+                if (currentEntity.v0[axis] !== 0 && p0[axis] === p1[axis])
+                    currentEntity.v0[axis] = 0;
+
             if (a0[0] !== a1[0] || a0[1] !== a1[1] || a0[2] !== a1[2]) {
                 currentEntity.a0 = currentEntity.a1;
+                // Acceleration updates not visible by clients.
                 entityUpdated = true;
             }
 
