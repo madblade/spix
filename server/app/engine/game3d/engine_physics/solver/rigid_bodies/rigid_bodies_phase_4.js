@@ -353,7 +353,7 @@ class RigidBodiesPhase4 {
                     // && currentAxis === axis
                 )
                 {
-                    // mapCollidingPossible.splice(k, 1);
+                    mapCollidingPossible.splice(k, 1);
                     currentIsInvalid = true;
                     break;
                 }
@@ -367,7 +367,7 @@ class RigidBodiesPhase4 {
                         // && currentAxis === axis
                     )
                     {
-                        // mapCollidingPossible.splice(k, 1);
+                        mapCollidingPossible.splice(k, 1);
                         break;
                     }
                 }

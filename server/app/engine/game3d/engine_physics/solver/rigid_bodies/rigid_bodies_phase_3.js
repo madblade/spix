@@ -153,8 +153,8 @@ class RigidBodiesPhase3 {
                             iInNewSubIsland && !jInNewSubIsland;
                 if (!goOn) {
                     // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
-                    if (terrain.indexOf(xIndexJ) < 0 && terrain.indexOf(xIndexI) < 0)
-                        continue;
+                    // if (terrain.indexOf(j) < 0 && terrain.indexOf(i) < 0)
+                    //     continue;
                 }
 
                 let id2 = oxAxis[xIndexJ].id;

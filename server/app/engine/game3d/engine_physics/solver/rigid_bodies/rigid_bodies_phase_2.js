@@ -90,7 +90,7 @@ class RigidBodiesPhase2 {
             }
         }
 
-        let dbg = true;
+        let dbg = false;
         if (dbg)
             for (let i = 0; i < islands.length; ++i)
                 islands[i].sort();
