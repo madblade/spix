@@ -6,6 +6,8 @@
 
 import PortalFragment  from './portal/portal.fragment.glsl';
 import PortalVertex    from './portal/portal.vertex.glsl';
+import SkyFragment     from './sky/sky.fragment.glsl';
+import SkyVertex       from './sky/sky.vertex.glsl';
 
 let ShadersModule = {
 
@@ -14,6 +16,14 @@ let ShadersModule = {
     },
 
     getPortalFragmentShader() {
+        return PortalFragment;
+    },
+
+    getSkyVertexShader() {
+        return PortalVertex;
+    },
+
+    getSkyFragmentShader() {
         return PortalFragment;
     }
 
