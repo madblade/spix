@@ -24,7 +24,7 @@ class Generator {
             let x = world.xSize;
             let y = world.ySize;
             let z = world.zSize;
-            let chunkMap = WorldGenerator.generateFlatWorld(x, y, z, world);
+            let chunkMap = WorldGenerator.generateInitialWorld(x, y, z, world);
 
             // Affect chunks.
             world.allChunks = chunkMap;

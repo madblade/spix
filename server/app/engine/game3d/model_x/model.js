@@ -116,7 +116,7 @@ class XModel {
             let zS = newWorld.zSize;
             // TODO [HIGH] Maybe it's not right to generate chunks here.
             let ijk = chunkId.split(',');
-            let newChunk = WorldGenerator.generateFlatChunk(xS, yS, zS, ...ijk, newWorld);
+            let newChunk = WorldGenerator.generateInitialChunk(xS, yS, zS, ...ijk, newWorld);
             newWorld.addChunk(newChunk.chunkId, newChunk);
             this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, offset, orientation, portalId);
             console.log('added world');

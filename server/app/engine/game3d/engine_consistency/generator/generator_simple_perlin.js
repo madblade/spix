@@ -2,7 +2,10 @@
  *
  */
 
+
 'use strict';
+
+import {WorldType, BlockType}        from '../../model_world/model';
 
 class SimplePerlin {
 
@@ -27,20 +30,22 @@ class SimplePerlin {
             204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205,
             93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180];
 
-        for (let i = 0; i < 256; ++i) {
+        for (let i = 0; i < 256; ++i)
             this.p[256 + i] = this.p[i];
-        }
     }
 
-    static fade(t) {
+    static fade(t)
+    {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    static lerp(t, a, b) {
+    static lerp(t, a, b)
+    {
         return a + t * (b - a);
     }
 
-    static grad(hash, x, y, z) {
+    static grad(hash, x, y, z)
+    {
         let h = hash & 15;
         let u = h < 8 ? x : y;
         let v = h < 4 ? y : h === 12 || h === 14 ? x : z;
@@ -93,63 +98,170 @@ class SimplePerlin {
         );
     }
 
-    static simplePerlinGeneration(chunk, shuffleChunks, worldId) {
+    static simplePerlinGeneration(chunk, shuffleChunks, worldId, worldType) {
         let dims = chunk.dimensions;
         const dx = dims[0];
         const dy = dims[1];
         const dz = dims[2];
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
-        // const ck = chunk.chunkK;
+        const ck = chunk.chunkK;
         const offsetX = dx * ci;
         const offsetY = dy * cj;
-        // const offsetZ = dz * ck;
+        const offsetZ = dz * ck;
 
-        // Fill with grass on main world, sand everywhere else.
-        const mainBlockId = parseInt(worldId, 10) === -1 ? 1 : 17;
+        const abs = Math.abs;
 
-        let perlin = new SimplePerlin();
+        // Create blocks.
         let blocks = new Uint8Array(dx * dy * dz);
 
-        let data = [];
-        let quality = 2;
-        const ijS = dx * dy;
-        const z = shuffleChunks ? Math.random() * 100 : 50;
+        const air = BlockType.AIR;
+        const stone = BlockType.STONE;
+        const grass = BlockType.GRASS;
+        const iron = BlockType.IRON;
+        const sand = BlockType.SAND;
 
-        for (let j = 0; j < 4; ++j)
-        {
-            if (j === 0) for (let i = 0; i < ijS; ++i) data[i] = 0;
+        // Detect cube or flat world.
+        let directions = [];
+        switch (worldType) {
+            case WorldType.FLAT:
+                directions.push(3); // === z (starting at 1 for signa)
+                // 1: x, 2: y, 3: z, 4: full, 5: empty
+                break;
+            case WorldType.CUBE:
+                const center = {x:0, y:0, z:-5};
+                const radius = 5;
 
-            for (let i = 0; i < ijS; ++i) {
-                let x = offsetX + i % dx;
-                let y = offsetY + (i / dx | 0); // / priority > | priority
-                data[i] += perlin.noise(x / quality, y / quality, z) * quality;
-            }
-
-            quality *= 4;
-        }
-
-        function getY(x, y) {
-            return data[x + y * dx] * 0.2 | 0; // * priority > | priority
-        }
-
-        for (let x = 0; x < dx; ++x) {
-            for (let y = 0; y < dy; ++y) {
-                let h = 16 + getY(x, y);
-                const rock = Math.floor(5 * h / 6);
-                let xy = x + y * dx;
-
-                for (let zz = 0; zz < rock; ++zz) {
-                    // Rock.
-                    blocks[ijS * zz + xy] = 2;
-
-                    // Iron.
-                    if (Math.random() > 0.99) blocks[ijS * zz + xy] = 18;
+                const deltaX = center.x - ci;
+                const deltaY = center.y - cj;
+                const deltaZ = center.z - ck;
+                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius) {
+                    blocks.fill(air);
+                    chunk.blocks = blocks;
+                    return; // Blocks are filled with zeros.
+                }
+                if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
+                    blocks.fill(stone);
+                    chunk.blocks = blocks;
+                    return;
                 }
 
-                // Grass.
-                for (let zz = rock; zz < h; ++zz) {
-                    blocks[ijS * zz + xy] = mainBlockId;
+                if (deltaX === radius)
+                    directions.push(-1);
+                else if (center.x + ci === radius)
+                    directions.push(1);
+                if (deltaY === radius)
+                    directions.push(-2);
+                else if (center.y + cj === radius)
+                    directions.push(2);
+                if (deltaZ === radius)
+                    directions.push(-3);
+                else if (center.z + ck === radius)
+                    directions.push(3);
+                break;
+        }
+
+        // Fill with grass on main world, sand everywhere else.
+        const mainBlockId = parseInt(worldId, 10) === -1 ? grass : sand;
+        const ijS = dx * dy;
+
+        if (directions.length === 3) {
+            // Eighth-full generation.
+            for (let lx = dx / 2, i = directions[0] > 0 ? 0 : lx, cx = 0; cx < lx; ++cx, ++i) {
+                for (let ly = dy / 2, j = directions[1] > 0 ? 0 : ly, cy = 0; cy < ly; ++cy, ++j)
+                    for (let lz = dz / 2, k = directions[2] > 0 ? 0 : lz, cz = 0; cz < lz; ++cz, ++k)
+                        blocks[i + j * dx + k * ijS] = grass;
+            }
+        } else if (directions.length === 2) {
+            // Quarter-full generation.
+            // 1 or 2, then 2 or 3!
+            for (let a1 = abs(directions[0]), l1 = a1 === 1 ? dx / 2 : dy / 2, ij = directions[0] > 0 ? 0 : l1, c1 = 0; c1 < l1; ++c1, ++ij)
+                for (let a2 = abs(directions[2]), l2 = a2 === 2 ? dy / 2 : dz / 2, jk = directions[1] > 0 ? 0 : l2, c2 = 0; c2 < l2; ++c2, ++jk)
+                {
+                    if (a1 > 1) {
+                        const ijk = ij * dx + jk * ijS;
+                        for (let x = 0; x < dx; ++x)
+                            blocks[x + ijk] = grass;
+                    }
+                    else if (a2 > 2) {
+                        const ijk = ij + jk * ijS;
+                        for (let y = 0; y < dy; ++y)
+                            blocks[ijk + y * dx] = grass;
+                    }
+                    else {
+                        const ijk = ij + jk * dx;
+                        for (let z = 0; z < dz; ++z)
+                            blocks[ijk + z * ijS] = grass;
+                    }
+                }
+        } else {
+            // Perlin generation.
+            let perlin = new SimplePerlin();
+
+            const v1 = directions[0]; // For signum & value.
+            const a1 = abs(v1);
+            let [d1, d2, d3, normalSize, offset1, offset2, perm] =
+                a1 > 2 ?
+                    [dx, dy, dz, dx * dy, offsetX, offsetY, 0] :
+                a1 > 1 ?
+                    [dx, dz, dy, dx * dz, offsetX, offsetZ, 1] :
+                    [dy, dz, dx, dy * dz, offsetY, offsetZ, 2]; // Can factor normalSize outside.
+
+            // let normalSize = a1 > 2 ? dx * dy : a1 > 1 ? dx * dz : dy * dz;
+
+            let data = [];
+            let quality = 2;
+            // const z = shuffleChunks ? Math.random() * 100 : 50;
+            const z = shuffleChunks ? Math.random() * d3 : Math.floor(d3 / 2);
+
+            for (let iteration = 0; iteration < 4; ++iteration)
+            {
+                if (iteration === 0) for (let i = 0; i < normalSize; ++i) data[i] = 0;
+
+                for (let i = 0; i < normalSize; ++i) {
+                    let x = offset1 + i % d1;
+                    let y = offset2 + (i / d1 | 0); // / priority > | priority
+                    data[i] += perlin.noise(x / quality, y / quality, z) * quality;
+                }
+
+                quality *= 4;
+            }
+
+            let getY = function(x, y) {
+                return data[x + y * d1] * 0.2 | 0; // * priority > | priority
+            };
+
+            for (let x = 0; x < d1; ++x) {
+                for (let y = 0; y < d2; ++y) {
+                    let h = d3 / 2 + getY(x, y);
+                    const rockLevel = Math.floor(5 * h / 6);
+                    let xy = perm === 0 ? x + y * d1 :
+                             perm === 1 ? x + y * d1 * d2 :
+                                          x * d1 + y * d1 * d2;
+
+                    let fz = v1 > 0 ?
+                        (perm === 0 ? (zed => xy + normalSize * zed) :
+                         perm === 1 ? (zed => xy + zed * d1) :
+                                      (zed => xy + zed)) :
+                        (perm === 0 ? (zed => xy + normalSize * (d3 - zed)) :
+                         perm === 1 ? (zed => xy + (d3 - zed) * d1) :
+                                      (zed => xy + (d3 - zed)));
+
+                    for (let zz = 0; zz < rockLevel; ++zz) {
+                        const currentBlock = fz(zz); // ijS * zz + xy;
+
+                        // Rock.
+                        blocks[currentBlock] = stone;
+
+                        // Iron.
+                        if (Math.random() > 0.99) blocks[currentBlock] = iron;
+                    }
+
+                    for (let zz = rockLevel; zz < h; ++zz) {
+                        // Grass or sand.
+                        const currentBlock = fz(zz);
+                        blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                    }
                 }
             }
         }

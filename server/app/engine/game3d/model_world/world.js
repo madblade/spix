@@ -6,10 +6,11 @@
 
 class World {
 
-    constructor(id, worldModel)
+    constructor(id, worldType, worldModel)
     {
         this._worldId = id; // Identifier
         this._worldModel = worldModel;
+        this._worldType = worldType;
 
         // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = new Map();
@@ -18,12 +19,13 @@ class World {
         this._generationMethod = 'flat';
 
         // Constants
-        this._xSize = 16;
-        this._ySize = 16;
-        this._zSize = 32;
+        this._xSize = 16; // MUST BE EVEN (ideally a power of two)
+        this._ySize = 16; // MUST BE EVEN (ideally a power of two)
+        this._zSize = 32; // MUST BE EVEN (ideally a power of two)
     }
 
     get worldId() { return this._worldId; }
+    get worldType() { return this._worldType; }
 
     get xSize() { return this._xSize; }
     get ySize() { return this._ySize; }
@@ -69,7 +71,7 @@ class World {
         const chunkId = `${i},${j},${k}`;
         let chunk = this._chunks.get(chunkId);
         if (!chunk || chunk === undefined) {
-            console.log(`ChkMgr@whatBlock: could not find chunk ${chunkId} from ${x},${y},${z}`);
+            console.log(`ChkMgr@whatBlock: could not find chunk ${chunkId} from (${x},${y},${z})!`);
             // TODO [MEDIUM] load concerned chunk.
             // TODO [MEDIUM] check minus
             return;

@@ -55,7 +55,7 @@ class ChunkLoader {
             if (!chunksInModel.has(currentChunkId)) { // TODO [LOW] worldify or delegate to consistency updater (better).
                 if (ChunkLoader.debug)
                     console.log(`We should generate ${currentChunkId} for the user.`);
-                let chunk = WorldGenerator.generateFlatChunk(dx, dy, dz, currentChunkId, world);
+                let chunk = WorldGenerator.generateInitialChunk(dx, dy, dz, currentChunkId, world);
                 chunksInModel.set(currentChunkId, chunk);
             }
 

@@ -22,31 +22,42 @@ class FaceLinker {
 
         const dd = deltaI + 3 * deltaJ + 9 * deltaK;
 
+        // console.log(`finding ${dd}, ${deltaI} + 3 ${deltaJ} + 9 ${deltaK}...`);
         switch (dd) {
             //case 0: 	break;
             case 1:     return 17;
             //case 2: 	break;
+
             case 3:     return 12;
             case 4:     return 5;
             case 5:     return 10;
+
             //case 6: 	break;
             case 7:     return 16;
             //case 8: 	break;
+
+
             case 9:     return 9;
             case 10:    return 3;
             case 11:    return 8;
+
             case 12:    return 1;
             //case 13: 	break;
             case 14:    return 0;
+
             case 15:    return 7;
             case 16:    return 2;
             case 17:    return 6;
+
+
             //case 18: 	break;
             case 19:    return 15;
-            case 20:    return 4;
+            //case 20:    return 4;
+
             case 21:    return 13;
-            //case 22: 	break;
+            case 22: 	return 4;
             case 23:    return 11;
+
             //case 24: 	break;
             case 25:    return 14;
             //case 26: 	break;
@@ -125,7 +136,11 @@ class FaceLinker {
         }
         else {
             const n = FaceLinker.findN(ci, cj, ck, ci$, cj$, ck$);
-            bs = neighbourBlocks[n][ijk$];
+            try {
+                bs = neighbourBlocks[n][ijk$];
+            } catch (e) {
+                throw Error('Undefined neighbour ' + n);
+            }
             // console.log(indexS + "|" + indexD + " : "
             // +i$+ "," +j$+ "," +k$+ "  " + ijk$ + " | " + n + " | " + bs);
         }

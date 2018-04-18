@@ -11,7 +11,8 @@ class Chunk {
 
     static debug = false;
 
-    constructor(xSize, ySize, zSize, chunkId, world) {
+    constructor(xSize, ySize, zSize, chunkId, world)
+    {
         // App.
         this._world = world;
 

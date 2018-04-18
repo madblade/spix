@@ -59,7 +59,7 @@ class ChunkBuilder {
         let world = chunk.world;
 
         switch (direction) {
-            case 0: return world.getChunk(i + 1, j, k);      // x+
+            case 0:  return world.getChunk(i + 1, j, k);     // x+
             case 1:  return world.getChunk(i - 1, j, k);     // x-
             case 2:  return world.getChunk(i, j + 1, k);     // y+
             case 3:  return world.getChunk(i, j - 1, k);     // y-

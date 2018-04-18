@@ -355,7 +355,7 @@ class CSFX {
 
     static getNeighbourChunks(neighbourChunks, chunk, neighbourBlocks) {
         //neighbourChunks.push();
-        for (let i = 0; i < 17; ++i) {
+        for (let i = 0; i < 18; ++i) {
             neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
         }
