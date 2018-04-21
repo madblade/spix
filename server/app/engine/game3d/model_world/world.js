@@ -10,7 +10,12 @@ class World {
     {
         this._worldId = id; // Identifier
         this._worldModel = worldModel;
-        this._worldType = worldType;
+        // this._worldType = worldType;
+        this._worldInfo = {
+            type: worldType,
+            center: {x: 0, y: 0, z: -2},
+            radius: 2
+        };
 
         // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = new Map();
@@ -21,11 +26,12 @@ class World {
         // Constants
         this._xSize = 16; // MUST BE EVEN (ideally a power of two)
         this._ySize = 16; // MUST BE EVEN (ideally a power of two)
-        this._zSize = 32; // MUST BE EVEN (ideally a power of two)
+        this._zSize = 16; // MUST BE EVEN (ideally a power of two)
     }
 
     get worldId() { return this._worldId; }
-    get worldType() { return this._worldType; }
+    // get worldType() { return this._worldType; }
+    get worldInfo() { return this._worldInfo; }
 
     get xSize() { return this._xSize; }
     get ySize() { return this._ySize; }
@@ -83,9 +89,9 @@ class World {
     getFreePosition() {
         let zLimit = this._zSize;
         let z = zLimit - 2;
-        while (this.whatBlock(4, 4, z) !== 0 &&
-            this.whatBlock(4, 4, z + 1) !== 0 && z + 1 < zLimit) ++z;
-        return [4.5, 4.5, z];
+        while (this.whatBlock(6, 6, z) !== 0 &&
+            this.whatBlock(6, 6, z + 1) !== 0 && z + 1 < zLimit) ++z;
+        return [6.5, 6.5, z];
     }
 
     getChunk(iCoordinate, jCoordinate, kCoordinate) {

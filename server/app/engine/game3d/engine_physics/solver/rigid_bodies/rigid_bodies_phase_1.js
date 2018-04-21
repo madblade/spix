@@ -95,7 +95,7 @@ class RigidBodiesPhase1 {
      */
     static processGlobalEvents(
         entities,
-        worldId,
+        world, worldId,
         relativeDt,
         oxAxis,
         leapfrogArray,
@@ -160,7 +160,7 @@ class RigidBodiesPhase1 {
             let r = currentEntity.r; // Rotation.
             const maxV = currentEntity.getVelocity();
             const factor = Math.sqrt(maxV * 1.05);
-            let g = rigidBodiesSolver.getGravity(worldId, p0[0], p0[1], p0[2]);
+            let g = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
             // console.log(vector);

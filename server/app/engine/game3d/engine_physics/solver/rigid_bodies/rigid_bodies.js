@@ -22,12 +22,12 @@ class RigidBodies {
     {
         //
         this._gravity = [0, 0, 2 * -0.00980665];
-        //this._gravity = [0, 0, 0];
+        // this._gravity = [0, 0, 0];
         this._globalTimeDilatation = 25;
         //this._globalTimeDilatation = 0.05;
         this._refreshRate = refreshRate;
 
-        this._variableGravity = false;
+        this._variableGravity = true;
         this._worldCenter = [0, 0, -100];
         //
     }
@@ -38,16 +38,31 @@ class RigidBodies {
     get refreshRate() { return this._refreshRate; }
 
     // Advanced gravity management.
-    getGravity(worldId, x, y, z) {
+    getGravity(world, worldId, x, y, z) {
         if (this._variableGravity && parseInt(worldId, 10) === -1)
         {
-            let direction = [0, 0, 0];
-            let distance = 0;
-            let center = this._worldCenter;
+            // let direction = [0, 0, 0];
+            // let distance = 0;
+            let center = world.worldInfo.center; // this._worldCenter;
+            let abs = Math.abs;
+            let max = Math.max;
+            const sX = world.xSize;
+            const sY = world.ySize;
+            const sZ = world.zSize;
+            const cX = sX * center.x + sX / 2;
+            const cY = sY * center.y + sY / 2;
+            const cZ = sZ * center.z + sZ / 2;
 
-            direction[0] = center[0] - x;
-            direction[1] = center[1] - y;
-            direction[2] = center[2] - z;
+            const dX = abs(x - cX);
+            const dY = abs(y - cY);
+            const dZ = abs(z - cZ);
+            const xPlus = x > cX;
+            const yPlus = y > cY;
+            const zPlus = z > cZ;
+
+            // direction[0] = center[0] - x;
+            // direction[1] = center[1] - y;
+            // direction[2] = center[2] - z;
 
             // TODO [LOW] compute attractor mass and force intensity
             // Keep in mind Gauss' Flow Theorem which states that
@@ -55,17 +70,26 @@ class RigidBodies {
             // to the min of (object position, attractor surface)
             // yielding 4/3 PI min(center-pos, attr radius)^3
 
-            distance += (x - center[0]) * (x - center[0]);
-            distance += (y - center[1]) * (y - center[1]);
-            distance += (z - center[2]) * (z - center[2]);
+            // distance += (x - center[0]) * (x - center[0]);
+            // distance += (y - center[1]) * (y - center[1]);
+            // distance += (z - center[2]) * (z - center[2]);
 
-            if (distance === 0)
-                return [0, 0, 0];
+            // if (distance === 0)
+            //     return [0, 0, 0];
 
-            for (let i = 0; i < 3; ++i)
-                direction[i] /= distance * distance; // Affectation occurs last.
+            // for (let i = 0; i < 3; ++i)
+            //     direction[i] /= distance * distance; // Affectation occurs last.
 
-            return direction;
+            const thirdFactor = this._gravity[2];
+            if (dX > max(dY, dZ))
+                return [(xPlus ? 1 : -1) * thirdFactor, 0, 0];
+            else if (dY > max(dX, dZ))
+                return [0, (yPlus ? 1 : -1) * thirdFactor, 0];
+            else if (dZ > max(dX, dY))
+                return [0, 0, (zPlus ? 1 : -1) * thirdFactor];
+            else return [0, 0, 0]; // this._gravity; // -z by default...
+
+            // return direction;
         }
         return this._gravity;
     }
@@ -137,7 +161,7 @@ class RigidBodies {
 
             // GLOBAL EVENTS, INPUTS & COMPUTATIONS.
             let leapfrogArray = new Array(oxAxis.length);
-            Phase1.processGlobalEvents(entities, worldId, relativeDt, oxAxis, leapfrogArray, passId, this);
+            Phase1.processGlobalEvents(entities, world, worldId, relativeDt, oxAxis, leapfrogArray, passId, this);
 
             // Sort entities according to incremental term.
             // TODO [OPT] ideally, use states
@@ -411,34 +435,34 @@ class RigidBodies {
     }
 
     // Legacy.
-    linearSolve(orderer, entity, em, wm, xm, world, dt) {
-        if (!entity || !entity.rotation) return;
-        const theta = entity.rotation[0];
-        const ds = entity.directions;
-        const pos = entity.position;
-        let impulseSpeed = [0, 0, 0];
-        let force = [0, 0, 0];
-        this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-        this.sumGlobalFields(force, pos, entity);
+    // linearSolve(orderer, entity, em, wm, xm, world, dt) {
+    //     if (!entity || !entity.rotation) return;
+    //     const theta = entity.rotation[0];
+    //     const ds = entity.directions;
+    //     const pos = entity.position;
+    //     let impulseSpeed = [0, 0, 0];
+    //     let force = [0, 0, 0];
+    //     this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+    //     this.sumGlobalFields(force, pos, entity);
         // RigidBodies.sumLocalFields(force, pos, EM);
-        let hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
-        return hasUpdated;
-    }
+    //     let hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
+    //     return hasUpdated;
+    // }
 
-    quadraticSolve(entity, em, wm, xm, world, dt) {
-        const theta = entity.rotation[0];
-        const ds = entity.directions;
-        const pos = entity.position;
-        let impulseSpeed = [0, 0, 0];
-        let force = [0, 0, 0];
-        let hasUpdated = false;
-        this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-        this.sumGlobalFields(force, pos, entity);
-        this.sumLocalFields(force, pos, em);
+    // quadraticSolve(entity, em, wm, xm, world, dt) {
+    //     const theta = entity.rotation[0];
+    //     const ds = entity.directions;
+    //     const pos = entity.position;
+    //     let impulseSpeed = [0, 0, 0];
+    //     let force = [0, 0, 0];
+    //     let hasUpdated = false;
+        // this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+        // this.sumGlobalFields(force, pos, entity);
+        // this.sumLocalFields(force, pos, em);
         // TODO [TEST] n^2 engine
-        hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, world, xm);
-        return hasUpdated;
-    }
+        // hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, world, xm);
+        // return hasUpdated;
+    // }
 
     static add(result, toAdd) {
         result[0] += toAdd[0];
@@ -449,85 +473,85 @@ class RigidBodies {
     // TODO [CRIT] rename to FreeForwardVector
     // TODO [CRIT] implement constrained 2D-3D rotation need vector.
 
-    computeDesiredSpeed(entity, speed, theta, ds, dt) {
-        let desiredSpeed = [0, 0, 0];
-        const gravity = this.gravity;
-        const pi4 = Math.PI / 4;
-
-        if (ds[0] && !ds[3]) // forward quarter
-        {
-            let theta2 = theta;
-            if (ds[1] && !ds[2]) // right
-                theta2 -= pi4;
-            else if (ds[2] && !ds[1]) // left
-                theta2 += pi4;
-            desiredSpeed[0] = -Math.sin(theta2);
-            desiredSpeed[1] = Math.cos(theta2);
-        }
-        else if (ds[3] && !ds[0]) // backward quarter
-        {
-            let theta2 = theta;
-            if (ds[1] && !ds[2]) // right
-                theta2 += pi4;
-            else if (ds[2] && !ds[1]) // left
-                theta2 -= pi4;
-            desiredSpeed[0] = Math.sin(theta2);
-            desiredSpeed[1] = -Math.cos(theta2);
-        }
-        else if (ds[1] && !ds[2]) // exact right
-        {
-            desiredSpeed[0] = Math.cos(theta);
-            desiredSpeed[1] = Math.sin(theta);
-        }
-        else if (ds[2] && !ds[1]) // exact left
-        {
-            desiredSpeed[0] = -Math.cos(theta);
-            desiredSpeed[1] = -Math.sin(theta);
-        }
-
-        let godMode = false;
-        if (godMode) {
-            desiredSpeed[2] = ds[4] && !ds[5] ?
-                1 :
-                ds[5] && !ds[4] ? -1 : 0;
-        } else
-            if (ds[4] && !ds[5]) {
-                for (let i = 0; i < 3; ++i) {
-                    if (gravity[i] < 0 && entity.adherence[i]) {
-                        entity.acceleration[i] = 3.3 / dt;
-                        entity.jump(i); // In which direction I jump
-                    }
-                }
-                for (let i = 3; i < 6; ++i) {
-                    if (gravity[i - 3] > 0 && entity.adherence[i]) {
-                        entity.acceleration[i - 3] = -3.3 / dt;
-                        entity.jump(i); // In which direction I jump
-                    }
-                }
-            }
-
-        desiredSpeed[0] *= 0.65;
-        desiredSpeed[1] *= 0.65;
-        desiredSpeed[2] *= 0.65;
-
-        RigidBodies.add(speed, desiredSpeed);
-    }
-
-    sumGlobalFields(force, pos, entity) {
-        // Gravity
-        let g = this.gravity;
-        let m = entity.mass;
-        let sum = [g[0] * m, g[1] * m, g[2] * m];
-
-        // sum[2] = 0; // ignore grav
-
-        RigidBodies.add(force, sum);
-    }
-
-    sumLocalFields(force/*, pos, EM*/) {
-        let sum = [0, 0, 0];
-        RigidBodies.add(force, sum);
-    }
+    // computeDesiredSpeed(entity, speed, theta, ds, dt) {
+    //     let desiredSpeed = [0, 0, 0];
+    //     const gravity = this.gravity;
+    //     const pi4 = Math.PI / 4;
+    //
+    //     if (ds[0] && !ds[3]) // forward quarter
+    //     {
+    //         let theta2 = theta;
+    //         if (ds[1] && !ds[2]) // right
+    //             theta2 -= pi4;
+    //         else if (ds[2] && !ds[1]) // left
+    //             theta2 += pi4;
+    //         desiredSpeed[0] = -Math.sin(theta2);
+    //         desiredSpeed[1] = Math.cos(theta2);
+    //     }
+    //     else if (ds[3] && !ds[0]) // backward quarter
+    //     {
+    //         let theta2 = theta;
+    //         if (ds[1] && !ds[2]) // right
+    //             theta2 += pi4;
+    //         else if (ds[2] && !ds[1]) // left
+    //             theta2 -= pi4;
+    //         desiredSpeed[0] = Math.sin(theta2);
+    //         desiredSpeed[1] = -Math.cos(theta2);
+    //     }
+    //     else if (ds[1] && !ds[2]) // exact right
+    //     {
+    //         desiredSpeed[0] = Math.cos(theta);
+    //         desiredSpeed[1] = Math.sin(theta);
+    //     }
+    //     else if (ds[2] && !ds[1]) // exact left
+    //     {
+    //         desiredSpeed[0] = -Math.cos(theta);
+    //         desiredSpeed[1] = -Math.sin(theta);
+    //     }
+    //
+    //     let godMode = false;
+    //     if (godMode) {
+    //         desiredSpeed[2] = ds[4] && !ds[5] ?
+    //             1 :
+    //             ds[5] && !ds[4] ? -1 : 0;
+    //     } else
+    //         if (ds[4] && !ds[5]) {
+    //             for (let i = 0; i < 3; ++i) {
+    //                 if (gravity[i] < 0 && entity.adherence[i]) {
+    //                     entity.acceleration[i] = 3.3 / dt;
+    //                     entity.jump(i); // In which direction I jump
+    //                 }
+    //             }
+    //             for (let i = 3; i < 6; ++i) {
+    //                 if (gravity[i - 3] > 0 && entity.adherence[i]) {
+    //                     entity.acceleration[i - 3] = -3.3 / dt;
+    //                     entity.jump(i); // In which direction I jump
+    //                 }
+    //             }
+    //         }
+    //
+    //     desiredSpeed[0] *= 0.65;
+    //     desiredSpeed[1] *= 0.65;
+    //     desiredSpeed[2] *= 0.65;
+    //
+    //     RigidBodies.add(speed, desiredSpeed);
+    // }
+    //
+    // sumGlobalFields(force, pos, entity) {
+    //     // Gravity
+    //     let g = this.gravity;
+    //     let m = entity.mass;
+    //     let sum = [g[0] * m, g[1] * m, g[2] * m];
+    //
+    //     // sum[2] = 0; // ignore grav
+    //
+    //     RigidBodies.add(force, sum);
+    // }
+    //
+    // sumLocalFields(force/*, pos, EM*/) {
+    //     let sum = [0, 0, 0];
+    //     RigidBodies.add(force, sum);
+    // }
 
 }
 

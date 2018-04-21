@@ -28,7 +28,7 @@ const WorldType = Object.freeze({
 
 class WorldModel {
 
-    static serverLoadingRadius = 2;
+    static serverLoadingRadius = 5;
 
     constructor(game)
     {
@@ -46,7 +46,7 @@ class WorldModel {
         let wid  = worldId || CollectionUtils.generateId(this._worlds);
 
         if (this._worlds.has(wid)) return;
-        let w = new World(wid, WorldType.FLAT, this);
+        let w = new World(wid, WorldType.CUBE, this);
         this._worlds.set(wid, w);
 
         return w;

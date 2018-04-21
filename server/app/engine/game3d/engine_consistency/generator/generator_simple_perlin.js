@@ -98,7 +98,7 @@ class SimplePerlin {
         );
     }
 
-    static simplePerlinGeneration(chunk, shuffleChunks, worldId, worldType) {
+    static simplePerlinGeneration(chunk, shuffleChunks, worldId, worldInfo) {
         let dims = chunk.dimensions;
         const dx = dims[0];
         const dy = dims[1];
@@ -120,6 +120,8 @@ class SimplePerlin {
         const grass = BlockType.GRASS;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
+        const planks = BlockType.PLANKS;
+        let worldType = worldInfo.type;
 
         // Detect cube or flat world.
         let directions = [];
@@ -129,12 +131,12 @@ class SimplePerlin {
                 // 1: x, 2: y, 3: z, 4: full, 5: empty
                 break;
             case WorldType.CUBE:
-                const center = {x:0, y:0, z:-5};
-                const radius = 5;
+                let center = worldInfo.center;
+                const radius = worldInfo.radius;
 
-                const deltaX = center.x - ci;
-                const deltaY = center.y - cj;
-                const deltaZ = center.z - ck;
+                const deltaX = center.x - parseInt(ci, 10);
+                const deltaY = center.y - parseInt(cj, 10);
+                const deltaZ = center.z - parseInt(ck, 10);
                 if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius) {
                     blocks.fill(air);
                     chunk.blocks = blocks;
@@ -146,18 +148,20 @@ class SimplePerlin {
                     return;
                 }
 
-                if (deltaX === radius)
-                    directions.push(-1);
-                else if (center.x + ci === radius)
-                    directions.push(1);
-                if (deltaY === radius)
-                    directions.push(-2);
-                else if (center.y + cj === radius)
-                    directions.push(2);
-                if (deltaZ === radius)
-                    directions.push(-3);
-                else if (center.z + ck === radius)
-                    directions.push(3);
+                // TODO [CRIT] manage empty chunks
+
+                // Debug
+                // blocks.fill(air);
+                // chunk.blocks = blocks;
+                // if (true) return;
+
+                if (abs(deltaX) === radius)
+                    directions.push(ci > center.x ? 1 : -1);
+                if (abs(deltaY) === radius)
+                    directions.push(cj > center.y ? 2 : -2);
+                if (abs(deltaZ) === radius)
+                    directions.push(ck > center.z ? 3 : -3);
+
                 break;
         }
 
@@ -170,31 +174,33 @@ class SimplePerlin {
             for (let lx = dx / 2, i = directions[0] > 0 ? 0 : lx, cx = 0; cx < lx; ++cx, ++i) {
                 for (let ly = dy / 2, j = directions[1] > 0 ? 0 : ly, cy = 0; cy < ly; ++cy, ++j)
                     for (let lz = dz / 2, k = directions[2] > 0 ? 0 : lz, cz = 0; cz < lz; ++cz, ++k)
-                        blocks[i + j * dx + k * ijS] = grass;
+                        blocks[i + j * dx + k * ijS] = planks;
             }
-        } else if (directions.length === 2) {
+        }
+        else if (directions.length === 2) {
             // Quarter-full generation.
             // 1 or 2, then 2 or 3!
             for (let a1 = abs(directions[0]), l1 = a1 === 1 ? dx / 2 : dy / 2, ij = directions[0] > 0 ? 0 : l1, c1 = 0; c1 < l1; ++c1, ++ij)
-                for (let a2 = abs(directions[2]), l2 = a2 === 2 ? dy / 2 : dz / 2, jk = directions[1] > 0 ? 0 : l2, c2 = 0; c2 < l2; ++c2, ++jk)
+                for (let a2 = abs(directions[1]), l2 = a2 === 2 ? dy / 2 : dz / 2, jk = directions[1] > 0 ? 0 : l2, c2 = 0; c2 < l2; ++c2, ++jk)
                 {
                     if (a1 > 1) {
                         const ijk = ij * dx + jk * ijS;
                         for (let x = 0; x < dx; ++x)
-                            blocks[x + ijk] = grass;
+                            blocks[x + ijk] = planks;
                     }
                     else if (a2 > 2) {
                         const ijk = ij + jk * ijS;
                         for (let y = 0; y < dy; ++y)
-                            blocks[ijk + y * dx] = grass;
+                            blocks[ijk + y * dx] = planks;
                     }
                     else {
                         const ijk = ij + jk * dx;
                         for (let z = 0; z < dz; ++z)
-                            blocks[ijk + z * ijS] = grass;
+                            blocks[ijk + z * ijS] = planks;
                     }
                 }
-        } else {
+        }
+        else {
             // Perlin generation.
             let perlin = new SimplePerlin();
 
@@ -212,7 +218,7 @@ class SimplePerlin {
             let data = [];
             let quality = 2;
             // const z = shuffleChunks ? Math.random() * 100 : 50;
-            const z = shuffleChunks ? Math.random() * d3 : Math.floor(d3 / 2);
+            const z = 4 * (shuffleChunks ? Math.random() * d3 : Math.floor(d3 / 2));
 
             for (let iteration = 0; iteration < 4; ++iteration)
             {
@@ -227,13 +233,13 @@ class SimplePerlin {
                 quality *= 4;
             }
 
-            let getY = function(x, y) {
-                return data[x + y * d1] * 0.2 | 0; // * priority > | priority
-            };
+            // let getY = function(x, y) {
+            //     return data[x + y * d1] * 0.2 | 0; // * priority > | priority
+            // };
 
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
-                    let h = d3 / 2 + getY(x, y);
+                    let h = d3 / 2 + (data[x + y * d1] * 0.2 | 0); // getY(x, y);
                     const rockLevel = Math.floor(5 * h / 6);
                     let xy = perm === 0 ? x + y * d1 :
                              perm === 1 ? x + y * d1 * d2 :
@@ -242,10 +248,11 @@ class SimplePerlin {
                     let fz = v1 > 0 ?
                         (perm === 0 ? (zed => xy + normalSize * zed) :
                          perm === 1 ? (zed => xy + zed * d1) :
-                                      (zed => xy + zed)) :
-                        (perm === 0 ? (zed => xy + normalSize * (d3 - zed)) :
-                         perm === 1 ? (zed => xy + (d3 - zed) * d1) :
-                                      (zed => xy + (d3 - zed)));
+                                      (zed => xy + zed))
+                        :
+                        (perm === 0 ? (zed => xy + normalSize * (d3 - zed - 1)) :
+                         perm === 1 ? (zed => xy + (d3 - zed - 1) * d1) :
+                                      (zed => xy + (d3 - zed - 1)));
 
                     for (let zz = 0; zz < rockLevel; ++zz) {
                         const currentBlock = fz(zz); // ijS * zz + xy;
