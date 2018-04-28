@@ -5,7 +5,7 @@
 'use strict';
 
 import Chunk            from './../../model_world/chunk';
-import WorldType        from './../../model_world/model';
+// import WorldType        from './../../model_world/model';
 
 // import GenTest          from './generator_test.js';
 // import GenAnalytic      from './generator_analytic.js';

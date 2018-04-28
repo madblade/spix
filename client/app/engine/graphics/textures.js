@@ -15,17 +15,17 @@ let TexturesModule = {
 
     loadTexture(whatTexture) {
         let loader = new THREE.TextureLoader();
-        let maxAnisotropy = this.rendererManager.renderer.getMaxAnisotropy();
+        let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
 
         let texture = loader.load(`app/assets/textures/${whatTexture}`);
 
         // TODO [MEDIUM] propose different anisotropy filtering
-        //texture.anisotropy = maxAnisotropy;
-        texture.generateMipmaps = true;
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
+        texture.anisotropy = maxAnisotropy;
+        // texture.generateMipmaps = true;
+        // texture.magFilter = THREE.NearestFilter;
+        // texture.minFilter = THREE.NearestFilter;
         // TODO [MEDIUM] graphical effects
-        //texture.minFilter = THREE.LinearMipMapLinearFilter;
+        // texture.minFilter = THREE.LinearMipMapLinearFilter;
 
         console.log(`Max anisotropy = ${maxAnisotropy}`);
 

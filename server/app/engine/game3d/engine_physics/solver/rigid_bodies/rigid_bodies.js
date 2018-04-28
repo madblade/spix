@@ -4,8 +4,6 @@
 
 'use strict';
 
-import Integrator from './integrator';
-
 import Searcher from '../collision/searcher';
 
 import Phase1 from './rigid_bodies_phase_1';
@@ -13,6 +11,11 @@ import Phase2 from './rigid_bodies_phase_2';
 import Phase3 from './rigid_bodies_phase_3';
 import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
+
+// TODO [HIGH] rotate collision model
+// TODO [HIGH] find angles and interpolate rotation
+// TODO [HIGH] rayleigh
+// TODO [HIGH] p2p interaction
 
 class RigidBodies {
 

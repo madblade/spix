@@ -22,6 +22,13 @@ let ChunksModule = {
             currentNatures = natures[cid];
             break;
         }
+        if (!currentComponent && !currentNatures) {
+            console.log('Got an empty chunk.');
+            currentComponent = [];
+            currentNatures = [];
+        }
+        // console.log(currentComponent);
+        // console.log(currentNatures);
 
         if (!currentComponent) {
             console.log('Warn: missed an update'); return;
