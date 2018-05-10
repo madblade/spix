@@ -128,9 +128,24 @@ extend(Camera.prototype, {
 
     setCameraPosition(x, y, z) {
         let up = this.up;
-        up.position.x = x;
-        up.position.y = y;
-        up.position.z = z - .7999;
+
+        let sin = Math.sin;
+        let cos = Math.cos;
+        let PI = Math.PI;
+        let rup = this.get3DObject().rotation;
+        let theta0 = rup.z + PI;
+        let theta1 = rup.x;
+        let f = 0.7999;
+        // Formula works for 4 out of 6 faces...
+        let upVector = [
+            -f * sin(theta1) * sin(theta0),
+            f * sin(theta1) * cos(theta0),
+            f * cos(theta1)
+        ];
+
+        up.position.x = x + upVector[0];
+        up.position.y = y + upVector[1];
+        up.position.z = z + upVector[2];
     },
 
     setScreen(screen) {

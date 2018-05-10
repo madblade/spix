@@ -32,6 +32,8 @@ class UpdaterBlock {
         let zp = false;
         let zm = false;
 
+        // TODO [LOW] compute surface changes on neighbours
+
         // Update (x+1, x-1) blocks.
         if (x > 0) {
             if (chunk.contains(x - 1, y, z)) {

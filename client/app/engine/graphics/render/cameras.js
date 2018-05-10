@@ -143,7 +143,11 @@ extend(CameraManager.prototype, {
 
     // Update.
     updateCameraPosition(vector) {
-        // TODO remove berk ugly
+        // TODO remove ugly
+        let sin = Math.sin;
+        let cos = Math.cos;
+        let PI = Math.PI;
+
         let cams = [this.mainCamera, this.mainRaycasterCamera];
         this.subCameras.forEach(function(cam) { cams.push(cam); });
         let localRecorder = this.mainCamera.getRecorder();
@@ -151,9 +155,22 @@ extend(CameraManager.prototype, {
         let i = this.graphicsEngine.getCameraInteraction();
 
         // TODO [HIGH] generalize (server-side, comes with collision cross-p)
-        let x = vector[0];
-        let y = vector[1];
-        let z = vector[2] + 1.6;
+        let up = this.mainCamera.get3DObject().rotation;
+        let theta0 = up.z;
+        let theta1 = up.x;
+        let f = 0; // 1.6;
+        let upVector = [
+            f * sin(theta1) * cos(theta0), // theta0 - PI / 2),
+            f * sin(theta1) * sin(theta0), // theta0 - PI / 2),
+            f * cos(theta1)
+        ];
+
+        let x = vector[0] + upVector[0];
+        let y = vector[1] + upVector[1];
+        let z = vector[2] + upVector[2];
+        // let x = vector[0];
+        // let y = vector[1];
+        // let z = vector[2] + 1.6;
         //let z = vector[2];
 
         if (i.isFirstPerson()) {
@@ -200,6 +217,7 @@ extend(CameraManager.prototype, {
         for (let i = 0, l = incoming.length; i < l; ++i) {
             let inc = incoming[i];
             let rot = [0, 0, 0, 0];
+            // TODO [HIGH] put that in fockin update received. FUCK.
             rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
             rotation[0] = rot[0];
             rotation[1] = rot[1];
@@ -310,6 +328,53 @@ extend(CameraManager.prototype, {
         projectionMatrix.elements[10] = c.z + 1.0;
         projectionMatrix.elements[14] = c.w;
     },
+    //
+    // setWrapperRotation(absX, absY) {
+    //     // Rotate main camera.
+    //     let camera = this.mainCamera;
+    //     let rotationZ = camera.getZRotation();
+    //     let rotationX = camera.getXRotation();
+    //
+    //     // Current up vector -> angles.
+    //     let up = camera.get3DObject().rotation;
+    //     let theta0 = up.z;
+    //     let theta1 = up.x;
+    //
+    //     // Rotate raycaster camera.
+    //     let raycasterCamera = this.mainRaycasterCamera;
+    //     raycasterCamera.setZRotation(rotationZ);
+    //     raycasterCamera.setXRotation(rotationX);
+    //
+    //     if (absX !== 0 || absY !== 0) {
+    //         // Add angles.
+    //         theta0 = theta0 + absX;
+    //         theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
+    //         camera.setUpRotation(theta1, 0, theta0);
+    //         raycasterCamera.setUpRotation(theta1, 0, theta0);
+    //     }
+    //
+    //     // Apply transform to portals.
+    //     this.updateCameraPortals(camera, rotationZ, rotationX, theta1, theta0);
+    // },
+
+    setAbsRotation(theta0, theta1) {
+        let camera = this.mainCamera;
+        let raycasterCamera = this.mainRaycasterCamera;
+        theta1 = Math.max(0, Math.min(Math.PI, theta1));
+        camera.setUpRotation(theta1, 0, theta0); // TODO smoothly modify orientation
+        raycasterCamera.setUpRotation(theta1, 0, theta0);
+    },
+
+    setRelRotation(theta0, theta1) {
+        let camera = this.mainCamera;
+        let raycasterCamera = this.mainRaycasterCamera;
+        // let rotationZ = camera.getZRotation();
+        // let rotationX = camera.getXRotation();
+        raycasterCamera.setZRotation(theta0);
+        raycasterCamera.setXRotation(theta1);
+        camera.setZRotation(theta0);
+        camera.setXRotation(theta1);
+    },
 
     moveCameraFromMouse(relX, relY, absX, absY) {
         // Rotate main camera.
@@ -331,10 +396,11 @@ extend(CameraManager.prototype, {
 
         if (absX !== 0 || absY !== 0) {
             // Add angles.
-            theta0 = theta0 + absX;
-            theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
-            camera.setUpRotation(theta1, 0, theta0);
-            raycasterCamera.setUpRotation(theta1, 0, theta0);
+            this.setAbsRotation(theta0 + absX, theta1 + absY);
+            // theta0 = theta0 + absX;
+            // theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
+            // camera.setUpRotation(theta1, 0, theta0);
+            // raycasterCamera.setUpRotation(theta1, 0, theta0);
         }
 
         // Apply transform to portals.

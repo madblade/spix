@@ -20,11 +20,12 @@ import Phase5 from './rigid_bodies_phase_5';
 class RigidBodies {
 
     static eps = .00000001;// .00001;
+    static gravityConstant = 2 * -0.00980665;
 
     constructor(refreshRate)
     {
         //
-        this._gravity = [0, 0, 2 * -0.00980665];
+        this._gravity = [0, 0, RigidBodies.gravityConstant];
         // this._gravity = [0, 0, 0];
         this._globalTimeDilatation = 25;
         //this._globalTimeDilatation = 0.05;
@@ -83,14 +84,40 @@ class RigidBodies {
             // for (let i = 0; i < 3; ++i)
             //     direction[i] /= distance * distance; // Affectation occurs last.
 
-            const thirdFactor = this._gravity[2];
-            if (dX > max(dY, dZ))
-                return [(xPlus ? 1 : -1) * thirdFactor, 0, 0];
-            else if (dY > max(dX, dZ))
-                return [0, (yPlus ? 1 : -1) * thirdFactor, 0];
-            else if (dZ > max(dX, dY))
-                return [0, 0, (zPlus ? 1 : -1) * thirdFactor];
-            else return [0, 0, 0]; // this._gravity; // -z by default...
+            // console.log(cX + ',' + cY + ',' + cZ + ' ; ' + x + ',' + y + ',' + z);
+            // console.log(res[0].toFixed(10) + ',' + res[1].toFixed(10) + ',' + res[2].toFixed(10));
+
+            // TODO [MILESTONE0] gravity gp
+            let squaredWithSmoothBorders = false;
+            let squaredRadius = 2;
+            if (squaredWithSmoothBorders) {
+                const thirdFactor = RigidBodies.gravityConstant;
+                if (dX > max(dY, dZ) + squaredRadius)
+                    return [(xPlus ? 1 : -1) * thirdFactor, 0, 0];
+                else if (dY > max(dX, dZ) + squaredRadius)
+                    return [0, (yPlus ? 1 : -1) * thirdFactor, 0];
+                else if (dZ > max(dX, dY) + squaredRadius)
+                    return [0, 0, (zPlus ? 1 : -1) * thirdFactor];
+                // else
+                // return [0, 0, 0]; // this._gravity; // -z by default...
+            }
+
+            const ff = 0.0000001;
+            let power = 8.0;
+            let ddx = parseFloat(cX) - parseFloat(x); // ddx *= ddx;
+            let ddy = parseFloat(cY) - parseFloat(y); // ddy *= ddy;
+            let ddz = parseFloat(cZ) - parseFloat(z); // ddz *= ddz;
+            let dd =
+                Math.pow(Math.pow(ddx, power) + Math.pow(ddy, power) + Math.pow(ddz, power), 1 / power);
+                // Math.sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
+            // dd *= dd * dd;
+            dd = Math.max(5.0, dd); // Cap. max acceleration.
+            // Can be done with gaussian mass elimination (M.S. knows what I mean)
+            return [
+                ff * Math.pow(Math.abs(ddx), power + 1) / (ddx * dd),
+                ff * Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
+                ff * Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
+            ];
 
             // return direction;
         }
@@ -419,7 +446,7 @@ class RigidBodies {
             // Integration.
             Phase5.applyIntegration(
                 entities, worldId, oxAxis, world,
-                xm, objectOrderer, searcher, o);
+                xm, objectOrderer, searcher, o, this);
 
             // 8. Perform updates in optimization structures.
             //    Perform updates in consistency maps.

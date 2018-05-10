@@ -6,9 +6,72 @@ import XCollider from '../collision/x';
 
 class RigidBodiesPhase5 {
 
+    // TODO [MILESTONE0] gravity gp
+    static applyGravityRotation(entity, gravity) {
+        let rot = entity.rotation;
+        if (rot === null) return;
+        // Represents self rotation.
+        let relPitch = rot[0];
+        let relYaw = rot[1];
+
+        // Represents gravity.
+        const pi = Math.PI;
+        const x = gravity[0];
+        const y = gravity[1];
+        const z = gravity[2];
+
+        let v1 = 0;
+        let v2 = 0;
+        // let v3 = 0;
+
+        if (y > 0) {
+            v1 = Math.atan(-x / y);
+        } else if (y < 0) {
+            v1 = x < 0 ? pi - Math.atan(x / y) : x > 0 ? -pi + Math.atan(-x / y) : /*x === 0 ?*/ pi;
+        } else /*if (y === 0)*/ {
+            v1 = x < 0 ? pi / 2 : x > 0 ? -pi / 2 : /*x === 0*/ 0;
+        }
+
+        if (z < 0) {
+            v2 = -Math.atan(Math.sqrt(x * x + y * y) / z);
+        } else if (z > 0) {
+            v2 = pi - Math.atan(Math.sqrt(x * x + y * y) / z);
+        } else /*if (z === 0)*/ {
+            v2 = pi / 2;
+        }
+
+        // v3 = x !== 0 && y !== 0 && z !== 0 ? Math.acos(Math.sqrt(x * x + z * z) / Math.sqrt(x * x + y * y + z * z)) : 0;
+
+        let absPitch = v1; // = x !== 0 && y !== 0 ? Math.atan2(x, y) : 0; // Math.asin(-y); // rot[2];
+        let absYaw = v2; // Math.PI + Math.acos(z / Math.sqrt(x * x + y * y + z * z)); // Math.atan2(x, z); // rot[3];
+
+        // absPitch = pi / 2;
+        // console.log(v1 + ',' + v2 + ' <- ' + x + ',' + y + ',' + z);
+        // absYaw = v3;
+        // console.log(absPitch.toFixed(5) + ', ' + absYaw.toFixed(5) + ' -> ' + gravity);
+        // let oldRelPitch = rot[0];
+        let oldAbsPitch = rot[2];
+        let deltaAbsPitch = absPitch - oldAbsPitch;
+        if (relPitch !== rot[0] || relYaw !== rot[1] ||
+            absPitch !== rot[2] || absYaw !== rot[3])
+        {
+            let deltaP =
+                absYaw < Math.PI / 4 ?
+                    relPitch - deltaAbsPitch :
+                absYaw > 3 * Math.PI / 4 ?
+                    relPitch + deltaAbsPitch :
+                    relPitch;
+            entity.rotate(deltaP, relYaw, absPitch, absYaw);
+            return true;
+        }
+
+        // return (entity === gravity);
+        return false;
+    }
+
     static applyIntegration(
         entities, worldId, oxAxis, world,
-        xm, objectOrderer, searcher, o)
+        xm, objectOrderer, searcher, o, rigidBodiesSolver)
     {
         entities.forEach(currentEntity => {
             if (!currentEntity) return;
@@ -60,6 +123,7 @@ class RigidBodiesPhase5 {
                 entityUpdated = true;
             }
 
+
             if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2]) {
                 //console.log('LetsUpdate!');
                 //console.log(p0);
@@ -73,6 +137,15 @@ class RigidBodiesPhase5 {
                     // TODO [HIGH] objectOrderer.switchEntityToWorld(...)
                 }
                 entityUpdated = true;
+            }
+
+            // Rotate entity
+            if (!xCrossed) {
+                let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+                if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
+                    entityUpdated = true;
+                    // TODO rotate collision model.
+                }
             }
 
             if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {

@@ -24,9 +24,9 @@ class World {
         this._generationMethod = 'flat';
 
         // Constants
-        this._xSize = 16; // MUST BE EVEN (ideally a power of two)
-        this._ySize = 16; // MUST BE EVEN (ideally a power of two)
-        this._zSize = 16; // MUST BE EVEN (ideally a power of two)
+        this._xSize = 4; // MUST BE EVEN (ideally a power of two)
+        this._ySize = 4; // MUST BE EVEN (ideally a power of two)
+        this._zSize = 4; // MUST BE EVEN (ideally a power of two)
     }
 
     get worldId() { return this._worldId; }
@@ -89,9 +89,12 @@ class World {
     getFreePosition() {
         let zLimit = this._zSize;
         let z = zLimit - 2;
-        while (this.whatBlock(6, 6, z) !== 0 &&
-            this.whatBlock(6, 6, z + 1) !== 0 && z + 1 < zLimit) ++z;
-        return [6.5, 6.5, z];
+        let centerInteger = parseInt(zLimit / 2, 10);
+        let centerFloat = parseFloat(zLimit / 2) + 0.01;
+        while (
+            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 || this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
+            z < 100 * zLimit) ++z;
+        return [centerFloat, centerFloat, z];
     }
 
     getChunk(iCoordinate, jCoordinate, kCoordinate) {

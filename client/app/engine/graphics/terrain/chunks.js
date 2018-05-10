@@ -212,7 +212,7 @@ let ChunksModule = {
             if (sizes[meshId] === 0) {
                 console.log('INFO: geometry deletion.');
                 // Remove mesh from scene.
-                this.sceneManager.removeFromScene(meshes[meshId], worldId);
+                this.removeFromScene(meshes[meshId], worldId);
                 geometries[meshId]  = undefined;
                 materials[meshId]   = undefined;
                 meshes[meshId]      = undefined;

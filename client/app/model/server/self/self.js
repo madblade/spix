@@ -81,9 +81,25 @@ extend(SelfModel.prototype, {
             // Notify modules.
             register.updateSelfState({position: [p.x, p.y, p.z]});
 
-            avatar.rotation.x = r[3];
             avatar.rotation.z = r[2];
+            avatar.rotation.x = r[3];
             avatar.getWrapper().rotation.y = Math.PI + r[0];
+
+            // let camr = graphics.cameraManager.mainCamera.get3DObject().rotation;
+            let theta0 = r[2];
+            let theta1 = r[3];
+            // let upv = graphics.cameraManager.mainCamera.get3DObject().rotation;
+            // let theta0Old = upv.z;
+            // let theta1Old = upv.x;
+            let cam = graphics.cameraManager.mainCamera;
+            let rotationZ = cam.getZRotation();
+            let rotationX = cam.getXRotation();
+            graphics.cameraManager.setAbsRotation(theta0, theta1);
+            // TODO [HIGH] compute delta transmitted from last time
+            graphics.cameraManager.setRelRotation(r[0], rotationX);
+
+            // mainCamera.setUpRotation(theta1, 0, theta0);
+            // moveCameraFromMouse(0, 0, newX, newY);
 
             // Update animation.
             if (animate) graphics.updateAnimation(id);

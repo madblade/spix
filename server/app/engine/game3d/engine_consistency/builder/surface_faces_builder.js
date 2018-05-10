@@ -303,7 +303,8 @@ class CSFX {
             fastMerger[k].sort(function(a, b) {return a - b;});
             let id = fastMerger[k][0];
             if (!fastCC.hasOwnProperty(id)) {
-                console.log(`PostMerger failed because of id inconsistency: ${id}.`);
+                // TODO [HIGH] refactor all that bullshit
+                // console.log(`PostMerger failed because of id inconsistency: ${id}.`);
                 continue;
             }
             let componentsToMerge = fastMerger[k];

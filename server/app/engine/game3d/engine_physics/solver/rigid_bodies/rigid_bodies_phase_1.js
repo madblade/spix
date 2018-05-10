@@ -160,9 +160,13 @@ class RigidBodiesPhase1 {
             let r = currentEntity.r; // Rotation.
             const maxV = currentEntity.getVelocity();
             const factor = Math.sqrt(maxV * 1.05);
-            let g = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+            // TODO [MILESTONE0] gravity gp
+            let g =
+                [0, 0, 0];
+                // rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
+            // let vector = RigidBodiesPhase1.getForwardVector(d); // Project 2D
             // console.log(vector);
             // let abs = Math.abs;
             // let sgn = Math.sign;
@@ -192,7 +196,7 @@ class RigidBodiesPhase1 {
 
             // TODO [HIGH] gp calibration (velocity++, curved jmp, gen3D)
             if (!adh[2] && g[2] < 0) {
-                nu[2] = 0;
+                // nu[2] = 0;
             }
 
             for (let i = 0; i < 3; ++i)
@@ -224,6 +228,19 @@ class RigidBodiesPhase1 {
             console.log(vS);
             console.log(aS);
         }
+    }
+
+    static getForwardVector(d) {
+        let fw = d[0] && !d[1]; let bw = !d[0] && d[1];
+        let rg = d[2] && !d[3]; let lf = !d[2] && d[3];
+        let up = d[4] && !d[5]; let dn = !d[4] && d[5];
+        if (fw) return [1, 0, 0];
+        if (bw) return [-1, 0, 0];
+        if (rg) return [0, -1, 0];
+        if (lf) return [0, 1, 0];
+        if (up) return [0, 0, 1];
+        if (dn) return [0, 0, -1];
+        return [0, 0, 0];
     }
 
     static getEntityForwardVector(d, rotation, factor, project2D)
