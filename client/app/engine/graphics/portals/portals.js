@@ -296,7 +296,8 @@ let PortalsModule = {
 
     // Remove link between portal (which is still present) and otherPortal
     // which is to be removed. Portal used to lead to otherPortal.
-    removePartOfPortalObject(portal, otherPortal/*, worldMap*/) {
+    removePartOfPortalObject(portal, otherPortal/*, worldMap*/)
+    {
         // let worldId = portal.worldId;
 
         //console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
@@ -333,7 +334,8 @@ let PortalsModule = {
     },
 
     // Remove the aforementioned portal.
-    removePortalObject(portal/*, worldMap*/) {
+    removePortalObject(portal/*, worldMap*/)
+    {
         // let worldId = portal.worldId;
 
         let currentPortalId = portal.portalId;

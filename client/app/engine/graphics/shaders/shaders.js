@@ -20,11 +20,11 @@ let ShadersModule = {
     },
 
     getSkyVertexShader() {
-        return PortalVertex;
+        return SkyVertex;
     },
 
     getSkyFragmentShader() {
-        return PortalFragment;
+        return SkyFragment;
     }
 
 };

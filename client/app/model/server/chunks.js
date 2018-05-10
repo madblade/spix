@@ -16,7 +16,10 @@ let ChunkModel = function(app) {
     this.worldProperties = new Map();
     this.chunkUpdates = [];
 
-    // Graphical component
+    // Whatever lies between.
+    this.skies = new Map();
+
+    // Graphical component.
     this.needsUpdate = false;
     this.debug = false;
 };
@@ -44,6 +47,53 @@ extend(ChunkModel.prototype, {
         this.worldProperties.set(worldId, properties);
 
         return properties;
+    },
+
+    // TODO [MILESTONE1] make sky creation api serverwise
+    // or seed behaviour
+    addSky(worldId, worldInfo) {
+        if (!worldInfo)
+            console.log('[Chunks] Default sky creation.');
+
+        let graphics = this.app.engine.graphics;
+        let sky = graphics.createSky();
+        let sunSphere = graphics.createSunSphere();
+        graphics.addToScene(sky, worldId);
+        graphics.addToScene(sunSphere, worldId);
+
+        let turbidity = 10;
+        let rayleigh = 2;
+        let mieCoefficient = 0.005;
+        let mieDirectionalG = 0.8;
+        let luminance = 1;
+        let inclination = 0;// 0.49; // elevation / inclination;
+        let azimuth = 0.25; // Facing front;
+        let isSunSphereVisible = true;
+        graphics.updateSky(
+            sky,
+            sunSphere,
+            turbidity,
+            rayleigh,
+            mieCoefficient,
+            mieDirectionalG,
+            luminance,
+            inclination,
+            azimuth,
+            isSunSphereVisible
+        );
+
+        this.skies.set(worldId, sky);
+    },
+
+    // TODO [MILESTONE1] make sky update api serverwise
+    // or seed behaviour
+    updateSky(worldId, worldInfo) {
+        if (!worldInfo)
+            console.log('[Chunks] Warn! Nothing to update in the sky.');
+
+        let currentSky = this.skies.get(worldId);
+        if (!currentSky)
+            console.log('[Chunks] Warn! Could not get required sky.');
     },
 
     /** Dynamics **/
@@ -81,6 +131,8 @@ extend(ChunkModel.prototype, {
                         light.position.set(0.5, 1, 0.75);
                         light.updateMatrixWorld();
                         graphics.addToScene(light, wid);
+
+                        this.addSky(wid, wif);
                     }
                 }
             }

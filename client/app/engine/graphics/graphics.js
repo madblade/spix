@@ -25,6 +25,7 @@ import { ScenesModule }  from './render/scene.js';
 import { FacesModule }  from './terrain/faces.js';
 import { ChunksModule }  from './terrain/chunks.js';
 import { ShadersModule }  from './shaders/shaders.js';
+import { SkyModule }  from './sky/skies.js';
 
 var Graphics = function(app) {
     // App and access to models.
@@ -85,5 +86,6 @@ extend(Graphics.prototype, ScenesModule);
 extend(Graphics.prototype, FacesModule);
 extend(Graphics.prototype, ChunksModule);
 extend(Graphics.prototype, ShadersModule);
+extend(Graphics.prototype, SkyModule);
 
 export { Graphics };

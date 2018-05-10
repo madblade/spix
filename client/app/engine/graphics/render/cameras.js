@@ -146,7 +146,7 @@ extend(CameraManager.prototype, {
         // TODO remove ugly
         let sin = Math.sin;
         let cos = Math.cos;
-        let PI = Math.PI;
+        // let PI = Math.PI;
 
         let cams = [this.mainCamera, this.mainRaycasterCamera];
         this.subCameras.forEach(function(cam) { cams.push(cam); });

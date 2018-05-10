@@ -92,7 +92,7 @@ extend(SelfModel.prototype, {
             // let theta0Old = upv.z;
             // let theta1Old = upv.x;
             let cam = graphics.cameraManager.mainCamera;
-            let rotationZ = cam.getZRotation();
+            // let rotationZ = cam.getZRotation();
             let rotationX = cam.getXRotation();
             graphics.cameraManager.setAbsRotation(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
