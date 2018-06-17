@@ -11,9 +11,6 @@ const float pi = 3.141592654;
 uniform float k_rayleigh;
 uniform float k_mie;
 
-float k_rayleigh_4pi = k_rayleigh * 4.0 * pi;
-float k_mie_4pi = k_mie * 4.0 * pi;
-
 const float E_sun = 15.0;
 const float g = 0.75;
 
@@ -62,6 +59,10 @@ vec3 out_scatter(vec3 pos, vec3 dir)
     vec3 samp = pos + step * 0.5;
 
     vec3 result = vec3(0.);
+
+    float k_rayleigh_4pi = k_rayleigh * 4.0 * pi;
+    float k_mie_4pi = k_mie * 4.0 * pi;
+
     for (int i = 0; i < nout_samples; ++i) {
         float height = length(samp) - planet_radius;
         result += step_dist *
@@ -128,6 +129,6 @@ void main()
     vec3 scatter = out_scatter(offpos + dir * inter, -dir);
     vec4 atten = vec4(exp(-scatter), 1.0);
 
-    gl_FragColor = 1.*atmos_sample(offpos, dir) +
+    gl_FragColor = 1. * atmos_sample(offpos, dir) +
         planet_color * atten;
 }

@@ -27,7 +27,7 @@ import { ChunksModule }  from './terrain/chunks.js';
 import { ShadersModule }  from './shaders/shaders.js';
 import { SkyModule }  from './sky/skies.js';
 
-var Graphics = function(app) {
+let Graphics = function(app) {
     // App and access to models.
     this.app = app;
 

@@ -9,8 +9,13 @@ varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
 varying float vSunE;
+varying vec3 vCenter;
+varying vec3 vForward;
+varying vec3 vPosition;
 
-const vec3 up = vec3(0.0, 1.0, 0.0);
+// TODO hack planet center
+const vec3 worldCenter = vec3(0.0, 100.0, 00.0);
+const vec3 up = vec3(0.0, 0.0, 1.0);
 
 // constants for atmospheric scattering
 const float e = 2.71828182845904523536028747135266249775724709369995957;
@@ -51,9 +56,20 @@ void main()
 	vWorldPosition = worldPosition.xyz;
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vCenter = (vec4(worldCenter, 1.0)).xyz;
+    vForward = normalize((modelViewMatrix * vec4(1.0, 0.0, 0.0, 1.0)).xyz);
+    vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+
 	gl_Position.z = gl_Position.w; // set z to camera.far
 
 	vSunDirection = normalize(sunPosition);
+
+    vec3 vc = vCenter;
+    vec3 vf = vForward;
+    vec3 diff = vPosition - vc;
+    float dotProcuct = dot(vf, diff * 0.01);
+    vec3 proj = (diff + vf * dotProcuct);
+    vec3 nup = normalize(proj - vc);
 
 	vSunE = sunIntensity(dot(vSunDirection, up));
 

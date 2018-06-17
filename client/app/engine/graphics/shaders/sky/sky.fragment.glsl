@@ -4,6 +4,9 @@ varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
 varying float vSunE;
+varying vec3 vCenter;
+varying vec3 vForward;
+varying vec3 vPosition;
 
 uniform float luminance;
 uniform float mieDirectionalG;
@@ -16,11 +19,11 @@ const float pi = 3.141592653589793238462643383279502884197169;
 const float n = 1.0003; // refractive index of air
 const float N = 2.545E25; // number of molecules per unit volume for air at
                             // 288.15K and 1013mb (sea level -45 celsius)
-
 // optical length at zenith for molecules
 const float rayleighZenithLength = 8.4E3;
 const float mieZenithLength = 1.25E3;
-const vec3 up = vec3(0.0, 1.0, 0.0);
+const vec3 up = vec3(0.0, 0.0, 1.0);
+
 // 66 arc seconds -> degrees, and the cosine of that
 const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;
 
@@ -57,11 +60,52 @@ vec3 Uncharted2Tonemap( vec3 x ) {
         ) - E / F;
 }
 
+const float e = 2.71828182845904523536028747135266249775724709369995957;
+const float cutoffAngle = 1.5 * 1.6110731556870734; // TODO hack
+const float steepness = 1.5; // TODO hack
+const float EE = 100.0; // TODO hack
+float sunIntensity(float zenithAngleCos) {
+	zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
+	return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
+}
+
 void main()
 {
+    vec3 deltaWorldCamera = normalize(vWorldPosition - cameraPos);
+    // 450 000
+
+    // 1. project vWorldPosition on the plane (n=modelView * forwardVector, p = c)
+    // 2. compute u = d(pvwp, c), up = vec(u)
+    // 3. extinct backface and distance > radius_atmos
+    // --
+    // 4. if d(plp, c) < radius_atmos:
+    //      up = f(forwardVector, plp, vCenter)
+    // 5. extinct after radius_atmos
+    // TODO hack
+    vec3 vc = normalize(vCenter); // vec3(0.0, -10.0, 0.0); // vCenter;
+    vec3 vf = normalize(vForward);
+    vec3 vp = normalize(vPosition);
+    vec3 diff = (vp - 1.1 * vc); // TODO hack 1.1 to 2.0 adjust for distance
+
+    // TODO remove hack
+    float dotProcuct = dot(vf, diff * 0.0001);
+    vec3 proj = (diff * 0.0001); // + vf * dotProcuct);
+
+    // TODO hack distance
+    float d = distance(vp, vc);
+    // TODO hack up vector (almost it)
+    vec3 nup =
+//    diff;
+      normalize(proj) * 1.0;
+//        normalize(vec3(0. 0, 0.0, 1.0));
+
+    // TODO hack sun intensity from intersection
+    float vse = vSunE;
+    vse = sunIntensity(dot(vSunDirection, nup));
+
 // optical length
 // cutoff angle at 90 to avoid singularity in next formula.
-	float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));
+	float zenithAngle = acos(max(0.0, dot(nup, deltaWorldCamera)));
 	float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
 	float sR = rayleighZenithLength * inverse;
 	float sM = mieZenithLength * inverse;
@@ -70,7 +114,7 @@ void main()
 	vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));
 
 // in scattering
-	float cosTheta = dot(normalize(vWorldPosition - cameraPos), vSunDirection);
+	float cosTheta = dot(deltaWorldCamera, vSunDirection);
 
 	float rPhase = rayleighPhase(cosTheta * 0.5 + 0.5);
 	vec3 betaRTheta = vBetaR * rPhase;
@@ -78,12 +122,16 @@ void main()
 	float mPhase = hgPhase(cosTheta, mieDirectionalG);
 	vec3 betaMTheta = vBetaM * mPhase;
 
-	vec3 Lin = pow(vSunE * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
-	Lin *= mix(vec3(1.0), pow(vSunE * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex,
-	vec3(1.0 / 2.0)), clamp(pow(1.0 - dot(up, vSunDirection), 5.0), 0.0, 1.0));
+	vec3 Lin = pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
+	Lin *= mix(
+	    vec3(1.0),
+        pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex,
+	    vec3(1.0 / 2.0)),
+	    clamp(pow(1.0 - dot(nup, vSunDirection), 5.0), 0.0, 1.0)
+    );
 
 // nightsky
-	vec3 direction = normalize(vWorldPosition - cameraPos);
+	vec3 direction = deltaWorldCamera;
 	float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]
 	float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]
 	vec2 uv = vec2(phi, theta) / vec2(2.0 * pi, pi) + vec2(0.5, 0.0);
@@ -91,9 +139,12 @@ void main()
 
 // composition + solar disc
 	float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
-	L0 += (vSunE * 19000.0 * Fex) * sundisk;
+	L0 += (vse * 19000.0 * Fex) * sundisk;
 
-	vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
+	vec3 texColor = (Lin
+	+ L0)
+//	)
+	* 0.04 + vec3(0.0, 0.0003, 0.00075);
 
 	vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(luminance, 4.0))) * texColor);
 	vec3 color = curr * whiteScale;
@@ -101,4 +152,5 @@ void main()
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vSunfade))));
 
 	gl_FragColor = vec4(retColor, 1.0);
+//	gl_FragColor = vec4(normalize(diff), 1.0);
 }

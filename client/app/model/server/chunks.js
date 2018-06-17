@@ -49,6 +49,16 @@ extend(ChunkModel.prototype, {
         return properties;
     },
 
+    addPlanet(worldId, worldInfo) {
+        if (!worldInfo)
+            console.log('[Chunks] Default sky creation.');
+
+        let graphics = this.app.engine.graphics;
+        let p = graphics.createPlanet();
+        graphics.addToScene(p.planet, worldId);
+        graphics.addToScene(p.atmosphere.mesh, worldId);
+    },
+
     // TODO [MILESTONE1] make sky creation api serverwise
     // or seed behaviour
     addSky(worldId, worldInfo) {
@@ -66,7 +76,7 @@ extend(ChunkModel.prototype, {
         let mieCoefficient = 0.005;
         let mieDirectionalG = 0.8;
         let luminance = 1;
-        let inclination = 0;// 0.49; // elevation / inclination;
+        let inclination = -0.15;// 0.49; // elevation / inclination;
         let azimuth = 0.25; // Facing front;
         let isSunSphereVisible = true;
         graphics.updateSky(
@@ -133,6 +143,8 @@ extend(ChunkModel.prototype, {
                         graphics.addToScene(light, wid);
 
                         this.addSky(wid, wif);
+
+                        // this.addPlanet(wid, wif);
                     }
                 }
             }

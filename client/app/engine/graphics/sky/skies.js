@@ -6,8 +6,17 @@
 
 import * as THREE from 'three';
 import { Sky } from './sky';
+import { SimplePlanet, Atmosphere } from './planet';
 
 let SkyModule = {
+
+    createPlanet()
+    {
+        let planet = new SimplePlanet();
+        let atmosphere = new Atmosphere(planet);
+        // atmosphere.render(renderer);
+        return {planet, atmosphere};
+    },
 
     createSky()
     {

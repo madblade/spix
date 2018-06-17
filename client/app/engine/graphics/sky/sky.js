@@ -39,7 +39,10 @@ let Sky = function()
         side: THREE.DoubleSide
     });
 
-    THREE.Mesh.call(this, new THREE.BoxBufferGeometry(1, 1, 1), material);
+    // material = new THREE.MeshNormalMaterial({wireframe:true});
+
+    let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    THREE.Mesh.call(this, geometry, material);
 };
 
 Sky.prototype = Object.create(THREE.Mesh.prototype);
