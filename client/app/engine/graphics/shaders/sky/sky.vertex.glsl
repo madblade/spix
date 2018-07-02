@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
@@ -12,9 +14,12 @@ varying float vSunE;
 varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
+varying vec3 vP2;
+varying mat4 vMVM;
 
 // TODO hack planet center
-const vec3 worldCenter = vec3(0.0, 100.0, 00.0);
+
+const vec3 worldCenter = vec3(-100.0, 100.0, 50.0);
 const vec3 up = vec3(0.0, 0.0, 1.0);
 
 // constants for atmospheric scattering
@@ -56,9 +61,15 @@ void main()
 	vWorldPosition = worldPosition.xyz;
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    vCenter = (vec4(worldCenter, 1.0)).xyz;
+    vCenter = (vec4(
+        worldCenter.x - modelMatrix[3][0],
+        worldCenter.y - modelMatrix[3][1],
+        worldCenter.z - modelMatrix[3][2],
+         1.0)).xyz;
     vForward = normalize((modelViewMatrix * vec4(1.0, 0.0, 0.0, 1.0)).xyz);
+    vP2 = (vec4(position, 1.0)).xyz;
     vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    vMVM = viewMatrix;
 
 	gl_Position.z = gl_Position.w; // set z to camera.far
 

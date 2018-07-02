@@ -22,6 +22,7 @@ let SkyModule = {
     {
         let sky = new Sky();
         sky.scale.setScalar(450000);
+        this.skyBox = sky;
         return sky;
     },
 
@@ -34,6 +35,30 @@ let SkyModule = {
         sunSphere.position.y = -700000;
         sunSphere.visible = false;
         return sunSphere;
+    },
+
+    updateSunPosition() {
+        if (!this.sky || !this.distance) return;
+        let s = this.sky;
+
+        let cos = Math.cos;
+        let sin = Math.sin;
+
+        let distance = this.distance;
+        let phi = this.phi;
+        let theta = this.theta;
+        phi += 0.001;
+        this.phi = phi;
+
+        let x = distance * cos(phi);
+        let y = distance * sin(phi) * sin(theta);
+        let z = distance * sin(phi) * cos(theta);
+        let vec3 = new THREE.Vector3(x, y, z);
+
+        s.material.uniforms.sunPosition.value.copy(vec3);
+        let p = this.app.model.server.selfModel.position;
+        this.skyBox.position.set(p[0], p[1], p[2]);
+        this.skyBox.updateMatrix();
     },
 
     // TODO [MILESTONE1] update suns position throughout day and year
@@ -62,6 +87,13 @@ let SkyModule = {
         let theta = Math.PI * (inclination - 0.5);
         let phi = 2 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
+
+        // TODO [CRIT] remove hack
+        // TODO [CRIT] remove temporary hack
+        this.sky = sky;
+        this.distance = distance;
+        this.phi = phi;
+        this.theta = theta;
 
         sunSphere.position.x = distance * cos(phi);
         sunSphere.position.y = distance * sin(phi) * sin(theta);

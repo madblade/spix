@@ -8,6 +8,8 @@
 
 import extend           from '../../extend.js';
 
+import * as THREE from 'three';
+
 let ChunkModel = function(app) {
     this.app = app;
 
@@ -70,6 +72,19 @@ extend(ChunkModel.prototype, {
         let sunSphere = graphics.createSunSphere();
         graphics.addToScene(sky, worldId);
         graphics.addToScene(sunSphere, worldId);
+
+        let g = new THREE.BoxBufferGeometry(50, 50, 50);
+        let m = new THREE.MeshNormalMaterial({wireframe: true});
+        let mm = new THREE.Mesh(g, m);
+        mm.position.x = -100;
+        mm.position.y = 100;
+        mm.position.z = 50;
+        graphics.addToScene(mm, worldId);
+
+        // TODO from space:
+        // turbidity = 1
+        // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
+        // mieDirectionalG = 0.0
 
         let turbidity = 10;
         let rayleigh = 2;

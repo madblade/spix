@@ -57,6 +57,9 @@ extend(RendererManager.prototype, {
         let renderer = this.renderer;
         let renderRegister = this.renderRegister;
 
+        // TODO [CRIT] remove
+        this.graphics.updateSunPosition();
+
         // Render first pass.
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
