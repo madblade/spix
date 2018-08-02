@@ -119,8 +119,13 @@ class UpdaterBlock {
         let neighbourBlocks = [];
         const numberOfNeighbours = 6;
         for (let i = 0; i < numberOfNeighbours; ++i) {
-            neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
-            neighbourBlocks.push(neighbourChunks[i].blocks);
+            let tempChunk = ChunkBuilder.getNeighboringChunk(chunk, i);
+            if (tempChunk) {
+                neighbourChunks.push(tempChunk);
+                neighbourBlocks.push(tempChunk.blocks);
+            } else {
+                console.log('Error: could not get neighboting chunk at UpdaterBlocks.');
+            }
         }
 
         let surfaceBlocks = chunk.surfaceBlocks;

@@ -26,7 +26,8 @@ let Sky = function()
             rayleigh: { value: 1 },
             mieCoefficient: { value: 0.005 },
             mieDirectionalG: { value: 0.8 },
-            sunPosition: { value: new THREE.Vector3() }
+            sunPosition: { value: new THREE.Vector3() },
+            viewInverse: { value:new THREE.Matrix4() }
         },
         vertexShader: ShadersModule.getSkyVertexShader(),
         fragmentShader: ShadersModule.getSkyFragmentShader()

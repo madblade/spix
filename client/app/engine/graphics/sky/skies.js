@@ -37,7 +37,7 @@ let SkyModule = {
         return sunSphere;
     },
 
-    updateSunPosition() {
+    updateSunPosition(camera) {
         if (!this.sky || !this.distance) return;
         let s = this.sky;
 
@@ -47,7 +47,7 @@ let SkyModule = {
         let distance = this.distance;
         let phi = this.phi;
         let theta = this.theta;
-        phi += 0.001;
+        phi += 0.0001;
         this.phi = phi;
 
         let x = distance * cos(phi);
@@ -55,7 +55,19 @@ let SkyModule = {
         let z = distance * sin(phi) * cos(theta);
         let vec3 = new THREE.Vector3(x, y, z);
 
+        if (camera.projectionMatrix) {
+            let mat4 = new THREE.Matrix4();
+            mat4.set(
+                camera.fov, camera.aspect, camera.far, camera.near,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0);
+            // mat4.getInverse(camera.projectionMatrix);
+            s.material.uniforms.viewInverse.value.copy(mat4);
+        }
         s.material.uniforms.sunPosition.value.copy(vec3);
+        // Better not touch this!
+        // This accounts for skybox translations in sky shaders.
         let p = this.app.model.server.selfModel.position;
         this.skyBox.position.set(p[0], p[1], p[2]);
         this.skyBox.updateMatrix();

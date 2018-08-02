@@ -4,6 +4,7 @@ uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
 uniform float mieCoefficient;
+uniform mat4 viewInverse;
 
 varying vec3 vWorldPosition;
 varying vec3 vSunDirection;
@@ -14,8 +15,11 @@ varying float vSunE;
 varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
+varying vec3 vPP;
+varying vec3 vUp;
 varying vec3 vP2;
 varying mat4 vMVM;
+varying mat4 vPM;
 
 // TODO hack planet center
 
@@ -67,9 +71,12 @@ void main()
         worldCenter.z - modelMatrix[3][2],
          1.0)).xyz;
     vForward = normalize((modelViewMatrix * vec4(1.0, 0.0, 0.0, 1.0)).xyz);
+    vUp = normalize((modelViewMatrix * vec4(0.0, 0.0, 1.0, 1.0)).xyz);
     vP2 = (vec4(position, 1.0)).xyz;
     vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    vPP = (vec4(worldCenter, 1.0)).xyz;
     vMVM = viewMatrix;
+    vPM = projectionMatrix * viewMatrix;
 
 	gl_Position.z = gl_Position.w; // set z to camera.far
 

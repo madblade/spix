@@ -57,12 +57,13 @@ extend(RendererManager.prototype, {
         let renderer = this.renderer;
         let renderRegister = this.renderRegister;
 
-        // TODO [CRIT] remove
-        this.graphics.updateSunPosition();
 
         // Render first pass.
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
+
+        // TODO [CRIT] remove! :0
+        this.graphics.updateSunPosition(mainCamera);
 
         // Render every portal.
         let renderCount = 0;
