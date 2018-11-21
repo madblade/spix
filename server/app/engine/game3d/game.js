@@ -130,6 +130,7 @@ class Game3D extends Game {
                     this._externalInput.addPlayer(p);
                 });
 
+                // TODO [MEDIUM] not safe
                 this._playerManager.setRemovePlayerBehaviour(player => {
                     this._externalInput.removePlayer(player.avatar.entityId);
                 });

@@ -69,6 +69,7 @@ let SkyModule = {
         // Better not touch this!
         // This accounts for skybox translations in sky shaders.
         let p = this.app.model.server.selfModel.position;
+        if (!p) return;
         this.skyBox.position.set(p[0], p[1], p[2]);
         this.skyBox.updateMatrix();
     },

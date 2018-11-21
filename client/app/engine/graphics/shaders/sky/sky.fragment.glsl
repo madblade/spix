@@ -136,6 +136,15 @@ bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
 
 // a = origin
 bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
+    float norm1 = distance(vec2(0), b - a);
+    float norm2 = distance(vec2(0), c - a);
+    float dot1 = dot(b - a, c - a) / (norm1 * norm2);
+    if (dot1 < -1.0) return false;
+
+//    float dot1 = dot(x, b);
+//    float dot2 = dot(x, c);
+//    if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
+
     bool rightAB = doesCLieOnTheRightOfAB(a, b, x);
     bool rightAC = doesCLieOnTheRightOfAB(a, c, x);
     return rightAB != rightAC;
@@ -146,7 +155,15 @@ float distanceTo2DHalf(vec2 origin, vec2 a, vec2 b) {
     float y1 = origin.y;
     float x2 = (a.x + b.x) * 0.5;
     float y2 = (a.y + b.y) * 0.5;
-    return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
+float distanceToPoint(vec2 origin, vec2 p) {
+    float x1 = origin.x;
+    float y1 = origin.y;
+    float x2 = p.x;
+    float y2 = p.y;
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 // Exp. angle factors
@@ -201,7 +218,6 @@ float dFuck(vec2 x, vec2 o, vec2 a, vec2 b) {
 
     float dist2 = distance(p1, p2);
     if (dist2 > 0.1) return -1.0;
-
 
     return distance(p1, vec2(0.0));
 }
@@ -342,20 +358,22 @@ void main()
     cps[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
     cps[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
     cps[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps[5] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
+    cps[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
     cps[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
 
     // Deprojection
-
     float nmf = 50000.0;
+    vec3 tcenter = vc;
     for (int i = 0; i < 8; ++i) {
         vec3 currentC = cps[i];
         // vc <- vf
-        float alpha = dot(currentC, vc);
-        float R = abs(alpha) > 0.00001 ? nmf / alpha : 1000000.0; // (far - near) / (2.0 * alpha)
-        vec3 yc = currentC - dot(currentC, vc) * vc;
+        float alpha = dot(currentC, tcenter);
+        float R = abs(alpha) > 0.000000001 ? nmf / alpha : 1000000.0; // (far - near) / (2.0 * alpha)
+        vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
         cps[i] = currentC + yc * (R - 1.0);
     }
+    // vec3 positiong = vp * distance(vec3(0.0),cps[1]);
+    // positiong = positiong + (positiong - dot(positiong, tcenter) * tcenter) * ((nmf / dot(positiong, tcenter)) - 1.0);
 
 //    vec4 cProjH = vPM * vec4(vCenter, 1.0);
     vec3 cProj =
@@ -370,8 +388,8 @@ void main()
 
     vec3 proj = vec3(1.0, 1.0, 1.0);
     vec3 dpv =
-//            vc +
-        cps[0] - vc * dot(cps[0], vc);
+//        vc +
+        0.5 * (cps[0] + cps[1]) - vc * dot(0.5 * (cps[0] + cps[1]), vc);
 //        cps[2];
 //            vPosition - vc * dot(vPosition, vc); // project(vPosition, vc);
 //        10.0 * vc + proj - vc * dot(proj, vc);
@@ -422,7 +440,7 @@ void main()
     for (int i = 0; i < 8; ++i)
         dots[i] = dot(xys[i], dpv2D);
     for (int i = 0; i < 8; ++i)
-        dots2[i] = dot(xys2[i], dpv2D2);
+        dots2[i] = (dot(xys2[i], dpv2D2) / (distance(vec2(0), xys2[i]) * distance(vec2(0), dpv2D2)));
 //        dots[i] = dot(cps[i], dpv);
 
     bool mustInvert = false;
@@ -431,16 +449,23 @@ void main()
 
     // Find positive elements
     // and quadratically determine triangles.
-    for (int i = 0; i < 3; ++i) {
-        if (dots2[i] > 0.0) {
-            for (int j = 0; j < 3; ++j) {
-                if (dots2[j] > 0.0 && j > i) {
-                    bool invert = dot(xys2[i], xys2[j]) < 0.0;
-                    if (invert) continue;
+    // TODO I found it! allow all dots, but filter afterwards
+    float minDotValue = -0.5; // 100000000000.0;
+    float doublet = 0.0;
+    float doublet2 = 0.0;
+    float doublet3 = 0.0;
+    for (int i = 0; i < 8; ++i) {
+        if (dots2[i] > minDotValue) {
+            for (int j = 0; j < 8; ++j) {
+                if (dots2[j] > minDotValue && j > i) {
+                    // bool invert = dot(xys2[i], xys2[j]) > 0.0;
+                    // invert = true;
+                    // if (invert) continue;
+
                     vec2 A = xys[i]; // invert ? xys[j] : xys[i];
                     vec2 B = xys[j]; // invert ? xys[i] : xys[j];
-                    vec2 A2 = xys2[i];
-                    vec2 B2 = xys2[j];
+                    vec2 A2 = xys2[i]; // invert ? xys2[i] : xys2[j];
+                    vec2 B2 = xys2[j]; // invert ? xys2[j] : xys2[i];
 
                     if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
                     {
@@ -450,8 +475,11 @@ void main()
 //                            distanceTo2DXAngle(dpv2D2, dpc2D2, A2, B2);
 //                            distanceTo2DHalf(dpc2D2, A2, B2);
                         if (newDistance > tempDistance) {
+                            doublet = float(i) * 8.0 + float(j) * 1.0;
+                            doublet2 = float(i);
+                            doublet3 = float(j);
                             distanceToShell = distanceTo2DHalf(dpc2D2, A2, B2);
-                            mustInvert = false;
+                            // mustInvert = false;
                             tempDistance = newDistance;
                             diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
                             // TODO it's more like it
@@ -473,18 +501,6 @@ void main()
 // TODO something if dot(vc, vp) < 0
 //    if (distanceToMinCP > distanceToCenter)
 //    flatParameter = distanceToMinCP / (distanceToMinCP + distanceToCenter);
-
-// TODO find spherical parametrization
-//    float adjustNorm = 2.0;
-//    if (ax > ay && ax > az) {
-//        flatParameter = pow(ax2, adjustNorm);
-//    }
-//    else if (ay > ax && ay > az) {
-//        flatParameter = pow(ay2, adjustNorm);
-//    }
-//    else if (az > ax && az > ay) {
-//        flatParameter = pow(az2, adjustNorm);
-//    }
 
     float omega = 2.0;
     if (distanceToShell > 0.0) omega /= (0.01 * distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
@@ -574,8 +590,25 @@ void main()
 
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
+
+    //if (abs(tempDistance - 10.0) < 100000000.0) {
+    //    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //} else
     // Output color
+
 	gl_FragColor = vec4(retColor, 1.0);
+//	gl_FragColor = vec4(normalize(vec3(100000000.0, tempDistance , 100000000.0)), doublet * 1.0/64.0);
+//	gl_FragColor = vec4(doublet * 1.0/64.0, doublet2 * 1.0/8.0, doublet3 * 1.0/8.0, 1.0);
+    for (int i = 0; i < 8; ++i) {
+        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+//        if (distance(positiong, cps[i]) < 2000.0)
+//            gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+
+//    if (distance(normalize(dpv2D2), normalize(dpc2D2)) < 0.01)
+//        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+
 
 //    gl_FragColor = vec4(1.0, 1.0, dd, 1.0);
 //    gl_FragColor = vec4(normalize(nup), 1.0);

@@ -21,6 +21,7 @@ class RigidBodies {
 
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
+    // static gravityConstant = 0;
 
     constructor(refreshRate)
     {
@@ -31,7 +32,7 @@ class RigidBodies {
         //this._globalTimeDilatation = 0.05;
         this._refreshRate = refreshRate;
 
-        this._variableGravity = true;
+        this._variableGravity = false;
         this._worldCenter = [0, 0, -100];
         //
     }
