@@ -485,9 +485,10 @@ void main()
 //                            diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
                             vec2 diffMeuh = -A2 + B2;
                             vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
+                            float meuhDot = dot(meuh, A2) > 0.0 ? 1.0 : -1.0;
                             // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
                             vec3 meumeuh = center + xVector * meuh.x + yVector * meuh.y; // vec3(1.0, 0.0, 0.0) * meuh[0] + vec3(0.0, 1.0, 0.0) * meuh[1];
-                            diff = 2.0 * (normalize(0.5 * (meumeuh))); //  - 1.0 * vc);
+                            diff = 2.0 * (normalize(0.5 * meuhDot * (meumeuh))); //  - 1.0 * vc);
                             // TODO it's more like it
 //                             diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
 
