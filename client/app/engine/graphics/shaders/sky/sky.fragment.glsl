@@ -481,9 +481,17 @@ void main()
                             distanceToShell = distanceTo2DHalf(dpc2D2, A2, B2);
                             // mustInvert = false;
                             tempDistance = newDistance;
-                            diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
+
+//                            diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
+                            vec2 diffMeuh = -A2 + B2;
+                            vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
+                            // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
+                            vec3 meumeuh = center + xVector * meuh.x + yVector * meuh.y; // vec3(1.0, 0.0, 0.0) * meuh[0] + vec3(0.0, 1.0, 0.0) * meuh[1];
+                            diff = 2.0 * (normalize(0.5 * (meumeuh))); //  - 1.0 * vc);
                             // TODO it's more like it
 //                             diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
+
+//                            diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
                         }
                     }
                 }
@@ -620,5 +628,5 @@ void main()
     // TODO put dithering back.
 	float noise = random(vp.xy);
 	float m = mix(-0.5/255.0, 0.5/255.0, noise);
-	gl_FragColor.rgb += vec3(m);
+	gl_FragColor.rgb += 10.0 * vec3(m);
 }
