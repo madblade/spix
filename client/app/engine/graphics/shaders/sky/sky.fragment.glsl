@@ -285,9 +285,12 @@ void main()
     // Find positive elements and quadratically determine segments.
     // I found it! allow all dots, but filter afterwards
     float minDotValue = -0.5; // 100000000000.0;
+
+    int bestI = 0;
+    int bestJ = 0;
+
     vec2 bestA;
     vec2 bestB;
-
     for (int i = 0; i < 8; ++i) {
         if (dots2[i] > minDotValue) {
             for (int j = 0; j < 8; ++j) {
@@ -298,8 +301,10 @@ void main()
                     {
                         float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
                         if (newDistance > tempDistance) {
-                            bestA = A2;
-                            bestB = B2;
+                            bestI = i; // bestA = A2;
+                            bestJ = j; // bestB = B2;
+                            bestA = xys2[i];
+                            bestB = xys2[j];
                             tempDistance = newDistance;
                         }
                     }
@@ -309,15 +314,64 @@ void main()
     }
 
     // TODO interpolation of the form:
+    float highestDotForB = -2.0;
+    float secondHighestDotForB = -2.0;
+    float highestDotForA = -2.0;
+    float secondHighestDotForA = -2.0;
+    float dotA = -2.0;
+    float dotB = -2.0;
+    vec2 firstB;
+    vec2 secondB;
+    vec2 firstA;
+    vec2 secondA;
+
+// TODO compute the closest neighbor
     for (int i = 0; i < 8; ++i) {
-        vec2 testPoint = xys2[i];
-        // Look at segment [bestA testPoint]
-        // Look at segment [bestB testPoint]
-        // Take middle of segment
-        // Compute dot product from center to meuhDot * meumeuh
-        // Take two lowest dots from right and left
-        // Take the one which has the greatest distanceTo2DIntersection
+        if (dots2[i] > minDotValue) {
+            vec2 testPoint = xys2[i];
+            dotA = dot(testPoint, bestA);
+            dotB = dot(testPoint, bestB);
+
+            // Look at segment [bestA testPoint]
+            if (i != bestI && dotA > dotB) {
+                if (dotA > highestDotForA) {
+                    highestDotForA = dotA;
+                    firstA = xys2[i];
+                } else if (dotA > secondHighestDotForA) {
+                    secondHighestDotForA = dotA;
+                    secondA = xys2[i];
+                }
+            }
+
+            // Look at segment [bestB testPoint]
+            if (i != bestJ && dotB > dotA) {
+                if (dotB > highestDotForB) {
+                    highestDotForB = dotB;
+                    firstB = xys2[i];
+                } else if (dotB > secondHighestDotForB) {
+                    secondHighestDotForB = dotB;
+                    secondB = xys2[i];
+                }
+            }
+
+            // Take middle of segment -> why?
+            // Compute dot product from center to meuhDot * meumeuh
+        }
     }
+    // Take two highest dots from right and left
+
+    // Take the one which has the greatest distanceTo2DIntersection
+    float distanceA1 = distanceTo2DIntersection(dpv2D2, dpc2D2, firstA, bestA);
+    float distanceA2 = distanceTo2DIntersection(dpv2D2, dpc2D2, secondA, bestA);
+    // TODO fix here! there is probably a wrong calculation done in the previous for
+    vec2 leftA = firstA; // distanceA1 > distanceA2 ? firstA : secondA;
+    float distanceB1 = distanceTo2DIntersection(dpv2D2, dpc2D2, firstB, bestB);
+    float distanceB2 = distanceTo2DIntersection(dpv2D2, dpc2D2, secondB, bestB);
+    vec2 rightB = firstB; // distanceB1 > distanceB2 ? firstB : secondB;
+    bool whichOne = dot(leftA, dpv2D2) > dot(rightB, dpv2D2);
+
+    vec2 interpolator = whichOne ? leftA : rightB;
+    vec2 interpolatorBout = whichOne ? bestA : bestB;
 
     {
         distanceToShell = distanceTo2DHalf(dpc2D2, bestA, bestB);
@@ -326,9 +380,19 @@ void main()
         vec2 diffMeuh = -bestA + bestB;
         vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
         float meuhDot = dot(meuh, bestA) > 0.0 ? 1.0 : -1.0;
+
+        vec2 diffOther = interpolator - interpolatorBout;
+        vec2 otherMeuh = vec2(diffOther.y, -diffOther.x);
+        float otherMeuhDot = dot(otherMeuh, interpolatorBout) > 0.0 ? 1.0 : -1.0;
+
+
         // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
-        vec3 meumeuh = center + xVector * meuh.x + yVector * meuh.y;
-        diff = 2.0 * (normalize(0.5 * meuhDot * (meumeuh))); //  - 1.0 * vc);
+        vec3 meumeuh = center
+//            + 1.0 * meuhDot * (xVector * meuh.x + yVector * meuh.y);
+//            + 1.0 * rightMeuhDot * (xVector * rightMeuh.x + yVector * rightMeuh.y);
+            + 1.0 * otherMeuhDot * (xVector * otherMeuh.x + yVector * otherMeuh.y);
+
+        diff = 5.0 * (normalize((meumeuh))); //  - 1.0 * vc);
         // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
         // diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
     }
