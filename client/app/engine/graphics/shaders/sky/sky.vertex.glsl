@@ -18,8 +18,8 @@ varying vec3 vPosition;
 varying vec3 vPP;
 varying vec3 vUp;
 varying vec3 vP2;
-varying mat4 vMVM;
-varying mat4 vPM;
+//varying mat4 vMVM;
+//varying mat4 vPM;
 
 // TODO hack planet center
 
@@ -75,8 +75,8 @@ void main()
     vP2 = (vec4(position, 1.0)).xyz;
     vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
     vPP = (vec4(worldCenter, 1.0)).xyz;
-    vMVM = viewMatrix;
-    vPM = projectionMatrix * viewMatrix;
+//    vMVM = viewMatrix;
+//    vPM = projectionMatrix * viewMatrix;
 
 	gl_Position.z = gl_Position.w; // set z to camera.far
 

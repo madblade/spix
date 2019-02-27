@@ -10,12 +10,12 @@ varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
 varying vec3 vP2;
-varying mat4 vMVM;
-varying mat4 vPM;
+//varying mat4 vMVM;
+//varying mat4 vPM;
 varying vec3 vUp;
 varying vec3 vPP;
 
-uniform mat4 viewInverse;
+// uniform mat4 viewInverse;
 uniform float luminance;
 uniform float mieDirectionalG;
 
@@ -81,23 +81,23 @@ float sunIntensity(float zenithAngleCos) {
 	return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
 }
 
-float acbrt1(float x0) {
-    // union {int ix; float x;};
-    int ix;
-    float x;
-    x = x0;                      // x can be viewed as int.
-    ix = ix / 4 + ix / 16;           // Approximate divide by 3.
-    ix = ix + ix / 16;
-    ix = ix + ix / 256;
-    ix = 0x2a5137a0 + ix;        // Initial guess.
-    x = 0.33333333 * (2.0 * x + x0 / (x * x));  // Newton step.
-    x = 0.33333333 * (2.0 * x + x0 / (x * x));  // Newton step again.
-    return x;
-}
+//float acbrt1(float x0) {
+//    // union {int ix; float x;};
+//    int ix;
+//    float x;
+//    x = x0;                      // x can be viewed as int.
+//    ix = ix / 4 + ix / 16;           // Approximate divide by 3.
+//    ix = ix + ix / 16;
+//    ix = ix + ix / 256;
+//    ix = 0x2a5137a0 + ix;        // Initial guess.
+//    x = 0.33333333 * (2.0 * x + x0 / (x * x));  // Newton step.
+//    x = 0.33333333 * (2.0 * x + x0 / (x * x));  // Newton step again.
+//    return x;
+//}
 
-float sinh(float x) {
-    return (exp(x) - exp(-x)) * 0.5;
-}
+//float sinh(float x) {
+//    return (exp(x) - exp(-x)) * 0.5;
+//}
 
 float normN(vec3 v, float n) {
     return pow(
@@ -112,23 +112,13 @@ vec3 normalizeN(vec3 v, float n) {
     return v * 1.0 / normN(v, n);
 }
 
-vec3 normalizeNRotated(vec3 v, float n) { // }, vec3 f) {
-//    float rho = sqrt(f.x * f.x + f.y * f.y + f.z * f.z);
-//    float the = acos(f.z / rho);
-//    float phi = atan2(f.x, f.y);
-    vec3 rotated = ((vMVM * vec4(v, 1.0)).xyz);
-    return v * 1.0 / normN(v, n);
-}
+// float dotN(vec3 v1, vec3 v2, float n) {
+//     return dot(v1, v2) * normN(v1, n) * normN(v2, n) / (normN(v1, 2.0) * normN(v2, 2.0));
+// }
 
-float dotN(vec3 v1, vec3 v2, float n) {
-    return dot(v1, v2) * normN(v1, n) * normN(v2, n) / (normN(v1, 2.0) * normN(v2, 2.0));
-}
-
-vec3 project(vec3 distantPoint, vec3 unitVector) {
-//    vec3 difference = distantPoint - unitVector;
-//    return (difference) - unitVector * dot(difference, unitVector);
-    return unitVector + distantPoint - unitVector * dot(distantPoint, unitVector);
-}
+//vec3 project(vec3 distantPoint, vec3 unitVector) {
+//    return unitVector + distantPoint - unitVector * dot(distantPoint, unitVector);
+//}
 
 bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
     return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y) > 0.0;
@@ -141,9 +131,9 @@ bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
     float dot1 = dot(b - a, c - a) / (norm1 * norm2);
     if (dot1 < -1.0) return false;
 
-//    float dot1 = dot(x, b);
-//    float dot2 = dot(x, c);
-//    if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
+    // float dot1 = dot(x, b);
+    // float dot2 = dot(x, c);
+    // if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
 
     bool rightAB = doesCLieOnTheRightOfAB(a, b, x);
     bool rightAC = doesCLieOnTheRightOfAB(a, c, x);
@@ -158,70 +148,6 @@ float distanceTo2DHalf(vec2 origin, vec2 a, vec2 b) {
     return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-float distanceToPoint(vec2 origin, vec2 p) {
-    float x1 = origin.x;
-    float y1 = origin.y;
-    float x2 = p.x;
-    float y2 = p.y;
-    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-}
-
-// Exp. angle factors
-float distanceTo2DXAngle(vec2 x, vec2 o, vec2 a, vec2 b) {
-    vec2 na = normalize(a);
-    vec2 nb = normalize(b);
-    vec2 nx = normalize(x);
-    vec2 no = normalize(o);
-
-    float aob = acos(dot(na, nb));
-//    if (abs(aob) < 1e-5) return -1.0;
-    float aox = acos(dot(na, nx));
-    float box = acos(dot(nb, nx));
-    float factor1 = abs(aox) / aob;
-    float factor2 = abs(box) / aob;
-
-    vec2 p = ((1.0 - factor2) * b + factor2 * a); //  / (1.0 + factor);
-    float dx = p.x - o.x;
-    float dy = p.y - o.y;
-
-    float distance = sqrt(dx * dx + dy * dy);
-    return distance;
-}
-
-float dFuck(vec2 x, vec2 o, vec2 a, vec2 b) {
-    float res = 0.0;
-
-    float ox = o.x;
-    float oy = o.y;
-    float ax = a.x;
-    float ay = a.y;
-    float bx = b.x;
-    float by = b.y;
-    float xx = x.x;
-    float xy = x.y;
-    // d1 (xo) : o + u.x
-    // d2 (ab) : a + v.b
-    // o + u.x = a + v.b
-    // ox + xx.u = ax + bx.v
-    // oy + xy.u = ay + by.v
-
-    // sub1
-    // v = (ox - ax + xx.u) / bx.
-    // oy + xy.u = ay + by.(ox - ax + xx.u) / bx
-    // u (xy - xx (by / bx)) = (ay - oy) + (by/bx) (ox-ax)
-    float u = (ay - oy) + (by / bx) * (ox - ax);
-    u = u / (xy - xx * (by / bx));
-    float v = (ox - ax + xx * u) / bx;
-
-    vec2 p1 = o + u * x;
-    vec2 p2 = a + v * b;
-
-    float dist2 = distance(p1, p2);
-    if (dist2 > 0.1) return -1.0;
-
-    return distance(p1, vec2(0.0));
-}
-
 float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     // x * p = a + q * b
     // (x*p, y*p) = (a.x + q*b.x, a.y, q*b.y)
@@ -230,14 +156,8 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     vec2 o = origin;
     float x1 = o.x;
     float y1 = o.y;
-    float x2 =
-        x.x;
-//         (a.x + b.x) * 0.5; // x.x;
-    float y2 =
-        x.y;
-//         (a.y + b.y) * 0.5; // x.y;
-
-//    return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+    float x2 = x.x;
+    float y2 = x.y;
 
     float x3 = a.x;
     float y3 = a.y;
@@ -259,9 +179,7 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     float dx = res.x - o.x;
     float dy = res.y - o.y;
 
-    return
-        sqrt(dx * dx + dy * dy);
-//        distance(vec2(0.0), res);
+    return sqrt(dx * dx + dy * dy);
 }
 
 void main()
@@ -277,67 +195,23 @@ void main()
     // 4. if d(plp, c) < radius_atmos:
     //      up = f(forwardVector, plp, vCenter)
     // 5. extinct after radius_atmos
-    // TODO hack
 
                                    // \/ WTF
-//    vec3 vc = normalizeN(vCenter - vP2, nPower); // vec3(0.0, -10.0, 0.0); // vCenter;
-    vec3 vc = normalizeN(vCenter, nPower); // vec3(0.0, -10.0, 0.0); // vCenter;
-    vec3 vf = normalizeN(vForward, nPower);
+    vec3 vc = normalizeN(vCenter, nPower);
     vec3 vp = normalizeN(vPosition, nPower);
 
     vec3 diff = (vp - 1.0 * vc); // TODO hack 1.1 to 2.0 adjust for distance
 
-//    diff *= 0.0001;
-//    diff = vPosition - vCenter;
-
-    float ddx = (vp.x - vc.x);
-    float ddy = (vp.y - vc.y);
-    float ddz = (vp.z - vc.z);
-
-    bool useL4 = true;
-    float dL2 = 1.0 * distance(vp, vc);
-    float dL4 = 1.0 * pow(pow(ddx, nPower) + pow(ddy, nPower) + pow(ddz, nPower), 1.0 / nPower);
-//    nPower = 8.0;
-//    float dL8 = 1.0 * pow(pow(vp.x - vc.x, nPower) + pow(vp.y - vc.y, nPower) + pow(vp.z - vc.z, nPower), 1.0 / nPower);
-
-//    diff = diff - vc * dot(diff, vc);
-    if (useL4 && false)
-    diff = vec3(
-        sign(ddx) * pow(ddx, nPower),
-        sign(ddy) * pow(ddy, nPower),
-        sign(ddz) * pow(ddz, nPower)) * 1.0 / dL4;
-
-    float dd = dotN(vp, vc, nPower);
-//    float ac = acos(dd);
-//    if (useL4)
-//        dd = 0.5 * pi * pow(sin(pi * dd), 1.0);
-
-    float pi2  = 0.5 * pi;
+//    float dd = dotN(vp, vc, nPower);
 //    diff *= d;
-    float dLim = 0.53;
-    float deltaD = dL4 - dLim;
-    float ccc = 1.0;
-//    if (deltaD > 0.0) ccc *= -1.0 / exp(1.0 + deltaD);
+//    float ccc = 1.0;
 
 // Compute clamped cubic vc-to-vp vector.
-    float sphericParameter = exp(-2.0 * ccc * (1.0 + dd) / 2.0);
-    float flatParameter = exp(-2.0 * abs(dd));
-// Intersect with plane x = vc.x + diameter
-// Intersect with plane y = vc.y - diameter
-// Intersect with plane z = vc.z + diameter
-// Intersect with plane z = vc.z - diameter
+//    float sphericParameter = exp(-2.0 * ccc * (1.0 + dd) / 2.0);
 
-// Solve vp*t = +-diameter, then take min on projection <- centered on 0
-// Solve vp*t = vc +- diameter, then take min on projection
-    // vpx * t = vcx +- diameter => t = vcx+-diameter/vpx
-    flatParameter = 0.1;
+//    float flatParameter = exp(-2.0 * abs(dd));
+    float flatParameter = 0.1;
 
-    float ax = abs(ddx); // abs((vCenter - vPosition).x); // ;
-    float ay = abs(ddy); // abs((vCenter - vPosition).y); // ;
-    float az = abs(ddz); // abs((vCenter - vPosition).z); // ;
-    float ax2 = abs(ddx);
-    float ay2 = abs(ddy);
-    float az2 = abs(ddz);
 
 // Project cube points on the plane tangent to the unit sphere in (vc).
     float cubeDiameter = 25.0;
@@ -349,8 +223,7 @@ void main()
     //                                (i >> 2 & 1 ? 1 : -1) * cubeDiameter);
 
 // TODO switch here for gagaga
-    vec3 center =
-    vCenter;
+    vec3 center = vCenter;
 //     vPP;
     cps[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
@@ -372,127 +245,62 @@ void main()
         vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
         cps[i] = currentC + yc * (R - 1.0);
     }
-    // vec3 positiong = vp * distance(vec3(0.0),cps[1]);
-    // positiong = positiong + (positiong - dot(positiong, tcenter) * tcenter) * ((nmf / dot(positiong, tcenter)) - 1.0);
 
-//    vec4 cProjH = vPM * vec4(vCenter, 1.0);
-    vec3 cProj =
-//        cProjH.xyz / cProjH.w;
-        vCenter;
+    vec3 cProj = vCenter;
 
-//    vp = (vPM * vec4(vPosition, 1.0)).xyz;
-//    vp = normalize(vp);
-
-//    for (int i = 0; i < 8; ++i)
-//        cps[i] = project(cps[i], vc);
 
     vec3 proj = vec3(1.0, 1.0, 1.0);
     vec3 dpv =
-//        vc +
         0.5 * (cps[0] + cps[1]) - vc * dot(0.5 * (cps[0] + cps[1]), vc);
-//        cps[2];
-//            vPosition - vc * dot(vPosition, vc); // project(vPosition, vc);
-//        10.0 * vc + proj - vc * dot(proj, vc);
-    vec3 dpc = cProj - vc * dot(cProj, vc); // project(vCenter, vc);
-    // vec3 dpv = project(vp, vc);
+    vec3 dpc = cProj - vc * dot(cProj, vc);
     // Projected vertex = dpv.
     // Projected center = vc.
 
     vec3 xVector = dpv;
     vec3 yVector = cross(dpv, vc);
-//    float xikoerk = 0.0;
 
-// TODO find a 2D uv parametrization
-    // Project on 3D plane.
-    vec2 xys[8];
+    // Project on 2D plane.
     vec2 xys2[8];
 
-// TODO Begin Change nil/2
-    vec4 centerProj = vPM * vec4(vPP, 1.0);
-    vec2 dpc2D =
-//    vec2(0.0, 0.0);
-//     vec2(dot(vc, xVector), dot(vc, yVector));
-        centerProj.xy / centerProj.w;
+// Begin Change nil/2
     vec2 dpc2D2 = vec2(dot(vc, xVector), dot(vc, yVector));
-    vec4 vertexProj = vPM * vec4(vPosition, 1.0);
-    vec2 dpv2D =
-//    vec2(1.0, 0.0);
-//     vec2(dot(vp, xVector), dot(vp, yVector));
-//        gl_FragCoord.xy;
-        vertexProj.xy / vertexProj.w - dpc2D;
     vec2 dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
     for (int i = 0; i < 8; ++i) {
-        vec4 currentProj = vPM * vec4(cps[i], 1.0);
-        xys[i] =
-        currentProj.xy / currentProj.w - dpc2D2;
         xys2[i] = vec2(dot(cps[i], xVector), dot(cps[i], yVector));
-//        xys2[i] = normalize(xys2[i]);
     }
-    dpc2D = vec2(0.0);
-//    dpv2D2 = normalize(dpv2D2);
-//TODO End Change nil/2
+// End Change nil/2
 
-// Find nearest point angles, then partial convex hull.
-// Define distance to center as x times the convex hull position.
-// + max if dotProduct < 0
-    float dots[8];
+    // Find nearest point angles, then partial convex hull.
+    // Define distance to center as x times the convex hull position.
+    // + max if dotProduct < 0
     float dots2[8];
     for (int i = 0; i < 8; ++i)
-        dots[i] = dot(xys[i], dpv2D);
-    for (int i = 0; i < 8; ++i)
         dots2[i] = (dot(xys2[i], dpv2D2) / (distance(vec2(0), xys2[i]) * distance(vec2(0), dpv2D2)));
-//        dots[i] = dot(cps[i], dpv);
+        // TODO check if this last division is necessary
 
     bool mustInvert = false;
     float distanceToShell = -1.0;
     float tempDistance = -1.0;
 
-    // Find positive elements
-    // and quadratically determine triangles.
-    // TODO I found it! allow all dots, but filter afterwards
+    // Find positive elements and quadratically determine segments.
+    // I found it! allow all dots, but filter afterwards
     float minDotValue = -0.5; // 100000000000.0;
-    float doublet = 0.0;
-    float doublet2 = 0.0;
-    float doublet3 = 0.0;
+    vec2 bestA;
+    vec2 bestB;
+
     for (int i = 0; i < 8; ++i) {
         if (dots2[i] > minDotValue) {
             for (int j = 0; j < 8; ++j) {
                 if (dots2[j] > minDotValue && j > i) {
-                    // bool invert = dot(xys2[i], xys2[j]) > 0.0;
-                    // invert = true;
-                    // if (invert) continue;
-
-                    vec2 A = xys[i]; // invert ? xys[j] : xys[i];
-                    vec2 B = xys[j]; // invert ? xys[i] : xys[j];
-                    vec2 A2 = xys2[i]; // invert ? xys2[i] : xys2[j];
-                    vec2 B2 = xys2[j]; // invert ? xys2[j] : xys2[i];
-
+                    vec2 A2 = xys2[i];
+                    vec2 B2 = xys2[j];
                     if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
                     {
-                        float newDistance =
-//                            dFuck(dpv2D2, dpc2D2, A2, B2);
-                            distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
-//                            distanceTo2DXAngle(dpv2D2, dpc2D2, A2, B2);
-//                            distanceTo2DHalf(dpc2D2, A2, B2);
+                        float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
                         if (newDistance > tempDistance) {
-                            doublet = float(i) * 8.0 + float(j) * 1.0;
-                            doublet2 = float(i);
-                            doublet3 = float(j);
-                            distanceToShell = distanceTo2DHalf(dpc2D2, A2, B2);
-                            // mustInvert = false;
+                            bestA = A2;
+                            bestB = B2;
                             tempDistance = newDistance;
-
-//                            diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
-                            vec2 diffMeuh = -A2 + B2;
-                            vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
-                            float meuhDot = dot(meuh, A2) > 0.0 ? 1.0 : -1.0;
-                            // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
-                            vec3 meumeuh = center + xVector * meuh.x + yVector * meuh.y; // vec3(1.0, 0.0, 0.0) * meuh[0] + vec3(0.0, 1.0, 0.0) * meuh[1];
-                            diff = 2.0 * (normalize(0.5 * meuhDot * (meumeuh))); //  - 1.0 * vc);
-                            // TODO it's more like it
-//                             diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
-
-//                            diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
                         }
                     }
                 }
@@ -500,16 +308,30 @@ void main()
         }
     }
 
-// TODO uncomment
-//    float distanceToCenter = distance(projectedVertex, cp);
-//    float distanceFromCenterToConvexHull = 0.0; // Project center on partial convex hull.
-//    float geodesic = distance(vp, cp1);
+    // TODO interpolation of the form:
+    for (int i = 0; i < 8; ++i) {
+        vec2 testPoint = xys2[i];
+        // Look at segment [bestA testPoint]
+        // Look at segment [bestB testPoint]
+        // Take middle of segment
+        // Compute dot product from center to meuhDot * meumeuh
+        // Take two lowest dots from right and left
+        // Take the one which has the greatest distanceTo2DIntersection
+    }
 
+    {
+        distanceToShell = distanceTo2DHalf(dpc2D2, bestA, bestB);
 
-// Approximation: min distance to cpi.
-// TODO something if dot(vc, vp) < 0
-//    if (distanceToMinCP > distanceToCenter)
-//    flatParameter = distanceToMinCP / (distanceToMinCP + distanceToCenter);
+        // diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
+        vec2 diffMeuh = -bestA + bestB;
+        vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
+        float meuhDot = dot(meuh, bestA) > 0.0 ? 1.0 : -1.0;
+        // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
+        vec3 meumeuh = center + xVector * meuh.x + yVector * meuh.y;
+        diff = 2.0 * (normalize(0.5 * meuhDot * (meumeuh))); //  - 1.0 * vc);
+        // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
+        // diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
+    }
 
     float omega = 2.0;
     if (distanceToShell > 0.0) omega /= (0.01 * distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
@@ -521,29 +343,16 @@ void main()
 //        1.0 / ac;
 // TODO hack exp inner factor to adjust for distance
         vc * subtract;
-//        0.0;
 
     float lum = luminance;
     float vsf = vSunfade;
 
-    // TODO remove hack
-//    vec3 p1 = vc - vf * dot(vf, vc);
-//    vec3 p2 = vp - 1.5 * vc * dot(vc, vp);
-//    diff = p2 - vc;
-
     // TODO hack distance
-    // TODO hack up vector (almost it)
-    vec3 nup =
-//    diff;
-       normalizeN(diff, nPower) * 1.0;
-//        normalize(vec3(0. 0, 0.0, 1.0));
+    vec3 nup = normalizeN(diff, nPower) * 1.0;
 
     // TODO hack sun intensity from intersection
     float vse = vSunE;
     vse = sunIntensity(dot(vSunDirection, nup));
-    // TODO compute distance in L-N space
-//    if (deltaD > 0.0) vse *= 1.0 / exp(20.0 * deltaD);
-//    if (deltaD < -0.02) vse *= 1.0 / exp(-20.0 * deltaD) ;
 
 // optical length
 // cutoff angle at 90 to avoid singularity in next formula.
@@ -589,10 +398,7 @@ void main()
 	float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
 	L0 += (vse * 19000.0 * Fex) * sundisk;
 
-	vec3 texColor = (Lin
-	+ L0)
-//	)
-	* 0.04 + vec3(0.0, 0.0003, 0.00075);
+	vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
 
 	vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(lum, 4.0))) * texColor);
 	vec3 color = curr * whiteScale;
@@ -600,30 +406,13 @@ void main()
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
 
-    //if (abs(tempDistance - 10.0) < 100000000.0) {
-    //    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    //} else
-    // Output color
-
 	gl_FragColor = vec4(retColor, 1.0);
-//	gl_FragColor = vec4(normalize(vec3(100000000.0, tempDistance , 100000000.0)), doublet * 1.0/64.0);
-//	gl_FragColor = vec4(doublet * 1.0/64.0, doublet2 * 1.0/8.0, doublet3 * 1.0/8.0, 1.0);
     for (int i = 0; i < 8; ++i) {
         if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
             gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-//        if (distance(positiong, cps[i]) < 2000.0)
-//            gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
     }
 
-//    if (distance(normalize(dpv2D2), normalize(dpc2D2)) < 0.01)
-//        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
-
-//    gl_FragColor = vec4(1.0, 1.0, dd, 1.0);
-//    gl_FragColor = vec4(normalize(nup), 1.0);
-//    gl_FragColor = vec4(normalize(diff), 1.0);
-//    if (abs(d - dLim) < 0.001)
-//	    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
 
     // Dithering
     // TODO put dithering back.
