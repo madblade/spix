@@ -313,84 +313,34 @@ void main()
         }
     }
 
-    // TODO interpolation of the form:
-    float highestDotForB = -2.0;
-    float secondHighestDotForB = -2.0;
-    float highestDotForA = -2.0;
-    float secondHighestDotForA = -2.0;
-    float dotA = -2.0;
-    float dotB = -2.0;
-    vec2 firstB;
-    vec2 secondB;
-    vec2 firstA;
-    vec2 secondA;
+    float dotNA = dot(normalize(bestA), dpv2D2);
+    float dotNB = dot(normalize(bestB), dpv2D2);
+    bool whichOne = dotNA > dotNB;
+    vec2 interpolatorEnd = whichOne ? normalize(bestA) : normalize(bestB);
+    vec2 middle = 0.5 * (bestA + bestB);
 
-// TODO compute the closest neighbor
-    for (int i = 0; i < 8; ++i) {
-        if (dots2[i] > minDotValue) {
-            vec2 testPoint = xys2[i];
-            dotA = dot(testPoint, bestA);
-            dotB = dot(testPoint, bestB);
+    float dotNE = dot(normalize(middle), normalize(interpolatorEnd));
+    float dotNC = dot(normalize(middle), normalize(dpv2D2));
+    float dotEV = dot(normalize(interpolatorEnd), normalize(dpv2D2));
 
-            // Look at segment [bestA testPoint]
-            if (i != bestI && dotA > dotB) {
-                if (dotA > highestDotForA) {
-                    highestDotForA = dotA;
-                    firstA = xys2[i];
-                } else if (dotA > secondHighestDotForA) {
-                    secondHighestDotForA = dotA;
-                    secondA = xys2[i];
-                }
-            }
-
-            // Look at segment [bestB testPoint]
-            if (i != bestJ && dotB > dotA) {
-                if (dotB > highestDotForB) {
-                    highestDotForB = dotB;
-                    firstB = xys2[i];
-                } else if (dotB > secondHighestDotForB) {
-                    secondHighestDotForB = dotB;
-                    secondB = xys2[i];
-                }
-            }
-
-            // Take middle of segment -> why?
-            // Compute dot product from center to meuhDot * meumeuh
-        }
-    }
-    // Take two highest dots from right and left
-
-    // Take the one which has the greatest distanceTo2DIntersection
-    float distanceA1 = distanceTo2DIntersection(dpv2D2, dpc2D2, firstA, bestA);
-    float distanceA2 = distanceTo2DIntersection(dpv2D2, dpc2D2, secondA, bestA);
-    // TODO fix here! there is probably a wrong calculation done in the previous for
-    vec2 leftA = firstA; // distanceA1 > distanceA2 ? firstA : secondA;
-    float distanceB1 = distanceTo2DIntersection(dpv2D2, dpc2D2, firstB, bestB);
-    float distanceB2 = distanceTo2DIntersection(dpv2D2, dpc2D2, secondB, bestB);
-    vec2 rightB = firstB; // distanceB1 > distanceB2 ? firstB : secondB;
-    bool whichOne = dot(leftA, dpv2D2) > dot(rightB, dpv2D2);
-
-    vec2 interpolator = whichOne ? leftA : rightB;
-    vec2 interpolatorBout = whichOne ? bestA : bestB;
+    // TODO find a function that is 1 at dpv2D2=interpolatorEnd and 0 at dpv2D2=middle
+    float interpolatorFactor = pow((dotEV - dotNE), 1.0);
 
     {
         distanceToShell = distanceTo2DHalf(dpc2D2, bestA, bestB);
 
         // diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
-        vec2 diffMeuh = -bestA + bestB;
-        vec2 meuh = vec2(diffMeuh.y, -diffMeuh.x);
-        float meuhDot = dot(meuh, bestA) > 0.0 ? 1.0 : -1.0;
+        vec2 bestSegment = -bestA + bestB;
+        vec2 orthoBestSegment = normalize(vec2(bestSegment.y, -bestSegment.x));
+        float orientationBestSegment = dot(orthoBestSegment, bestA) > 0.0 ? 1.0 : -1.0;
 
-        vec2 diffOther = interpolator - interpolatorBout;
-        vec2 otherMeuh = vec2(diffOther.y, -diffOther.x);
-        float otherMeuhDot = dot(otherMeuh, interpolatorBout) > 0.0 ? 1.0 : -1.0;
+        float otherMeuhDot = dot(dpv2D2, interpolatorEnd) > 0.0 ? 1.0 : -1.0;
 
-
-        // vec2 meuh = 0.5 * (A2 + B2); // (A2 + B2);
-        vec3 meumeuh = center
-//            + 1.0 * meuhDot * (xVector * meuh.x + yVector * meuh.y);
-//            + 1.0 * rightMeuhDot * (xVector * rightMeuh.x + yVector * rightMeuh.y);
-            + 1.0 * otherMeuhDot * (xVector * otherMeuh.x + yVector * otherMeuh.y);
+        float iF = 1.0 * interpolatorFactor;
+        vec3 meumeuh =
+            (1.0 - iF) * (center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y))
+            + (iF) * (center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
+//;
 
         diff = 5.0 * (normalize((meumeuh))); //  - 1.0 * vc);
         // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
@@ -469,12 +419,14 @@ void main()
 
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
+//    retColor = vec3(1.0, 0.0, exp(-interpolatorFactor));
 
 	gl_FragColor = vec4(retColor, 1.0);
-    for (int i = 0; i < 8; ++i) {
-        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
-            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    }
+//    for (int i = 0; i < 8; ++i) {
+//        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
+//            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+//    }
+
 
 
 
