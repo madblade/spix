@@ -278,7 +278,6 @@ void main()
         dots2[i] = (dot(xys2[i], dpv2D2) / (distance(vec2(0), xys2[i]) * distance(vec2(0), dpv2D2)));
         // TODO check if this last division is necessary
 
-    bool mustInvert = false;
     float distanceToShell = -1.0;
     float tempDistance = -1.0;
 
@@ -316,15 +315,21 @@ void main()
     float dotNA = dot(normalize(bestA), dpv2D2);
     float dotNB = dot(normalize(bestB), dpv2D2);
     bool whichOne = dotNA > dotNB;
-    vec2 interpolatorEnd = whichOne ? normalize(bestA) : normalize(bestB);
+    vec2 iE = whichOne ? bestA : bestB;
+    vec2 interpolatorEnd = normalize(iE);
     vec2 middle = 0.5 * (bestA + bestB);
 
+//    float dotNNA = dot(normalize(middle), normalize(bestA));
+//    float dotNNB = dot(normalize(middle), normalize(bestB));
     float dotNE = dot(normalize(middle), normalize(interpolatorEnd));
+//    if (dotNE > 0.9) dotNE = dot(normalize(vec2(bestA[0] + 0.2 * bestA[1], bestA[1] + 0.2 * bestA[0])), normalize(interpolatorEnd));
     float dotNC = dot(normalize(middle), normalize(dpv2D2));
     float dotEV = dot(normalize(interpolatorEnd), normalize(dpv2D2));
 
-    // TODO find a function that is 1 at dpv2D2=interpolatorEnd and 0 at dpv2D2=middle
-    float interpolatorFactor = pow((dotEV - dotNE), 1.0);
+    float interpolatorFactor = 0.0; // pow((dotEV - dotNE) / (1.0 - dotNE), 1.0);
+
+    // Tweak this function for smoothing.
+    if (dotEV > 0.95) interpolatorFactor = pow((dotEV - 0.95) * 20.0, 20.0);
 
     {
         distanceToShell = distanceTo2DHalf(dpc2D2, bestA, bestB);
@@ -335,21 +340,21 @@ void main()
         float orientationBestSegment = dot(orthoBestSegment, bestA) > 0.0 ? 1.0 : -1.0;
 
         float otherMeuhDot = dot(dpv2D2, interpolatorEnd) > 0.0 ? 1.0 : -1.0;
+//        float otherMeuhDot = dotEV > 0.0 ? 1.0 : -1.0;
 
         float iF = 1.0 * interpolatorFactor;
         vec3 meumeuh =
-            (1.0 - iF) * (center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y))
-            + (iF) * (center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
+            (1.0 - iF) * normalize(center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y))
+            + (2.0 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
 //;
 
-        diff = 5.0 * (normalize((meumeuh))); //  - 1.0 * vc);
+        diff = 5.0 * normalize(meumeuh); // - 0.1 * vc;
         // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
         // diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
     }
 
     float omega = 2.0;
     if (distanceToShell > 0.0) omega /= (0.01 * distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
-    if (mustInvert) omega *= -1.0;
 
     flatParameter = 2.0 * exp(-20.0 * omega * pow(abs(flatParameter), 1.0));
     float subtract = flatParameter;
