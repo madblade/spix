@@ -9,17 +9,16 @@ varying float vSunE;
 varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
-varying vec3 vP2;
 //varying mat4 vMVM;
 //varying mat4 vPM;
 varying vec3 vUp;
-varying vec3 vPP;
 
 // uniform mat4 viewInverse;
 uniform float luminance;
 uniform float mieDirectionalG;
 
 const vec3 cameraPos = vec3(0.0, 0.0, 0.0);
+const vec3 worldCenter = vec3(-100.0, 100.0, 50.0);
 
 // constants for atmospheric scattering
 const float pi = 3.141592653589793238462643383279502884197169;
@@ -202,17 +201,6 @@ void main()
 
     vec3 diff = (vp - 1.0 * vc); // TODO hack 1.1 to 2.0 adjust for distance
 
-//    float dd = dotN(vp, vc, nPower);
-//    diff *= d;
-//    float ccc = 1.0;
-
-// Compute clamped cubic vc-to-vp vector.
-//    float sphericParameter = exp(-2.0 * ccc * (1.0 + dd) / 2.0);
-
-//    float flatParameter = exp(-2.0 * abs(dd));
-    float flatParameter = 0.1;
-
-
 // Project cube points on the plane tangent to the unit sphere in (vc).
     float cubeDiameter = 25.0;
     vec3 cps[8];
@@ -243,7 +231,7 @@ void main()
         float alpha = dot(currentC, tcenter);
         float R = abs(alpha) > 0.000000001 ? nmf / alpha : 1000000.0; // (far - near) / (2.0 * alpha)
         vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
-        cps[i] = currentC + yc * (R - 1.0);
+//        cps[i] = currentC + yc * (R - 1.0);
     }
 
     vec3 cProj = vCenter;
@@ -256,8 +244,8 @@ void main()
     // Projected vertex = dpv.
     // Projected center = vc.
 
-    vec3 xVector = dpv;
-    vec3 yVector = cross(dpv, vc);
+    vec3 xVector = normalize(dpv);
+    vec3 yVector = cross(normalize(dpv), vc);
 
     // Project on 2D plane.
     vec2 xys2[8];
@@ -266,7 +254,8 @@ void main()
     vec2 dpc2D2 = vec2(dot(vc, xVector), dot(vc, yVector));
     vec2 dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
     for (int i = 0; i < 8; ++i) {
-        xys2[i] = vec2(dot(cps[i], xVector), dot(cps[i], yVector));
+        xys2[i] = vec2(dot(normalize(cps[i]), xVector), dot(normalize(cps[i]), yVector));
+//        xys2[i] = vec2(dot((cps[i]), xVector), dot((cps[i]), yVector));
     }
 // End Change nil/2
 
@@ -330,9 +319,9 @@ void main()
 
     // Tweak this function for smoothing.
     if (dotEV > 0.95) interpolatorFactor = pow((dotEV - 0.95) * 20.0, 20.0);
+//    interpolatorFactor = 0.0;
 
     {
-        distanceToShell = distanceTo2DHalf(dpc2D2, bestA, bestB);
 
         // diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
         vec2 bestSegment = -bestA + bestB;
@@ -343,31 +332,65 @@ void main()
 //        float otherMeuhDot = dotEV > 0.0 ? 1.0 : -1.0;
 
         float iF = 1.0 * interpolatorFactor;
-        vec3 meumeuh =
+        vec3 meumeuh;
+        meumeuh =
             (1.0 - iF) * normalize(center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y))
-            + (2.0 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
+            + (0.85 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
 //;
 
-        diff = 5.0 * normalize(meumeuh); // - 0.1 * vc;
+
+        vec2 ABV = bestSegment;
+        vec2 PBV = bestB - dpv2D2;
+
+        vec3 verticalCros = cross(vec3(ABV, 0.0), vec3(0.0, 0.0, 1.0));
+        bool whichOrientation = dot(vec2(verticalCros.x, verticalCros.y), bestB) > 0.0;
+        bool whichSide = ABV.x * PBV.y - PBV.x * ABV.y > 0.0;
+        if (whichOrientation) whichSide = !whichSide;
+        // dot(cross(vec3(bestB - bestA, 0.0), vec3(dpv2D2 - bestA, 0.0)), vec3(0.0, 0.0, 1.0)) > 0.0;
+
+        float dotVV = dot(vCenter, vPosition);
+        float dotVM = dot(vc, vp);
+
+        float coeffV = min(pow(1.0 - dotVM, 2.0), 0.99);
+        if (dotVM < 0.0) {
+            meumeuh = -normalize(vPosition-vCenter) * 2.0 * (-0.5 + dotVM);
+        }
+
+        diff = 0.5 * meumeuh * coeffV;
+
+        if (whichSide) diff = vec3(0.0);
+//        else diff = vec3(1.0);
+
+//        diff = normalize(diff);
+//         meumeuh = normalize(vPosition-vCenter);
+
+//        dotVM > 0.5 ? 0.005 * (dotVM) * meumeuh :
+//            dotVM < -0.5 ? 0.005*(1.5)*meumeuh:
+//            0.005*(1.0 - dotVM)*meumeuh ;
+
+          // vec3(0.0); // - 0.0001 * vc;
         // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
         // diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
     }
 
-    float omega = 2.0;
-    if (distanceToShell > 0.0) omega /= (0.01 * distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
 
-    flatParameter = 2.0 * exp(-20.0 * omega * pow(abs(flatParameter), 1.0));
-    float subtract = flatParameter;
-    diff -=
-//        1.0 / ac;
+    float dvcvp = 0.0; //distanceTo2DHalf(dpc2D2, bestA, bestB); // 120.0 * dot(vCenter, vPosition);
+    distanceToShell = dvcvp; // 100.0 * dvcvp > 0.0 ? dvcvp : -1.0;
+     // distance(dpv2D2, dpc2D2);
+     // distanceTo2DHalf(dpc2D2, bestA, bestB);
+
+    float omega = 1.0;
+    if (distanceToShell > 0.0) omega = 100.0 / (distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
+
+//    float flatParameter = 0.0; // 4.0 * exp(-2.0 * omega);
+//    diff -= vc * flatParameter;
 // TODO hack exp inner factor to adjust for distance
-        vc * subtract;
 
     float lum = luminance;
     float vsf = vSunfade;
 
     // TODO hack distance
-    vec3 nup = normalizeN(diff, nPower) * 1.0;
+    vec3 nup = diff * 1.0;
 
     // TODO hack sun intensity from intersection
     float vse = vSunE;
@@ -424,15 +447,15 @@ void main()
 
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
-//    retColor = vec3(1.0, 0.0, exp(-interpolatorFactor));
+//    retColor = vec3(dot(vp, normalize(dpv)), dot(vp, cross(normalize(dpv), vc)), 1.0); // vec3(1.0, 0.0, vp.x);
+//    retColor = vec3(normalize(bestB + bestA).x, normalize(bestB + bestA).y, 1.0); // vec3(1.0, 0.0, vp.x);
+//    retColor = vec3(normalize(bestA), 1.0); // vec3(1.0, 0.0, vp.x);
 
 	gl_FragColor = vec4(retColor, 1.0);
 //    for (int i = 0; i < 8; ++i) {
 //        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
 //            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 //    }
-
-
 
 
     // Dithering
