@@ -258,33 +258,57 @@ void main()
     cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
 
     // Deprojection
+    // TODO [HARD] fix deprojection
     float near = 0.1;
     float far = 2000.0;
+    float fmn = far - near;
     vec3 tcenter = vc;
+    bool doNormalize = false;
+//    float debugBetas[8];
+//    float debugBeta;
     for (int i = 0; i < 8; ++i) {
-        vec3 currentC = cps2[i];
-        // vc <- vf
+        cps2[i] += 0.0 * center;
+        vec3 currentC = 1.0 * (cps2[i] - center) + center;
         float alpha = dot(currentC, tcenter);
+        float beta = dot(normalize(currentC), normalize(tcenter));
         float didi = distance(currentC, vec3(0.0));
-        float R = (far - near) / alpha;
-        vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
-        // TODO [hard] fix deprojection
-        // cps[i] = currentC + yc * (R - 1.0);
+        float R = beta < 0.1 ? fmn : fmn / alpha;
+//        if (alpha < 1e-1) R = 1e0;
+//        R = fmn / alpha; // pow(didi, 2.0);
+//        R = min(R, 1e0);
+        vec3 yc = currentC - alpha * tcenter;
+        if (!doNormalize)
+            cps[i] = currentC + yc * (R - 1.0);
+        else
+            cps[i] = currentC;
+        cps2[i] -= 0.0 * center;
+//        debugBetas[i] = beta;
     }
 
-    vec3 dpv = 0.5 * (cps[0] + cps[1]) - vc * dot(0.5 * (cps[0] + cps[1]), vc);
+    vec3 midPoint = 0.5 * (cps[0] + cps[1]);
+    vec3 dpv = midPoint - vc * dot(midPoint, vc);
 
-    vec3 xVector = normalize(dpv);
-    vec3 yVector = cross(normalize(dpv), vc);
+    vec3 xVector = doNormalize ? normalize(dpv) : dpv;
+    vec3 yVector = cross(xVector, vc);
 
     // Project on 2D plane.
     vec2 xys2[8];
 
 // Begin Change nil/2
-    vec2 dpc2D2 = vec2(dot(vc, xVector), dot(vc, yVector));
-    vec2 dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
+    vec2 dpc2D2;
+    vec2 dpv2D2;
+    if (doNormalize) {
+    dpc2D2 = vec2(dot(vc, xVector), dot(vc, yVector));
+    dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
     for (int i = 0; i < 8; ++i) {
         xys2[i] = vec2(dot(normalize(cps[i]), xVector), dot(normalize(cps[i]), yVector));
+    }
+    } else {
+    dpc2D2 = vec2(dot(vCenter, xVector), dot(vCenter, yVector));
+    dpv2D2 = vec2(dot(vPosition, xVector), dot(vPosition, yVector));
+    for (int i = 0; i < 8; ++i) {
+        xys2[i] = vec2(dot((cps[i]), xVector), dot((cps[i]), yVector));
+    }
     }
 // End Change nil/2
 
@@ -293,10 +317,8 @@ void main()
     // + max if dotProduct < 0
     float dots2[8];
     for (int i = 0; i < 8; ++i)
-        dots2[i] = (dot(xys2[i], dpv2D2) / (distance(vec2(0), xys2[i]) * distance(vec2(0), dpv2D2)));
-        // TODO check if this last division is necessary
+        dots2[i] = dot(normalize(xys2[i]), normalize(dpv2D2));
 
-    float distanceToShell = -1.0;
     float tempDistance = -1.0;
 
     // Find positive elements and quadratically determine segments.
@@ -313,15 +335,16 @@ void main()
                 if (dots2[j] > minDotValue && j > i) {
                     vec2 A2 = xys2[i];
                     vec2 B2 = xys2[j];
-                    if (isInsideAngle(5.0 * dpv2D2, dpc2D2, A2, B2))
+                    if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
                     {
-                        float newDistance = distanceTo2DIntersection(1.0 * dpv2D2, dpc2D2, A2, B2);
+                        float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
                         if (newDistance > tempDistance) {
                             bestA = xys2[i];
                             bestB = xys2[j];
                             bestCPA = cps2[i];
                             bestCPB = cps2[j];
                             tempDistance = newDistance;
+//                            debugBeta = debugBetas[i];
                         }
                     }
                 }
@@ -339,7 +362,7 @@ void main()
     float interpolatorFactor = 0.0;
 
     // Tweak this function for smoothing.
-    if (dotEV > 0.90) interpolatorFactor = pow((dotEV - 0.90) * 10.0, 20.0);
+    if (dotEV > 0.90) interpolatorFactor = pow((dotEV - 0.90) * 10.0, 200.0);
     float iF = 1.0 * interpolatorFactor;
     // iF = 0.0;
 
@@ -358,11 +381,6 @@ void main()
                 normalize(cross(0.5 * (bestCPA + bestCPB), coeffOrientation * (bestCPA - bestCPB)));
 
     }
-
-    float dvcvp = 0.0;
-    distanceToShell = dvcvp;
-    float omega = 1.0;
-    if (distanceToShell > 0.0) omega = 100.0 / (distanceToShell);
 
     vec3 nup = diff * 0.02;
 
@@ -419,7 +437,7 @@ void main()
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
     // Debug here:
-    // retColor = vec3(dpv2D2, 0.0);
+    // retColor = vec3(1.0, debugBeta, 0.0);
 
 	gl_FragColor = vec4(retColor, 1.0);
     // Edges

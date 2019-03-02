@@ -47,7 +47,7 @@ let SkyModule = {
         let distance = this.distance;
         let phi = this.phi;
         let theta = this.theta;
-        phi += 0.0101;
+        // phi += 0.0101;
         this.phi = phi;
 
         let x = distance * cos(phi);
