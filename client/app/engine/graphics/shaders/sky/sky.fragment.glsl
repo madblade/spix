@@ -181,6 +181,33 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     return sqrt(dx * dx + dy * dy);
 }
 
+float distanceTo2DNormalizedIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
+    float res = 0.0;
+
+    // vec2 intersect = 0.5 * (a+b);
+    // t * x = a + u * (b-a)
+    // tx = ub + (1-u)a
+
+    // (For the record, solving for t:)
+    // tx cross (b-a) = (a + u(b-a)) cross (b-a)
+    // t(x cross (b-a)) = a cross (b-a)
+    // t = (a cross (b-a)) / (x cross (b-a))
+
+    // (Solving for u:)
+    // tx cross x = (a + u(b-a)) cross x
+    // 0 = (a cross x) + u((b-a) cross x)
+    // u = -(a cross x) / ((b-a) cross x)
+    vec2 bma = b - a;
+    float aCrossX = a.x * x.y - x.x * a.y;
+    float bmaCrossX = bma.x * x.y - x.x * bma.y;
+    float u = - aCrossX / bmaCrossX;
+
+    vec2 intersect = u * b + (1.0 - u) * a;
+
+    res = distance(x, intersect);
+    return res;
+}
+
 void main()
 {
     float nPower = 2.0;
@@ -196,8 +223,10 @@ void main()
     // 5. extinct after radius_atmos
 
                                    // \/ WTF
-    vec3 vc = normalizeN(vCenter, nPower);
-    vec3 vp = normalizeN(vPosition, nPower);
+//    vec3 vc = normalizeN(vCenter, nPower);
+//    vec3 vp = normalizeN(vPosition, nPower);
+    vec3 vc = normalize(vCenter);
+    vec3 vp = normalize(vPosition);
 
     vec3 diff = (vp - 1.0 * vc); // TODO hack 1.1 to 2.0 adjust for distance
 
@@ -229,13 +258,12 @@ void main()
         vec3 currentC = cps[i];
         // vc <- vf
         float alpha = dot(currentC, tcenter);
-        float R = abs(alpha) > 0.000000001 ? nmf / alpha : 1000000.0; // (far - near) / (2.0 * alpha)
+        float R = 0.00005 * nmf / alpha; // abs(alpha) > 0.000000001 ?  : 1000000.0; // (far - near) / (2.0 * alpha)
         vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
 //        cps[i] = currentC + yc * (R - 1.0);
     }
 
     vec3 cProj = vCenter;
-
 
     vec3 proj = vec3(1.0, 1.0, 1.0);
     vec3 dpv =
@@ -243,6 +271,9 @@ void main()
     vec3 dpc = cProj - vc * dot(cProj, vc);
     // Projected vertex = dpv.
     // Projected center = vc.
+
+    vec3 unXVector = dpv;
+    vec3 unYVector = cross(dpv, vCenter);
 
     vec3 xVector = normalize(dpv);
     vec3 yVector = cross(normalize(dpv), vc);
@@ -279,6 +310,8 @@ void main()
 
     vec2 bestA;
     vec2 bestB;
+    vec3 bestCPA;
+    vec3 bestCPB;
     for (int i = 0; i < 8; ++i) {
         if (dots2[i] > minDotValue) {
             for (int j = 0; j < 8; ++j) {
@@ -293,6 +326,8 @@ void main()
                             bestJ = j; // bestB = B2;
                             bestA = xys2[i];
                             bestB = xys2[j];
+                            bestCPA = cps[i];
+                            bestCPB = cps[j];
                             tempDistance = newDistance;
                         }
                     }
@@ -319,10 +354,9 @@ void main()
 
     // Tweak this function for smoothing.
     if (dotEV > 0.95) interpolatorFactor = pow((dotEV - 0.95) * 20.0, 20.0);
-//    interpolatorFactor = 0.0;
+    interpolatorFactor = 0.0;
 
     {
-
         // diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
         vec2 bestSegment = -bestA + bestB;
         vec2 orthoBestSegment = normalize(vec2(bestSegment.y, -bestSegment.x));
@@ -334,32 +368,59 @@ void main()
         float iF = 1.0 * interpolatorFactor;
         vec3 meumeuh;
         meumeuh =
-            (1.0 - iF) * normalize(center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y))
-            + (0.85 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
+            (1.0 - iF) * normalize(center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y));
+//            + (0.85 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
 //;
 
+        vec2 ABV = bestSegment; // (vec3(bestSegment, 0.0) - dot(vec3(bestSegment, 0.0), vc) * vc).xy;
+//        dpv2D2 = vec2(dot(vp, dpv), dot(vp, cross(dpv, vc)));
 
-        vec2 ABV = bestSegment;
-        vec2 PBV = bestB - dpv2D2;
+        float d2c = 1.0; // distance(dpv2D2, dpc2D2);
+        vec2 PBV = (bestA -
+             4.0 * dpv2D2); // * 1e-5 * distance(vPosition, vCenter);
+//            1.5 * 1e-6 * vec2(dot(vPosition, xVector), dot(vPosition, yVector));
+
+        // * (3.14 - acos(dot(dpv2D2, middle)))/(3.14-acos(dot(bestA, bestB)));
 
         vec3 verticalCros = cross(vec3(ABV, 0.0), vec3(0.0, 0.0, 1.0));
         bool whichOrientation = dot(vec2(verticalCros.x, verticalCros.y), bestB) > 0.0;
-        bool whichSide = ABV.x * PBV.y - PBV.x * ABV.y > 0.0;
+        bool whichSide =
+            ABV.x * PBV.y - PBV.x * ABV.y > 0.0;
+//            dot(cross(vec3(bestB - bestA, 0.0), vec3(dpv2D2 - bestA, 0.0)), vec3(0.0, 0.0, 1.0)) > 0.0;
         if (whichOrientation) whichSide = !whichSide;
-        // dot(cross(vec3(bestB - bestA, 0.0), vec3(dpv2D2 - bestA, 0.0)), vec3(0.0, 0.0, 1.0)) > 0.0;
 
         float dotVV = dot(vCenter, vPosition);
-        float dotVM = dot(vc, vp);
+//        float
+        float dotVM = 1.0 *
+//         distanceTo2DIntersection(dpv2D2, dpc2D2, bestA, bestB);
+        distance(dpv2D2, middle);
 
-        float coeffV = min(pow(1.0 - dotVM, 2.0), 0.99);
-        if (dotVM < 0.0) {
-            meumeuh = -normalize(vPosition-vCenter) * 2.0 * (-0.5 + dotVM);
+//        xVector = (dpv);
+//        yVector = cross((dpv), vc);
+//        dpv2D2 = 0.000005 * vec2(dot(vPosition, xVector), dot(vPosition, yVector));
+
+//        float testSky = -dot(bestA, dpv2D2 - bestA);
+        float sharpCoefficient = 1.0;
+        dotVM = sharpCoefficient * distanceTo2DNormalizedIntersection(1.0 * dpv2D2, dpc2D2, bestA, bestB);
+//        dotVM = distance(dpv2D2, middle);
+//        dotVM *= dot(dpv2D2, middle);
+//        dotVM = 1.0 - dot(vc, vp);
+
+        float coeffV = 2.0 * min(pow(dotVM, 2.0), 0.99);
+        if (dotVM < 0.0) { // Backsky
+//            meumeuh = -normalize(vPosition-vCenter) * 2.0 * (-0.5 + dotVM);
         }
 
         diff = 0.5 * meumeuh * coeffV;
+//        diff = vec3(0.0, bestSegment);
+        diff = vec3(orthoBestSegment.x, orthoBestSegment.yx);
+        float coeffOrientation = whichOrientation ? -1.0 : 1.0;
+        diff = normalize(cross(0.5 * (bestCPA + bestCPB), coeffOrientation * (bestCPA - bestCPB)));
 
-        if (whichSide) diff = vec3(0.0);
+//        if (whichSide) diff = vec3(0.0, 0.0, 1.0);
 //        else diff = vec3(1.0);
+
+//        if (dotVM < 0.0) diff = vec3(0.0, 0.0, 1.0);
 
 //        diff = normalize(diff);
 //         meumeuh = normalize(vPosition-vCenter);
@@ -450,10 +511,11 @@ void main()
 //    retColor = vec3(dot(vp, normalize(dpv)), dot(vp, cross(normalize(dpv), vc)), 1.0); // vec3(1.0, 0.0, vp.x);
 //    retColor = vec3(normalize(bestB + bestA).x, normalize(bestB + bestA).y, 1.0); // vec3(1.0, 0.0, vp.x);
 //    retColor = vec3(normalize(bestA), 1.0); // vec3(1.0, 0.0, vp.x);
+//    retColor = vec3(dpv2D2, 0.0);
 
 	gl_FragColor = vec4(retColor, 1.0);
 //    for (int i = 0; i < 8; ++i) {
-//        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.01)
+//        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
 //            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 //    }
 
