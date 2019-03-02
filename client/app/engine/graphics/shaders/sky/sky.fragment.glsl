@@ -222,9 +222,6 @@ void main()
     //      up = f(forwardVector, plp, vCenter)
     // 5. extinct after radius_atmos
 
-                                   // \/ WTF
-//    vec3 vc = normalizeN(vCenter, nPower);
-//    vec3 vp = normalizeN(vPosition, nPower);
     vec3 vc = normalize(vCenter);
     vec3 vp = normalize(vPosition);
 
@@ -240,9 +237,7 @@ void main()
     //                                (i >> 1 & 1 ? 1 : -1) * cubeDiameter,
     //                                (i >> 2 & 1 ? 1 : -1) * cubeDiameter);
 
-// TODO switch here for gagaga
     vec3 center = vCenter;
-//     vPP;
     cps[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
@@ -273,20 +268,11 @@ void main()
         float didi = distance(currentC, vec3(0.0));
         float R = (far - near) / alpha;
         vec3 yc = currentC - dot(currentC, tcenter) * tcenter;
-//        cps[i] = currentC + yc * 1.0 / alpha;
+        // TODO [hard] fix deprojection
+        // cps[i] = currentC + yc * (R - 1.0);
     }
 
-    vec3 cProj = vCenter;
-
-    vec3 proj = vec3(1.0, 1.0, 1.0);
-    vec3 dpv =
-        0.5 * (cps[0] + cps[1]) - vc * dot(0.5 * (cps[0] + cps[1]), vc);
-    vec3 dpc = cProj - vc * dot(cProj, vc);
-    // Projected vertex = dpv.
-    // Projected center = vc.
-
-    vec3 unXVector = dpv;
-    vec3 unYVector = cross(dpv, vCenter);
+    vec3 dpv = 0.5 * (cps[0] + cps[1]) - vc * dot(0.5 * (cps[0] + cps[1]), vc);
 
     vec3 xVector = normalize(dpv);
     vec3 yVector = cross(normalize(dpv), vc);
@@ -299,7 +285,6 @@ void main()
     vec2 dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
     for (int i = 0; i < 8; ++i) {
         xys2[i] = vec2(dot(normalize(cps[i]), xVector), dot(normalize(cps[i]), yVector));
-//        xys2[i] = vec2(dot((cps[i]), xVector), dot((cps[i]), yVector));
     }
 // End Change nil/2
 
@@ -316,10 +301,7 @@ void main()
 
     // Find positive elements and quadratically determine segments.
     // I found it! allow all dots, but filter afterwards
-    float minDotValue = -0.5; // 100000000000.0;
-
-    int bestI = 0;
-    int bestJ = 0;
+    float minDotValue = -0.5;
 
     vec2 bestA;
     vec2 bestB;
@@ -333,12 +315,8 @@ void main()
                     vec2 B2 = xys2[j];
                     if (isInsideAngle(5.0 * dpv2D2, dpc2D2, A2, B2))
                     {
-//                        float newDistance = distanceTo2DNormalizedIntersection(5.0 * dpv2D2, dpc2D2, A2, B2);
                         float newDistance = distanceTo2DIntersection(1.0 * dpv2D2, dpc2D2, A2, B2);
-                        // newDistance = pow(newDistance, 20.0);
                         if (newDistance > tempDistance) {
-                            bestI = i; // bestA = A2;
-                            bestJ = j; // bestB = B2;
                             bestA = xys2[i];
                             bestB = xys2[j];
                             bestCPA = cps2[i];
@@ -356,87 +334,20 @@ void main()
     bool whichOne = dotNA > dotNB;
     vec2 iE = whichOne ? bestA : bestB;
     vec2 interpolatorEnd = normalize(iE);
-    vec2 middle = 0.5 * (bestA + bestB);
+    float dotEV = dot(interpolatorEnd, normalize(dpv2D2));
 
-//    float dotNNA = dot(normalize(middle), normalize(bestA));
-//    float dotNNB = dot(normalize(middle), normalize(bestB));
-    float dotNE = dot(normalize(middle), normalize(interpolatorEnd));
-//    if (dotNE > 0.9) dotNE = dot(normalize(vec2(bestA[0] + 0.2 * bestA[1], bestA[1] + 0.2 * bestA[0])), normalize(interpolatorEnd));
-    float dotNC = dot(normalize(middle), normalize(dpv2D2));
-    float dotEV = dot(normalize(interpolatorEnd), normalize(dpv2D2));
-
-    float interpolatorFactor = 0.0; // pow((dotEV - dotNE) / (1.0 - dotNE), 1.0);
+    float interpolatorFactor = 0.0;
 
     // Tweak this function for smoothing.
     if (dotEV > 0.90) interpolatorFactor = pow((dotEV - 0.90) * 10.0, 20.0);
-//    interpolatorFactor = 0.0;
     float iF = 1.0 * interpolatorFactor;
-//    iF = 0.0;
+    // iF = 0.0;
 
     {
-        // diff = 10.0 * (normalize(0.5 * (cps[i] + cps[j])) - 1.0 * vc);
         vec2 bestSegment = -bestA + bestB;
-        vec2 orthoBestSegment = normalize(vec2(bestSegment.y, -bestSegment.x));
-        float orientationBestSegment = dot(orthoBestSegment, bestA) > 0.0 ? 1.0 : -1.0;
-
-        float otherMeuhDot = dot(dpv2D2, interpolatorEnd) > 0.0 ? 1.0 : -1.0;
-//        float otherMeuhDot = dotEV > 0.0 ? 1.0 : -1.0;
-
-        vec3 meumeuh;
-        meumeuh =
-            (1.0 - iF) * normalize(center + orientationBestSegment * (xVector * orthoBestSegment.x + yVector * orthoBestSegment.y));
-//            + (0.85 * iF) * normalize(center + otherMeuhDot * (xVector * interpolatorEnd.x + yVector * interpolatorEnd.y));
-//;
-
-        vec2 ABV = bestSegment; // (vec3(bestSegment, 0.0) - dot(vec3(bestSegment, 0.0), vc) * vc).xy;
-//        dpv2D2 = vec2(dot(vp, dpv), dot(vp, cross(dpv, vc)));
-
-        float d2c = 1.0; // distance(dpv2D2, dpc2D2);
-        vec2 PBV = (bestA -
-             4.0 * dpv2D2); // * 1e-5 * distance(vPosition, vCenter);
-//            1.5 * 1e-6 * vec2(dot(vPosition, xVector), dot(vPosition, yVector));
-
-        // * (3.14 - acos(dot(dpv2D2, middle)))/(3.14-acos(dot(bestA, bestB)));
-
-        vec3 verticalCros = cross(vec3(ABV, 0.0), vec3(0.0, 0.0, 1.0));
+        vec3 verticalCros = cross(vec3(bestSegment, 0.0), vec3(0.0, 0.0, 1.0));
         bool whichOrientation = dot(vec2(verticalCros.x, verticalCros.y), bestB) > 0.0;
-        bool whichSide =
-            ABV.x * PBV.y - PBV.x * ABV.y > 0.0;
-//            dot(cross(vec3(bestB - bestA, 0.0), vec3(dpv2D2 - bestA, 0.0)), vec3(0.0, 0.0, 1.0)) > 0.0;
-        if (whichOrientation) whichSide = !whichSide;
-
-        float dotVV = dot(vCenter, vPosition);
-//        float
-        float dotVM = 1.0 *
-//         distanceTo2DIntersection(dpv2D2, dpc2D2, bestA, bestB);
-        distance(dpv2D2, middle);
-
-//        xVector = (dpv);
-//        yVector = cross((dpv), vc);
-//        dpv2D2 = 0.000005 * vec2(dot(vPosition, xVector), dot(vPosition, yVector));
-
-//        float testSky = -dot(bestA, dpv2D2 - bestA);
-        float sharpCoefficient = 1.0;
-        dotVM = sharpCoefficient * distanceTo2DNormalizedIntersection(dpv2D2, dpc2D2, bestA, bestB);
-//        dotVM = distance(dpv2D2, middle);
-//        dotVM *= dot(dpv2D2, middle);
-//        dotVM = 1.0 - dot(vc, vp);
-
-        float coeffV = 2.0 * min(pow(dotVM, 2.0), 0.99);
-        if (dotVM < 0.0) { // Backsky
-//            meumeuh = -normalize(vPosition-vCenter) * 2.0 * (-0.5 + dotVM);
-        }
-
-        diff = 0.5 * meumeuh * coeffV;
-//        diff = vec3(0.0, bestSegment);
-        diff = vec3(orthoBestSegment.x, orthoBestSegment.yx);
         float coeffOrientation = whichOrientation ? -1.0 : 1.0;
-
-        // TODO find closest between bestCPA & bestCPB
-
-//        float dotCA = dot(bestCPA, vPosition);
-//        float dotCB = dot(bestCPB, vPosition);
-//        whichOne = dotCA > dotCB;
 
         vec3 closestCP = whichOne ? bestCPA : bestCPB;
         closestCP = 0.98 * exp(8.0*dotEV)/exp(8.0) * (closestCP - center) + center;
@@ -446,69 +357,41 @@ void main()
             + (1.0 - 1.0 * iF) *
                 normalize(cross(0.5 * (bestCPA + bestCPB), coeffOrientation * (bestCPA - bestCPB)));
 
-//        diff = 0.5 * meumeuh * coeffV;
-//        if (whichSide) diff = vec3(0.0, 0.0, 1.0);
-//        else diff = vec3(1.0);
-
-//        if (dotVM < 0.0) diff = vec3(0.0, 0.0, 1.0);
-
-//        diff = normalize(diff);
-//         meumeuh = normalize(vPosition-vCenter);
-
-//        dotVM > 0.5 ? 0.005 * (dotVM) * meumeuh :
-//            dotVM < -0.5 ? 0.005*(1.5)*meumeuh:
-//            0.005*(1.0 - dotVM)*meumeuh ;
-
-          // vec3(0.0); // - 0.0001 * vc;
-        // diff = 2.0 * (normalize(cross(cps[i] - cps[j], vc)));
-        // diff = 2.0 * (normalize(0.5 * (cps[i] + cps[j]))); //  - 1.0 * vc);
     }
 
-
-    float dvcvp = 0.0; //distanceTo2DHalf(dpc2D2, bestA, bestB); // 120.0 * dot(vCenter, vPosition);
-    distanceToShell = dvcvp; // 100.0 * dvcvp > 0.0 ? dvcvp : -1.0;
-     // distance(dpv2D2, dpc2D2);
-     // distanceTo2DHalf(dpc2D2, bestA, bestB);
-
+    float dvcvp = 0.0;
+    distanceToShell = dvcvp;
     float omega = 1.0;
-    if (distanceToShell > 0.0) omega = 100.0 / (distanceToShell); // exp(1.0 + 100.0 * distanceToShell);
+    if (distanceToShell > 0.0) omega = 100.0 / (distanceToShell);
 
-//    float flatParameter = 0.0; // 4.0 * exp(-2.0 * omega);
-//    diff -= vc * flatParameter;
-// TODO hack exp inner factor to adjust for distance
-
-    float lum = luminance;
-    float vsf = vSunfade;
-
-    // TODO hack distance
     vec3 nup = diff * 0.02;
 
-    // TODO hack sun intensity from intersection
+    // TODO check if needed to hack sun intensity from intersection
+    float lum = luminance;
+    float vsf = vSunfade;
     float vse = vSunE;
     vse = sunIntensity(dot(vSunDirection, nup));
 
-// optical length
-// cutoff angle at 90 to avoid singularity in next formula.
-// TODO zenith angle coefficient should be interpolated
+    // optical length
+    // cutoff angle at 90 to avoid singularity in next formula.
+    // TODO zenith angle coefficient should be interpolated
     float coeff = 50.0;
     float dotUpDelta = coeff * dot(nup, deltaWorldCamera);
     float cutoff = max(0.0, dotUpDelta);
-//	float zenithAngle = acos(cutoff);
-// TODO find the right coeff before atan...
+    //	float zenithAngle = acos(cutoff);
+    // TODO find the right coeff before atan
 	float zenithAngle = 1.05 * atan(-cutoff) + pi * 0.5;
 	float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
 	float sR = rayleighZenithLength * inverse;
 	float sM = mieZenithLength * inverse;
 
-// combined extinction factor
+    // combined extinction factor
 	vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));
 
-// in scattering
+    // in scattering
 	float cosTheta = dot(deltaWorldCamera, vSunDirection);
-
 	float rPhase = rayleighPhase(cosTheta * 0.5 + 0.5);
 	vec3 betaRTheta = vBetaR * rPhase;
-
 	float mPhase = hgPhase(cosTheta, mieDirectionalG);
 	vec3 betaMTheta = vBetaM * mPhase;
 
@@ -520,39 +403,33 @@ void main()
 	    clamp(pow(1.0 - dot(nup, vSunDirection), 5.0), 0.0, 1.0)
     );
 
-// nightsky
+    // nightsky
 	vec3 direction = deltaWorldCamera;
 	float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]
 	float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]
 	vec2 uv = vec2(phi, theta) / vec2(2.0 * pi, pi) + vec2(0.5, 0.0);
 	vec3 L0 = vec3(0.1) * Fex;
 
-// composition + solar disc
+    // composition + solar disc
 	float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
 	L0 += (vse * 19000.0 * Fex) * sundisk;
-
 	vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
-
 	vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(lum, 4.0))) * texColor);
 	vec3 color = curr * whiteScale;
-
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
-//    retColor = vec3(dot(vp, normalize(dpv)), dot(vp, cross(normalize(dpv), vc)), 1.0); // vec3(1.0, 0.0, vp.x);
-//    retColor = vec3(normalize(bestB + bestA).x, normalize(bestB + bestA).y, 1.0); // vec3(1.0, 0.0, vp.x);
-//    retColor = vec3(normalize(bestA), 1.0); // vec3(1.0, 0.0, vp.x);
-//    retColor = vec3(dpv2D2, 0.0);
+    // Debug here:
+    // retColor = vec3(dpv2D2, 0.0);
 
 	gl_FragColor = vec4(retColor, 1.0);
-//    for (int i = 0; i < 8; ++i) {
-//        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
-//            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-//    }
+    // Edges
+    //    for (int i = 0; i < 8; ++i) {
+    //        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
+    //            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //    }
 
-
-    // Dithering
-    // TODO put dithering back.
+    // Dithering (removes gradient banding)
 	float noise = random(vp.xy);
 	float m = mix(-0.5/255.0, 0.5/255.0, noise);
-	gl_FragColor.rgb += 10.0 * vec3(m);
+	gl_FragColor.rgb += 3.0 * vec3(m);
 }
