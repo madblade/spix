@@ -380,7 +380,7 @@ void main()
     float smoothCoefficient = 0.02;
     vec3 nup = diff * smoothCoefficient;
 
-    // TODO check if needed to hack sun intensity from intersection
+    // XXX check if needed to hack sun intensity from intersection (2019-03[madblade]: low priority)
     float lum = luminance;
     float vsf = vSunfade;
     float vse = vSunE;
