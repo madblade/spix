@@ -127,16 +127,23 @@ bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
 bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
     float norm1 = distance(vec2(0), b - a);
     float norm2 = distance(vec2(0), c - a);
-    float dot1 = dot(b - a, c - a) / (norm1 * norm2);
-    if (dot1 < -1.0) return false;
+    float dot1;
+    float dot2;
 
-    // float dot1 = dot(x, b);
-    // float dot2 = dot(x, c);
+    // dot1 = dot(b - a, c - a) / (norm1 * norm2);
+    // if (dot1 < -1.0) return false;
+
+    // dot1 = dot(x, b);
+    // dot2 = dot(x, c);
     // if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
+
+    dot1 = dot(vec3(0.0, 0.0, 1.0), cross(vec3(b, 0.0), vec3(b - c, 0.0)));
+    bool invert = dot1 > 0.0;
 
     bool rightAB = doesCLieOnTheRightOfAB(a, b, x);
     bool rightAC = doesCLieOnTheRightOfAB(a, c, x);
-    return rightAB != rightAC;
+    // return rightAB != rightAC;
+    return invert ? (!rightAB && rightAC) : (rightAB && !rightAC);
 }
 
 float distanceTo2DHalf(vec2 origin, vec2 a, vec2 b) {
@@ -227,7 +234,7 @@ void main()
 
     vec3 diff = (vp - 1.0 * vc); // TODO hack 1.1 to 2.0 adjust for distance
 
-// Project cube points on the plane tangent to the unit sphere in (vc).
+    // Project cube points on the plane tangent to the unit sphere in (vc).
     float cubeDiameter = 12.5;
     vec3 cps[8];
     vec3 cps2[8];
@@ -260,14 +267,14 @@ void main()
     // Deprojection
     // TODO [HARD] fix deprojection
     float near = 0.1;
-    float far = 2000.0;
+    float far = 20000.0;
     float fmn = far - near;
     vec3 tcenter = vc;
     bool doNormalize = false;
-//    float debugBetas[8];
-//    float debugBeta;
+    float debugBetas[8];
+    float debugBeta1;
+    float debugBeta2;
     for (int i = 0; i < 8; ++i) {
-        cps2[i] += 0.0 * center;
         vec3 currentC = 1.0 * (cps2[i] - center) + center;
         float alpha = dot(currentC, tcenter);
         float beta = dot(normalize(currentC), normalize(tcenter));
@@ -281,8 +288,10 @@ void main()
             cps[i] = currentC + yc * (R - 1.0);
         else
             cps[i] = currentC;
-        cps2[i] -= 0.0 * center;
-//        debugBetas[i] = beta;
+
+        // Bump a little from the screen
+        // if (beta < 0.5) cps[i] = yc + center * 0.1;
+        debugBetas[i] = beta;
     }
 
     vec3 midPoint = 0.5 * (cps[0] + cps[1]);
@@ -323,7 +332,7 @@ void main()
 
     // Find positive elements and quadratically determine segments.
     // I found it! allow all dots, but filter afterwards
-    float minDotValue = -0.5;
+    float minDotValue = -1.0;
 
     vec2 bestA;
     vec2 bestB;
@@ -344,7 +353,8 @@ void main()
                             bestCPA = cps2[i];
                             bestCPB = cps2[j];
                             tempDistance = newDistance;
-//                            debugBeta = debugBetas[i];
+                            debugBeta1 = debugBetas[i];
+                            debugBeta2 = debugBetas[j];
                         }
                     }
                 }
@@ -356,6 +366,8 @@ void main()
     float dotNB = dot(normalize(bestB), dpv2D2);
     bool whichOne = dotNA > dotNB;
     vec2 iE = whichOne ? bestA : bestB;
+    if (!whichOne) debugBeta2 = debugBeta1;
+    else debugBeta1 = debugBeta2;
     vec2 interpolatorEnd = normalize(iE);
     float dotEV = dot(interpolatorEnd, normalize(dpv2D2));
 
@@ -437,7 +449,7 @@ void main()
 	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
     // Debug here:
-    // retColor = vec3(1.0, debugBeta, 0.0);
+    // retColor = vec3(1.0, debugBeta1, 0.0);
 
 	gl_FragColor = vec4(retColor, 1.0);
     // Edges
