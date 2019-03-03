@@ -9,11 +9,8 @@ varying float vSunE;
 varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
-//varying mat4 vMVM;
-//varying mat4 vPM;
 varying vec3 vUp;
 
-// uniform mat4 viewInverse;
 uniform float luminance;
 uniform float mieDirectionalG;
 
@@ -98,6 +95,33 @@ float sunIntensity(float zenithAngleCos) {
 //    return (exp(x) - exp(-x)) * 0.5;
 //}
 
+//float distanceTo2DNormalizedIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
+//    float res = 0.0;
+//
+//    // vec2 intersect = 0.5 * (a+b);
+//    // t * x = a + u * (b-a)
+//    // tx = ub + (1-u)a
+//
+//    // (For the record, solving for t:)
+//    // tx cross (b-a) = (a + u(b-a)) cross (b-a)
+//    // t(x cross (b-a)) = a cross (b-a)
+//    // t = (a cross (b-a)) / (x cross (b-a))
+//
+//    // (Solving for u:)
+//    // tx cross x = (a + u(b-a)) cross x
+//    // 0 = (a cross x) + u((b-a) cross x)
+//    // u = -(a cross x) / ((b-a) cross x)
+//    vec2 bma = b - a;
+//    float aCrossX = a.x * x.y - x.x * a.y;
+//    float bmaCrossX = bma.x * x.y - x.x * bma.y;
+//    float u = - aCrossX / bmaCrossX;
+//
+//    vec2 intersect = u * b + (1.0 - u) * a;
+//
+//    res = distance(x, intersect);
+//    return res;
+//}
+
 float normN(vec3 v, float n) {
     return pow(
         pow(v.x, n) +
@@ -111,14 +135,6 @@ vec3 normalizeN(vec3 v, float n) {
     return v * 1.0 / normN(v, n);
 }
 
-// float dotN(vec3 v1, vec3 v2, float n) {
-//     return dot(v1, v2) * normN(v1, n) * normN(v2, n) / (normN(v1, 2.0) * normN(v2, 2.0));
-// }
-
-//vec3 project(vec3 distantPoint, vec3 unitVector) {
-//    return unitVector + distantPoint - unitVector * dot(distantPoint, unitVector);
-//}
-
 bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
     return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y) > 0.0;
 }
@@ -130,9 +146,6 @@ bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
     float dot1;
     float dot2;
 
-    // dot1 = dot(b - a, c - a) / (norm1 * norm2);
-    // if (dot1 < -1.0) return false;
-
     // dot1 = dot(x, b);
     // dot2 = dot(x, c);
     // if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
@@ -142,7 +155,6 @@ bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
 
     bool rightAB = doesCLieOnTheRightOfAB(a, b, x);
     bool rightAC = doesCLieOnTheRightOfAB(a, c, x);
-    // return rightAB != rightAC;
     return invert ? (!rightAB && rightAC) : (rightAB && !rightAC);
 }
 
@@ -188,62 +200,28 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     return sqrt(dx * dx + dy * dy);
 }
 
-float distanceTo2DNormalizedIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
-    float res = 0.0;
-
-    // vec2 intersect = 0.5 * (a+b);
-    // t * x = a + u * (b-a)
-    // tx = ub + (1-u)a
-
-    // (For the record, solving for t:)
-    // tx cross (b-a) = (a + u(b-a)) cross (b-a)
-    // t(x cross (b-a)) = a cross (b-a)
-    // t = (a cross (b-a)) / (x cross (b-a))
-
-    // (Solving for u:)
-    // tx cross x = (a + u(b-a)) cross x
-    // 0 = (a cross x) + u((b-a) cross x)
-    // u = -(a cross x) / ((b-a) cross x)
-    vec2 bma = b - a;
-    float aCrossX = a.x * x.y - x.x * a.y;
-    float bmaCrossX = bma.x * x.y - x.x * bma.y;
-    float u = - aCrossX / bmaCrossX;
-
-    vec2 intersect = u * b + (1.0 - u) * a;
-
-    res = distance(x, intersect);
-    return res;
-}
-
+// PERF [VXS] flag stands for temporary code for
+// using vertices instead of the neighbor edge lookup
 void main()
 {
     float nPower = 2.0;
     vec3 deltaWorldCamera = normalize(vWorldPosition - cameraPos);
-    // 450 000
-
-    // 1. project vWorldPosition on the plane (n=modelView * forwardVector, p = c)
-    // 2. compute u = d(pvwp, c), up = vec(u)
-    // 3. extinct backface and distance > radius_atmos
-    // --
-    // 4. if d(plp, c) < radius_atmos:
-    //      up = f(forwardVector, plp, vCenter)
-    // 5. extinct after radius_atmos
 
     vec3 vc = normalize(vCenter);
     vec3 vp = normalize(vPosition);
-
-    vec3 diff = (vp - 1.0 * vc); // TODO hack 1.1 to 2.0 adjust for distance
+    vec3 diff;
 
     // Project cube points on the plane tangent to the unit sphere in (vc).
     float cubeDiameter = 12.5;
     vec3 cps[8];
     vec3 cps2[8];
     // for future version (GL ES 3.0 -> bitwise ops)
-    //    for (int i = 0; i < 8; ++i)
-    //        cps[i] = vCenter + vec3((i & 1 ? 1 : -1) * cubeDiameter,
-    //                                (i >> 1 & 1 ? 1 : -1) * cubeDiameter,
-    //                                (i >> 2 & 1 ? 1 : -1) * cubeDiameter);
+    // for (int i = 0; i < 8; ++i)
+    //     cps[i] = vCenter + vec3((i & 1 ? 1 : -1) * cubeDiameter,
+    //                             (i >> 1 & 1 ? 1 : -1) * cubeDiameter,
+    //                             (i >> 2 & 1 ? 1 : -1) * cubeDiameter);
 
+    // Advice: do not refactor this.
     vec3 center = vCenter;
     cps[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
@@ -254,6 +232,7 @@ void main()
     cps[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
     cps[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
 
+    // Advice: do not refactor this.
     cubeDiameter *= 2.0;
     cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
@@ -264,119 +243,111 @@ void main()
     cps2[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
     cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
 
-    // Deprojection
-    // TODO [HARD] fix deprojection
+    // Deprojection (should not depend on fov or near/far planes).
+    // Used for computing the right part of the projected convex shell.
     float near = 0.1;
     float far = 20000.0;
     float fmn = far - near;
     vec3 tcenter = vc;
-    bool doNormalize = false;
-    float debugBetas[8];
-    float debugBeta1;
-    float debugBeta2;
     for (int i = 0; i < 8; ++i) {
         vec3 currentC = 1.0 * (cps2[i] - center) + center;
         float alpha = dot(currentC, tcenter);
         float beta = dot(normalize(currentC), normalize(tcenter));
-        float didi = distance(currentC, vec3(0.0));
         float R = beta < 0.1 ? fmn : fmn / alpha;
-//        if (alpha < 1e-1) R = 1e0;
-//        R = fmn / alpha; // pow(didi, 2.0);
-//        R = min(R, 1e0);
         vec3 yc = currentC - alpha * tcenter;
-        if (!doNormalize)
-            cps[i] = currentC + yc * (R - 1.0);
-        else
-            cps[i] = currentC;
-
-        // Bump a little from the screen
-        // if (beta < 0.5) cps[i] = yc + center * 0.1;
-        debugBetas[i] = beta;
+        cps[i] = currentC + yc * (R - 1.0);
     }
 
+    // Compupte projection plane.
     vec3 midPoint = 0.5 * (cps[0] + cps[1]);
     vec3 dpv = midPoint - vc * dot(midPoint, vc);
-
-    vec3 xVector = doNormalize ? normalize(dpv) : dpv;
+    vec3 xVector = dpv;
     vec3 yVector = cross(xVector, vc);
 
-    // Project on 2D plane.
-    vec2 xys2[8];
-
-// Begin Change nil/2
+    // Project cube on 2D plane.
+    vec2 xys[8];
     vec2 dpc2D2;
     vec2 dpv2D2;
-    if (doNormalize) {
-    dpc2D2 = vec2(dot(vc, xVector), dot(vc, yVector));
-    dpv2D2 = vec2(dot(vp, xVector), dot(vp, yVector));
-    for (int i = 0; i < 8; ++i) {
-        xys2[i] = vec2(dot(normalize(cps[i]), xVector), dot(normalize(cps[i]), yVector));
-    }
-    } else {
     dpc2D2 = vec2(dot(vCenter, xVector), dot(vCenter, yVector));
     dpv2D2 = vec2(dot(vPosition, xVector), dot(vPosition, yVector));
     for (int i = 0; i < 8; ++i) {
-        xys2[i] = vec2(dot((cps[i]), xVector), dot((cps[i]), yVector));
+        xys[i] = vec2(dot(cps[i], xVector), dot(cps[i], yVector));
     }
-    }
-// End Change nil/2
 
-    // Find nearest point angles, then partial convex hull.
-    // Define distance to center as x times the convex hull position.
-    // + max if dotProduct < 0
-    float dots2[8];
-    for (int i = 0; i < 8; ++i)
-        dots2[i] = dot(normalize(xys2[i]), normalize(dpv2D2));
-
-    float tempDistance = -1.0;
-
-    // Find positive elements and quadratically determine segments.
-    // I found it! allow all dots, but filter afterwards
-    float minDotValue = -1.0;
-
+    // Quadratically determine best segments.
     vec2 bestA;
     vec2 bestB;
     vec3 bestCPA;
     vec3 bestCPB;
+    float tempDistance = -1.0;
     for (int i = 0; i < 8; ++i) {
-        if (dots2[i] > minDotValue) {
-            for (int j = 0; j < 8; ++j) {
-                if (dots2[j] > minDotValue && j > i) {
-                    vec2 A2 = xys2[i];
-                    vec2 B2 = xys2[j];
-                    if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
-                    {
-                        float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
-                        if (newDistance > tempDistance) {
-                            bestA = xys2[i];
-                            bestB = xys2[j];
-                            bestCPA = cps2[i];
-                            bestCPB = cps2[j];
-                            tempDistance = newDistance;
-                            debugBeta1 = debugBetas[i];
-                            debugBeta2 = debugBetas[j];
-                        }
+        for (int j = 0; j < 8; ++j) {
+            if (j > i) {
+                vec2 A2 = xys[i];
+                vec2 B2 = xys[j];
+                if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
+                {
+                    float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
+                    if (newDistance > tempDistance) {
+                        bestA = xys[i];
+                        bestB = xys[j];
+                        bestCPA = cps2[i];
+                        bestCPB = cps2[j];
+                        tempDistance = newDistance;
                     }
                 }
             }
         }
     }
 
+    // Get nearest cube vertex.
     float dotNA = dot(normalize(bestA), dpv2D2);
     float dotNB = dot(normalize(bestB), dpv2D2);
     bool whichOne = dotNA > dotNB;
     vec2 iE = whichOne ? bestA : bestB;
-    if (!whichOne) debugBeta2 = debugBeta1;
-    else debugBeta1 = debugBeta2;
+    vec2 iE2 = whichOne ? bestB : bestA;
+
+    // Determine neighbor of best segment.
+    vec2 neighborSegment = iE + 0.1 * (iE - iE2);
+        // this vector should be inside the neighbor's angle
+        // (2019-03[madblade] or is this wrong?)
+        // (2019-03[madblade] if it is, switch to the ugly but more efficient interp using the best vertex)
+    vec2 bestNeighborProjected;
+    vec3 bestCPNeighbor;
+    tempDistance = -1.0;
+    for (int i = 0; i < 8; ++i) {
+        vec2 other = xys[i];
+        if (isInsideAngle(neighborSegment, dpc2D2, iE, other)) {
+            float newDistance = distanceTo2DIntersection(neighborSegment, dpc2D2, iE, other);
+            if (newDistance > tempDistance) {
+                bestNeighborProjected = xys[i];
+                bestCPNeighbor = cps2[i];
+                tempDistance = newDistance;
+            }
+        }
+    }
+
     vec2 interpolatorEnd = normalize(iE);
     float dotEV = dot(interpolatorEnd, normalize(dpv2D2));
-
+    vec2 middle = 0.5 * (bestA + bestB);
+    float dotES = dot(interpolatorEnd, normalize(middle));
     float interpolatorFactor = 0.0;
 
-    // Tweak this function for smoothing.
-    if (dotEV > 0.90) interpolatorFactor = pow((dotEV - 0.90) * 10.0, 200.0);
+    // Tweak this function for smoothing the interp at the cube angles.
+    float start = 0.9;
+    float ceiler = 1.0 / (1.0 - start);
+    float agreement = (dotEV - start) * ceiler;
+    if (dotEV > start) {
+        float increaseMe = 200.0;
+            // increase this to limit the range for interpolation
+            // (causes sharper edges at cube vertices)
+        interpolatorFactor = 0.5 * pow(agreement, increaseMe);
+        // PERF [VXS]
+        // interpolatorFactor = 1.0 * pow(agreement, 200.0);
+    }
+
     float iF = 1.0 * interpolatorFactor;
-    // iF = 0.0;
+    // iF = 0.0; // (uncomment to discard interpolation, BAD! edges will be sharp)
 
     {
         vec2 bestSegment = -bestA + bestB;
@@ -385,16 +356,29 @@ void main()
         float coeffOrientation = whichOrientation ? -1.0 : 1.0;
 
         vec3 closestCP = whichOne ? bestCPA : bestCPB;
-        closestCP = 0.98 * exp(8.0*dotEV)/exp(8.0) * (closestCP - center) + center;
-        diff =
-            iF *
-                normalize(cross(closestCP, cross(closestCP - center, closestCP)))
-            + (1.0 - 1.0 * iF) *
-                normalize(cross(0.5 * (bestCPA + bestCPB), coeffOrientation * (bestCPA - bestCPB)));
+        vec3 bestEdge = cross(0.5 * (bestCPA + bestCPB), coeffOrientation * (bestCPA - bestCPB));
 
+        vec2 bestSegment2 = -bestNeighborProjected + iE;
+        vec3 verticalCros2 = cross(vec3(bestSegment2, 0.0), vec3(0.0, 0.0, 1.0));
+        bool whichOrientation2 = dot(vec2(verticalCros2.x, verticalCros2.y), iE) < 0.0;
+        float coeffOrientation2 = whichOrientation2 ? -1.0 : 1.0;
+        vec3 bestEdge2 = cross(0.5 * (closestCP + bestCPNeighbor), coeffOrientation2 * (closestCP - bestCPNeighbor));
+
+        // PERF [VXS]
+        // vec3 bestVertex = cross(closestCP, cross(closestCP - center, closestCP));
+        // float dms = dotEV - start; // from 0 to 0.1
+        // float attenuationCoeff = 1.0;
+        // // 0.9 + 0.1 * pow(dms/0.1, 2.0); // (experimental) vertex circles mitigation
+        // closestCP = 1.00 * attenuationCoeff * (closestCP - center) + center;
+        // bestVertex = cross(closestCP, cross(closestCP - center, closestCP));
+        // diff = normalize(iF * normalize(bestVertex) + (1.0 - iF) * normalize(bestEdge));
+
+        diff = normalize(iF * normalize(bestEdge2) + (1.0 - iF) * normalize(bestEdge));
     }
 
-    vec3 nup = diff * 0.02;
+    // Change this coefficient for the sky gradient: 1.0 = sharp, 0.001 = smooth.
+    float smoothCoefficient = 0.02;
+    vec3 nup = diff * smoothCoefficient;
 
     // TODO check if needed to hack sun intensity from intersection
     float lum = luminance;
@@ -404,12 +388,12 @@ void main()
 
     // optical length
     // cutoff angle at 90 to avoid singularity in next formula.
-    // TODO zenith angle coefficient should be interpolated
+    // XXX zenith angle coefficient should be interpolated (2019-03[madblade]: huh?)
     float coeff = 50.0;
     float dotUpDelta = coeff * dot(nup, deltaWorldCamera);
     float cutoff = max(0.0, dotUpDelta);
     //	float zenithAngle = acos(cutoff);
-    // TODO find the right coeff before atan
+    // XXX find the right coeff before atan (2019-03[madblade]: whatever this means, not a priority)
 	float zenithAngle = 1.05 * atan(-cutoff) + pi * 0.5;
 	float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
 	float sR = rayleighZenithLength * inverse;
@@ -452,13 +436,14 @@ void main()
     // retColor = vec3(1.0, debugBeta1, 0.0);
 
 	gl_FragColor = vec4(retColor, 1.0);
-    // Edges
-    //    for (int i = 0; i < 8; ++i) {
-    //        if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
-    //            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    //    }
+    // (the following displays center-to-cube-vertices lines in red)
+    // for (int i = 0; i < 8; ++i) {
+    //     if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
+    //         gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    // }
 
     // Dithering (removes gradient banding)
+    // (there is still banding at 0.2 noise)
 	float noise = random(vp.xy);
 	float m = mix(-0.5/255.0, 0.5/255.0, noise);
 	gl_FragColor.rgb += 3.0 * vec3(m);
