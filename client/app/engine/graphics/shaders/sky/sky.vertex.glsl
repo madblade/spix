@@ -15,9 +15,9 @@ varying float vSunE;
 varying vec3 vCenter;
 varying vec3 vForward;
 varying vec3 vPosition;
-varying vec3 vPP;
+//varying vec3 vPP;
 varying vec3 vUp;
-varying vec3 vP2;
+//varying vec3 vP2;
 //varying mat4 vMVM;
 //varying mat4 vPM;
 
@@ -72,9 +72,9 @@ void main()
          1.0)).xyz;
     vForward = normalize((modelViewMatrix * vec4(1.0, 0.0, 0.0, 1.0)).xyz);
     vUp = normalize((modelViewMatrix * vec4(0.0, 0.0, 1.0, 1.0)).xyz);
-    vP2 = (vec4(position, 1.0)).xyz;
+//    vP2 = (modelViewMatrix * vec4(position, 1.0)).xyz;
     vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
-    vPP = (vec4(worldCenter, 1.0)).xyz;
+//    vPP = (vec4(worldCenter, 1.0)).xyz;
 //    vMVM = viewMatrix;
 //    vPM = projectionMatrix * viewMatrix;
 

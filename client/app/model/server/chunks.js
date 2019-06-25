@@ -90,7 +90,7 @@ extend(ChunkModel.prototype, {
         let rayleigh = 2;
         let mieCoefficient = 0.005;
         let mieDirectionalG = 0.8;
-        let luminance = 1;
+        let luminance = 0.5;
         let inclination = -0.15;// 0.49; // elevation / inclination;
         let azimuth = 0.25; // Facing front;
         let isSunSphereVisible = true;
