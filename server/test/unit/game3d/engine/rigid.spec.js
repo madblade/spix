@@ -61,7 +61,7 @@ describe('Rigid (AABB) solver routines:', function () {
         });
     });
 
-    describe('', function() {
+    describe('Bip', function() {
         beforeEach(function (done) {
             done();
         });
@@ -76,7 +76,10 @@ describe('Rigid (AABB) solver routines:', function () {
     });
 
     // Clear BDD after testing
-    // after(function() {
-    //     return Table.removeAsync();
-    // });
+    after(function(done) {
+        // return Table.removeAsync();
+        done();
+        process.exit(); // This is to remove hooks, to call last
+        // TODO put that in a z-file
+    });
 });

@@ -112,7 +112,9 @@ describe('Hub API:', function () {
     });
 
     // Clear DataBase after testing
-    // after(function() {
+    after(function(done) {
     //     return Table.removeAsync();
-    // });
+    //     process.exit();
+        done();
+     });
 });
