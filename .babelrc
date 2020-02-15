@@ -1,7 +1,7 @@
 {
-    "presets": ["es2015"],
+    "presets": ["@babel/preset-env"],
     "plugins": [
-      "transform-flow-comments",
-      "transform-class-properties"
+      "@babel/plugin-transform-flow-comments",
+      "@babel/plugin-proposal-class-properties"
     ]
 }

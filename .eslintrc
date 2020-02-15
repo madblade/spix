@@ -5,6 +5,10 @@
     },
     "globals": {},
     "plugins": [],
+    "parserOptions": {
+        "sourceType": "module",
+        "allowImportExportEverywhere": true
+    },
     "rules": {
         //Possible Errors
         "comma-dangle": 0,                                          //disallow or enforce trailing commas
