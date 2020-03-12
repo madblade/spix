@@ -4,7 +4,8 @@ uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
 uniform float mieCoefficient;
-uniform mat4 viewInverse;
+//uniform mat4 viewInverse;
+uniform vec3 cameraPos;
 
 varying vec3 vWorldPosition;
 varying vec3 vSunDirection;
@@ -83,19 +84,26 @@ void main()
 
 	vSunDirection = normalize(sunPosition);
 
-    vec3 vc = vCenter;
-    vec3 vf = vForward;
-    vec3 diff = vPosition - vc;
-    float dotProcuct = dot(vf, diff * 0.01);
-    vec3 proj = (diff + vf * dotProcuct);
-    vec3 nup = normalize(proj - vc);
-
 	vSunE = sunIntensity(dot(vSunDirection, up));
+
+    float cubeDiameter = 12.5;
+    cubeDiameter *= 2.0;
 
     // TODO night
     // which face is the cam on
     // which vector must we take the vertical component to later fade
-	vSunfade = 1.0; // 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
+//    vec3 altitudeVector = vPosition
+    vec3 centerToCamera = cameraPos - worldCenter;
+    float cx = centerToCamera.x; float acx = abs(cx);
+    float cy = centerToCamera.y; float acy = abs(cy);
+    float cz = centerToCamera.z; float acz = abs(cz);
+    bool isX = acx > acy && acx > acz;
+    bool isY = acy > acx && acy > acz;
+    bool isZ = !isX && !isY;
+    float projection = isX ? sign(cx) * sunPosition.x : isY ? sign(cy) * sunPosition.y : sign(cz) * sunPosition.z;
+//	vSunfade = 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
+	vSunfade = 1.0 - clamp(1.0 - exp(projection / 150000.0), 0.0, 1.0);
+//    vSunfade = isZ ? 1.0 : 0.0;
 
 	float rayleighCoefficient = rayleigh - (1.0 * (1.0 - vSunfade));
 
@@ -107,9 +115,7 @@ void main()
 	vBetaM = totalMie(turbidity) * mieCoefficient;
 
 // pass center coordinates
-    float cubeDiameter = 12.5;
     vec3 center = vCenter;
-    cubeDiameter *= 2.0;
     cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
     cps2[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
@@ -124,8 +130,7 @@ void main()
     float near = 0.1;
     float far = 20000.0;
     float fmn = far - near;
-    vec3 vc2 = normalize(vCenter);
-    vec3 tcenter = vc2;
+    vec3 tcenter = normalize(vCenter);
     for (int i = 0; i < 8; ++i) {
         vec3 currentC = 1.0 * (cps2[i] - center) + center;
         float alpha = dot(currentC, tcenter);

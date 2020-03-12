@@ -27,7 +27,8 @@ let Sky = function()
             mieCoefficient: { value: 0.005 },
             mieDirectionalG: { value: 0.8 },
             sunPosition: { value: new THREE.Vector3() },
-            viewInverse: { value:new THREE.Matrix4() }
+            // viewInverse: { value: new THREE.Matrix4() },
+            cameraPos: { value: new THREE.Vector3() }
         },
         vertexShader: ShadersModule.getSkyVertexShader(),
         fragmentShader: ShadersModule.getSkyFragmentShader()
@@ -46,7 +47,7 @@ let Sky = function()
 
     THREE.Mesh.call(this, geometry,
         material
-        // new THREE.MeshBasicMaterial({color: 0xffffff})
+        // new THREE.MeshPhongMaterial({color: 0xffffff})
     );
 };
 

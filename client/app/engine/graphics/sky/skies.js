@@ -56,14 +56,17 @@ let SkyModule = {
         let vec3 = new THREE.Vector3(x, y, z);
 
         if (camera.projectionMatrix) {
-            let mat4 = new THREE.Matrix4();
-            mat4.set(
-                camera.fov, camera.aspect, camera.far, camera.near,
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0);
+            // let mat4 = new THREE.Matrix4();
+            // mat4.set(
+            //     camera.fov, camera.aspect, camera.far, camera.near,
+            //     0, 0, 0, 0,
+            //     0, 0, 0, 0,
+            //     0, 0, 0, 0);
             // mat4.getInverse(camera.projectionMatrix);
-            s.material.uniforms.viewInverse.value.copy(mat4);
+            // s.material.uniforms.viewInverse.value.copy(mat4);
+            let v = new THREE.Vector3();
+            camera.getWorldPosition(v);
+            s.material.uniforms.cameraPos.value.copy(v);
         }
         s.material.uniforms.sunPosition.value.copy(vec3);
         // Better not touch this!
@@ -97,8 +100,8 @@ let SkyModule = {
         uniforms.mieCoefficient.value = mieCoefficient;
         uniforms.mieDirectionalG.value = mieDirectionalG;
 
-        let theta = Math.PI * (inclination - 0.5);
-        let phi = 2 * Math.PI * (azimuth - 0.5);
+        let theta = 0; // 2 * Math.PI * (inclination - 0.5);
+        let phi = 4 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
 
         // TODO [CRIT] remove hack

@@ -17,7 +17,8 @@ varying vec3 vUp;
 uniform float luminance;
 uniform float mieDirectionalG;
 
-const vec3 cameraPos = vec3(0.0, 0.0, 0.0);
+//const vec3 cameraPos = vec3(0.0, 0.0, 0.0);
+uniform vec3 cameraPos;
 const vec3 worldCenter = vec3(-100.0, 100.0, 50.0);
 
 // constants for atmospheric scattering
@@ -207,8 +208,10 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
 // using vertices instead of the neighbor edge lookup
 void main()
 {
-    float nPower = 2.0;
-    vec3 deltaWorldCamera = normalize(vWorldPosition - cameraPos);
+    // TODO investigate
+//    vec3 cpp = cameraPos;
+    vec3 cpp = vec3(0.0);
+    vec3 deltaWorldCamera = normalize(vWorldPosition - cpp);
 
     vec3 vc = normalize(vCenter);
     vec3 vp = normalize(vPosition);
@@ -445,7 +448,7 @@ void main()
     }
 
     // Change this coefficient for the sky gradient: 1.0 = sharp, 0.001 = smooth.
-    float smoothCoefficient = 0.08;
+    float smoothCoefficient = 0.02; // TODO tweak
     vec3 nup = diff * smoothCoefficient;
 
     // XXX check if needed to hack sun intensity from intersection (2019-03[madblade]: low priority)
@@ -457,7 +460,7 @@ void main()
     // optical length
     // cutoff angle at 90 to avoid singularity in next formula.
     // XXX zenith angle coefficient should be interpolated (2019-03[madblade]: huh?)
-    float coeff = 50.0;
+    float coeff = 500.0; // TODO tweak
     float dotUpDelta = coeff * dot(nup, deltaWorldCamera);
     float cutoff = max(0.0, dotUpDelta);
     //	float zenithAngle = acos(cutoff);
