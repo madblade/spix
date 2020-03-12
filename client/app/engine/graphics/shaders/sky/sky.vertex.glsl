@@ -1,4 +1,4 @@
-precision highp float;
+precision mediump float;
 
 uniform vec3 sunPosition;
 uniform float rayleigh;
@@ -21,7 +21,8 @@ varying vec3 vUp;
 //varying mat4 vMVM;
 //varying mat4 vPM;
 
-// TODO hack planet center
+varying vec3 cps[8];
+varying vec3 cps2[8];
 
 const vec3 worldCenter = vec3(-100.0, 100.0, 50.0);
 const vec3 up = vec3(0.0, 0.0, 1.0);
@@ -91,7 +92,10 @@ void main()
 
 	vSunE = sunIntensity(dot(vSunDirection, up));
 
-	vSunfade = 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
+    // TODO night
+    // which face is the cam on
+    // which vector must we take the vertical component to later fade
+	vSunfade = 1.0; // 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
 
 	float rayleighCoefficient = rayleigh - (1.0 * (1.0 - vSunfade));
 
@@ -101,4 +105,33 @@ void main()
 
 // mie coefficients
 	vBetaM = totalMie(turbidity) * mieCoefficient;
+
+// pass center coordinates
+    float cubeDiameter = 12.5;
+    vec3 center = vCenter;
+    cubeDiameter *= 2.0;
+    cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
+    cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
+    cps2[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
+    cps2[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
+    cps2[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
+    cps2[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
+    cps2[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
+    cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
+
+    // Deprojection (should not depend on fov or near/far planes).
+    // Used for computing the right part of the projected convex hull.
+    float near = 0.1;
+    float far = 20000.0;
+    float fmn = far - near;
+    vec3 vc2 = normalize(vCenter);
+    vec3 tcenter = vc2;
+    for (int i = 0; i < 8; ++i) {
+        vec3 currentC = 1.0 * (cps2[i] - center) + center;
+        float alpha = dot(currentC, tcenter);
+        float beta = dot(normalize(currentC), normalize(tcenter));
+        float R = beta < 0.1 ? fmn : fmn / alpha;
+        vec3 yc = currentC - alpha * tcenter;
+        cps[i] = currentC + yc * (R - 1.0);
+    }
 }

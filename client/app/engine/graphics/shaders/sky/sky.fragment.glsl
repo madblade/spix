@@ -1,4 +1,7 @@
-precision highp float;
+precision mediump float;
+
+varying vec3 cps[8];
+varying vec3 cps2[8];
 
 varying vec3 vWorldPosition;
 varying vec3 vSunDirection;
@@ -141,16 +144,16 @@ bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
 
 // a = origin
 bool isInsideAngle(vec2 x, vec2 a, vec2 b, vec2 c) {
-    float norm1 = distance(vec2(0), b - a);
-    float norm2 = distance(vec2(0), c - a);
-    float dot1;
-    float dot2;
+//    float norm1 = distance(vec2(0), b - a);
+//    float norm2 = distance(vec2(0), c - a);
+//    float dot1;
+//    float dot2;
 
     // dot1 = dot(x, b);
     // dot2 = dot(x, c);
     // if (dot1 < 0.0 || dot2 < 0.0) return false; // discard inverted angles
 
-    dot1 = dot(vec3(0.0, 0.0, 1.0), cross(vec3(b, 0.0), vec3(b - c, 0.0)));
+    float dot1 = dot(vec3(0.0, 0.0, 1.0), cross(vec3(b, 0.0), vec3(b - c, 0.0)));
     bool invert = dot1 > 0.0;
 
     bool rightAB = doesCLieOnTheRightOfAB(a, b, x);
@@ -186,7 +189,7 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     float y1my2 = y1 - y2; float y3my4 = y3 - y4;
     float x1mx2 = x1 - x2; float x3mx4 = x3 - x4;
     float den = x1mx2 * y3my4 - y1my2 * x3mx4;
-    if (den == 0.0 || abs(den) <= 0.0001) return -1.0;
+    if (den == 0.0 || abs(den) <= 0.00001) return -1.0;
 
     float n1 = x1 * y2 - y1 * x2;
     float n2 = x3 * y4 - y3 * x4;
@@ -197,7 +200,7 @@ float distanceTo2DIntersection(vec2 x, vec2 origin, vec2 a, vec2 b) {
     float dx = res.x - o.x;
     float dy = res.y - o.y;
 
-    return sqrt(dx * dx + dy * dy);
+    return (dx * dx + dy * dy);
 }
 
 // PERF [VXS] flag stands for temporary code for
@@ -212,9 +215,9 @@ void main()
     vec3 diff;
 
     // Project cube points on the plane tangent to the unit sphere in (vc).
-    float cubeDiameter = 12.5;
-    vec3 cps[8];
-    vec3 cps2[8];
+//    float cubeDiameter = 12.5;
+//    vec3 cps[8];
+//    vec3 cps2[8];
     // for future version (GL ES 3.0 -> bitwise ops)
     // for (int i = 0; i < 8; ++i)
     //     cps[i] = vCenter + vec3((i & 1 ? 1 : -1) * cubeDiameter,
@@ -222,41 +225,31 @@ void main()
     //                             (i >> 2 & 1 ? 1 : -1) * cubeDiameter);
 
     // Advice: do not refactor this.
-    vec3 center = vCenter;
-    cps[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
-    cps[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
-
-    // Advice: do not refactor this.
-    cubeDiameter *= 2.0;
-    cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps2[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps2[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps2[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps2[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps2[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
-    cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
-
-    // Deprojection (should not depend on fov or near/far planes).
-    // Used for computing the right part of the projected convex shell.
-    float near = 0.1;
-    float far = 20000.0;
-    float fmn = far - near;
-    vec3 tcenter = vc;
-    for (int i = 0; i < 8; ++i) {
-        vec3 currentC = 1.0 * (cps2[i] - center) + center;
-        float alpha = dot(currentC, tcenter);
-        float beta = dot(normalize(currentC), normalize(tcenter));
-        float R = beta < 0.1 ? fmn : fmn / alpha;
-        vec3 yc = currentC - alpha * tcenter;
-        cps[i] = currentC + yc * (R - 1.0);
-    }
+//    vec3 center = vCenter;
+//    cubeDiameter *= 2.0;
+//    cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
+//    cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
+//    cps2[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
+//    cps2[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
+//    cps2[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
+//    cps2[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
+//    cps2[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
+//    cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
+//
+//    // Deprojection (should not depend on fov or near/far planes).
+//    // Used for computing the right part of the projected convex hull.
+//    float near = 0.1;
+//    float far = 20000.0;
+//    float fmn = far - near;
+//    vec3 tcenter = vc;
+//    for (int i = 0; i < 8; ++i) {
+//        vec3 currentC = 1.0 * (cps2[i] - center) + center;
+//        float alpha = dot(currentC, tcenter);
+//        float beta = dot(normalize(currentC), normalize(tcenter));
+//        float R = beta < 0.1 ? fmn : fmn / alpha;
+//        vec3 yc = currentC - alpha * tcenter;
+//        cps[i] = currentC + yc * (R - 1.0);
+//    }
 
     // Compupte projection plane.
     vec3 midPoint = 0.5 * (cps[0] + cps[1]);
@@ -280,25 +273,100 @@ void main()
     vec3 bestCPA;
     vec3 bestCPB;
     float tempDistance = -1.0;
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if (j > i) {
-                vec2 A2 = xys[i];
-                vec2 B2 = xys[j];
-                if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
-                {
-                    float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
-                    if (newDistance > tempDistance) {
-                        bestA = xys[i];
-                        bestB = xys[j];
-                        bestCPA = cps2[i];
-                        bestCPB = cps2[j];
-                        tempDistance = newDistance;
-                    }
-                }
-            }
-        }
+
+    float newDistance;
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[0], xys[1]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[0], xys[1])) > tempDistance) {
+        bestA = xys[0]; bestB = xys[1];
+        bestCPA = cps2[0]; bestCPB = cps2[1];
+        tempDistance = newDistance;
     }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[0], xys[2]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[0], xys[2])) > tempDistance) {
+        bestA = xys[0]; bestB = xys[2];
+        bestCPA = cps2[0]; bestCPB = cps2[2];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[1], xys[3]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[1], xys[3])) > tempDistance) {
+        bestA = xys[1]; bestB = xys[3];
+        bestCPA = cps2[1]; bestCPB = cps2[3];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[2], xys[3]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[2], xys[3])) > tempDistance) {
+        bestA = xys[2]; bestB = xys[3];
+        bestCPA = cps2[2]; bestCPB = cps2[3];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[4], xys[5]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[4], xys[5])) > tempDistance) {
+        bestA = xys[4]; bestB = xys[5];
+        bestCPA = cps2[4]; bestCPB = cps2[5];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[4], xys[6]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[4], xys[6])) > tempDistance) {
+        bestA = xys[4]; bestB = xys[6];
+        bestCPA = cps2[4]; bestCPB = cps2[6];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[5], xys[7]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[5], xys[7])) > tempDistance) {
+        bestA = xys[5]; bestB = xys[7];
+        bestCPA = cps2[5]; bestCPB = cps2[7];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[6], xys[7]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[6], xys[7])) > tempDistance) {
+        bestA = xys[6]; bestB = xys[7];
+        bestCPA = cps2[6]; bestCPB = cps2[7];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[0], xys[4]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[0], xys[4])) > tempDistance) {
+        bestA = xys[0]; bestB = xys[4];
+        bestCPA = cps2[0]; bestCPB = cps2[4];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[1], xys[5]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[1], xys[5])) > tempDistance) {
+        bestA = xys[1]; bestB = xys[5];
+        bestCPA = cps2[1]; bestCPB = cps2[5];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[2], xys[6]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[2], xys[6])) > tempDistance) {
+        bestA = xys[2]; bestB = xys[6];
+        bestCPA = cps2[2]; bestCPB = cps2[6];
+        tempDistance = newDistance;
+    }
+    if (isInsideAngle(dpv2D2, dpc2D2, xys[3], xys[7]) && (newDistance =
+        distanceTo2DIntersection(dpv2D2, dpc2D2, xys[3], xys[7])) > tempDistance) {
+        bestA = xys[3]; bestB = xys[7];
+        bestCPA = cps2[3]; bestCPB = cps2[7];
+        // tempDistance = newDistance;
+    }
+
+//    for (int i = 0; i < 8; ++i) {
+//        for (int j = 0; j < 8; ++j) {
+//            if (j > i) {
+//                vec2 A2 = xys[i];
+//                vec2 B2 = xys[j];
+//                if (isInsideAngle(dpv2D2, dpc2D2, A2, B2))
+//                {
+//                    float newDistance = distanceTo2DIntersection(dpv2D2, dpc2D2, A2, B2);
+//                    if (newDistance > tempDistance) {
+//                        bestA = xys[i];
+//                        bestB = xys[j];
+//                        bestCPA = cps2[i];
+//                        bestCPB = cps2[j];
+//                        tempDistance = newDistance;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     // Get nearest cube vertex.
     float dotNA = dot(normalize(bestA), dpv2D2);
@@ -318,7 +386,7 @@ void main()
     for (int i = 0; i < 8; ++i) {
         vec2 other = xys[i];
         if (isInsideAngle(neighborSegment, dpc2D2, iE, other)) {
-            float newDistance = distanceTo2DIntersection(neighborSegment, dpc2D2, iE, other);
+            newDistance = distanceTo2DIntersection(neighborSegment, dpc2D2, iE, other);
             if (newDistance > tempDistance) {
                 bestNeighborProjected = xys[i];
                 bestCPNeighbor = cps2[i];
@@ -377,7 +445,7 @@ void main()
     }
 
     // Change this coefficient for the sky gradient: 1.0 = sharp, 0.001 = smooth.
-    float smoothCoefficient = 0.02;
+    float smoothCoefficient = 0.08;
     vec3 nup = diff * smoothCoefficient;
 
     // XXX check if needed to hack sun intensity from intersection (2019-03[madblade]: low priority)

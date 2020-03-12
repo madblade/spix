@@ -43,7 +43,11 @@ let Sky = function()
     // material = new THREE.MeshNormalMaterial({wireframe:true});
 
     let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-    THREE.Mesh.call(this, geometry, material);
+
+    THREE.Mesh.call(this, geometry,
+        material
+        // new THREE.MeshBasicMaterial({color: 0xffffff})
+    );
 };
 
 Sky.prototype = Object.create(THREE.Mesh.prototype);
