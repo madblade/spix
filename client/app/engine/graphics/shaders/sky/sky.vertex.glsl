@@ -4,7 +4,6 @@ uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
 uniform float mieCoefficient;
-//uniform mat4 viewInverse;
 uniform vec3 cameraPos;
 
 varying vec3 vWorldPosition;
@@ -12,15 +11,8 @@ varying vec3 vSunDirection;
 varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
-varying float vSunE;
 varying vec3 vCenter;
-varying vec3 vForward;
 varying vec3 vPosition;
-//varying vec3 vPP;
-varying vec3 vUp;
-//varying vec3 vP2;
-//varying mat4 vMVM;
-//varying mat4 vPM;
 
 varying vec3 cps[8];
 varying vec3 cps2[8];
@@ -51,11 +43,6 @@ const float cutoffAngle = 1.6110731556870734;
 const float steepness = 1.5;
 const float EE = 1000.0;
 
-float sunIntensity(float zenithAngleCos) {
-	zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
-	return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
-}
-
 vec3 totalMie(float T) {
 	float c = (0.2 * T) * 10E-18;
 	return 0.434 * c * MieConst;
@@ -72,27 +59,16 @@ void main()
         worldCenter.y - modelMatrix[3][1],
         worldCenter.z - modelMatrix[3][2],
          1.0)).xyz;
-    vForward = normalize((modelViewMatrix * vec4(1.0, 0.0, 0.0, 1.0)).xyz);
-    vUp = normalize((modelViewMatrix * vec4(0.0, 0.0, 1.0, 1.0)).xyz);
-//    vP2 = (modelViewMatrix * vec4(position, 1.0)).xyz;
     vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
-//    vPP = (vec4(worldCenter, 1.0)).xyz;
-//    vMVM = viewMatrix;
-//    vPM = projectionMatrix * viewMatrix;
 
 	gl_Position.z = gl_Position.w; // set z to camera.far
 
 	vSunDirection = normalize(sunPosition);
 
-	vSunE = sunIntensity(dot(vSunDirection, up));
-
     float cubeDiameter = 12.5;
     cubeDiameter *= 2.0;
 
-    // TODO night
-    // which face is the cam on
-    // which vector must we take the vertical component to later fade
-//    vec3 altitudeVector = vPosition
+    // night
     vec3 centerToCamera = cameraPos - worldCenter;
     float cx = centerToCamera.x; float acx = abs(cx);
     float cy = centerToCamera.y; float acy = abs(cy);
@@ -100,9 +76,11 @@ void main()
     bool isX = acx > acy && acx > acz;
     bool isY = acy > acx && acy > acz;
     bool isZ = !isX && !isY;
-    float projection = isX ? sign(cx) * sunPosition.x : isY ? sign(cy) * sunPosition.y : sign(cz) * sunPosition.z;
+    vec3 nsp = normalize(sunPosition);
+    float projection = isX ? sign(cx) * nsp.x : isY ? sign(cy) * nsp.y : sign(cz) * nsp.z;
 //	vSunfade = 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
-	vSunfade = 1.0 - clamp(1.0 - exp(projection / 150000.0), 0.0, 1.0);
+//	vSunfade = 1.0 - clamp(1.0 - exp(projection / 150000.0), 0.0, 1.0);
+	vSunfade = 1.0 - 1.0 * clamp(1.0 - exp(projection), 0.0, 1.0);
 //    vSunfade = isZ ? 1.0 : 0.0;
 
 	float rayleighCoefficient = rayleigh - (1.0 * (1.0 - vSunfade));
