@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Player from '../../server/app/model/client/player';
+// import Player from '../../server/app/model/client/player';
 
 import                  '../style/app.css';
 
@@ -46,7 +46,7 @@ App.Core = function() {
     // Also acts as a Mediator between engine, model(s) and modules
     this.state =      new StateManager(this);
 
-    this.p = new Player({connection:{socket: {on: _=>{}, off: _=>{}}}}, '');
+    // this.p = new Player({connection:{socket: {on: _=>{}, off: _=>{}}}}, '');
 
     // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {
