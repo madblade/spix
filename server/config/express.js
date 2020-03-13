@@ -115,17 +115,19 @@ export default function(app) {
          * Reload all devices when bundle is complete
          * or send a fullscreen error message to the browser instead
          */
-        compiler.plugin('done', function(stats) {
-            console.log('webpack done hook');
-            if (stats.hasErrors() || stats.hasWarnings()) {
-                return browserSync.sockets.emit('fullscreen:message', {
-                    title: 'Webpack Error:',
-                    body: stripAnsi(stats.toString()),
-                    timeout: 100000
-                });
-            }
-            browserSync.reload();
-        });
+        compiler.hooks.done.tap('WebpackShellPlugin',
+            //.plugin('done',
+            function(stats) {
+                console.log('webpack done hook');
+                if (stats.hasErrors() || stats.hasWarnings()) {
+                    return browserSync.sockets.emit('fullscreen:message', {
+                        title: 'Webpack Error:',
+                        body: stripAnsi(stats.toString()),
+                        timeout: 100000
+                    });
+                }
+                browserSync.reload();
+            });
     }
 
     if (env === 'development' || env === 'test') {

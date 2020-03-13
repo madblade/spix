@@ -130,6 +130,8 @@ module.exports = function makeWebpackConfig(options) {
                 loader: 'babel-loader',
                 include: [
                     path.resolve(__dirname, 'client/'),
+                    // TODO [FFFF] perform middleware management here!
+                    // path.resolve(__dirname, 'server/'),
                     path.resolve(__dirname, 'node_modules/lodash-es/')
                 ]
             },

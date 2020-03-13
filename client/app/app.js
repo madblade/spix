@@ -4,6 +4,8 @@
 
 'use strict';
 
+import Player from '../../server/app/model/client/player';
+
 import                  '../style/app.css';
 
 import extend           from './extend.js';
@@ -43,6 +45,8 @@ App.Core = function() {
     // State pattern manages in-game, loading, menus.
     // Also acts as a Mediator between engine, model(s) and modules
     this.state =      new StateManager(this);
+
+    this.p = new Player({connection:{socket: {on: _=>{}, off: _=>{}}}}, '');
 
     // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {

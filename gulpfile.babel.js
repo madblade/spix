@@ -16,7 +16,6 @@ import { Server as KarmaServer } from 'karma';
 import webpack from 'webpack-stream';
 import makeWebpackConfig from './webpack.make';
 import shell from 'gulp-shell';
-const imagemin = require('gulp-imagemin');
 
 let plugins = gulpLoadPlugins();
 let config;
@@ -378,17 +377,17 @@ gulp.task('test:client', done => {
  ********************/
 
 var cleandist = () => {
-    return del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true});
+    return del([`${paths.dist}/!(.git*|Procfile)**`], {dot: true});
 };
 
 var buildimages = () => {
     return gulp.src(paths.client.images)
-        .pipe(imagemin([
-            imagemin.optipng({optimizationLevel: 5}),
-            imagemin.mozjpeg({progressive: true}),
-            imagemin.gifsicle({interlaced: true}),
-            imagemin.svgo({plugins: [{removeViewBox: false}]})
-        ]))
+        // .pipe(imagemin([
+        //     imagemin.optipng({optimizationLevel: 5}),
+        //     imagemin.mozjpeg({progressive: true}),
+        //     imagemin.gifsicle({interlaced: true}),
+        //     imagemin.svgo({plugins: [{removeViewBox: false}]})
+        // ]))
         .pipe(plugins.rev())
         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/images`))
         .pipe(plugins.rev.manifest(`${paths.dist}/${paths.client.revManifest}`, {
