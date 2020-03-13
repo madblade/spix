@@ -1,4 +1,5 @@
 /* eslint-disable */
+var should = require('chai').should();
 
 import express          from 'express';
 import App              from '../../../../app/app.js';
@@ -49,6 +50,18 @@ describe('Hub API:', function () {
         //
         //     return entity.saveAsync();
         // });
+    });
+
+    describe('passing', function() {
+        it ('should pass no matter what', function() {
+            true.should.equal(true);
+        });
+    });
+
+    describe('not passing', function() {
+        it ('should fail no matter what', function() {
+            true.should.equal(false);
+        });
     });
 
     describe('ioServer', function() {

@@ -9,6 +9,7 @@ public
 
 /server/config/local.env.js
 
+.nyc_output/
 .yo-rc.json
 npm-debug.log
 dependencies.txt

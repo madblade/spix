@@ -23,9 +23,9 @@ import ConsistencyModel from './model_consistency/model';
 
 import Chat             from './../../model/connection/chat';
 
-class Game3D extends Game {
-
-    static serverRefreshRate = 16;
+class Game3D extends Game
+{
+    static serverRefreshRate = 8;
     // static serverRefreshRate = 420; // blaze it
 
     constructor(hub, gameId, connector) {
@@ -81,46 +81,47 @@ class Game3D extends Game {
     //^
     update() {
         // Idea maybe split in several loops (purposes).
-        let t;
-        let dt1; let dt2; let dt3; let dt4; let dt5;
-        let debugThresh = 1000; // ms
+        let debugThresh = 4000; // microsecs
 
         /** Inputs **/
-        t = process.hrtime();
+        let t = process.hrtime();
+        const t0 = t;
         this._ai.update();                // Update intents.
-        dt1 = process.hrtime(t)[1] / 1000;
+        const dt1 = process.hrtime(t)[1] / 1000;
         if (Game3D.bench && dt1 > debugThresh) console.log(`${dt1} µs to update intents.`);
 
         t = process.hrtime();
         this._externalInput.update();     // Update human spawn/leave requests.
         this._internalInput.update();     // Update artificial inputs.
-        dt2 = process.hrtime(t)[1] / 1000;
+        const dt2 = process.hrtime(t)[1] / 1000;
         if (Game3D.bench && dt2 > debugThresh) console.log(`${dt2} µs to update inputs.`);
 
         /** Updates **/
         t = process.hrtime();
         this._topologyEngine.update();    // Update topological model.
         this._physicsEngine.update();     // Update physical simulation.
-        dt3 = process.hrtime(t)[1] / 1000;
+        const dt3 = process.hrtime(t)[1] / 1000;
         if (Game3D.bench && dt3 > debugThresh) console.log(`${dt3} µs to update engines.`);
 
         /** Consistency solving: mediator between player and server models **/
         t = process.hrtime();
         this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
-        dt4 = process.hrtime(t)[1] / 1000;
+        const dt4 = process.hrtime(t)[1] / 1000;
         if (Game3D.bench && dt4 > debugThresh) console.log(`${dt4} µs to update consistency.`);
 
         /** Outputs **/
         t = process.hrtime();
         this._externalOutput.update();    // Send updates.
         this._internalOutput.update();    // Update perceptions.
-        dt5 = process.hrtime(t)[1] / 1000;
+        const dt5 = process.hrtime(t)[1] / 1000;
         if (Game3D.bench && dt5 > debugThresh) console.log(`${dt5} µs to update outputs.`);
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
         // this._tt += 1;
         // if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
+        const t1 = process.hrtime(t0)[1] / 1000;
+        if (t1 > 4000 && Game3D.bench) console.log(`${t1} µs.`);
     }
 
     generate() {

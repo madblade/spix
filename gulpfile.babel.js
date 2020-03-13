@@ -12,11 +12,11 @@ import http from 'http';
 import open from 'open';
 import lazypipe from 'lazypipe';
 import nodemon from 'nodemon';
-import {Server as KarmaServer} from 'karma';
-// import {Instrumenter} from 'isparta';
-import {Instrumenter} from 'istanbul';
+import { Server as KarmaServer } from 'karma';
 import webpack from 'webpack-stream';
 import makeWebpackConfig from './webpack.make';
+import shell from 'gulp-shell';
+const imagemin = require('gulp-imagemin');
 
 let plugins = gulpLoadPlugins();
 let config;
@@ -44,7 +44,7 @@ const paths = {
         json: [`${serverPath}/**/*.json`],
         test: {
             // One can add globals.
-            integration: [`${serverPath}/**/*.integration.js`], // , 'mocha.global.js'],
+            // integration: [`${serverPath}/**/*.integration.js`], // , 'mocha.global.js'],
             unit: [`${serverPath}/**/*.spec.js`] // , 'mocha.global.js']
         }
     },
@@ -141,26 +141,11 @@ let mocha = lazypipe()
         ]
     });
 
-let istanbul = lazypipe()
-    .pipe(plugins.istanbul.writeReports)
-    .pipe(plugins.istanbulEnforcer, {
-        thresholds: {
-            global: {
-                lines: 80,
-                statements: 80,
-                branches: 80,
-                functions: 80
-            }
-        },
-        coverageDirectory: './coverage',
-        rootDirectory : ''
-    });
-
 /********************
  * Env
  ********************/
 
-gulp.task('env:all', (done) => {
+var envall = (done) => {
     let localConfig;
     try {
         localConfig = require(`./${serverPath}/config/local.env`);
@@ -171,26 +156,28 @@ gulp.task('env:all', (done) => {
         vars: localConfig
     });
     done();
-});
-gulp.task('env:test', (done) => {
+};
+
+var envtest = (done) => {
     plugins.env({
         vars: {NODE_ENV: 'test'}
     });
     done();
-});
-gulp.task('env:prod', (done) => {
+};
+
+var envprod = (done) => {
     plugins.env({
         vars: {NODE_ENV: 'production'}
     });
     done();
-});
+};
 
 /********************
  * Tasks
  ********************/
 
-// INJECT
-gulp.task('inject:css', () =>
+// Inject
+var injectcss = () =>
     gulp.src(paths.client.mainStyle)
         .pipe(plugins.inject(
             gulp.src(
@@ -210,21 +197,21 @@ gulp.task('inject:css', () =>
             })
         )
         .pipe(gulp.dest(`${clientPath}/style/`))
-);
+;
 
-gulp.task('inject',
-    gulp.series('inject:css'));
+var inject =
+    gulp.series(injectcss);
 
-// WEBPACK
-gulp.task('webpack:dev', function() {
+// Webpack
+var webpackdev = function() {
     const webpackDevConfig = makeWebpackConfig({ DEV: true });
     return gulp.src(webpackDevConfig.entry.app)
         .pipe(plugins.plumber())
         .pipe(webpack(webpackDevConfig))
         .pipe(gulp.dest('.tmp'));
-});
+};
 
-gulp.task('webpack:dist', function() {
+var webpackdist = function() {
     const webpackDistConfig = makeWebpackConfig({ BUILD: true });
     return gulp.src(webpackDistConfig.entry.app)
         .pipe(webpack(webpackDistConfig))
@@ -232,104 +219,87 @@ gulp.task('webpack:dist', function() {
           console.log(err);
         })
         .pipe(gulp.dest(`${paths.dist}/client`));
-});
+};
 
-gulp.task('webpack:test', function() {
+var webpacktest = function() {
     const webpackTestConfig = makeWebpackConfig({ TEST: true });
     return gulp.src(webpackTestConfig.entry.app)
         .pipe(webpack(webpackTestConfig))
         .pipe(gulp.dest('.tmp'));
-});
+};
 
-// STYLES
-gulp.task('styles', () =>
-    gulp.src(paths.client.styles)
-        .pipe(styles())
-        .pipe(gulp.dest('.tmp/app'))
-);
-
-// TRANSPILE
-gulp.task('transpile:server', () => {
+// Transpile
+var transpileserver = () => {
     return gulp.src(_.union(paths.server.scripts, paths.server.json))
         .pipe(transpileServer())
         .pipe(gulp.dest(`${paths.dist}/${serverPath}`));
-});
+};
 
-// LINT
-
-gulp.task('lint:scripts:client', () => {
+// Code style
+var lintscriptsclient = () => {
     return gulp.src(_.union(
         paths.client.scripts,
         _.map(paths.client.test, blob => '!' + blob)
     ))
         .pipe(lintClientScripts());
-});
+};
 
-gulp.task('lint:scripts:server', () => {
+var lintscriptsserver = () => {
     return gulp.src(_.union(paths.server.scripts,
         _.map(paths.server.test, blob => '!' + blob)))
         .pipe(lintServerScripts());
-});
-
-gulp.task('lint:scripts:clientTest', () => {
-    return gulp.src(paths.client.test)
-        .pipe(lintClientScripts());
-});
-
-gulp.task('lint:scripts:serverTest', () => {
-    return gulp.src(paths.server.test)
-        .pipe(lintServerTestScripts());
-});
+};
 
 gulp.task('lint:scripts',
-    gulp.parallel(
-        'lint:scripts:client',
-        'lint:scripts:server'));
+    gulp.series(
+        lintscriptsserver,
+        lintscriptsclient,
+    ));
 
-// JSCS
-gulp.task('jscs', () => {
-  return gulp.src(_.union(paths.client.scripts, paths.server.scripts))
-      .pipe(plugins.jscs())
-      .pipe(plugins.jscs.reporter());
-});
-
-// CLEAN
-gulp.task('clean:tmp', () => {
+// Clean
+var cleantmp = () => {
     return del(['.tmp/**/*'], {dot: true})
-});
+};
 
-// START
-gulp.task('start:client', cb => {
+// Start
+var startclientdev = cb => {
     whenServerReady(() => {
         open('http://localhost:' + '9000', 'chrome'); // config.browserSyncPort);
         cb();
     });
-});
+};
 
-gulp.task('start:server', () => {
+var startclient = cb => {
+    whenServerReady(() => {
+        open('http://localhost:' + '8080', 'chrome'); // config.browserSyncPort);
+        cb();
+    });
+};
+
+var startserver = () => {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
     config = require(`./${serverPath}/config/environment`);
     nodemon(`-w ${serverPath} ${serverPath}`)
         .on('log', onServerLog);
-});
+};
 
-gulp.task('start:server:prod', () => {
+var startserverprod = () => {
     process.env.NODE_ENV = process.env.NODE_ENV || 'production';
     config = require(`./${paths.dist}/${serverPath}/config/environment`);
     nodemon(`-w ${paths.dist}/${serverPath} ${paths.dist}/${serverPath}`)
         .on('log', onServerLog);
-});
+};
 
-gulp.task('start:server:debug', () => {
+var startserverdebug = () => {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
     config = require(`./${serverPath}/config/environment`);
     // nodemon(`-w ${serverPath} --debug=5858 --debug-brk ${serverPath}`)
-    nodemon(`-w ${serverPath} --inspect --debug-brk ${serverPath}`)
+    nodemon(`-w ${serverPath} --inspect-brk ${serverPath}`)
         .on('log', onServerLog);
-});
+};
 
-// WATCH
-gulp.task('watch', () => {
+// Lightspeed watch
+var watch = () => {
     var testFiles = _.union(
         paths.client.test,
         paths.server.test.unit,
@@ -342,10 +312,10 @@ gulp.task('watch', () => {
     plugins.watch(_.union(paths.server.test.unit, paths.server.test.integration))
         .pipe(plugins.plumber())
         .pipe(lintServerTestScripts());
-});
+};
 
-// UNIT TESTING
-gulp.task('mocha:unit', (d) => {
+// Unit
+var mochaunit = (d) => {
     return gulp.src(paths.server.test.unit)
         .pipe(mocha({ reporter: 'list', exit: true }))
         .once('error', () => {
@@ -354,54 +324,39 @@ gulp.task('mocha:unit', (d) => {
         .once('end', () => {
             d();
         });
-});
+};
 
-gulp.task('mocha:integration', () => {
-    return gulp.src(paths.server.test.integration)
-        .pipe(mocha({exit: true}));
-});
+// var mochaintegration = () => {
+//     return gulp.src(paths.server.test.integration)
+//         .pipe(mocha({exit: true}));
+// };
 
-// COVERAGE TESTING
-gulp.task('coverage:pre', () => {
-  return gulp.src(paths.server.scripts)
-    // Covering files
-    .pipe(plugins.istanbul({
-        // instrumenter: Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
-        instrumenter: Instrumenter, // Use the istanbul instrumenter (code coverage for ES6)
-        includeUntested: true
-    }))
-    // Force `require` to return covered files
-    .pipe(plugins.istanbul.hookRequire());
-});
+// Coverage
 
-gulp.task('coverage:unit', () => {
-    return gulp.src(paths.server.test.unit)
-        .pipe(mocha({exit: true}))
-        .pipe(istanbul())
-        // Creating the reports after tests ran
-});
+var coverageunit =
+    shell.task([
+        `cross-env NODE_ENV=test nyc --reporter=html mocha ${paths.server.test.unit[0]}`,
+    ])
+;
 
-gulp.task('coverage:integration', () => {
-    return gulp.src(paths.server.test.integration)
-        .pipe(mocha({exit: true}))
-        .pipe(istanbul())
-        // Creating the reports after tests ran
-});
+// var coverageintegration =
+//     shell.task([
+//         `cross-env NODE_ENV=test nyc --reporter=html mocha ${paths.server.test.integration[0]}`,
+//     ])
+// ;
 
 gulp.task('test:server',
     gulp.series(
-        'env:all',
-        'env:test',
-        'mocha:unit',
-        'mocha:integration'
+        envall,
+        envtest,
+        mochaunit //,
+        // mochaintegration
     ));
 
-gulp.task('test:server:coverage',
-    gulp.series('coverage:pre',
-        'env:all',
-        'env:test',
-        'coverage:unit',
-        'coverage:integration'));
+gulp.task('coverage:server',
+    gulp.series(
+        coverageunit
+    ));
 
 gulp.task('test:client', done => {
     new KarmaServer({
@@ -413,26 +368,26 @@ gulp.task('test:client', done => {
     }).start();
 });
 
-gulp.task('test',
-    gulp.series(
-        'test:server',
-        'test:client'));
+// gulp.task('test',
+//     gulp.series(
+//         'test:server',
+//         'test:client'));
 
 /********************
  * Build
  ********************/
 
-gulp.task('clean:dist', () => {
+var cleandist = () => {
     return del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true});
-});
+};
 
-gulp.task('build:images', () => {
+var buildimages = () => {
     return gulp.src(paths.client.images)
-        .pipe(plugins.imagemin([
-            plugins.imagemin.optipng({optimizationLevel: 5}),
-            plugins.imagemin.jpegtran({progressive: true}),
-            plugins.imagemin.gifsicle({interlaced: true}),
-            plugins.imagemin.svgo({plugins: [{removeViewBox: false}]})
+        .pipe(imagemin([
+            imagemin.optipng({optimizationLevel: 5}),
+            imagemin.mozjpeg({progressive: true}),
+            imagemin.gifsicle({interlaced: true}),
+            imagemin.svgo({plugins: [{removeViewBox: false}]})
         ]))
         .pipe(plugins.rev())
         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/images`))
@@ -441,26 +396,24 @@ gulp.task('build:images', () => {
             merge: true
         }))
         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`));
-});
+};
 
-gulp.task('revReplaceWebpack', function() {
+var revReplaceWebpack = function() {
     return gulp.src('dist/client/app.*.js')
         .pipe(plugins.revReplace({manifest: gulp.src(`${paths.dist}/${paths.client.revManifest}`)}))
         .pipe(gulp.dest('dist/client'));
-});
+};
 
-gulp.task('copy:extras', () => {
+var copyextras = () => {
     return gulp.src([
         `${clientPath}/favicon.ico`,
         `${clientPath}/robots.txt`,
         `${clientPath}/.htaccess`
     ], { dot: true })
         .pipe(gulp.dest(`${paths.dist}/${clientPath}`));
-});
+};
 
-/**
- * turns 'bootstrap/fonts/font.woff' into 'bootstrap/font.woff'
- */
+// turns 'bootstrap/fonts/font.woff' into 'bootstrap/font.woff'
 function flatten() {
     return through2.obj(function(file, enc, next) {
         if(!file.isDirectory()) {
@@ -476,83 +429,88 @@ function flatten() {
         next();
     });
 }
-gulp.task('copy:fonts:dev', () => {
+
+var copyfontsdev = () => {
     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
         .pipe(flatten())
         .pipe(gulp.dest(`${clientPath}/assets/fonts`));
-});
-gulp.task('copy:fonts:dist', () => {
+};
+var copyfontsdist = () => {
     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
         .pipe(flatten())
         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/fonts`));
-});
+};
 
-gulp.task('copy:assets', () => {
+var copyassets = () => {
     return gulp.src([paths.client.assets, '!' + paths.client.images])
         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`));
-});
+};
 
-gulp.task('copy:server', () => {
+var copyserver = () => {
     return gulp.src([
         'package.json'
     ], {cwdbase: true})
         .pipe(gulp.dest(paths.dist));
-});
+};
 
 // MAIN TASKS
-gulp.task('build',
-    gulp.series(
-        gulp.parallel(
-            'clean:dist',
-            'clean:tmp'),
-        'inject',
-        'transpile:server',
-        gulp.parallel(
-            'build:images'),
-        gulp.parallel(
-            'copy:extras',
-            'copy:assets',
-            'copy:fonts:dist',
-            'copy:server',
-            'webpack:dist'),
-        // 'revReplaceWebpack'
-    ));
-
 gulp.task('serve',
     gulp.series(
         gulp.parallel(
-            'clean:tmp',
-            // 'lint:scripts', // TODO [FFF] correct errors here
-            'inject',
-            'copy:fonts:dev',
-            'env:all'),
-        'webpack:dev',
+            cleantmp,
+            // lintscripts, // TODO [FFF] correct errors here
+            inject,
+            copyfontsdev,
+            envall),
+        webpackdev,
         gulp.parallel(
-            'start:server',
-            'start:client'),
-        'watch'));
+            startserver,
+            startclientdev),
+        watch));
 
 // TODO [FFF] update to karma-webpack 4
 
 gulp.task('serve:debug',
     gulp.series(
         gulp.parallel(
-            'clean:tmp',
-            'lint:scripts',
-            'inject',
-            'copy:fonts:dev',
-            'env:all'),
-        'webpack:dev',
+            cleantmp,
+            // 'lint:scripts',
+            inject,
+            copyfontsdev,
+            envall),
+        webpackdev,
         gulp.parallel(
-            'start:server:debug',
-            'start:client'),
-        'watch'));
+            startserverdebug,
+            startclientdev),
+        watch));
+
+
+gulp.task('build',
+    gulp.series(
+        gulp.parallel(
+            cleandist,
+            cleantmp
+        ),
+        inject,
+        transpileserver,
+        gulp.parallel(
+            buildimages
+        ),
+        gulp.parallel(
+            copyextras,
+            copyassets,
+            copyfontsdist,
+            copyserver,
+            webpackdist
+        ),
+        // revReplaceWebpack
+    ));
 
 gulp.task('serve:dist',
     gulp.series(
         'build',
-        'env:all',
-        'env:prod',
+        envall,
+        envprod,
         gulp.parallel(
-            'start:server:prod',
-            'start:client')));
+            startserverprod,
+            startclient)));

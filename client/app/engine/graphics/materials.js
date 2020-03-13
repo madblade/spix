@@ -15,7 +15,7 @@ let MaterialsModule = {
             case 'flat-phong':
                 material = new THREE.MeshPhongMaterial({
                     specular: 0xffffff,
-                    shading: THREE.flatShading,
+                    flatShading: true,
                     vertexColors: THREE.VertexColors
                 });
                 break;
