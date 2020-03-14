@@ -4,6 +4,8 @@
 
 'use strict';
 
+import TimeUtils from '../../../math/time';
+
 class UserOutput {
 
     static debug = false;
@@ -27,29 +29,29 @@ class UserOutput {
         let t1;
         let t2;
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         //this.spawnPlayers();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to spawn players.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateChunks();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateEntities();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateX();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send x updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateMeta();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send other stuff.`);
 
         this._consistencyEngine.flushBuffers();

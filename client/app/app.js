@@ -26,19 +26,16 @@ import { Hub }          from './model/hub/hub.js';
 import { Server }       from './model/server/server.js';
 import { Client }       from './model/client/client.js';
 
+// Local Netcode
+import { Standalone }   from './localserver/standalone';
+import { Middleware }   from './localserver/middleware';
+
 // Modules
 import { Register }     from './modules/register/register.js';
 // import { Polyfills }    from 'modules/polyfills/polyfills.js';
 
 // Global application structure.
 let App = App || {Core : {}};
-// var App = App || {
-//     State: {},
-//     Core: {},
-//     Engine: {},
-//     Model: {},
-//     Modules: {}
-// };
 
 // Main entry point.
 App.Core = function() {
@@ -46,7 +43,12 @@ App.Core = function() {
     // Also acts as a Mediator between engine, model(s) and modules
     this.state =      new StateManager(this);
 
-    // this.p = new Player({connection:{socket: {on: _=>{}, off: _=>{}}}}, '');
+    // Standalone server for solo mode (or local client)
+    // Middleware for high latency discrepancy networks (non-LAN)
+    this.localServer = {
+        standalone:   new Standalone(this),
+        middleware:   new Middleware(this)
+    };
 
     // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {
@@ -72,8 +74,17 @@ App.Core = function() {
 // Application entry point.
 extend(App.Core.prototype, {
 
+    startFromLocalServer() {
+        this.setState('loading');
+        let s = this.localServer.standalone.io.socketClient;
+        this.engine.connection.setupLocalSocket(s);
+        this.engine.connection.connect();
+        this.localServer.standalone.start();
+    },
+
     start() {
         this.setState('loading');
+        this.engine.connection.setupSocket();
         this.engine.connection.connect();
     },
 
@@ -192,6 +203,7 @@ extend(App.Core.prototype, {
 window.register = (function() {
     let app = new App.Core();
     app.start();
+    // app.startFromLocalServer();
     return app.register;
 }());
 

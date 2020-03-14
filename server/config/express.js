@@ -83,7 +83,7 @@ export default function(app) {
         const stripAnsi = require('strip-ansi');
         const webpack = require('webpack');
         const makeWebpackConfig = require('../../webpack.make');
-        const webpackConfig = makeWebpackConfig({ DEV: true });
+        const webpackConfig = makeWebpackConfig({ DEV: true, LOCALSERVER: true });
         const compiler = webpack(webpackConfig);
         const browserSync = require('browser-sync').create();
 

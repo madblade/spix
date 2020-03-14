@@ -95,30 +95,8 @@ let lintClientScripts = lazypipe()
     .pipe(plugins.eslint, `${clientPath}/.eslintrc`)
     .pipe(plugins.eslint.format);
 
-const lintClientTestScripts = lazypipe()
-    .pipe(plugins.eslint, {
-        configFile: `${clientPath}/.eslintrc`,
-        envs: [
-            'browser',
-            'es6',
-            'mocha'
-        ]
-    })
-    .pipe(plugins.eslint.format);
-
 let lintServerScripts = lazypipe()
     .pipe(plugins.eslint, `${serverPath}/.eslintrc`)
-    .pipe(plugins.eslint.format);
-
-let lintServerTestScripts = lazypipe()
-    .pipe(plugins.eslint, {
-        configFile: `${serverPath}/.eslintrc`,
-        envs: [
-            'node',
-            'es6',
-            'mocha'
-        ]
-    })
     .pipe(plugins.eslint.format);
 
 let transpileServer = lazypipe()
@@ -202,30 +180,30 @@ var inject =
     gulp.series(injectcss);
 
 // Webpack
-var webpackdev = function() {
-    const webpackDevConfig = makeWebpackConfig({ DEV: true });
+var webpackdev = function(packLocal){ return function() {
+    const webpackDevConfig = makeWebpackConfig({ DEV: true, LOCALSERVER: !!packLocal });
     return gulp.src(webpackDevConfig.entry.app)
         .pipe(plugins.plumber())
         .pipe(webpack(webpackDevConfig))
         .pipe(gulp.dest('.tmp'));
-};
+}};
 
-var webpackdist = function() {
-    const webpackDistConfig = makeWebpackConfig({ BUILD: true });
+var webpackdist = function(packLocal){ return function() {
+    const webpackDistConfig = makeWebpackConfig({ BUILD: true, LOCALSERVER: !!packLocal });
     return gulp.src(webpackDistConfig.entry.app)
         .pipe(webpack(webpackDistConfig))
         .on('error', (err) => {
           console.log(err);
         })
         .pipe(gulp.dest(`${paths.dist}/client`));
-};
+}};
 
-var webpacktest = function() {
-    const webpackTestConfig = makeWebpackConfig({ TEST: true });
-    return gulp.src(webpackTestConfig.entry.app)
-        .pipe(webpack(webpackTestConfig))
-        .pipe(gulp.dest('.tmp'));
-};
+// var webpacktest = function() {
+//     const webpackTestConfig = makeWebpackConfig({ TEST: true });
+//     return gulp.src(webpackTestConfig.entry.app)
+//         .pipe(webpack(webpackTestConfig))
+//         .pipe(gulp.dest('.tmp'));
+// };
 
 // Transpile
 var transpileserver = () => {
@@ -295,22 +273,6 @@ var startserverdebug = () => {
     // nodemon(`-w ${serverPath} --debug=5858 --debug-brk ${serverPath}`)
     nodemon(`-w ${serverPath} --inspect-brk ${serverPath}`)
         .on('log', onServerLog);
-};
-
-// Lightspeed watch
-var watch = () => {
-    var testFiles = _.union(
-        paths.client.test,
-        paths.server.test.unit,
-        paths.server.test.integration);
-
-    plugins.watch(_.union(paths.server.scripts, testFiles))
-        .pipe(plugins.plumber())
-        .pipe(lintServerScripts());
-
-    plugins.watch(_.union(paths.server.test.unit, paths.server.test.integration))
-        .pipe(plugins.plumber())
-        .pipe(lintServerTestScripts());
 };
 
 // Unit
@@ -452,6 +414,8 @@ var copyserver = () => {
         .pipe(gulp.dest(paths.dist));
 };
 
+var bundleServerInClient = true;
+
 // MAIN TASKS
 gulp.task('serve',
     gulp.series(
@@ -461,11 +425,12 @@ gulp.task('serve',
             inject,
             copyfontsdev,
             envall),
-        webpackdev,
+        webpackdev(bundleServerInClient),
         gulp.parallel(
             startserver,
-            startclientdev),
-        watch));
+            startclientdev
+        ),
+    ));
 
 // TODO [FFF] update to karma-webpack 4
 
@@ -477,11 +442,11 @@ gulp.task('serve:debug',
             inject,
             copyfontsdev,
             envall),
-        webpackdev,
+        webpackdev(bundleServerInClient),
         gulp.parallel(
             startserverdebug,
             startclientdev),
-        watch));
+    ));
 
 
 gulp.task('build',
@@ -500,7 +465,7 @@ gulp.task('build',
             copyassets,
             copyfontsdist,
             copyserver,
-            webpackdist
+            webpackdist(bundleServerInClient)
         ),
         // revReplaceWebpack
     ));

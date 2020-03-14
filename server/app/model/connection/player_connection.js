@@ -53,7 +53,7 @@ class PlayerConnection {
      * @param room
      */
     join(room) {
-        this._socket.join(room);
+        // this._socket.join(room);
         this._rooms.push(room);
     }
 
@@ -62,7 +62,8 @@ class PlayerConnection {
      * @param room
      */
     leave(room) {
-        this._socket.leave(room);
+        // this._socket.leave(room);
+        // is there a reason for using rooms?
         CollectionUtils.removeFromArray(this._rooms, room);
     }
 

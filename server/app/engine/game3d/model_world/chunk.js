@@ -7,6 +7,8 @@
 // import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
 // import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
 
+import TimeUtils from '../../math/time';
+
 class Chunk {
 
     static debug = false;
@@ -42,7 +44,7 @@ class Chunk {
         this._ready = false;
 
         // Events.
-        this._lastUpdated = process.hrtime();
+        this._lastUpdated = TimeUtils.getTimeSecNano();
         this._updates = [{}, {}, {}];
     }
 

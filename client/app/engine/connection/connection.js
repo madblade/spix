@@ -14,11 +14,10 @@ let Connection = function(app) {
 
 extend(Connection.prototype, {
 
-    connect(autoconfig) {
+    setupSocket(autoconfig) {
         let socketAddress = '';
-        let app = this.app;
-        let hub = app.model.hub;
 
+        // TODO expose socketAddress
         if (!autoconfig && location.hostname !== 'localhost') {
             socketAddress = `ws://${location.hostname}:8000`;
         }
@@ -28,6 +27,15 @@ extend(Connection.prototype, {
             // 'query': 'token=' + Auth.getToken()
             path: '/socket.io-client'
         });
+    },
+
+    setupLocalSocket(s) {
+        this.socket = s;
+    },
+
+    connect() {
+        let app = this.app;
+        let hub = app.model.hub;
 
         // Custom listeners.
         this.socket.on('hub',               function(data) {hub.update(data);});

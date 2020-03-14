@@ -10,6 +10,7 @@ import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
 // import ChunkIterator        from '../builder/iterator_chunks';
 import ChunkBuilder         from '../builder/builder_chunks';
+import TimeUtils from '../../../math/time';
 
 class ChunkLoader {
 
@@ -181,26 +182,26 @@ class ChunkLoader {
         let newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
-        let t = process.hrtime();
+        let t = TimeUtils.getTimeSecNano();
 
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
         ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, false);
 
-        let dt1 = process.hrtime(t)[1] / 1000;
+        let dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO [HIGH] check on Z+/-.
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
 
         let newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, true);
 
-        dt1 = process.hrtime(t)[1] / 1000;
+        dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
         if (newChunk) {
