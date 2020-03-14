@@ -70,12 +70,12 @@ let Atmosphere = function(planet)
         new THREE.Vector3(1, -1, 0.5)];
 
     this.directions = new Float32Array(12);
-    this.directions.set(
-        [-1, 1, 0.5,
+    this.directions.set([
+        -1, 1, 0.5,
         1, 1, 0.5,
         -1, -1, 0.5,
-        1, -1, 0.5]
-    );
+        1, -1, 0.5
+    ]);
 
     // Ugly
     var plane = new THREE.PlaneBufferGeometry(
@@ -117,7 +117,7 @@ let Atmosphere = function(planet)
 
     // material = new THREE.MeshNormalMaterial();
 
-    plane.addAttribute('sampleDir', sampleDir);
+    plane.setAttribute('sampleDir', sampleDir);
 
     this.mesh = new THREE.Mesh(plane, material);
     this.mesh.position.y = 20;
@@ -148,7 +148,7 @@ extend(Atmosphere.prototype, {
         }
 
         this.sun.position.set(Math.cos(Date.now() / 5000),
-           0, Math.sin(Date.now() / 5000)).normalize();
+            0, Math.sin(Date.now() / 5000)).normalize();
         // this.sun.position.set(0.9, 0., 0.1).normalize();
 
         let scale = 1e-5;

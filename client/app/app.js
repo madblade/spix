@@ -4,8 +4,6 @@
 
 'use strict';
 
-// import Player from '../../server/app/model/client/player';
-
 import                  '../style/app.css';
 
 import extend           from './extend.js';

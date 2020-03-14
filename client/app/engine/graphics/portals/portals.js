@@ -236,7 +236,7 @@ let PortalsModule = {
     },
 
     addPortalGraphics(portal, otherPortal, cameraPath, cameraTransform,
-                                depth, originPid, destinationPid, destinationWid, pidPathString)
+        depth, originPid, destinationPid, destinationWid, pidPathString)
     {
         let renderRegister = this.rendererManager.getRenderRegister();
         for (let i in renderRegister)
@@ -277,8 +277,8 @@ let PortalsModule = {
     },
 
     addPortalObject(portal, otherPortal, cameraPath, cameraTransform,
-                              depth, originPid, destinationPid, destinationWid,
-                              pidPathString)
+        depth, originPid, destinationPid, destinationWid,
+        pidPathString)
     {
         this.portalUpdates.push({
             /*portal: */portal,

@@ -85,10 +85,10 @@ let ChunksModule = {
         }
 
         let geometry = new THREE.BufferGeometry();
-        geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-        geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
         geometry.computeBoundingSphere();
 
         let material = this.createMaterial('textured-phong', 0xaaaaaa);
@@ -107,7 +107,7 @@ let ChunksModule = {
     },
 
     updateChunk(worldId, chunk, chunkId, components,
-                           chunkSizeX, chunkSizeY, chunkSizeZ)
+        chunkSizeX, chunkSizeY, chunkSizeZ)
     {
         let geometries =        chunk.geometries;
         let materials =         chunk.materials;
@@ -133,8 +133,8 @@ let ChunksModule = {
     },
 
     removeChunkFaces(worldId, removed,
-                                geometries, materials, meshes, capacities, sizes,
-                                whereToFindFace, whichFaceIs)
+        geometries, materials, meshes, capacities, sizes,
+        whereToFindFace, whichFaceIs)
     {
         let geometry; let vertices; let colors; let normals; let uvs;
         let meshId;
@@ -231,9 +231,9 @@ let ChunksModule = {
     },
 
     addChunkFaces(worldId, added,
-                             geometries, materials, meshes, capacities, sizes,
-                             whereToFindFace, whichFaceIs,
-                             chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
+        geometries, materials, meshes, capacities, sizes,
+        whereToFindFace, whichFaceIs,
+        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
     {
         let geometry; let vertices; let colors; let normals; let uvs;
         let meshId; let faceId;
@@ -329,10 +329,10 @@ let ChunksModule = {
                 normal, color, n);
 
             if (meshHasToBeAdded) {
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-                geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-                geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+                geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
                 meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
                 this.addToScene(meshes[meshId], worldId);

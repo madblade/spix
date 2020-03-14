@@ -69,9 +69,10 @@ extend(ChunkModel.prototype, {
 
         let graphics = this.app.engine.graphics;
         let sky = graphics.createSky();
+        let sunPosition = new THREE.Vector3(0, -700000, 0);
         let sunSphere = graphics.createSunSphere();
         graphics.addToScene(sky, worldId);
-        graphics.addToScene(sunSphere, worldId);
+        // graphics.addToScene(sunSphere, worldId);
 
         let g = new THREE.BoxBufferGeometry(50, 50, 50);
         let m = new THREE.MeshNormalMaterial({wireframe: true});
@@ -96,7 +97,7 @@ extend(ChunkModel.prototype, {
         let isSunSphereVisible = true;
         graphics.updateSky(
             sky,
-            sunSphere,
+            sunPosition,
             turbidity,
             rayleigh,
             mieCoefficient,

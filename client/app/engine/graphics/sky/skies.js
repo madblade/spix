@@ -80,7 +80,7 @@ let SkyModule = {
     // TODO [MILESTONE1] update suns position throughout day and year
     updateSky(
         sky,
-        sunSphere,
+        sunPosition,
         turbidity, //: 10,
         rayleigh, //: 2,
         mieCoefficient, //: 0.005,
@@ -88,12 +88,13 @@ let SkyModule = {
         luminance, //: 1,
         inclination, // 0.49, elevation / inclination
         azimuth,
-        isSunSphereVisible) //: 0.25, Facing front
+    ) //: 0.25, Facing front
     {
         let sin = Math.sin;
         let cos = Math.cos;
 
         let uniforms = sky.material.uniforms;
+        if (!uniforms) return;
         uniforms.turbidity.value = turbidity;
         uniforms.rayleigh.value = rayleigh;
         uniforms.luminance.value = luminance;
@@ -111,13 +112,11 @@ let SkyModule = {
         this.phi = phi;
         this.theta = theta;
 
-        sunSphere.position.x = distance * cos(phi);
-        sunSphere.position.y = distance * sin(phi) * sin(theta);
-        sunSphere.position.z = distance * sin(phi) * cos(theta);
+        sunPosition.x = distance * cos(phi);
+        sunPosition.y = distance * sin(phi) * sin(theta);
+        sunPosition.z = distance * sin(phi) * cos(theta);
 
-        sunSphere.visible = isSunSphereVisible;
-
-        uniforms.sunPosition.value.copy(sunSphere.position);
+        uniforms.sunPosition.value.copy(sunPosition);
     }
 };
 

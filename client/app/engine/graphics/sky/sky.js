@@ -8,6 +8,9 @@ import * as THREE from 'three';
 import { ShadersModule }  from '../shaders/shaders';
 // import extend from '../../../extend.js';
 
+// TODO [CRIT] a non-cube sky, vertical with eternal zenith, but with directional light in the case of a cube earth.
+//  I can also make this sun spin.
+
 let Sky = function()
 {
     // "turbidity", 1.0, 20.0, 0.1
@@ -46,8 +49,8 @@ let Sky = function()
     let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
     THREE.Mesh.call(this, geometry,
-        material
-        // new THREE.MeshPhongMaterial({color: 0xffffff})
+        // material
+        new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xff00ff})
     );
 };
 
