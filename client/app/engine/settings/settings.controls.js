@@ -28,7 +28,7 @@ let ControlsModule = {
     },
 
     goControls() {
-        this.unlistenHome();
+        this.unlistenSettingsMenu();
         $('#announce')
             .empty()
             .append(this.getControlsHTML(this.controlsSettings));

@@ -25,9 +25,11 @@ extend(Socket.prototype, {
     setOtherEndPoint(s) {
         this.otherSocket = s;
     },
+
     on(message, action) {
         this.actions[message] = action;
     },
+
     removeListener(message) {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
@@ -35,6 +37,7 @@ extend(Socket.prototype, {
             console.log(`[Socket] Removed '${message}' listener`);
         }
     },
+
     removeAllListeners(message) {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
@@ -42,12 +45,14 @@ extend(Socket.prototype, {
             console.log(`[Socket] Removed '${message}' listener`);
         }
     },
+
     disconnect() {
         let has = this.actions.hasOwnProperty('disconnect');
         if (has) {
             this.actions.disconnect();
         }
     },
+
     emit(message, data) {
         // console.log(`emit ${message} with ${data}`);
         // Forward action

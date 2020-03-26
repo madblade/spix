@@ -45,7 +45,7 @@ extend(Settings.prototype, {
             if (event.keyCode === this.controlsEngine.keyControls.escape) {
                 // Remove listeners and get away from the bike.
                 $(document).off('keydown');
-                this.unlistenHome();
+                this.unlistenSettingsMenu();
                 this.stateManager.setState('ingame');
             }
         }.bind(this));

@@ -21,7 +21,7 @@ let GraphicsModule = {
     },
 
     goGraphics() {
-        this.unlistenHome();
+        this.unlistenSettingsMenu();
         $('#announce')
             .empty()
             .append(this.getGraphicsHTML(this.graphicsSettings));

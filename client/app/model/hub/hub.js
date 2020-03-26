@@ -15,10 +15,9 @@ let Hub = function(app) {
 extend(Hub.prototype, {
 
     update(data) {
-        console.log('Hub fetched.');
+        console.log(`Hub: ${data}`);
         data = JSON.parse(data);
 
-        let app = this.app;
         let map = this.games;
 
         // For all kinds.
@@ -36,6 +35,12 @@ extend(Hub.prototype, {
             }
         }
 
+        this.enterHub();
+    },
+
+    enterHub() {
+        let app = this.app;
+        let map = this.games;
         if (app.isLoading()) {
             // Update state.
             app.setState('hub', map);

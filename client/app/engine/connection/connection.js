@@ -45,7 +45,7 @@ extend(Connection.prototype, {
 
         // Default listeners
         this.socket.on('connect',           function() {console.log('Connecting...');});
-        this.socket.on('disconnect',        function() {console.log('Disconected! :(');});
+        this.socket.on('disconnect',        function() {console.log('Disconnected!');});
         this.socket.on('reconnect',         function() {console.log('Reconnecting...');});
         this.socket.on('reconnect_failed',  function() {console.log('Could not reconnect after MANY attempts.');});
         this.socket.on('reconnect_error',   function() {console.log('Reconnection failed! :(');});

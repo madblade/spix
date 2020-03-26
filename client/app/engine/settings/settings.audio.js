@@ -21,7 +21,7 @@ let AudioModule = {
     },
 
     goAudio() {
-        this.unlistenHome();
+        this.unlistenSettingsMenu();
         $('#announce')
             .empty()
             .append(this.getAudioHTML(this.audioSettings));

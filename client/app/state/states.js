@@ -10,6 +10,7 @@ import { IngameState }      from './states/ingame.js';
 import { LoadingState }     from './states/loading.js';
 import { SettingsState }    from './states/settings.js';
 import { HubState }         from './states/hub.js';
+import {$} from '../modules/polyfills/dom';
 
 let StateManager = function(app) {
     this.app = app;
@@ -62,6 +63,13 @@ extend(StateManager.prototype, {
                 this.states[this.state].start(opt);
             }.bind(this));
         }
+    },
+
+    cleanupDOM() {
+        $('#announce').empty();
+        $('#network-graph').empty();
+        $('#container').empty();
+        $('#hud').empty();
     }
 
 });

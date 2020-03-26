@@ -18,19 +18,19 @@ extend(HubState.prototype, {
         let app = this.app;
         let content = '';
 
-        content +=
-            '<table ' +
-            'class="table table-bordered" ' +
-            'style="width:100%" ' +
-            'class="noselect">';
+        content += `
+            <table
+            class="table table-bordered"
+            style="width:100%"
+            class="noselect">`;
 
         map.forEach(function(value, key) {
             for (let id = 0; id < value.length; ++id) {
                 content +=
-                    '<tr>' +
-                        `<td>${key}</td>` +
-                        `<td>${value[id]}</td>` +
-                    '</tr>';
+                    `<tr>
+                        <td>${key}</td>
+                        <td>${value[id]}</td>
+                    </tr>`;
             }
         });
 

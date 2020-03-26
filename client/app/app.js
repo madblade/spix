@@ -179,6 +179,7 @@ extend(App.Core.prototype, {
         this.engine.graphics.stop();
         this.engine.controls.stop();
         this.engine.audio.stop();
+        this.state.cleanupDOM();
     },
 
 });
