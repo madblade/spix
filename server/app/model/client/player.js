@@ -45,7 +45,8 @@ class Player {
 
     // Close player connection.
     disconnect() {
-        this._playerConnection.close();
+        if (this._playerConnection)
+            this._playerConnection.close();
     }
 
     /**

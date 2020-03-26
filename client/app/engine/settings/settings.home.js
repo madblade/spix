@@ -22,11 +22,11 @@ let HomeModule = {
 
     goHome() {
         this.unlistenSettingsMenu();
+        $(window).off('keydown');
         // this.app.setState('loading');
         this.app.engine.connection.send('leave');
         this.app.stopGame();
         let hub = this.app.model.hub;
-        $(document).off('keydown');
         hub.enterHub();
     },
 
@@ -36,11 +36,19 @@ let HomeModule = {
         $('#audio').click(function() { this.goAudio(); }.bind(this));
         $('#home').click(function() { this.goHome(); }.bind(this));
         $('#return').click(function() {
-            $(document).off('keydown');
+            $(window).off('keydown');
             this.unlistenSettingsMenu();
             this.stateManager.setState('ingame');
             this.controlsEngine.requestPointerLock();
             this.app.setFocused(true);
+        }.bind(this));
+        $(window).keydown(function(event) {
+            if (!event.keyCode) { return; }
+            if (event.keyCode === this.controlsEngine.keyControls.escape) {
+                // Remove listeners and get away from the bike.
+                this.unlistenSettingsMenu();
+                this.stateManager.setState('ingame');
+            }
         }.bind(this));
 
         // TODO [LOW] use listeners array.
@@ -48,10 +56,12 @@ let HomeModule = {
     },
 
     unlistenSettingsMenu() {
+        $(window).off('keydown');
         $('#graphics').off('click');
         $('#gameplay').off('click');
         $('#audio').off('click');
         $('#home').off('click');
+        $('#return').off('click');
     },
 
     listenReturn() {

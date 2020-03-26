@@ -39,20 +39,11 @@ extend(Settings.prototype, {
             .fadeIn();
 
         this.listenHome();
-
-        $(document).keydown(function(event) {
-            if (!event.keyCode) { return; }
-            if (event.keyCode === this.controlsEngine.keyControls.escape) {
-                // Remove listeners and get away from the bike.
-                $(document).off('keydown');
-                this.unlistenSettingsMenu();
-                this.stateManager.setState('ingame');
-            }
-        }.bind(this));
     },
 
     stop() {
         // Fade out settings menu.
+        this.unlistenSettingsMenu();
         return new Promise(function(resolve) {
             let settings = $('#announce');
             settings.fadeOut(200, function() {
