@@ -82,6 +82,8 @@ class UserInput {
         player.on('x', listener[i++]);
         player.on('a', listener[i++]);
         player.on('chat', listener[i]);
+
+        player.on('leave', () => { player.leave(); });
     }
 
     unlistenPlayer(player) {

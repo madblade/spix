@@ -19,11 +19,10 @@ extend(HubState.prototype, {
         let content = '';
 
         content += `
-            <table
-            class="table table-bordered"
-            style="width:100%"
-            class="noselect">`;
+            <table class="table table-bordered noselect"
+            style="width:100%">`;
 
+        console.log(map);
         map.forEach(function(value, key) {
             for (let id = 0; id < value.length; ++id) {
                 content +=

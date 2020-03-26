@@ -22,9 +22,11 @@ let HomeModule = {
 
     goHome() {
         this.unlistenSettingsMenu();
+        // this.app.setState('loading');
+        this.app.engine.connection.send('leave');
         this.app.stopGame();
-        this.app.setState('loading');
         let hub = this.app.model.hub;
+        $(document).off('keydown');
         hub.enterHub();
     },
 

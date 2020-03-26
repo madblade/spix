@@ -52,8 +52,8 @@ extend(Connection.prototype, {
     },
 
     disconnect() {
-        let scope = this;
-        scope.unregisterSocketForGame3D();
+        this.socket.disconnect();
+        this.unregisterSocketForGame3D();
 
         ['hub', 'joined', 'cantjoin', 'connected', 'connect', 'disconnect',
             'reconnect', 'reconnect_failed', 'reconnect_error']

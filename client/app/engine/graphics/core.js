@@ -5,9 +5,14 @@
 'use strict';
 
 import { sigma } from 'sigma';
+import Stats from 'stats.js';
 
 let CoreModule = {
     run() {
+        // Initialize DOM element
+        this.initializeDOM();
+        this.fps = new Stats();
+
         // Controls are tightly linked to camera.
         this.initializeControls();
 
@@ -16,8 +21,14 @@ let CoreModule = {
         this.animate();
 
         // Init stats.
+        // Benches.
         // document.body.appendChild(this.fps.dom);
         this.runSigma();
+    },
+
+    initializeDOM() {
+        this.container = document.getElementById('container');
+        this.container.appendChild(this.rendererManager.renderer.domElement);
     },
 
     runSigma() {

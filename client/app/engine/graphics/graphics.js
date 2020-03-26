@@ -4,9 +4,6 @@
 
 'use strict';
 
-// External dependencies.
-import Stats    from 'stats.js';
-
 import extend       from '../../extend.js';
 
 // Base dependencies.
@@ -48,14 +45,6 @@ let Graphics = function(app) {
 
     // Interaction.
     this.controls =     null;
-
-    // Initialize DOM element
-    this.container = document.getElementById('container');
-    this.container.appendChild(this.rendererManager.renderer.domElement);
-
-    // Benches.
-    this.fps = new Stats();
-    // document.body.appendChild(this.fps.dom);
 
     // Animations
     this.initializeAnimations();

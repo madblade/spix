@@ -41,13 +41,13 @@ extend(Hub.prototype, {
     enterHub() {
         let app = this.app;
         let map = this.games;
-        if (app.isLoading()) {
-            // Update state.
-            app.setState('hub', map);
-        } else if (app.getState() === 'hub') {
-            // Bypass endHub.
-            app.setState('hub', map);
-        }
+        app.setState('hub', map);
+        // if (app.isLoading()) {
+        // Update state.
+        // } else if (app.getState() === 'hub') {
+        // Bypass endHub.
+        // app.setState('hub', map);
+        // }
     }
 
 });
