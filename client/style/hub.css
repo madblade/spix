@@ -3,28 +3,29 @@
     width: 25%;
     height: 25%;
 
-    color: coral;
-    font-family: "Courier New", Courier, monospace;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     font-size: 16px;
     text-align: center;
 }
 
 tr {
+    color: white;
     background-color: transparent;
     cursor: pointer;
 }
 
 tr:hover {
-    background-color: #894612;
+    background-color: #362c6b;
 }
 
 .game-creator {
     white-space: normal;
     font-size: 16px;
-    color: coral;
+    color: white;
     background: none;
 }
+
 .game-creator:hover {
-    background-color: #894612;
-    color: coral;
+    color: white;
+    background-color: #362c6b;
 }

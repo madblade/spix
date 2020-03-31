@@ -50,7 +50,7 @@ class EntityModel {
 
         let entityId;
         if (freedEntities.length > 0) {
-            entityId = freedEntities[0];
+            entityId = freedEntities[0]; // TODO [FFFFFFFF] impact consistency model...
             freedEntities.shift();
         } else {
             entityId = entities.length;

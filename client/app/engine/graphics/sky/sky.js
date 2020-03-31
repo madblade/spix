@@ -50,7 +50,7 @@ let Sky = function()
 
     THREE.Mesh.call(this, geometry,
         // material
-        new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xff00ff})
+        new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x362c6b})
     );
 };
 

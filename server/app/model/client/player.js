@@ -40,7 +40,8 @@ class Player {
     // Leave game and make the game forget.
     leave() {
         this.disconnect();
-        this._game.removePlayer(this);
+        if (this._game)
+            this._game.removePlayer(this);
     }
 
     // Close player connection.

@@ -69,7 +69,13 @@ extend(StateManager.prototype, {
         $('#announce').empty();
         $('#network-graph').empty();
         $('#container').empty();
-        $('#hud').empty();
+        // HUD
+        $('#position').empty();
+        $('#item_offset').empty();
+        $('#item_orientation').empty();
+        $('#items').empty();
+        $('#diagram').empty();
+        $('#chat').empty();
     }
 
 });

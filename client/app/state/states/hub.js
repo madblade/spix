@@ -1,5 +1,5 @@
 /**
- *
+ * List, join, request game creation in a given server.
  */
 
 'use strict';
@@ -15,7 +15,7 @@ let HubState = function(stateManager) {
 extend(HubState.prototype, {
 
     start(map) {
-        let app = this.app;
+        let app = this.app; // this object is bound to stateManager
         let content = '';
 
         content += `
