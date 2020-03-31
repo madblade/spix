@@ -30,7 +30,7 @@ class UserConnection {
     }
 
     // Drawback: switch potentially evaluates all statements
-    // Advantage: does not loads the socket with many listeners
+    // Advantage: does not load the socket with many listeners
     onUserRequest(data) {
         switch (data.request) {
 

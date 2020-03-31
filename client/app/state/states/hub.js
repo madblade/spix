@@ -14,8 +14,7 @@ let HubState = function(stateManager) {
 
 extend(HubState.prototype, {
 
-    start(map) {
-        let app = this.app; // this object is bound to stateManager
+    getHTML(map) {
         let content = '';
 
         content += `
@@ -37,12 +36,18 @@ extend(HubState.prototype, {
         content += '<div><button class="btn btn-default game-creator" style="float:none">' +
             'Request 3D game creation</button></div>';
 
+        return content;
+    },
+
+    start(map) {
+        let app = this.stateManager.app; // this object is bound to stateManager
+
         // Add content then fade in.
         let hub = $('#announce');
         hub.empty()
             .removeClass()
             .addClass('hub')
-            .append(content)
+            .append(this.getHTML(map))
             .center()
             .fadeIn();
 

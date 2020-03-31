@@ -5,12 +5,13 @@
 'use strict';
 
 import extend               from '../extend.js';
+import { $ }                from '../modules/polyfills/dom';
 
 import { IngameState }      from './states/ingame.js';
 import { LoadingState }     from './states/loading.js';
 import { SettingsState }    from './states/settings.js';
 import { HubState }         from './states/hub.js';
-import {$} from '../modules/polyfills/dom';
+import {MainMenuState}      from './states/mainmenu';
 
 let StateManager = function(app) {
     this.app = app;
@@ -26,6 +27,7 @@ let StateManager = function(app) {
     this.registerState(new LoadingState(this));
     this.registerState(new SettingsState(this));
     this.registerState(new HubState(this));
+    this.registerState(new MainMenuState(this));
 };
 
 StateManager.prototype.register = [];
@@ -35,13 +37,8 @@ extend(StateManager.prototype, {
 
     registerState(state) {
         let stateId = state.stateName;
-        let start = state.start;
-        let  end = state.end;
         if (!this.states.hasOwnProperty(stateId)) {
-            this.states[stateId] = {
-                start: start.bind(this),
-                end: end.bind(this)
-            };
+            this.states[stateId] = state;
         }
     },
 
@@ -51,7 +48,7 @@ extend(StateManager.prototype, {
         this.state = state;
 
         if (!this.states.hasOwnProperty(this.state)) {
-            console.log('The specified state does not exist.');
+            console.error(`[StateManager] State "${state}" does not exist.`);
             return;
         }
 
@@ -60,7 +57,9 @@ extend(StateManager.prototype, {
             this.states[this.state].start(opt);
         } else {
             this.states[this.previousState].end().then(function() {
-                this.states[this.state].start(opt);
+                let s = this.states[this.state];
+                let start = s.start.bind(s);
+                start(opt);
             }.bind(this));
         }
     },

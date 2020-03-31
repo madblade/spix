@@ -9,6 +9,7 @@ import $                from 'jquery';
 
 let Hud = function(register) {
     this.register = register;
+    this.orangeColor = '#c96530';
 };
 
 extend(Hud.prototype, {
@@ -20,7 +21,7 @@ extend(Hud.prototype, {
             let text = `${f(p[0])}, ${f(p[1])}, ${f(p[2])}`;
             $('#position')
                 .text(text)
-                .css('color', 'orange');
+                .css('color', this.orangeColor);
         }
 
         if (newState.hasOwnProperty('diagram')) {
@@ -54,21 +55,21 @@ extend(Hud.prototype, {
             let h = newState.activeItem;
             $('#items')
                 .text(h)
-                .css('color', 'orange');
+                .css('color', this.orangeColor);
         }
 
         if (newState.hasOwnProperty('itemOrientation')) {
             let or = newState.itemOrientation;
             $('#item_orientation')
                 .text(or)
-                .css('color', 'orange');
+                .css('color', this.orangeColor);
         }
 
         if (newState.hasOwnProperty('itemOffset')) {
             let of = newState.itemOffset;
             $('#item_offset')
                 .text(of)
-                .css('color', 'orange');
+                .css('color', this.orangeColor);
         }
     }
 

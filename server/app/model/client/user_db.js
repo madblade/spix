@@ -50,7 +50,8 @@ class UserDataBase {
 
         let users = this._users;
         users.forEach(user/*, userId*/ => {
-            user.send('hub', JSON.stringify(game));
+            user.fetchHubState();
+            // user.send('hub', JSON.stringify(game));
         });
     }
 

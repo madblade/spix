@@ -80,10 +80,15 @@ extend(App.Core.prototype, {
         this.localServer.standalone.start();
     },
 
-    start() {
+    startFromRemoteServer() {
         this.setState('loading');
         this.engine.connection.setupSocket();
         this.engine.connection.connect();
+    },
+
+    start() {
+        this.setState('loading');
+        setTimeout(() => this.setState('main'), 1000);
     },
 
     stop() {

@@ -25,7 +25,7 @@ extend(IngameState.prototype, {
     },
 
     end() {
-        this.app.engine.controls.stopListeners();
+        this.stateManager.app.engine.controls.stopListeners();
 
         return new Promise(function(resolve) {
             $('#announce')
