@@ -20,6 +20,7 @@ let Standalone = function(app) {
 
     this.io = new IO();
     this.server = new StandaloneServer();
+    this._isRunning = false;
 };
 
 extend(Standalone.prototype, {
@@ -28,13 +29,19 @@ extend(Standalone.prototype, {
         console.log('[Standalone] Starting local server.');
         this.server.connect(this.io); // setup IO object
         this.io.connect(); // handshake
+        this._isRunning = true;
         // this.io.socketClient.emit('connection');
         // this.io.socketServer.emit('connected');
     },
 
     stop() {
+        this._isRunning = false;
         console.log('[Standalone] Stopping local server.');
         this.io.disconnect();
+    },
+
+    isRunning() {
+        return this._isRunning;
     }
 
 });

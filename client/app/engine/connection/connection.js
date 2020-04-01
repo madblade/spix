@@ -14,15 +14,16 @@ let Connection = function(app) {
 
 extend(Connection.prototype, {
 
-    setupSocket(autoconfig) {
-        let socketAddress = '';
+    connectSocket(socketAddress, port, autoconfig) {
+        let remoteAddress = '';
 
-        // TODO expose socketAddress
-        if (!autoconfig && location.hostname !== 'localhost') {
-            socketAddress = `ws://${location.hostname}:8000`;
+        if (!autoconfig && socketAddress === '' && location.hostname !== 'localhost') {
+            remoteAddress = `ws://${location.hostname}:${port}`;
+        } else if (!autoconfig) {
+            remoteAddress = `ws://${socketAddress}:${port}`;
         }
 
-        this.socket = io(socketAddress, {
+        this.socket = io(remoteAddress, {
             // Send auth token on connection, you will need to DI the Auth service above
             // 'query': 'token=' + Auth.getToken()
             path: '/socket.io-client'
@@ -33,7 +34,7 @@ extend(Connection.prototype, {
         this.socket = s;
     },
 
-    connect() {
+    listen() {
         let app = this.app;
         let hub = app.model.hub;
 

@@ -39,19 +39,9 @@ extend(HubState.prototype, {
         return content;
     },
 
-    start(map) {
-        let app = this.stateManager.app; // this object is bound to stateManager
+    startListeners() {
+        let app = this.stateManager.app;
 
-        // Add content then fade in.
-        let hub = $('#announce');
-        hub.empty()
-            .removeClass()
-            .addClass('hub')
-            .append(this.getHTML(map))
-            .center()
-            .fadeIn();
-
-        // Add listeners.
         $('tr').click(function() {
             let gameType = $(this).find('td:first')
                 .text();
@@ -72,10 +62,28 @@ extend(HubState.prototype, {
         });
     },
 
-    end() {
-        // Remove jQuery listeners.
+    start(map) {
+        // Add content then fade in.
+        let hub = $('#announce');
+        hub.empty()
+            .removeClass()
+            .addClass('hub')
+            .append(this.getHTML(map))
+            .center()
+            .fadeIn();
+
+        // Add listeners.
+        this.startListeners();
+    },
+
+    stopListeners() {
         $('tr').off('click');
         $('.game-creator').off('click');
+    },
+
+    end() {
+        // Remove jQuery listeners.
+        this.stopListeners();
 
         // Fade out hub announce.
         return new Promise(function(resolve) {
