@@ -7,17 +7,22 @@
 
 import extend           from '../../extend.js';
 
-let RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
-let RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription;
+let RTCPeerConnection =
+    window.RTCPeerConnection || window.mozRTCPeerConnection ||
+    window.webkitRTCPeerConnection;
+let RTCSessionDescription =
+    window.RTCSessionDescription || window.mozRTCSessionDescription;
 
-let WebRTCSocket = function() {
+let WebRTCSocket = function(app) {
+    this.app = app;
+
     this.outboundConnection = null;
     this.outboundChannel = null;
 
     this.currentInboundConnection = null;
     this.currentInboundChannel = null;
-    this.inboundConnections = [];
-    this.inboundChannels = [];
+    this.inboundConnections = new Map();
+    this.inboundChannels = new Map();
 
     // internals
     this.offer = ''; // for server
@@ -25,14 +30,14 @@ let WebRTCSocket = function() {
     this.sdpConstraints = {
         optional: [],
     };
-    this.cfg = { iceServers: {
-        urls: [
-            'stun:stun.l.google.com:19302',
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302',
-            'stun:stun.l.google.com:19302?transport=udp',
+    this.cfg = { iceServers:
+        [
+            { url: 'stun:stun.l.google.com:19302' },
+            { url: 'stun:stun1.l.google.com:19302' },
+            { url: 'stun:stun2.l.google.com:19302' },
+            { url: 'stun:stun.l.google.com:19302?transport=udp' },
         ]
-    } };
+    };
     this.con = { optional: [{DtlsSrtpKeyAgreement: true}] };
 };
 
@@ -44,7 +49,7 @@ extend(WebRTCSocket.prototype, {
         let connection = this.outboundConnection;
         connection.onicecandidate = e => {
             if (e.candidate === null) {
-                this.answer = JSON.stringify(pc2.localDescription);
+                this.answer = JSON.stringify(connection.localDescription);
                 // TODO update HTML answer creation callback!
             }
         };
@@ -75,24 +80,28 @@ extend(WebRTCSocket.prototype, {
     },
 
     // Create server slot and offer
-    addServerSlot() {
+    addServerSlot(userID) {
         let newConnection = new RTCPeerConnection(this.cfg, this.con);
-        this.currentInboundConnection = newConnection;
+        // this.currentInboundConnection = newConnection;
         newConnection.onicecandidate = e => {
             if (e.candidate === null) {
                 this.offer = JSON.stringify(newConnection.localDescription);
+                console.log('onicecandidate called');
+                console.log(this.offer);
                 // TODO update HTML offer creation callback!
             }
         };
 
         let newChannel = newConnection.createDataChannel('test', {reliable: true});
-        this.currentInboundChannel = newChannel;
+        // this.currentInboundChannel = newChannel;
         newChannel.onopen = e => {
-            console.log(e); console.log('Connection established.');
+            console.log(e); console.log('Channel onopen called, RTC connection established.');
             // TODO update HTML server slot
             // TODO update server slot internal with IO methods
-            this.inboundChannels.push(this.currentInboundChannel);
-            this.inboundConnections.push(this.currentInboundConnection);
+            // this.inboundChannels.push(this.currentInboundChannel);
+            // this.inboundConnections.push(this.currentInboundConnection);
+            this.inboundChannels.set(userID, newChannel);
+            this.inboundConnections.set(userID, newConnection);
 
             // TODO setup communication in the socket part
             newChannel.send(JSON.stringify({message: 'hello there'}));
@@ -106,15 +115,17 @@ extend(WebRTCSocket.prototype, {
         newConnection.createOffer(
             desc => {
                 newConnection.setLocalDescription(desc, () => {}, () => {});
+                console.log('createOffer called');
             },
             () => {},
             this.sdpConstraints
         );
     },
 
-    acceptInboundConnection(answer) {
+    acceptInboundConnection(inboundConnection, answer) {
         let answerDesc = new RTCSessionDescription(JSON.parse(answer));
-        this.currentInboundConnection.setRemoteDescription(answerDesc);
+        // this.currentInboundConnection.setRemoteDescription(answerDesc);
+        inboundConnection.setRemoteDescription(answerDesc);
     }
 
 });

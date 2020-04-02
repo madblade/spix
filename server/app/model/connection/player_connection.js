@@ -63,13 +63,14 @@ class PlayerConnection {
      */
     leave(room) {
         // this._socket.leave(room);
-        // is there a reason for using rooms?
+        // TODO think about the following question:
+        //  is there a reason for using rooms?
         CollectionUtils.removeFromArray(this._rooms, room);
     }
 
     // Leave all chans this player was connected to.
     leaveAll() {
-        this._rooms.forEach(room => this._socket.leave(room));
+        // this._rooms.forEach(room => this._socket.leave(room));
         this._rooms = [];
     }
 

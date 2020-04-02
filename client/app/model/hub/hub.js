@@ -1,5 +1,5 @@
 /**
- *
+ * Keeps track of active server games.
  */
 
 'use strict';
@@ -8,7 +8,6 @@ import extend       from '../../extend.js';
 
 let Hub = function(app) {
     this.app = app;
-
     this.games = new Map();
 };
 
@@ -28,6 +27,8 @@ extend(Hub.prototype, {
             if (!thisGames) {
                 map.set(property, games);
             } else {
+                // Reset games.
+                thisGames.empty();
                 for (let id = 0; id < games.length; ++id) {
                     let g = games[id];
                     if (thisGames.indexOf(g) < 0) thisGames.push(g);

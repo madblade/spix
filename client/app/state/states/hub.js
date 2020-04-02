@@ -32,9 +32,13 @@ extend(HubState.prototype, {
             }
         });
 
-        content += '</table>';
-        content += '<div><button class="btn btn-default game-creator" style="float:none">' +
-            'Request 3D game creation</button></div>';
+        content += `
+            </table>
+            <div>
+                <button class="btn btn-default" id="button-create-game" style="float:none">
+                    Request 3D game creation</button>
+            </div>
+        `;
 
         return content;
     },
@@ -57,7 +61,7 @@ extend(HubState.prototype, {
             app.join(gameType, gid);
         });
 
-        $('.game-creator').click(function() {
+        $('#button-create-game').click(function() {
             app.requestGameCreation('game3d');
         });
     },
@@ -78,7 +82,7 @@ extend(HubState.prototype, {
 
     stopListeners() {
         $('tr').off('click');
-        $('.game-creator').off('click');
+        $('#button-create-game').off('click');
     },
 
     end() {

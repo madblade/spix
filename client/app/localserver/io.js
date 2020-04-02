@@ -26,6 +26,7 @@ extend(Socket.prototype, {
         this.otherSocket = s;
     },
 
+    // Override
     on(message, action) {
         this.actions[message] = action;
     },
@@ -38,6 +39,7 @@ extend(Socket.prototype, {
         }
     },
 
+    // Override
     removeAllListeners(message) {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
@@ -53,6 +55,7 @@ extend(Socket.prototype, {
         }
     },
 
+    // Override
     emit(message, data) {
         // console.log(`emit ${message} with ${data}`);
         // Forward action

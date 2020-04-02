@@ -23,6 +23,7 @@ import { Settings }     from './engine/settings/settings.js';
 import { Hub }          from './model/hub/hub.js';
 import { Server }       from './model/server/server.js';
 import { Client }       from './model/client/client.js';
+import { LocalServer }  from './model/localserver/localserver.js';
 
 // Local Netcode
 import { Standalone }   from './localserver/standalone';
@@ -61,7 +62,8 @@ App.Core = function() {
     this.model = {
         hub:          new Hub(this),
         server:       new Server(this),
-        client:       new Client(this)
+        client:       new Client(this),
+        localServer:  new LocalServer(this)
     };
 
     // Modules can be registered to add custom behaviours
@@ -76,7 +78,7 @@ extend(App.Core.prototype, {
         this.setState('loading');
         let s = this.localServer.standalone.io.socketClient;
         this.engine.connection.setupLocalSocket(s);
-        this.engine.connection.connect();
+        this.engine.connection.listen();
         this.localServer.standalone.start();
     },
 
