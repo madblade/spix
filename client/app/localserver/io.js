@@ -29,6 +29,7 @@ extend(Socket.prototype, {
     // Override
     on(message, action) {
         this.actions[message] = action;
+        // console.log(`[Socket] added '${message}' listener`);
     },
 
     removeListener(message) {

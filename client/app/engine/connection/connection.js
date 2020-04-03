@@ -41,9 +41,13 @@ extend(Connection.prototype, {
         let hub = app.model.hub;
 
         // Custom listeners.
-        this.socket.on('hub',               function(data) {hub.update(data);});
+        this.socket.on('hub',               function(data) {
+            console.log('HUB');
+            console.log(data);
+            hub.update(data);
+        });
         this.socket.on('joined',            function() {app.joinedServer();});
-        this.socket.on('cantjoin',          function() {location.reload();});
+        this.socket.on('cantjoin',          function() {console.error('Server refused!');});
         this.socket.on('connected',         function() {app.connectionEstablished();});
 
         // Default listeners

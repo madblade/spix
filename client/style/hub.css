@@ -18,14 +18,14 @@ tr:hover {
     background-color: #362c6b;
 }
 
-#button-create-game {
+.hub-button {
     white-space: normal;
     font-size: 16px;
     color: white;
     background: none;
 }
 
-#button-create-game:hover {
+.hub-button:hover {
     color: white;
     background-color: #362c6b;
 }

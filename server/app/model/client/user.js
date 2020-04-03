@@ -76,6 +76,7 @@ class User {
 
     // Leave all games (current game). Stay idle.
     leave() {
+        console.log('USER LEFT');
         this._ingame = false;
         if (this._player) {
             this._player.leave();
@@ -83,6 +84,10 @@ class User {
             // So player does not belong to its game model.
             this._player = null;
         }
+        this.listen();
+    }
+
+    listen() {
         this._userConnection.listen();
     }
 

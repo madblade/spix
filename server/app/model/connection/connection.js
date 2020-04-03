@@ -91,7 +91,11 @@ class Connector {
      * @param socketio
      */
     configure(socketio) {
-        if (this._io) throw new Error('Trying to configure a running app.');
+        if (this._io) {
+            console.log('[Server/Connector] Trying to configure a running app, ' +
+                'using the last configuration!');
+            return;
+        }
 
         this._io = socketio;
 

@@ -40,7 +40,12 @@ class PlayerManager {
         if (this._handleRemovePlayer) this._handleRemovePlayer(player);
         player.avatar.die();
         delete player.avatar;
-        player.destroy(); // Clean references from player
+
+        // Listen to user requests for joining games.
+        player.user.listen();
+
+        // Clean references from player
+        player.destroy();
     }
 
     removeAllPlayers() {

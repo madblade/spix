@@ -12,7 +12,7 @@ let MainMenuState = function(stateManager) {
     this.stateName = 'main';
     this.html = `
         <div class="container"">
-            <label for="connect-socket-server">Connect to a real server (Socket)</label>
+            <label for="connect-socket-server">Connect to a distant server (Socket)</label>
             <div class="input-group mb-3" id="connect-socket-server">
                 <div class="input-group-prepend">
                     <span class="input-group-text">@</span>
@@ -34,22 +34,33 @@ let MainMenuState = function(stateManager) {
                 </div>
             </div>
 
+            <hr/>
+
             <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, experimental)</label>
             <div class="input-group mb-3" id="connect-webrtc-server">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">@</span>
+                    <span class="input-group-text">Offer</span>
                 </div>
 
                 <input type="text" id="remote-client-id"
-                    class="form-control" placeholder="Host ID">
+                    class="form-control" placeholder="Offer text">
+
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Answer</span>
+                </div>
+
+                <input type="text" id="remote-client-id"
+                    class="form-control" placeholder="Answer text">
 
                 <div class="input-group-append">
                     <button id="button-connect-webrtc-server"
-                        class="btn btn-light" type="button">Connect</button>
+                        class="btn btn-light" type="button">Generate Answer</button>
                 </div>
             </div>
 
-            <label for="connect-throttle-server">Connect to the local sandbox (experimental)</label>
+            <hr/>
+
+            <label for="connect-throttle-server">Connect to my local sandbox (experimental)</label>
             <div class="input-group mb-3" id="connect-throttle-server">
                 <div class="input-group-prepend">
                     <span class="input-group-text">@localhost/browser</span>
@@ -60,7 +71,7 @@ let MainMenuState = function(stateManager) {
                 </div>
             </div>
 
-            <label for="start-sandbox">Local sandbox (VERY experimental)</label>
+            <label for="start-sandbox">Invite people into my local sandbox (experimental)</label>
             <div class="input-group mb-3" id="add-sandbox">
                 <div class="input-group-prepend">
                     <span class="input-group-text">@friend</span>
@@ -75,11 +86,13 @@ let MainMenuState = function(stateManager) {
             <div class="list-group" id="user-slots">
             </div>
 
-            <label for="play-quick">I don’t have time for this.</label>
+            <hr/>
+
+            <label for="play-quick">In a hurry? Press the button below.</label>
             <div class="input-group mb-3" id="play-quick">
                 <div class="input-group-append">
                     <button id="button-play-quick"
-                        class="btn btn-light" type="button">Click here if you want to play QUICK, NOW.</button>
+                        class="btn btn-light" type="button">I demand to be entertained, at once!</button>
                 </div>
             </div>
         </div>

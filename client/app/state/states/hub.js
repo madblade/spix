@@ -10,6 +10,16 @@ import { $ }                from '../../modules/polyfills/dom.js';
 let HubState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'hub';
+    this.htmlControls = `
+        <div>
+            <button class="btn btn-default hub-button" id="button-return-main" style="float:none">
+                Return</button>
+        </div>
+        <div>
+            <button class="btn btn-default hub-button" id="button-create-game" style="float:none">
+                Request 3D game creation</button>
+        </div>
+      `;
 };
 
 extend(HubState.prototype, {
@@ -18,6 +28,7 @@ extend(HubState.prototype, {
         let content = '';
 
         content += `
+            ${this.htmlControls}
             <table class="table table-bordered noselect"
             style="width:100%">`;
 
@@ -31,15 +42,7 @@ extend(HubState.prototype, {
                     </tr>`;
             }
         });
-
-        content += `
-            </table>
-            <div>
-                <button class="btn btn-default" id="button-create-game" style="float:none">
-                    Request 3D game creation</button>
-            </div>
-        `;
-
+        content += '</table>';
         return content;
     },
 
@@ -64,6 +67,10 @@ extend(HubState.prototype, {
         $('#button-create-game').click(function() {
             app.requestGameCreation('game3d');
         });
+
+        $('#button-return-main').click(function() {
+            app.setState('main');
+        });
     },
 
     start(map) {
@@ -83,6 +90,7 @@ extend(HubState.prototype, {
     stopListeners() {
         $('tr').off('click');
         $('#button-create-game').off('click');
+        $('#button-return-main').off('click');
     },
 
     end() {

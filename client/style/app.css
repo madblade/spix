@@ -64,6 +64,10 @@ body {
     height: 100%;
 }
 
+hr {
+    border-color: white;
+}
+
 .reticle-wrapper {
     width: 32px;
     height: 32px;
