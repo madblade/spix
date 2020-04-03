@@ -31,9 +31,9 @@ let WebRTCSocket = function(app) {
     this.cfg = { iceServers:
         [
             { url: 'stun:stun.l.google.com:19302' },
-            { url: 'stun:stun1.l.google.com:19302' },
-            { url: 'stun:stun2.l.google.com:19302' },
-            { url: 'stun:stun.l.google.com:19302?transport=udp' },
+            // { url: 'stun:stun1.l.google.com:19302' },
+            // { url: 'stun:stun2.l.google.com:19302' },
+            // { url: 'stun:stun.l.google.com:19302?transport=udp' },
         ]
     };
     this.con = { optional: [{DtlsSrtpKeyAgreement: true}] };
@@ -42,13 +42,13 @@ let WebRTCSocket = function(app) {
 extend(WebRTCSocket.prototype, {
 
     // Create client connection from server offer
-    createClientConnection(offer) {
+    createClientConnection(offer, mainMenuState) {
         this.outboundConnection = new RTCPeerConnection(this.cfg, this.con);
         let connection = this.outboundConnection;
         connection.onicecandidate = e => {
             if (e.candidate === null) {
                 this.answer = JSON.stringify(connection.localDescription);
-                // TODO update HTML answer creation callback!
+                mainMenuState.answerSent(this.answer);
             }
         };
 
@@ -64,6 +64,7 @@ extend(WebRTCSocket.prototype, {
             let dataChannel = e.channel || e;
             this.outboundChannel = dataChannel;
             dataChannel.onopen = function(m) {
+                console.log('CHANNEL OPEN CLIENT');
                 console.log(m);
                 // TODO update HTML client and join game
 
@@ -85,14 +86,14 @@ extend(WebRTCSocket.prototype, {
                 this.offer = JSON.stringify(newConnection.localDescription);
                 console.log('onicecandidate called');
                 console.log(this.offer);
-                mainMenuState.serverSlotCreated(userID, this.offer);
-                // TODO update HTML offer creation callback!
+                mainMenuState.serverSlotCreated(userID, this.offer, newConnection);
             }
         };
 
         let newChannel = newConnection.createDataChannel('test', {reliable: true});
         // this.currentInboundChannel = newChannel;
         newChannel.onopen = e => {
+            console.log('CHANNEL OPEN SERVER');
             console.log(e); console.log('Channel onopen called, RTC connection established.');
             // TODO update HTML server slot
             // TODO update server slot internal with IO methods
@@ -111,7 +112,6 @@ extend(WebRTCSocket.prototype, {
         newConnection.createOffer(
             desc => {
                 newConnection.setLocalDescription(desc, () => {}, () => {});
-                console.log('createOffer called');
             },
             () => {},
             this.sdpConstraints

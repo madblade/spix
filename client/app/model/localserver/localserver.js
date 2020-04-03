@@ -10,6 +10,9 @@ import extend       from '../../extend.js';
 let LocalServer = function(app) {
     this.app = app;
     this.users = new Map();
+
+    this.localClientOffer = '';
+    this.localClientAnswer = '';
 };
 
 extend(LocalServer.prototype, {
@@ -42,6 +45,19 @@ extend(LocalServer.prototype, {
         }
     },
 
+    setUserConnection(userID, connection) {
+        let user = this.users.get(userID);
+        if (!user) {
+            console.error(`[Model/LocalServer] User "${userID}" not found.`);
+            return;
+        }
+        user.inboundConnection = connection;
+    },
+
+    getUser(userID) {
+        return this.users.get(userID);
+    },
+
     // Client answer
     addAnswer(userID, answer) {
         let user = this.users.get(userID);
@@ -50,8 +66,16 @@ extend(LocalServer.prototype, {
             return;
         }
         user.answer = answer;
-    }
+    },
 
+    // WebRTC Client methods
+    setLocalClientOffer(offer) {
+        this.localClientOffer = offer;
+    },
+
+    setLocalClientAnswer(answer) {
+        this.localClientAnswer = answer;
+    }
 });
 
 export { LocalServer };

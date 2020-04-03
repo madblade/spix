@@ -44,15 +44,15 @@ let MainMenuState = function(stateManager) {
                 <span class="input-group-text">Offer</span>
             </div>
 
-            <input type="text" id="remote-client-id"
-                class="form-control" placeholder="Offer text">
+            <input type="text" id="remote-client-offer"
+                class="form-control" placeholder="Offer text" value="">
 
             <div class="input-group-prepend">
                 <span class="input-group-text">Answer</span>
             </div>
 
-            <input type="text" id="remote-client-id"
-                class="form-control" placeholder="Answer text">
+            <input type="text" id="remote-client-answer"
+                class="form-control" placeholder="Answer text" value="">
 
             <div class="input-group-append">
                 <button id="button-connect-webrtc-server"
@@ -116,7 +116,7 @@ extend(MainMenuState.prototype, {
         });
 
         $('#button-connect-webrtc-server').click(() => {
-            let id = $('#remote-client-id').val();
+            this.generateClientAnswer();
             console.log('con webrtc');
         });
 
@@ -170,6 +170,26 @@ extend(MainMenuState.prototype, {
             resolve();
         });
     },
+
+    // ######### RTC CLIENT METHODS #########
+
+    generateClientAnswer() {
+        let offer = $('#remote-client-offer').val();
+        let localServerModel = this.stateManager.app.model.localServer;
+        localServerModel.setLocalClientOffer(offer);
+
+        let rtcService = this.stateManager.app.engine.connection.rtc;
+        rtcService.createClientConnection(offer, this);
+    },
+
+    answerSent(answer) {
+        let localServerModel = this.stateManager.app.model.localServer;
+        localServerModel.setLocalClientAnswer(answer);
+
+        $('#remote-client-answer').val(answer);
+    },
+
+    // ######### RTC SERVER METHODS #########
 
     getRTCUserHTML(userID, offer, answer) {
         if (!offer) offer = '';
@@ -255,7 +275,7 @@ extend(MainMenuState.prototype, {
         // TODO add listeners on buttons for new users.
     },
 
-    serverSlotCreated(userID, offer) {
+    serverSlotCreated(userID, offer, connection) {
         let offerElement = $(`#offer-user-${userID}`);
         if (!offerElement) {
             console.error(`[States/MainMenu] User "${userID}" HTML element not found.`);
@@ -264,7 +284,21 @@ extend(MainMenuState.prototype, {
         offerElement.val(offer);
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.setUserOffer(userID, offer);
+        localServerModel.setUserConnection(userID, connection);
 
+        let rtcService = this.stateManager.app.engine.connection.rtc;
+        $(`#button-connect-user-${userID}`).click(() => {
+            let user = localServerModel.getUser(userID);
+            if (!user) {
+                console.error(`User "${userID}" not found.`);
+                return;
+            }
+            let answer = $(`#answer-user-${userID}`).val();
+            if (!answer || answer.length < 1) {
+                console.error(`Invalid answer: ${answer}`);
+            }
+            rtcService.acceptInboundConnection(user.inboundConnection, answer);
+        });
     },
 
 });
