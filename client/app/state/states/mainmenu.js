@@ -10,93 +10,95 @@ import { $ } from '../../modules/polyfills/dom.js';
 let MainMenuState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'main';
-    this.html = `
-        <div class="container"">
-            <label for="connect-socket-server">Connect to a distant server (Socket)</label>
-            <div class="input-group mb-3" id="connect-socket-server">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">@</span>
-                </div>
 
-                <input type="text" id="remote-server-address"
-                    class="form-control" placeholder="IP address or host name">
-
-                <div class="input-group-append">
-                    <span class="input-group-text">:</span>
-                </div>
-
-                <input type="text" id="remote-server-port"
-                    class="form-control" placeholder="Port">
-
-                <div class="input-group-append">
-                    <button id="button-connect-socket-server"
-                        class="btn btn-light" type="button">Connect</button>
-                </div>
+    this.htmlHead = '<div className="container"">';
+    this.htmlDistantServer = `
+        <label for="connect-socket-server">Connect to a distant server (Socket)</label>
+        <div class="input-group mb-3" id="connect-socket-server">
+            <div class="input-group-prepend">
+                <span class="input-group-text">@</span>
             </div>
 
-            <hr/>
+            <input type="text" id="remote-server-address"
+                class="form-control" placeholder="IP address or host name">
 
-            <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, experimental)</label>
-            <div class="input-group mb-3" id="connect-webrtc-server">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Offer</span>
-                </div>
-
-                <input type="text" id="remote-client-id"
-                    class="form-control" placeholder="Offer text">
-
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Answer</span>
-                </div>
-
-                <input type="text" id="remote-client-id"
-                    class="form-control" placeholder="Answer text">
-
-                <div class="input-group-append">
-                    <button id="button-connect-webrtc-server"
-                        class="btn btn-light" type="button">Generate Answer</button>
-                </div>
+            <div class="input-group-append">
+                <span class="input-group-text">:</span>
             </div>
 
-            <hr/>
+            <input type="text" id="remote-server-port"
+                class="form-control" placeholder="Port">
 
-            <label for="connect-throttle-server">Connect to my local sandbox (experimental)</label>
-            <div class="input-group mb-3" id="connect-throttle-server">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">@localhost/browser</span>
-                </div>
-                <div class="input-group-append">
-                    <button id="button-connect-throttle-server"
-                        class="btn btn-light" type="button">Connect</button>
-                </div>
+            <div class="input-group-append">
+                <button id="button-connect-socket-server"
+                    class="btn btn-light" type="button">Connect</button>
+            </div>
+        </div>`;
+
+    this.htmlRemoteSandbox =
+        `<hr/>
+
+        <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, no AdBlock)</label>
+        <div class="input-group mb-3" id="connect-webrtc-server">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Offer</span>
             </div>
 
-            <label for="start-sandbox">Invite people into my local sandbox (experimental)</label>
-            <div class="input-group mb-3" id="add-sandbox">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">@friend</span>
-                </div>
-                <input type="text" id="new-user-id" pattern="^[a-zA-Z]+$"
-                    class="form-control" placeholder="Player ID (no space, no accents, only letters)">
-                <div class="input-group-append">
-                    <button id="button-add-sandbox"
-                        class="btn btn-light" type="button">Add player slot</button>
-                </div>
-            </div>
-            <div class="list-group" id="user-slots">
+            <input type="text" id="remote-client-id"
+                class="form-control" placeholder="Offer text">
+
+            <div class="input-group-prepend">
+                <span class="input-group-text">Answer</span>
             </div>
 
-            <hr/>
+            <input type="text" id="remote-client-id"
+                class="form-control" placeholder="Answer text">
 
-            <label for="play-quick">In a hurry? Press the button below.</label>
-            <div class="input-group mb-3" id="play-quick">
-                <div class="input-group-append">
-                    <button id="button-play-quick"
-                        class="btn btn-light" type="button">I demand to be entertained, at once!</button>
-                </div>
+            <div class="input-group-append">
+                <button id="button-connect-webrtc-server"
+                    class="btn btn-light" type="button">Generate Answer</button>
+            </div>
+        </div>`;
+
+    this.htmlLocalSandbox =
+        `<hr/>
+
+        <label for="connect-throttle-server">Connect to my local sandbox</label>
+        <div class="input-group mb-3" id="connect-throttle-server">
+            <div class="input-group-prepend">
+                <span class="input-group-text">@localhost/browser</span>
+            </div>
+            <div class="input-group-append">
+                <button id="button-connect-throttle-server"
+                    class="btn btn-light" type="button">Connect</button>
+            </div>
+        </div>
+
+        <label for="start-sandbox">Invite people into my local sandbox (WebRTC, no AdBlock!)</label>
+        <div class="input-group mb-3" id="add-sandbox">
+            <div class="input-group-prepend">
+                <span class="input-group-text">@friend</span>
+            </div>
+            <input type="text" id="new-user-id" pattern="^[a-zA-Z]+$"
+                class="form-control" placeholder="Player ID (no space, no accents, only letters)">
+            <div class="input-group-append">
+                <button id="button-add-sandbox"
+                    class="btn btn-light" type="button">Add player slot</button>
+            </div>
+        </div>`;
+
+    this.htmlQuick =
+        `<hr/>
+
+        <label for="play-quick">In a hurry? Press the button below.</label>
+        <div class="input-group mb-3" id="play-quick">
+            <div class="input-group-append">
+                <button id="button-play-quick"
+                    class="btn btn-light" type="button">I demand to be entertained, at once!</button>
             </div>
         </div>
     `;
+    this.htmlTail = '</div>';
 };
 
 extend(MainMenuState.prototype, {
@@ -138,7 +140,13 @@ extend(MainMenuState.prototype, {
         $('#announce')
             .empty()
             .removeClass()
-            .append(this.html)
+            .append(this.htmlHead)
+            .append(this.htmlDistantServer)
+            .append(this.htmlRemoteSandbox)
+            .append(this.htmlLocalSandbox)
+            .append(this.getRTCUsers())
+            .append(this.htmlQuick)
+            .append(this.htmlTail)
             .center()
             .show();
 
@@ -161,6 +169,53 @@ extend(MainMenuState.prototype, {
                 .empty();
             resolve();
         });
+    },
+
+    getRTCUserHTML(userID, offer, answer) {
+        if (!offer) offer = '';
+        else offer = offer.replace(/\x22/g, '&quot;');
+        if (!answer) answer = '';
+        else answer = answer.replace(/\x22/g, '&quot;');
+
+        return `
+            <div class="input-group mb-3" id="${userID}">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">@${userID}</span>
+                </div>
+                <div class="input-group-append">
+                    <span class="input-group-text">Offer</span>
+                </div>
+
+                <input type="text" id="offer-user-${userID}"
+                    class="form-control" placeholder="Offer" value="${offer}">
+
+                <div class="input-group-append">
+                    <span class="input-group-text">Answer</span>
+                </div>
+
+                <input type="text" id="answer-user-${userID}"
+                    class="form-control" placeholder="Answer" value="${answer}">
+
+                <div class="input-group-append">
+                    <button id="button-connect-user-${userID}"
+                        class="btn btn-light" type="button">Connect User</button>
+                </div>
+                <div class="input-group-append">
+                    <button id="button-disconnect-user-${userID}"
+                        class="btn btn-light" type="button">Disconnect User</button>
+                </div>
+            </div>`;
+    },
+
+    getRTCUsers() {
+        let localServerModel = this.stateManager.app.model.localServer;
+        let users = localServerModel.users;
+        let usersHTML = '<div class="list-group" id="user-slots">';
+        users.forEach((user, userID) => {
+            usersHTML += this.getRTCUserHTML(userID, user.offer, user.answer);
+        });
+        usersHTML += '</div>';
+        return usersHTML;
     },
 
     addUserSlot() {
@@ -191,35 +246,26 @@ extend(MainMenuState.prototype, {
         }
 
         userSlotsHTML.append(
-            `<div class="input-group mb-3" id="${newUserID}">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">@${newUserID}</span>
-                </div>
-                <div class="input-group-append">
-                    <span class="input-group-text">Offer</span>
-                </div>
-
-                <input type="text" id="offer-user-${newUserID}"
-                    class="form-control" placeholder="Offer">
-
-                <div class="input-group-append">
-                    <span class="input-group-text">Answer</span>
-                </div>
-
-                <input type="text" id="answer-user-${newUserID}"
-                    class="form-control" placeholder="Answer">
-
-                <div class="input-group-append">
-                    <button id="button-connect-user-${newUserID}"
-                        class="btn btn-light" type="button">Connect User</button>
-                </div>
-            </div>`);
+            this.getRTCUserHTML(newUserID)
+        );
 
         localServerModel.addUser(newUserID);
-        rtcService.addServerSlot(newUserID);
+        rtcService.addServerSlot(newUserID, this);
 
         // TODO add listeners on buttons for new users.
-    }
+    },
+
+    serverSlotCreated(userID, offer) {
+        let offerElement = $(`#offer-user-${userID}`);
+        if (!offerElement) {
+            console.error(`[States/MainMenu] User "${userID}" HTML element not found.`);
+            return;
+        }
+        offerElement.val(offer);
+        let localServerModel = this.stateManager.app.model.localServer;
+        localServerModel.setUserOffer(userID, offer);
+
+    },
 
 });
 

@@ -19,8 +19,6 @@ let WebRTCSocket = function(app) {
     this.outboundConnection = null;
     this.outboundChannel = null;
 
-    this.currentInboundConnection = null;
-    this.currentInboundChannel = null;
     this.inboundConnections = new Map();
     this.inboundChannels = new Map();
 
@@ -80,14 +78,14 @@ extend(WebRTCSocket.prototype, {
     },
 
     // Create server slot and offer
-    addServerSlot(userID) {
+    addServerSlot(userID, mainMenuState) {
         let newConnection = new RTCPeerConnection(this.cfg, this.con);
-        // this.currentInboundConnection = newConnection;
         newConnection.onicecandidate = e => {
             if (e.candidate === null) {
                 this.offer = JSON.stringify(newConnection.localDescription);
                 console.log('onicecandidate called');
                 console.log(this.offer);
+                mainMenuState.serverSlotCreated(userID, this.offer);
                 // TODO update HTML offer creation callback!
             }
         };
@@ -98,8 +96,6 @@ extend(WebRTCSocket.prototype, {
             console.log(e); console.log('Channel onopen called, RTC connection established.');
             // TODO update HTML server slot
             // TODO update server slot internal with IO methods
-            // this.inboundChannels.push(this.currentInboundChannel);
-            // this.inboundConnections.push(this.currentInboundConnection);
             this.inboundChannels.set(userID, newChannel);
             this.inboundConnections.set(userID, newConnection);
 
@@ -124,7 +120,6 @@ extend(WebRTCSocket.prototype, {
 
     acceptInboundConnection(inboundConnection, answer) {
         let answerDesc = new RTCSessionDescription(JSON.parse(answer));
-        // this.currentInboundConnection.setRemoteDescription(answerDesc);
         inboundConnection.setRemoteDescription(answerDesc);
     }
 

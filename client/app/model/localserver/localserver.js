@@ -28,7 +28,7 @@ extend(LocalServer.prototype, {
     },
 
     // Server offer
-    addOffer(userID, offer) {
+    setUserOffer(userID, offer) {
         let user = this.users.get(userID);
         if (!user) {
             this.users.set(userID, {
