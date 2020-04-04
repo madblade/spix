@@ -49,7 +49,7 @@ extend(WebRTCSocket.prototype, {
 
     // Create client connection from server offer
     createClientConnection(mainMenuState) {
-        this.outboundConnection = new RTCPeerConnection(null);
+        this.outboundConnection = new RTCPeerConnection(this.cfg);
         let connection = this.outboundConnection;
         let rtc = this;
 
@@ -96,18 +96,16 @@ extend(WebRTCSocket.prototype, {
         connection.createAnswer(
             function(answerDesc) { connection.setLocalDescription(answerDesc); },
             function() { console.error('Could not create answer.'); },
-            { optional: [{RtpDataChannels: true}]  }
+            this.sdpConstraints
         );
     },
 
     // Create server slot and offer
     addServerSlot(userID, mainMenuState) {
-        let newConnection = new RTCPeerConnection(null);
+        let newConnection = new RTCPeerConnection(this.cfg);
         newConnection.onicecandidate = e => {
             if (e.candidate) return;
             this.offer = JSON.stringify(newConnection.localDescription);
-            console.log('onicecandidate called');
-            console.log(this.offer);
             mainMenuState.serverSlotCreated(userID, this.offer, newConnection);
         };
         // newConnection.onsignalingstatechange = function(e) {
