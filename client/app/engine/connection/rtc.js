@@ -7,11 +7,11 @@
 
 import extend           from '../../extend.js';
 
-let RTCPeerConnection =
-    window.RTCPeerConnection || window.mozRTCPeerConnection ||
-    window.webkitRTCPeerConnection;
-let RTCSessionDescription =
-    window.RTCSessionDescription || window.mozRTCSessionDescription;
+let RTCPeerConnection = window.RTCPeerConnection;
+// || window.mozRTCPeerConnection ||
+//     window.webkitRTCPeerConnection;
+let RTCSessionDescription = window.RTCSessionDescription;
+// || window.mozRTCSessionDescription;
 
 let WebRTCSocket = function(app) {
     this.app = app;
@@ -26,43 +26,36 @@ let WebRTCSocket = function(app) {
     this.offer = ''; // for server
     this.answer = ''; // for client
     this.sdpConstraints = {
-        optional: [],
+        optional: [
+            {RtpDataChannels: true}
+        ],
     };
-    this.cfg = { iceServers:
-        [
-            { url: 'stun:stun.l.google.com:19302' },
-            // { url: 'stun:stun1.l.google.com:19302' },
-            // { url: 'stun:stun2.l.google.com:19302' },
-            // { url: 'stun:stun.l.google.com:19302?transport=udp' },
-        ]
+    this.cfg = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            // { urls: 'stun:stun1.l.google.com:19302' },
+            // { urls: 'stun:stun2.l.google.com:19302' },
+            // { urls: 'stun:stun.l.google.com:19302?transport=udp' },
+        ],
+        // iceCandidatePoolSize: 10,
     };
-    this.con = { optional: [{DtlsSrtpKeyAgreement: true}] };
+    this.con = { optional: [
+        // {DtlsSrtpKeyAgreement: true},
+        // {RtpDataChannels: true}
+    ] };
 };
 
 extend(WebRTCSocket.prototype, {
 
     // Create client connection from server offer
-    createClientConnection(offer, mainMenuState) {
-        this.outboundConnection = new RTCPeerConnection(this.cfg, this.con);
+    createClientConnection(mainMenuState) {
+        this.outboundConnection = new RTCPeerConnection(null);
         let connection = this.outboundConnection;
-        connection.onicecandidate = e => {
-            if (e.candidate === null) {
-                this.answer = JSON.stringify(connection.localDescription);
-                mainMenuState.answerSent(this.answer);
-            }
-        };
+        let rtc = this;
 
-        let offerDesc = new RTCSessionDescription(JSON.parse(offer));
-        connection.setRemoteDescription(offerDesc);
-        connection.createAnswer(
-            answerDesc => connection.setLocalDescription(answerDesc),
-            () => {},
-            this.sdpConstraints
-        );
-
-        connection.ondatachannel = e => {
-            let dataChannel = e.channel || e;
-            this.outboundChannel = dataChannel;
+        connection.ondatachannel = function(e) {
+            let dataChannel = e.channel;
+            // this.outboundChannel = dataChannel;
             dataChannel.onopen = function(m) {
                 console.log('CHANNEL OPEN CLIENT');
                 console.log(m);
@@ -76,22 +69,66 @@ extend(WebRTCSocket.prototype, {
                 console.log(data.message);
             };
         };
+
+        connection.onicecandidate = function(e) {
+            if (e.candidate) return;
+            rtc.answer = JSON.stringify(connection.localDescription);
+            mainMenuState.answerSent(rtc.answer);
+        };
+
+        connection.oniceconnectionstatechange = function() {
+            console.log(`[RTC] ICE connection state: ${connection.iceConnectionState}`);
+            if (connection.iceConnectionState === 'failed') {
+                mainMenuState.notifyRTCError('ice-failed-client');
+                // TODO HTML cleanup
+            }
+        };
+
+        // connection.onsignalingstatechange = function(e) {
+        // console.log(e);
+        // };
+    },
+
+    createClientAnswer(offer) {
+        let connection = this.outboundConnection;
+        let offerDesc = new RTCSessionDescription(JSON.parse(offer));
+        connection.setRemoteDescription(offerDesc);
+        connection.createAnswer(
+            function(answerDesc) { connection.setLocalDescription(answerDesc); },
+            function() { console.error('Could not create answer.'); },
+            { optional: [{RtpDataChannels: true}]  }
+        );
     },
 
     // Create server slot and offer
     addServerSlot(userID, mainMenuState) {
-        let newConnection = new RTCPeerConnection(this.cfg, this.con);
+        let newConnection = new RTCPeerConnection(null);
         newConnection.onicecandidate = e => {
-            if (e.candidate === null) {
-                this.offer = JSON.stringify(newConnection.localDescription);
-                console.log('onicecandidate called');
-                console.log(this.offer);
-                mainMenuState.serverSlotCreated(userID, this.offer, newConnection);
+            if (e.candidate) return;
+            this.offer = JSON.stringify(newConnection.localDescription);
+            console.log('onicecandidate called');
+            console.log(this.offer);
+            mainMenuState.serverSlotCreated(userID, this.offer, newConnection);
+        };
+        // newConnection.onsignalingstatechange = function(e) {
+        // console.log(e);
+        // };
+        newConnection.oniceconnectionstatechange = function() {
+            console.log(`[RTC] ICE connection state: ${newConnection.iceConnectionState}`);
+            if (newConnection.iceConnectionState === 'failed') {
+                mainMenuState.notifyRTCError('ice-failed-server');
+                // TODO HTML cleanup
             }
         };
 
-        let newChannel = newConnection.createDataChannel('test', {reliable: true});
-        // this.currentInboundChannel = newChannel;
+        let newChannel = newConnection.createDataChannel('chat'
+            // , {reliable: true}
+        );
+        newConnection.createOffer().then(
+            desc => {
+                newConnection.setLocalDescription(desc);
+            }
+        );
         newChannel.onopen = e => {
             console.log('CHANNEL OPEN SERVER');
             console.log(e); console.log('Channel onopen called, RTC connection established.');
@@ -108,14 +145,6 @@ extend(WebRTCSocket.prototype, {
             let data = JSON.parse(e.data);
             console.log(data.message);
         };
-
-        newConnection.createOffer(
-            desc => {
-                newConnection.setLocalDescription(desc, () => {}, () => {});
-            },
-            () => {},
-            this.sdpConstraints
-        );
     },
 
     acceptInboundConnection(inboundConnection, answer) {

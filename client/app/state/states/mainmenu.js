@@ -22,7 +22,7 @@ let MainMenuState = function(stateManager) {
             <input type="text" id="remote-server-address"
                 class="form-control" placeholder="IP address or host name">
 
-            <div class="input-group-append">
+            <div class="input-group-prepend" style="margin-left: -1px;">
                 <span class="input-group-text">:</span>
             </div>
 
@@ -31,7 +31,7 @@ let MainMenuState = function(stateManager) {
 
             <div class="input-group-append">
                 <button id="button-connect-socket-server"
-                    class="btn btn-light" type="button">Connect</button>
+                    class="btn btn-outline-light" type="button">Connect</button>
             </div>
         </div>`;
 
@@ -47,7 +47,7 @@ let MainMenuState = function(stateManager) {
             <input type="text" id="remote-client-offer"
                 class="form-control" placeholder="Offer text" value="">
 
-            <div class="input-group-prepend">
+            <div class="input-group-prepend" style="margin-left: -1px;">
                 <span class="input-group-text">Answer</span>
             </div>
 
@@ -56,9 +56,10 @@ let MainMenuState = function(stateManager) {
 
             <div class="input-group-append">
                 <button id="button-connect-webrtc-server"
-                    class="btn btn-light" type="button">Generate Answer</button>
+                    class="btn btn-outline-light" type="button">Generate Answer</button>
             </div>
-        </div>`;
+        </div>
+        <div class="list-group" id="error-remote-sandbox">`;
 
     this.htmlLocalSandbox =
         `<hr/>
@@ -70,7 +71,7 @@ let MainMenuState = function(stateManager) {
             </div>
             <div class="input-group-append">
                 <button id="button-connect-throttle-server"
-                    class="btn btn-light" type="button">Connect</button>
+                    class="btn btn-outline-light" type="button">Connect</button>
             </div>
         </div>
 
@@ -83,19 +84,24 @@ let MainMenuState = function(stateManager) {
                 class="form-control" placeholder="Player ID (no space, no accents, only letters)">
             <div class="input-group-append">
                 <button id="button-add-sandbox"
-                    class="btn btn-light" type="button">Add player slot</button>
+                    class="btn btn-outline-light" type="button">Add player slot</button>
             </div>
         </div>`;
 
     this.htmlQuick =
         `<hr/>
 
-        <label for="play-quick">In a hurry? Press the button below.</label>
-        <div class="input-group mb-3" id="play-quick">
+        <label for="play-quick">Solo mode</label>
+        <div class="input-group mb-3 center-block" id="play-quick">
+
+            <div class="input-group-prepend">
+                <span class="input-group-text">No time to set up a server?</span>
+            </div>
             <div class="input-group-append">
                 <button id="button-play-quick"
-                    class="btn btn-light" type="button">I demand to be entertained, at once!</button>
+                    class="btn btn-outline-light" type="button">I want to play at once; make it so!</button>
             </div>
+
         </div>
     `;
     this.htmlTail = '</div>';
@@ -111,26 +117,23 @@ extend(MainMenuState.prototype, {
             if (!host) host = '';
             if (!port || isNaN(port)) port = 8000;
 
-            console.log('con sock');
             this.stateManager.app.startFromRemoteServer(host, port);
         });
 
         $('#button-connect-webrtc-server').click(() => {
             this.generateClientAnswer();
-            console.log('con webrtc');
         });
 
         $('#button-connect-throttle-server').click(() => {
-            console.log('con throttle');
+            // TODO check if I need to do more
+            this.stateManager.app.startFromLocalServer();
         });
 
         $('#button-add-sandbox').click(() => {
-            console.log('add webrtc slot');
             this.addUserSlot();
         });
 
         $('#button-play-quick').click(() => {
-            console.log('play quick');
             this.stateManager.app.startFromLocalServer();
         });
     },
@@ -151,6 +154,9 @@ extend(MainMenuState.prototype, {
             .show();
 
         this.startListeners();
+
+        let rtcService = this.stateManager.app.engine.connection.rtc;
+        rtcService.createClientConnection(this);
     },
 
     stopListeners() {
@@ -174,12 +180,13 @@ extend(MainMenuState.prototype, {
     // ######### RTC CLIENT METHODS #########
 
     generateClientAnswer() {
+        $('.error-message').remove();
         let offer = $('#remote-client-offer').val();
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.setLocalClientOffer(offer);
 
         let rtcService = this.stateManager.app.engine.connection.rtc;
-        rtcService.createClientConnection(offer, this);
+        rtcService.createClientAnswer(offer);
     },
 
     answerSent(answer) {
@@ -202,14 +209,14 @@ extend(MainMenuState.prototype, {
                 <div class="input-group-prepend">
                     <span class="input-group-text">@${userID}</span>
                 </div>
-                <div class="input-group-append">
+                <div class="input-group-append" style="margin-right: -1px;">
                     <span class="input-group-text">Offer</span>
                 </div>
 
                 <input type="text" id="offer-user-${userID}"
                     class="form-control" placeholder="Offer" value="${offer}">
 
-                <div class="input-group-append">
+                <div class="input-group-append" style="margin-right: -1px;">
                     <span class="input-group-text">Answer</span>
                 </div>
 
@@ -218,11 +225,11 @@ extend(MainMenuState.prototype, {
 
                 <div class="input-group-append">
                     <button id="button-connect-user-${userID}"
-                        class="btn btn-light" type="button">Connect User</button>
+                        class="btn btn-outline-light" type="button">Connect User</button>
                 </div>
                 <div class="input-group-append">
                     <button id="button-disconnect-user-${userID}"
-                        class="btn btn-light" type="button">Disconnect User</button>
+                        class="btn btn-outline-light" type="button">Disconnect User</button>
                 </div>
             </div>`;
     },
@@ -238,18 +245,47 @@ extend(MainMenuState.prototype, {
         return usersHTML;
     },
 
+    notifyRTCError(errorType) {
+        $('.error-message').remove();
+        let userSlotsHTML = errorType === 'ice-failed-client' ?
+            $('#error-remote-sandbox') : $('#user-slots');
+
+        let errorMsgConsole = '';
+        let errorMsgHTML = '';
+        switch (errorType) {
+            case 'user-id-empty':
+                errorMsgConsole = '[States/MainMenu] User ID must not be empty.';
+                errorMsgHTML =  `<div class="alert alert-danger error-message">
+                    Please specify a Player ID (name)</div>`;
+                break;
+            case 'user-id-taken':
+                errorMsgConsole = '[States/MainMenu] User ID already used.';
+                errorMsgHTML = `<div class="alert alert-danger error-message">
+                    Player ID already taken</div>`;
+                break;
+            case 'ice-failed-server':
+            case 'ice-failed-client':
+                errorMsgConsole = '[States/MainMenu] ICE exchange failed.';
+                errorMsgHTML = `<div class="alert alert-danger error-message">
+                    Connection failed. Possible causes: <br />AdBlock /
+                    uBlock (uncheck WebRTC);<br />
+                    Prefer Chrome over Firefox;<br />
+                    Firewall settings.</div>`;
+                break;
+            default: break;
+        }
+        console.log(errorMsgConsole);
+        userSlotsHTML.append(errorMsgHTML);
+    },
+
     addUserSlot() {
         let newUserID = $('#new-user-id').val();
         console.log(newUserID);
         let userSlotsHTML = $('#user-slots');
 
-        $('#user-id-conflict').remove();
+        $('.error-message').remove();
         if (newUserID.length < 1) {
-            console.error('[States/MainMenu] User ID must not be empty.');
-            userSlotsHTML.append(
-                `<div class="alert alert-danger"
-                    id="user-id-conflict">Please specify a Player ID (name)</div>`
-            );
+            this.notifyRTCError('user-id-empty');
             return;
         }
 
@@ -257,11 +293,7 @@ extend(MainMenuState.prototype, {
         let rtcService = this.stateManager.app.engine.connection.rtc;
 
         if (localServerModel.hasUser(newUserID)) {
-            console.error('[States/MainMenu] User ID already used.');
-            userSlotsHTML.append(
-                `<div class="alert alert-danger"
-                    id="user-id-conflict">Player ID already taken</div>`
-            );
+            this.notifyRTCError('user-id-taken');
             return;
         }
 
@@ -298,6 +330,7 @@ extend(MainMenuState.prototype, {
                 console.error(`Invalid answer: ${answer}`);
             }
             rtcService.acceptInboundConnection(user.inboundConnection, answer);
+            // TODO off button connect user
         });
     },
 
