@@ -28,7 +28,7 @@ extend(Standalone.prototype, {
     start() {
         console.log('[Standalone] Starting local server.');
         this.server.connect(this.io); // setup IO object
-        this.io.connect(); // handshake
+        this.io.connect(this.io.socketServer); // handshake
         this._isRunning = true;
         // this.io.socketClient.emit('connection');
         // this.io.socketServer.emit('connected');
@@ -37,8 +37,16 @@ extend(Standalone.prototype, {
     stop() {
         this._isRunning = false;
         console.log('[Standalone] Stopping local server.');
-        this.io.disconnect();
+        this.io.disconnect(this.io.socketServer);
     },
+
+    connectUser(socketClient) {
+        this.server.connectRTC(socketClient);
+    },
+
+    // disconnectUser(socketClient) {
+    //     this.io.disconnect(socketClient);
+    // },
 
     isRunning() {
         return this._isRunning;

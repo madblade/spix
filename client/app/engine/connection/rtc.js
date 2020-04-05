@@ -6,6 +6,7 @@
 'use strict';
 
 import extend           from '../../extend.js';
+import {RTCSocket} from './rtcsocket';
 
 let RTCPeerConnection = window.RTCPeerConnection;
 // || window.mozRTCPeerConnection ||
@@ -13,7 +14,7 @@ let RTCPeerConnection = window.RTCPeerConnection;
 let RTCSessionDescription = window.RTCSessionDescription;
 // || window.mozRTCSessionDescription;
 
-let WebRTCSocket = function(app) {
+let RTCService = function(app) {
     this.app = app;
 
     this.outboundConnection = null;
@@ -45,7 +46,7 @@ let WebRTCSocket = function(app) {
     ] };
 };
 
-extend(WebRTCSocket.prototype, {
+extend(RTCService.prototype, {
 
     // Create client connection from server offer
     createClientConnection(mainMenuState) {
@@ -57,18 +58,19 @@ extend(WebRTCSocket.prototype, {
             // TODO setup communication in server part
             let dataChannel = e.channel;
             // this.outboundChannel = dataChannel;
-            dataChannel.onopen = function(m) {
+            let rtcSocket = new RTCSocket(dataChannel);
+
+            dataChannel.onopen = function() { // (m) {
                 // Update HTML / Join game
-                mainMenuState.notifyServerConnected();
-                console.log('CHANNEL OPEN CLIENT');
-                console.log(m);
-                dataChannel.send(JSON.stringify({message: 'General Kenobi'}));
+                mainMenuState.notifyServerConnected(rtcSocket);
+                // console.log(m);
+                // dataChannel.send(JSON.stringify({message: 'General Kenobi'}));
             };
 
-            dataChannel.onmessage = function(m) {
-                let data = JSON.parse(m.data);
-                console.log(data.message);
-            };
+            // dataChannel.onmessage = function(m) {
+            //     let data = JSON.parse(m.data);
+            //     console.log(data.message);
+            // };
         };
 
         connection.onicecandidate = function(e) {
@@ -137,22 +139,25 @@ extend(WebRTCSocket.prototype, {
             }
         );
 
+        let rtcSocket = new RTCSocket(newChannel, userID);
+
         // TODO update server slot internal with IO methods
         // TODO setup communication in the socket part
-        newChannel.onopen = e => {
-            mainMenuState.notifyUserConnected(userID);
-            console.log('CHANNEL OPEN SERVER');
-            console.log(e); console.log('Channel onopen called, RTC connection established.');
+        newChannel.onopen = () => {
+            mainMenuState.notifyUserConnected(userID, rtcSocket);
+            // console.log('CHANNEL OPEN SERVER');
+            // console.log(e);
+            console.log('[RTCService/Server] RTC connection established.');
             this.inboundChannels.set(userID, newChannel);
             this.inboundConnections.set(userID, newConnection);
-            newChannel.send(JSON.stringify({message: 'hello there'}));
+            // newChannel.send(JSON.stringify({message: 'hello there'}));
         };
 
-        newChannel.onmessage = e => {
-            if (e.data.charCodeAt(0) === 2) return; // ?
-            let data = JSON.parse(e.data);
-            console.log(data.message);
-        };
+        // newChannel.onmessage = e => {
+        //     if (e.data.charCodeAt(0) === 2) return; // ?
+        //     let data = JSON.parse(e.data);
+        //     console.log(data.message);
+        // };
     },
 
     acceptInboundConnection(inboundConnection, answer) {
@@ -162,4 +167,4 @@ extend(WebRTCSocket.prototype, {
 
 });
 
-export { WebRTCSocket };
+export { RTCService };

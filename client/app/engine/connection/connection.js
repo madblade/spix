@@ -6,12 +6,12 @@
 
 import extend           from '../../extend.js';
 import io               from 'socket.io-client';
-import { WebRTCSocket } from './rtc';
+import { RTCService }   from './rtc';
 
 let Connection = function(app) {
     this.app = app;
     this.socket = {};
-    this.rtc = new WebRTCSocket(app);
+    this.rtc = new RTCService(app);
 };
 
 extend(Connection.prototype, {

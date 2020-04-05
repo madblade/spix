@@ -124,7 +124,8 @@ extend(MainMenuState.prototype, {
         });
 
         $('#button-connect-throttle-server').click(() => {
-            // TODO check if I need to do more
+            // TODO check if it works.
+            // TODO handle deco.
             this.stateManager.app.startFromLocalServer();
         });
 
@@ -133,7 +134,7 @@ extend(MainMenuState.prototype, {
         });
 
         $('#button-play-quick').click(() => {
-            this.stateManager.app.startFromLocalServer();
+            this.stateManager.app.startDemo();
         });
     },
 
@@ -209,13 +210,12 @@ extend(MainMenuState.prototype, {
         button.addClass('status-checking');
     },
 
-    notifyServerConnected() {
-        console.log('serv connected');
+    notifyServerConnected(rtcSocket) {
         let button = $('#button-connect-webrtc-server');
         button.removeClass('status-checking');
         button.removeClass('status-error');
         button.addClass('status-connected');
-        // TODO start engine!
+        this.stateManager.app.startFromRemoteSandbox(rtcSocket);
     },
 
     // ######### RTC SERVER METHODS #########
@@ -303,13 +303,13 @@ extend(MainMenuState.prototype, {
         $(`#status-${userID}`).addClass('status-checking');
     },
 
-    notifyUserConnected(userID) {
+    notifyUserConnected(userID, rtcSocket) {
         $(`#status-${userID}`).addClass('status-connected');
+        this.stateManager.app.clientConnectedToLocalSandbox(rtcSocket);
     },
 
     addUserSlot() {
         let newUserID = $('#new-user-id').val();
-        console.log(newUserID);
         let userSlotsHTML = $('#user-slots');
 
         $('.error-message').remove();

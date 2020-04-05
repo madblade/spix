@@ -20,6 +20,10 @@ class App {
     connect(socketio) {
         this._connection.configure(socketio);
     }
+
+    connectRTC(socket) {
+        this._connection.configureFromSocket(socket);
+    }
 }
 
 export default App;

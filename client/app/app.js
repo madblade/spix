@@ -74,6 +74,18 @@ App.Core = function() {
 // Application entry point.
 extend(App.Core.prototype, {
 
+    // The only intended way to play.
+    startFromRemoteServer(socketAddress, port) {
+        this.setState('loading');
+        this.engine.connection.connectSocket(socketAddress, port, true); // connects
+        this.engine.connection.listen(); // listens
+    },
+
+    startDemo() {
+        // TODO order a new demo server and spawn immediately.
+        this.startFromLocalServer();
+    },
+
     startFromLocalServer() {
         this.setState('loading');
         let s = this.localServer.standalone.io.socketClient;
@@ -82,10 +94,18 @@ extend(App.Core.prototype, {
         this.localServer.standalone.start();
     },
 
-    startFromRemoteServer(socketAddress, port) {
+    startFromRemoteSandbox(socket) {
         this.setState('loading');
-        this.engine.connection.connectSocket(socketAddress, port, true); // connects
-        this.engine.connection.listen(); // listens
+        this.engine.connection.setupLocalSocket(socket);
+        this.engine.connection.listen();
+        console.log('listening....');
+    },
+
+    // Careful with what clients may execute in the local sandbox!
+    clientConnectedToLocalSandbox(socket) {
+        this.localServer.standalone.connectUser(socket);
+        // XXX [LOW] UDP-like handshake.
+        // setTimeout(() => socket.emit('connected'), 1000);
     },
 
     start() {

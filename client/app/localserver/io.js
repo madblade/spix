@@ -87,12 +87,14 @@ extend(IO.prototype, {
         }
     },
 
-    connect() {
-        this.connectionCallback(this.socketServer);
+    connect(socket) {
+        this.connectionCallback(socket);
     },
 
-    disconnect() {
-        console.log('[IO] Disconnect');
+    disconnect(socket) {
+        if (socket && socket.disconnect)
+            socket.disconnect();
+        console.log('[IO] Disconnect ');
         this.socketServer.disconnect();
     }
 

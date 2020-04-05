@@ -96,23 +96,27 @@ class Connector {
                 'using the last configuration!');
             return;
         }
+        console.log('configuration socketIO.......');
 
         this._io = socketio;
 
         socketio.on('connection', socket => {
-            // Define debug functions and attributes
-            this.setupDebug(socket);
-
-            // Define disconnect behaviour
-            this.setupDisconnect(socket);
-
-            // Register user
-            this.setupUser(socket);
-
-            if (this._debug) socket.log('CONNECTED');
+            this.configureFromSocket(socket);
         });
     }
 
+    configureFromSocket(socket) {
+        // Define debug functions and attributes
+        this.setupDebug(socket);
+
+        // Define disconnect behaviour
+        this.setupDisconnect(socket);
+
+        // Register user
+        this.setupUser(socket);
+
+        if (this._debug) socket.log('CONNECTED');
+    }
 }
 
 export default Connector;
