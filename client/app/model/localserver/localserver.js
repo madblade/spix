@@ -30,6 +30,10 @@ extend(LocalServer.prototype, {
         });
     },
 
+    removeUser(userID) {
+        this.users.delete(userID);
+    },
+
     // Server offer
     setUserOffer(userID, offer) {
         let user = this.users.get(userID);

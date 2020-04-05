@@ -113,7 +113,6 @@ extend(MainMenuState.prototype, {
         $('#button-connect-socket-server').click(() => {
             let host = $('#remote-server-address').val();
             let port = $('#remote-server-port').val();
-            // TODO manage answer and errors
             if (!host) host = '';
             if (!port || isNaN(port)) port = 8000;
 
@@ -154,9 +153,6 @@ extend(MainMenuState.prototype, {
             .show();
 
         this.startListeners();
-
-        let rtcService = this.stateManager.app.engine.connection.rtc;
-        rtcService.createClientConnection(this);
     },
 
     stopListeners() {
@@ -180,12 +176,14 @@ extend(MainMenuState.prototype, {
     // ######### RTC CLIENT METHODS #########
 
     generateClientAnswer() {
+        let rtcService = this.stateManager.app.engine.connection.rtc;
+        rtcService.createClientConnection(this);
+
         $('.error-message').remove();
         let offer = $('#remote-client-offer').val();
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.setLocalClientOffer(offer);
 
-        let rtcService = this.stateManager.app.engine.connection.rtc;
         rtcService.createClientAnswer(offer);
     },
 
@@ -194,6 +192,30 @@ extend(MainMenuState.prototype, {
         localServerModel.setLocalClientAnswer(answer);
 
         $('#remote-client-answer').val(answer);
+    },
+
+    notifyServerFailed() {
+        let button = $('#button-connect-webrtc-server');
+        button.removeClass('status-checking');
+        button.removeClass('status-connected');
+        button.addClass('status-error');
+    },
+
+    notifyServerChecking() {
+        // Front notif on button.
+        let button = $('#button-connect-webrtc-server');
+        button.removeClass('status-error');
+        button.removeClass('status-connected');
+        button.addClass('status-checking');
+    },
+
+    notifyServerConnected() {
+        console.log('serv connected');
+        let button = $('#button-connect-webrtc-server');
+        button.removeClass('status-checking');
+        button.removeClass('status-error');
+        button.addClass('status-connected');
+        // TODO start engine!
     },
 
     // ######### RTC SERVER METHODS #########
@@ -207,7 +229,7 @@ extend(MainMenuState.prototype, {
         return `
             <div class="input-group mb-3" id="${userID}">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">@${userID}</span>
+                    <span class="input-group-text" id="status-${userID}">@${userID}</span>
                 </div>
                 <div class="input-group-append" style="margin-right: -1px;">
                     <span class="input-group-text">Offer</span>
@@ -261,21 +283,28 @@ extend(MainMenuState.prototype, {
             case 'user-id-taken':
                 errorMsgConsole = '[States/MainMenu] User ID already used.';
                 errorMsgHTML = `<div class="alert alert-danger error-message">
-                    Player ID already taken</div>`;
+                    Player ID invalid or already taken</div>`;
                 break;
             case 'ice-failed-server':
             case 'ice-failed-client':
                 errorMsgConsole = '[States/MainMenu] ICE exchange failed.';
                 errorMsgHTML = `<div class="alert alert-danger error-message">
-                    Connection failed. Possible causes: <br />AdBlock /
-                    uBlock (uncheck WebRTC);<br />
-                    Prefer Chrome over Firefox;<br />
-                    Firewall settings.</div>`;
+                    Cannot connect. Possible causes: <br />AdBlock (uncheck WebRTC protection);<br />
+                    Firefox client timeout (10-15s);<br />
+                    Network / firewall settings.</div>`;
                 break;
             default: break;
         }
         console.log(errorMsgConsole);
         userSlotsHTML.append(errorMsgHTML);
+    },
+
+    notifyUserChecking(userID) {
+        $(`#status-${userID}`).addClass('status-checking');
+    },
+
+    notifyUserConnected(userID) {
+        $(`#status-${userID}`).addClass('status-connected');
     },
 
     addUserSlot() {
@@ -292,7 +321,7 @@ extend(MainMenuState.prototype, {
         let localServerModel = this.stateManager.app.model.localServer;
         let rtcService = this.stateManager.app.engine.connection.rtc;
 
-        if (localServerModel.hasUser(newUserID)) {
+        if ($(`#${newUserID}`).length !== 0 || localServerModel.hasUser(newUserID)) {
             this.notifyRTCError('user-id-taken');
             return;
         }
@@ -305,6 +334,14 @@ extend(MainMenuState.prototype, {
         rtcService.addServerSlot(newUserID, this);
 
         // TODO add listeners on buttons for new users.
+    },
+
+    removeUserSlot(userID) {
+        let offerElement = $(`#${userID}`);
+        offerElement.remove();
+
+        let localServerModel = this.stateManager.app.model.localServer;
+        localServerModel.removeUser(userID);
     },
 
     serverSlotCreated(userID, offer, connection) {

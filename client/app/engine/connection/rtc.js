@@ -54,16 +54,17 @@ extend(WebRTCSocket.prototype, {
         let rtc = this;
 
         connection.ondatachannel = function(e) {
+            // TODO setup communication in server part
             let dataChannel = e.channel;
             // this.outboundChannel = dataChannel;
             dataChannel.onopen = function(m) {
+                // Update HTML / Join game
+                mainMenuState.notifyServerConnected();
                 console.log('CHANNEL OPEN CLIENT');
                 console.log(m);
-                // TODO update HTML client and join game
-
-                // TODO setup communication in server part
                 dataChannel.send(JSON.stringify({message: 'General Kenobi'}));
             };
+
             dataChannel.onmessage = function(m) {
                 let data = JSON.parse(m.data);
                 console.log(data.message);
@@ -78,9 +79,12 @@ extend(WebRTCSocket.prototype, {
 
         connection.oniceconnectionstatechange = function() {
             console.log(`[RTC] ICE connection state: ${connection.iceConnectionState}`);
-            if (connection.iceConnectionState === 'failed') {
+            let status = connection.iceConnectionState;
+            if (status === 'failed') {
                 mainMenuState.notifyRTCError('ice-failed-client');
-                // TODO HTML cleanup
+                mainMenuState.notifyServerFailed();
+            } else if (status === 'checking' || status === 'connected') {
+                mainMenuState.notifyServerChecking();
             }
         };
 
@@ -113,9 +117,14 @@ extend(WebRTCSocket.prototype, {
         // };
         newConnection.oniceconnectionstatechange = function() {
             console.log(`[RTC] ICE connection state: ${newConnection.iceConnectionState}`);
-            if (newConnection.iceConnectionState === 'failed') {
+            let status = newConnection.iceConnectionState;
+            if (status === 'failed') {
                 mainMenuState.notifyRTCError('ice-failed-server');
-                // TODO HTML cleanup
+                newChannel.close();
+                newConnection.close();
+                mainMenuState.removeUserSlot(userID);
+            } else if (status === 'checking' || status === 'connected') {
+                mainMenuState.notifyUserChecking(userID);
             }
         };
 
@@ -127,17 +136,18 @@ extend(WebRTCSocket.prototype, {
                 newConnection.setLocalDescription(desc);
             }
         );
+
+        // TODO update server slot internal with IO methods
+        // TODO setup communication in the socket part
         newChannel.onopen = e => {
+            mainMenuState.notifyUserConnected(userID);
             console.log('CHANNEL OPEN SERVER');
             console.log(e); console.log('Channel onopen called, RTC connection established.');
-            // TODO update HTML server slot
-            // TODO update server slot internal with IO methods
             this.inboundChannels.set(userID, newChannel);
             this.inboundConnections.set(userID, newConnection);
-
-            // TODO setup communication in the socket part
             newChannel.send(JSON.stringify({message: 'hello there'}));
         };
+
         newChannel.onmessage = e => {
             if (e.data.charCodeAt(0) === 2) return; // ?
             let data = JSON.parse(e.data);
