@@ -6,8 +6,8 @@
 
 import Factory from './model/factory';
 
-class App {
-
+class App
+{
     constructor() {
         this._hub = Factory.createHub(this);
         this._connection = Factory.createConnection(this);

@@ -104,8 +104,6 @@ extend(App.Core.prototype, {
     // Careful with what clients may execute in the local sandbox!
     clientConnectedToLocalSandbox(socket) {
         this.localServer.standalone.connectUser(socket);
-        // XXX [LOW] UDP-like handshake.
-        // setTimeout(() => socket.emit('connected'), 1000);
     },
 
     start() {

@@ -117,6 +117,7 @@ extend(EventComponent.prototype, {
         // Remove all rotations except the last.
         for (let i = 0, l = events.length; i < l; ++i) {
             let currentEvent = events[i];
+            if (!currentEvent) continue;
             if (currentEvent[0] !== 'r') {
                 lastRotation = events[i];
             }

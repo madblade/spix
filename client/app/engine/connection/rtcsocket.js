@@ -76,7 +76,9 @@ extend(RTCSocket.prototype, {
             m: message,
             c: data
         });
-        this.dataChannel.send(compact);
+        if (this.dataChannel.readyState === 'open') {
+            this.dataChannel.send(compact);
+        }
     }
 
 });

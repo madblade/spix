@@ -303,9 +303,18 @@ extend(MainMenuState.prototype, {
         $(`#status-${userID}`).addClass('status-checking');
     },
 
-    notifyUserConnected(userID, rtcSocket) {
+    notifyUserConnected(userID, newChannel, newConnection, rtcSocket) {
         $(`#status-${userID}`).addClass('status-connected');
+        let localServer = this.stateManager.app.model.localServer;
+        localServer.setUserConnectionStatus(userID, true);
+        localServer.setUserChannel(userID, newChannel);
         this.stateManager.app.clientConnectedToLocalSandbox(rtcSocket);
+    },
+
+    notifyUserDisconnected(userID) {
+        $(`#status-${userID}`).addClass('status-error');
+        this.stateManager.app.model.localServer.setUserConnectionStatus(userID, false);
+        // TODO reconnection mechanism
     },
 
     addUserSlot() {
@@ -332,16 +341,19 @@ extend(MainMenuState.prototype, {
 
         localServerModel.addUser(newUserID);
         rtcService.addServerSlot(newUserID, this);
-
-        // TODO add listeners on buttons for new users.
     },
 
     removeUserSlot(userID) {
-        let offerElement = $(`#${userID}`);
-        offerElement.remove();
-
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.removeUser(userID);
+
+        // Remove listeners
+        $(`#button-connect-user-${userID}`).off('click');
+        $(`#button-disconnect-user-${userID}`).off('click');
+
+        // Remove elements
+        let offerElement = $(`#${userID}`);
+        offerElement.remove();
     },
 
     serverSlotCreated(userID, offer, connection) {
@@ -367,7 +379,18 @@ extend(MainMenuState.prototype, {
                 console.error(`Invalid answer: ${answer}`);
             }
             rtcService.acceptInboundConnection(user.inboundConnection, answer);
-            // TODO off button connect user
+        });
+
+        $(`#button-disconnect-user-${userID}`).click(() => {
+            let user = localServerModel.getUser(userID);
+            if (!user) {
+                console.error(`User "${userID}" not found.`);
+                return;
+            }
+            rtcService.disconnectUser(userID);
+
+            // Remove user slot HTML and user model.
+            this.removeUserSlot(userID);
         });
     },
 

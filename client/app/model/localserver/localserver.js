@@ -26,7 +26,8 @@ extend(LocalServer.prototype, {
             offer: '',
             answer: '',
             inboundConnection: null,
-            inboundChannel: null
+            inboundChannel: null,
+            connected: false
         });
     },
 
@@ -42,7 +43,8 @@ extend(LocalServer.prototype, {
                 offer,
                 answer: '',
                 inboundConnection: null,
-                inboundChannel: null
+                inboundChannel: null,
+                connected: false
             });
         } else {
             user.offer = offer;
@@ -58,8 +60,23 @@ extend(LocalServer.prototype, {
         user.inboundConnection = connection;
     },
 
+    setUserChannel(userID, channel) {
+        let user = this.users.get(userID);
+        if (!user) {
+            console.error(`[Model/LocalServer] User "${userID}" not found.`);
+            return;
+        }
+        user.inboundChannel = channel;
+    },
+
     getUser(userID) {
         return this.users.get(userID);
+    },
+
+    setUserConnectionStatus(userID, isConnected) {
+        let user = this.users.get(userID);
+        if (!user) return;
+        user.connected = isConnected;
     },
 
     // Client answer

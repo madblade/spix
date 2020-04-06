@@ -6,8 +6,8 @@
 
 import Factory from '../factory';
 
-class Connector {
-
+class Connector
+{
     constructor(app) {
         this._app = app;
         this._userDB = Factory.createUserDB(this);
