@@ -139,7 +139,6 @@ extend(MainMenuState.prototype, {
     },
 
     start() {
-        console.log('main menu started');
         $('#announce')
             .empty()
             .removeClass()

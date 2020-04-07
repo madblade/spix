@@ -59,7 +59,7 @@ extend(RTCService.prototype, {
             // TODO setup communication in server part
             let dataChannel = e.channel;
             // this.outboundChannel = dataChannel;
-            let rtcSocket = new RTCSocket(dataChannel);
+            let rtcSocket = new RTCSocket(dataChannel, connection);
 
             dataChannel.onopen = function() { // (m) {
                 // Update HTML / Join game
@@ -162,10 +162,11 @@ extend(RTCService.prototype, {
         // Cache socket for reconnection
         let rtcSocket = this.sockets.get(userID);
         if (!rtcSocket) {
-            rtcSocket = new RTCSocket(newChannel, userID);
+            rtcSocket = new RTCSocket(newChannel, newConnection, userID);
             this.sockets.set(userID, rtcSocket);
         } else {
             rtcSocket.setDataChannel(newChannel);
+            rtcSocket.setDataConnection(newConnection);
         }
 
         // TODO update server slot internal with IO methods

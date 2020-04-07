@@ -4,10 +4,12 @@
 
 import extend           from '../../extend.js';
 
-let RTCSocket = function(dataChannel, clientID) {
+let RTCSocket = function(dataChannel, connection, clientID) {
     if (!clientID) clientID = 'localhost';
     this.dataChannel = dataChannel;
+    this.dataConnection = connection;
     this.name = clientID;
+    this.isWebRTC = true;
     this.actions = {};
     this.request = {
         connection: {
@@ -65,10 +67,8 @@ extend(RTCSocket.prototype, {
     },
 
     disconnect() {
-        let has = this.actions.hasOwnProperty('disconnect');
-        if (has) {
-            this.actions.disconnect();
-        }
+        let m = {m: 'disconnect', c:''};
+        this.dataChannel.send(JSON.stringify(m));
     },
 
     emit(message, data) {
@@ -84,6 +84,15 @@ extend(RTCSocket.prototype, {
     setDataChannel(newDataChannel) {
         this.dataChannel = newDataChannel;
         this.dataChannel.onmessage = this.receivedMessage.bind(this);
+    },
+
+    setDataConnection(newConnection) {
+        this.dataConnection = newConnection;
+    },
+
+    closeConnection() {
+        this.dataChannel.close();
+        this.dataConnection.close();
     }
 
 });

@@ -54,6 +54,10 @@ class Connector
             this._userDB.removeUser(user);
 
             if (this._debug) socket.log('DISCONNECTED');
+
+            if (socket.isWebRTC) {
+                socket.closeConnection();
+            }
         });
     }
 
@@ -125,10 +129,12 @@ class Connector
                 });
                 if (userReplace) {
                     console.log('CLEANUP OLD SOCKET');
-                    userReplace.connection.socket = socket; // CAUTION! Setter handles cleanup.
+                    // CAUTION! Setter handles cleanup.
+                    userReplace.connection.socket = socket;
                     if (userReplace.player) {
                         let playerCo = userReplace.player.connection;
-                        playerCo.socket = socket; // CAUTION! Setter handles cleanup here too.
+                        // CAUTION! Setter handles cleanup here too.
+                        playerCo.socket = socket;
                     }
                     this.confirmUserConnection(socket);
                     return;

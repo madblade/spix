@@ -69,6 +69,8 @@ extend(HubState.prototype, {
         });
 
         $('#button-return-main').click(function() {
+            // Disconnect from WebRTC socket
+            app.engine.connection.disconnect();
             app.setState('main');
         });
     },

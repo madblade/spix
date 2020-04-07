@@ -10,8 +10,8 @@ import CollectionUtils from '../../engine/math/collections';
  * Note: every time a user joins a given game, it is given a new Player instance.
  * So all Player instances which belong to a game must be cleaned at the moment this game is cleaned.
  */
-class PlayerManager {
-
+class PlayerManager
+{
     constructor() {
         this._players = [];
         this._handleAddPlayer = null;
