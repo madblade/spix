@@ -6,8 +6,8 @@
 
 import Factory from './../factory';
 
-class User {
-
+class User
+{
     constructor(hub, socket, nick, id) {
         // Model
         this._hub = hub;
@@ -54,7 +54,7 @@ class User {
         this._userConnection.idle();
 
         // Check if the game already contains a player with the same socket
-        if (game.hasPlayerForSocket()) return true;
+        if (game.hasPlayerForSocket(this._userConnection.socket)) return true;
         // TODO consistency for Terrain and Entity and X update on spawn / respawn / rejoin.
 
         // Create a player associated to this game and spawn it

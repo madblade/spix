@@ -7,8 +7,8 @@
 import CollectionUtils from '../../engine/math/collections';
 import Factory from '../factory';
 
-class Hub {
-
+class Hub
+{
     constructor(app) {
         this._app = app;
         this._games = new Map();

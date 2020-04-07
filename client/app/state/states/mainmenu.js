@@ -125,7 +125,6 @@ extend(MainMenuState.prototype, {
 
         $('#button-connect-throttle-server').click(() => {
             // TODO check if it works.
-            // TODO handle deco.
             this.stateManager.app.startFromLocalServer();
         });
 
@@ -136,6 +135,8 @@ extend(MainMenuState.prototype, {
         $('#button-play-quick').click(() => {
             this.stateManager.app.startDemo();
         });
+
+        this.listenRTCUsers();
     },
 
     start() {
@@ -219,16 +220,17 @@ extend(MainMenuState.prototype, {
 
     // ######### RTC SERVER METHODS #########
 
-    getRTCUserHTML(userID, offer, answer) {
+    getRTCUserHTML(userID, offer, answer, isConnected) {
         if (!offer) offer = '';
         else offer = offer.replace(/\x22/g, '&quot;');
         if (!answer) answer = '';
         else answer = answer.replace(/\x22/g, '&quot;');
+        let status = `status-${isConnected ? 'connected' : 'error'}`;
 
         return `
             <div class="input-group mb-3" id="${userID}">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="status-${userID}">@${userID}</span>
+                    <span class="input-group-text ${status}" id="status-${userID}">@${userID}</span>
                 </div>
                 <div class="input-group-append" style="margin-right: -1px;">
                     <span class="input-group-text">Offer</span>
@@ -260,7 +262,7 @@ extend(MainMenuState.prototype, {
         let users = localServerModel.users;
         let usersHTML = '<div class="list-group" id="user-slots">';
         users.forEach((user, userID) => {
-            usersHTML += this.getRTCUserHTML(userID, user.offer, user.answer);
+            usersHTML += this.getRTCUserHTML(userID, user.offer, user.answer, user.connected);
         });
         usersHTML += '</div>';
         return usersHTML;
@@ -322,7 +324,6 @@ extend(MainMenuState.prototype, {
         element.removeClass('status-connected');
         element.addClass('status-error');
         this.stateManager.app.model.localServer.setUserConnectionStatus(userID, false);
-        // TODO reconnection mechanism
         $(`#answer-user-${userID}`).val();
         $(`#offer-user-${userID}`).val();
     },
@@ -384,7 +385,22 @@ extend(MainMenuState.prototype, {
         localServerModel.setUserOffer(userID, offer);
         localServerModel.setUserConnection(userID, connection);
 
+        this.listenButtonConnectUser(userID);
+        this.listenButtonDisconnectUser(userID);
+    },
+
+    listenRTCUsers() {
+        let localServerModel = this.stateManager.app.model.localServer;
+        let users = localServerModel.users;
+        users.forEach((user, userID) => {
+            this.listenButtonConnectUser(userID);
+            this.listenButtonDisconnectUser(userID);
+        });
+    },
+
+    listenButtonConnectUser(userID) {
         let rtcService = this.stateManager.app.engine.connection.rtc;
+        let localServerModel = this.stateManager.app.model.localServer;
         $(`#button-connect-user-${userID}`).click(() => {
             let user = localServerModel.getUser(userID);
             if (!user) {
@@ -398,7 +414,11 @@ extend(MainMenuState.prototype, {
             }
             rtcService.acceptInboundConnection(user.inboundConnection, answer);
         });
+    },
 
+    listenButtonDisconnectUser(userID) {
+        let rtcService = this.stateManager.app.engine.connection.rtc;
+        let localServerModel = this.stateManager.app.model.localServer;
         $(`#button-disconnect-user-${userID}`).click(() => {
             let user = localServerModel.getUser(userID);
             if (!user) {
@@ -410,7 +430,7 @@ extend(MainMenuState.prototype, {
             // Remove user slot HTML and user model.
             this.removeUserSlot(userID);
         });
-    },
+    }
 
 });
 

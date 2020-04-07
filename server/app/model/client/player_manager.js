@@ -78,9 +78,13 @@ class PlayerManager
     hasPlayerForSocket(socket) {
         let players = this._players;
         let nb = players.length;
+        if (!socket || !socket.name) return false;
+
         for (let p = 0; p < nb; ++p) {
             let player = players[p];
-            if (socket === player.socket) {
+            if (!player.connection.socket || !player.connection.socket.name) continue;
+
+            if (socket.name === player.connection.socket.name) {
                 return true;
             }
         }

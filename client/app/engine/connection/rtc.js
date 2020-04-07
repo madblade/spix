@@ -56,7 +56,6 @@ extend(RTCService.prototype, {
         let rtc = this;
 
         connection.ondatachannel = function(e) {
-            // TODO setup communication in server part
             let dataChannel = e.channel;
             // this.outboundChannel = dataChannel;
             let rtcSocket = new RTCSocket(dataChannel, connection);
@@ -169,8 +168,6 @@ extend(RTCService.prototype, {
             rtcSocket.setDataConnection(newConnection);
         }
 
-        // TODO update server slot internal with IO methods
-        // TODO setup communication in the socket part
         newChannel.onopen = () => {
             mainMenuState.notifyUserConnected(userID, newChannel, newConnection, rtcSocket);
             // console.log('CHANNEL OPEN SERVER');
