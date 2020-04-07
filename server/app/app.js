@@ -21,8 +21,8 @@ class App
         this._connection.configure(socketio);
     }
 
-    connectRTC(socket) {
-        this._connection.configureFromSocket(socket);
+    connectRTC(userID, socket) {
+        this._connection.configureFromSocket(socket, userID);
     }
 }
 

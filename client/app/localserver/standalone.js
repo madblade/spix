@@ -40,8 +40,8 @@ extend(Standalone.prototype, {
         this.io.disconnect(this.io.socketServer);
     },
 
-    connectUser(socketClient) {
-        this.server.connectRTC(socketClient);
+    connectUser(userID, socketClient) {
+        this.server.connectRTC(userID, socketClient);
     },
 
     // disconnectUser(socketClient) {

@@ -13,6 +13,7 @@ class Connector
         this._userDB = Factory.createUserDB(this);
         this._io = null;
         this._debug = false;
+        this._sandboxConnections = new Set();
     }
 
     // Model
@@ -30,6 +31,10 @@ class Connector
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
+        this.confirmUserConnection(socket);
+    }
+
+    confirmUserConnection(socket) {
         setTimeout(() => socket.emit('connected', ''), 50);
     }
 
@@ -105,7 +110,33 @@ class Connector
         });
     }
 
-    configureFromSocket(socket) {
+    configureFromSocket(socket, userID) {
+        if (userID) {
+            let hasUser = this._sandboxConnections.has(userID);
+            if (hasUser) {
+                // Find user with the connection id.
+                let users = this._userDB.getUsers();
+                let userReplace = null;
+                users.forEach(user => {
+                    // replace user socket
+                    if (user.connection.socket.name === userID) {
+                        userReplace = user;
+                    }
+                });
+                if (userReplace) {
+                    console.log('CLEANUP OLD SOCKET');
+                    userReplace.connection.socket = socket; // CAUTION! Setter handles cleanup.
+                    if (userReplace.player) {
+                        let playerCo = userReplace.player.connection;
+                        playerCo.socket = socket; // CAUTION! Setter handles cleanup here too.
+                    }
+                    this.confirmUserConnection(socket);
+                    return;
+                }
+            }
+            else this._sandboxConnections.add(userID);
+        }
+
         // Define debug functions and attributes
         this.setupDebug(socket);
 

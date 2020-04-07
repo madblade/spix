@@ -75,6 +75,17 @@ class PlayerManager {
         delete this._handleRemovePlayer;
     }
 
+    hasPlayerForSocket(socket) {
+        let players = this._players;
+        let nb = players.length;
+        for (let p = 0; p < nb; ++p) {
+            let player = players[p];
+            if (socket === player.socket) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 export default PlayerManager;

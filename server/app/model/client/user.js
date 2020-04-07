@@ -24,6 +24,7 @@ class User {
     get hub() { return this._hub; }
     get id() { return this._id; }
     get connection() { return this._userConnection; }
+    get player() { return this._player; }
 
     get nick() { return this._nick; }
     set nick(nick) { this._nick = nick; }
@@ -51,6 +52,9 @@ class User {
         // Stop listening for general game management events...
         // Prevents the user from joining multiple games.
         this._userConnection.idle();
+
+        // Check if the game already contains a player with the same socket
+        if (game.hasPlayerForSocket()) return true;
 
         // Create a player associated to this game and spawn it
         let player = Factory.createPlayer(this, game);

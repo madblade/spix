@@ -78,6 +78,10 @@ class Game {
 
     /** Players **/
 
+    hasPlayerForSocket(socket) {
+        return this._playerManager.hasPlayerForSocket(socket);
+    }
+
     addPlayer(player) {
         console.log('A player joined.');
 

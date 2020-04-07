@@ -19,6 +19,7 @@ class Player {
     // Model
     get game() { return this._game; }
     get user() { return this._user; }
+    get connection() { return this._playerConnection; }
 
     /**
      * Join a socket room.

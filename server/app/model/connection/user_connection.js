@@ -17,6 +17,11 @@ class UserConnection {
     get user() { return this._user; }
     set user(user) { this._user = user; }
     get socket() { return this._socket; }
+    set socket(socket) {
+        this.idle();
+        this._socket = socket;
+        this.listen();
+    }
 
     send(kind, data) {
         this._socket.emit(kind, data);

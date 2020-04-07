@@ -22,6 +22,7 @@ let RTCService = function(app) {
 
     this.inboundConnections = new Map();
     this.inboundChannels = new Map();
+    this.sockets = new Map();
 
     // internals
     this.offer = ''; // for server
@@ -73,7 +74,8 @@ extend(RTCService.prototype, {
             // };
 
             let probremCallback = function() {
-                // TODO notify disconnection on ingame state!
+                console.log('[RTC] Error or disconnected.');
+                // TODO notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             };
             dataChannel.onclose = probremCallback;
@@ -96,7 +98,7 @@ extend(RTCService.prototype, {
             } else if (status === 'checking' || status === 'connected') {
                 mainMenuState.notifyServerChecking();
             } else if (status === 'disconnected') {
-                // TODO notify disconnection on ingame state!
+                // TODO notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             }
         };
@@ -118,7 +120,7 @@ extend(RTCService.prototype, {
     },
 
     // Create server slot and offer
-    addServerSlot(userID, mainMenuState) {
+    addServerSlot(userID, mainMenuState, restart) {
         let newConnection = new RTCPeerConnection(this.cfg);
         newConnection.onicecandidate = e => {
             if (e.candidate) return;
@@ -128,6 +130,7 @@ extend(RTCService.prototype, {
         // newConnection.onsignalingstatechange = function(e) {
         // console.log(e);
         // };
+        let rtcService = this;
         newConnection.oniceconnectionstatechange = function() {
             console.log(`[RTC] ICE connection state: ${newConnection.iceConnectionState}`);
             let status = newConnection.iceConnectionState;
@@ -140,17 +143,30 @@ extend(RTCService.prototype, {
                 mainMenuState.notifyUserChecking(userID);
             } else if (status === 'disconnected') {
                 mainMenuState.notifyUserDisconnected(userID);
+                rtcService.disconnectUser(userID);
             }
         };
 
         let newChannel = newConnection.createDataChannel('chat'
             // , {reliable: true}
         );
-        newConnection.createOffer().then(
-            desc => { newConnection.setLocalDescription(desc); }
-        );
+        if (restart)
+            newConnection.createOffer().then(
+                desc => { newConnection.setLocalDescription(desc); }
+            );
+        else
+            newConnection.createOffer().then(
+                desc => { newConnection.setLocalDescription(desc); }
+            );
 
-        let rtcSocket = new RTCSocket(newChannel, userID);
+        // Cache socket for reconnection
+        let rtcSocket = this.sockets.get(userID);
+        if (!rtcSocket) {
+            rtcSocket = new RTCSocket(newChannel, userID);
+            this.sockets.set(userID, rtcSocket);
+        } else {
+            rtcSocket.setDataChannel(newChannel);
+        }
 
         // TODO update server slot internal with IO methods
         // TODO setup communication in the socket part
@@ -171,6 +187,7 @@ extend(RTCService.prototype, {
         // };
 
         let probremCallback = function() {
+            console.log('[RTC] Error or disconnected.');
             mainMenuState.notifyUserDisconnected(userID, rtcSocket);
         };
         newChannel.onclose = probremCallback;

@@ -103,6 +103,8 @@ class UserInput {
         player.off('a', listener[i++]);
         player.off('chat', listener[i]);
 
+        player.off('leave', () => { player.leave(); });
+
         delete this._listeners[player];
     }
 

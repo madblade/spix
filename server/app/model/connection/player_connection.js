@@ -12,6 +12,14 @@ class PlayerConnection {
         this._socket = socket;
         this._rooms = [];
         this._listeners = [];
+        this._savedListeners = {};
+    }
+
+    get socket() { return this._socket; }
+    set socket(newSocket) {
+        this.dropListenersAndSave();
+        this._socket = newSocket;
+        this.resetListenersFromSave();
     }
 
     send(kind, data) {
@@ -28,6 +36,7 @@ class PlayerConnection {
             console.log('WARN: invalid socket definition.');
         else {
             this._listeners.push(message);
+            this._savedListeners[message] = behaviour;
             this._socket.on(message, behaviour);
         }
     }
@@ -46,6 +55,14 @@ class PlayerConnection {
     offAll() {
         this._listeners.forEach(message => this._socket.removeAllListeners(message));
         this._listeners = [];
+    }
+
+    dropListenersAndSave() {
+        this._listeners.forEach(message => this._socket.off(message, this._savedListeners[message]));
+    }
+
+    resetListenersFromSave() {
+        this._listeners.forEach(message => this._socket.on(message, this._savedListeners[message]));
     }
 
     /**

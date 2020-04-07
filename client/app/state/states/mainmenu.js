@@ -300,21 +300,32 @@ extend(MainMenuState.prototype, {
     },
 
     notifyUserChecking(userID) {
-        $(`#status-${userID}`).addClass('status-checking');
+        let element = $(`#status-${userID}`);
+        element.removeClass('status-error');
+        element.removeClass('status-connected');
+        element.addClass('status-checking');
     },
 
     notifyUserConnected(userID, newChannel, newConnection, rtcSocket) {
-        $(`#status-${userID}`).addClass('status-connected');
+        let element = $(`#status-${userID}`);
+        element.removeClass('status-checking');
+        element.removeClass('status-error');
+        element.addClass('status-connected');
         let localServer = this.stateManager.app.model.localServer;
         localServer.setUserConnectionStatus(userID, true);
         localServer.setUserChannel(userID, newChannel);
-        this.stateManager.app.clientConnectedToLocalSandbox(rtcSocket);
+        this.stateManager.app.clientConnectedToLocalSandbox(userID, rtcSocket);
     },
 
     notifyUserDisconnected(userID) {
-        $(`#status-${userID}`).addClass('status-error');
+        let element = $(`#status-${userID}`);
+        element.removeClass('status-checking');
+        element.removeClass('status-connected');
+        element.addClass('status-error');
         this.stateManager.app.model.localServer.setUserConnectionStatus(userID, false);
         // TODO reconnection mechanism
+        $(`#answer-user-${userID}`).val();
+        $(`#offer-user-${userID}`).val();
     },
 
     addUserSlot() {
@@ -329,6 +340,13 @@ extend(MainMenuState.prototype, {
 
         let localServerModel = this.stateManager.app.model.localServer;
         let rtcService = this.stateManager.app.engine.connection.rtc;
+
+        // Reconnection
+        if (localServerModel.isUserConnectionAvailable(newUserID)) {
+            $(`#answer-user-${newUserID}`).val('');
+            rtcService.addServerSlot(newUserID, this, true);
+            return;
+        }
 
         if ($(`#${newUserID}`).length !== 0 || localServerModel.hasUser(newUserID)) {
             this.notifyRTCError('user-id-taken');
@@ -377,6 +395,7 @@ extend(MainMenuState.prototype, {
             let answer = $(`#answer-user-${userID}`).val();
             if (!answer || answer.length < 1) {
                 console.error(`Invalid answer: ${answer}`);
+                return;
             }
             rtcService.acceptInboundConnection(user.inboundConnection, answer);
         });

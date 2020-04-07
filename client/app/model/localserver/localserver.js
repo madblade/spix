@@ -79,6 +79,11 @@ extend(LocalServer.prototype, {
         user.connected = isConnected;
     },
 
+    isUserConnectionAvailable(userID) {
+        let user = this.users.get(userID);
+        return !!user && !user.connected;
+    },
+
     // Client answer
     addAnswer(userID, answer) {
         let user = this.users.get(userID);

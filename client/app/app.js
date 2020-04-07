@@ -102,8 +102,8 @@ extend(App.Core.prototype, {
     },
 
     // Careful with what clients may execute in the local sandbox!
-    clientConnectedToLocalSandbox(socket) {
-        this.localServer.standalone.connectUser(socket);
+    clientConnectedToLocalSandbox(userID, socket) {
+        this.localServer.standalone.connectUser(userID, socket);
     },
 
     start() {
