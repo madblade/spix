@@ -17,7 +17,19 @@ let HubState = function(stateManager) {
         </div>
         <div>
             <button class="btn btn-default hub-button" id="button-create-game" style="float:none">
-                Request 3D game creation</button>
+                New World: Cube</button>
+        </div>
+        <div>
+            <button class="btn btn-default hub-button" style="float:none">
+                New World: Hills and Dales</button>
+        </div>
+        <div>
+            <button class="btn btn-default hub-button" style="float:none">
+                New World: Unstructured</button>
+        </div>
+        <div>
+            <button class="btn btn-default hub-button" style="float:none">
+                New World: Demo</button>
         </div>
       `;
 };
