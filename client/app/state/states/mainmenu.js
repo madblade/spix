@@ -11,10 +11,10 @@ let MainMenuState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'main';
 
-    this.htmlHead = '<div className="container"">';
+    this.htmlHead = '<div class="container">';
     this.htmlDistantServer = `
         <label for="connect-socket-server">Connect to a distant server (Socket)</label>
-        <div class="input-group mb-3" id="connect-socket-server">
+        <div class="input-group" id="connect-socket-server">
             <div class="input-group-prepend">
                 <span class="input-group-text">@</span>
             </div>
@@ -39,7 +39,7 @@ let MainMenuState = function(stateManager) {
         `<hr/>
 
         <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, no AdBlock)</label>
-        <div class="input-group mb-3" id="connect-webrtc-server">
+        <div class="input-group mb-1" id="connect-webrtc-server">
             <div class="input-group-prepend">
                 <span class="input-group-text">Offer</span>
             </div>
@@ -66,8 +66,8 @@ let MainMenuState = function(stateManager) {
 
         <label for="connect-throttle-server">Connect to my local sandbox</label>
         <div class="input-group mb-3" id="connect-throttle-server">
-            <div class="input-group-prepend">
-                <span class="input-group-text">@localhost/browser</span>
+            <div class="input-group-prepend flex-fill">
+                <span class="input-group-text flex-fill">@localhost/browser</span>
             </div>
             <div class="input-group-append">
                 <button id="button-connect-throttle-server"
@@ -76,7 +76,7 @@ let MainMenuState = function(stateManager) {
         </div>
 
         <label for="start-sandbox">Invite people into my local sandbox (WebRTC, no AdBlock!)</label>
-        <div class="input-group mb-3" id="add-sandbox">
+        <div class="input-group mb-1" id="add-sandbox">
             <div class="input-group-prepend">
                 <span class="input-group-text">@friend</span>
             </div>
@@ -92,10 +92,10 @@ let MainMenuState = function(stateManager) {
         `<hr/>
 
         <label for="play-quick">Solo mode</label>
-        <div class="input-group mb-3 center-block" id="play-quick">
+        <div class="input-group mb-1 center-block" id="play-quick">
 
-            <div class="input-group-prepend">
-                <span class="input-group-text">No time to set up a server?</span>
+            <div class="input-group-prepend flex-fill">
+                <span class="input-group-text flex-fill">No time to set up a server?</span>
             </div>
             <div class="input-group-append">
                 <button id="button-play-quick"
@@ -228,7 +228,7 @@ extend(MainMenuState.prototype, {
         let status = `status-${isConnected ? 'connected' : 'error'}`;
 
         return `
-            <div class="input-group mb-3" id="${userID}">
+            <div class="input-group mb-1" id="${userID}">
                 <div class="input-group-prepend">
                     <span class="input-group-text ${status}" id="status-${userID}">@${userID}</span>
                 </div>

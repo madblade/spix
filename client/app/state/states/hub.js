@@ -11,26 +11,117 @@ let HubState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'hub';
     this.htmlControls = `
-        <div>
-            <button class="btn btn-default hub-button" id="button-return-main" style="float:none">
-                Return</button>
+    <div class="container">
+
+        <hr />
+
+        <!-- Cube world -->
+<!--        <label for="button-create-cube-game">Cube Worlds</label>-->
+        <div class="input-group">
+            <div class="input-group-prepend mb-1 flex-fill">
+                <span class="input-group-text flex-fill">Cube World</span>
+            </div>
+            <select id="cube-game-hills" class="form-control">
+                <option value="0" selected>No Hills</option>
+                <option value="1">Moderate Hills</option>
+            </select>
+
+            <div class="input-group-append mb-1">
+                <span class="input-group-text">Cube size</span>
+            </div>
+            <input class="form-control" type="number" value="1" min="1" id="cube-game-side-size">
+
+            <div class="input-group-append mb-1">
+                <button class="btn btn-outline-light" id="button-create-cube-game">
+                    <!-- style="float:none"> -->
+                    Create
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-default hub-button" id="button-create-game" style="float:none">
-                New World: Cube</button>
+
+<!--        <hr />-->
+
+        <!-- Flat world -->
+<!--        <label for="button-create-flat-game">Flat World: Hills and Dales</label>-->
+        <div class="input-group">
+            <div class="input-group-prepend mb-1 flex-fill">
+                <span class="input-group-text flex-fill">Flat World</span>
+            </div>
+
+            <select id="flat-game-caves-type" class="form-control">
+                <option value="0" selected>No Caves</option>
+                <option value="1">Subsurface Caves</option>
+            </select>
+
+            <select id="flat-game-hills-size" class="form-control">
+                <option value="0" selected>No Hills</option>
+                <option value="1">Regular Hills</option>
+                <option value="2">Giant Hills</option>
+                <option value="3">Eroded formations and Arches</option>
+                <option value="4">Spikes</option>
+            </select>
+
+            <div class="input-group-append mb-1">
+                <button class="btn btn-outline-light" id="button-create-flat-game" style="float:none">
+                    Create
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-default hub-button" style="float:none">
-                New World: Hills and Dales</button>
+
+<!--        <hr /> -->
+
+        <!-- Unstructured world -->
+        <!-- TODO triangulation model, graphics, update and netcode -->
+        <!-- <label for="button-create-unstructured-game">New World: Unstructured</label> -->
+        <!-- <form class="form-inline"> -->
+        <!--     <button class="btn btn-default hub-button" id="button-create-unstructured-game" style="float:none"> -->
+        <!--         Create</button> -->
+        <!-- </form> -->
+
+        <!-- Load world -->
+<!--        <label for="button-load-game">Import World (coming soon)</label>-->
+
+<!--        <hr />-->
+
+        <!-- Demo / Tutorial -->
+<!--        <label for="button-create-demo-game">New World: Demo / Tutorial</label>-->
+        <div class="input-group">
+            <div class="input-group-prepend mb-1 flex-fill">
+                <span class="input-group-text flex-fill">Demo / Tutorial</span>
+            </div>
+            <div class="input-group-append mb-1">
+                <button class="btn btn-outline-light"
+                    id="button-create-demo-game" style="float:none">
+                    Create
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-default hub-button" style="float:none">
-                New World: Unstructured</button>
+
+        <!-- TODO save and import functions server-wise -->
+        <div class="input-group">
+            <div class="input-group-prepend mb-1 flex-fill">
+                <span class="input-group-text flex-fill">Import World (coming soon)</span>
+            </div>
+
+            <input type="text" class="form-control" id="load-game-path"
+                value="" placeholder="File Path" disabled>
+
+            <div class="input-group-append mb-1">
+                <button class="btn btn-outline-light"
+                    id="button-load-game" style="float:none" disabled>
+                    Import
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-default hub-button" style="float:none">
-                New World: Demo</button>
+
+        <hr />
+
+        <div class="input-group">
+            <button class="btn btn-outline-light btn-block" id="button-return-main">
+                Back
+            </button>
         </div>
+    </div>
       `;
 };
 
@@ -40,7 +131,6 @@ extend(HubState.prototype, {
         let content = '';
 
         content += `
-            ${this.htmlControls}
             <table class="table table-bordered noselect"
             style="width:100%">`;
 
@@ -54,7 +144,7 @@ extend(HubState.prototype, {
                     </tr>`;
             }
         });
-        content += '</table>';
+        content += `</table>${this.htmlControls}`;
         return content;
     },
 
