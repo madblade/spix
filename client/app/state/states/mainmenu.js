@@ -356,6 +356,7 @@ extend(MainMenuState.prototype, {
         userSlotsHTML.append(
             this.getRTCUserHTML(newUserID)
         );
+        $('#announce').center();
 
         localServerModel.addUser(newUserID);
         rtcService.addServerSlot(newUserID, this);
@@ -372,6 +373,8 @@ extend(MainMenuState.prototype, {
         // Remove elements
         let offerElement = $(`#${userID}`);
         offerElement.remove();
+
+        $('#announce').center();
     },
 
     serverSlotCreated(userID, offer, connection) {
