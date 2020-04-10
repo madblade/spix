@@ -22,6 +22,7 @@ extend(Hub.prototype, {
 
         // For all kinds.
         for (let property in data) {
+            if (!data.hasOwnProperty(property)) continue;
             let games = data[property];
             map.set(property, games);
         }
@@ -33,12 +34,6 @@ extend(Hub.prototype, {
         let app = this.app;
         let map = this.games;
         app.setState('hub', map);
-        // if (app.isLoading()) {
-        // Update state.
-        // } else if (app.getState() === 'hub') {
-        // Bypass endHub.
-        // app.setState('hub', map);
-        // }
     }
 
 });

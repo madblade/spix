@@ -4,8 +4,8 @@
 
 'use strict';
 
-class UserConnection {
-
+class UserConnection
+{
     constructor(user, socket) {
         this._user = user;
         this._socket = socket;
@@ -92,7 +92,6 @@ class UserConnection {
         delete this._user;
         delete this._socket;
     }
-
 }
 
 export default UserConnection;

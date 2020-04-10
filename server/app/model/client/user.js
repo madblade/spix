@@ -117,7 +117,6 @@ class User
         delete this._id;
         delete this._ingame;
     }
-
 }
 
 export default User;

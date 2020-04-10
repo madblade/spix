@@ -6,7 +6,7 @@
 'use strict';
 
 import extend           from '../../extend.js';
-import {RTCSocket} from './rtcsocket';
+import { RTCSocket } from './rtcsocket';
 
 let RTCPeerConnection = window.RTCPeerConnection;
 // || window.mozRTCPeerConnection ||
@@ -57,14 +57,11 @@ extend(RTCService.prototype, {
 
         connection.ondatachannel = function(e) {
             let dataChannel = e.channel;
-            // this.outboundChannel = dataChannel;
             let rtcSocket = new RTCSocket(dataChannel, connection);
 
             dataChannel.onopen = function() { // (m) {
                 // Update HTML / Join game
                 mainMenuState.notifyServerConnected(rtcSocket);
-                // console.log(m);
-                // dataChannel.send(JSON.stringify({message: 'General Kenobi'}));
             };
 
             // dataChannel.onmessage = function(m) {
@@ -170,12 +167,9 @@ extend(RTCService.prototype, {
 
         newChannel.onopen = () => {
             mainMenuState.notifyUserConnected(userID, newChannel, newConnection, rtcSocket);
-            // console.log('CHANNEL OPEN SERVER');
-            // console.log(e);
             console.log('[RTCService/Server] RTC connection established.');
             this.inboundChannels.set(userID, newChannel);
             this.inboundConnections.set(userID, newConnection);
-            // newChannel.send(JSON.stringify({message: 'hello there'}));
         };
 
         // newChannel.onmessage = e => {

@@ -30,8 +30,6 @@ extend(Standalone.prototype, {
         this.server.connect(this.io); // setup IO object
         this.io.connect(this.io.socketServer); // handshake
         this._isRunning = true;
-        // this.io.socketClient.emit('connection');
-        // this.io.socketServer.emit('connected');
     },
 
     stop() {

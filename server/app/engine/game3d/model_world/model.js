@@ -27,8 +27,8 @@ const WorldType = Object.freeze({
     UNSTRUCTURED: Symbol('unstructured')
 });
 
-class WorldModel {
-
+class WorldModel
+{
     static serverLoadingRadius = 1;
 
     constructor(game)

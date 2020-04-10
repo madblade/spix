@@ -98,7 +98,7 @@ extend(App.Core.prototype, {
         this.setState('loading');
         this.engine.connection.setupLocalSocket(socket);
         this.engine.connection.listen();
-        console.log('listening....');
+        console.log('[App/Core] Awaiting remote sandbox answer...');
     },
 
     // Careful with what clients may execute in the local sandbox!

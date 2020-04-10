@@ -39,7 +39,7 @@ class Hub
             case 'demo':
                 validated = !options; // Options must be null.
                 break;
-            case 'cube': // TODO rename cube.
+            case 'cube':
                 validated = options.hasOwnProperty('hills') &&
                     (x => x >= 0 && x <= 1)(parseInt(options.hills, 10)) &&
                     options.hasOwnProperty('size') &&
@@ -49,7 +49,7 @@ class Hub
                 validated = options.hasOwnProperty('hills') &&
                     (x => x >= 0 && x <= 4)(parseInt(options.hills, 10)) &&
                     options.hasOwnProperty('caves') &&
-                    (x => x >= 0 && x <= 1)(parseInt(options.size, 10));
+                    (x => x >= 0 && x <= 1)(parseInt(options.caves, 10));
                 break;
             case 'unstructured':
                 validated = false;
@@ -70,7 +70,7 @@ class Hub
 
         const validation = nbGames < 5;
         console.log(nbGames > 0 ? nbGames : `No game${nbGames > 1 ? 's are' : ' is'} running or idle.`);
-        if (!validation) console.log('Invalid game creation request.');
+        if (!validation) console.error('[Server/Hub] Invalid game creation request: too many games running.');
         return validation;
     }
 
@@ -85,9 +85,10 @@ class Hub
 
         // Create game and notify users.
         const id = this.addGame(kind, options);
-        app.connection.db.notifyGameCreation(kind, id);
-
-        return true;
+        if (id || id === 0) {
+            app.connection.db.notifyGameCreation(kind, id);
+            return true;
+        } else return false;
     }
 
     getGame(kind, gameId) {
@@ -132,9 +133,12 @@ class Hub
         let game = Factory.createGame(this, kind, gid, connection, options);
 
         // Add to games.
-        if (game) games.get(kind).set(gid, game);
-
-        return game.gameId;
+        if (game) {
+            games.get(kind).set(gid, game);
+            return game.gameId;
+        } else {
+            return null;
+        }
     }
 
     endGame(game) {
@@ -149,10 +153,11 @@ class Hub
 
         game.destroy();
         let gamesOfKind = games.get(kind);
-        gamesOfKind.delete(gid);
-        if (gamesOfKind.size < 1) games.delete(kind);
+        if (gamesOfKind) {
+            gamesOfKind.delete(gid);
+            if (gamesOfKind.size < 1) games.delete(kind);
+        }
     }
-
 }
 
 export default Hub;
