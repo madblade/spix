@@ -16,7 +16,6 @@ let HubState = function(stateManager) {
         <hr />
 
         <!-- Cube world -->
-<!--        <label for="button-create-cube-game">Cube Worlds</label>-->
         <div class="input-group">
             <div class="input-group-prepend mb-1 flex-fill">
                 <span class="input-group-text flex-fill">Cube World</span>
@@ -39,10 +38,7 @@ let HubState = function(stateManager) {
             </div>
         </div>
 
-<!--        <hr />-->
-
         <!-- Flat world -->
-<!--        <label for="button-create-flat-game">Flat World: Hills and Dales</label>-->
         <div class="input-group">
             <div class="input-group-prepend mb-1 flex-fill">
                 <span class="input-group-text flex-fill">Flat World</span>
@@ -68,23 +64,21 @@ let HubState = function(stateManager) {
             </div>
         </div>
 
-<!--        <hr /> -->
-
         <!-- Unstructured world -->
         <!-- TODO triangulation model, graphics, update and netcode -->
-        <!-- <label for="button-create-unstructured-game">New World: Unstructured</label> -->
-        <!-- <form class="form-inline"> -->
-        <!--     <button class="btn btn-default hub-button" id="button-create-unstructured-game" style="float:none"> -->
-        <!--         Create</button> -->
-        <!-- </form> -->
-
-        <!-- Load world -->
-<!--        <label for="button-load-game">Import World (coming soon)</label>-->
-
-<!--        <hr />-->
+        <!-- <div class="input-group">-->
+        <!--     <div class="input-group-prepend mb-1 flex-fill">-->
+        <!--         <span class="input-group-text flex-fill">Unstructured / Simplex World</span>-->
+        <!--     </div>-->
+        <!--     <div class="input-group-append mb-1">-->
+        <!--         <button class="btn btn-outline-light"-->
+        <!--             id="button-create-unstructured-game" style="float:none">-->
+        <!--             Create-->
+        <!--         </button>-->
+        <!--     </div>-->
+        <!-- </div>-->
 
         <!-- Demo / Tutorial -->
-<!--        <label for="button-create-demo-game">New World: Demo / Tutorial</label>-->
         <div class="input-group">
             <div class="input-group-prepend mb-1 flex-fill">
                 <span class="input-group-text flex-fill">Demo / Tutorial</span>
@@ -97,6 +91,7 @@ let HubState = function(stateManager) {
             </div>
         </div>
 
+        <!-- Load world -->
         <!-- TODO save and import functions server-wise -->
         <div class="input-group">
             <div class="input-group-prepend mb-1 flex-fill">
@@ -127,14 +122,22 @@ let HubState = function(stateManager) {
 
 extend(HubState.prototype, {
 
-    getHTML(map) {
-        let content = '';
+    getCommandsHTML() {
+        return this.htmlControls;
+    },
 
-        content += `
+    getInstancesHTMLContainer(map) {
+        return `
+            <div class="container" id="game-instances-table">
+                ${this.getInstancesHTMLTable(map)}
+            </div>`;
+    },
+
+    getInstancesHTMLTable(map) {
+        let content = `
             <table class="table table-bordered noselect"
             style="width:100%">`;
 
-        console.log(map);
         map.forEach(function(value, key) {
             for (let id = 0; id < value.length; ++id) {
                 content +=
@@ -144,11 +147,35 @@ extend(HubState.prototype, {
                     </tr>`;
             }
         });
-        content += `</table>${this.htmlControls}`;
+
+        content += '</table>';
         return content;
     },
 
-    startListeners() {
+    // Consider using this for faster hub state update.
+    updateInstances(newMap) {
+        this.stopTableListeners();
+        let container = $('#game-instances-table');
+        container.html(this.getInstancesHTMLTable(newMap));
+        this.startTableListeners();
+    },
+
+    start(map) {
+        // Add content then fade in.
+        let hub = $('#announce');
+        hub.empty()
+            .removeClass()
+            .addClass('hub')
+            .append(this.getInstancesHTMLContainer(map))
+            .append(this.getCommandsHTML())
+            .center()
+            .fadeIn();
+
+        // Add listeners.
+        this.startListeners();
+    },
+
+    startTableListeners() {
         let app = this.stateManager.app;
 
         $('tr').click(function() {
@@ -165,8 +192,21 @@ extend(HubState.prototype, {
 
             app.join(gameType, gid);
         });
+    },
 
-        $('#button-create-game').click(function() {
+    startListeners() {
+        let app = this.stateManager.app;
+
+        this.startTableListeners();
+
+        $('#button-create-cube-game').click(function() {
+            // TODO command game
+        });
+        $('#button-create-flat-game').click(function() {
+            // TODO command game
+        });
+        $('#button-create-demo-game').click(function() {
+            // TODO command game
             app.requestGameCreation('game3d');
         });
 
@@ -175,24 +215,20 @@ extend(HubState.prototype, {
             app.engine.connection.disconnect();
             app.setState('main');
         });
+
+        // XXX To implement: saving / loading
+        // $('#button-load-game').click(function() {});
+
+        // XXX To implement: unstructured game
+        // $('#button-create-unstructured-game').click(function() {});
     },
 
-    start(map) {
-        // Add content then fade in.
-        let hub = $('#announce');
-        hub.empty()
-            .removeClass()
-            .addClass('hub')
-            .append(this.getHTML(map))
-            .center()
-            .fadeIn();
-
-        // Add listeners.
-        this.startListeners();
+    stopTableListeners() {
+        $('tr').off('click');
     },
 
     stopListeners() {
-        $('tr').off('click');
+        this.stopTableListeners();
         $('#button-create-game').off('click');
         $('#button-return-main').off('click');
     },
