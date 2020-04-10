@@ -23,7 +23,8 @@ const BlockType = Object.freeze({
 const WorldType = Object.freeze({
     FLAT: Symbol('flat'),
     CUBE: Symbol('cube'),
-    SHRIKE: Symbol('shrike')
+    SHRIKE: Symbol('shrike'),
+    UNSTRUCTURED: Symbol('unstructured')
 });
 
 class WorldModel {

@@ -28,7 +28,8 @@ let HubState = function(stateManager) {
             <div class="input-group-append mb-1">
                 <span class="input-group-text">Cube size</span>
             </div>
-            <input class="form-control" type="number" value="1" min="1" id="cube-game-side-size">
+            <input class="form-control" type="number"
+                value="1" min="1" max="256" id="cube-game-side-size">
 
             <div class="input-group-append mb-1">
                 <button class="btn btn-outline-light" id="button-create-cube-game">
@@ -200,24 +201,38 @@ extend(HubState.prototype, {
         this.startTableListeners();
 
         $('#button-create-cube-game').click(function() {
-            // TODO command game
+            let size = $('#cube-game-side-size').val();
+            let hills = $('#cube-game-hills')
+                .children('option:selected')
+                .val();
+            app.requestGameCreation('cube', {size, hills});
         });
+
         $('#button-create-flat-game').click(function() {
-            // TODO command game
+            let hills = $('#flat-game-hills-size')
+                .children('option:selected')
+                .val();
+            let caves = $('#flat-game-caves-type')
+                .children('option:selected')
+                .val();
+            app.requestGameCreation('flat', {caves, hills});
         });
+
         $('#button-create-demo-game').click(function() {
-            // TODO command game
-            app.requestGameCreation('game3d');
+            app.requestGameCreation('demo');
         });
 
         $('#button-return-main').click(function() {
-            // Disconnect from WebRTC socket
+            // Necessary to disconnect from WebRTC socket
+            // (among, possibly, other things).
             app.engine.connection.disconnect();
             app.setState('main');
         });
 
         // XXX To implement: saving / loading
-        // $('#button-load-game').click(function() {});
+        // $('#button-load-game').click(function() {
+        // load-game-path
+        // });
 
         // XXX To implement: unstructured game
         // $('#button-create-unstructured-game').click(function() {});

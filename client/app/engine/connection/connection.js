@@ -83,17 +83,24 @@ extend(Connection.prototype, {
         this.send('util', {request: 'hub'});
     },
 
-    requestGameCreation(gameType) {
-        this.send('util', {request: 'createGame', gameType});
+    requestGameCreation(gameType, options) {
+        this.send('util', {
+            request: 'createGame', gameType, options
+        });
     },
 
     configureGame(gameType, gid) {
         switch (gameType) {
-            case 'game3d':
+            case 'cube':
+            case 'flat':
+            case 'demo':
                 this.registerSocketForGame3D();
                 break;
+            case 'unstructured':
+                console.error('[Client/Connection] Unstructured not yet supported.');
+                break;
             default:
-                throw Error('Could not configure ' +
+                console.error('Could not configure ' +
                     'socket listeners for an unknown game type' +
                     `on game ${gid}.`);
         }

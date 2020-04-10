@@ -37,8 +37,8 @@ class User
     }
 
     // Requests the hub to create a new gaming pool.
-    requestNewGame(data) {
-        return this._hub.requestNewGame(this, data);
+    requestNewGame(kind, options) {
+        return this._hub.requestNewGame(this, kind, options);
     }
 
     // Join a specific game.

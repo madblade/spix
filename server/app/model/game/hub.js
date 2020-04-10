@@ -22,13 +22,41 @@ class Hub
     }
 
     static validateKind(kind) {
-        let res = false;
         switch (kind) {
-            case 'game3d': case 'game2d':
-                res = true;
+            case 'cube': case 'flat': case 'demo':
+                return true;
+            case 'unstructured':
+                console.log('[Server/Hub] Unstructured support coming soon.');
+                return false;
         }
-        if (!res) console.log('Invalid game kind requested.');
-        return res;
+        console.log('[Server/Hub/Validator] Requested an unsupported game kind.');
+        return false;
+    }
+
+    static validateOptions(kind, options) {
+        let validated = false;
+        switch (kind) {
+            case 'demo':
+                validated = !options; // Options must be null.
+                break;
+            case 'cube': // TODO rename cube.
+                validated = options.hasOwnProperty('hills') &&
+                    (x => x >= 0 && x <= 1)(parseInt(options.hills, 10)) &&
+                    options.hasOwnProperty('size') &&
+                    (x => x >= 1 && x <= 256)(parseInt(options.size, 10));
+                break;
+            case 'flat':
+                validated = options.hasOwnProperty('hills') &&
+                    (x => x >= 0 && x <= 4)(parseInt(options.hills, 10)) &&
+                    options.hasOwnProperty('caves') &&
+                    (x => x >= 0 && x <= 1)(parseInt(options.size, 10));
+                break;
+            case 'unstructured':
+                validated = false;
+                break;
+        }
+        if (!validated) console.error('[Server/Hub/Validator] Invalid game creation options.');
+        return validated;
     }
 
     validateRequest() {
@@ -46,16 +74,17 @@ class Hub
         return validation;
     }
 
-    requestNewGame(user, kind) {
+    requestNewGame(user, kind, options) {
         let app = this._app;
 
         // Verify.
         if (!Hub.validateUser(user)) return false;
         if (!Hub.validateKind(kind)) return false;
+        if (!Hub.validateOptions(kind, options)) return false;
         if (!this.validateRequest()) return false;
 
         // Create game and notify users.
-        const id = this.addGame(kind);
+        const id = this.addGame(kind, options);
         app.connection.db.notifyGameCreation(kind, id);
 
         return true;
@@ -91,7 +120,7 @@ class Hub
      * @param kind
      * @returns {*}
      */
-    addGame(kind) {
+    addGame(kind, options) {
         let games = this._games;
         let connection = this._app.connection;
 
@@ -100,7 +129,7 @@ class Hub
         let gid = CollectionUtils.generateId(games.get(kind));
 
         // Create matching game
-        let game = Factory.createGame(this, kind, gid, connection);
+        let game = Factory.createGame(this, kind, gid, connection, options);
 
         // Add to games.
         if (game) games.get(kind).set(gid, game);

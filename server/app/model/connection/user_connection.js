@@ -37,11 +37,17 @@ class UserConnection {
     // Drawback: switch potentially evaluates all statements
     // Advantage: does not load the socket with many listeners
     onUserRequest(data) {
-        switch (data.request) {
-
+        console.log('got request');
+        console.log(data);
+        switch (data.request)
+        {
             // A user can ask the hub for a new game to be created.
             case 'createGame':
-                if (data.hasOwnProperty('gameType')) this.handleCreateGame(data.gameType);
+                if (!data.hasOwnProperty('gameType')) {
+                    console.error('[Server/UserConnection] Missing game type.');
+                    break;
+                }
+                this.handleCreateGame(data.gameType, data.options);
                 break;
 
             // A user can join a specific game (given a kind and id).
@@ -60,8 +66,8 @@ class UserConnection {
         }
     }
 
-    handleCreateGame(kind) {
-        const created = this._user.requestNewGame(kind);
+    handleCreateGame(kind, options) {
+        const created = this._user.requestNewGame(kind, options);
         if (created) console.log('Created new game.');
         return created;
     }

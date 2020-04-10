@@ -157,13 +157,15 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'creation' request is emitted from Hub state.
-    requestGameCreation(gameType) {
-        if (this.getState() !== 'hub')
-            throw Error('Could not request game creation outside of Hub.');
+    requestGameCreation(gameType, options) {
+        if (this.getState() !== 'hub') {
+            console.error('Could not request game creation outside of Hub.');
+            return;
+        }
 
-        this.engine.connection.requestGameCreation(gameType);
+        this.engine.connection.requestGameCreation(gameType, options);
         // TODO single-page without reloading every time a new game is asked...
-        //location.reload();
+        // location.reload();
     },
 
     // Called when a 'join' request is emitted from Hub state.
