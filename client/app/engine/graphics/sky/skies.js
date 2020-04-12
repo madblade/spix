@@ -5,7 +5,7 @@
 'use strict';
 
 import * as THREE from 'three';
-import { Sky } from './sky';
+import { SkyFlat, SkyCube } from './sky';
 import { SimplePlanet, Atmosphere } from './planet';
 
 let SkyModule = {
@@ -20,10 +20,23 @@ let SkyModule = {
 
     createSky()
     {
-        let sky = new Sky();
+        let center = new THREE.Vector3(0, 0, -8);
+        let radius = 0.5 * 16;
+        let sky = new SkyCube(center.x, center.y, center.z, radius);
         sky.scale.setScalar(450000);
         this.skyBox = sky;
-        return sky;
+
+        let g = new THREE.BoxBufferGeometry(
+            2 * radius, 2 * radius, 2 * radius
+        );
+        let m = new THREE.MeshNormalMaterial({wireframe: true});
+        let helper = new THREE.Mesh(g, m);
+        helper.position.y = center.y;
+        helper.position.z = center.z;
+        helper.position.x = center.x;
+        this.skyBoxHelper = helper;
+
+        return { mesh: sky, helper };
     },
 
     createSunSphere()

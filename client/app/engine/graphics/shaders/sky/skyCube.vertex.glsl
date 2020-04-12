@@ -17,12 +17,14 @@ varying vec3 vPosition;
 varying vec3 cps[8];
 varying vec3 cps2[8];
 
-const vec3 worldCenter = vec3(-100.0, 100.0, 50.0);
+// TODO expose uniforms
+uniform vec3 worldCenter; // = vec3(-100.0, 100.0, 50.0);
+uniform float cubeRadius; // = 50.0;
 const vec3 up = vec3(0.0, 0.0, 1.0);
 
 // constants for atmospheric scattering
-const float e = 2.71828182845904523536028747135266249775724709369995957;
-const float pi = 3.141592653589793238462643383279502884197169;
+//const float e = 2.71828182845904523536028747135266249775724709369995957;
+//const float pi = 3.141592653589793238462643383279502884197169;
 
 // wavelength of used primaries, according to preetham
 const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);
@@ -32,8 +34,8 @@ const vec3 totalRayleigh = vec3(5.804542996261093E-6, 1.3562911419845635E-5, 3.0
 
 // mie stuff
 // K coefficient for the primaries
-const float v = 4.0;
-const vec3 K = vec3(0.686, 0.678, 0.666);
+//const float v = 4.0;
+//const vec3 K = vec3(0.686, 0.678, 0.666);
 // MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
 const vec3 MieConst = vec3(1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14);
 
@@ -65,8 +67,8 @@ void main()
 
 	vSunDirection = normalize(sunPosition);
 
-    float cubeDiameter = 12.5;
-    cubeDiameter *= 2.0;
+//    float cubeRadius = 12.5;
+//    cubeRadius *= 2.0;
 
     // night
     vec3 centerToCamera = cameraPos - worldCenter;
@@ -94,14 +96,14 @@ void main()
 
 // pass center coordinates
     vec3 center = vCenter;
-    cps2[0] = center + vec3( cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps2[1] = center + vec3(-cubeDiameter,  cubeDiameter,  cubeDiameter);
-    cps2[2] = center + vec3( cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps2[3] = center + vec3(-cubeDiameter, -cubeDiameter,  cubeDiameter);
-    cps2[4] = center + vec3( cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps2[5] = center + vec3(-cubeDiameter,  cubeDiameter, -cubeDiameter);
-    cps2[6] = center + vec3( cubeDiameter, -cubeDiameter, -cubeDiameter);
-    cps2[7] = center + vec3(-cubeDiameter, -cubeDiameter, -cubeDiameter);
+    cps2[0] = center + vec3( cubeRadius,  cubeRadius,  cubeRadius);
+    cps2[1] = center + vec3(-cubeRadius,  cubeRadius,  cubeRadius);
+    cps2[2] = center + vec3( cubeRadius, -cubeRadius,  cubeRadius);
+    cps2[3] = center + vec3(-cubeRadius, -cubeRadius,  cubeRadius);
+    cps2[4] = center + vec3( cubeRadius,  cubeRadius, -cubeRadius);
+    cps2[5] = center + vec3(-cubeRadius,  cubeRadius, -cubeRadius);
+    cps2[6] = center + vec3( cubeRadius, -cubeRadius, -cubeRadius);
+    cps2[7] = center + vec3(-cubeRadius, -cubeRadius, -cubeRadius);
 
     // Deprojection (should not depend on fov or near/far planes).
     // Used for computing the right part of the projected convex hull.

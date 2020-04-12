@@ -70,17 +70,17 @@ extend(ChunkModel.prototype, {
         let graphics = this.app.engine.graphics;
         let sky = graphics.createSky();
         let sunPosition = new THREE.Vector3(0, -700000, 0);
-        let sunSphere = graphics.createSunSphere();
-        graphics.addToScene(sky, worldId);
+        // let sunSphere = graphics.createSunSphere();
+        graphics.addToScene(sky.mesh, worldId);
         // graphics.addToScene(sunSphere, worldId);
 
-        let g = new THREE.BoxBufferGeometry(50, 50, 50);
-        let m = new THREE.MeshNormalMaterial({wireframe: true});
-        let mm = new THREE.Mesh(g, m);
-        mm.position.x = -100;
-        mm.position.y = 100;
-        mm.position.z = 50;
-        graphics.addToScene(mm, worldId);
+        // let g = new THREE.BoxBufferGeometry(50, 50, 50);
+        // let m = new THREE.MeshNormalMaterial({wireframe: true});
+        // let mm = new THREE.Mesh(g, m);
+        // mm.position.x = -100;
+        // mm.position.y = 100;
+        // mm.position.z = 50;
+        graphics.addToScene(sky.helper, worldId);
 
         // TODO from space:
         // turbidity = 1
@@ -96,7 +96,7 @@ extend(ChunkModel.prototype, {
         let azimuth = 0.25; // Facing front;
         let isSunSphereVisible = true;
         graphics.updateSky(
-            sky,
+            sky.mesh,
             sunPosition,
             turbidity,
             rayleigh,

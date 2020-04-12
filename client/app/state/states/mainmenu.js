@@ -115,7 +115,7 @@ extend(MainMenuState.prototype, {
             let port = $('#remote-server-port').val();
             if (!host) host = '';
             if (!port || isNaN(port)) port = 8000;
-
+            // TODO seek the production port
             this.stateManager.app.startFromRemoteServer(host, port);
         });
 

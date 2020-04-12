@@ -6,8 +6,10 @@
 
 import PortalFragment  from './portal/portal.fragment.glsl';
 import PortalVertex    from './portal/portal.vertex.glsl';
-import SkyFragment     from './sky/sky.fragment.glsl';
-import SkyVertex       from './sky/sky.vertex.glsl';
+import SkyFlatFragment from './sky/skyFlat.fragment.glsl';
+import SkyFlatVertex   from './sky/skyFlat.vertex.glsl';
+import SkyCubeFragment from './sky/skyCube.fragment.glsl';
+import SkyCubeVertex   from './sky/skyCube.vertex.glsl';
 import PlanetFragment  from './sky/planet.fragment.glsl';
 import PlanetVertex    from './sky/planet.vertex.glsl';
 
@@ -21,12 +23,20 @@ let ShadersModule = {
         return PortalFragment;
     },
 
-    getSkyVertexShader() {
-        return SkyVertex;
+    getSkyCubeVertexShader() {
+        return SkyCubeVertex;
     },
 
-    getSkyFragmentShader() {
-        return SkyFragment;
+    getSkyCubeFragmentShader() {
+        return SkyCubeFragment;
+    },
+
+    getSkyFlatVertexShader() {
+        return SkyFlatVertex;
+    },
+
+    getSkyFlatFragmentShader() {
+        return SkyFlatFragment;
     },
 
     getPlanetVertexShader() {
