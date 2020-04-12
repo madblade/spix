@@ -112,7 +112,7 @@ let transpileServer = lazypipe()
 let mocha = lazypipe()
     .pipe(plugins.mocha, {
         reporter: 'spec',
-        timeout: 5000,
+        cubeRadius: 5000,
         require: [
             './mocha.conf'
         ]

@@ -17,10 +17,9 @@ varying vec3 vPosition;
 varying vec3 cps[8];
 varying vec3 cps2[8];
 
-// TODO expose uniforms
 uniform vec3 worldCenter; // = vec3(-100.0, 100.0, 50.0);
 uniform float cubeRadius; // = 50.0;
-const vec3 up = vec3(0.0, 0.0, 1.0);
+//const vec3 up = vec3(0.0, 0.0, 1.0);
 
 // constants for atmospheric scattering
 //const float e = 2.71828182845904523536028747135266249775724709369995957;

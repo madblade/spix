@@ -4,7 +4,8 @@ uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
 uniform float mieCoefficient;
-uniform vec3 up;
+//uniform vec3 up;
+const vec3 up = vec3(0.0, 0.0, 1.0);
 
 varying vec3 vWorldPosition;
 varying vec3 vSunDirection;
@@ -15,7 +16,7 @@ varying float vSunE;
 varying vec3 vPosition;
 
 // constants for atmospheric scattering
-//const float e = 2.71828182845904523536028747135266249775724709369995957;
+const float e = 2.71828182845904523536028747135266249775724709369995957;
 //const float pi = 3.141592653589793238462643383279502884197169;
 
 // wavelength of used primaries, according to preetham

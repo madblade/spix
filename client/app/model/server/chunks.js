@@ -9,6 +9,7 @@
 import extend           from '../../extend.js';
 
 import * as THREE from 'three';
+import {SkyFlat} from '../../engine/graphics/sky/sky';
 
 let ChunkModel = function(app) {
     this.app = app;
@@ -68,45 +69,52 @@ extend(ChunkModel.prototype, {
             console.log('[Chunks] Default sky creation.');
 
         let graphics = this.app.engine.graphics;
-        let sky = graphics.createSky();
+
         let sunPosition = new THREE.Vector3(0, -700000, 0);
-        // let sunSphere = graphics.createSunSphere();
-        graphics.addToScene(sky.mesh, worldId);
-        // graphics.addToScene(sunSphere, worldId);
+        let sky;
 
-        // let g = new THREE.BoxBufferGeometry(50, 50, 50);
-        // let m = new THREE.MeshNormalMaterial({wireframe: true});
-        // let mm = new THREE.Mesh(g, m);
-        // mm.position.x = -100;
-        // mm.position.y = 100;
-        // mm.position.z = 50;
-        graphics.addToScene(sky.helper, worldId);
+        let skyType = 'flat';
+        if (skyType === 'cube') {
+            sky = graphics.createCubeSky();
+            // let sunSphere = graphics.createSunSphere();
+            graphics.addToScene(sky.mesh, worldId);
+            graphics.addToScene(sky.helper, worldId);
+            // graphics.addToScene(sunSphere, worldId);
 
-        // TODO from space:
-        // turbidity = 1
-        // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
-        // mieDirectionalG = 0.0
-
-        let turbidity = 10;
-        let rayleigh = 2;
-        let mieCoefficient = 0.005;
-        let mieDirectionalG = 0.8;
-        let luminance = 1.0;
-        let inclination = -0.15;// 0.49; // elevation / inclination;
-        let azimuth = 0.25; // Facing front;
-        let isSunSphereVisible = true;
-        graphics.updateSky(
-            sky.mesh,
-            sunPosition,
-            turbidity,
-            rayleigh,
-            mieCoefficient,
-            mieDirectionalG,
-            luminance,
-            inclination,
-            azimuth,
-            isSunSphereVisible
-        );
+            // TODO [LOW] sky as seen from space
+            // turbidity = 1
+            // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
+            // mieDirectionalG = 0.0
+            graphics.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.25, // Facing front
+                true // isSunSphereVisible
+            );
+        } else if (skyType === 'flat') {
+            sky = graphics.createFlatSky();
+            graphics.addToScene(sky.mesh, worldId);
+            graphics.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.25, // Facing front
+                true // isSunSphereVisible
+            );
+        } else {
+            return;
+        }
 
         this.skies.set(worldId, sky);
     },

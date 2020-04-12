@@ -10,7 +10,8 @@ varying vec3 vPosition;
 
 uniform float luminance;
 uniform float mieDirectionalG;
-uniform vec3 up;
+//uniform vec3 up;
+const vec3 up = vec3(0.0, 0.0, 1.0);
 
 const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
 
@@ -30,6 +31,10 @@ const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848
 const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
 // 1.0 / ( 4.0 * pi )
 const float ONE_OVER_FOURPI = 0.07957747154594767;
+
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
 
 float rayleighPhase( float cosTheta ) {
 	return THREE_OVER_SIXTEENPI * ( 1.0 + pow( cosTheta, 2.0 ) );
@@ -85,9 +90,9 @@ void main() {
 
 // nightsky
 // TODO stars
-	float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]
-	float phi = atan( direction.z, direction.x ); // azimuth --> x-axis [-pi/2, pi/2]
-	vec2 uv = vec2( phi, theta ) / vec2( 2.0 * pi, pi ) + vec2( 0.5, 0.0 );
+//	float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]
+//	float phi = atan( direction.z, direction.x ); // azimuth --> x-axis [-pi/2, pi/2]
+//	vec2 uv = vec2( phi, theta ) / vec2( 2.0 * pi, pi ) + vec2( 0.5, 0.0 );
 	vec3 L0 = vec3( 0.1 ) * Fex;
 
 // composition + solar disc
@@ -104,8 +109,8 @@ void main() {
 	gl_FragColor = vec4( retColor, 1.0 );
 
     // quick dithering pass
-    vec3 vp = normalize(vPosition);
-    float noise = random(vp.xy);
-    float m = mix(-0.5 / 255.0, 0.5 / 255.0, noise);
-    gl_FragColor.rgb += 3.0 * vec3(m);
+//    vec3 vp = normalize(vPosition);
+//    float noise = random(vp.xy);
+//    float m = mix(-0.5 / 255.0, 0.5 / 255.0, noise);
+//    gl_FragColor.rgb += 3.0 * vec3(m);
 }

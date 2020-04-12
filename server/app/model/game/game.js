@@ -21,6 +21,7 @@ class Game {
         this._refreshRate = 200;
         this._isRunning = false;
         this._ready = false;
+        this._killed = false;
 
         //
         this._playerManager = Factory.createPlayerManager();
@@ -31,6 +32,7 @@ class Game {
     get connector()     { return this._connection; }
 
     get ready()         { return this._ready; }
+    get killed()        { return this._killed; }
     get kind()          { return this._kind; }
     get gameId()        { return this._gameId; }
     get isRunning()     { return this._isRunning; }
@@ -105,7 +107,7 @@ class Game {
 
         // Stop game if need be.
         if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
-        this.pause(true); // Stop with idle timeout.
+        this.pause(false); // Stop with idle timeout.
     }
 
     removeAllPlayers() {
@@ -121,6 +123,7 @@ class Game {
 
     // To be triggered from Hub only.
     destroy() {
+        this._killed = true;
         if (this._isRunning) this.pause(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
         this._playerManager.destroy();

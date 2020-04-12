@@ -47,7 +47,7 @@ class User
 
         this._ingame = true;
         let game = this._hub.getGame(kind, gameId);
-        if (!game) return false;
+        if (!game || game.killed) return false;
 
         // Stop listening for general game management events...
         // Prevents the user from joining multiple games.

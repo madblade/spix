@@ -18,7 +18,15 @@ let SkyModule = {
         return {planet, atmosphere};
     },
 
-    createSky()
+    createFlatSky()
+    {
+        let sky = new SkyFlat();
+        sky.scale.setScalar(450000);
+        this.skyBox = sky;
+        return { mesh: sky };
+    },
+
+    createCubeSky()
     {
         let center = new THREE.Vector3(0, 0, -8);
         let radius = 0.5 * 16;
@@ -118,8 +126,6 @@ let SkyModule = {
         let phi = 4 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
 
-        // TODO [CRIT] remove hack
-        // TODO [CRIT] remove temporary hack
         this.sky = sky;
         this.distance = distance;
         this.phi = phi;
