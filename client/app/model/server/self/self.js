@@ -156,6 +156,26 @@ extend(SelfModel.prototype, {
         let head = this.avatar.getHead();
         if (!head) return null;
         return head.position;
+    },
+
+    cleanup() {
+        // General
+        this.entityId = '-1';
+        this.worldId = '-1';
+        this.oldWorldId = null;
+
+        // Model component.
+        this.position = [0, 0, 0];
+        this.rotation = [0, 0, 0];
+        // this.inventory = this.getInventory();
+
+        // Graphical component.
+        this.worldNeedsUpdate = false;
+        this.needsUpdate = false;
+        this.displayAvatar = false;
+
+        this.avatar = null;
+        // TODO [LEAK] cleanup graphical component of avatar.
     }
 
 });

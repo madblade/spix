@@ -176,6 +176,10 @@ extend(RendererManager.prototype, {
     switchAvatarToScene(/*sceneId*/) {
         // TODO [CRIT] update render register.
         // this.renderRegister;
+    },
+
+    cleanup() {
+        this.renderRegister.length = 0;
     }
 
 });

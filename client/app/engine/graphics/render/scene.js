@@ -94,6 +94,25 @@ extend(SceneManager.prototype, {
 
         this.removeObject(screen.getMesh(), screen.getWorldId());
         this.screens.delete(screenId);
+    },
+
+    cleanup() {
+        this.mainScene.dispose();
+        this.mainScene = this.createScene(-1);
+        this.subScenes.forEach(s => {
+            s.dispose();
+        });
+        this.subScenes.clear();
+        this.screens.forEach(s => {
+            if (s.mesh) {
+                s.mesh.geometry.dispose();
+                s.mesh.material.dispose();
+            }
+            if (s.renderTarget) {
+                s.renderTarget.dispose();
+            }
+        });
+        this.screens.clear();
     }
 
 });

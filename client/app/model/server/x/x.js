@@ -125,6 +125,16 @@ extend(XModel.prototype, {
         newWorldId = parseInt(newWorldId, 10);
         this.worldMap.switchRoot(oldWorldId, newWorldId);
         //this.forceUpdate = true;
+    },
+
+    cleanup() {
+        this.portals.clear();
+        this.worldToPortals.clear();
+        this.worldMap = new WorldMap(this);
+        this.xUpdates = [];
+        this.needsUpdate = false;
+        this.forceUpdate = false;
+        // TODO [LEAK] cleanup graphical component, scenes and render targets.
     }
 
 });

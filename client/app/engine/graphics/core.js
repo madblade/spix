@@ -140,6 +140,12 @@ let CoreModule = {
         }
     },
 
+    cleanupFullGraphics() {
+        this.sceneManager.cleanup();
+        this.cameraManager.cleanup();
+        this.rendererManager.cleanup();
+    },
+
     resize() {
         let width = window.innerWidth;
         let height = window.innerHeight;

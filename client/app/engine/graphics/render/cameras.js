@@ -468,6 +468,14 @@ extend(CameraManager.prototype, {
         intersects = raycaster.intersectObjects(terrain);
 
         return intersects;
+    },
+
+    cleanup() {
+        this.mainCamera = this.createCamera(false, -1);
+        this.mainCamera.setCameraId(-1);
+        this.subCameras.clear();
+        this.mainRaycasterCamera = this.createCamera(true, -1);
+        this.raycaster = this.createRaycaster();
     }
 
 });

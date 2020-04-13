@@ -51,6 +51,13 @@ extend(Server.prototype, {
 
     getSelfModel() {
         return this.selfModel;
+    },
+
+    cleanupFullModel() {
+        this.selfModel.cleanup();
+        this.chunkModel.cleanup();
+        this.entityModel.cleanup();
+        this.xModel.cleanup();
     }
 
 });

@@ -350,8 +350,39 @@ extend(ChunkModel.prototype, {
         });
 
         return meshes;
-    }
+    },
 
+    cleanup() {
+        this.worlds.forEach(w => {
+            w.forEach(currentChunk => {
+                if (!!currentChunk && currentChunk.hasOwnProperty('meshes')) {
+                    currentChunk.meshes.forEach(mesh => {
+                        mesh.geometry.dispose();
+                        mesh.material.dispose();
+                    });
+                }
+            });
+        });
+        this.worlds.clear();
+        this.worldProperties.clear();
+        this.chunkUpdates = [];
+
+        // Sky collection.
+        this.skies.forEach(s => {
+            if (s.mesh) {
+                s.mesh.geometry.dispose();
+                s.mesh.material.dispose();
+            }
+            if (s.helper)
+                s.helper.dispose();
+        })
+        this.skies.clear();
+
+        // Graphical component.
+        this.needsUpdate = false;
+        this.debug = false;
+        // TODO [LEAK] cleanup graphical component and all meshes.
+    }
 });
 
 export { ChunkModel };
