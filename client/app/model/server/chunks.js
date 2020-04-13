@@ -94,7 +94,7 @@ extend(ChunkModel.prototype, {
                 0.8,
                 1.0,
                 -0.15, // 0.49; // elevation / inclination
-                0.25, // Facing front
+                0.0, // Facing front
                 true // isSunSphereVisible
             );
         } else if (skyType === 'flat') {
@@ -109,7 +109,7 @@ extend(ChunkModel.prototype, {
                 0.8,
                 1.0,
                 -0.15, // 0.49; // elevation / inclination
-                0.25, // Facing front
+                0.0, // Facing front
                 true // isSunSphereVisible
             );
         } else {

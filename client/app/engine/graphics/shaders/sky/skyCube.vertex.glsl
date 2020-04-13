@@ -12,7 +12,6 @@ varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
 varying vec3 vCenter;
-varying vec3 vPosition;
 
 varying vec3 cps[8];
 varying vec3 cps2[8];
@@ -45,26 +44,25 @@ const float steepness = 1.5;
 const float EE = 1000.0;
 
 vec3 totalMie(float T) {
-	float c = (0.2 * T) * 10E-18;
-	return 0.434 * c * MieConst;
+    float c = (0.2 * T) * 10E-18;
+    return 0.434 * c * MieConst;
 }
 
 void main()
 {
-	vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-	vWorldPosition = worldPosition.xyz;
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     vCenter = (vec4(
         worldCenter.x - modelMatrix[3][0],
         worldCenter.y - modelMatrix[3][1],
         worldCenter.z - modelMatrix[3][2],
          1.0)).xyz;
-    vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
 
-	gl_Position.z = gl_Position.w; // set z to camera.far
+    gl_Position.z = gl_Position.w; // set z to camera.far
 
-	vSunDirection = normalize(sunPosition);
+    vSunDirection = normalize(sunPosition);
 
 //    float cubeRadius = 12.5;
 //    cubeRadius *= 2.0;
@@ -81,17 +79,17 @@ void main()
     float projection = isX ? sign(cx) * nsp.x : isY ? sign(cy) * nsp.y : sign(cz) * nsp.z;
 //	vSunfade = 1.0 - clamp(1.0 - exp((sunPosition.y / 450000.0)), 0.0, 1.0);
 //	vSunfade = 1.0 - clamp(1.0 - exp(projection / 150000.0), 0.0, 1.0);
-	vSunfade = 1.0 - 1.0 * clamp(1.0 - exp(projection), 0.0, 1.0);
+    vSunfade = 1.0 - 1.0 * clamp(1.0 - exp(projection), 0.0, 1.0);
 //    vSunfade = isZ ? 1.0 : 0.0;
 
-	float rayleighCoefficient = rayleigh - (1.0 * (1.0 - vSunfade));
+    float rayleighCoefficient = rayleigh - (1.0 * (1.0 - vSunfade));
 
 // extinction (absorbtion + out scattering)
 // rayleigh coefficients
-	vBetaR = totalRayleigh * rayleighCoefficient;
+    vBetaR = totalRayleigh * rayleighCoefficient;
 
 // mie coefficients
-	vBetaM = totalMie(turbidity) * mieCoefficient;
+    vBetaM = totalMie(turbidity) * mieCoefficient;
 
 // pass center coordinates
     vec3 center = vCenter;

@@ -9,7 +9,6 @@ varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
 varying vec3 vCenter;
-varying vec3 vPosition;
 
 uniform float luminance;
 uniform float mieDirectionalG;
@@ -35,13 +34,13 @@ const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
 const float ONE_OVER_FOURPI = 0.07957747154594767;
 
 float rayleighPhase(float cosTheta) {
-	return THREE_OVER_SIXTEENPI * (1.0 + pow(cosTheta, 2.0));
+    return THREE_OVER_SIXTEENPI * (1.0 + pow(cosTheta, 2.0));
 }
 
 float hgPhase(float cosTheta, float g) {
-	float g2 = pow(g, 2.0);
-	float inverse = 1.0 / pow(1.0 - 2.0 * g * cosTheta + g2, 1.5);
-	return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);
+    float g2 = pow(g, 2.0);
+    float inverse = 1.0 / pow(1.0 - 2.0 * g * cosTheta + g2, 1.5);
+    return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);
 }
 
 float random(vec2 st) {
@@ -59,10 +58,10 @@ const float F = 0.30;
 const float whiteScale = 1.0748724675633854; // 1.0 / Uncharted2Tonemap(1000.0)
 
 vec3 Uncharted2Tonemap( vec3 x ) {
-	return
-	    (
-	        (x * (A * x + C * B) + D * E) /
-	        (x * (A * x + B) + D * F )
+    return
+        (
+            (x * (A * x + C * B) + D * E) /
+            (x * (A * x + B) + D * F )
         ) - E / F;
 }
 
@@ -71,8 +70,8 @@ const float cutoffAngle = 1.6110731556870734; // TODO hack
 const float steepness = 2.5; // TODO hack
 const float EE = 10000.0; // TODO hack
 float sunIntensity(float zenithAngleCos) {
-	zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
-	return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
+    zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
+    return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
 }
 
 bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
@@ -135,7 +134,7 @@ void main()
     vec3 deltaWorldCamera = normalize(vWorldPosition - cpp);
 
     vec3 vc = normalize(vCenter);
-    vec3 vp = normalize(vPosition);
+    vec3 vp = normalize(vWorldPosition);
     vec3 diff;
 
     // Compupte projection plane.
@@ -149,7 +148,7 @@ void main()
     vec2 dpc2D2;
     vec2 dpv2D2;
     dpc2D2 = vec2(dot(vCenter, xVector), dot(vCenter, yVector));
-    dpv2D2 = vec2(dot(vPosition, xVector), dot(vPosition, yVector));
+    dpv2D2 = vec2(dot(vWorldPosition, xVector), dot(vWorldPosition, yVector));
     for (int i = 0; i < 8; ++i) {
         xys[i] = vec2(dot(cps[i], xVector), dot(cps[i], yVector));
     }
@@ -319,44 +318,44 @@ void main()
     float cutoff = max(0.0, dotUpDelta);
     //	float zenithAngle = acos(cutoff);
     // XXX find the right coeff before atan (2019-03[madblade]: whatever this means, not a priority)
-	float zenithAngle = 1.05 * atan(-cutoff) + pi * 0.5;
-	float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
-	float sR = rayleighZenithLength * inverse;
-	float sM = mieZenithLength * inverse;
+    float zenithAngle = 1.05 * atan(-cutoff) + pi * 0.5;
+    float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
+    float sR = rayleighZenithLength * inverse;
+    float sM = mieZenithLength * inverse;
 
     // combined extinction factor
-	vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));
+    vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));
 
     // in scattering
-	float cosTheta = dot(deltaWorldCamera, vSunDirection);
-	float rPhase = rayleighPhase(cosTheta * 0.5 + 0.5);
-	vec3 betaRTheta = vBetaR * rPhase;
-	float mPhase = hgPhase(cosTheta, mieDirectionalG);
-	vec3 betaMTheta = vBetaM * mPhase;
+    float cosTheta = dot(deltaWorldCamera, vSunDirection);
+    float rPhase = rayleighPhase(cosTheta * 0.5 + 0.5);
+    vec3 betaRTheta = vBetaR * rPhase;
+    float mPhase = hgPhase(cosTheta, mieDirectionalG);
+    vec3 betaMTheta = vBetaM * mPhase;
 
-	vec3 Lin = pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
-	Lin *= mix(
-	    vec3(1.0),
+    vec3 Lin = pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
+    Lin *= mix(
+        vec3(1.0),
         pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex,
-	    vec3(1.0 / 2.0)),
-	    clamp(pow(1.0 - dot(nup, vSunDirection), 5.0), 0.0, 1.0)
+        vec3(1.0 / 2.0)),
+        clamp(pow(1.0 - dot(nup, vSunDirection), 5.0), 0.0, 1.0)
     );
 
     // nightsky
-	vec3 L0 = vec3(0.1) * Fex;
+    vec3 L0 = vec3(0.1) * Fex;
 
     // composition + solar disc
-	float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
-	L0 += (vse * 19000.0 * Fex) * sundisk;
-	vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
-	vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(lum, 4.0))) * texColor);
-	vec3 color = curr * whiteScale;
-	vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
+    float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
+    L0 += (vse * 19000.0 * Fex) * sundisk;
+    vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
+    vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(lum, 4.0))) * texColor);
+    vec3 color = curr * whiteScale;
+    vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
 
     // Debug here:
     // retColor = vec3(1.0, debugBeta1, 0.0);
 
-	gl_FragColor = vec4(retColor, 1.0);
+    gl_FragColor = vec4(retColor, 1.0);
     // (the following displays center-to-cube-vertices lines in red)
     // for (int i = 0; i < 8; ++i) {
     //     if (distance(normalize(dpv2D2), normalize(xys2[i])) < 0.005)
@@ -365,7 +364,7 @@ void main()
 
     // Dithering (removes gradient banding)
     // (there is still banding at 0.2 noise)
-	float noise = random(vp.xy);
-	float m = mix(-0.5 / 255.0, 0.5 / 255.0, noise);
-	gl_FragColor.rgb += 3.0 * vec3(m);
+    float noise = random(vp.xy);
+    float m = mix(-0.5 / 255.0, 0.5 / 255.0, noise);
+    gl_FragColor.rgb += 3.0 * vec3(m);
 }

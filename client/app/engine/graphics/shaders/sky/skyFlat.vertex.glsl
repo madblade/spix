@@ -4,7 +4,6 @@ uniform vec3 sunPosition;
 uniform float rayleigh;
 uniform float turbidity;
 uniform float mieCoefficient;
-//uniform vec3 up;
 const vec3 up = vec3(0.0, 0.0, 1.0);
 
 varying vec3 vWorldPosition;
@@ -13,7 +12,6 @@ varying float vSunfade;
 varying vec3 vBetaR;
 varying vec3 vBetaM;
 varying float vSunE;
-varying vec3 vPosition;
 
 // constants for atmospheric scattering
 const float e = 2.71828182845904523536028747135266249775724709369995957;
@@ -39,37 +37,35 @@ const float steepness = 1.5;
 const float EE = 1000.0;
 
 float sunIntensity( float zenithAngleCos ) {
-	zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
-	return EE * max( 0.0, 1.0 - pow( e, -( ( cutoffAngle - acos( zenithAngleCos ) ) / steepness ) ) );
+    zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
+    return EE * max( 0.0, 1.0 - pow( e, -( ( cutoffAngle - acos( zenithAngleCos ) ) / steepness ) ) );
 }
 
 vec3 totalMie( float T ) {
-	float c = ( 0.2 * T ) * 10E-18;
-	return 0.434 * c * MieConst;
+    float c = ( 0.2 * T ) * 10E-18;
+    return 0.434 * c * MieConst;
 }
 
 void main() {
 
-	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-	vWorldPosition = worldPosition.xyz;
+    vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+    vWorldPosition = worldPosition.xyz;
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-	gl_Position.z = gl_Position.w; // set z to camera.far
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    gl_Position.z = gl_Position.w; // set z to camera.far
 
-	vSunDirection = normalize( sunPosition );
+    vSunDirection = normalize( sunPosition );
 
-	vSunE = sunIntensity( dot( vSunDirection, up ) );
+    vSunE = sunIntensity( dot( vSunDirection, up ) );
 
-	vSunfade = 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
+    vSunfade = 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
 
-	float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
+    float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
 
 // extinction (absorbtion + out scattering)
 // rayleigh coefficients
-	vBetaR = totalRayleigh * rayleighCoefficient;
+    vBetaR = totalRayleigh * rayleighCoefficient;
 
 // mie coefficients
-	vBetaM = totalMie( turbidity ) * mieCoefficient;
-
-    vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    vBetaM = totalMie( turbidity ) * mieCoefficient;
 }
