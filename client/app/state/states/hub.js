@@ -244,7 +244,9 @@ extend(HubState.prototype, {
 
     stopListeners() {
         this.stopTableListeners();
-        $('#button-create-game').off('click');
+        $('#button-create-cube-game').off('click');
+        $('#button-create-flat-game').off('click');
+        $('#button-create-demo-game').off('click');
         $('#button-return-main').off('click');
     },
 

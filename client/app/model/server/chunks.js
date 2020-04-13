@@ -27,7 +27,7 @@ let ChunkModel = function(app) {
 
 extend(ChunkModel.prototype, {
 
-    addWorld(worldId, worldInfo) {
+    addWorldIfNotPresent(worldId, worldInfo) {
         if (this.worlds.has(worldId)) {
             // console.log('This world I know... (' + typeof worldId +')');
             return;
@@ -158,7 +158,7 @@ extend(ChunkModel.prototype, {
                         wif[id] = parseInt(wif[id], 10);
 
                     // Add new world and matching scene.
-                    let properties = this.addWorld(wid, wif);
+                    let properties = this.addWorldIfNotPresent(wid, wif);
                     if (properties) {
                         // 1 world <-> 1 scene, multiple cameras
                         graphics.addScene(wid);
@@ -175,14 +175,15 @@ extend(ChunkModel.prototype, {
             }
 
             for (let worldId in updates) {
-                if (worldId === 'worlds') {
+                if (!updates.hasOwnProperty(worldId) || worldId === 'worlds')
                     continue;
-                }
 
                 let subdates = updates[worldId];
                 let sup = {};
 
                 for (let chunkId in subdates) {
+                    if (!subdates.hasOwnProperty(chunkId)) continue;
+
                     let update = subdates[chunkId];
 
                     if (!update) {

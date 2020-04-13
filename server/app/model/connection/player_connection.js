@@ -6,8 +6,8 @@
 
 import CollectionUtils from '../../engine/math/collections';
 
-class PlayerConnection {
-
+class PlayerConnection
+{
     constructor(socket) {
         this._socket = socket;
         this._rooms = [];
@@ -53,7 +53,7 @@ class PlayerConnection {
 
     // Remove all listeners.
     offAll() {
-        this._listeners.forEach(message => this._socket.removeAllListeners(message));
+        this._listeners.forEach(() => this._socket.removeAllListeners());
         this._listeners = [];
     }
 

@@ -29,7 +29,7 @@ const WorldType = Object.freeze({
 
 class WorldModel
 {
-    static serverLoadingRadius = 1;
+    static serverLoadingRadius = 3;
 
     constructor(game)
     {

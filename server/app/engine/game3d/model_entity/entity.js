@@ -34,8 +34,9 @@ class Entity {
 
         this._metaX         = null;
 
+        // Displacement speeds
         this._capS          = .005;
-        this._capW          = 5.01;
+        this._capW          = .01;
         this._capR          = .03;
 
         // LEGACY PhysicsEngine

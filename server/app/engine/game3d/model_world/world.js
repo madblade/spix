@@ -92,7 +92,8 @@ class World {
         let centerInteger = parseInt(zLimit / 2, 10);
         let centerFloat = parseFloat(zLimit / 2) + 0.01;
         while (
-            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 || this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
+            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 ||
+                this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
             z < 100 * zLimit) ++z;
         return [centerFloat, centerFloat, z];
     }
