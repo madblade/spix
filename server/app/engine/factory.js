@@ -10,8 +10,6 @@ class GameFactory
 {
     static createGame(hub, kind, gameId, connector, options)
     {
-        console.log('got options:');
-        console.log(options);
         // TODO apply options
         let game;
         switch (kind) {

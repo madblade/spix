@@ -106,8 +106,7 @@ class Game {
         this._playerManager.removePlayer(player);
 
         // Stop game if need be.
-        if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
-        this.pause(false); // Stop with idle timeout.
+        // if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
     }
 
     removeAllPlayers() {

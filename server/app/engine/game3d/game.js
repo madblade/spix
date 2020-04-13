@@ -123,6 +123,9 @@ class Game3D extends Game
         // if (this._tt % 1000 === 0) console.log((TimeUtils.getTimeSecNano(time)[1]/1000) + " µs a loop.");
         const t1 = TimeUtils.getTimeSecNano(t0)[1] / 1000;
         if (t1 > 4000 && Game3D.bench) console.log(`${t1} µs.`);
+
+        if (this._playerManager.nbPlayers < 1)
+            this.pause(false); // Stop with idle timeout.
     }
 
     generate() {

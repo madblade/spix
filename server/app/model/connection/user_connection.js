@@ -37,8 +37,6 @@ class UserConnection
     // Drawback: switch potentially evaluates all statements
     // Advantage: does not load the socket with many listeners
     onUserRequest(data) {
-        console.log('got request');
-        console.log(data);
         switch (data.request)
         {
             // A user can ask the hub for a new game to be created.

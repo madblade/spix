@@ -24,7 +24,7 @@ class ConsistencyModel {
     }
 
     spawnPlayer(player) {
-        let playerId = player.avatar.entityId;
+        let playerId = parseInt(player.avatar.entityId, 10);
         let chunksMap = new Map();
         chunksMap.set(player.avatar.worldId, new Set());
 
@@ -37,6 +37,7 @@ class ConsistencyModel {
     }
 
     removePlayer(playerId) {
+        playerId = parseInt(playerId, 10);
         this._entityIdsForEntity.delete(playerId);
         this._chunkIdsForEntity.delete(playerId);
         this._chunkIdAndPartsForEntity.delete(playerId);

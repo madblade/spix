@@ -196,7 +196,7 @@ extend(ChunkModel.prototype, {
 
                     else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3) {
                         // TODO [HIGH] server-side, use distinct channels for chunk updates.
-                        console.log('WARN: corrupt update or model @refresh / updateChunk.');
+                        console.error(`WARN: corrupt update or model @refresh / updateChunk ${chunkId}.`);
                         console.log(update);
                         this.chunkUpdates = [];
                         return;
@@ -204,7 +204,7 @@ extend(ChunkModel.prototype, {
 
                     // Non-loaded chunk.
                     else if (update.length !== 2) {
-                        console.log('WARN: corrupt update or model @refresh / initChunk.');
+                        console.error('WARN: corrupt update or model @refresh / initChunk.');
                         console.log(update);
                         return;
 
@@ -263,7 +263,7 @@ extend(ChunkModel.prototype, {
         // Initialize model if a new world is transmitted.
         let world = this.worlds.get(worldId);
         if (!world) {
-            console.log(`Got chunk ${chunkId} (${typeof worldId}) from an unknown world: ${worldId}`);
+            console.error(`Got chunk ${chunkId} (${typeof worldId}) from an unknown world: ${worldId}`);
             return;
         }
 
@@ -277,7 +277,7 @@ extend(ChunkModel.prototype, {
 
         // Add to scene.
         if (!chunk || !chunk.hasOwnProperty('meshes')) {
-            console.log(`WARN. Update miss @ initializeChunk: ${chunkId}`);
+            console.error(`WARN. Update miss @ initializeChunk: ${chunkId}`);
             console.log(all);
             return;
         }
@@ -362,6 +362,7 @@ extend(ChunkModel.prototype, {
                     });
                 }
             });
+            w.clear();
         });
         this.worlds.clear();
         this.worldProperties.clear();
@@ -375,7 +376,7 @@ extend(ChunkModel.prototype, {
             }
             if (s.helper)
                 s.helper.dispose();
-        })
+        });
         this.skies.clear();
 
         // Graphical component.

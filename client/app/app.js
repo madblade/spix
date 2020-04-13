@@ -203,6 +203,7 @@ extend(App.Core.prototype, {
     },
 
     stopGame() {
+        this.engine.connection.unregisterSocketForGame3D();
         this.engine.graphics.stop();
         this.engine.controls.stop();
         this.engine.audio.stop();
