@@ -6,8 +6,12 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import LegacyJSONLoader from './LegacyJSONLoader';
+import {
+    AnimationMixer, AnimationClip,
+    Object3D, Mesh,
+    MeshLambertMaterial, FaceColors, BufferGeometry
+} from 'three';
 
 let EntitiesModule = {
 
@@ -17,17 +21,17 @@ let EntitiesModule = {
 
         // TODO [FFF] export model to format glTF
         loader.load(`app/assets/models/${model}.json`, function(geometry) {
-            let bufferGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
+            let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
-            let mesh = new THREE.Mesh(bufferGeometry, new THREE.MeshLambertMaterial({
-                vertexColors: THREE.FaceColors,
+            let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
+                vertexColors: FaceColors,
                 morphTargets: true
             }));
 
             mesh.scale.set(1.0, 1.0, 1.0);
 
-            let mixer = new THREE.AnimationMixer(mesh);
-            let clip = THREE.AnimationClip.CreateFromMorphTargetSequence('run',
+            let mixer = new AnimationMixer(mesh);
+            let clip = AnimationClip.CreateFromMorphTargetSequence('run',
                 geometry.morphTargets, 30);
             mixer.clipAction(clip)
                 .setDuration(1)
@@ -41,8 +45,8 @@ let EntitiesModule = {
     // For composite entities, wrap heavy model parts in higher level structure.
     finalizeEntity(id, createdEntity) {
         // First only manage avatars.
-        let up = new THREE.Object3D();
-        let wrapper = new THREE.Object3D();
+        let up = new Object3D();
+        let wrapper = new Object3D();
         let head = this.createMesh(
             this.createGeometry('box'),
             this.createMaterial('flat-phong')

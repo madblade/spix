@@ -4,8 +4,11 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import { Screen } from './screen.js';
+import {
+    DoubleSide, LinearFilter, NearestFilter, RGBFormat,
+    Mesh, PlaneBufferGeometry, ShaderMaterial, WebGLRenderTarget
+} from 'three';
 
 let PortalsModule = {
 
@@ -35,16 +38,17 @@ let PortalsModule = {
 
             let width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
             let height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
-            let rtTexture = new THREE.WebGLRenderTarget(
+            let rtTexture = new WebGLRenderTarget(
                 width, height,
                 {
-                    minFilter: THREE.LinearFilter,
-                    magFilter: THREE.NearestFilter,
-                    format: THREE.RGBFormat
+                    minFilter: LinearFilter,
+                    magFilter: NearestFilter,
+                    format: RGBFormat
                 }
             );
 
-            let geometry = new THREE.PlaneBufferGeometry(portalWidth, portalHeight);
+            // TODO call new geometry from meshes module
+            let geometry = new PlaneBufferGeometry(portalWidth, portalHeight);
             // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
             //let uvs = geometry.attributes.uv.array;
             //let uvi = 0;
@@ -56,15 +60,15 @@ let PortalsModule = {
 
             let portalVShader = this.getPortalVertexShader();
             let portalFShader = this.getPortalFragmentShader();
-            let material = new THREE.ShaderMaterial({
-                side: THREE.DoubleSide,
+            let material = new ShaderMaterial({
+                side: DoubleSide,
                 uniforms: {
                     texture1: { type:'t', value:rtTexture.texture }
                 },
                 vertexShader: portalVShader,
                 fragmentShader: portalFShader
             });
-            let mesh = new THREE.Mesh(geometry, material);
+            let mesh = new Mesh(geometry, material);
 
             // TODO [CRIT] orientations
             // console.log(tempOffset);

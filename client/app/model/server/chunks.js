@@ -7,9 +7,7 @@
 /** Model **/
 
 import extend           from '../../extend.js';
-
-import * as THREE from 'three';
-import {SkyFlat} from '../../engine/graphics/sky/sky';
+import { Vector3 }      from 'three';
 
 let ChunkModel = function(app) {
     this.app = app;
@@ -52,6 +50,9 @@ extend(ChunkModel.prototype, {
         return properties;
     },
 
+    /**
+     * @deprecated
+     */
     addPlanet(worldId, worldInfo) {
         if (!worldInfo)
             console.log('[Chunks] Default sky creation.');
@@ -70,7 +71,7 @@ extend(ChunkModel.prototype, {
 
         let graphics = this.app.engine.graphics;
 
-        let sunPosition = new THREE.Vector3(0, -700000, 0);
+        let sunPosition = new Vector3(0, -700000, 0);
         let sky;
 
         let skyType = 'flat';

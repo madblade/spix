@@ -4,70 +4,85 @@
 
 'use strict';
 
-import * as THREE from 'three';
-
 import extend       from '../../../extend';
+import {
+    WebGLRenderTarget,
+    Mesh, MeshPhongMaterial, ShaderMaterial,
+    LinearFilter, NearestFilter, RGBFormat,
+    OrthographicCamera, PerspectiveCamera,
+    PlaneBufferGeometry, SphereGeometry,
+    DirectionalLight,
+    BufferAttribute, Vector3
+} from 'three';
+// import * as ImageUtils from 'three/src/extras/ImageUtils';
 
 import { ShadersModule }  from '../shaders/shaders';
 
+/**
+ * @deprecated
+ */
 let SimplePlanet = function()
 {
     this.radius = 2; // 6371e3;
     this.mass = 5.972e24;
     this.atmos_scale_height = 7.64e3;
 
-    let geometry = new THREE.SphereGeometry(this.radius, 64, 64);
-    let material = new THREE.MeshPhongMaterial({
-        map: THREE.ImageUtils.loadTexture('../../../assets/images/2_no_clouds_8k.jpg'),
-        bumpMap: THREE.ImageUtils.loadTexture('../../../assets/images/elev_bump_8k.jpg'),
-        bumpScale:   0.005,
-        specularMap: THREE.ImageUtils.loadTexture('../../../assets/images/water_8k.png'),
-    });
+    let geometry = new SphereGeometry(this.radius, 64, 64);
+    let material = new MeshPhongMaterial();
+    // let material = new MeshPhongMaterial({
+    //     map: ImageUtils.loadTexture('../../../assets/images/2_no_clouds_8k.jpg'),
+    //     bumpMap: ImageUtils.loadTexture('../../../assets/images/elev_bump_8k.jpg'),
+    //     bumpScale:   0.005,
+    //     specularMap: ImageUtils.loadTexture('../../../assets/images/water_8k.png'),
+    // });
 
-    let position = new THREE.Vector3();
+    let position = new Vector3();
     position.set(0, 5, 0); // -10e6);
 
-    THREE.Mesh.call(this, geometry, material);
+    Mesh.call(this, geometry, material);
     this.position.copy(position);
 };
 
-SimplePlanet.prototype = Object.create(THREE.Mesh.prototype);
+SimplePlanet.prototype = Object.create(Mesh.prototype);
 
+/**
+ * @deprecated
+ */
 let Atmosphere = function(planet)
 {
     let atmosVertex = ShadersModule.getPlanetVertexShader();
     let atmosFragment = ShadersModule.getPlanetFragmentShader();
 
     this.planet = planet;
-    // this.planet_scene = new THREE.Scene();
+    // this.planet_scene = new Scene();
     // this.planet_scene.add(planet.mesh);
 
-    //this.planet_scene.add( new THREE.AmbientLight( 0x333333 ) );
-    this.sun = new THREE.DirectionalLight(0xffffff, 1);
+    //this.planet_scene.add( new AmbientLight( 0x333333 ) );
+    this.sun = new DirectionalLight(0xffffff, 1);
     this.sun.position.set(0.707, 0.707, 0);
     // this.planet_scene.add(this.sun);
 
-    this.planet_camera = new THREE.PerspectiveCamera(
+    this.planet_camera = new PerspectiveCamera(
         75., window.innerWidth / window.innerHeight, 1e3, 1e8);
     // base_camera.add(this.planet_camera);
 
-    this.planet_texture = new THREE.WebGLRenderTarget(
+    this.planet_texture = new WebGLRenderTarget(
         window.innerWidth, window.innerHeight,
         {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.NearestFilter,
-            format: THREE.RGBFormat
+            minFilter: LinearFilter,
+            magFilter: NearestFilter,
+            format: RGBFormat
         }
     );
 
     this.base_directions = [
-        new THREE.Vector3(-1, 1, 0.5), new THREE.Vector3(1, 1, 0.5),
-        new THREE.Vector3(-1, -1, 0.5), new THREE.Vector3(1, -1, 0.5)];
+        new Vector3(-1, 1, 0.5), new Vector3(1, 1, 0.5),
+        new Vector3(-1, -1, 0.5), new Vector3(1, -1, 0.5)];
     this.directions = [
-        new THREE.Vector3(-1, 1, 0.5),
-        new THREE.Vector3(1, 1, 0.5),
-        new THREE.Vector3(-1, -1, 0.5),
-        new THREE.Vector3(1, -1, 0.5)];
+        new Vector3(-1, 1, 0.5),
+        new Vector3(1, 1, 0.5),
+        new Vector3(-1, -1, 0.5),
+        new Vector3(1, -1, 0.5)];
 
     this.directions = new Float32Array(12);
     this.directions.set([
@@ -78,7 +93,7 @@ let Atmosphere = function(planet)
     ]);
 
     // Ugly
-    var plane = new THREE.PlaneBufferGeometry(
+    var plane = new PlaneBufferGeometry(
         // 10, 10);
         window.innerWidth, window.innerHeight);
 
@@ -89,8 +104,8 @@ let Atmosphere = function(planet)
     this.radius = planet.radius + this.rayleigh_length * 5;
 
     this.uniforms = {
-        camera_pos: { type: 'v3', value: new THREE.Vector3() },
-        planet_pos: { type: 'v3', value: new THREE.Vector3() },
+        camera_pos: { type: 'v3', value: new Vector3() },
+        planet_pos: { type: 'v3', value: new Vector3() },
         planet_radius: { type: 'f', value: 0.0 },
         atmos_radius: { type: 'f', value: 0.0 },
 
@@ -103,31 +118,31 @@ let Atmosphere = function(planet)
         sun: { type: 'v3', value: this.sun.position }
     };
 
-    let sampleDir = new THREE.BufferAttribute(this.directions, 3);
+    let sampleDir = new BufferAttribute(this.directions, 3);
     // this.attributes = {
     //     sampleDir: { type: 'v3', value: this.directions }
     // };
 
-    let material = new THREE.ShaderMaterial({
+    let material = new ShaderMaterial({
         uniforms: this.uniforms,
         // attributes: this.attributes,
         vertexShader: atmosVertex,
         fragmentShader: atmosFragment
     });
 
-    // material = new THREE.MeshNormalMaterial();
+    // material = new MeshNormalMaterial();
 
     plane.setAttribute('sampleDir', sampleDir);
 
-    this.mesh = new THREE.Mesh(plane, material);
+    this.mesh = new Mesh(plane, material);
     this.mesh.position.y = 20;
     this.mesh.rotation.x = Math.PI / 2;
 
 
-    // this.scene = new THREE.Scene();
+    // this.scene = new Scene();
     // this.scene.add(this.mesh);
 
-    this.camera = new THREE.OrthographicCamera(
+    this.camera = new OrthographicCamera(
         window.innerWidth / -2, window.innerWidth / 2,
         window.innerHeight / 2, window.innerHeight / -2, -10000, 10000);
 
@@ -138,7 +153,7 @@ extend(Atmosphere.prototype, {
 
     render: function() //renderer)
     {
-        let offset = new THREE.Vector3();
+        let offset = new Vector3();
 
         for (let i = 0; i < 4; ++i) {
             offset.setFromMatrixPosition(this.planet_camera.matrixWorld);

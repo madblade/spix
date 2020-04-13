@@ -4,16 +4,15 @@
 
 'use strict';
 
-import * as THREE from 'three';
-
 import { Entity } from './entity.js';
+import { Object3D } from 'three';
 
 let PlayerModule = {
 
     loadCube(id, updatedEntity, graphics, entities)
     {
         // TODO [LOW] do it in graphics
-        let wrapper = new THREE.Object3D();
+        let wrapper = new Object3D();
         let cube = graphics.createMesh(
             graphics.createGeometry('box'),
             graphics.createMaterial('flat-phong')

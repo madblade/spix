@@ -4,7 +4,10 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import {
+    BackSide, VertexColors,
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial
+} from 'three';
 
 let MaterialsModule = {
 
@@ -13,32 +16,32 @@ let MaterialsModule = {
 
         switch (whatMaterial) {
             case 'flat-phong':
-                material = new THREE.MeshPhongMaterial({
+                material = new MeshPhongMaterial({
                     specular: 0xffffff,
                     flatShading: true,
-                    vertexColors: THREE.VertexColors
+                    vertexColors: VertexColors
                 });
                 break;
 
             case 'textured-phong':
-                material = new THREE.MeshLambertMaterial({
+                material = new MeshLambertMaterial({
                     //color: 0xffffff, specular: 0xffffff, shininess: 250,
-                    //shading: THREE.FlatShading,
-                    side: THREE.BackSide,
-                    //vertexColors: THREE.VertexColors,
+                    //shading: FlatShading,
+                    side: BackSide,
+                    //vertexColors: VertexColors,
                     map: this.texture
                 });
                 break;
 
             case 'basic-black':
-                material = new THREE.MeshBasicMaterial({
+                material = new MeshBasicMaterial({
                     wireframe:true,
                     color:0x000000
                 });
                 break;
 
             default: // Block material
-                material = new THREE.MeshBasicMaterial({
+                material = new MeshBasicMaterial({
                     color:0xff0000
                 });
                 console.log(meta);

@@ -4,8 +4,8 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
+import { WebGLRenderer } from 'three';
 
 let RendererManager = function(graphicsEngine) {
     this.graphics = graphicsEngine;
@@ -32,7 +32,7 @@ extend(RendererManager.prototype, {
 
     createRenderer() {
         // Configure renderer
-        let renderer = new THREE.WebGLRenderer({
+        let renderer = new WebGLRenderer({
             // TODO [MEDIUM] propose different antialiasing strategy
             antialias: true,
             alpha: true
@@ -132,7 +132,7 @@ extend(RendererManager.prototype, {
             //if (this.thenstop) {
                 //let posX = screen1.getMesh().position;
                 //let  = localRecorder.position;
-                //let posC = new THREE.Vector3();
+                //let posC = new Vector3();
                 //posC.setFromMatrixPosition(mainCamera.matrixWorld);
 
                 //let me = this.graphics.app.model.server.selfModel.position;

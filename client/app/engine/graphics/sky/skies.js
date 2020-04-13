@@ -4,9 +4,12 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import { SkyFlat, SkyCube } from './sky';
 import { SimplePlanet, Atmosphere } from './planet';
+import {
+    Mesh, MeshBasicMaterial, MeshNormalMaterial,
+    BoxBufferGeometry, SphereBufferGeometry, Vector3
+} from 'three';
 
 let SkyModule = {
 
@@ -28,17 +31,17 @@ let SkyModule = {
 
     createCubeSky()
     {
-        let center = new THREE.Vector3(0, 0, -8);
+        let center = new Vector3(0, 0, -8);
         let radius = 0.5 * 16;
         let sky = new SkyCube(center.x, center.y, center.z, radius);
         sky.scale.setScalar(450000);
         this.skyBox = sky;
 
-        let g = new THREE.BoxBufferGeometry(
+        let g = new BoxBufferGeometry(
             2 * radius, 2 * radius, 2 * radius
         );
-        let m = new THREE.MeshNormalMaterial({wireframe: true});
-        let helper = new THREE.Mesh(g, m);
+        let m = new MeshNormalMaterial({wireframe: true});
+        let helper = new Mesh(g, m);
         helper.position.y = center.y;
         helper.position.z = center.z;
         helper.position.x = center.x;
@@ -49,9 +52,9 @@ let SkyModule = {
 
     createSunSphere()
     {
-        let sunSphere = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(20000, 16, 8),
-            new THREE.MeshBasicMaterial({color: 0xffffff})
+        let sunSphere = new Mesh(
+            new SphereBufferGeometry(20000, 16, 8),
+            new MeshBasicMaterial({color: 0xffffff})
         );
         sunSphere.position.y = -700000;
         sunSphere.visible = false;
@@ -77,7 +80,7 @@ let SkyModule = {
         let x = distance * cos(phi);
         let y = distance * sin(phi) * sin(theta);
         let z = distance * sin(phi) * cos(theta);
-        let vec3 = new THREE.Vector3(x, y, z);
+        let vec3 = new Vector3(x, y, z);
 
         if (camera.projectionMatrix) {
             // let mat4 = new THREE.Matrix4();
@@ -88,7 +91,7 @@ let SkyModule = {
             //     0, 0, 0, 0);
             // mat4.getInverse(camera.projectionMatrix);
             // s.material.uniforms.viewInverse.value.copy(mat4);
-            let v = new THREE.Vector3();
+            let v = new Vector3();
             camera.getWorldPosition(v);
             s.material.uniforms.cameraPos.value.copy(v);
         }

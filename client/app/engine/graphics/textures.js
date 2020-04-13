@@ -4,7 +4,7 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import { TextureLoader } from 'three';
 
 let TexturesModule = {
 
@@ -14,7 +14,7 @@ let TexturesModule = {
     },
 
     loadTexture(whatTexture) {
-        let loader = new THREE.TextureLoader();
+        let loader = new TextureLoader();
         let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
 
         let texture = loader.load(`app/assets/textures/${whatTexture}`);

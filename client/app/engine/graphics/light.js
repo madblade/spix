@@ -4,7 +4,7 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import { AmbientLight, HemisphereLight } from 'three';
 
 let LightModule = {
 
@@ -13,11 +13,11 @@ let LightModule = {
 
         switch (whatLight) {
             case 'hemisphere':
-                light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+                light = new HemisphereLight(0xeeeeff, 0x777788, 0.75);
                 break;
 
             default:
-                light = new THREE.AmbientLight(0x404040);
+                light = new AmbientLight(0x404040);
         }
 
         return light;

@@ -4,8 +4,8 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
+import { Scene } from 'three';
 
 let SceneManager = function() {
     this.mainScene = this.createScene(-1);
@@ -16,7 +16,7 @@ let SceneManager = function() {
 extend(SceneManager.prototype, {
 
     createScene(newSceneId) {
-        let scene = new THREE.Scene();
+        let scene = new Scene();
         scene.sceneId = newSceneId;
         scene.autoUpdate = false;
         return scene;

@@ -4,7 +4,10 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import {
+    BufferAttribute, BufferGeometry,
+    Color, Mesh, Vector3
+} from 'three';
 
 let ChunksModule = {
 
@@ -54,9 +57,9 @@ let ChunksModule = {
         let colors = new Float32Array(sunCapacity * 3 * 3);
         let uvs = new Float32Array(sunCapacity * 3 * 2);
 
-        let pA = new THREE.Vector3(); let pB = new THREE.Vector3();
-        let pC = new THREE.Vector3(); let cb = new THREE.Vector3();
-        let ab = new THREE.Vector3(); let color = new THREE.Color();
+        let pA = new Vector3(); let pB = new Vector3();
+        let pC = new Vector3(); let cb = new Vector3();
+        let ab = new Vector3(); let color = new Color();
 
         let whereToFindFace = new Map();
         let whichFaceIs = new Map();
@@ -84,11 +87,11 @@ let ChunksModule = {
             i += 18;
         }
 
-        let geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        let geometry = new BufferGeometry();
+        geometry.setAttribute('position', new BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+        geometry.setAttribute('color', new BufferAttribute(colors, 3));
+        geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
         geometry.computeBoundingSphere();
 
         let material = this.createMaterial('textured-phong', 0xaaaaaa);
@@ -96,7 +99,7 @@ let ChunksModule = {
         return {
             geometries:         [geometry],
             materials:          [material],
-            meshes:             [new THREE.Mesh(geometry, material)],
+            meshes:             [new Mesh(geometry, material)],
 
             capacities:         [sunCapacity / 2],
             sizes:              [triangles / 2],
@@ -280,7 +283,7 @@ let ChunksModule = {
                 }
 
                 // Create geometry.
-                geometry = new THREE.BufferGeometry();
+                geometry = new BufferGeometry();
                 geometries[meshId] = geometry;
                 materials[meshId] = this.createMaterial('textured-phong', 0xb8860b);
                 sizes[meshId] = 1;
@@ -308,13 +311,13 @@ let ChunksModule = {
             }
 
             // Add face.
-            let pA = new THREE.Vector3();
-            let pB = new THREE.Vector3();
-            let pC = new THREE.Vector3();
-            let cb = new THREE.Vector3();
-            let ab = new THREE.Vector3();
+            let pA = new Vector3();
+            let pB = new Vector3();
+            let pC = new Vector3();
+            let cb = new Vector3();
+            let ab = new Vector3();
             let n = 800;
-            let color = new THREE.Color();
+            let color = new Color();
             let pos = sizes[meshId] - 1;
 
             let nature = added[aid]; // Corresponds to block id.
@@ -329,12 +332,12 @@ let ChunksModule = {
                 normal, color, n);
 
             if (meshHasToBeAdded) {
-                geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+                geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
 
-                meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
+                meshes[meshId] = new Mesh(geometry, materials[meshId]);
                 this.addToScene(meshes[meshId], worldId);
             }
 

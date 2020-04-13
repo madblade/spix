@@ -4,18 +4,18 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
+import { Object3D, PerspectiveCamera } from 'three';
 
 let Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 {
     // Wrap for primitive manipulation simplicity.
-    let camera = new THREE.PerspectiveCamera(fov, aspect, nearPlane, farPlane);
+    let camera = new PerspectiveCamera(fov, aspect, nearPlane, farPlane);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
-    let pitch = new THREE.Object3D();
-    let yaw = new THREE.Object3D();
-    let up = new THREE.Object3D();
+    let pitch = new Object3D();
+    let yaw = new Object3D();
+    let up = new Object3D();
     pitch.add(camera);
     yaw.add(pitch);
     up.add(yaw);

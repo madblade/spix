@@ -4,8 +4,11 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import { ShadersModule }  from '../shaders/shaders';
+import {
+    UniformsUtils, DoubleSide,
+    BoxBufferGeometry, Mesh, ShaderMaterial, Vector3
+} from 'three';
 // import extend from '../../../extend.js';
 
 // TODO [CRIT] a non-cube sky, vertical with eternal zenith,
@@ -29,29 +32,29 @@ let SkyCube = function(centerX, centerY, centerZ, radius)
             rayleigh: { value: 1 },
             mieCoefficient: { value: 0.005 },
             mieDirectionalG: { value: 0.8 },
-            sunPosition: { value: new THREE.Vector3() },
-            // viewInverse: { value: new THREE.Matrix4() },
-            cameraPos: { value: new THREE.Vector3() },
-            worldCenter: { value: new THREE.Vector3(centerX, centerY, centerZ) },
+            sunPosition: { value: new Vector3() },
+            // viewInverse: { value: new Matrix4() },
+            cameraPos: { value: new Vector3() },
+            worldCenter: { value: new Vector3(centerX, centerY, centerZ) },
             cubeRadius: { value: radius }
         },
         vertexShader: ShadersModule.getSkyCubeVertexShader(),
         fragmentShader: ShadersModule.getSkyCubeFragmentShader()
     };
 
-    let material = new THREE.ShaderMaterial({
+    let material = new ShaderMaterial({
         fragmentShader: shader.fragmentShader,
         vertexShader: shader.vertexShader,
-        uniforms: THREE.UniformsUtils.clone(shader.uniforms),
-        side: THREE.DoubleSide
+        uniforms: UniformsUtils.clone(shader.uniforms),
+        side: DoubleSide
     });
 
-    let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    let geometry = new BoxBufferGeometry(1, 1, 1);
 
-    THREE.Mesh.call(this, geometry,
+    Mesh.call(this, geometry,
         material
-        // new THREE.MeshBasicMaterial({
-        //     side: THREE.DoubleSide, color: 0x362c6b})
+        // new MeshBasicMaterial({
+        //     side: DoubleSide, color: 0x362c6b})
     );
 };
 
@@ -64,28 +67,28 @@ let SkyFlat = function()
             rayleigh: { value: 1 },
             mieCoefficient: { value: 0.005 },
             mieDirectionalG: { value: 0.8 },
-            sunPosition: { value: new THREE.Vector3() },
-            cameraPos: { value: new THREE.Vector3() }
+            sunPosition: { value: new Vector3() },
+            cameraPos: { value: new Vector3() }
         },
         vertexShader: ShadersModule.getSkyFlatVertexShader(),
         fragmentShader: ShadersModule.getSkyFlatFragmentShader()
     };
 
-    let material = new THREE.ShaderMaterial({
+    let material = new ShaderMaterial({
         fragmentShader: shader.fragmentShader,
         vertexShader: shader.vertexShader,
-        uniforms: THREE.UniformsUtils.clone(shader.uniforms),
-        side: THREE.DoubleSide
+        uniforms: UniformsUtils.clone(shader.uniforms),
+        side: DoubleSide
     });
 
-    let geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    let geometry = new BoxBufferGeometry(1, 1, 1);
 
-    THREE.Mesh.call(this, geometry,
+    Mesh.call(this, geometry,
         material
     );
 };
 
-SkyCube.prototype = Object.create(THREE.Mesh.prototype);
-SkyFlat.prototype = Object.create(THREE.Mesh.prototype);
+SkyCube.prototype = Object.create(Mesh.prototype);
+SkyFlat.prototype = Object.create(Mesh.prototype);
 
 export { SkyFlat, SkyCube };

@@ -4,9 +4,9 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
 import { Camera } from './camera.js';
+import { Matrix4, Plane, Raycaster, Vector2, Vector3, Vector4 } from 'three';
 
 let CameraManager = function(graphicsEngine) {
     this.graphicsEngine = graphicsEngine;
@@ -244,34 +244,34 @@ extend(CameraManager.prototype, {
 
     // TODO fix clipping planes
     clipOblique(mirror, mirrorCamera, localRecorder) {
-        let matrix = new THREE.Matrix4();
+        let matrix = new Matrix4();
         matrix.extractRotation(mirror.matrix);
 
         // Reversal criterion: vector(pos(x)-pos(cam)) dot vector(x normal)
 
         // x normal
-        let vec1 = new THREE.Vector3(0, 0, 1);
+        let vec1 = new Vector3(0, 0, 1);
         vec1.applyMatrix4(matrix);
 
         // pos(x)-pos(camera)
         let posX = mirror.position;
         //let  = localRecorder.position;
-        let posC = new THREE.Vector3();
+        let posC = new Vector3();
         posC.setFromMatrixPosition(localRecorder.matrixWorld);
 
-        let vec2 = new THREE.Vector3();
+        let vec2 = new Vector3();
         vec2.x = posX.x - posC.x;
         vec2.y = posX.y - posC.y;
         vec2.z = posX.z - posC.z;
 
         // mirrorCamera.getWorldDirection(vec2);
 
-        //let camPosition = new THREE.Vector3();
+        //let camPosition = new Vector3();
         //camPosition.setFromMatrixPosition(mirrorCamera.matrixWorld);
         //let vec1 = mirror.normal;
-        //let vec2 = new THREE.Vector3(0,0, -1);
+        //let vec2 = new Vector3(0,0, -1);
         //vec2.applyQuaternion(mirrorCamera.quaternion);
-        //let vec2 = new THREE.Vector3(mirrorCamera.matrix[8], mirrorCamera.matrix[9], mirrorCamera.matrix[10]);
+        //let vec2 = new Vector3(mirrorCamera.matrix[8], mirrorCamera.matrix[9], mirrorCamera.matrix[10]);
 
         if (!vec1 || !vec2) {
             console.log('[XCam] Dot product error.');
@@ -284,7 +284,7 @@ extend(CameraManager.prototype, {
         //console.log(s);
         //console.log(dot);
         let normalFactor = 1; // [Expert] replace with -1 to invert normal.
-        let N = new THREE.Vector3(0, 0, s * normalFactor);
+        let N = new Vector3(0, 0, s * normalFactor);
         N.applyMatrix4(matrix);
 
         //update mirrorCamera matrices!!
@@ -296,17 +296,17 @@ extend(CameraManager.prototype, {
         // now update projection matrix with new clip plane
         // implementing code from: http://www.terathon.com/code/oblique.html
         // paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-        let clipPlane = new THREE.Plane();
+        let clipPlane = new Plane();
         clipPlane.setFromNormalAndCoplanarPoint(N, mirror.position);
         clipPlane.applyMatrix4(mirrorCamera.matrixWorldInverse);
 
-        clipPlane = new THREE.Vector4(
+        clipPlane = new Vector4(
             clipPlane.normal.x,
             clipPlane.normal.y,
             clipPlane.normal.z,
             clipPlane.constant);
 
-        let q = new THREE.Vector4();
+        let q = new Vector4();
         let projectionMatrix = mirrorCamera.projectionMatrix;
 
         let sgn = Math.sign;
@@ -319,7 +319,7 @@ extend(CameraManager.prototype, {
             mirrorCamera.projectionMatrix.elements[14];
 
         // Calculate the scaled plane vector
-        let c = new THREE.Vector4();
+        let c = new Vector4();
         c = clipPlane.multiplyScalar(2.0 / clipPlane.dot(q));
 
         // Replace the third row of the projection matrix
@@ -451,7 +451,7 @@ extend(CameraManager.prototype, {
 
     // Raycasting.
     createRaycaster() {
-        return new THREE.Raycaster();
+        return new Raycaster();
     },
 
     performRaycast() {
@@ -464,7 +464,7 @@ extend(CameraManager.prototype, {
         let terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
         let intersects;
-        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+        raycaster.setFromCamera(new Vector2(0, 0), camera);
         intersects = raycaster.intersectObjects(terrain);
 
         return intersects;
