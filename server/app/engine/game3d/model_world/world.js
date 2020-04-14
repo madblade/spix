@@ -4,12 +4,10 @@
 
 'use strict';
 
+import { ChunkSizes } from './model';
+
 class World
 {
-
-    static CHUNK_SIZE_X = 4; // MUST BE EVEN (ideally a power of two)
-    static CHUNK_SIZE_Y = 4;
-    static CHUNK_SIZE_Z = 4;
 
     constructor(id, worldInfo, worldModel)
     {
@@ -29,12 +27,13 @@ class World
         this._chunks = new Map();
 
         // Keep same generation method
-        this._generationMethod = 'flat';
+        // this._generationMethod = 'flat';
 
+        let chunkSizes = worldInfo.chunkSizes || ChunkSizes.CUBE_SMALL;
         // Constants
-        this._xSize = World.CHUNK_SIZE_X * 2;
-        this._ySize = World.CHUNK_SIZE_Y * 2;
-        this._zSize = World.CHUNK_SIZE_Z * 2;
+        this._xSize = chunkSizes[0] * 2;
+        this._ySize = chunkSizes[1] * 2;
+        this._zSize = chunkSizes[2] * 2;
         if (this._xSize % 2 !== 0 || this._ySize % 2 !== 0 || this._zSize % 2 !== 0) {
             console.error('World creation: chunk sizes must be even.');
         }
@@ -51,8 +50,8 @@ class World
     get allChunks() { return this._chunks; }
     set allChunks(newChunks) { this._chunks = newChunks; }
 
-    get generationMethod() { return this._generationMethod; }
-    set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
+    // get generationMethod() { return this._generationMethod; }
+    // set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);

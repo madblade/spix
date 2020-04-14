@@ -47,7 +47,7 @@ const ChunkSizes = Object.freeze({
     CUBE_REGULAR: [8, 8, 8],
     CUBE_HUGE: [16, 16, 16],
     FLAT_SMALL: [8, 8, 16],
-    FLAT_REGULAR: [16, 16, 32],
+    FLAT_REGULAR: [16, 16, 16],
     FLAT_HUGE: [32, 32, 64]
 });
 
@@ -127,6 +127,7 @@ class WorldModel
                 }
                 worldInfo.sideSize = parseInt(gameInfo.size, 10);
                 worldInfo.caves = CaveType.NO_CAVES;
+                worldInfo.chunkSizes = ChunkSizes.CUBE_REGULAR;
                 break;
             case WorldType.FLAT:
                 worldInfo.kind = WorldType.FLAT;
@@ -144,6 +145,7 @@ class WorldModel
                     default: break;
                 }
                 worldInfo.sideSize = -1; // infinite flat world
+                worldInfo.chunkSizes = ChunkSizes.FLAT_REGULAR;
                 break;
             case WorldType.SHRIKE:
             case WorldType.UNSTRUCTURED:
@@ -156,4 +158,4 @@ class WorldModel
     }
 }
 
-export { WorldModel as default, WorldType, BlockType };
+export { WorldModel as default, WorldType, BlockType, ChunkSizes };

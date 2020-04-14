@@ -210,12 +210,10 @@ class SimplePerlin {
 
             const v1 = directions[0]; // For signum & value.
             const a1 = abs(v1);
-            let [d1, d2, d3, normalSize, offset1, offset2, perm] =
-                a1 > 2 ?
-                    [dx, dy, dz, dx * dy, offsetX, offsetY, 0] :
-                a1 > 1 ?
-                    [dx, dz, dy, dx * dz, offsetX, offsetZ, 1] :
-                    [dy, dz, dx, dy * dz, offsetY, offsetZ, 2]; // Can factor normalSize outside.
+            let [d1, d2, d3, normalSize, offset1, offset2, offset3, perm] = a1 > 2 ?
+                [dx, dy, dz, dx * dy, offsetX, offsetY, offsetZ, 0] : a1 > 1 ?
+                    [dx, dz, dy, dx * dz, offsetX, offsetZ, offsetY, 1] :
+                    [dy, dz, dx, dy * dz, offsetY, offsetZ, offsetX, 2]; // Can factor normalSize outside.
 
             // let normalSize = a1 > 2 ? dx * dy : a1 > 1 ? dx * dz : dy * dz;
 
@@ -235,31 +233,35 @@ class SimplePerlin {
 
                 quality *= 4;
             }
-            console.log(data);
 
             // let getY = function(x, y) {
             //     return data[x + y * d1] * 0.2 | 0; // * priority > | priority
             // };
 
+            // Get vertical generation direction.
+            let fz = v1 > 0 ?
+                (
+                    perm === 0 ? (xy => zed => xy + normalSize * zed) :
+                        perm === 1 ? (xy => zed => xy + zed * d1) : (xy => zed => xy + zed)
+                ) : (
+                    perm === 0 ? (xy => zed => xy + normalSize * (d3 - zed - 1)) :
+                        perm === 1 ? (xy => zed => xy + (d3 - zed - 1) * d1) : (xy => zed => xy + (d3 - zed - 1))
+                );
+
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
                     let h = d3 / 2 + (data[x + y * d1] * 0.2 | 0); // getY(x, y);
-                    const rockLevel = Math.floor(5 * h / 6);
+                    let rockLevel = Math.floor(5 * h / 6);
                     let xy = perm === 0 ? x + y * d1 :
-                             perm === 1 ? x + y * d1 * d2 :
-                                          x * d1 + y * d1 * d2;
+                        perm === 1 ? x + y * d1 * d2 :
+                            x * d1 + y * d1 * d2;
+                    let ffz = fz(xy);
 
-                    let fz = v1 > 0 ?
-                        (perm === 0 ? (zed => xy + normalSize * zed) :
-                         perm === 1 ? (zed => xy + zed * d1) :
-                                      (zed => xy + zed))
-                        :
-                        (perm === 0 ? (zed => xy + normalSize * (d3 - zed - 1)) :
-                         perm === 1 ? (zed => xy + (d3 - zed - 1) * d1) :
-                                      (zed => xy + (d3 - zed - 1)));
-
-                    for (let zz = 0; zz < rockLevel; ++zz) {
-                        const currentBlock = fz(zz); // ijS * zz + xy;
+                    h -= offset3;
+                    rockLevel -= offset3;
+                    let rl = Math.min(rockLevel, d3);
+                    for (let zz = 0; zz < rl; ++zz) {
+                        const currentBlock = ffz(zz); // ijS * zz + xy;
 
                         // Rock.
                         blocks[currentBlock] = stone;
@@ -268,9 +270,10 @@ class SimplePerlin {
                         if (Math.random() > 0.99) blocks[currentBlock] = iron;
                     }
 
-                    for (let zz = rockLevel; zz < h; ++zz) {
+                    let bl = Math.min(h, d3);
+                    for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
-                        const currentBlock = fz(zz);
+                        const currentBlock = ffz(zz);
                         blocks[currentBlock] = mainBlockId; // ijS * zz + xy
                     }
                 }
