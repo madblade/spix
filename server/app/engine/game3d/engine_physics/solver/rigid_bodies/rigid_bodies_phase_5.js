@@ -144,7 +144,7 @@ class RigidBodiesPhase5 {
                 let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
                 if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
                     entityUpdated = true;
-                    // TODO rotate collision model.
+                    // TODO [CRITICAL] rotate collision model.
                 }
             }
 

@@ -24,16 +24,24 @@ import ConsistencyModel from './model_consistency/model';
 import Chat             from './../../model/connection/chat';
 import TimeUtils from '../math/time';
 
+const GameType = Object.freeze({
+    FLAT: Symbol('flat'),
+    CUBE: Symbol('cube'),
+    DEMO: Symbol('demo'),
+    UNSTRUCTURED: Symbol('unstructured')
+});
+
 class Game3D extends Game
 {
     static serverRefreshRate = 8;
     // static serverRefreshRate = 420; // blaze it
 
-    constructor(hub, gameId, connector) {
+    constructor(hub, gameId, connector, gameInfo) {
         super(hub, gameId, connector);
 
         // Utility parameters
-        this._kind = 'game3d';
+        this._kind = gameInfo.kind;
+        this._gameInfo = gameInfo;
         this._refreshRate = Game3D.serverRefreshRate;
         //this._refreshRate = 1000;
         this._tt = 0;
@@ -64,6 +72,8 @@ class Game3D extends Game
     }
 
     // Model
+
+    get gameInfo()          { return this._gameInfo; }
 
     get entityModel()       { return this._entityModel; }
     get worldModel()        { return this._worldModel; }
@@ -151,4 +161,4 @@ class Game3D extends Game
 
 }
 
-export default Game3D;
+export { Game3D as default, GameType };

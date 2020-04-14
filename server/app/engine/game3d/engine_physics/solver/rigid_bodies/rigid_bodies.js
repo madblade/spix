@@ -11,6 +11,7 @@ import Phase2 from './rigid_bodies_phase_2';
 import Phase3 from './rigid_bodies_phase_3';
 import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
+import { WorldType } from '../../../model_world/model';
 
 // TODO [HIGH] rotate collision model
 // TODO [HIGH] find angles and interpolate rotation
@@ -44,7 +45,9 @@ class RigidBodies {
 
     // Advanced gravity management.
     getGravity(world, worldId, x, y, z) {
-        if (this._variableGravity && parseInt(worldId, 10) === -1)
+        if (this._variableGravity &&
+            //parseInt(worldId, 10) === -1
+            world.worldInfo.type === WorldType.CUBE)
         {
             // let direction = [0, 0, 0];
             // let distance = 0;

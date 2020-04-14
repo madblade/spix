@@ -120,7 +120,9 @@ extend(RendererManager.prototype, {
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
             this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
             //bufferScene.updateMatrixWorld();
-            renderer.render(bufferScene, bufferCamera, bufferTexture);
+            renderer.setRenderTarget(bufferTexture);
+            renderer.render(bufferScene, bufferCamera);
+            renderer.setRenderTarget(null);
 
             //if (true) {
                 //let rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();

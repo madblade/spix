@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Game3D from './game3d/game';
+import Game3D, { GameType } from './game3d/game';
 
 class GameFactory
 {
@@ -16,15 +16,15 @@ class GameFactory
             case 'flat':
                 let flatHillsType = parseInt(options.hills, 10);
                 let caves = parseInt(options.caves, 10);
-                game = new Game3D(hub, gameId, connector);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.FLAT, flatHillsType, caves });
                 break;
             case 'cube':
                 let threeHillsType = parseInt(options.hills, 10);
-                let size = parseInt(options.hills, 10);
-                game = new Game3D(hub, gameId, connector);
+                let size = parseInt(options.size, 10);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.CUBE, threeHillsType, size });
                 break;
             case 'demo':
-                game = new Game3D(hub, gameId, connector);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.DEMO });
                 break;
             case 'unstructured':
                 console.log('[Server/GameFactory] Unstructured not yet supported.');

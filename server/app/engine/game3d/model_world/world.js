@@ -4,17 +4,25 @@
 
 'use strict';
 
-class World {
+class World
+{
 
-    constructor(id, worldType, worldModel)
+    static CHUNK_SIZE_X = 4; // MUST BE EVEN (ideally a power of two)
+    static CHUNK_SIZE_Y = 4;
+    static CHUNK_SIZE_Z = 4;
+
+    constructor(id, worldInfo, worldModel)
     {
         this._worldId = id; // Identifier
         this._worldModel = worldModel;
-        // this._worldType = worldType;
         this._worldInfo = {
-            type: worldType,
-            center: {x: 0, y: 0, z: -2},
-            radius: 2
+            hills: worldInfo.hills,
+            caves: worldInfo.caves,
+            type: worldInfo.kind,
+
+            // Only for CubeWorld
+            radius: worldInfo.sideSize,
+            center: {x: 0, y: 0, z: -worldInfo.sideSize},
         };
 
         // Chunk id (i+','+j+','+k) -> chunk
@@ -24,9 +32,12 @@ class World {
         this._generationMethod = 'flat';
 
         // Constants
-        this._xSize = 4; // MUST BE EVEN (ideally a power of two)
-        this._ySize = 4; // MUST BE EVEN (ideally a power of two)
-        this._zSize = 4; // MUST BE EVEN (ideally a power of two)
+        this._xSize = World.CHUNK_SIZE_X * 2;
+        this._ySize = World.CHUNK_SIZE_Y * 2;
+        this._zSize = World.CHUNK_SIZE_Z * 2;
+        if (this._xSize % 2 !== 0 || this._ySize % 2 !== 0 || this._zSize % 2 !== 0) {
+            console.error('World creation: chunk sizes must be even.');
+        }
     }
 
     get worldId() { return this._worldId; }
@@ -76,7 +87,7 @@ class World {
 
         const chunkId = `${i},${j},${k}`;
         let chunk = this._chunks.get(chunkId);
-        if (!chunk || chunk === undefined) {
+        if (!chunk) {
             console.log(`ChkMgr@whatBlock: could not find chunk ${chunkId} from (${x},${y},${z})!`);
             // TODO [MEDIUM] load concerned chunk.
             // TODO [MEDIUM] check minus
@@ -89,8 +100,8 @@ class World {
     getFreePosition() {
         let zLimit = this._zSize;
         let z = zLimit - 2;
-        let centerInteger = parseInt(zLimit / 2, 10);
-        let centerFloat = parseFloat(zLimit / 2) + 0.01;
+        let centerInteger = Math.trunc(zLimit / 2); // parseInt(zLimit / 2, 10);
+        let centerFloat = zLimit / 2 + 0.01; // parseFloat(zLimit / 2) + 0.01;
         while (
             (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 ||
                 this.whatBlock(centerInteger, centerInteger, z) !== 0) &&

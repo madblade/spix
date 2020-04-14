@@ -29,7 +29,7 @@ let HubState = function(stateManager) {
                 <span class="input-group-text">Cube size</span>
             </div>
             <input class="form-control" type="number"
-                value="1" min="1" max="256" id="cube-game-side-size">
+                value="2" min="1" max="256" id="cube-game-side-size">
 
             <div class="input-group-append mb-1">
                 <button class="btn btn-outline-light" id="button-create-cube-game">

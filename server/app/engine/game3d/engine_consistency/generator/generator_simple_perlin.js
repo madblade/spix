@@ -163,6 +163,8 @@ class SimplePerlin {
                     directions.push(ck > center.z ? 3 : -3);
 
                 break;
+            default:
+                console.error('[Generator Simple Perlin] Unknown world type.');
         }
 
         // Fill with grass on main world, sand everywhere else.
@@ -177,7 +179,8 @@ class SimplePerlin {
                         blocks[i + j * dx + k * ijS] = planks;
             }
         }
-        else if (directions.length === 2) {
+
+        if (directions.length === 2) {
             // Quarter-full generation.
             // 1 or 2, then 2 or 3!
             for (let a1 = abs(directions[0]), l1 = a1 === 1 ? dx / 2 : dy / 2, ij = directions[0] > 0 ? 0 : l1, c1 = 0; c1 < l1; ++c1, ++ij)
@@ -200,7 +203,8 @@ class SimplePerlin {
                     }
                 }
         }
-        else {
+
+        if (directions.length === 1) {
             // Perlin generation.
             let perlin = new SimplePerlin();
 
@@ -220,10 +224,9 @@ class SimplePerlin {
             // const z = shuffleChunks ? Math.random() * 100 : 50;
             const z = 4 * (shuffleChunks ? Math.random() * d3 : Math.floor(d3 / 2));
 
+            for (let i = 0; i < normalSize; ++i) data[i] = 0;
             for (let iteration = 0; iteration < 4; ++iteration)
             {
-                if (iteration === 0) for (let i = 0; i < normalSize; ++i) data[i] = 0;
-
                 for (let i = 0; i < normalSize; ++i) {
                     let x = offset1 + i % d1;
                     let y = offset2 + (i / d1 | 0); // / priority > | priority
@@ -232,6 +235,7 @@ class SimplePerlin {
 
                 quality *= 4;
             }
+            console.log(data);
 
             // let getY = function(x, y) {
             //     return data[x + y * d1] * 0.2 | 0; // * priority > | priority
