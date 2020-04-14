@@ -153,6 +153,8 @@ extend(ChunkModel.prototype, {
                 //console.log(updates['worlds']);
                 let worlds = updates.worlds;
                 for (let wid in worlds) {
+                    if (!worlds.hasOwnProperty(wid)) continue;
+
                     let wif = worlds[wid];
                     for (let id = 0, wl = wif.length; id < wl; ++id)
                         wif[id] = parseInt(wif[id], 10);
@@ -346,7 +348,11 @@ extend(ChunkModel.prototype, {
                 return;
             }
 
-            currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh);});
+            currentChunk.meshes.forEach(function(mesh) {
+                if (!!mesh && !!mesh.geometry) { // empty chunk or geometry
+                    meshes.push(mesh);
+                }
+            });
         });
 
         return meshes;

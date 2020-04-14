@@ -49,18 +49,18 @@ let PointerLockModule = {
 
             switch (event.which) {
                 case 1: // Left
-                    break;
+                    // break;
                 case 2: // Middle
                 case 3: // Right
                 default:
-                    return;
+                    // return;
             }
 
             // Ask the browser to lock the pointer.
-            event.preventDefault();
-            event.stopPropagation();
-            scope.requestPointerLock();
-            app.setFocused(true);
+            // event.preventDefault();
+            // event.stopPropagation();
+            // scope.requestPointerLock();
+            // app.setFocused(true);
         });
     },
 

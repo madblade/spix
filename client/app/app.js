@@ -176,7 +176,7 @@ extend(App.Core.prototype, {
         console.log('Join request...');
 
         // Configuration.
-        this.setState('ingame');
+        this.setState('preingame');
         this.engine.connection.configureGame(gameType, gameId);
 
         // Start model loop.

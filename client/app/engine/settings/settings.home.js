@@ -10,7 +10,7 @@ let HomeModule = {
 
     getHomeHTML() {
         return `
-            <table class="table table-bordered" style="width:100%" class="noselect">
+            <table class="table table-bordered noselect" style="width:100%">
             <tr id="graphics"><td>Graphics</td></tr>
             <tr id="gameplay"><td>Gameplay</td></tr>
             <tr id="audio"><td>Audio</td></tr>
@@ -22,7 +22,7 @@ let HomeModule = {
 
     goHome() {
         this.unlistenSettingsMenu();
-        $(window).off('keydown');
+        // $(window).off('keydown');
         // this.app.setState('loading');
         this.app.engine.connection.send('leave');
         this.app.stopGame();
@@ -36,20 +36,20 @@ let HomeModule = {
         $('#audio').click(function() { this.goAudio(); }.bind(this));
         $('#home').click(function() { this.goHome(); }.bind(this));
         $('#return').click(function() {
-            $(window).off('keydown');
+            // $(window).off('keydown');
             this.unlistenSettingsMenu();
             this.stateManager.setState('ingame');
             this.controlsEngine.requestPointerLock();
             this.app.setFocused(true);
         }.bind(this));
-        $(window).keydown(function(event) {
-            if (!event.keyCode) { return; }
-            if (event.keyCode === this.controlsEngine.keyControls.escape) {
-                // Remove listeners and get away from the bike.
-                this.unlistenSettingsMenu();
-                this.stateManager.setState('ingame');
-            }
-        }.bind(this));
+        // $(window).keydown(function(event) {
+        //     if (!event.keyCode) { return; }
+        //     if (event.keyCode === this.controlsEngine.keyControls.escape) {
+        // Remove listeners and get away from the bike.
+        // this.unlistenSettingsMenu();
+        // this.stateManager.setState('ingame');
+        // }
+        // }.bind(this));
 
         // TODO [LOW] use listeners array.
         // this.listeners.push('graphics', 'gameplay', 'audio', 'home', 'return');
