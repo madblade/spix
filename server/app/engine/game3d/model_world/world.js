@@ -104,7 +104,7 @@ class World
         while (
             (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 ||
                 this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
-            z < 100 * zLimit) ++z;
+            z < 2 * zLimit) ++z; // check 2 chunks and abort
         return [centerFloat, centerFloat, z];
     }
 

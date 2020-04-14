@@ -137,15 +137,27 @@ class SimplePerlin {
                 const deltaX = center.x - parseInt(ci, 10);
                 const deltaY = center.y - parseInt(cj, 10);
                 const deltaZ = center.z - parseInt(ck, 10);
-                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius) {
+
+                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius)
+                {
                     blocks.fill(air);
                     chunk.blocks = blocks;
                     return; // Blocks are filled with zeros.
                 }
+
+                // full stone inside the cubeworld
                 if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
-                    blocks.fill(stone);
-                    chunk.blocks = blocks;
-                    return;
+                    if (abs(deltaX) < abs(deltaZ) && abs(deltaY) < abs(deltaZ) && abs(deltaZ) > 0) {
+                        directions.push(ck > center.z ? 3 : -3);
+                    } else if (abs(deltaX) < abs(deltaY) && abs(deltaZ) < abs(deltaY) && abs(deltaY) > 0) {
+                        directions.push(cj > center.y ? 2 : -2);
+                    } else if (abs(deltaY) < abs(deltaX) && abs(deltaZ) < abs(deltaX) && abs(deltaX) > 0) {
+                        directions.push(ci > center.x ? 1 : -1);
+                    } else {
+                        blocks.fill(stone);
+                        chunk.blocks = blocks;
+                        return;
+                    }
                 }
 
                 // TODO [CRIT] manage empty chunks
@@ -248,6 +260,18 @@ class SimplePerlin {
                         perm === 1 ? (xy => zed => xy + (d3 - zed - 1) * d1) : (xy => zed => xy + (d3 - zed - 1))
                 );
 
+            if (worldType === WorldType.CUBE) {
+                let r = parseInt(worldInfo.radius, 10);
+                switch (v1) {
+                    case 1:  offset3 = (-worldInfo.center.x - r + parseInt(ci, 10)) * d1; break;
+                    case -1: offset3 = (worldInfo.center.x - r - parseInt(ci, 10)) * d1; break;
+                    case 2:  offset3 = (-worldInfo.center.y - r + parseInt(cj, 10)) * d2; break;
+                    case -2: offset3 = (worldInfo.center.y - r - parseInt(cj, 10)) * d2; break;
+                    case 3:  offset3 = (-worldInfo.center.z - r + parseInt(ck, 10)) * d3; break;
+                    case -3: offset3 = (worldInfo.center.z - r - parseInt(ck, 10)) * d3; break;
+                }
+            }
+
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
                     let h = d3 / 2 + (data[x + y * d1] * 0.2 | 0); // getY(x, y);
@@ -259,7 +283,7 @@ class SimplePerlin {
 
                     h -= offset3;
                     rockLevel -= offset3;
-                    let rl = Math.min(rockLevel, d3);
+                    let rl = Math.max(0, Math.min(rockLevel, d3));
                     for (let zz = 0; zz < rl; ++zz) {
                         const currentBlock = ffz(zz); // ijS * zz + xy;
 
@@ -270,7 +294,7 @@ class SimplePerlin {
                         if (Math.random() > 0.99) blocks[currentBlock] = iron;
                     }
 
-                    let bl = Math.min(h, d3);
+                    let bl = Math.max(0, Math.min(h, d3));
                     for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
                         const currentBlock = ffz(zz);

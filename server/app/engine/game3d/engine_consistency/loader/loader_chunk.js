@@ -113,8 +113,9 @@ class ChunkLoader {
         // Get current chunk.
         let starterChunk = world.getChunkById(nearestChunkId);
         if (!starterChunk) {
-            console.log('Could not load chunk on which current entity is.');
-            return;
+            console.log('[WARN] Could not load chunk on which current entity is.');
+            starterChunk = ChunkBuilder.addChunk(world.xSize, world.ySize, world.zSize, nearestChunkId, world);
+            // return;
         }
 
         // Return variables.
