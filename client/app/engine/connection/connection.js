@@ -54,6 +54,28 @@ extend(Connection.prototype, {
         this.socket.on('reconnect_error',   function() {console.log('Reconnection failed! :(');});
     },
 
+    listenQuick() {
+        let app = this.app;
+        this.socket.on('hub',               function(data) {
+            data = JSON.parse(data);
+            let d = 'demo';
+            if (!data.hasOwnProperty(d)) {
+                console.log(data);
+                console.error('could not join demo'); return;
+            }
+            let array = data[d];
+            if (array.length !== 1) {
+                console.log(array);
+                console.log('WARN: Demo already present in the local sandbox.');
+            }
+            if (array.length < 1) {
+                console.error('Failed to create demo.'); return;
+            }
+            app._forceJoin(d, array[0]);
+        });
+        this.socket.on('joined',            function() { app.joinedServer(); });
+    },
+
     disconnect() {
         this.socket.disconnect();
         this.unregisterSocketForGame3D();

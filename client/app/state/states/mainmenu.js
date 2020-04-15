@@ -40,7 +40,7 @@ let MainMenuState = function(stateManager) {
     this.htmlRemoteSandbox =
         `<hr/>
 
-        <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, no AdBlock)</label>
+        <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, might be <em>uBlock</em>ed!)</label>
         <div class="input-group mb-1" id="connect-webrtc-server">
             <div class="input-group-prepend">
                 <span class="input-group-text">Offer</span>
@@ -66,7 +66,7 @@ let MainMenuState = function(stateManager) {
     this.htmlLocalSandbox =
         `<hr/>
 
-        <label for="connect-throttle-server">Connect to my local sandbox</label>
+        <label for="connect-throttle-server">Connect to my local sandbox (this very browser)</label>
         <div class="input-group mb-3" id="connect-throttle-server">
             <div class="input-group-prepend flex-fill">
                 <span class="input-group-text flex-fill">@localhost/browser</span>
@@ -77,7 +77,7 @@ let MainMenuState = function(stateManager) {
             </div>
         </div>
 
-        <label for="start-sandbox">Invite people into my local sandbox (WebRTC, no AdBlock!)</label>
+        <label for="start-sandbox">Invite people into my local sandbox (WebRTC, might be <em>uBlock</em>ed!)</label>
         <div class="input-group mb-1" id="add-sandbox">
             <div class="input-group-prepend">
                 <span class="input-group-text">@friend</span>

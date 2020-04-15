@@ -23,6 +23,7 @@ let Server = function(app) {
     this.selfModel.xModel = this.xModel;
 
     this.isRunning = false;
+    this.isDirty = false;
 };
 
 extend(Server.prototype, UpdateModule);

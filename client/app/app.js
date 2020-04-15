@@ -83,9 +83,13 @@ extend(App.Core.prototype, {
 
     startDemo() {
         // TODO order a new demo server and spawn immediately.
-        this.startFromLocalServer();
-        this.requestGameCreation('demo');
-        this.join('demo', 1);
+        this.setState('loading');
+        let s = this.localServer.standalone.io.socketClient;
+        this.engine.connection.setupLocalSocket(s);
+        this.engine.connection.listenQuick(); // only listen to hub and join
+        this.model.server.isDirty = true;
+        this.localServer.standalone.start();
+        this._forceRequestGameCreation('demo');
     },
 
     startFromLocalServer() {
@@ -166,6 +170,18 @@ extend(App.Core.prototype, {
         }
 
         this.engine.connection.requestGameCreation(gameType, options);
+    },
+
+    _forceRequestGameCreation(gameType, options) {
+        this.engine.connection.requestGameCreation(gameType, options);
+    },
+
+    _forceJoin(gameType, gameId) {
+        this.setState('preingame');
+        this.engine.connection.configureGame(gameType, gameId);
+        this.model.client.init(gameType);
+        this.model.server.init(gameType);
+        this.engine.connection.join(gameType, gameId);
     },
 
     // Called when a 'join' request is emitted from Hub state.

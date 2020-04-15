@@ -206,7 +206,10 @@ class UserOutput {
 
         // TODO [OPT] use arrays
         game.players.forEach(p => {
-            let pid = p.avatar.entityId;
+            let pav = p.avatar;
+            if (!pav) return;
+
+            let pid = pav.entityId;
             let addedOrRemovedX = xOutput.get(pid);
 
             if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0) {

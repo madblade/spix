@@ -22,6 +22,7 @@ class Game {
         this._isRunning = false;
         this._ready = false;
         this._killed = false;
+        this._awaitingJoin = 0;
 
         //
         this._playerManager = Factory.createPlayerManager();
@@ -85,6 +86,15 @@ class Game {
     }
 
     addPlayer(player) {
+        if (!this._ready) {
+            console.warn('WARN: A player tries to join although the game is not ready.');
+            if (this._awaitingJoin < 10) {
+                console.warn('Retrying in 300ms.');
+                setTimeout(() => { this.addPlayer(player); }, 300);
+            }
+            ++this._awaitingJoin;
+            return;
+        }
         console.log('A player joined.');
 
         // Join channel.
