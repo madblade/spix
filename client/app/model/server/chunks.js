@@ -7,7 +7,6 @@
 /** Model **/
 
 import extend           from '../../extend.js';
-import { Vector3 }      from 'three';
 
 const WorldType = Object.freeze({
     FLAT: 0, // Symbol('flat'),
@@ -75,98 +74,6 @@ extend(ChunkModel.prototype, {
         graphics.addToScene(p.atmosphere.mesh, worldId);
     },
 
-    // TODO [MILESTONE1] make sky creation api serverwise
-    // or seed behaviour
-    addSky(worldId)
-    {
-        let worldMeta = this.worldProperties.get(worldId);
-        if (!worldMeta)
-            console.log('[Chunks] Default sky creation.');
-
-        let graphics = this.app.engine.graphics;
-
-        // Sky light.
-        let light = graphics.createLight('hemisphere');
-        light.position.set(0.5, 1, 0.75);
-        light.updateMatrixWorld();
-        graphics.addToScene(light, worldId);
-
-        let sunPosition = new Vector3(0, -700000, 0);
-        let sky;
-        let skyType = worldMeta.type;
-        if (skyType === WorldType.CUBE) {
-            if (!worldMeta.center || !worldMeta.radius) {
-                console.error('[Chunks/NewSky]: No center and radius specified.');
-                return;
-            }
-            if (worldMeta.chunkSizeX !== worldMeta.chunkSizeY ||
-                worldMeta.chunkSizeX !== worldMeta.chunkSizeZ) {
-                console.error('[Chunks/NewSky]: Cube world must have cube chunks.');
-                return;
-            }
-            let chunkSize = worldMeta.chunkSizeX;
-            let center = new Vector3(
-                (worldMeta.center.x + 0.5) * chunkSize,
-                (worldMeta.center.y + 0.5) * chunkSize,
-                (worldMeta.center.z + 0.5) * chunkSize - 1);
-            let radius = Math.max(worldMeta.radius, 1) * chunkSize - 1;
-
-            sky = graphics.createCubeSky(center, radius);
-            // let sunSphere = graphics.createSunSphere();
-            graphics.addToScene(sky.mesh, worldId);
-            // graphics.addToScene(sky.helper, worldId);
-            // graphics.addToScene(sunSphere, worldId);
-
-            // TODO [LOW] sky as seen from space
-            // turbidity = 1
-            // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
-            // mieDirectionalG = 0.0
-            graphics.updateSky(
-                sky.mesh,
-                sunPosition,
-                10,
-                2,
-                0.005,
-                0.8,
-                1.0,
-                -0.15, // 0.49; // elevation / inclination
-                0.0, // Facing front
-                true // isSunSphereVisible
-            );
-        } else if (skyType === WorldType.FLAT) {
-            sky = graphics.createFlatSky();
-            graphics.addToScene(sky.mesh, worldId);
-            graphics.updateSky(
-                sky.mesh,
-                sunPosition,
-                10,
-                2,
-                0.005,
-                0.8,
-                1.0,
-                -0.15, // 0.49; // elevation / inclination
-                0.0, // Facing front
-                true // isSunSphereVisible
-            );
-        } else {
-            console.error('Unsupported sky type.');
-            return;
-        }
-
-        this.skies.set(worldId, sky);
-    },
-
-    // TODO [MILESTONE1] make sky update api serverwise
-    // or seed behaviour
-    updateSky(worldId, worldInfo) {
-        if (!worldInfo)
-            console.log('[Chunks] Warn! Nothing to update in the sky.');
-
-        let currentSky = this.skies.get(worldId);
-        if (!currentSky)
-            console.log('[Chunks] Warn! Could not get required sky.');
-    },
-
     /** Dynamics **/
 
     init() {},
@@ -212,7 +119,9 @@ extend(ChunkModel.prototype, {
                     // 1 world <-> 1 scene, multiple cameras
                     graphics.addScene(wid);
 
-                    this.addSky(wid);
+                    let newSky = graphics.addSky(wid, this.worldProperties.get(wid));
+                    if (newSky)
+                        this.skies.set(wid, newSky);
                 }
             }
 
@@ -435,4 +344,4 @@ extend(ChunkModel.prototype, {
     }
 });
 
-export { ChunkModel };
+export { ChunkModel, WorldType };

@@ -11,10 +11,6 @@ import {
 } from 'three';
 // import extend from '../../../extend.js';
 
-// TODO [CRIT] a non-cube sky, vertical with eternal zenith,
-//  but with directional light in the case of a cube earth.
-//  I can also make this sun spin.
-
 // turbidity, 1.0, 20.0, 0.1
 // rayleigh, 0.0, 4, 0.001
 // mieCoefficient, 0.0, 0.1, 0.001

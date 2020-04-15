@@ -84,6 +84,8 @@ extend(App.Core.prototype, {
     startDemo() {
         // TODO order a new demo server and spawn immediately.
         this.startFromLocalServer();
+        this.requestGameCreation('demo');
+        this.join('demo', 1);
     },
 
     startFromLocalServer() {
@@ -164,8 +166,6 @@ extend(App.Core.prototype, {
         }
 
         this.engine.connection.requestGameCreation(gameType, options);
-        // TODO single-page without reloading every time a new game is asked...
-        // location.reload();
     },
 
     // Called when a 'join' request is emitted from Hub state.

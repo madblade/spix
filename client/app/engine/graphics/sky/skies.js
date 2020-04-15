@@ -10,6 +10,7 @@ import {
     Mesh, MeshBasicMaterial, MeshNormalMaterial,
     BoxBufferGeometry, SphereBufferGeometry, Vector3
 } from 'three';
+import { WorldType } from '../../../model/server/chunks';
 
 let SkyModule = {
 
@@ -56,6 +57,84 @@ let SkyModule = {
         return sunSphere;
     },
 
+    // TODO [MILESTONE1] make sky creation api serverwise
+    // or seed behaviour
+    addSky(worldId, worldMeta)
+    {
+        if (!worldMeta)
+            console.log('[Chunks] Default sky creation.');
+
+        // Sky light.
+        // TODO [CRIT] AO light and update
+        let light = this.createLight('hemisphere');
+        light.position.set(0.5, 1, 0.75);
+        light.updateMatrixWorld();
+        this.addToScene(light, worldId);
+
+        let sunPosition = new Vector3(0, -700000, 0);
+        let sky;
+        let skyType = worldMeta.type;
+        if (skyType === WorldType.CUBE) {
+            if (!worldMeta.center || !worldMeta.radius) {
+                console.error('[Chunks/NewSky]: No center and radius specified.');
+                return;
+            }
+            if (worldMeta.chunkSizeX !== worldMeta.chunkSizeY ||
+                worldMeta.chunkSizeX !== worldMeta.chunkSizeZ) {
+                console.error('[Chunks/NewSky]: Cube world must have cube chunks.');
+                return;
+            }
+            let chunkSize = worldMeta.chunkSizeX;
+            let center = new Vector3(
+                (worldMeta.center.x + 0.5) * chunkSize,
+                (worldMeta.center.y + 0.5) * chunkSize,
+                (worldMeta.center.z + 0.5) * chunkSize - 1);
+            let radius = Math.max(worldMeta.radius, 1) * chunkSize - 1;
+
+            sky = this.createCubeSky(center, radius);
+            // let sunSphere = graphics.createSunSphere();
+            this.addToScene(sky.mesh, worldId);
+            // graphics.addToScene(sky.helper, worldId);
+            // graphics.addToScene(sunSphere, worldId);
+
+            // turbidity = 1
+            // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
+            // mieDirectionalG = 0.0
+            this.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.0, // Facing front
+                true // isSunSphereVisible
+            );
+        } else if (skyType === WorldType.FLAT) {
+            sky = this.createFlatSky();
+            this.addToScene(sky.mesh, worldId);
+            this.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.0, // Facing front
+                true // isSunSphereVisible
+            );
+        } else {
+            console.error('Unsupported sky type.');
+            return;
+        }
+
+        return sky;
+    },
+
     updateSunPosition(camera, sky) {
         if (!sky || !this.distance) return;
         let s = sky;
@@ -76,6 +155,8 @@ let SkyModule = {
         let y = distance * sin(phi) * sin(theta);
         let z = distance * sin(phi) * cos(theta);
         let vec3 = new Vector3(x, y, z);
+
+        // TODO [CRIT] update light position
 
         if (camera.projectionMatrix) {
             // let mat4 = new THREE.Matrix4();

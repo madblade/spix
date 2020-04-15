@@ -61,7 +61,7 @@ extend(RendererManager.prototype, {
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
 
-        // TODO [CRIT] put somewhere else
+        // TODO [CRIT] do this for every portal with a different camera.
         let skies = this.graphics.app.model.server.chunkModel.skies;
         skies.forEach(sky => {
             this.graphics.updateSunPosition(mainCamera, sky.mesh);

@@ -13,6 +13,8 @@ let MainMenuState = function(stateManager) {
 
     this.htmlHead = '<div class="container">';
     this.htmlDistantServer = `
+        <hr/>
+
         <label for="connect-socket-server">Connect to a distant server (Socket)</label>
         <div class="input-group" id="connect-socket-server">
             <div class="input-group-prepend">
@@ -89,8 +91,7 @@ let MainMenuState = function(stateManager) {
         </div>`;
 
     this.htmlQuick =
-        `<hr/>
-
+        `
         <label for="play-quick">Solo mode</label>
         <div class="input-group mb-1 center-block" id="play-quick">
 
@@ -144,11 +145,11 @@ extend(MainMenuState.prototype, {
             .empty()
             .removeClass()
             .append(this.htmlHead)
+            .append(this.htmlQuick)
             .append(this.htmlDistantServer)
             .append(this.htmlRemoteSandbox)
             .append(this.htmlLocalSandbox)
             .append(this.getRTCUsers())
-            .append(this.htmlQuick)
             .append(this.htmlTail)
             .center()
             .show();

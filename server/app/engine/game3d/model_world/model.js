@@ -97,9 +97,19 @@ class WorldModel
             case GameType.DEMO:
                 let wid = parseInt(worldId, 10);
                 if (wid === 2) {
-                    return { kind: WorldType.CUBE, sideSize: 4, hills: HillType.NO_HILLS };
+                    return {
+                        kind: WorldType.CUBE,
+                        sideSize: 4,
+                        hills: HillType.NO_HILLS,
+                        caves: CaveType.NO_CAVES
+                    };
                 } else if (wid === 3) {
-                    return { kind: WorldType.CUBE, sideSize: 16, hills: HillType.REGULAR_HILLS };
+                    return {
+                        kind: WorldType.CUBE,
+                        sideSize: 16,
+                        hills: HillType.REGULAR_HILLS,
+                        caves: CaveType.NO_CAVES
+                    };
                 } else {
                     wk = WorldType.FLAT;
                 }
