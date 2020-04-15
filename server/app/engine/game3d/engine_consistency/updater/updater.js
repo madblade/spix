@@ -137,6 +137,7 @@ class Updater {
             let addedX;
             let removedX;
             let addedW;
+            let addedWMeta;
             let x = xLoader.computeNewXInRange(p);
             if (x) [addedX, removedX] = x;
 
@@ -151,13 +152,18 @@ class Updater {
 
             if (addedChunks)        {
                 addedW = {};
+                addedWMeta = {};
                 forEach(addedChunks, wid => {
                     if (!(wid in addedW)) {
                         let w = worldModel.getWorld(parseInt(wid, 10));
                         addedW[wid] = [w.xSize, w.ySize, w.zSize];
+                        if (!consistencyModel.hasWorld(wid)) {
+                            addedWMeta[wid] = [w.worldInfo.type, w.worldInfo.radius, w.worldInfo.center.x, w.worldInfo.center.y, w.worldInfo.center.z];
+                        }
                     }
-                    forEach(addedChunks[wid], c =>
-                        {consistencyModel.setChunkLoaded(pid, parseInt(wid, 10), c);});
+                    forEach(addedChunks[wid], c => {
+                        consistencyModel.setChunkLoaded(pid, parseInt(wid, 10), c);
+                    });
                 });
             }
             if (removedChunks)
@@ -166,9 +172,10 @@ class Updater {
                         consistencyModel.setChunkOutOfRange(pid, parseInt(wid, 10), c));
                 });
 
+            // TODO [OPT] pack everything in just one send
             // Update output buffers.
             if (addedChunks || removedChunks)
-                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW);
+                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW, addedWMeta);
             if (addedEntities || removedEntities)
                 ebuf.updateEntitiesForPlayer(pid, addedEntities, removedEntities);
             if (addedX || removedX)

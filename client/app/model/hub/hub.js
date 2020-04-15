@@ -14,7 +14,6 @@ let Hub = function(app) {
 extend(Hub.prototype, {
 
     update(data) {
-        console.log(`Hub: ${data}`);
         data = JSON.parse(data);
 
         let map = this.games;

@@ -124,11 +124,12 @@ class UserOutput {
 
                 // Format:
                 // {
-                //  'worlds': {worldId:[x,y,z]} ............... World metadata
+                //  'worldsMeta': {worldId:[type, r, cx,cy,cz]} . World metadata
+                //  'worlds': {worldId:[x,y,z]} ................. World chunk dimensions
                 //  worldId:
-                //      {chunkId: [fastCC, fastCCId]} ......... Added chunk
-                //      {chunkId: [removed, added, updated]} .. Updated chunk
-                //      {chunkId: null} ....................... Removed chunk
+                //      {chunkId: [fastCC, fastCCId]} ........... Added chunk
+                //      {chunkId: [removed, added, updated]} .... Updated chunk
+                //      {chunkId: null} ......................... Removed chunk
                 // }
 
                 let output = UserOutput.pack(addedOrRemovedChunks);

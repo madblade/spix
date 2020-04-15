@@ -10,7 +10,6 @@ class GameFactory
 {
     static createGame(hub, kind, gameId, connector, options)
     {
-        // TODO apply options
         let game;
         switch (kind) {
             case 'flat':

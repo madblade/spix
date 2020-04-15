@@ -61,8 +61,11 @@ extend(RendererManager.prototype, {
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
 
-        // TODO [CRIT] remove! :0
-        this.graphics.updateSunPosition(mainCamera);
+        // TODO [CRIT] put somewhere else
+        let skies = this.graphics.app.model.server.chunkModel.skies;
+        skies.forEach(sky => {
+            this.graphics.updateSunPosition(mainCamera, sky.mesh);
+        });
 
         // Render every portal.
         let renderCount = 0;

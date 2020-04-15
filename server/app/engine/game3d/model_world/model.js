@@ -22,23 +22,23 @@ const BlockType = Object.freeze({
 });
 
 const WorldType = Object.freeze({
-    FLAT: Symbol('flat'),
-    CUBE: Symbol('cube'),
-    SHRIKE: Symbol('shrike'),
-    UNSTRUCTURED: Symbol('unstructured')
+    FLAT: 0, // Symbol('flat'),
+    CUBE: 1, // Symbol('cube'),
+    SHRIKE: 2, // Symbol('shrike'),
+    UNSTRUCTURED: 3 // Symbol('unstructured')
 });
 
 const HillType = Object.freeze({
-    NO_HILLS: Symbol('no-hills'),
-    REGULAR_HILLS: Symbol('regular-hills'),
-    GIANT_HILLS: Symbol('giant-hills'),
-    ERODED: Symbol('eroded-formations'),
-    SPIKES: Symbol('spikes'),
+    NO_HILLS: 0, // Symbol('no-hills'),
+    REGULAR_HILLS: 1, // Symbol('regular-hills'),
+    GIANT_HILLS: 2, // Symbol('giant-hills'),
+    ERODED: 3, // Symbol('eroded-formations'),
+    SPIKES: 4 // Symbol('spikes'),
 });
 
 const CaveType = Object.freeze({
-    NO_CAVES: Symbol('no-caves'),
-    SUBSURFACE_CAVES: Symbol('subsurface-caves'),
+    NO_CAVES: 0, // Symbol('no-caves'),
+    SUBSURFACE_CAVES: 1 // Symbol('subsurface-caves'),
 });
 
 const ChunkSizes = Object.freeze({
@@ -61,7 +61,6 @@ class WorldModel
         this._worlds = new Map();
 
         let masterWorldInfo = this.generateWorldInfoFromGameInfo(-1);
-        console.log(masterWorldInfo);
         this._worlds.set(-1, new World(-1, masterWorldInfo, this));
     }
 
@@ -121,8 +120,8 @@ class WorldModel
         switch (wk) {
             case WorldType.CUBE:
                 switch (gameInfo.threeHillsType) {
-                    case '0': worldInfo.hills = HillType.NO_HILLS; break;
-                    case '1': worldInfo.hills = HillType.REGULAR_HILLS; break;
+                    case 0: worldInfo.hills = HillType.NO_HILLS; break;
+                    case 1: worldInfo.hills = HillType.REGULAR_HILLS; break;
                     default: break;
                 }
                 worldInfo.sideSize = parseInt(gameInfo.size, 10);
@@ -132,16 +131,16 @@ class WorldModel
             case WorldType.FLAT:
                 worldInfo.kind = WorldType.FLAT;
                 switch (gameInfo.flatHillsType) {
-                    case '0': worldInfo.hills = HillType.NO_HILLS; break;
-                    case '1': worldInfo.hills = HillType.REGULAR_HILLS; break;
-                    case '2': worldInfo.hills = HillType.GIANT_HILLS; break;
-                    case '3': worldInfo.hills = HillType.ERODED; break;
-                    case '4': worldInfo.hills = HillType.SPIKES; break;
+                    case 0: worldInfo.hills = HillType.NO_HILLS; break;
+                    case 1: worldInfo.hills = HillType.REGULAR_HILLS; break;
+                    case 2: worldInfo.hills = HillType.GIANT_HILLS; break;
+                    case 3: worldInfo.hills = HillType.ERODED; break;
+                    case 4: worldInfo.hills = HillType.SPIKES; break;
                     default: break;
                 }
                 switch (gameInfo.caves) {
-                    case '0': worldInfo.caves = CaveType.NO_CAVES; break;
-                    case '1': worldInfo.caves = CaveType.SUBSURFACE_CAVES; break;
+                    case 0: worldInfo.caves = CaveType.NO_CAVES; break;
+                    case 1: worldInfo.caves = CaveType.SUBSURFACE_CAVES; break;
                     default: break;
                 }
                 worldInfo.sideSize = -1; // infinite flat world
@@ -158,4 +157,4 @@ class WorldModel
     }
 }
 
-export { WorldModel as default, WorldType, BlockType, ChunkSizes };
+export { WorldModel as default, WorldType, BlockType, HillType, CaveType, ChunkSizes };

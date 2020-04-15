@@ -25,17 +25,17 @@ let SkyModule = {
     {
         let sky = new SkyFlat();
         sky.scale.setScalar(450000);
-        this.skyBox = sky;
+        // this.skyBox = sky;
         return { mesh: sky };
     },
 
-    createCubeSky()
+    createCubeSky(center, radius)
     {
-        let center = new Vector3(0, 0, -8);
-        let radius = 0.5 * 16;
+        // let center = new Vector3(0, 0, -8);
+        // let radius = 0.5 * 16;
         let sky = new SkyCube(center.x, center.y, center.z, radius);
         sky.scale.setScalar(450000);
-        this.skyBox = sky;
+        // this.skyBox = sky;
 
         let g = new BoxBufferGeometry(
             2 * radius, 2 * radius, 2 * radius
@@ -45,7 +45,7 @@ let SkyModule = {
         helper.position.y = center.y;
         helper.position.z = center.z;
         helper.position.x = center.x;
-        this.skyBoxHelper = helper;
+        // this.skyBoxHelper = helper;
 
         return { mesh: sky, helper };
     },
@@ -61,9 +61,9 @@ let SkyModule = {
         return sunSphere;
     },
 
-    updateSunPosition(camera) {
-        if (!this.sky || !this.distance) return;
-        let s = this.sky;
+    updateSunPosition(camera, sky) {
+        if (!sky || !this.distance) return;
+        let s = sky;
 
         let cos = Math.cos;
         let sin = Math.sin;
@@ -100,8 +100,8 @@ let SkyModule = {
         // This accounts for skybox translations in sky shaders.
         let p = this.app.model.server.selfModel.position;
         if (!p) return;
-        this.skyBox.position.set(p[0], p[1], p[2]);
-        this.skyBox.updateMatrix();
+        sky.position.set(p[0], p[1], p[2]);
+        sky.updateMatrix();
     },
 
     // TODO [MILESTONE1] update suns position throughout day and year
@@ -132,7 +132,7 @@ let SkyModule = {
         let phi = 4 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
 
-        this.sky = sky;
+        // this.sky = sky;
         this.distance = distance;
         this.phi = phi;
         this.theta = theta;

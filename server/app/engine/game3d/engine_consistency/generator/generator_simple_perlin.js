@@ -5,7 +5,7 @@
 
 'use strict';
 
-import {WorldType, BlockType}        from '../../model_world/model';
+import { WorldType, BlockType, HillType } from '../../model_world/model';
 
 class SimplePerlin {
 
@@ -122,6 +122,7 @@ class SimplePerlin {
         const sand = BlockType.SAND;
         const planks = BlockType.PLANKS;
         let worldType = worldInfo.type;
+        let hillsType = worldInfo.hills;
 
         // Detect cube or flat world.
         let directions = [];
@@ -272,9 +273,17 @@ class SimplePerlin {
                 }
             }
 
+            let perlinIntensity;
+            switch (hillsType) {
+                case HillType.NO_HILLS: perlinIntensity = 0; break;
+                case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
+                case HillType.GIANT_HILLS: perlinIntensity = 2.0; break;
+                default: perlinIntensity = 0.1; break;
+            }
+
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
-                    let h = d3 / 2 + (data[x + y * d1] * 0.2 | 0); // getY(x, y);
+                    let h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0); // getY(x, y);
                     let rockLevel = Math.floor(5 * h / 6);
                     let xy = perm === 0 ? x + y * d1 :
                         perm === 1 ? x + y * d1 * d2 :

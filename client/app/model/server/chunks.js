@@ -9,6 +9,13 @@
 import extend           from '../../extend.js';
 import { Vector3 }      from 'three';
 
+const WorldType = Object.freeze({
+    FLAT: 0, // Symbol('flat'),
+    CUBE: 1, // Symbol('cube'),
+    SHRIKE: 2, // Symbol('shrike'),
+    UNSTRUCTURED: 3 // Symbol('unstructured')
+});
+
 let ChunkModel = function(app) {
     this.app = app;
 
@@ -27,18 +34,23 @@ let ChunkModel = function(app) {
 
 extend(ChunkModel.prototype, {
 
-    addWorldIfNotPresent(worldId, worldInfo) {
-        if (this.worlds.has(worldId)) {
-            // console.log('This world I know... (' + typeof worldId +')');
-            return;
-        }
+    hasWorld(worldId) {
+        return this.worlds.has(worldId);
+    },
 
+    addWorldIfNotPresent(worldId, worldInfo, worldInfoMeta)
+    {
         // console.log('This world I don\'t know... ' + worldId);
         let world = new Map();
         let properties = {
             chunkSizeX : worldInfo[0], // 16,
             chunkSizeY : worldInfo[1], // 16,
-            chunkSizeZ : worldInfo[2]  // 32
+            chunkSizeZ : worldInfo[2],  // 32
+            type : worldInfoMeta[0],
+            radius : worldInfoMeta[1],
+            center : {
+                x: worldInfoMeta[2], y: worldInfoMeta[3], z: worldInfoMeta[4]
+            }
         };
 
         properties.chunkCapacity =
@@ -65,8 +77,10 @@ extend(ChunkModel.prototype, {
 
     // TODO [MILESTONE1] make sky creation api serverwise
     // or seed behaviour
-    addSky(worldId, worldInfo) {
-        if (!worldInfo)
+    addSky(worldId)
+    {
+        let worldMeta = this.worldProperties.get(worldId);
+        if (!worldMeta)
             console.log('[Chunks] Default sky creation.');
 
         let graphics = this.app.engine.graphics;
@@ -74,9 +88,26 @@ extend(ChunkModel.prototype, {
         let sunPosition = new Vector3(0, -700000, 0);
         let sky;
 
-        let skyType = 'flat';
-        if (skyType === 'cube') {
-            sky = graphics.createCubeSky();
+        let skyType = worldMeta.type;
+
+        if (skyType === WorldType.CUBE) {
+            if (!worldMeta.center || !worldMeta.radius) {
+                console.error('[Chunks/NewSky]: No center and radius specified.');
+                return;
+            }
+            if (worldMeta.chunkSizeX !== worldMeta.chunkSizeY ||
+                worldMeta.chunkSizeX !== worldMeta.chunkSizeZ) {
+                console.error('[Chunks/NewSky]: Cube world must have cube chunks.');
+                return;
+            }
+            let chunkSize = worldMeta.chunkSizeX;
+            let center = new Vector3(
+                (worldMeta.center.x + 0.5) * chunkSize,
+                (worldMeta.center.y + 0.5) * chunkSize,
+                (worldMeta.center.z + 0.5) * chunkSize);
+            let radius = Math.max(worldMeta.radius, 1) * chunkSize;
+
+            sky = graphics.createCubeSky(center, radius);
             // let sunSphere = graphics.createSunSphere();
             graphics.addToScene(sky.mesh, worldId);
             graphics.addToScene(sky.helper, worldId);
@@ -98,7 +129,7 @@ extend(ChunkModel.prototype, {
                 0.0, // Facing front
                 true // isSunSphereVisible
             );
-        } else if (skyType === 'flat') {
+        } else if (skyType === WorldType.FLAT) {
             sky = graphics.createFlatSky();
             graphics.addToScene(sky.mesh, worldId);
             graphics.updateSky(
@@ -114,6 +145,7 @@ extend(ChunkModel.prototype, {
                 true // isSunSphereVisible
             );
         } else {
+            console.error('Unsupported sky type.');
             return;
         }
 
@@ -152,6 +184,7 @@ extend(ChunkModel.prototype, {
                 //console.log('World metadata:');
                 //console.log(updates['worlds']);
                 let worlds = updates.worlds;
+                let worldsMeta = updates.worldsMeta;
                 for (let wid in worlds) {
                     if (!worlds.hasOwnProperty(wid)) continue;
 
@@ -160,24 +193,36 @@ extend(ChunkModel.prototype, {
                         wif[id] = parseInt(wif[id], 10);
 
                     // Add new world and matching scene.
-                    let properties = this.addWorldIfNotPresent(wid, wif);
-                    if (properties) {
-                        // 1 world <-> 1 scene, multiple cameras
-                        graphics.addScene(wid);
-                        let light = graphics.createLight('hemisphere');
-                        light.position.set(0.5, 1, 0.75);
-                        light.updateMatrixWorld();
-                        graphics.addToScene(light, wid);
-
-                        this.addSky(wid, wif);
-
-                        // this.addPlanet(wid, wif);
+                    if (this.hasWorld(wid)) {
+                        // console.log(`Update for a world I already have: ${wid}.`);
+                        continue;
                     }
+
+                    if (!worldsMeta || !worldsMeta.hasOwnProperty(wid)) {
+                        console.error(`NO METADATA FOR NEW WORLD: ${wid}.`);
+                        continue;
+                    }
+                    let wifm = worldsMeta[wid];
+                    this.addWorldIfNotPresent(wid, wif, wifm);
+
+                    // 1 world <-> 1 scene, multiple cameras
+                    graphics.addScene(wid);
+
+                    // TODO AO light
+                    let light = graphics.createLight('hemisphere');
+                    light.position.set(0.5, 1, 0.75);
+                    light.updateMatrixWorld();
+                    graphics.addToScene(light, wid);
+
+                    this.addSky(wid);
+
+                    // this.addPlanet(wid, wif);
                 }
             }
 
             for (let worldId in updates) {
-                if (!updates.hasOwnProperty(worldId) || worldId === 'worlds')
+                if (!updates.hasOwnProperty(worldId) ||
+                    worldId === 'worlds' || worldId === 'worldsMeta')
                     continue;
 
                 let subdates = updates[worldId];
@@ -380,8 +425,10 @@ extend(ChunkModel.prototype, {
                 s.mesh.geometry.dispose();
                 s.mesh.material.dispose();
             }
-            if (s.helper)
-                s.helper.dispose();
+            if (s.helper && s.helper.mesh) {
+                s.helper.mesh.geometry.dispose();
+                s.helper.mesh.material.dispose();
+            }
         });
         this.skies.clear();
 

@@ -8,7 +8,6 @@ import { ChunkSizes } from './model';
 
 class World
 {
-
     constructor(id, worldInfo, worldModel)
     {
         this._worldId = id; // Identifier

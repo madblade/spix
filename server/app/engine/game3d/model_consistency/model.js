@@ -54,6 +54,14 @@ class ConsistencyModel {
         return this._chunkIdsForEntity.get(playerId);
     }
 
+    hasWorld(playerId, worldId) {
+        playerId = parseInt(playerId, 10);
+        worldId = parseInt(worldId, 10);
+
+        let chunkIdsForEntity = this._chunkIdsForEntity.get(playerId);
+        return chunkIdsForEntity && chunkIdsForEntity.has(worldId);
+    }
+
     hasChunk(playerId, worldId, chunkId) {
         playerId = parseInt(playerId, 10);
         worldId = parseInt(worldId, 10);
@@ -83,6 +91,9 @@ class ConsistencyModel {
 
         let chunksForPlayerInWorld = this._chunkIdsForEntity.get(playerId).get(worldId);
         chunksForPlayerInWorld.delete(chunkId);
+        if (chunksForPlayerInWorld.size < 1) {
+            this._chunkIdsForEntity.get(playerId).delete(worldId);
+        }
     }
 
     doneChunkLoadingPhase(player, starterChunk) {

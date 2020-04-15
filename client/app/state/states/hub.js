@@ -17,12 +17,12 @@ let HubState = function(stateManager) {
 
         <!-- Cube world -->
         <div class="input-group">
-            <div class="input-group-prepend mb-1 flex-fill">
-                <span class="input-group-text flex-fill">Cube World</span>
+            <div class="input-group-prepend mb-1">
+                <span class="input-group-text">Cube World</span>
             </div>
             <select id="cube-game-hills" class="form-control">
-                <option value="0" selected>No Hills</option>
-                <option value="1">Moderate Hills</option>
+                <option value="1" selected>Moderate Hills</option>
+                <option value="0">No Hills</option>
             </select>
 
             <div class="input-group-append mb-1">
@@ -51,8 +51,8 @@ let HubState = function(stateManager) {
             </select>
 
             <select id="flat-game-hills-size" class="form-control">
-                <option value="0" selected>No Hills</option>
-                <option value="1">Regular Hills</option>
+                <option value="1" selected>Regular Hills</option>
+                <option value="0">No Hills</option>
                 <option value="2">Giant Hills</option>
                 <option value="3">Eroded formations and Arches</option>
                 <option value="4">Spikes</option>
