@@ -25,17 +25,13 @@ let SkyModule = {
     {
         let sky = new SkyFlat();
         sky.scale.setScalar(450000);
-        // this.skyBox = sky;
         return { mesh: sky };
     },
 
     createCubeSky(center, radius)
     {
-        // let center = new Vector3(0, 0, -8);
-        // let radius = 0.5 * 16;
         let sky = new SkyCube(center.x, center.y, center.z, radius);
         sky.scale.setScalar(450000);
-        // this.skyBox = sky;
 
         let g = new BoxBufferGeometry(
             2 * radius, 2 * radius, 2 * radius
@@ -45,7 +41,6 @@ let SkyModule = {
         helper.position.y = center.y;
         helper.position.z = center.z;
         helper.position.x = center.x;
-        // this.skyBoxHelper = helper;
 
         return { mesh: sky, helper };
     },
@@ -132,7 +127,6 @@ let SkyModule = {
         let phi = 4 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
 
-        // this.sky = sky;
         this.distance = distance;
         this.phi = phi;
         this.theta = theta;

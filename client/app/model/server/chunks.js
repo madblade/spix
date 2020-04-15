@@ -85,11 +85,15 @@ extend(ChunkModel.prototype, {
 
         let graphics = this.app.engine.graphics;
 
+        // Sky light.
+        let light = graphics.createLight('hemisphere');
+        light.position.set(0.5, 1, 0.75);
+        light.updateMatrixWorld();
+        graphics.addToScene(light, worldId);
+
         let sunPosition = new Vector3(0, -700000, 0);
         let sky;
-
         let skyType = worldMeta.type;
-
         if (skyType === WorldType.CUBE) {
             if (!worldMeta.center || !worldMeta.radius) {
                 console.error('[Chunks/NewSky]: No center and radius specified.');
@@ -104,13 +108,13 @@ extend(ChunkModel.prototype, {
             let center = new Vector3(
                 (worldMeta.center.x + 0.5) * chunkSize,
                 (worldMeta.center.y + 0.5) * chunkSize,
-                (worldMeta.center.z + 0.5) * chunkSize);
-            let radius = Math.max(worldMeta.radius, 1) * chunkSize;
+                (worldMeta.center.z + 0.5) * chunkSize - 1);
+            let radius = Math.max(worldMeta.radius, 1) * chunkSize - 1;
 
             sky = graphics.createCubeSky(center, radius);
             // let sunSphere = graphics.createSunSphere();
             graphics.addToScene(sky.mesh, worldId);
-            graphics.addToScene(sky.helper, worldId);
+            // graphics.addToScene(sky.helper, worldId);
             // graphics.addToScene(sunSphere, worldId);
 
             // TODO [LOW] sky as seen from space
@@ -208,15 +212,7 @@ extend(ChunkModel.prototype, {
                     // 1 world <-> 1 scene, multiple cameras
                     graphics.addScene(wid);
 
-                    // TODO AO light
-                    let light = graphics.createLight('hemisphere');
-                    light.position.set(0.5, 1, 0.75);
-                    light.updateMatrixWorld();
-                    graphics.addToScene(light, wid);
-
                     this.addSky(wid);
-
-                    // this.addPlanet(wid, wif);
                 }
             }
 

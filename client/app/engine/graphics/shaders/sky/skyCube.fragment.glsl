@@ -272,7 +272,7 @@ void main()
     float ceiler = 1.0 / (1.0 - start);
     float agreement = (dotEV - start) * ceiler;
     if (dotEV > start) {
-        float increaseMe = 200.0;
+        float increaseMe = 20.0; // TODO tweak (200 was default without terrain)
             // increase this to limit the range for interpolation
             // (causes sharper edges at cube vertices)
         interpolatorFactor = 0.5 * pow(agreement, increaseMe);
@@ -302,7 +302,7 @@ void main()
     }
 
     // Change this coefficient for the sky gradient: 1.0 = sharp, 0.001 = smooth.
-    float smoothCoefficient = 0.02; // TODO tweak
+    float smoothCoefficient = 0.01; // TODO tweak (0.02 was default without terrain)
     vec3 nup = diff * smoothCoefficient;
 
     // XXX check if needed to hack sun intensity from intersection (2019-03[madblade]: low priority)

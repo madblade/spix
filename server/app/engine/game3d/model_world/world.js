@@ -25,9 +25,6 @@ class World
         // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = new Map();
 
-        // Keep same generation method
-        // this._generationMethod = 'flat';
-
         let chunkSizes = worldInfo.chunkSizes || ChunkSizes.CUBE_SMALL;
         // Constants
         this._xSize = chunkSizes[0] * 2;
@@ -48,9 +45,6 @@ class World
 
     get allChunks() { return this._chunks; }
     set allChunks(newChunks) { this._chunks = newChunks; }
-
-    // get generationMethod() { return this._generationMethod; }
-    // set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);

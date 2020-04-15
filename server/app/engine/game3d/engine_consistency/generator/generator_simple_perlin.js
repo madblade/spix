@@ -277,7 +277,7 @@ class SimplePerlin {
             switch (hillsType) {
                 case HillType.NO_HILLS: perlinIntensity = 0; break;
                 case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
-                case HillType.GIANT_HILLS: perlinIntensity = 2.0; break;
+                case HillType.GIANT_HILLS: perlinIntensity = 1.0; break;
                 default: perlinIntensity = 0.1; break;
             }
 
