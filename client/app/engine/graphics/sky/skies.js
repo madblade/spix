@@ -135,7 +135,8 @@ let SkyModule = {
         return sky;
     },
 
-    updateSunPosition(camera, sky) {
+    updateSunPosition(camera, skyObject) {
+        let sky = skyObject.mesh;
         if (!sky || !this.distance) return;
         let s = sky;
 
@@ -143,13 +144,13 @@ let SkyModule = {
         let sin = Math.sin;
 
         let distance = this.distance;
-        let phi = this.phi;
+        let phi = skyObject.phi || 0;
         let theta = this.theta;
 
         phi %= 2 * Math.PI;
         let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
         phi += 0.0101 * dist;
-        this.phi = phi;
+        skyObject.phi = phi;
 
         let x = distance * cos(phi);
         let y = distance * sin(phi) * sin(theta);

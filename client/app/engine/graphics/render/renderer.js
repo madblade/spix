@@ -56,15 +56,14 @@ extend(RendererManager.prototype, {
         let renderer = this.renderer;
         let renderRegister = this.renderRegister;
 
-
         // Render first pass.
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
 
-        // TODO [CRIT] do this for every portal with a different camera.
+        // TODO [CRIT] do this for every portal with a different camera transform path.
         let skies = this.graphics.app.model.server.chunkModel.skies;
         skies.forEach(sky => {
-            this.graphics.updateSunPosition(mainCamera, sky.mesh);
+            this.graphics.updateSunPosition(mainCamera, sky);
         });
 
         // Render every portal.

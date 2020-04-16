@@ -281,10 +281,12 @@ extend(XGraph.prototype, {
         ];
 
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
-            let currentPid = parseInt(pidPath[pathId][0], 10);
-            let currentP = portals.get(currentPid);
+            let currentTunnel = pidPath[pathId].split(',');
+            let sourcePortalId = currentTunnel[0];
+            let destinationPortalId = currentTunnel[1];
+            let destinationPortal = portals.get(destinationPortalId);
 
-            // TODO [CRIT] compute transform
+            // TODO [CRIT] compute chain transformation
         }
 
         console.log('Computed Camera Transform.');

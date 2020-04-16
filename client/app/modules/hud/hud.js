@@ -97,11 +97,10 @@ extend(Hud.prototype, {
                 });
             }
 
-            console.log(this.sigma.graph.edges());
-            console.log(this.sigma.graph.nodes());
-            console.log(d.length);
+            // console.log(this.sigma.graph.edges());
+            // console.log(this.sigma.graph.nodes());
+            console.log('[HUD] New flat graph:');
             console.log(d);
-            console.log('was the flat graph');
             this.sigma.refresh();
             // this.sigma.startForceAtlas2();
         }

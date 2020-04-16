@@ -68,6 +68,7 @@ extend(CameraManager.prototype, {
         this.subCameras.set(cameraId, camera);
 
         // TODO [CRIT] compute rotation and position from path.
+
         camera.copyCameraPosition(mainCamera);
         camera.copyCameraUpRotation(mainCamera);
         camera.setZRotation(mainCamera.getZRotation());
