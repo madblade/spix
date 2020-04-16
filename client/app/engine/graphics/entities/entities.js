@@ -2,8 +2,6 @@
  *
  */
 
-// TODO [FFF] rename this file, there is a "i" missing.
-
 'use strict';
 
 import LegacyJSONLoader from './LegacyJSONLoader';

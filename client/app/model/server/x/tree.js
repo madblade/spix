@@ -273,7 +273,7 @@ extend(XGraph.prototype, {
         return string;
     },
 
-    computeCameraTransform(pidPath/*, portals, cameraManager*/) {
+    computeCameraTransform(pidPath, portals, cameraManager) {
         // let root = cameraManager.mainCamera;
         let cameraTransform = [
             0, 0, 0, // Position
@@ -281,8 +281,8 @@ extend(XGraph.prototype, {
         ];
 
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
-            // let currentPid = parseInt(pidPath[pathId][0], 10);
-            // let currentP = portals.get(currentPid);
+            let currentPid = parseInt(pidPath[pathId][0], 10);
+            let currentP = portals.get(currentPid);
 
             // TODO [CRIT] compute transform
         }
@@ -305,7 +305,8 @@ extend(XGraph.prototype, {
 
         let currentStep; let destinationWid; let originPid; let destinationPid;
         // let originWid; let widPath;
-        let pidPathString; let pidPath; let depth;
+        let pidPathString; let pidPath;
+        let depth;
         let cameraTransform;
         for (let i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];

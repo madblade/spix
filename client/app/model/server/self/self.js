@@ -140,11 +140,17 @@ extend(SelfModel.prototype, {
         // Player id '-1' never used by any other entity.
         let entityId = this.entityId;
         let worldId = this.worldId;
+        let selfModel = this;
 
         graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
             let object3d = graphics.finalizeEntity(entityId, createdEntity);
-            this.avatar = object3d;
-            if (this.displayAvatar) graphics.addToScene(object3d, worldId);
+
+            graphics.loadItemMesh('portal-gun', function(gltfObject) {
+                object3d.getWrapper().add(gltfObject);
+                selfModel.avatar = object3d;
+                if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
+            });
+
         }.bind(this));
     },
 

@@ -128,27 +128,27 @@ extend(RendererManager.prototype, {
             renderer.setRenderTarget(null);
 
             //if (true) {
-                //let rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
-                //rec.updateProjectionMatrix();
-                //rec.updateMatrixWorld();
-                //rec.matrixWorldInverse.getInverse(rec.matrixWorld);
+            //let rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
+            //rec.updateProjectionMatrix();
+            //rec.updateMatrixWorld();
+            //rec.matrixWorldInverse.getInverse(rec.matrixWorld);
             //}
 
             //if (this.thenstop) {
-                //let posX = screen1.getMesh().position;
-                //let  = localRecorder.position;
-                //let posC = new Vector3();
-                //posC.setFromMatrixPosition(mainCamera.matrixWorld);
+            //let posX = screen1.getMesh().position;
+            //let  = localRecorder.position;
+            //let posC = new Vector3();
+            //posC.setFromMatrixPosition(mainCamera.matrixWorld);
 
-                //let me = this.graphics.app.model.server.selfModel.position;
+            //let me = this.graphics.app.model.server.selfModel.position;
 
-                //console.log('#####\nCAM POSITION');
-                //console.log(posC);
-                //console.log(cameraManager.mainCamera.get3DObject().position);
-                //console.log('X POSITION');
-                //console.log(posX);
-                //console.log('ME POSITION');
-                //console.log(me);
+            //console.log('#####\nCAM POSITION');
+            //console.log(posC);
+            //console.log(cameraManager.mainCamera.get3DObject().position);
+            //console.log('X POSITION');
+            //console.log(posX);
+            //console.log('ME POSITION');
+            //console.log(me);
             //}
 
             if (screen2) {
@@ -168,7 +168,7 @@ extend(RendererManager.prototype, {
 
 
         //if (this.thenstop) {
-            //this.stop = true;
+        //this.stop = true;
         //}
     },
 
@@ -179,7 +179,7 @@ extend(RendererManager.prototype, {
     },
 
     switchAvatarToScene(/*sceneId*/) {
-        // TODO [CRIT] update render register.
+        // TODO here goes the mesh switch.
         // this.renderRegister;
     },
 
