@@ -82,7 +82,6 @@ extend(App.Core.prototype, {
     },
 
     startDemo() {
-        // TODO order a new demo server and spawn immediately.
         this.setState('loading');
         let s = this.localServer.standalone.io.socketClient;
         this.engine.connection.setupLocalSocket(s);

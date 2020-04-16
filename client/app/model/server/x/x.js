@@ -86,11 +86,11 @@ extend(XModel.prototype, {
             let s = worldMap
                 .invalidate()
                 .computeWorldMap()
-                .computeFlatGraph()
-                .toString();
+                .computeFlatGraph();
+            // Alternatively, use worldMap.toString();
 
             register.updateSelfState({diagram: s});
-            // TODO [HIGH] this should be heavily optimized.
+            // TODO [OPTI] possible perf improvements.
             worldMap.computeRenderingGraph(graphics);
             this.forceUpdate = false;
         }

@@ -71,7 +71,7 @@ let PortalsModule = {
             let mesh = new Mesh(geometry, material);
 
             // TODO [CRIT] orientations
-            // console.log(tempOffset);
+            // TODO round instead of parseInt
             let x0 = parseInt(pos[0], 10);
             let y0 = parseInt(pos[1], 10);
             let z0 = parseInt(pos[2], 10);

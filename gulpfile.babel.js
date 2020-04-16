@@ -421,7 +421,7 @@ gulp.task('serve',
     gulp.series(
         gulp.parallel(
             cleantmp,
-            // lintscripts, // TODO [FFF] correct errors here
+            // lintscripts,
             inject,
             copyfontsdev,
             envall),
@@ -431,8 +431,6 @@ gulp.task('serve',
             startclientdev
         ),
     ));
-
-// TODO [FFF] update to karma-webpack 4
 
 gulp.task('serve:debug',
     gulp.series(

@@ -287,6 +287,8 @@ extend(XGraph.prototype, {
             // TODO [CRIT] compute transform
         }
 
+        console.log('Computed Camera Transform.');
+        console.log(cameraTransform);
         return cameraTransform;
     },
 
@@ -316,8 +318,8 @@ extend(XGraph.prototype, {
             // widPath         = currentStep.wpath.split(';');
             depth           = currentStep.depth;
 
-            switch (currentStep.type) {
-
+            switch (currentStep.type)
+            {
                 case 'lime': // Regular.
                     // Add screen.
                     // Add camera.
@@ -496,7 +498,7 @@ extend(XGraph.prototype, {
         }
 
         this.flatGraph = flatGraph;
-        return this;
+        return this.flatGraph;
     }
 
 });

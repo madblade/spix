@@ -125,7 +125,6 @@ extend(MainMenuState.prototype, {
         });
 
         $('#button-connect-throttle-server').click(() => {
-            // TODO check if it works.
             this.stateManager.app.startFromLocalServer();
         });
 

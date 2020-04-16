@@ -135,6 +135,10 @@ module.exports = function makeWebpackConfig(options) {
     config.module = {
         rules: [
             {
+                test: /sigma.*/,
+                use: 'imports-loader?this=>window',
+            },
+            {
             // preLoaders: [],
             // loaders: [{
                 // JS LOADER

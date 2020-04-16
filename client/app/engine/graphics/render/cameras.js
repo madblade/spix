@@ -52,8 +52,6 @@ extend(CameraManager.prototype, {
     {
         let cameraId = cameraPath;
 
-        // TODO [CRIT] compute relative positions and rotations.
-
         if (this.subCameras.has(cameraId)) {
             //console.log('Camera ' + cameraId + ' cannot be added a second time.');
             console.log('[CameraManager] Skipping camera addition.');
@@ -69,6 +67,7 @@ extend(CameraManager.prototype, {
         if (screen) camera.setScreen(screen);
         this.subCameras.set(cameraId, camera);
 
+        // TODO [CRIT] compute rotation and position from path.
         camera.copyCameraPosition(mainCamera);
         camera.copyCameraUpRotation(mainCamera);
         camera.setZRotation(mainCamera.getZRotation());
@@ -143,7 +142,6 @@ extend(CameraManager.prototype, {
 
     // Update.
     updateCameraPosition(vector) {
-        // TODO remove ugly
         let sin = Math.sin;
         let cos = Math.cos;
         // let PI = Math.PI;
@@ -204,7 +202,6 @@ extend(CameraManager.prototype, {
         }
     },
 
-    // TODO [CRIT] 3Dize
     addCameraRotationEvent(relX, relY, absX, absY) {
         this.incomingRotationEvents.push([relX, relY, absX, absY]);
     },
@@ -217,7 +214,7 @@ extend(CameraManager.prototype, {
         for (let i = 0, l = incoming.length; i < l; ++i) {
             let inc = incoming[i];
             let rot = [0, 0, 0, 0];
-            // TODO [HIGH] put that in fockin update received. FUCK.
+            // TODO [HIGH] put that in update received instead.
             rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
             rotation[0] = rot[0];
             rotation[1] = rot[1];

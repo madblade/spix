@@ -4,12 +4,36 @@
 
 'use strict';
 
-import extend           from '../../extend.js';
-import $                from 'jquery';
+import extend              from '../../extend.js';
+import $                   from 'jquery';
+import { sigma as Sigma }  from 'sigma';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/settings';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow';
 
 let Hud = function(register) {
     this.register = register;
     this.orangeColor = '#c96530';
+
+    this.sigma = new Sigma({
+        graph: {nodes:[], edges: []},
+        renderer: {
+            container: document.getElementById('network-graph'),
+            type: 'canvas'
+        },
+        // container: 'network-graph',
+        // container: 'diagram',
+        settings: {
+            minArrowSize: 20,
+            defaultNodeColor: '#ec5148',
+            drawLabels: true,
+            labelThreshold: 0,
+            // enableHovering: false
+            // defaultEdgeLabelSize: 20,
+            // edgeLabelSize: 'fixed',
+        }
+    });
 };
 
 extend(Hud.prototype, {
@@ -25,30 +49,58 @@ extend(Hud.prototype, {
         }
 
         if (newState.hasOwnProperty('diagram')) {
+            let graph = this.sigma.graph;
+            // this.sigma.stopForceAtlas2();
+            graph.clear();
+            let nodeSet = new Set();
+            let depthMap = new Map();
+
             let d = newState.diagram;
+            for (let i = 0, l = d.length; i < l; ++i) {
+                let di = d[i];
+                if (!di.origin || !di.destination) continue;
 
-            let s = d.split(/\r?\n/g);
-            let colors = ['lime', 'orange', 'red', 'cyan'];
-            for (let is = 0, il = s.length; is < il; ++is) {
-                // Display
-                let color = 'white';
+                if (!nodeSet.has(di.origin)) {
+                    let currentDepth = parseInt(di.depth, 10);
+                    let currentH = depthMap.get(currentDepth);
+                    if (!currentH) currentH = 0;
+                    depthMap.set(currentDepth, currentH + 1);
 
-                for (let ic = 0; ic < colors.length; ++ic)
-                    if (s[is].indexOf(colors[ic]) > -1) {
-                        color = colors[ic];
-                        break;
-                    }
+                    nodeSet.add(di.origin);
+                    graph.addNode({
+                        id: di.origin, label: di.origin.toString(), size: 1,
+                        y: 0.2 * currentDepth,
+                        x: 0.2 * (currentH + 1),
+                        color: i === 0 ? 'blue' : 'orange'
+                    });
+                }
+                if (!nodeSet.has(di.destination)) {
+                    let currentDepth = parseInt(di.depth, 10);
+                    let currentH = depthMap.get(currentDepth + 1);
+                    if (!currentH) currentH = 0;
+                    depthMap.set(currentDepth + 1, currentH + 1);
 
-                s[is] = s[is].replace(color, '');
-                s[is] = s[is].replace('{', `<span style="color:${color};">`);
-                s[is] = s[is].replace('}', '</span>');
+                    nodeSet.add(di.destination);
+                    graph.addNode({
+                        id: di.destination, label: di.destination.toString(), size: 1,
+                        y: 0.2 * (currentDepth + 1),
+                        x: 0.2 * (currentH + 1),
+                        color: 'orange'
+                    });
+                }
+                graph.addEdge({
+                    id: di.pid, // path
+                    color: di.type, // ['lime', 'orange', 'red', 'cyan', yellow];
+                    source: di.origin, target: di.destination,
+                    // label: di.pid,
+                    // edgeLabelColor: di.type
+                });
             }
 
-            s = s.join('<br />');
-
-            // Wrap
-            s = `<p style="color:white;">${s}</p>`;
-            $('#diagram').html(s); // .css('color', 'cyan');
+            console.log(this.sigma.graph.edges());
+            console.log(this.sigma.graph.nodes());
+            this.sigma.refresh();
+            // this.sigma.startForceAtlas2();
         }
 
         if (newState.hasOwnProperty('activeItem')) {
