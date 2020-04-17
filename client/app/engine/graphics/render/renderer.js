@@ -5,11 +5,12 @@
 'use strict';
 
 import extend from '../../../extend.js';
-import { WebGLRenderer } from 'three';
+import { PCFSoftShadowMap, WebGLRenderer } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
 
 let RendererManager = function(graphicsEngine) {
     this.graphics = graphicsEngine;
@@ -35,16 +36,39 @@ extend(RendererManager.prototype, {
         return 0 | cssColor.replace('#', '0x');
     },
 
-    createComposer(rendrr, sc, cam, target) {
+    createComposer(rendrr, sc, cam, target)
+    {
+        let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        let scenePass = new RenderPass(sc, cam);
+        composer.addPass(scenePass);
+
+        // TODO [LOW] expose ultra graphics settings
+        let ultraGraphics = false;
+
+        // Anti-alias
         let resolutionX = 1 / window.innerWidth;
         let resolutionY = 1 / window.innerHeight;
         let fxaa = new ShaderPass(FXAAShader);
         let u = 'resolution';
         fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
-        let scenePass = new RenderPass(sc, cam);
-        composer.addPass(scenePass);
         composer.addPass(fxaa);
+        composer.addPass(fxaa);
+
+        // Ambient occlusion
+        if (!target && ultraGraphics) {
+            let sao = new SAOPass(sc, cam, false, false);
+            sao.params.output = SAOPass.OUTPUT.Default;
+            sao.params.saoBias = 2.5;
+            sao.params.saoIntensity = 0.18;
+            sao.params.saoScale = 10000;
+            sao.params.saoKernelRadius = 100;
+            sao.params.saoMinResolution = 0;
+            sao.params.saoBlur = 1;
+            sao.params.saoBlurRadius = 16;
+            sao.params.saoBlurStdDev = 4;
+            sao.params.saoBlurDepthCutoff = 0.01;
+            composer.addPass(sao);
+        }
         return composer;
     },
 
@@ -53,9 +77,12 @@ extend(RendererManager.prototype, {
         let renderer = new WebGLRenderer({
             // TODO [MEDIUM] propose different antialiasing strategy
             antialias: false,
-            alpha: true
+            alpha: true,
+            // precision: 'mediump'
         });
 
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         return renderer;
@@ -151,7 +178,7 @@ extend(RendererManager.prototype, {
                 this.composers.set(id, composer);
             }
             composer.render(); // Double render for camera 1frame lag.
-            composer.render();
+            // composer.render();
             // renderer.render(bufferScene, bufferCamera);
             // renderer.setRenderTarget(null);
 
@@ -197,6 +224,10 @@ extend(RendererManager.prototype, {
     },
 
     cleanup() {
+        this.composers.forEach(function() {
+            // TODO cleanup composer.
+        });
+        this.composers = new Map();
         this.renderRegister.length = 0;
     }
 

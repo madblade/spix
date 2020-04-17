@@ -17,6 +17,92 @@ let FacesModule = {
         return this.textureCoordinates[nature];
     },
 
+    setPNC1(
+        positions, colors, normals,
+        i, normal, color,
+        ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC,
+        ab, cb, iChunkOffset, jChunkOffset, kChunkOffset)
+    {
+        // Positions
+        positions[i + 0] = normal ? cx : cx;
+        positions[i + 1] = normal ? cy : cy;
+        positions[i + 2] = normal ? cz : cz;
+
+        positions[i + 3] = normal ? bx : ax;
+        positions[i + 4] = normal ? by : ay;
+        positions[i + 5] = normal ? bz : az;
+
+        positions[i + 6] = normal ? ax : bx;
+        positions[i + 7] = normal ? ay : by;
+        positions[i + 8] = normal ? az : bz;
+
+        // Normals
+        pA.set(ax, ay, az);
+        normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
+        normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
+        cb.subVectors(pC, pB);
+        ab.subVectors(pA, pB);
+        cb.cross(ab);
+        cb.normalize();
+        let nx = cb.x; let ny = cb.y; let nz = cb.z;
+        for (let j = 0; j < 3; ++j) {
+            normals[i + 3 * j]   = nx;
+            normals[i + 3 * j + 1] = ny;
+            normals[i + 3 * j + 2] = nz;
+        }
+
+        // Colors
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
+        for (let j = 0; j < 3; ++j) {
+            colors[i + j * 3] = color.r;
+            colors[i + j * 3 + 1] = color.g;
+            colors[i + j * 3 + 2] = color.b;
+        }
+    },
+
+    setPNC2(positions, colors, normals,
+        i, normal, color,
+        ax, ay, az, cx, cy, cz, dx, dy, dz,
+        pA, pB, pC, ab, cb,
+        iChunkOffset, jChunkOffset, kChunkOffset)
+    {
+        // Positions
+        positions[i + 9]  = normal ? cx : cx;
+        positions[i + 10] = normal ? cy : cy;
+        positions[i + 11] = normal ? cz : cz;
+
+        positions[i + 12] = normal ? ax : dx;
+        positions[i + 13] = normal ? ay : dy;
+        positions[i + 14] = normal ? az : dz;
+
+        positions[i + 15] = normal ? dx : ax;
+        positions[i + 16] = normal ? dy : ay;
+        positions[i + 17] = normal ? dz : az;
+
+        // Normals
+        pA.set(ax, ay, az);
+        normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
+        normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
+        cb.subVectors(pC, pB);
+        ab.subVectors(pA, pB);
+        cb.cross(ab);
+        cb.normalize();
+        let nx = cb.x; let ny = cb.y; let nz = cb.z;
+        for (let j = 0; j < 3; ++j) {
+            normals[i + 9 + 3 * j]   = nx;
+            normals[i + 9 + 3 * j + 1] = ny;
+            normals[i + 9 + 3 * j + 2] = nz;
+        }
+
+        // Colors
+        this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
+        for (let j = 0; j < 3; ++j) {
+            colors[i + 9 + j * 3] = color.r;
+            colors[i + 9 + j * 3 + 1] = color.g;
+            colors[i + 9 + j * 3 + 2] = color.b;
+        }
+    },
+
     addFace(faceId, i, iS, ijS, ijkS,
         positions, normals, colors, uvs, nature,
         iChunkOffset, jChunkOffset, kChunkOffset,
@@ -28,7 +114,6 @@ let FacesModule = {
         let ay; let by; let cy; let dy;
         let az; let bz; let cz; let dz;
         let ii; let jj; let kk;
-        let nx; let ny; let nz;
 
         // UVS
         let uvi = 2 * i / 3;
@@ -53,91 +138,31 @@ let FacesModule = {
             cx = ax;    cy = ay + 1;    cz = az + 1;
             dx = ax;    dy = ay + 1;    dz = az;
 
-            // Positions H1
-            positions[i]   = ax;
-            positions[i + 1] = ay;
-            positions[i + 2] = az;
-            positions[i + 3] = normal ? bx : cx;
-            positions[i + 4] = normal ? by : cy;
-            positions[i + 5] = normal ? bz : cz;
-            positions[i + 6] = normal ? cx : bx;
-            positions[i + 7] = normal ? cy : by;
-            positions[i + 8] = normal ? cz : bz;
-
-            // Normals H1
-            pA.set(ax, ay, az);
-            normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
-            normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 3 * j]   = nx;
-                normals[i + 3 * j + 1] = ny;
-                normals[i + 3 * j + 2] = nz;
-            }
-
-            // Colors H1
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + j * 3] = color.r;
-                colors[i + j * 3 + 1] = color.g;
-                colors[i + j * 3 + 2] = color.b;
-            }
+            this.setPNC1(positions, colors, normals, i, normal, color,
+                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
+                iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[0][0] : txCoords[3][0]) * 0.0625;
             offsetV = (normal ? txCoords[0][1] : txCoords[3][1]) * 0.0625;
-            uvs[uvi]     = offsetU + 0. + eps;
-            uvs[uvi + 1] = offsetV + 0. + eps;
-            uvs[uvi + 2] = offsetU + (normal ? 0. + eps : 0.0625 - eps);
+            uvs[uvi]     = offsetU + eps;
+            uvs[uvi + 1] = offsetV + eps;
+            uvs[uvi + 2] = offsetU + (normal ? eps : 0.0625 - eps);
             uvs[uvi + 3] = offsetV + 0.0625 - eps;
-            uvs[uvi + 4] = offsetU + (normal ? 0.0625 - eps : 0. + eps);
+            uvs[uvi + 4] = offsetU + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 5] = offsetV + 0.0625 - eps;
 
-            // Positions H1
-            positions[i + 9]  = ax;
-            positions[i + 10] = ay;
-            positions[i + 11] = az;
-            positions[i + 12] = normal ? cx : dx;
-            positions[i + 13] = normal ? cy : dy;
-            positions[i + 14] = normal ? cz : dz;
-            positions[i + 15] = normal ? dx : cx;
-            positions[i + 16] = normal ? dy : cy;
-            positions[i + 17] = normal ? dz : cz;
-
-            // Normals H2
-            pA.set(ax, ay, az);
-            normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
-            normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 9 + 3 * j]   = nx;
-                normals[i + 9 + 3 * j + 1] = ny;
-                normals[i + 9 + 3 * j + 2] = nz;
-            }
-
-            // Colors H2
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + 9 + j * 3] = color.r;
-                colors[i + 9 + j * 3 + 1] = color.g;
-                colors[i + 9 + j * 3 + 2] = color.b;
-            }
+            this.setPNC2(positions, colors, normals, i, normal, color,
+                ax, ay, az, cx, cy, cz, dx, dy, dz,
+                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
-            uvs[uvi + 6]  = offsetU + 0. + eps;
-            uvs[uvi + 7]  = offsetV + 0. + eps;
+            uvs[uvi + 6]  = offsetU + eps;
+            uvs[uvi + 7]  = offsetV + eps;
             uvs[uvi + 8]  = offsetU + 0.0625 - eps;
-            uvs[uvi + 9]  = offsetV + (normal ? 0.0625 - eps : 0. + eps);
+            uvs[uvi + 9]  = offsetV + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 10] = offsetU + 0.0625 - eps;
-            uvs[uvi + 11] = offsetV + (normal ? 0. + eps : 0.0625 - eps);
+            uvs[uvi + 11] = offsetV + (normal ? eps : 0.0625 - eps);
         }
 
         else if (faceId < 2 * ijkS) // J
@@ -152,87 +177,28 @@ let FacesModule = {
             cx = ax + 1; cy = ay; cz = az + 1;
             dx = ax; dy = ay; dz = az + 1;
 
-            positions[i]   = ax;
-            positions[i + 1] = ay;
-            positions[i + 2] = az;
-            positions[i + 3] = normal ? bx : cx;
-            positions[i + 4] = normal ? by : cy;
-            positions[i + 5] = normal ? bz : cz;
-            positions[i + 6] = normal ? cx : bx;
-            positions[i + 7] = normal ? cy : by;
-            positions[i + 8] = normal ? cz : bz;
-
-            // Normals H1
-            pA.set(ax, ay, az);
-            normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
-            normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 3 * j]   = nx;
-                normals[i + 3 * j + 1] = ny;
-                normals[i + 3 * j + 2] = nz;
-            }
-
-            // Colors H1
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + j * 3] = color.r;
-                colors[i + j * 3 + 1] = color.g;
-                colors[i + j * 3 + 2] = color.b;
-            }
+            this.setPNC1(positions, colors, normals, i, normal, color,
+                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
+                iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[1][0] : txCoords[4][0]) * 0.0625;
             offsetV = (normal ? txCoords[1][1] : txCoords[4][1]) * 0.0625;
-            uvs[uvi]     = offsetU + (normal ? 0.0625 - eps : 0. + eps);
-            uvs[uvi + 1] = offsetV + (0. + eps);
-            uvs[uvi + 2] = offsetU + (normal ? 0. + eps : 0.0625 - eps);
-            uvs[uvi + 3] = offsetV + (normal ? 0. + eps : 0.0625 - eps);
-            uvs[uvi + 4] = offsetU + (normal ? 0. + eps : 0.0625 - eps);
-            uvs[uvi + 5] = offsetV + (normal ? 0.0625 - eps : 0. + eps);
+            uvs[uvi]     = offsetU + (normal ? 0.0625 - eps : eps);
+            uvs[uvi + 1] = offsetV + eps;
+            uvs[uvi + 2] = offsetU + (normal ? eps : 0.0625 - eps);
+            uvs[uvi + 3] = offsetV + (normal ? eps : 0.0625 - eps);
+            uvs[uvi + 4] = offsetU + (normal ? eps : 0.0625 - eps);
+            uvs[uvi + 5] = offsetV + (normal ? 0.0625 - eps : eps);
 
-            // Positions H2
-            positions[i + 9]  = ax;
-            positions[i + 10] = ay;
-            positions[i + 11] = az;
-            positions[i + 12] = normal ? cx : dx;
-            positions[i + 13] = normal ? cy : dy;
-            positions[i + 14] = normal ? cz : dz;
-            positions[i + 15] = normal ? dx : cx;
-            positions[i + 16] = normal ? dy : cy;
-            positions[i + 17] = normal ? dz : cz;
-
-            // Normals H2
-            pA.set(ax, ay, az);
-            normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
-            normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 9 + 3 * j]   = nx;
-                normals[i + 9 + 3 * j + 1] = ny;
-                normals[i + 9 + 3 * j + 2] = nz;
-            }
-
-            // Colors H2
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + 9 + j * 3] = color.r;
-                colors[i + 9 + j * 3 + 1] = color.g;
-                colors[i + 9 + j * 3 + 2] = color.b;
-            }
+            this.setPNC2(positions, colors, normals, i, normal, color,
+                ax, ay, az, cx, cy, cz, dx, dy, dz,
+                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
-            uvs[uvi + 6]  = offsetU + (normal ? 0.0625 - eps : 0. + eps);
-            uvs[uvi + 7]  = offsetV + 0. + eps;
-            uvs[uvi + 8]  = offsetU + 0. + eps;
+            uvs[uvi + 6]  = offsetU + (normal ? 0.0625 - eps : eps);
+            uvs[uvi + 7]  = offsetV + eps;
+            uvs[uvi + 8]  = offsetU + eps;
             uvs[uvi + 9]  = offsetV + 0.0625 - eps;
             uvs[uvi + 10] = offsetU + 0.0625 - eps;
             uvs[uvi + 11] = offsetV + 0.0625 - eps;
@@ -250,91 +216,31 @@ let FacesModule = {
             cx = ax + 1; cy = ay + 1; cz = az;
             dx = ax + 1; dy = ay; dz = az;
 
-            // Positions H1
-            positions[i]   = ax;
-            positions[i + 1] = ay;
-            positions[i + 2] = az;
-            positions[i + 3] = normal ? bx : cx;
-            positions[i + 4] = normal ? by : cy;
-            positions[i + 5] = normal ? bz : cz;
-            positions[i + 6] = normal ? cx : bx;
-            positions[i + 7] = normal ? cy : by;
-            positions[i + 8] = normal ? cz : bz;
-
-            // Normals H1
-            pA.set(ax, ay, az);
-            normal ? pB.set(bx, by, bz) : pB.set(cx, cy, cz);
-            normal ? pC.set(cx, cy, cz) : pC.set(bx, by, bz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 3 * j] = nx;
-                normals[i + 3 * j + 1] = ny;
-                normals[i + 3 * j + 2] = nz;
-            }
-
-            // Colors H1
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + j * 3] = color.r;
-                colors[i + j *  3 + 1] = color.g;
-                colors[i + j * 3 + 2] = color.b;
-            }
+            this.setPNC1(positions, colors, normals, i, normal, color,
+                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
+                iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[2][0] : txCoords[5][0]) * 0.0625;
             offsetV = (normal ? txCoords[2][1] : txCoords[5][1]) * 0.0625;
-            uvs[uvi]    = offsetU + 0. + eps;
-            uvs[uvi + 1] = offsetV + 0. + eps;
-            uvs[uvi + 2]  = offsetU + (normal ? 0. + eps : 0.0625 - eps);
+            uvs[uvi]     = offsetU  + eps;
+            uvs[uvi + 1] = offsetV + eps;
+            uvs[uvi + 2] = offsetU + (normal ? eps : 0.0625 - eps);
             uvs[uvi + 3] = offsetV + 0.0625 - eps;
-            uvs[uvi + 4]  = offsetU + (normal ? 0.0625 - eps : 0. + eps);
+            uvs[uvi + 4] = offsetU + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 5] = offsetV + 0.0625 - eps;
 
-            // Positions H2
-            positions[i + 9]  = ax;
-            positions[i + 10] = ay;
-            positions[i + 11] = az;
-            positions[i + 12] = normal ? cx : dx;
-            positions[i + 13] = normal ? cy : dy;
-            positions[i + 14] = normal ? cz : dz;
-            positions[i + 15] = normal ? dx : cx;
-            positions[i + 16] = normal ? dy : cy;
-            positions[i + 17] = normal ? dz : cz;
-
-            // Normals H2
-            pA.set(ax, ay, az);
-            normal ? pB.set(cx, cy, cz) : pB.set(dx, dy, dz);
-            normal ? pC.set(dx, dy, dz) : pC.set(cx, cy, cz);
-            cb.subVectors(pC, pB);
-            ab.subVectors(pA, pB);
-            cb.cross(ab);
-            cb.normalize();
-            nx = cb.x; ny = cb.y; nz = cb.z;
-            for (j = 0; j < 3; ++j) {
-                normals[i + 9 + 3 * j]   = nx;
-                normals[i + 9 + 3 * j + 1] = ny;
-                normals[i + 9 + 3 * j + 2] = nz;
-            }
-
-            // Colors H2
-            this.setColor(iChunkOffset, jChunkOffset, kChunkOffset, color);
-            for (j = 0; j < 3; ++j) {
-                colors[i + 9 + j * 3] = color.r;
-                colors[i + 9 + j * 3 + 1] = color.g;
-                colors[i + 9 + j * 3 + 2] = color.b;
-            }
+            this.setPNC2(positions, colors, normals, i, normal, color,
+                ax, ay, az, cx, cy, cz, dx, dy, dz,
+                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
-            uvs[uvi + 6]  = offsetU + 0. + eps;
-            uvs[uvi + 7]  = offsetV + 0. + eps;
+            uvs[uvi + 6]  = offsetU + eps;
+            uvs[uvi + 7]  = offsetV + eps;
             uvs[uvi + 8]  = offsetU + 0.0625 - eps;
-            uvs[uvi + 9]  = offsetV + (normal ? 0.0625 - eps : 0. + eps);
+            uvs[uvi + 9]  = offsetV + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 10] = offsetU + 0.0625 - eps;
-            uvs[uvi + 11] = offsetV + (normal ? 0. + eps : 0.0625 - eps);
+            uvs[uvi + 11] = offsetV + (normal ? eps : 0.0625 - eps);
         }
 
         for (j = 0; j < 18; ++j) {

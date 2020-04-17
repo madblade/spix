@@ -374,6 +374,9 @@ extend(CameraManager.prototype, {
         // Apply transform to portals.
         this.updateCameraPortals(camera, rotationZ, rotationX, theta1, theta0);
 
+        // Apply transform to local model.
+        this.graphicsEngine.app.model.server.selfModel.cameraMoved(this.mainCamera);
+
         // drunken controls: tmpQuaternion.set(- movementY * 0.002, - movementX * 0.002, 0, 1).normalize();
         // camera.quaternion.multiply(tmpQuaternion);
         // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);

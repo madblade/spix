@@ -7,6 +7,7 @@
 import extend               from '../../../extend.js';
 
 import { InventoryModule }  from './inventory.js';
+import { Vector3 } from 'three';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -27,8 +28,10 @@ let SelfModel = function(app) {
     this.worldNeedsUpdate = false;
     this.needsUpdate = false;
     this.displayAvatar = false;
+    this.displayHandItem = true;
 
     this.avatar = null;
+    this.handItem = null;
 };
 
 extend(SelfModel.prototype, InventoryModule);
@@ -48,6 +51,7 @@ extend(SelfModel.prototype, {
         let clientModel = this.app.model.client;
 
         let avatar = this.avatar;
+        let handItem = this.handItem;
         let up = this.position;
         let r = this.rotation;
         let id = this.entityId;
@@ -63,11 +67,14 @@ extend(SelfModel.prototype, {
             let worldId = this.worldId;
             let oldWorldId = this.oldWorldId;
             let displayAvatar = this.displayAvatar;
+            let displayHandItem = this.displayHandItem;
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+            else if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
             if (displayAvatar) graphics.addToScene(avatar, worldId);
+            else if (displayHandItem) graphics.addToScene(handItem, worldId);
             xModel.forceUpdate = true;
         }
 
@@ -84,6 +91,13 @@ extend(SelfModel.prototype, {
             avatar.rotation.z = r[2];
             avatar.rotation.x = r[3];
             avatar.getWrapper().rotation.y = Math.PI + r[0];
+
+            if (handItem) {
+                let mc = graphics.cameraManager.mainCamera;
+                handItem.position.copy(mc.up.position);
+                // handItem.rotation.x = mc.pitch.rotation.x;
+                // handItem.rotation.z = mc.yaw.rotation.z;
+            }
 
             // let camr = graphics.cameraManager.mainCamera.get3DObject().rotation;
             let theta0 = r[2];
@@ -112,6 +126,13 @@ extend(SelfModel.prototype, {
 
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
+    },
+
+    cameraMoved(cameraObject) {
+        let handItem = this.handItem;
+        if (!handItem) return;
+        handItem.rotation.x = cameraObject.pitch.rotation.x;
+        handItem.rotation.z = cameraObject.yaw.rotation.z;
     },
 
     updateSelf(p, r, w) {
@@ -144,14 +165,14 @@ extend(SelfModel.prototype, {
 
         graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
             let object3d = graphics.finalizeEntity(entityId, createdEntity);
-
-            graphics.loadItemMesh('portal-gun', function(gltfObject) {
-                object3d.getWrapper().add(gltfObject);
-                selfModel.avatar = object3d;
-                if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
-            });
-
+            selfModel.avatar = object3d;
+            if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
         }.bind(this));
+
+        graphics.loadItemMesh('portal-gun', function(gltfObject) {
+            selfModel.handItem = gltfObject;
+            if (!selfModel.displayAvatar) graphics.addToScene(gltfObject, worldId);
+        });
     },
 
     getSelfPosition() {

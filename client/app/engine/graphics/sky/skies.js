@@ -65,9 +65,9 @@ let SkyModule = {
             console.log('[Chunks] Default sky creation.');
 
         // Sky light.
-        // TODO [CRIT] AO light and update
-        let light = this.createLight('hemisphere');
-        light.position.set(0.5, 1, 0.75);
+        // TODO [CRIT] light update
+        let light = this.createLight('sun');
+        light.position.set(-1, -2, -10);
         light.updateMatrixWorld();
         this.addToScene(light, worldId);
 

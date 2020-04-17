@@ -337,6 +337,10 @@ let ChunksModule = {
                 geometry.setAttribute('color', new BufferAttribute(colors, 3));
                 geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
 
+                // let addedMesh = new Mesh(geometry, materials[meshId]);
+                // addedMesh.castShadow = true;
+                // addedMesh.receiveShadow = true;
+                // meshes[meshId] = addedMesh;
                 meshes[meshId] = new Mesh(geometry, materials[meshId]);
                 this.addToScene(meshes[meshId], worldId);
             }

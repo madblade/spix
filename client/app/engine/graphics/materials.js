@@ -6,7 +6,7 @@
 
 import {
     BackSide, VertexColors,
-    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide
 } from 'three';
 
 let MaterialsModule = {
@@ -24,10 +24,10 @@ let MaterialsModule = {
                 break;
 
             case 'textured-phong':
-                material = new MeshLambertMaterial({
+                material = new MeshPhongMaterial({
                     //color: 0xffffff, specular: 0xffffff, shininess: 250,
                     //shading: FlatShading,
-                    side: BackSide,
+                    side: FrontSide,
                     //vertexColors: VertexColors,
                     map: this.texture
                 });
