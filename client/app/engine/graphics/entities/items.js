@@ -15,7 +15,7 @@ let ItemsModule = {
 
         let loader = new GLTFLoader();
         loader.load(`app/assets/models/${modelPath}.glb`, function(gltf) {
-            let object = gltf.scene.children[1]; // portal gun
+            let object = gltf.scene.children[0]; // portal gun
             object.scale.set(0.08, 0.08, 0.08);
             object.rotation.set(0, Math.PI, 0);
             // object.rotation.reorder('ZYX');
