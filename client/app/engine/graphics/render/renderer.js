@@ -6,6 +6,10 @@
 
 import extend from '../../../extend.js';
 import { WebGLRenderer } from 'three';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 
 let RendererManager = function(graphicsEngine) {
     this.graphics = graphicsEngine;
@@ -14,6 +18,7 @@ let RendererManager = function(graphicsEngine) {
     this.renderMax = Number.POSITIVE_INFINITY;
 
     this.renderer = this.createRenderer();
+    this.composers = new Map();
 
     // Lightweight screen, camera and scene manager for portals.
     this.renderRegister = [];
@@ -30,11 +35,24 @@ extend(RendererManager.prototype, {
         return 0 | cssColor.replace('#', '0x');
     },
 
+    createComposer(rendrr, sc, cam, target) {
+        let resolutionX = 1 / window.innerWidth;
+        let resolutionY = 1 / window.innerHeight;
+        let fxaa = new ShaderPass(FXAAShader);
+        let u = 'resolution';
+        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
+        let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        let scenePass = new RenderPass(sc, cam);
+        composer.addPass(scenePass);
+        composer.addPass(fxaa);
+        return composer;
+    },
+
     createRenderer() {
         // Configure renderer
         let renderer = new WebGLRenderer({
             // TODO [MEDIUM] propose different antialiasing strategy
-            antialias: true,
+            antialias: false,
             alpha: true
         });
 
@@ -110,7 +128,7 @@ extend(RendererManager.prototype, {
             if (screen2) {
                 otherSceneId = currentPass.sceneId;
                 otherEnd = screen2.getMesh();
-                sceneManager.removeObject(otherEnd, otherSceneId);
+                sceneManager.removeObject(otherEnd, otherSceneId, true);
             }
             //console.log('[Renderer] Rendering.');
             //screen1.getMesh().updateMatrixWorld();
@@ -122,33 +140,20 @@ extend(RendererManager.prototype, {
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
             this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
             //bufferScene.updateMatrixWorld();
-            renderer.setRenderTarget(bufferTexture);
-            renderer.render(bufferScene, bufferCamera);
-            renderer.setRenderTarget(null);
 
-            //if (true) {
-            //let rec = cameraManager.mainCamera.getRecorder(); //.getRecorder();
-            //rec.updateProjectionMatrix();
-            //rec.updateMatrixWorld();
-            //rec.matrixWorldInverse.getInverse(rec.matrixWorld);
-            //}
-
-            //if (this.thenstop) {
-            //let posX = screen1.getMesh().position;
-            //let  = localRecorder.position;
-            //let posC = new Vector3();
-            //posC.setFromMatrixPosition(mainCamera.matrixWorld);
-
-            //let me = this.graphics.app.model.server.selfModel.position;
-
-            //console.log('#####\nCAM POSITION');
-            //console.log(posC);
-            //console.log(cameraManager.mainCamera.get3DObject().position);
-            //console.log('X POSITION');
-            //console.log(posX);
-            //console.log('ME POSITION');
-            //console.log(me);
-            //}
+            // renderer.setRenderTarget(bufferTexture);
+            let id = currentPass.id.toString();
+            let composer;
+            if (this.composers.has(id)) {
+                composer = this.composers.get(id);
+            } else {
+                composer = this.createComposer(renderer, bufferScene, bufferCamera, bufferTexture);
+                this.composers.set(id, composer);
+            }
+            composer.render(); // Double render for camera 1frame lag.
+            composer.render();
+            // renderer.render(bufferScene, bufferCamera);
+            // renderer.setRenderTarget(null);
 
             if (screen2) {
                 sceneManager.addObject(otherEnd, otherSceneId);
@@ -163,7 +168,16 @@ extend(RendererManager.prototype, {
         mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
         //this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
         //mainScene.updateMatrixWorld();
-        renderer.render(mainScene, mainCamera);
+        let id = this.graphics.app.model.server.selfModel.worldId.toString();
+        let composer;
+        if (this.composers.has(id)) {
+            composer = this.composers.get(id);
+        } else {
+            composer = this.createComposer(renderer, mainScene, mainCamera, null);
+            this.composers.set(id, composer);
+        }
+        composer.render();
+        // renderer.render(mainScene, mainCamera);
 
 
         //if (this.thenstop) {

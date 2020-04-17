@@ -18,10 +18,10 @@ let FacesModule = {
     },
 
     addFace(faceId, i, iS, ijS, ijkS,
-                       positions, normals, colors, uvs, nature,
-                       iChunkOffset, jChunkOffset, kChunkOffset,
-                       pA, pB, pC, cb, ab,
-                       normal, color)
+        positions, normals, colors, uvs, nature,
+        iChunkOffset, jChunkOffset, kChunkOffset,
+        pA, pB, pC, cb, ab,
+        normal, color)
     {
         let j;
         let ax; let bx; let cx; let dx;

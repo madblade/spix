@@ -56,12 +56,14 @@ extend(SceneManager.prototype, {
         if (scene) scene.add(object);
     },
 
-    removeObject(object, sceneId) {
+    removeObject(object, sceneId, doNotDispose) {
         let scene = this.getScene(sceneId);
         if (scene) {
             scene.remove(object);
-            if (object.geometry) { object.geometry.dispose(); object.geometry = null; }
-            if (object.material) { object.material.dispose(); object.material = null; }
+            if (!doNotDispose) {
+                if (object.geometry) { object.geometry.dispose(); object.geometry = null; }
+                if (object.material) { object.material.dispose(); object.material = null; }
+            }
         }
     },
 
@@ -92,8 +94,12 @@ extend(SceneManager.prototype, {
         let screen = this.screens.get(screenId);
         if (!screen) return;
 
-        this.removeObject(screen.getMesh(), screen.getWorldId());
-        this.screens.delete(screenId);
+        let scene = this.getScene(screen.getWorldId());
+        if (scene) scene.remove(screen);
+
+        // Do not dispose of the object! Later use for screen when we get back to this world.
+        this.removeObject(screen.getMesh(), screen.getWorldId(), true);
+        // this.screens.delete(screenId);
     },
 
     cleanup() {
@@ -132,11 +138,11 @@ let ScenesModule = {
         sceneManager.addObject(object3D, sceneId);
     },
 
-    removeFromScene(object3D, sceneId) {
+    removeFromScene(object3D, sceneId, doNotDispose) {
         let sceneManager = this.sceneManager;
         if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
         sceneId = parseInt(sceneId, 10);
-        sceneManager.removeObject(object3D, sceneId);
+        sceneManager.removeObject(object3D, sceneId, doNotDispose);
     },
 
     addScene(newSceneId) {

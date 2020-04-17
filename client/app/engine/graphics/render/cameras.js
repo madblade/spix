@@ -41,7 +41,7 @@ extend(CameraManager.prototype, {
         return new Camera(
             this.mainFOV,
             this.mainAspect,
-            forRaycaster ? 1 : this.mainNear, // TODO [LOW] check security.
+            forRaycaster ? 1 : this.mainNear,
             this.mainFar,
             worldId);
     },
@@ -68,6 +68,7 @@ extend(CameraManager.prototype, {
         this.subCameras.set(cameraId, camera);
 
         // TODO [CRIT] compute rotation and position from path.
+
 
         camera.copyCameraPosition(mainCamera);
         camera.copyCameraUpRotation(mainCamera);
@@ -97,10 +98,8 @@ extend(CameraManager.prototype, {
         console.log(`Successfully added side camera to scene ${worldId}`);
     },
 
-    // TODO [HIGH] investigate the Camera Path Problem.
-    removeCamera(cameraId) {
-        console.log(`TODO: remove camera ${cameraId}`);
-    },
+    // removeCamera(cameraId) {
+    // },
 
     removeCameraFromScene(cameraId, worldId) {
         worldId = parseInt(worldId, 10);
@@ -114,7 +113,7 @@ extend(CameraManager.prototype, {
 
         if (!worldId) worldId = camera.getWorldId();
 
-        this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId);
+        this.graphicsEngine.removeFromScene(camera.get3DObject(), worldId, true);
     },
 
     switchMainCameraToWorld(oldMainSceneId, sceneId) {
@@ -130,7 +129,7 @@ extend(CameraManager.prototype, {
         graphics.addToScene(mainRaycasterCamera.get3DObject(), sceneId);
     },
 
-    // TODO [HIGH] passify, dont forget raycaster
+    /** @deprecated */
     switchToCamera(oldWorldId, newWorldId) {
         //let newMainCamera = this.subCameras.get(newMainCameraId);
         //if (!newMainCamera) { console.log('Failed to switch with camera ' + newMainCameraId); return; }
@@ -174,6 +173,7 @@ extend(CameraManager.prototype, {
 
         if (i.isFirstPerson()) {
             cams.forEach(function(cam/*, cameraId*/) {
+                // TODO [CRIT] update differently from portal transforms.
                 cam.setCameraPosition(x, y, z);
                 cam.setFirstPerson();
                 let mirrorCamera = cam.getRecorder();
@@ -215,7 +215,7 @@ extend(CameraManager.prototype, {
         for (let i = 0, l = incoming.length; i < l; ++i) {
             let inc = incoming[i];
             let rot = [0, 0, 0, 0];
-            // TODO [HIGH] put that in update received instead.
+            // TODO [MEDIUM] put that in update received instead.
             rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
             rotation[0] = rot[0];
             rotation[1] = rot[1];
@@ -224,16 +224,14 @@ extend(CameraManager.prototype, {
         }
         this.incomingRotationEvents = [];
 
-        // TODO [MEDIUM] perform additional filtering
+        // Here we could perform additional filtering
         if (rotation) {
-            /*
-            console.log(
-                rotation[0].toFixed(4) + ', ' +
-                rotation[1].toFixed(4) + ' ; ' +
-                rotation[2].toFixed(4) + ', ' +
-                rotation[3].toFixed(4)
-            );
-            */
+            // console.log(`
+            //     ${rotation[0].toFixed(4)},
+            //     ${rotation[1].toFixed(4)};
+            //     ${rotation[2].toFixed(4)},
+            //     ${rotation[3].toFixed(4)}
+            // `);
 
             let clientModel = this.graphicsEngine.app.model.client;
             clientModel.triggerEvent('r', rotation);
@@ -326,34 +324,6 @@ extend(CameraManager.prototype, {
         projectionMatrix.elements[10] = c.z + 1.0;
         projectionMatrix.elements[14] = c.w;
     },
-    //
-    // setWrapperRotation(absX, absY) {
-    //     // Rotate main camera.
-    //     let camera = this.mainCamera;
-    //     let rotationZ = camera.getZRotation();
-    //     let rotationX = camera.getXRotation();
-    //
-    //     // Current up vector -> angles.
-    //     let up = camera.get3DObject().rotation;
-    //     let theta0 = up.z;
-    //     let theta1 = up.x;
-    //
-    //     // Rotate raycaster camera.
-    //     let raycasterCamera = this.mainRaycasterCamera;
-    //     raycasterCamera.setZRotation(rotationZ);
-    //     raycasterCamera.setXRotation(rotationX);
-    //
-    //     if (absX !== 0 || absY !== 0) {
-    //         // Add angles.
-    //         theta0 = theta0 + absX;
-    //         theta1 = Math.max(0, Math.min(Math.PI, theta1 + absY));
-    //         camera.setUpRotation(theta1, 0, theta0);
-    //         raycasterCamera.setUpRotation(theta1, 0, theta0);
-    //     }
-    //
-    //     // Apply transform to portals.
-    //     this.updateCameraPortals(camera, rotationZ, rotationX, theta1, theta0);
-    // },
 
     setAbsRotation(theta0, theta1) {
         let camera = this.mainCamera;
@@ -414,6 +384,7 @@ extend(CameraManager.prototype, {
         let localRecorder = camera.getRecorder();
         this.subCameras.forEach(function(subCamera/*, cameraId*/) {
             // TODO [CRIT] update camera position, rotation rel. to portal position.
+
 
             let mirrorCamera = subCamera.getRecorder();
             let mirror = subCamera.getScreen().getMesh();
@@ -490,6 +461,7 @@ let CamerasModule = {
         return this.cameraManager.mainCamera.getCameraPosition();
     },
 
+    /** @deprecated */
     switchToCamera(oldId, newId) {
         return this.cameraManager.switchToCamera(oldId, newId);
     }

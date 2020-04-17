@@ -287,6 +287,7 @@ extend(XGraph.prototype, {
             let destinationPortal = portals.get(destinationPortalId);
 
             // TODO [CRIT] compute chain transformation
+            // compose everything but NOT THE MAIN CAMERA!
         }
 
         console.log('Computed Camera Transform.');

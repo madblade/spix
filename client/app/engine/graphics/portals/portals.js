@@ -29,6 +29,7 @@ let PortalsModule = {
         // Create screen.
         let screen = this.getScreen(portalId);
         if (!screen) {
+            console.log('NNNNNNNEEEEEEW SCREEEEEENu');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;
             let tempOffset = portal.tempOffset;
@@ -63,7 +64,7 @@ let PortalsModule = {
             let material = new ShaderMaterial({
                 side: DoubleSide,
                 uniforms: {
-                    texture1: { type:'t', value:rtTexture.texture }
+                    texture1: { type: 't', value: rtTexture.texture }
                 },
                 vertexShader: portalVShader,
                 fragmentShader: portalFShader
@@ -233,7 +234,6 @@ let PortalsModule = {
         });
 
         // Flush render targets.
-        // TODO [HIGH] graphics: adaptive render register (prevent texture freezing)
         this.rendererManager.setRenderRegister([]);
         this.lastRenderPaths = new Set();
         this.lastRenderGates = new Set();

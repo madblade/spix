@@ -4,12 +4,12 @@
 
 'use strict';
 
-import { TextureLoader } from 'three';
+import { NearestFilter, TextureLoader } from 'three';
 
 let TexturesModule = {
 
     loadTextures() {
-        this.texture = this.loadTexture('3.png');
+        this.texture = this.loadTexture('3.jpg');
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
     },
 
@@ -20,12 +20,11 @@ let TexturesModule = {
         let texture = loader.load(`app/assets/textures/${whatTexture}`);
 
         // TODO [MEDIUM] propose different anisotropy filtering
-        texture.anisotropy = maxAnisotropy;
-        // texture.generateMipmaps = true;
-        // texture.magFilter = THREE.NearestFilter;
-        // texture.minFilter = THREE.NearestFilter;
-        // TODO [MEDIUM] graphical effects
-        // texture.minFilter = THREE.LinearMipMapLinearFilter;
+        // texture.anisotropy = maxAnisotropy;
+        // texture.generateMipmaps = false;
+        texture.magFilter = NearestFilter;
+        texture.minFilter = NearestFilter;
+        // texture.minFilter = LinearMipMapLinearFilter;
 
         console.log(`Max anisotropy = ${maxAnisotropy}`);
 
