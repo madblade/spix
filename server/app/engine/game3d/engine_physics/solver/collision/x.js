@@ -31,18 +31,20 @@ class XCollider {
             let sum = 0 + (x1 === x0) + (y1 === y0) + (z1 === z0);
             const opx = op[0]; const opy = op[1]; const opz = op[2];
             const npx = np[0]; const npy = np[1]; const npz = np[2];
-            // x1 = cos alpha  ;  x2 = cos (alpha + beta) = cos alpha cos beta - sin alpha sin beta
-            // y1 = sin alpha  ;  y2 = sin (alpha + beta) = sin alpha cos beta + cos alpha sin beta
-            // x2 = x1 cos beta - y1 sin beta
-            // y2 = y1 cos beta + x1 sin beta
-            let beta = -parseFloat(o);
-            let cosBeta = Math.cos(beta); let sinBeta = Math.sin(beta);
-            let transform = (inputX, inputY, inputZ) =>
-                [inputX * cosBeta - inputY * sinBeta, inputY * cosBeta + inputX * sinBeta, inputZ];
-
             if (sum === 2)
             {
                 let axis = x1 !== x0 ? 'x' : y1 !== y0 ? 'y' : z1 !== z0 ? 'z' : '?';
+
+                // x1 = cos alpha  ;  x2 = cos (alpha + beta) = cos alpha cos beta - sin alpha sin beta
+                // y1 = sin alpha  ;  y2 = sin (alpha + beta) = sin alpha cos beta + cos alpha sin beta
+                // x2 = x1 cos beta - y1 sin beta
+                // y2 = y1 cos beta + x1 sin beta
+                let beta = -parseFloat(o);
+                if (axis === 'x') beta += Math.PI / 2;
+                if (axis === 'y') beta = -beta + Math.PI / 2;
+                let cosBeta = Math.cos(beta); let sinBeta = Math.sin(beta);
+                let transform = (inputX, inputY, inputZ) =>
+                    [inputX * cosBeta - inputY * sinBeta, inputY * cosBeta + inputX * sinBeta, inputZ];
 
                 let fx0; let fx1; let fy0; let fy1; let fz0; let fz1;
                 let cosAlphaO; let sinAlphaO; let cosAlphaN; let sinAlphaN;
@@ -56,14 +58,30 @@ class XCollider {
                         oT[0] += z0 + 0.5; nT[0] += z0 + 0.5;
                         oT[1] += y0 + 0.5; nT[1] += y0 + 0.5;
 
-                        fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
-                        fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
-                        fz0 = z0 + 0.5;             fz1 = fz0;
-                        if ((oT[2] > fz0 && nT[2] < fz1 || oT[2] < fz0 && nT[2] > fz1) &&
+                        // fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
+                        // fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
+                        // fz0 = z0 + 0.5;             fz1 = fz0;
+                        fx0 = z0 + 0.5;                 fx1 = fx0;
+                        fy0 = Math.min(y0, y1);         fy1 = Math.max(y0, y1) + 1;
+                        fz0 = Math.min(x0, x1) + 0.5;   fz1 = Math.max(x0, x1) + 1.5;
+
+                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
+                            console.log('[XXX] Normal breached');
+                        }
+                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
                             oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
-                            oT[0] + .5 > fx0 && oT[0] + .5 < fx1 && nT[0] + .5 > fx0 && nT[0] + .5 < fx1
+                            oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
                         ) return xModel.getOtherSide(xId);
                         break;
+
+                        // if (oT[2] > fz0 && nT[2] < fz1 || oT[2] < fz0 && nT[2] > fz1) {
+                        //     console.log('[X] Normal breached.');
+                        // }
+                        // if ((oT[2] > fz0 && nT[2] < fz1 || oT[2] < fz0 && nT[2] > fz1) &&
+                        //     oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
+                        //     oT[0] + .5 > fx0 && oT[0] + .5 < fx1 && nT[0] + .5 > fx0 && nT[0] + .5 < fx1
+                        // ) return xModel.getOtherSide(xId);
+                        // break;
                     case 'y':
                         cosAlphaO = opx - (x0 + 0.5); sinAlphaO = opz - (z0 + 0.5);
                         cosAlphaN = npx - (x0 + 0.5); sinAlphaN = npz - (z0 + 0.5);
@@ -72,14 +90,30 @@ class XCollider {
                         oT[0] += x0 + 0.5; nT[0] += x0 + 0.5;
                         oT[1] += z0 + 0.5; nT[1] += z0 + 0.5;
 
-                        fx0 = x0 + 0.5;             fx1 = fx0;
-                        fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
-                        fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
+                        // fx0 = x0 + 0.5;             fx1 = fx0;
+                        // fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
+                        // fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
+                        fx0 = x0 + 0.5;               fx1 = fx0;
+                        fy0 = Math.min(z0, z1);       fy1 = Math.max(z0, z1) + 1;
+                        fz0 = Math.min(y0, y1) + 0.5; fz1 = Math.max(y0, y1) + 1.5;
+
+                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
+                            console.log('[YYYY] Normal breached');
+                        }
                         if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
-                            oT[2] > fz0 && oT[2] < fz1 && nT[2] > fz0 && nT[2] < fz1 &&
-                            oT[1] + .5 > fy0 && oT[1] + .5 < fy1 && nT[1] + .5 > fy0 && nT[1] + .5 < fy1
+                            oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
+                            oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
                         ) return xModel.getOtherSide(xId);
                         break;
+
+                        // if (oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) {
+                        //     console.log('[Y] Normal breached.');
+                        // }
+                        // if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
+                        //     oT[2] > fz0 && oT[2] < fz1 && nT[2] > fz0 && nT[2] < fz1 &&
+                        //     oT[1] + .5 > fy0 && oT[1] + .5 < fy1 && nT[1] + .5 > fy0 && nT[1] + .5 < fy1
+                        // ) return xModel.getOtherSide(xId);
+                        // break;
                     case 'z':
                         cosAlphaO = opx - (x0 + 0.5); sinAlphaO = opy - (y0 + 0.5);
                         cosAlphaN = npx - (x0 + 0.5); sinAlphaN = npy - (y0 + 0.5);
@@ -88,13 +122,13 @@ class XCollider {
                         oT[0] += x0 + 0.5; nT[0] += x0 + 0.5;
                         oT[1] += y0 + 0.5; nT[1] += y0 + 0.5;
 
-                        fx0 = x0 + 0.5;             fx1 = fx0;
-                        fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
-                        fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
+                        fx0 = x0 + 0.5;               fx1 = fx0;
+                        fy0 = Math.min(y0, y1);       fy1 = Math.max(y0, y1) + 1;
+                        fz0 = Math.min(z0, z1) + 0.5; fz1 = Math.max(z0, z1) + 1.5;
+
                         if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
                             console.log('[DEBUG/XCollision] Normal breached');
                         }
-
                         if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
                             oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
                             oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1

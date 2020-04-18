@@ -284,12 +284,23 @@ extend(XGraph.prototype, {
         console.log(pidPath);
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
             let currentTunnel = pidPath[pathId].split(',');
-            // let sourcePortalId = currentTunnel[0];
+            let sourcePortalId = currentTunnel[0];
+            let sourcePortal = portals.get(sourcePortalId);
             let destinationPortalId = currentTunnel[1];
             let destinationPortal = portals.get(destinationPortalId);
-            if (!destinationPortal) continue;
+            if (!destinationPortal || !sourcePortal) continue;
 
-            // TODO [CRIT] compute chain transformation
+            let P0B0 = sourcePortal.tempPosition;
+            let P0B1 = sourcePortal.tempOtherPosition;
+            let P1B0 = destinationPortal.tempPosition;
+            let P1B1 = destinationPortal.tempOtherPosition;
+            // TODO [CRIT] compute relative position and orientation.
+
+            let thetaP0 = sourcePortal.tempOrientation;
+            let thetaP1 = destinationPortal.tempOrientation;
+            let portalRelativeOrientation = [o1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
+
+            // TODO [CRIT] compute chain transformation.
             console.log(destinationPortalId);
             console.log(destinationPortal.tempPosition);
             console.log(destinationPortal.tempOrientation);
