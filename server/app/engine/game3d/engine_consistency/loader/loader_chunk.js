@@ -127,14 +127,14 @@ class ChunkLoader {
         if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
-                // if !P.has(i,j,k)
-                    // Load (i,j,k) and break
+            //     if !P.has(i,j,k)
+            //         Load (i,j,k) and break
 
             // unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
             unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             // For (i,j,k) s.t. P.has(i,j,k)
-                // if d({i,j,k}, P) > P.thresh
-                    // Unload (i,j,k)
+            //     if d({i,j,k}, P) > P.thresh
+            //         Unload (i,j,k)
             avatar.nearestChunkId = nearestChunkId;
         }
 

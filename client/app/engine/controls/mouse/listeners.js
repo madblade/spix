@@ -67,7 +67,7 @@ let ListenerModule = {
 
         if (ex + ey + ez !== 1) {
             // TODO [HIGH] how do I remove an X?
-            console.log('Error: precision on intersection @addBlock');
+            console.warn('[OnLeftMouse] Error: precision on intersection @addBlock');
             return;
         }
 
@@ -146,7 +146,7 @@ let ListenerModule = {
         let ex = dx < 0.0000001; let ey = dy < 0.0000001; let ez = dz < 0.0000001;
 
         if (ex + ey + ez !== 1) {
-            console.log('Error: precision on intersection @addBlock');
+            console.warn('[OnRightMouse] Error: precision on intersection @addBlock');
             return;
         }
 

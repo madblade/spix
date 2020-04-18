@@ -32,13 +32,13 @@ let PortalsModule = {
             console.log('NNNNNNNEEEEEEW SCREEEEEENu');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;
-            let tempOffset = portal.tempOffset;
+            // let tempOffset = portal.tempOffset;
             let tempOrientation = portal.tempOrientation;
             let portalWidth = portal.tempWidth;
             let portalHeight = portal.tempHeight;
 
-            let width = window.innerWidth; // (tempWidth * window.innerWidth) / 2;
-            let height = window.innerHeight; // (tempHeight * window.innerHeight) / 2;
+            let width = window.innerWidth; // (portalWidth * window.innerWidth) / 2;
+            let height = window.innerHeight; // (portalHeight * window.innerHeight) / 2;
             let rtTexture = new WebGLRenderTarget(
                 width, height,
                 {
@@ -50,14 +50,6 @@ let PortalsModule = {
 
             // TODO call new geometry from meshes module
             let geometry = new PlaneBufferGeometry(portalWidth, portalHeight);
-            // geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-            //let uvs = geometry.attributes.uv.array;
-            //let uvi = 0;
-            // Quad 1
-            //uvs[uvi++] = 1.0; uvs[uvi++] = 1.0; // 1, 1 -> top right
-            //uvs[uvi++] = 0.;  uvs[uvi++] = 1.0; // 0, 1 -> top left
-            //uvs[uvi++] = 1.0; uvs[uvi++] = 0.;  // 1, 0 -> bottom right
-            //uvs[uvi++] = 0.;  uvs[uvi++] = 0.;  // 0, 0 -> bottom left
 
             let portalVShader = this.getPortalVertexShader();
             let portalFShader = this.getPortalFragmentShader();
@@ -71,15 +63,13 @@ let PortalsModule = {
             });
             let mesh = new Mesh(geometry, material);
 
-            // TODO [CRIT] orientations
-            // TODO round instead of parseInt
-            let x0 = parseInt(pos[0], 10);
-            let y0 = parseInt(pos[1], 10);
-            let z0 = parseInt(pos[2], 10);
+            let x0 = Math.floor(pos[0]);
+            let y0 = Math.floor(pos[1]);
+            let z0 = Math.floor(pos[2]);
 
-            let x1 = parseInt(top[0], 10);
-            let y1 = parseInt(top[1], 10);
-            let z1 = parseInt(top[2], 10);
+            let x1 = Math.floor(top[0]);
+            let y1 = Math.floor(top[1]);
+            let z1 = Math.floor(top[2]);
 
             let PI2 = Math.PI / 2;
             if (z0 !== z1) {
@@ -89,10 +79,7 @@ let PortalsModule = {
                 mesh.position.y = pos[1] + 0.5;
                 mesh.position.z = pos[2] + 1;
             } else if (y0 !== y1) {
-                // mesh.rotation.z = PI2;
                 mesh.rotation.y = PI2 - parseFloat(tempOrientation);
-                // mesh.rotation.z = PI2;
-                // mesh.rotation.z = PI2;
                 mesh.position.x = pos[0] + 0.5;
                 mesh.position.y = pos[1] + 1;
                 mesh.position.z = pos[2] + 0.5;

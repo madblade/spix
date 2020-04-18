@@ -7,7 +7,6 @@
 import extend               from '../../../extend.js';
 
 import { InventoryModule }  from './inventory.js';
-import { Vector3 } from 'three';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -92,13 +91,6 @@ extend(SelfModel.prototype, {
             avatar.rotation.x = r[3];
             avatar.getWrapper().rotation.y = Math.PI + r[0];
 
-            if (handItem) {
-                let mc = graphics.cameraManager.mainCamera;
-                handItem.position.copy(mc.up.position);
-                // handItem.rotation.x = mc.pitch.rotation.x;
-                // handItem.rotation.z = mc.yaw.rotation.z;
-            }
-
             // let camr = graphics.cameraManager.mainCamera.get3DObject().rotation;
             let theta0 = r[2];
             let theta1 = r[3];
@@ -122,6 +114,13 @@ extend(SelfModel.prototype, {
             clientModel.pushForLaterUpdate('camera-position', this.position);
             //clientModel.selfComponent.processChanges();
             graphics.cameraManager.updateCameraPosition(this.position);
+
+            if (handItem) {
+                let mc = graphics.cameraManager.mainCamera;
+                handItem.position.copy(mc.up.position);
+                // handItem.rotation.x = mc.pitch.rotation.x;
+                // handItem.rotation.z = mc.yaw.rotation.z;
+            }
         }
 
         this.worldNeedsUpdate = false;

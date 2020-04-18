@@ -4,8 +4,6 @@
 
 'use strict';
 
-// import GeometryUtils        from '../../../math/geometry';
-
 class XLoader
 {
     constructor(consistencyEngine) {

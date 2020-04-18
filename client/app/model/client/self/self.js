@@ -55,7 +55,6 @@ extend(SelfComponent.prototype, {
     },
 
     getItemOrientation() {
-        // TODO [CRIT] review orientation
         return this._itemOrientation;
     },
 

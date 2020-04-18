@@ -11,6 +11,7 @@ class XCollider
         if (!xs || xs.size < 1) return;
 
         let portals = xModel.portals;
+        // TODO [MEDIUM] collide with head instead of entity center.
         const op = oldPosition;
         const np = newPosition;
 
