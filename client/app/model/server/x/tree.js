@@ -280,13 +280,20 @@ extend(XGraph.prototype, {
             0, 0, 0  // Rotation
         ];
 
+        console.log('CAMERA TRANSFORMATION');
+        console.log(pidPath);
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
             let currentTunnel = pidPath[pathId].split(',');
-            let sourcePortalId = currentTunnel[0];
+            // let sourcePortalId = currentTunnel[0];
             let destinationPortalId = currentTunnel[1];
             let destinationPortal = portals.get(destinationPortalId);
+            if (!destinationPortal) continue;
 
             // TODO [CRIT] compute chain transformation
+            console.log(destinationPortalId);
+            console.log(destinationPortal.tempPosition);
+            console.log(destinationPortal.tempOrientation);
+
             // compose everything but NOT THE MAIN CAMERA!
         }
 

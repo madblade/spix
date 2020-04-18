@@ -53,6 +53,7 @@ extend(XModel.prototype, {
             let data = updates[i];
 
             for (let portalId in data) {
+                if (!data.hasOwnProperty(portalId)) continue;
                 let meta = data[portalId];
                 let isArray = meta instanceof Array;
 

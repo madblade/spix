@@ -44,7 +44,7 @@ let ListenerModule = {
         // Perform intersection.
         let intersects = graphicsEngine.cameraManager.performRaycast();
         if (intersects.length <= 0) {
-            console.log('Nothing intersected.');
+            console.log('[LeftMouse] Nothing intersected.');
             return;
         }
         intersects.sort(function(a, b) { return a.distance > b.distance; });
@@ -97,19 +97,25 @@ let ListenerModule = {
         }
 
         let fx2; let fy2; let fz2;
+        let cameraPosition = graphicsEngine.cameraManager.mainCamera.getCameraPosition();
+        let angle = 0;
         if (ex) {
             fx2 = positiveIsFree ? fx1 + 1 : fx1 - 1;
             fy2 = fy1;
             fz2 = fz1;
+            angle = Math.atan2(fz2 + 0.5 - cameraPosition.z, fy2 + 0.5 - cameraPosition.y);
         } else if (ey) {
             fx2 = fx1;
             fy2 = positiveIsFree ? fy1 + 1 : fy1 - 1;
             fz2 = fz1;
+            angle = Math.atan2(fz2 + 0.5 - cameraPosition.z, fx2 + 0.5 - cameraPosition.x);
         } else if (ez) {
             fx2 = fx1;
             fy2 = fy1;
             fz2 = positiveIsFree ? fz1 + 1 : fz1 - 1;
+            angle = Math.atan2(fy2 + 0.5 - cameraPosition.y, fx2 + 0.5 - cameraPosition.x);
         }
+        clientModel.selfComponent.setAngleFromIntersectionPoint(angle.toFixed(4));
 
         clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2]);
     },
@@ -121,7 +127,7 @@ let ListenerModule = {
 
         let intersects = graphicsEngine.cameraManager.performRaycast();
         if (intersects.length <= 0) {
-            console.log('Nothing intersected.');
+            console.log('[RightMouse] Nothing intersected.');
             return;
         }
         intersects.sort(function(a, b) { return a.distance > b.distance; });

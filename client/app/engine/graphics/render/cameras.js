@@ -387,7 +387,7 @@ extend(CameraManager.prototype, {
         let localRecorder = camera.getRecorder();
         this.subCameras.forEach(function(subCamera/*, cameraId*/) {
             // TODO [CRIT] update camera position, rotation rel. to portal position.
-
+            // TODO shouldn’t i clip after having rotated?
 
             let mirrorCamera = subCamera.getRecorder();
             let mirror = subCamera.getScreen().getMesh();

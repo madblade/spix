@@ -31,8 +31,8 @@ class XUpdater {
             let y2 = parseInt(meta[5], 10);
             let z2 = parseInt(meta[6], 10);
             let offset = parseFloat(meta[7]);
-            let o = meta[8];
-            let orientation = o === 0 ? 'first' : 'next';
+            let o = parseFloat(meta[8]);
+            let orientation = typeof o === 'number' ? o : 0; // o === 0 ? 'first' : 'next';
             let portalToLink = meta[9];
             if (portalToLink) portalToLink = parseInt(portalToLink, 10);
             xModel.addPortal(originWorld, x1, y1, z1, x2, y2, z2, offset, orientation, portalToLink);

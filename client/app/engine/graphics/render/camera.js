@@ -85,6 +85,7 @@ extend(Camera.prototype, {
 
     setUpRotation(x, y, z) {
         // TODO use local transform
+
         let up = this.up;
         up.rotation.x = x;
         up.rotation.y = y;
@@ -97,6 +98,7 @@ extend(Camera.prototype, {
 
     setXRotation(rotationX) {
         // TODO use local transform
+
         this.pitch.rotation.x = rotationX;
     },
 
@@ -106,11 +108,13 @@ extend(Camera.prototype, {
 
     setZRotation(rotationZ) {
         // TODO use local transform
+
         this.yaw.rotation.z = rotationZ;
     },
 
     copyCameraPosition(otherCamera) {
         // TODO [CRIT] maybe apply local transform here?
+
         if (otherCamera) {
             let up = this.up.position;
             let oup = otherCamera.getCameraPosition();
@@ -122,6 +126,7 @@ extend(Camera.prototype, {
 
     copyCameraUpRotation(otherCamera) {
         // TODO [CRIT] maybe use local transform here?
+
         if (otherCamera) {
             let ur = this.up.rotation;
             let our = otherCamera.getUpRotation();
@@ -133,6 +138,7 @@ extend(Camera.prototype, {
 
     setCameraPosition(x, y, z) {
         // TODO [CRIT] maybe use local transform here?
+
         let up = this.up;
 
         let sin = Math.sin;

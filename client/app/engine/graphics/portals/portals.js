@@ -83,45 +83,25 @@ let PortalsModule = {
 
             let PI2 = Math.PI / 2;
             if (z0 !== z1) {
-                if (tempOrientation === 'first') {
-                    mesh.rotation.x = PI2;
-                    mesh.rotation.y = PI2;
-                    mesh.position.x = pos[0] + parseFloat(tempOffset);
-                    mesh.position.y = pos[1] + 0.5;
-                    mesh.position.z = pos[2] + 1;
-                } else if (tempOrientation === 'next') {
-                    mesh.rotation.x = PI2;
-                    mesh.rotation.y = PI2;
-                    mesh.position.x = pos[0] + 0.5;
-                    mesh.position.y = pos[1] + parseFloat(tempOffset);
-                    mesh.position.z = pos[2] + 1;
-                    mesh.rotation.y += PI2;
-                }
+                mesh.rotation.x = PI2;
+                mesh.rotation.y = PI2 + parseFloat(tempOrientation);
+                mesh.position.x = pos[0] + 0.5;
+                mesh.position.y = pos[1] + 0.5;
+                mesh.position.z = pos[2] + 1;
             } else if (y0 !== y1) {
-                if (tempOrientation === 'first') {
-                    mesh.rotation.x = PI2;
-                    mesh.rotation.y = PI2;
-                    mesh.rotation.z = PI2;
-                    mesh.position.x = pos[0] + parseFloat(tempOffset);
-                    mesh.position.y = pos[1] + 1;
-                    mesh.position.z = pos[2] + 0.5;
-                } else if (tempOrientation === 'next') {
-                    mesh.position.x = pos[0] + 0.5;
-                    mesh.position.y = pos[1] + 1;
-                    mesh.position.z = pos[2] + parseFloat(tempOffset);
-                }
+                // mesh.rotation.z = PI2;
+                mesh.rotation.y = PI2 - parseFloat(tempOrientation);
+                // mesh.rotation.z = PI2;
+                // mesh.rotation.z = PI2;
+                mesh.position.x = pos[0] + 0.5;
+                mesh.position.y = pos[1] + 1;
+                mesh.position.z = pos[2] + 0.5;
             } else if (x0 !== x1) {
                 mesh.rotation.z = PI2;
-                if (tempOrientation === 'first') {
-                    mesh.position.x = pos[0] + 1;
-                    mesh.position.y = pos[1] + 0.5;
-                    mesh.position.z = pos[2] + parseFloat(tempOffset);
-                } else if (tempOrientation === 'next') {
-                    mesh.position.x = pos[0] + 1;
-                    mesh.position.y = pos[1] + parseFloat(tempOffset);
-                    mesh.position.z = pos[2] + 0.5;
-                    mesh.rotation.x += PI2;
-                }
+                mesh.position.x = pos[0] + 1;
+                mesh.position.y = pos[1] + 0.5;
+                mesh.position.z = pos[2] + 0.5;
+                mesh.rotation.x = PI2 + parseFloat(tempOrientation);
             }
 
             // mesh.updateMatrixWorld();

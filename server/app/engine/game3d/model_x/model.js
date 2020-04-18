@@ -56,7 +56,7 @@ class XModel {
 
         // Check parameters.
         // Orientation should be correct.
-        if (orientation !== 'first' && orientation !== 'next') return;
+        // if (orientation !== 'first' && orientation !== 'next') return;
         // Portal must be orthogonal an axis: exactly one block coordinate in common.
         let bx = x1 === x2;
         let by = y1 === y2;
@@ -77,7 +77,10 @@ class XModel {
         if (chunk1 && chunk1 !== chunk2) return;
 
         let portalId = CollectionUtils.generateId(portals);
-        let portal = new Portal(worldId, portalId, [x1, y1, z1], [x2, y2, z2], offset, orientation, chunk1);
+        let portal = new Portal(
+            worldId, portalId, [x1, y1, z1], [x2, y2, z2],
+            offset, orientation, chunk1
+        );
 
         let chunkId = chunk1.chunkId;
         portals.set(portalId, portal);
@@ -310,21 +313,21 @@ class XModel {
                     let currentPortal = this.getPortal(g);
                     let otherSide = this.getOtherSide(g);
                     if (!otherSide) {
-                        recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                        recursedPortals.set(g, [
+                            null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state
+                        ]);
                     } else {
                         let otherChunk = otherSide.chunk;
                         if (XModel.debug)
                             console.log(`origin: world ${currentPortal.worldId}, portal ${currentPortal.portalId}`);
                         if (XModel.debug)
                             console.log(`destin: world ${otherSide.worldId}, portal ${otherSide.portalId}`);
-                        recursedPortals.set(
-                            g,
-                            [
-                                otherSide.portalId,
-                                currentPortal.chunkId,
-                                currentPortal.worldId,
-                                ...currentPortal.state
-                            ]);
+                        recursedPortals.set(g, [
+                            otherSide.portalId,
+                            currentPortal.chunkId,
+                            currentPortal.worldId,
+                            ...currentPortal.state
+                        ]);
                         if (otherChunk) {
                             let otherWorld = otherChunk.world.worldId;
                             let otherChunkId = otherChunk.chunkId;

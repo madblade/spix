@@ -54,7 +54,8 @@ extend(EventComponent.prototype, {
                     if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
                     if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
                     data.push(clientSelfModel.getItemOffset());
-                    data.push(clientSelfModel.getItemOrientation());
+                    data.push(clientSelfModel.getAngleFromIntersectionPoint());
+                    // data.push(clientSelfModel.getItemOrientation());
                     this.triggerBlock('x', data);
                 } else {
                     // TODO [MEDIUM] object, skill...

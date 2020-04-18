@@ -31,6 +31,7 @@ let SelfComponent = function(clientModel) {
     this._itemOrientation = this._itemOrientations[0];
     this._itemPlacementRatio = 0;
     this._itemOffset = 0.999;
+    this._angleFromIntersectionPoint = 0;
 
     /** Dynamic **/
 
@@ -56,6 +57,14 @@ extend(SelfComponent.prototype, {
     getItemOrientation() {
         // TODO [CRIT] review orientation
         return this._itemOrientation;
+    },
+
+    setAngleFromIntersectionPoint(angle) {
+        this._angleFromIntersectionPoint = angle;
+    },
+
+    getAngleFromIntersectionPoint() {
+        return this._angleFromIntersectionPoint;
     },
 
     getItemOffset() {
