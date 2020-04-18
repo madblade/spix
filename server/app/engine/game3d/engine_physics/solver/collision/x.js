@@ -1,7 +1,7 @@
 'use strict';
 
-class XCollider {
-
+class XCollider
+{
     static xCollide(oldPosition, newPosition, world, xModel)
     {
         let chk = world.getChunkByCoordinates(...oldPosition);
@@ -49,6 +49,8 @@ class XCollider {
                 let fx0; let fx1; let fy0; let fy1; let fz0; let fz1;
                 let cosAlphaO; let sinAlphaO; let cosAlphaN; let sinAlphaN;
                 let oT; let nT;
+
+                // Perform rotation with the sine sum formula to simplify collision.
                 switch (axis) {
                     case 'x': // Warn! for 'x', 'first' is z.
                         cosAlphaO = opz - (z0 + 0.5); sinAlphaO = opy - (y0 + 0.5);
@@ -58,30 +60,15 @@ class XCollider {
                         oT[0] += z0 + 0.5; nT[0] += z0 + 0.5;
                         oT[1] += y0 + 0.5; nT[1] += y0 + 0.5;
 
-                        // fx0 = Math.min(x0, x1);     fx1 = Math.max(x0, x1) + 1;
-                        // fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
-                        // fz0 = z0 + 0.5;             fz1 = fz0;
                         fx0 = z0 + 0.5;                 fx1 = fx0;
                         fy0 = Math.min(y0, y1);         fy1 = Math.max(y0, y1) + 1;
                         fz0 = Math.min(x0, x1) + 0.5;   fz1 = Math.max(x0, x1) + 1.5;
 
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
-                            console.log('[XXX] Normal breached');
-                        }
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
-                            oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
-                            oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
-                        ) return xModel.getOtherSide(xId);
+                        // if (oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) {
+                        //     console.log('[XXX] Normal breached');
+                        // }
                         break;
 
-                        // if (oT[2] > fz0 && nT[2] < fz1 || oT[2] < fz0 && nT[2] > fz1) {
-                        //     console.log('[X] Normal breached.');
-                        // }
-                        // if ((oT[2] > fz0 && nT[2] < fz1 || oT[2] < fz0 && nT[2] > fz1) &&
-                        //     oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
-                        //     oT[0] + .5 > fx0 && oT[0] + .5 < fx1 && nT[0] + .5 > fx0 && nT[0] + .5 < fx1
-                        // ) return xModel.getOtherSide(xId);
-                        // break;
                     case 'y':
                         cosAlphaO = opx - (x0 + 0.5); sinAlphaO = opz - (z0 + 0.5);
                         cosAlphaN = npx - (x0 + 0.5); sinAlphaN = npz - (z0 + 0.5);
@@ -90,30 +77,15 @@ class XCollider {
                         oT[0] += x0 + 0.5; nT[0] += x0 + 0.5;
                         oT[1] += z0 + 0.5; nT[1] += z0 + 0.5;
 
-                        // fx0 = x0 + 0.5;             fx1 = fx0;
-                        // fy0 = Math.min(y0, y1);     fy1 = Math.max(y0, y1) + 1;
-                        // fz0 = Math.min(z0, z1);     fz1 = Math.max(z0, z1) + 1;
                         fx0 = x0 + 0.5;               fx1 = fx0;
                         fy0 = Math.min(z0, z1);       fy1 = Math.max(z0, z1) + 1;
                         fz0 = Math.min(y0, y1) + 0.5; fz1 = Math.max(y0, y1) + 1.5;
 
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
-                            console.log('[YYYY] Normal breached');
-                        }
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
-                            oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
-                            oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
-                        ) return xModel.getOtherSide(xId);
+                        // if (oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) {
+                        //     console.log('[YYYY] Normal breached');
+                        // }
                         break;
 
-                        // if (oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) {
-                        //     console.log('[Y] Normal breached.');
-                        // }
-                        // if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
-                        //     oT[2] > fz0 && oT[2] < fz1 && nT[2] > fz0 && nT[2] < fz1 &&
-                        //     oT[1] + .5 > fy0 && oT[1] + .5 < fy1 && nT[1] + .5 > fy0 && nT[1] + .5 < fy1
-                        // ) return xModel.getOtherSide(xId);
-                        // break;
                     case 'z':
                         cosAlphaO = opx - (x0 + 0.5); sinAlphaO = opy - (y0 + 0.5);
                         cosAlphaN = npx - (x0 + 0.5); sinAlphaN = npy - (y0 + 0.5);
@@ -126,16 +98,21 @@ class XCollider {
                         fy0 = Math.min(y0, y1);       fy1 = Math.max(y0, y1) + 1;
                         fz0 = Math.min(z0, z1) + 0.5; fz1 = Math.max(z0, z1) + 1.5;
 
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1)) {
-                            console.log('[DEBUG/XCollision] Normal breached');
-                        }
-                        if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
-                            oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
-                            oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
-                        ) return xModel.getOtherSide(xId);
+                        // if (oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) {
+                        //     console.log('[DEBUG/XCollision] Normal breached');
+                        // }
                         break;
-                    default: console.log('[XCollide] Unmanaged portal orientation.');
+
+                    default:
+                        console.log('[XCollide] Unmanaged portal orientation.');
+                        return;
                 }
+
+                // Perform collision
+                if ((oT[0] > fx0 && nT[0] < fx1 || oT[0] < fx0 && nT[0] > fx1) &&
+                    oT[1] > fy0 && oT[1] < fy1 && nT[1] > fy0 && nT[1] < fy1 &&
+                    oT[2] + .5 > fz0 && oT[2] + .5 < fz1 && nT[2] + .5 > fz0 && nT[2] + .5 < fz1
+                ) return xModel.getOtherSide(xId);
             }
 
             // Big portals
