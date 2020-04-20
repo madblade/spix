@@ -5,7 +5,7 @@
 'use strict';
 
 import extend from '../../../extend.js';
-import { PCFSoftShadowMap, WebGLRenderer } from 'three';
+import { PCFSoftShadowMap, sRGBEncoding, WebGLRenderer } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -81,8 +81,11 @@ extend(RendererManager.prototype, {
             // precision: 'mediump'
         });
 
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = PCFSoftShadowMap;
+        // renderer.shadowMap.enabled = true;
+        // renderer.shadowMap.type = PCFSoftShadowMap;
+        renderer.outputEncoding = sRGBEncoding;
+        renderer.gammaOutput = true;
+        renderer.gammaFactor = 2.2;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         return renderer;

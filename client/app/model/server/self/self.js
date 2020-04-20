@@ -166,9 +166,9 @@ extend(SelfModel.prototype, {
             let object3d = graphics.finalizeEntity(entityId, createdEntity);
             selfModel.avatar = object3d;
             if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
-        }.bind(this));
+        });
 
-        graphics.loadItemMesh('portal-gun', function(gltfObject) {
+        graphics.loadItemMesh('pixel-crossbow', function(gltfObject) {
             selfModel.handItem = gltfObject;
             if (!selfModel.displayAvatar) graphics.addToScene(gltfObject, worldId);
         });
