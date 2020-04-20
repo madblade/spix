@@ -4,7 +4,7 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { BackSide, Color, FrontSide, MeshBasicMaterial, MeshPhongMaterial, Object3D } from 'three';
 
-let ItemsModule = {
+let ItemsGraphicsModule = {
 
     loadItems(callback) {
         this.loadItemMesh('portal-gun', callback);
@@ -72,4 +72,4 @@ let ItemsModule = {
 
 };
 
-export { ItemsModule };
+export { ItemsGraphicsModule };

@@ -13,7 +13,7 @@ import { PointerLockModule } from './pointerlockcontrols.js';
 let MouseModule = {
 
     setupMouse() {
-        this.buttons = {left: 1, middle: 2, right: 3};
+        this.buttons = Object.freeze({left: 1, middle: 2, right: 3});
 
         // Click / move handlers.
         this.setupPointerLock();

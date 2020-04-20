@@ -6,7 +6,7 @@
 
 import extend               from '../../../extend.js';
 
-import { InventoryModule }  from './inventory.js';
+import { InventoryModel }   from './inventory.js';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -20,7 +20,7 @@ let SelfModel = function(app) {
     // Model component.
     this.position = null;
     this.rotation = null;
-    // this.inventory = this.getInventory();
+    this.inventoryModel = new InventoryModel();
 
     // Graphical component.
     // let graphics = app.engine.graphics;
@@ -32,8 +32,6 @@ let SelfModel = function(app) {
     this.avatar = null;
     this.handItem = null;
 };
-
-extend(SelfModel.prototype, InventoryModule);
 
 extend(SelfModel.prototype, {
 
@@ -184,6 +182,10 @@ extend(SelfModel.prototype, {
         return head.position;
     },
 
+    getInventory() {
+        return this.inventoryModel;
+    },
+
     cleanup() {
         // General
         this.entityId = '-1';
@@ -193,7 +195,7 @@ extend(SelfModel.prototype, {
         // Model component.
         this.position = [0, 0, 0];
         this.rotation = [0, 0, 0];
-        // this.inventory = this.getInventory();
+        this.inventoryModel.reset();
 
         // Graphical component.
         this.worldNeedsUpdate = false;

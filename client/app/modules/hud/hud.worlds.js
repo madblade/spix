@@ -5,9 +5,40 @@
 
 'use strict';
 
+import { sigma as Sigma } from 'sigma';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/settings';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve';
+// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow';
+
 let HUDWorldsModule =
 {
-    refreshHUDWorldGraph(newDiagram) {
+    initSigma()
+    {
+        if (this.sigma) return; // sigma == renderer, no need for a new one
+
+        this.sigma = new Sigma({
+            graph: {nodes:[], edges: []},
+            renderer: {
+                container: document.getElementById('network-graph'),
+                type: 'canvas'
+            },
+            // container: 'network-graph',
+            // container: 'diagram',
+            settings: {
+                minArrowSize: 20,
+                defaultNodeColor: '#ec5148',
+                drawLabels: true,
+                labelThreshold: 0,
+                // enableHovering: false
+                // defaultEdgeLabelSize: 20,
+                // edgeLabelSize: 'fixed',
+            }
+        });
+    },
+
+    refreshHUDWorldGraph(newDiagram)
+    {
         let graph = this.sigma.graph;
         // this.sigma.stopForceAtlas2();
         graph.clear();

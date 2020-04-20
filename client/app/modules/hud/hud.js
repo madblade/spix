@@ -6,45 +6,40 @@
 
 import extend              from '../../extend.js';
 import $                   from 'jquery';
-import { sigma as Sigma }  from 'sigma';
 import { HUDWorldsModule } from './hud.worlds';
-// import 'sigma/plugins/sigma.renderers.edgeLabels/settings';
-// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def';
-// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve';
-// import 'sigma/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow';
 
 let Hud = function(register) {
     this.register = register;
     this.orangeColor = '#c96530';
+    this.sigma = null;
 
-    this.sigma = new Sigma({
-        graph: {nodes:[], edges: []},
-        renderer: {
-            container: document.getElementById('network-graph'),
-            type: 'canvas'
-        },
-        // container: 'network-graph',
-        // container: 'diagram',
-        settings: {
-            minArrowSize: 20,
-            defaultNodeColor: '#ec5148',
-            drawLabels: true,
-            labelThreshold: 0,
-            // enableHovering: false
-            // defaultEdgeLabelSize: 20,
-            // edgeLabelSize: 'fixed',
-        }
-    });
+    this.html = `
+        <div id="hud">
+            <div id="position"></div>
+            <div id="diagram"></div>
+            <div id="items"></div>
+            <!-- <div id="item_offset"></div> -->
+            <!-- <div id="item_orientation"></div> -->
+            <!-- <div id="chat"></div>-->
+        </div>
+        <div id="network-graph">
+        </div>
+    `;
 };
 
 extend(Hud.prototype, {
 
     // Game started
     initModule() {
+        this.initSigma();
+        let announce = $('#announce');
+        announce.insertBefore(this.html);
     },
 
     // Game ended
     disposeModule() {
+        $('#hud').remove();
+        $('#network-graph').remove();
     },
 
     updateSelfState(newState) {
@@ -68,19 +63,19 @@ extend(Hud.prototype, {
                 .css('color', this.orangeColor);
         }
 
-        if (newState.hasOwnProperty('itemOrientation')) {
-            let or = newState.itemOrientation;
-            $('#item_orientation')
-                .text(or)
-                .css('color', this.orangeColor);
-        }
+        // if (newState.hasOwnProperty('itemOrientation')) {
+        // let or = newState.itemOrientation;
+        // $('#item_orientation')
+        //     .text(or)
+        //     .css('color', this.orangeColor);
+        // }
 
-        if (newState.hasOwnProperty('itemOffset')) {
-            let of = newState.itemOffset;
-            $('#item_offset')
-                .text(of)
-                .css('color', this.orangeColor);
-        }
+        // if (newState.hasOwnProperty('itemOffset')) {
+        // let of = newState.itemOffset;
+        // $('#item_offset')
+        //     .text(of)
+        //     .css('color', this.orangeColor);
+        // }
     }
 
 });

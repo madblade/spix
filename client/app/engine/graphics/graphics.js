@@ -14,7 +14,7 @@ import { MaterialsModule }  from './materials.js';
 import { MeshesModule }  from './meshes.js';
 import { TexturesModule }  from './textures.js';
 import { EntitiesModule }  from './entities/entities.js';
-import { ItemsModule }  from './entities/items.js';
+import { ItemsGraphicsModule }  from './entities/items.js';
 import { AnimationsModule }  from './entities/animations.js'; // Needed
 import { PortalsModule }  from './portals/portals.js';
 import { CamerasModule }  from './render/cameras.js';
@@ -68,7 +68,7 @@ extend(Graphics.prototype, MaterialsModule);
 extend(Graphics.prototype, MeshesModule);
 extend(Graphics.prototype, TexturesModule);
 extend(Graphics.prototype, EntitiesModule);
-extend(Graphics.prototype, ItemsModule);
+extend(Graphics.prototype, ItemsGraphicsModule);
 extend(Graphics.prototype, AnimationsModule);
 extend(Graphics.prototype, PortalsModule);
 extend(Graphics.prototype, CamerasModule);

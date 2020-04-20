@@ -44,7 +44,9 @@ extend(EventComponent.prototype, {
                     if (data[0] === 'add') {
                         // From inventory, select block to be added.
                         data.splice(-3, 3);
-                        data.push(serverSelfModel.getInventory().getItem(clientSelfModel.getCurrentItem()));
+                        let activeItemSlot = clientSelfModel.getCurrentItem();
+                        let itemID = serverSelfModel.getInventory().getItem(activeItemSlot);
+                        data.push(itemID);
                     }
                     this.triggerBlock('b', data);
                 } else if (i.isX()) {

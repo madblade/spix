@@ -7,7 +7,7 @@
 let LayoutQWERTY = {
 
     getQWERTY() {
-        return {
+        return Object.freeze({
             // Arrow directional controls.
             arrowUp: 38,
             arrowDown: 40,
@@ -99,7 +99,7 @@ let LayoutQWERTY = {
             rightHandSouthEast: 190,    // .
             rightHandSouthEast2: 191    // /
 
-        };
+        });
     }
 
 };
