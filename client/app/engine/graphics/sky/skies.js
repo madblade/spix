@@ -66,10 +66,14 @@ let SkyModule = {
 
         // Sky light.
         // TODO [CRIT] light update
-        let light = this.createLight('hemisphere');
-        light.position.set(-1, -2, -10);
+        let light = this.createLight('sun');
+        light.position.set(-1, -2, -1);
         light.updateMatrixWorld();
         this.addToScene(light, worldId);
+        let light2 = this.createLight('hemisphere');
+        light2.position.set(-1, -2, -10);
+        light2.updateMatrixWorld();
+        this.addToScene(light2, worldId);
 
         let sunPosition = new Vector3(0, -700000, 0);
         let sky;

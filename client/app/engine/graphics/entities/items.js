@@ -2,7 +2,7 @@
 'use strict';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { BackSide, Color, DataTexture, FrontSide, MeshPhongMaterial, Object3D, RepeatWrapping, RGBFormat, Vector2 } from 'three';
+import { BackSide, BufferAttribute, Color, DataTexture, FrontSide, MeshPhongMaterial, Object3D, RepeatWrapping, RGBFormat, Vector2 } from 'three';
 
 let ItemsGraphicsModule = {
 
@@ -61,15 +61,17 @@ let ItemsGraphicsModule = {
         //     color: new Color(4, 4, 4), map: m});
         // object.material = newMat;
         object.children[0].material.roughness = 1.0; //; 0.3;
-        object.children[0].material.metalness = 1.0; // 0.5;
-        object.children[0].material.emissive = new Color(0x212121);
+        object.children[0].material.metalness = 0.5; // 0.5;
+        object.children[0].material.color = new Color(0xffffff);
+        // object.children[0].material.side = BackSide;
 
-        let width = 32; let height = 32;
+        let width = 128; let height = 128;
         let size = width * height;
         let data = new Uint8Array(3 * size);
         for (let i = 0; i < size; ++i) {
             let stride = i * 3;
-            let r = i % 30 > 10 ? 255 : 0;
+            // let r = i < size / 2 ? 255 : Math.random() * 255;
+            let r = Math.random() > 0.5 ? 255 : 0;
             data[stride] = r;
             data[stride + 1] = r;
             data[stride + 2] = r;
@@ -77,24 +79,20 @@ let ItemsGraphicsModule = {
         let tex = new DataTexture(data, width, height, RGBFormat);
         tex.wrapT = RepeatWrapping;
         tex.wrapS = RepeatWrapping;
-        // tex.repeat.set(9, 1);
+        tex.repeat.set(9, 1);
         object.children[0].material.roughnessMap = tex;
-        object.children[0].material.map = tex;
+        // object.children[0].material.metalnessMap = tex;
+        // object.children[0].material.map = tex;
         object.children[0].material.needsUpdate = true;
 
         let g = object.children[0].geometry;
-        g.faceVertexUvs = [[]];
-        for (let i = 0; i < 8; ++i) {// 8 faces
-            g.faceVertexUvs[0].push( // x
-                [new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0)]
-            );
-            g.faceVertexUvs[0].push( // y
-                [new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0)]
-            );
-            g.faceVertexUvs[0].push( // z
-                [new Vector2(1, 0), new Vector2(0, 0), new Vector2(0, 1)]
-            );
+        // g.faceVertexUvs = [[]];
+        let uvs = new Float32Array(72 * 2);
+        for (let i = 0; i < 72; ++i) { // 8 faces
+            uvs.set([Math.random(), Math.random()], i);
         }
+        g.setAttribute('uv', new BufferAttribute(uvs, 2));
+        g.attributes.uv.needsUpdate = true;
         g.uvsNeedUpdate = true;
         g.needsUpdate = true;
 

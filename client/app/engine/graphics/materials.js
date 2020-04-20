@@ -6,7 +6,7 @@
 
 import {
     BackSide, VertexColors,
-    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide, MeshStandardMaterial
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide, MeshStandardMaterial, Color
 } from 'three';
 
 let MaterialsModule = {
@@ -24,10 +24,19 @@ let MaterialsModule = {
                 break;
 
             case 'textured-phong':
-                material = new MeshPhongMaterial({
-                    //color: 0xffffff, specular: 0xffffff, shininess: 250,
+                // material = new MeshPhongMaterial({
+                //shading: FlatShading,
+                // color: 0x110011,
+                // emissive: new Color(0, 0, 0),
+                // specular: new Color(0, 0, 0),
+                // shininess: 0,
+                // side: FrontSide,
+                //vertexColors: VertexColors,
+                // map: this.texture
+                // });
+                material = new MeshLambertMaterial({
                     //shading: FlatShading,
-                    // color: 0x010101,
+                    // color: 0x110011,
                     side: FrontSide,
                     //vertexColors: VertexColors,
                     map: this.texture
@@ -37,7 +46,7 @@ let MaterialsModule = {
             case 'basic-black':
                 material = new MeshBasicMaterial({
                     wireframe:true,
-                    color:0x000000
+                    color: 0x000000
                 });
                 break;
 

@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { AmbientLight, DirectionalLight, HemisphereLight } from 'three';
+import { AmbientLight, DirectionalLight, HemisphereLight, PointLight } from 'three';
 
 let LightModule = {
 
@@ -13,7 +13,7 @@ let LightModule = {
 
         switch (whatLight) {
             case 'sun':
-                light = new DirectionalLight(0xffffff, 0.75);
+                light = new DirectionalLight(0xffffff, 0.25);
                 // light.castShadow = true;
                 // light.shadow.mapSize.width = 512;
                 // light.shadow.mapSize.height = 512;
@@ -22,7 +22,7 @@ let LightModule = {
                 break;
 
             case 'hemisphere':
-                light = new HemisphereLight(0xeeeeff, 0x777788, 0.75);
+                light = new HemisphereLight(0xeeeeff, 0x777788, 0.5);
                 break;
 
             default:
