@@ -35,6 +35,9 @@ let ItemsGraphicsModule = {
         object.material.side = FrontSide;
         object.material.color = new Color(10, 10, 10);
         m.flatShading = true;
+        // Render on top
+        object.renderOrder = 9999;
+        object.onBeforeRender = function(renderer) {renderer.clearDepth();};
 
         object.scale.set(0.04, 0.04, 0.04);
         object.rotation.set(0, Math.PI / 4, 0);

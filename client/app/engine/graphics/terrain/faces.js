@@ -118,6 +118,7 @@ let FacesModule = {
         // UVS
         let uvi = 2 * i / 3;
         let scalingHD = 8; // depends on texture resolution
+        // let scalingHD = 1; // for 512 texture
         let eps = 0.00390625 / scalingHD; // remove 1 pixel (prevent from texture interpolation on edges)
         let txCoords = this.getTexture(nature);
         if (!txCoords) {
