@@ -27,6 +27,30 @@ extend(Register.prototype, {
         this.modules[moduleName] = module;
     },
 
+    gameStarted() {
+        for (let m in this.modules) {
+            if (!this.modules.hasOwnProperty(m)) continue;
+            let module = this.modules[m];
+            if (module.hasOwnProperty('initModule') &&
+                typeof module.initModule === 'function')
+            {
+                module.initModule();
+            }
+        }
+    },
+
+    gameStopped() {
+        for (let m in this.modules) {
+            if (!this.modules.hasOwnProperty(m)) continue;
+            let module = this.modules[m];
+            if (module.hasOwnProperty('disposeModule') &&
+                typeof module.disposeModule === 'function')
+            {
+                module.disposeModule();
+            }
+        }
+    },
+
     updateSelfState(data) {
         this.modules.hud.updateSelfState(data);
     },

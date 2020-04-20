@@ -3,6 +3,7 @@
 @import '~font-awesome/css/font-awesome.css';
 /* inject:css */
 @import 'hub.css';
+@import 'hud.css';
 @import 'loader.css';
 @import 'noselect.css';
 @import 'settings.css';

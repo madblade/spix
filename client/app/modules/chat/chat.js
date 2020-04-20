@@ -13,6 +13,20 @@ let Chat = function(register) {
 extend(Chat.prototype, {
 
     /**
+     * Called whenever a game starts.
+     * Init HTML elements here.
+     */
+    initModule() {
+    },
+
+    /**
+     * Dispose of HTML elements here.
+     * Called whenever a game stops.
+     */
+    disposeModule() {
+    },
+
+    /**
      * Called on socket 'chat' receive.
      */
     updateChat(data) {

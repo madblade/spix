@@ -212,12 +212,14 @@ extend(App.Core.prototype, {
     },
 
     runGame() {
+        this.register.gameStarted();
         this.engine.graphics.run();
         this.engine.controls.run();
         this.engine.audio.run();
     },
 
     stopGame() {
+        this.register.gameStopped();
         this.engine.connection.unregisterSocketForGame3D();
         this.engine.graphics.stop();
         this.engine.controls.stop();
@@ -247,8 +249,5 @@ extend(App.Core.prototype, {
 window.register = (function() {
     let app = new App.Core();
     app.start();
-    // app.startFromLocalServer();
     return app.register;
 }());
-
-// module.exports = App.Core;
