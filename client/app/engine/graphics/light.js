@@ -26,7 +26,7 @@ let LightModule = {
                 break;
 
             default:
-                light = new AmbientLight(0x404040);
+                light = new AmbientLight(0xffffff);
         }
 
         return light;

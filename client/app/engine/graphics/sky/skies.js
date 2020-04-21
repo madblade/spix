@@ -74,6 +74,10 @@ let SkyModule = {
         light2.position.set(-1, -2, -10);
         light2.updateMatrixWorld();
         this.addToScene(light2, worldId);
+        // let light3 = this.createLight();
+        // light3.position.set(-1, -2, -10);
+        // light3.updateMatrixWorld();
+        // this.addToScene(light3, worldId);
 
         let sunPosition = new Vector3(0, -700000, 0);
         let sky;

@@ -166,7 +166,7 @@ extend(SelfModel.prototype, {
             if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
         });
 
-        graphics.loadItemMesh('katana', function(gltfObject) {
+        graphics.loadItemMesh('pixel-crossbow', function(gltfObject) {
             selfModel.handItem = gltfObject;
             if (!selfModel.displayAvatar) graphics.addToScene(gltfObject, worldId);
         });

@@ -95,11 +95,13 @@ let ChunksModule = {
         geometry.computeBoundingSphere();
 
         let material = this.createMaterial('textured-phong', 0xaaaaaa);
+        let newMesh = new Mesh(geometry, material);
+        if (Math.random() < 0.5) newMesh.userData.bloom = true;
 
         return {
             geometries:         [geometry],
             materials:          [material],
-            meshes:             [new Mesh(geometry, material)],
+            meshes:             [newMesh],
 
             capacities:         [sunCapacity / 2],
             sizes:              [triangles / 2],
@@ -341,8 +343,10 @@ let ChunksModule = {
                 // addedMesh.castShadow = true;
                 // addedMesh.receiveShadow = true;
                 // meshes[meshId] = addedMesh;
-                meshes[meshId] = new Mesh(geometry, materials[meshId]);
-                this.addToScene(meshes[meshId], worldId);
+                let newMesh = new Mesh(geometry, materials[meshId]);
+                if (Math.random() < 0.25) newMesh.userData.bloom = true;
+                meshes[meshId] = newMesh;
+                this.addToScene(newMesh, worldId);
             }
 
             // Notify object.

@@ -31,15 +31,16 @@ extend(Hud.prototype, {
 
     // Game started
     initModule() {
-        this.initSigma();
         let announce = $('#announce');
-        announce.insertBefore(this.html);
+        announce.before(this.html);
+        this.initSigma();
     },
 
     // Game ended
     disposeModule() {
         $('#hud').remove();
         $('#network-graph').remove();
+        this.killSigma();
     },
 
     updateSelfState(newState) {

@@ -28,6 +28,11 @@ let ItemsGraphicsModule = {
         });
     },
 
+    renderOnTop(object) {
+        object.renderOrder = 9999;
+        object.onBeforeRender = function(renderer) {renderer.clearDepth();};
+    },
+
     finalizeCrossbowMesh(gltf, callback) {
         let object = gltf.scene.children[0];
         console.log(object);
@@ -39,13 +44,14 @@ let ItemsGraphicsModule = {
         object.material.side = FrontSide;
         object.material.color = new Color(10, 10, 10);
         m.flatShading = true;
-        // Render on top
-        object.renderOrder = 9999;
-        object.onBeforeRender = function(renderer) {renderer.clearDepth();};
 
         object.scale.set(0.04, 0.04, 0.04);
         object.rotation.set(0, Math.PI / 4, 0);
         object.position.set(0.4, -.25, -0.15);
+
+        // render order
+        this.renderOnTop(object);
+
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);
@@ -101,6 +107,9 @@ let ItemsGraphicsModule = {
         object.scale.set(0.08, 0.08, 0.08);
         // object.rotation.set(0, Math.PI / 4, 0);
         object.position.set(0.4, -.25, -0.25);
+
+        this.renderOnTop(object);
+
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);
@@ -121,6 +130,9 @@ let ItemsGraphicsModule = {
         c.material = new MeshPhongMaterial({color: 0xffffff});
         c = object.children[3];
         c.material = new MeshPhongMaterial({color: 0x999999});
+
+        this.renderOnTop(object);
+
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);

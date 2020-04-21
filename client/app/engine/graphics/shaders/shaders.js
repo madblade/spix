@@ -12,6 +12,8 @@ import SkyCubeFragment from './sky/skyCube.fragment.glsl';
 import SkyCubeVertex   from './sky/skyCube.vertex.glsl';
 import PlanetFragment  from './sky/planet.fragment.glsl';
 import PlanetVertex    from './sky/planet.vertex.glsl';
+import BloomSelectiveFragment  from './postprocessing/bloom.selective.fragment.glsl';
+import BloomSelectiveVertex  from './postprocessing/bloom.selective.vertex.glsl';
 
 let ShadersModule = {
 
@@ -45,6 +47,14 @@ let ShadersModule = {
 
     getPlanetFragmentShader() {
         return PlanetFragment;
+    },
+
+    getBloomSelectiveVertexShader() {
+        return BloomSelectiveVertex;
+    },
+
+    getBloomSelectiveFragmentShader() {
+        return BloomSelectiveFragment;
     }
 
 };

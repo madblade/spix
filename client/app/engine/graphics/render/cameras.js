@@ -388,6 +388,9 @@ extend(CameraManager.prototype, {
         this.subCameras.forEach(function(subCamera/*, cameraId*/) {
             // TODO [CRIT] update camera position, rotation rel. to portal position.
             // TODO shouldn’t i clip after having rotated?
+            subCamera.setZRotation(rotationZ);
+            subCamera.setXRotation(rotationX);
+            subCamera.setUpRotation(theta1, 0, theta0);
 
             let mirrorCamera = subCamera.getRecorder();
             let mirror = subCamera.getScreen().getMesh();
@@ -395,10 +398,6 @@ extend(CameraManager.prototype, {
             if (mirrorCamera) {
                 this.clipOblique(mirror, mirrorCamera, localRecorder);
             }
-
-            subCamera.setZRotation(rotationZ);
-            subCamera.setXRotation(rotationX);
-            subCamera.setUpRotation(theta1, 0, theta0);
         }.bind(this));
     },
 

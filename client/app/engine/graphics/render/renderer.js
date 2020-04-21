@@ -5,12 +5,13 @@
 'use strict';
 
 import extend from '../../../extend.js';
-import { PCFSoftShadowMap, sRGBEncoding, WebGLRenderer } from 'three';
+import { DoubleSide, Layers, MeshBasicMaterial, PCFSoftShadowMap, ShaderMaterial, sRGBEncoding, Vector2, WebGLRenderer } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 let RendererManager = function(graphicsEngine) {
     this.graphics = graphicsEngine;
@@ -28,6 +29,9 @@ let RendererManager = function(graphicsEngine) {
 
     this.stop = false;
     this.thenstop = false;
+
+    // Bloom
+    this.darkMaterial = new MeshBasicMaterial({ color: 'black', side: DoubleSide });
 };
 
 extend(RendererManager.prototype, {
@@ -54,6 +58,41 @@ extend(RendererManager.prototype, {
         composer.addPass(fxaa);
         composer.addPass(fxaa);
 
+        if (true) {
+            // Bloom
+            let bloomPass = new UnrealBloomPass(
+                new Vector2(window.innerWidth, window.innerHeight),
+                1.5, 0.4, 0.85);
+            bloomPass.exposure = 0.5;
+            bloomPass.threshold = 0.3;
+            bloomPass.strength = 1.0;
+            bloomPass.radius = 0;
+            let bloomComposer = !target ?
+                new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+            bloomComposer.renderToScreen = false;
+            bloomComposer.addPass(scenePass);
+            bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
+
+            let finalPass = new ShaderPass(
+                new ShaderMaterial({
+                    uniforms: {
+                        baseTexture: { value: null },
+                        bloomTexture: { value: bloomComposer.renderTarget2.texture }
+                    },
+                    vertexShader: this.graphics.getBloomSelectiveVertexShader(),
+                    fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
+                    defines: {}
+                }), 'baseTexture'
+            );
+            finalPass.needsSwap = true;
+            let finalComposer = !target ?
+                new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+            finalComposer.addPass(scenePass);
+            finalComposer.addPass(finalPass);
+            finalComposer.addPass(fxaa);
+            return [bloomComposer, finalComposer, composer];
+        }
+
         // Ambient occlusion
         if (!target && ultraGraphics) {
             let sao = new SAOPass(sc, cam, false, false);
@@ -67,9 +106,9 @@ extend(RendererManager.prototype, {
             sao.params.saoBlurRadius = 16;
             sao.params.saoBlurStdDev = 4;
             sao.params.saoBlurDepthCutoff = 0.01;
-            composer.addPass(sao);
+            // composer.addPass(sao);
         }
-        return composer;
+        // return composer;
     },
 
     createRenderer() {
@@ -84,8 +123,6 @@ extend(RendererManager.prototype, {
         // renderer.shadowMap.enabled = true;
         // renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.outputEncoding = sRGBEncoding;
-        renderer.gammaOutput = true;
-        renderer.gammaFactor = 2.2;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
         return renderer;
@@ -103,6 +140,21 @@ extend(RendererManager.prototype, {
         if (this.stop) return;
         let renderer = this.renderer;
         let renderRegister = this.renderRegister;
+
+        // Util.
+        let materials = {};
+        let darkenNonBloomed = obj => {
+            if (obj.isMesh && obj.userData.bloom !== true) {
+                materials[obj.uuid] = obj.material;
+                obj.material = this.darkMaterial;
+            }
+        };
+        let restoreMaterial = obj => {
+            if (materials[obj.uuid]) {
+                obj.material = materials[obj.uuid];
+                delete materials[obj.uuid];
+            }
+        };
 
         // Render first pass.
         let mainScene = sceneManager.mainScene;
@@ -173,14 +225,19 @@ extend(RendererManager.prototype, {
 
             // renderer.setRenderTarget(bufferTexture);
             let id = currentPass.id.toString();
-            let composer;
+            let bufferComposer;
             if (this.composers.has(id)) {
-                composer = this.composers.get(id);
+                bufferComposer = this.composers.get(id);
             } else {
-                composer = this.createComposer(renderer, bufferScene, bufferCamera, bufferTexture);
-                this.composers.set(id, composer);
+                bufferComposer = this.createComposer(renderer, bufferScene, bufferCamera, bufferTexture);
+                this.composers.set(id, bufferComposer);
             }
-            composer.render(); // Double render for camera 1frame lag.
+
+            bufferScene.traverse(darkenNonBloomed);
+            bufferComposer[0].render();
+            bufferScene.traverse(restoreMaterial);
+            bufferComposer[1].render();
+            // composer.render(); // Double render for camera 1frame lag.
             // composer.render();
             // renderer.render(bufferScene, bufferCamera);
             // renderer.setRenderTarget(null);
@@ -206,7 +263,15 @@ extend(RendererManager.prototype, {
             composer = this.createComposer(renderer, mainScene, mainCamera, null);
             this.composers.set(id, composer);
         }
-        composer.render();
+
+        // MAIN RENDER
+        mainScene.traverse(darkenNonBloomed);
+        composer[0].render();
+        mainScene.traverse(restoreMaterial);
+        composer[1].render();
+
+        // composer.render();
+
         // renderer.render(mainScene, mainCamera);
 
 

@@ -15,7 +15,11 @@ let HUDWorldsModule =
 {
     initSigma()
     {
-        if (this.sigma) return; // sigma == renderer, no need for a new one
+        if (this.sigma) {
+            // sigma == renderer, no need for a new one
+            // console.log('[Sigma] Sigma already declared.');
+            // return;
+        }
 
         this.sigma = new Sigma({
             graph: {nodes:[], edges: []},
@@ -37,8 +41,19 @@ let HUDWorldsModule =
         });
     },
 
+    killSigma() {
+        if (!this.sigma || !this.sigma.graph) return;
+        this.sigma.graph.clear();
+        this.sigma.graph.kill();
+    },
+
     refreshHUDWorldGraph(newDiagram)
     {
+        if (!this.sigma || !this.sigma.graph) {
+            console.warn('[HUD] Sigma failed to update.');
+            return;
+        }
+
         let graph = this.sigma.graph;
         // this.sigma.stopForceAtlas2();
         graph.clear();

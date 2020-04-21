@@ -45,12 +45,6 @@ let CoreModule = {
         serverModel.refresh();
         this.render();
         clientModel.refresh();
-
-        // Rendering twice fixes inertia artifacts on WebGL render targets AND I DON'T KNOW WHY.
-        // Perf loss is visually compensated by the decoupled camera movement aggregation scheme.
-        //serverModel.refresh();
-        // this.render();
-        //clientModel.refresh();
     },
 
     render() {

@@ -31,8 +31,7 @@ extend(Register.prototype, {
         for (let m in this.modules) {
             if (!this.modules.hasOwnProperty(m)) continue;
             let module = this.modules[m];
-            if (module.hasOwnProperty('initModule') &&
-                typeof module.initModule === 'function')
+            if (typeof module.initModule === 'function')
             {
                 module.initModule();
             }
@@ -43,8 +42,7 @@ extend(Register.prototype, {
         for (let m in this.modules) {
             if (!this.modules.hasOwnProperty(m)) continue;
             let module = this.modules[m];
-            if (module.hasOwnProperty('disposeModule') &&
-                typeof module.disposeModule === 'function')
+            if (typeof module.disposeModule === 'function')
             {
                 module.disposeModule();
             }
