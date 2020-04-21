@@ -19,8 +19,7 @@ let TexturesModule = {
 
         let texture = loader.load(`app/assets/textures/${whatTexture}`);
 
-        // TODO [MEDIUM] propose different anisotropy filtering
-        // texture.anisotropy = maxAnisotropy;
+        texture.anisotropy = maxAnisotropy;
         // texture.generateMipmaps = false;
         texture.magFilter = NearestFilter;
         texture.minFilter = NearestFilter;

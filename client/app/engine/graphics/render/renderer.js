@@ -96,7 +96,7 @@ extend(RendererManager.prototype, {
             sao.params.saoIntensity = 0.18;
             sao.params.saoScale = 10000;
             sao.params.saoKernelRadius = 100;
-            sao.params.saoMinResolution = 0;
+            sao.params.saoMinResolution = 0.000004;
             sao.params.saoBlur = 1;
             sao.params.saoBlurRadius = 8;
             sao.params.saoBlurStdDev = 4;

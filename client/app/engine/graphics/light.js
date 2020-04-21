@@ -6,6 +6,19 @@
 
 import { AmbientLight, DirectionalLight, HemisphereLight, PointLight } from 'three';
 
+let LightDefaultIntensities = Object.freeze({
+    HEMISPHERE: 0.25,
+    DIRECTIONAL: 0.5,
+    AMBIENT: 1.0
+});
+
+let LightDefaultColors = Object.freeze({
+    DIRECTIONAL: 0xffffff,
+    AMBIENT: 0x0011ee,
+    HEMISPHERE_SKY: 0xeeeeff,
+    HEMISPHERE_GROUND: 0x777788,
+});
+
 let LightModule = {
 
     createLight(whatLight) {
@@ -13,7 +26,10 @@ let LightModule = {
 
         switch (whatLight) {
             case 'sun':
-                light = new DirectionalLight(0xffffff, 0.25);
+                light = new DirectionalLight(
+                    LightDefaultColors.DIRECTIONAL,
+                    LightDefaultIntensities.HEMISPHERE
+                );
                 // light.castShadow = true;
                 // light.shadow.mapSize.width = 512;
                 // light.shadow.mapSize.height = 512;
@@ -22,11 +38,18 @@ let LightModule = {
                 break;
 
             case 'hemisphere':
-                light = new HemisphereLight(0xeeeeff, 0x777788, 0.5);
+                light = new HemisphereLight(
+                    LightDefaultColors.HEMISPHERE_SKY,
+                    LightDefaultColors.HEMISPHERE_GROUND,
+                    LightDefaultIntensities.DIRECTIONAL
+                );
                 break;
 
             default:
-                light = new AmbientLight(0xffffff);
+                light = new AmbientLight(
+                    LightDefaultColors.AMBIENT,
+                    LightDefaultIntensities.AMBIENT
+                );
         }
 
         return light;
@@ -34,4 +57,4 @@ let LightModule = {
 
 };
 
-export { LightModule };
+export { LightModule, LightDefaultIntensities, LightDefaultColors };

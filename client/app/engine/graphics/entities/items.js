@@ -2,7 +2,10 @@
 'use strict';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { BackSide, BufferAttribute, Color, DataTexture, FrontSide, MeshPhongMaterial, Object3D, RepeatWrapping, RGBFormat, Vector2 } from 'three';
+import {
+    BufferAttribute, Color, DataTexture, FrontSide, MeshPhongMaterial,
+    Object3D, RepeatWrapping, RGBFormat
+} from 'three';
 
 let ItemsGraphicsModule = {
 
