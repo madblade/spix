@@ -46,9 +46,6 @@ extend(RendererManager.prototype, {
         let scenePass = new RenderPass(sc, cam);
         composer.addPass(scenePass);
 
-        // TODO [LOW] expose ultra graphics settings
-        let ultraGraphics = false;
-
         // Anti-alias
         let resolutionX = 1 / window.innerWidth;
         let resolutionY = 1 / window.innerHeight;
@@ -58,57 +55,56 @@ extend(RendererManager.prototype, {
         composer.addPass(fxaa);
         composer.addPass(fxaa);
 
-        if (true) {
-            // Bloom
-            let bloomPass = new UnrealBloomPass(
-                new Vector2(window.innerWidth, window.innerHeight),
-                1.5, 0.4, 0.85);
-            bloomPass.exposure = 0.5;
-            bloomPass.threshold = 0.3;
-            bloomPass.strength = 1.0;
-            bloomPass.radius = 0;
-            let bloomComposer = !target ?
-                new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
-            bloomComposer.renderToScreen = false;
-            bloomComposer.addPass(scenePass);
-            bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
+        // Bloom
+        let bloomPass = new UnrealBloomPass(
+            new Vector2(window.innerWidth, window.innerHeight),
+            1.5, 0.4, 0.85);
+        bloomPass.exposure = 0.5;
+        bloomPass.threshold = 0.3;
+        bloomPass.strength = 1.0;
+        bloomPass.radius = 0;
+        let bloomComposer = !target ?
+            new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        bloomComposer.renderToScreen = false;
+        bloomComposer.addPass(scenePass);
+        bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
 
-            let finalPass = new ShaderPass(
-                new ShaderMaterial({
-                    uniforms: {
-                        baseTexture: { value: null },
-                        bloomTexture: { value: bloomComposer.renderTarget2.texture }
-                    },
-                    vertexShader: this.graphics.getBloomSelectiveVertexShader(),
-                    fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
-                    defines: {}
-                }), 'baseTexture'
-            );
-            finalPass.needsSwap = true;
-            let finalComposer = !target ?
-                new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
-            finalComposer.addPass(scenePass);
-            finalComposer.addPass(finalPass);
-            finalComposer.addPass(fxaa);
-            return [bloomComposer, finalComposer, composer];
-        }
+        let bloomMergePass = new ShaderPass(
+            new ShaderMaterial({
+                uniforms: {
+                    baseTexture: { value: null },
+                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
+                },
+                vertexShader: this.graphics.getBloomSelectiveVertexShader(),
+                fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
+                defines: {}
+            }), 'baseTexture'
+        );
+        bloomMergePass.needsSwap = true;
+        let finalComposer = !target ?
+            new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        finalComposer.addPass(scenePass);
+        finalComposer.addPass(bloomMergePass);
+        finalComposer.addPass(fxaa);
 
         // Ambient occlusion
+        let ultraGraphics = false;
         if (!target && ultraGraphics) {
             let sao = new SAOPass(sc, cam, false, false);
             sao.params.output = SAOPass.OUTPUT.Default;
-            sao.params.saoBias = 2.5;
+            sao.params.saoBias = 0.1;
             sao.params.saoIntensity = 0.18;
             sao.params.saoScale = 10000;
             sao.params.saoKernelRadius = 100;
             sao.params.saoMinResolution = 0;
             sao.params.saoBlur = 1;
-            sao.params.saoBlurRadius = 16;
+            sao.params.saoBlurRadius = 8;
             sao.params.saoBlurStdDev = 4;
             sao.params.saoBlurDepthCutoff = 0.01;
-            // composer.addPass(sao);
+            finalComposer.addPass(sao);
         }
-        // return composer;
+
+        return [bloomComposer, finalComposer, composer];
     },
 
     createRenderer() {
