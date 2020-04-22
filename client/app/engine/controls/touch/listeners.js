@@ -8,7 +8,10 @@ import $ from 'jquery';
 
 let ListenerModule = {
 
-    registerTouch() {
+    registerTouch()
+    {
+        // TODO wire into MobileWidgetControls.
+
         // Low-level swipe manipulation
         $(window).on('touchstart', function(ev) {
             let e = ev.originalEvent;

@@ -29,7 +29,7 @@ let UI = function(app) {
 
     // Other input methods.
     this.mouse = {};
-    this.touch = {};
+    this.touch = {}; // TODO plug touch widget
 };
 
 extend(UI.prototype, {
@@ -43,6 +43,7 @@ extend(UI.prototype, {
         this.setupTouch();
         this.setupWindowListeners();
 
+        // TODO resize touch widget
         $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
     },
 
