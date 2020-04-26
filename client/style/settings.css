@@ -1,7 +1,7 @@
+/* In-game settings menus */
+
 .settings {
     width: 50%;
-    /*margin: 20px auto;*/
-    /*height: 25%;*/
 
     color: white;
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
@@ -12,6 +12,8 @@
     display: block;
 }
 
-.settings>table, .settings>.container>table {
+.settings>table,
+.settings>.container>table
+{
     margin-bottom: 0;
 }
