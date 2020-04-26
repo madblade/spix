@@ -53,7 +53,7 @@ extend(SelfModel.prototype, {
         let r = this.rotation;
         let id = this.entityId;
 
-        if (!graphics.controls || !avatar) return;
+        if (!avatar) return;
 
         let p = avatar.position;
 

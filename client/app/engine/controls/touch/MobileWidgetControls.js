@@ -23,10 +23,6 @@ let MobileWidgetControls = function(
     if (!(element instanceof HTMLElement))
         throw Error('[MobileWidgetControls] Expected element to be an HTMLElement.');
 
-    // const isTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
-    // if (!isTouch)
-    //     throw Error('[MobileWidgetControls] Device does not appear to support touch events.');
-
     let w = window.innerWidth;
     let h = window.innerHeight;
     let dpr = window.devicePixelRatio;
@@ -71,17 +67,6 @@ let MobileWidgetControls = function(
         this.canvas = c;
     }
 
-    // Listeners.
-
-    // Here to debug with mouse events.
-    // this.element.addEventListener('mousemove', e => this.updateMove(e));
-    // this.element.addEventListener('mousedown', e => this.updateDown(e));
-    // this.element.addEventListener('mouseup', e => this.updateUp(e));
-
-    // Rescale canvas and event/drawable coordinates with devicePixelRatio.
-    window.addEventListener('resize', () => this.resize());
-    window.addEventListener('orientationchange', () => this.resize());
-
     // Main listener.
     let touchListener = k => e =>
     {
@@ -117,17 +102,39 @@ let MobileWidgetControls = function(
         }
     };
 
-    // Binding to the actual events.
-    this.canvas.addEventListener('touchstart', touchListener('start'), false);
-    this.canvas.addEventListener('touchmove', touchListener('move'), false);
-    this.canvas.addEventListener('touchend', touchListener('end'), false);
-    this.canvas.addEventListener('touchcancel', touchListener('cancel'), false);
+    this.touchStart = touchListener('start');
+    this.touchMove = touchListener('move');
+    this.touchEnd = touchListener('end');
+    this.touchCancel = touchListener('cancel');
 
     // Internal.
     this._resizeRequest = null;
 
     // Model init.
     this.init();
+};
+
+MobileWidgetControls.prototype.stopWidgetListeners = function()
+{
+    window.removeEventListener('resize', this.resize);
+    window.removeEventListener('orientationchange', this.resize);
+    this.canvas.removeEventListener('touchstart', this.touchStart);
+    this.canvas.removeEventListener('touchmove', this.touchMove);
+    this.canvas.removeEventListener('touchend', this.touchEnd);
+    this.canvas.removeEventListener('touchcancel', this.touchCancel);
+};
+
+MobileWidgetControls.prototype.startWidgetListeners = function()
+{
+    // Rescale canvas and event/drawable coordinates with devicePixelRatio.
+    window.addEventListener('resize', this.resize);
+    window.addEventListener('orientationchange', this.resize);
+
+    // Bindings to the actual events.
+    this.canvas.addEventListener('touchstart', this.touchStart, false);
+    this.canvas.addEventListener('touchmove', this.touchMove, false);
+    this.canvas.addEventListener('touchend', this.touchEnd, false);
+    this.canvas.addEventListener('touchcancel', this.touchCancel, false);
 };
 
 MobileWidgetControls.prototype.init = function()

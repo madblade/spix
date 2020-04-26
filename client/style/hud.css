@@ -1,5 +1,9 @@
 /* Menus */
 
+#widget {
+    z-index: 4;
+}
+
 #announce {
     z-index: 3;
 }

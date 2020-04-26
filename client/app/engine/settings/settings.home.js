@@ -48,7 +48,7 @@ let HomeModule = {
             // $(window).off('keydown');
             this.unlistenSettingsMenu();
             this.stateManager.setState('ingame');
-            this.controlsEngine.requestPointerLock();
+            this.controlsEngine.requestLock();
             this.app.setFocused(true);
         }.bind(this));
         // $(window).keydown(function(event) {

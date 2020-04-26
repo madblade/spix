@@ -31,7 +31,7 @@ extend(PreIngameState.prototype, {
 
         $('#request-pl').click(function() {
             this.stateManager.setState('ingame');
-            this.stateManager.app.engine.controls.requestPointerLock();
+            this.stateManager.app.engine.controls.requestLock();
             this.stateManager.app.setFocused(true);
         }.bind(this));
     },

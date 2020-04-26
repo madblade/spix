@@ -19,29 +19,21 @@ let MouseModule = {
         this.setupPointerLock();
     },
 
-    getControls(controlType) {
-        let controls;
-
-        if (controlType === 'first-person') {
-            controls = this.getFirstPersonControls();
-            controls.type = 'fp';
-        } else {
-            controls = undefined;
-        }
-
-        return controls;
-    },
-
     startMouseListeners() {
-        let graphicsEngine = this.app.engine.graphics;
-        graphicsEngine.startListeners();
+        if (this.isTouch)
+            console.warn('[Keyboard] requested keyboard listeners on a touch device.');
+
+        // let graphicsEngine = this.app.engine.graphics;
+        // graphicsEngine.startListeners();
+        this.registerMouseMove();
         this.registerMouseDown();
         this.registerMouseWheel();
     },
 
     stopMouseListeners() {
-        let graphicsEngine = this.app.engine.graphics;
-        graphicsEngine.stopListeners();
+        // let graphicsEngine = this.app.engine.graphics;
+        // graphicsEngine.stopListeners();
+        this.unregisterMouseMove();
         this.unregisterMouseDown();
         this.unregisterMouseWheel();
     }

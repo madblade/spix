@@ -45,15 +45,19 @@ let ControlsModule = {
     listenControls() {
         let controlsEngine = this.app.engine.controls;
 
-        let l = $('#language');
-        l.change(function() {
-            let selected = l.find('option:selected').val();
-            controlsEngine.changeLayout(selected, true); // Don't restart listeners.
-        });
+        if (this.controlsSettings.hasOwnProperty('language')) {
+            let l = $('#language');
+            l.change(function() {
+                let selected = l.find('option:selected').val();
+                controlsEngine.changeLayout(selected, true); // Don't restart listeners.
+            });
+        }
     },
 
     unlistenControls() {
-        $('#language').off('change');
+        if (this.controlsSettings.hasOwnProperty('language')) {
+            $('#language').off('change');
+        }
     }
 
 };

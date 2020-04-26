@@ -31,9 +31,11 @@ let WindowModule = {
         // TODO [MEDIUM] check for double-deactivation
         let handlerVisibilityChange = function() {
             if (document[hidden]) {
-                this.stopKeyboardListeners();
-            } else {
-                this.startKeyboardListeners();
+                if (this.isTouch) this.stopTouchListeners();
+                else this.stopKeyboardListeners();
+            } else if (!document[hidden]) { // eslint if
+                if (this.isTouch) this.stopTouchListeners();
+                else this.startKeyboardListeners();
             }
         }.bind(this);
 

@@ -13,7 +13,7 @@ let CoreModule = {
         this.fps = new Stats();
 
         // Controls are tightly linked to camera.
-        this.initializeControls();
+        this.initializeCameras();
 
         // Init animation.
         this.resize();
@@ -34,12 +34,16 @@ let CoreModule = {
     animate() {
         let clientModel = this.app.model.client;
         let serverModel = this.app.model.server;
+        let controlsEngine = this.app.engine.controls;
 
         // Request animation frame.
         this.requestId = requestAnimationFrame(this.animate.bind(this));
 
         // Bench.
         this.fps.update();
+
+        // Update controls for Touch/Gamepad devices.
+        controlsEngine.updateControlsDevice();
 
         // Render.
         serverModel.refresh();
@@ -87,6 +91,13 @@ let CoreModule = {
 
         // Resize render targets.
         this.sceneManager.resize(width, height);
+    },
+
+    initializeCameras() {
+        let selfModel = this.app.model.server.selfModel;
+        let worldId = selfModel.worldId;
+        this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
+        this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
     },
 
     getCameraInteraction() {

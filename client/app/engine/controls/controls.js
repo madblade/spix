@@ -17,19 +17,34 @@ let UI = function(app) {
     this.app = app;
 
     // User customizable settings.
-    this.settings = {
-        language: ''
-    };
+    this.settings = {};
 
+    // Mouse on desktop.
     this.threeControlsEnabled = false;
+    this.mouse = {};
 
     // Keyboard needs a list of possible keystrokes;
     // and a list of keys actually pressed.
     this.keyControls = {};
 
     // Other input methods.
-    this.mouse = {};
-    this.touch = {}; // TODO plug touch widget
+    this.touchControlsEnabled = false;
+    this.isTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
+    if (this.isTouch) {
+        this.touch = {
+            // Stick states
+            leftX: 0, leftY: 0,
+            rightX: 0, rightY: 0,
+            // Euler-type controls
+            rx: 0, ry: 0,
+            leftLast: ''
+        };
+        this.touchWidgetControls = this.setupTouchWidget();
+    }
+
+    if (!this.isTouch) {
+        this.settings.language = ''; // expose keyboard layout settings
+    }
 };
 
 extend(UI.prototype, {
@@ -37,10 +52,14 @@ extend(UI.prototype, {
     run() {
         let graphicsEngine = this.app.engine.graphics;
 
-        // TODO detect device (PC, tablet, smartphone, VR <- lol)
-        this.setupKeyboard();
-        this.setupMouse();
-        this.setupTouch();
+        // TODO gamepad
+
+        if (this.isTouch) {
+            this.setupTouch();
+        } else {
+            this.setupKeyboard();
+            this.setupMouse();
+        }
         this.setupWindowListeners();
 
         // TODO resize touch widget
@@ -52,12 +71,37 @@ extend(UI.prototype, {
     },
 
     stopListeners() {
-        this.stopKeyboardListeners();
-        this.stopMouseListeners();
-        this.stopTouchListeners();
+        if (this.isTouch) {
+            this.stopTouchListeners();
+        } else {
+            this.stopKeyboardListeners();
+            this.stopMouseListeners();
+        }
         this.stopWindowListeners();
-    }
+    },
 
+    // getControls(controlType)
+    // {
+    //     if (controlType !== 'first-person')
+    //         return undefined;
+    //
+    //     let controls;
+    //     if (this.isTouch) {
+    //         controls = this.getFirstPersonTouchControls();
+    //     } else {
+    //         controls = this.getFirstPersonMouseControls();
+    //         controls.type = 'fp';
+    //     }
+    //
+    //     return controls;
+    // },
+
+    requestLock() {
+        if (this.isTouch)
+            this.requestTouchLock();
+        else
+            this.requestPointerLock();
+    },
 });
 
 extend(UI.prototype, KeyboardModule);
