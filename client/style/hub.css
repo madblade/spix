@@ -1,4 +1,6 @@
 .hub {
+    padding-top: 50px;
+    padding-bottom: 50px;
     /*margin: 20px auto;*/
     /*width: 100%;*/
     /*height: 100%;*/
@@ -6,6 +8,19 @@
     /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
     /*font-size: 16px;*/
     /*text-align: left;*/
+}
+
+.small-title {
+    position: relative;
+    display: block;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    text-align: center;
+    padding-bottom: 40px;
+}
+
+#game-instances-table {
+    position: relative;
+    display: block;
 }
 
 tr {

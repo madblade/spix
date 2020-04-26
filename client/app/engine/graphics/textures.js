@@ -25,7 +25,7 @@ let TexturesModule = {
         texture.minFilter = NearestFilter;
         // texture.minFilter = LinearMipMapLinearFilter;
 
-        console.log(`Max anisotropy = ${maxAnisotropy}`);
+        // console.log(`Max anisotropy = ${maxAnisotropy}`);
 
         // Mipmapping...
         // let p = 512;

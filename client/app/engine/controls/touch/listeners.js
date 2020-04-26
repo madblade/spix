@@ -63,10 +63,10 @@ let ListenerModule = {
         });
 
         // Higher level API
-        $(window).on('tap', function(ev) {console.log(ev);});
-        $(window).on('swipe', function(ev) {console.log(ev);});
-        $(window).on('swipeleft', function(ev) {console.log(ev);});
-        $(window).on('swiperight', function(ev) {console.log(ev);});
+        // $(window).on('tap', function(ev) {console.log(ev);});
+        // $(window).on('swipe', function(ev) {console.log(ev);});
+        // $(window).on('swipeleft', function(ev) {console.log(ev);});
+        // $(window).on('swiperight', function(ev) {console.log(ev);});
     },
 
     unregisterTouch() {
@@ -74,10 +74,10 @@ let ListenerModule = {
         $(window).off('touchend');
         $(window).off('touchmove');
 
-        $(window).on('tap');
-        $(window).on('swipe');
-        $(window).on('swipeleft');
-        $(window).on('swiperight');
+        // $(window).off('tap');
+        // $(window).off('swipe');
+        // $(window).off('swipeleft');
+        // $(window).off('swiperight');
     }
 
 };

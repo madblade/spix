@@ -11,9 +11,15 @@ let MainMenuState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'main';
 
-    this.htmlHead = '<div class="container">';
+    this.htmlHead = `
+        <div class="container">
+            <div class="container small-title">
+                <h2>spix RC-0.1</h2>
+            </div>
+        `;
     this.htmlDistantServer = `
-        <hr/>
+        <div class="row col-12"><div class="col-12">
+        <hr />
 
         <label for="connect-socket-server">Connect to a distant server (Socket)</label>
         <div class="input-group" id="connect-socket-server">
@@ -35,10 +41,15 @@ let MainMenuState = function(stateManager) {
                 <button id="button-connect-socket-server"
                     class="btn btn-outline-light" type="button">Connect</button>
             </div>
-        </div>`;
+        </div>
+
+        </div></div>
+        `;
 
     this.htmlRemoteSandbox =
-        `<hr/>
+        `
+        <div class="row col-12 d-none d-sm-block"><div class="col-12">
+        <hr />
 
         <label for="connect-webrtc-server">Connect to a remote sandbox (WebRTC, might be <em>uBlock</em>ed!)</label>
         <div class="input-group mb-1" id="connect-webrtc-server">
@@ -61,11 +72,15 @@ let MainMenuState = function(stateManager) {
                     class="btn btn-outline-light" type="button">Generate Answer</button>
             </div>
         </div>
-        <div class="list-group" id="error-remote-sandbox">`;
+        <div class="list-group" id="error-remote-sandbox"></div>
+
+        </div></div>
+        `;
 
     this.htmlLocalSandbox =
-        `<hr/>
-
+        `
+        <div class="row col-12 d-none d-sm-block"><div class="col-12">
+        <hr />
         <label for="connect-throttle-server">Connect to my local sandbox (this very browser)</label>
         <div class="input-group mb-3" id="connect-throttle-server">
             <div class="input-group-prepend flex-fill">
@@ -76,7 +91,9 @@ let MainMenuState = function(stateManager) {
                     class="btn btn-outline-light" type="button">Connect</button>
             </div>
         </div>
+        </div></div>
 
+        <div class="row col-12 d-none d-sm-block"><div class="col-12">
         <label for="start-sandbox">Invite people into my local sandbox (WebRTC, might be <em>uBlock</em>ed!)</label>
         <div class="input-group mb-1" id="add-sandbox">
             <div class="input-group-prepend">
@@ -88,14 +105,18 @@ let MainMenuState = function(stateManager) {
                 <button id="button-add-sandbox"
                     class="btn btn-outline-light" type="button">Add player slot</button>
             </div>
-        </div>`;
+        </div>
+        </div></div>
+        `;
 
     this.htmlQuick =
         `
+        <div class="row col-12"><div class="col-12">
+
         <label for="play-quick">Solo mode</label>
         <div class="input-group mb-1 center-block" id="play-quick">
 
-            <div class="input-group-prepend flex-fill">
+            <div class="d-none d-sm-block input-group-prepend flex-fill">
                 <span class="input-group-text flex-fill">No time to set up a server?</span>
             </div>
             <div class="input-group-append">
@@ -104,7 +125,9 @@ let MainMenuState = function(stateManager) {
             </div>
 
         </div>
-    `;
+
+        </div></div>
+        `;
     this.htmlTail = '</div>';
 };
 
@@ -140,17 +163,19 @@ extend(MainMenuState.prototype, {
     },
 
     start() {
-        $('#announce')
-            .empty()
+        $('#announce').empty()
             .removeClass()
-            .append(this.htmlHead)
-            .append(this.htmlQuick)
-            .append(this.htmlDistantServer)
-            .append(this.htmlRemoteSandbox)
-            .append(this.htmlLocalSandbox)
-            .append(this.getRTCUsers())
-            .append(this.htmlTail)
-            .center()
+            .addClass('main-menu')
+            .append(
+                this.htmlHead +
+                this.htmlQuick +
+                this.htmlDistantServer +
+                this.htmlRemoteSandbox +
+                this.htmlLocalSandbox +
+                this.getRTCUsers() +
+                this.htmlTail
+            )
+            .css('position', '')
             .show();
 
         this.startListeners();
@@ -228,6 +253,8 @@ extend(MainMenuState.prototype, {
         let status = `status-${isConnected ? 'connected' : 'error'}`;
 
         return `
+            <div class="row col-12"><div class="col-12">
+
             <div class="input-group mb-1" id="${userID}">
                 <div class="input-group-prepend">
                     <span class="input-group-text ${status}" id="status-${userID}">@${userID}</span>
@@ -254,7 +281,10 @@ extend(MainMenuState.prototype, {
                     <button id="button-disconnect-user-${userID}"
                         class="btn btn-outline-light" type="button">Disconnect User</button>
                 </div>
-            </div>`;
+            </div>
+
+            </div>
+            `;
     },
 
     getRTCUsers() {
@@ -356,7 +386,7 @@ extend(MainMenuState.prototype, {
         userSlotsHTML.append(
             this.getRTCUserHTML(newUserID)
         );
-        $('#announce').center();
+        // $('#announce').center();
 
         localServerModel.addUser(newUserID);
         rtcService.addServerSlot(newUserID, this);

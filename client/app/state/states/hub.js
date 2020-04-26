@@ -10,6 +10,14 @@ import { $ }                from '../../modules/polyfills/dom.js';
 let HubState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'hub';
+
+    this.htmlHead = `
+    <div class="container">
+        <div class="container small-title">
+            <h2>spix RC-0.1</h2>
+        </div>
+    `;
+
     this.htmlControls = `
     <div class="container">
 
@@ -131,7 +139,8 @@ extend(HubState.prototype, {
         return `
             <div class="container" id="game-instances-table">
                 ${this.getInstancesHTMLTable(map)}
-            </div>`;
+            </div>
+        `;
     },
 
     getInstancesHTMLTable(map) {
@@ -167,9 +176,12 @@ extend(HubState.prototype, {
         hub.empty()
             .removeClass()
             .addClass('hub')
-            .append(this.getInstancesHTMLContainer(map))
-            .append(this.getCommandsHTML())
-            .center()
+            .append(
+                this.htmlHead +
+                this.getInstancesHTMLContainer(map) +
+                this.getCommandsHTML()
+            )
+            .css('position', '')
             .fadeIn();
 
         // Add listeners.
