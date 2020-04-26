@@ -116,3 +116,7 @@ hr {
     padding-top: 50px;
     padding-bottom: 50px;
 }
+
+.btn-outline-light {
+    background-color: #c96530;
+}

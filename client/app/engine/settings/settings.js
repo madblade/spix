@@ -33,6 +33,8 @@ extend(Settings.prototype, {
 
         // Add content, then fade in and add listeners.
         $('#announce')
+            .empty()
+            .removeClass()
             .addClass('settings')
             .append(this.getHomeHTML())
             .center()

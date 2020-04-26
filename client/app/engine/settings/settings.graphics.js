@@ -9,14 +9,20 @@ import $ from 'jquery';
 let GraphicsModule = {
 
     getGraphicsHTML(graphicsSettings) {
-        let content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+        let content = `
+            <div class="container">
+            <table class="table table-bordered noselect" style="width:100%"
+            `;
 
         for (let s in graphicsSettings) {
             content += `<tr><td>${graphicsSettings[s]}</td></tr>`;
         }
 
-        content += '<tr id="return"><td>Return</td></tr>';
-        content += '</table>';
+        content += `
+            <tr id="return"><td>Return</td></tr>
+            </table>
+            </div>`;
+
         return content;
     },
 

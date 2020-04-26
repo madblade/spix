@@ -23,6 +23,7 @@ extend(PreIngameState.prototype, {
     start() {
         $('#announce')
             .empty()
+            .removeClass()
             .addClass('settings')
             .append(this.html)
             .center()

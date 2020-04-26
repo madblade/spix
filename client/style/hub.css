@@ -23,14 +23,19 @@
     display: block;
 }
 
+.table-bordered th, .table-bordered td {
+    border: 1px solid #495057;
+}
+
 tr {
-    color: white;
-    background-color: transparent;
+    color: #495057;
+    background-color: #e9ecef;
     cursor: pointer;
 }
 
 tr:hover {
-    background-color: #362c6b;
+    color: white;
+    background-color: #c96530;
 }
 
 .hub-button {

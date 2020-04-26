@@ -9,20 +9,26 @@ import $ from 'jquery';
 let ControlsModule = {
 
     getControlsHTML(controlsSettings) {
-        let content = '<table class="table table-bordered" style="width:100%" class="noselect">';
+        let content = `
+            <div class="container">
+            <table class="table table-bordered noselect" style="width:100%">
+        `;
 
         if (controlsSettings.hasOwnProperty('language')) {
-            let language =  '<select id="language" class="form-control">' +
-                '<option value="default">Choose your layout:</option>' +
-                '<option value="en">en</option>' +
-                '<option value="fr">fr</option>' +
-                '</select>';
+            let language = `
+                <select id="language" class="form-control">
+                    <option value="default">Choose your layout:</option>
+                    <option value="en">en</option>
+                    <option value="fr">fr</option>
+                </select>`;
 
             content += `<tr><td>Keyboard layout</td><td>${language}</td></tr>`;
         }
 
-        content += '<tr id="return"><td colspan="2">Return</td></tr>';
-        content += '</table>';
+        content += `
+            <tr id="return"><td colspan="2">Return</td></tr>
+            </table>
+            </div>`;
 
         return content;
     },
