@@ -11,6 +11,7 @@
 /* Helpers */
 
 #hud {
+    z-index: 3;
     position: absolute;
 }
 

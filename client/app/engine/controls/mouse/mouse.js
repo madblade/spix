@@ -23,16 +23,12 @@ let MouseModule = {
         if (this.isTouch)
             console.warn('[Keyboard] requested keyboard listeners on a touch device.');
 
-        // let graphicsEngine = this.app.engine.graphics;
-        // graphicsEngine.startListeners();
         this.registerMouseMove();
         this.registerMouseDown();
         this.registerMouseWheel();
     },
 
     stopMouseListeners() {
-        // let graphicsEngine = this.app.engine.graphics;
-        // graphicsEngine.stopListeners();
         this.unregisterMouseMove();
         this.unregisterMouseDown();
         this.unregisterMouseWheel();

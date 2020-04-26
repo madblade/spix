@@ -62,7 +62,7 @@ extend(UI.prototype, {
         }
         this.setupWindowListeners();
 
-        // TODO resize touch widget
+        // TODO manage somewhere else.
         $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
     },
 
@@ -79,22 +79,6 @@ extend(UI.prototype, {
         }
         this.stopWindowListeners();
     },
-
-    // getControls(controlType)
-    // {
-    //     if (controlType !== 'first-person')
-    //         return undefined;
-    //
-    //     let controls;
-    //     if (this.isTouch) {
-    //         controls = this.getFirstPersonTouchControls();
-    //     } else {
-    //         controls = this.getFirstPersonMouseControls();
-    //         controls.type = 'fp';
-    //     }
-    //
-    //     return controls;
-    // },
 
     requestLock() {
         if (this.isTouch)

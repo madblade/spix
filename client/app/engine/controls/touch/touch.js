@@ -39,18 +39,7 @@ let TouchModule = {
 
     // Setup listener
     setupTouch()
-    {
-        // TODO make visible
-        // var startX,
-        //     startY,
-        //     dX, dY, daX, daY,
-        //     threshold = 150, // Required min distance traveled to be considered swipe.
-        //     allowedTime = 250, // Maximum time allowed to travel that distance.
-        //     elapsedTime,
-        //     startTime;
-
-        // this.startTouchListeners();
-    },
+    {},
 
     // Activate listeners
     startTouchListeners() {
@@ -119,10 +108,40 @@ let TouchModule = {
         let ly = this.touch.leftY;
         let lastLeft = this.touch.leftLast;
         let newLeft = [];
-        if (lx > 0) newLeft.push('r');
-        if (lx < 0) newLeft.push('l');
-        if (ly < 0) newLeft.push('f');
-        if (ly > 0) newLeft.push('b');
+        if (ly !== 0 && lx !== 0) {
+            let angle = Math.atan2(ly, lx);
+            let pi8 = Math.PI / 8;
+            switch (true) {
+                case angle < -7 * pi8 || angle > 7 * pi8:
+                    newLeft.push('l');
+                    break;
+                case angle < -5 * pi8:
+                    newLeft.push('f', 'l');
+                    break;
+                case angle < -3 * pi8:
+                    newLeft.push('f');
+                    break;
+                case angle < -pi8:
+                    newLeft.push('f', 'r');
+                    break;
+                case angle > 5 * pi8:
+                    newLeft.push('b');
+                    break;
+                case angle > 3 * pi8:
+                    newLeft.push('b', 'l');
+                    break;
+                case angle > pi8:
+                    newLeft.push('b', 'r');
+                    break;
+                default:
+                    newLeft.push('r');
+                    break;
+            }
+        }
+        // if (lx > 0) newLeft.push('r');
+        // if (lx < 0) newLeft.push('l');
+        // if (ly < 0) newLeft.push('f');
+        // if (ly > 0) newLeft.push('b');
         if (newLeft.length > 2) console.error('[Touch] too many events detected.');
         for (let i = 0; i < newLeft.length; ++i) {
             let t = newLeft[i];
