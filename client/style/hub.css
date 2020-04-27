@@ -5,34 +5,40 @@
     padding-bottom: 50px;
 }
 
-#game-instances-table {
+.hub #game-instances-table {
     position: relative;
     display: block;
 }
 
-.table-bordered th, .table-bordered td {
+.hub .table-bordered th,.hub .table-bordered td {
     border: 1px solid #495057;
 }
 
-tr {
+.hub tr {
     color: #495057;
     background-color: #e9ecef;
     cursor: pointer;
 }
 
-tr:hover {
+.hub tr:hover {
     color: white;
     background-color: #c96530;
 }
 
-.hub-button {
+.hub .hub-button {
     white-space: normal;
     font-size: 16px;
     color: white;
     background: none;
 }
 
-.hub-button:hover {
+.hub .hub-button:hover {
     color: white;
     background-color: #362c6b;
+}
+
+hr {
+    display: block;
+    position: relative;
+    border-top: 1px solid rgba(0, 0, 0, 1.0)
 }

@@ -3,6 +3,8 @@
  */
 
 let ItemType = Object.freeze({
+    NONE: 0,
+
     // Blocks
     BLOCK_GRASS: 1,
     BLOCK_STONE: 2,
@@ -16,9 +18,16 @@ let ItemType = Object.freeze({
     // ...
     // server-side: (model_world / model)
 
-    // Active items
-    SWORD: 257,
-    BOW: 258,
+    // Weapons
+    KATANA: 257,
+    NAGAMAKI: 258,  // long handle longsword
+    NODACHI: 259,   // sephiroth longsword
+    YARI: 260,      // straight spear
+    NAGINATA: 261,  // curved spear
+
+    YA: 300,        // arrow
+    YUMI: 301,      // longbow
+    TEPPO: 302,     // arquebus
     // ...
 
     // Special items

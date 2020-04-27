@@ -5,6 +5,7 @@
 'use strict';
 
 import extend       from '../../../extend.js';
+import { ItemType } from '../../server/self/items';
 
 let SelfComponent = function(clientModel) {
     this.clientModel = clientModel;
@@ -32,6 +33,12 @@ let SelfComponent = function(clientModel) {
     this._itemPlacementRatio = 0;
     this._itemOffset = 0.999;
     this._angleFromIntersectionPoint = 0;
+
+    let emptyItem  = ItemType.NONE;
+    this._quickBar = [
+        emptyItem, emptyItem, emptyItem, emptyItem,
+        emptyItem, emptyItem, emptyItem, emptyItem
+    ];
 
     /** Dynamic **/
 

@@ -24,8 +24,8 @@ extend(InventoryModel.prototype, {
 
     reset() {
         this.setItem(0, ItemType.BLOCK_PLANKS);
-        this.setItem(1, ItemType.SWORD);
-        this.setItem(2, ItemType.CROSSBOW);
+        this.setItem(1, ItemType.KATANA);
+        this.setItem(2, ItemType.YUMI);
         this.setItem(3, ItemType.PORTAL_GUN_SINGLE);
         this.setItem(4, ItemType.PORTAL_GUN_DOUBLE);
     },

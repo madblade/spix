@@ -4,11 +4,13 @@
 
 'use strict';
 
-import extend              from '../../extend.js';
-import $                   from 'jquery';
-import { HUDWorldsModule } from './hud.worlds';
+import extend                   from '../../extend.js';
+import $                        from 'jquery';
+import { HUDWorldsModule }      from './hud.worlds';
+import { HUDInventoryModule }   from './hud.inventory';
 
-let Hud = function(register) {
+let Hud = function(register)
+{
     this.register = register;
     this.orangeColor = '#c96530';
     this.sigma = null;
@@ -17,12 +19,23 @@ let Hud = function(register) {
         <div id="hud">
             <div id="position"></div>
             <div id="diagram"></div>
-            <div id="items"></div>
             <!-- <div id="item_offset"></div> -->
             <!-- <div id="item_orientation"></div> -->
             <!-- <div id="chat"></div>-->
+            <div id="network-graph"></div>
+            <div id="mini-map"></div>
         </div>
-        <div id="network-graph">
+        <div id="items">
+            <div id="item-table">
+            <div class="square"><div class="content" id="item1"></div></div>
+            <div class="square"><div class="content" id="item2"></div></div>
+            <div class="square"><div class="content" id="item3"></div></div>
+            <div class="square"><div class="content" id="item4"></div></div>
+            <div class="square"><div class="content" id="item5"></div></div>
+            <div class="square"><div class="content" id="item6"></div></div>
+            <div class="square"><div class="content" id="item7"></div></div>
+            <div class="square"><div class="content" id="item8"></div></div>
+            </div>
         </div>
     `;
 };
@@ -33,7 +46,12 @@ extend(Hud.prototype, {
     initModule() {
         let announce = $('#announce');
         announce.before(this.html);
+
+        // World map renderer
         this.initSigma();
+
+        // Quick items
+        this.initInventory();
     },
 
     // Game ended
@@ -82,5 +100,6 @@ extend(Hud.prototype, {
 });
 
 extend(Hud.prototype, HUDWorldsModule);
+extend(Hud.prototype, HUDInventoryModule);
 
 export { Hud };

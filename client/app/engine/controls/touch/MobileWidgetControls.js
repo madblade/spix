@@ -28,8 +28,8 @@ let MobileWidgetControls = function(
     let dpr = window.devicePixelRatio;
 
     // Overflow causes an ugly y shift (the size of the bar).
-    document.body.style.overflowX = 'hidden';
-    document.body.style.overflowY = 'hidden';
+    // document.body.style.overflowX = 'hidden';
+    // document.body.style.overflowY = 'hidden';
 
     // Main objects.
     this.element = element;

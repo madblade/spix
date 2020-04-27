@@ -220,4 +220,9 @@ $.fn.center = function() {
     }
 }($));
 
+$(window).resize(function() {
+    $('.settings').center();
+    $('.reticle').center();
+});
+
 export { $ };
