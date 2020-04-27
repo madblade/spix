@@ -281,18 +281,21 @@ extend(RendererManager.prototype, {
         if (!height) height = window.innerHeight;
         this.renderer.setSize(width, height);
 
-        this.composers.forEach(c => {
-            c.setSize(width, height);
-            let pixelRatio = this.renderer.getPixelRatio();
-            let r = 'resolution';
-            let passes = c.passes;
-            passes.forEach(p => {
-                if (!p || !(p instanceof ShaderPass)) return;
-                if (!p.material || !p.material.uniforms) return;
-                if (!p.material.uniforms[r]) return;
-                p.material.uniforms[r].value.x = 1 / (width * pixelRatio);
-                p.material.uniforms[r].value.y = 1 / (height * pixelRatio);
-            });
+        this.composers.forEach(cs => {
+            for (let i = 0; i < cs.length; ++i) {
+                let c = cs[i];
+                c.setSize(width, height);
+                let pixelRatio = this.renderer.getPixelRatio();
+                let r = 'resolution';
+                let passes = c.passes;
+                passes.forEach(p => {
+                    if (!p || !(p instanceof ShaderPass)) return;
+                    if (!p.material || !p.material.uniforms) return;
+                    if (!p.material.uniforms[r]) return;
+                    p.material.uniforms[r].value.x = 1 / (width * pixelRatio);
+                    p.material.uniforms[r].value.y = 1 / (height * pixelRatio);
+                });
+            }
         });
     },
 

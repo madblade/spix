@@ -18,7 +18,7 @@ let ItemType = Object.freeze({
 
     // Active items
     SWORD: 257,
-    CROSSBOW: 258,
+    BOW: 258,
     // ...
 
     // Special items

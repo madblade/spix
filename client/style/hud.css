@@ -11,13 +11,14 @@
 /* Helpers */
 
 #hud {
-    z-index: 3;
     position: absolute;
+    z-index: 3;
 }
 
 #network-graph {
     position: absolute;
-    top: 0; bottom: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
     width: 20%;
     z-index: 3;
 }
@@ -27,7 +28,12 @@
 }
 
 #items {
-
+    position: absolute;
+    z-index: 3;
+    /*left: 0;*/
+    /*right: 0;*/
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #diagram {

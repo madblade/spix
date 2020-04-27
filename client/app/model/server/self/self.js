@@ -130,6 +130,7 @@ extend(SelfModel.prototype, {
         if (!handItem) return;
         handItem.rotation.x = cameraObject.pitch.rotation.x;
         handItem.rotation.z = cameraObject.yaw.rotation.z;
+        // handItem.children[0].rotation.x += 0.01;
     },
 
     updateSelf(p, r, w) {

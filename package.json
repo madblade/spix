@@ -19,7 +19,7 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "stats.js": "*",
-    "three": "^0.114.0"
+    "three": "^0.115.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
