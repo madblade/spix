@@ -15,16 +15,32 @@ let ItemsGraphicsModule = {
 
     loadItemMesh(modelPath, callback) {
         if (modelPath !== 'portal-gun' &&
-            modelPath !== 'pixel-crossbow' &&
-            modelPath !== 'katana') return;
+            // modelPath !== 'pixel-crossbow' &&
+            modelPath !== 'yari-morph' &&
+            modelPath !== 'ya' &&
+            modelPath !== 'nagamaki' &&
+            modelPath !== 'naginata' &&
+            modelPath !== 'nodachi' &&
+            modelPath !== 'katana'
+        ) return;
 
         let loader = new GLTFLoader();
         loader.load(`app/assets/models/${modelPath}.glb`, gltf => {
             if (modelPath === 'portal-gun')
                 this.finalizePortalMesh(gltf, callback);
-            else if (modelPath === 'pixel-crossbow')
-                this.finalizeCrossbowMesh(gltf, callback);
+            // else if (modelPath === 'pixel-crossbow')
+            //     this.finalizeCrossbowMesh(gltf, callback);
             else if (modelPath === 'katana')
+                this.finalizeKatanaPackMesh(gltf, callback);
+            else if (modelPath === 'ya')
+                this.finalizeKatanaPackMesh(gltf, callback);
+            else if (modelPath === 'yari-morph')
+                this.finalizeKatanaPackMesh(gltf, callback);
+            else if (modelPath === 'nagamaki')
+                this.finalizeNagamakiPackMesh(gltf, callback);
+            else if (modelPath === 'naginata')
+                this.finalizeKatanaPackMesh(gltf, callback);
+            else if (modelPath === 'nodachi')
                 this.finalizeKatanaPackMesh(gltf, callback);
         }, undefined, function(error) {
             console.error(error);
@@ -36,25 +52,51 @@ let ItemsGraphicsModule = {
         object.onBeforeRender = function(renderer) {renderer.clearDepth();};
     },
 
-    finalizeCrossbowMesh(gltf, callback) {
+    finalizeNagamakiPackMesh(gltf, callback) {
         let object = gltf.scene.children[0];
         console.log(object);
-        let m = object.material.map;
 
-        // let newMat = new MeshBasicMaterial({
-        //     color: new Color(4, 4, 4), map: m});
-        // object.material = newMat;
-        object.material.side = FrontSide;
-        object.material.color = new Color(10, 10, 10);
-        m.flatShading = true;
+        object.material = new MeshPhongMaterial({
+            color: 0x707070,
+            shininess: 1000,
+            specular: 0xffffff,
+            vertexColors: true
+        });
 
-        object.scale.set(0.04, 0.04, 0.04);
-        object.rotation.set(0, Math.PI / 4, 0);
-        object.position.set(0.4, -.25, -0.15);
+        let g = object.geometry;
+        let p = g.attributes.position;
+        let count = p.count;
+        g.setAttribute('color',
+            new BufferAttribute(new Float32Array(count * 3), 3)
+        );
+        let colors = g.attributes.color;
+        for (let i = 0; i < count; ++i) {
+            let x; let y; let z;
+            let xCoord = p.getX(i); let yCoord = p.getY(i); let zCoord = p.getZ(i);
+            if (xCoord < -1.975) {
+                x = 0.5 + 0.5 * Math.random();
+                y = 0.5 + 0.5 * Math.random();
+                z = 0.5 + 0.5 * Math.random();
+            } else if (xCoord > -1.3 &&
+                Math.abs(zCoord) < 0.7 && Math.abs(yCoord) < 0.09)
+            {
+                y = z = x = 0;
+            } else {
+                x = 255 / 256;
+                y = 215 / 256;
+                z = 0;
+            }
+            colors.setXYZ(i, x, y, z);
+        }
 
-        // render order
+        // Think about setting roughness
+        object.rotation.reorder('ZYX');
+        let sc = object.scale; let f = 0.4;
+        sc.set(f * sc.x, f * sc.y, f * sc.z);
+        object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
+        object.position.set(0.4, -.25, -0.25);
+
         this.renderOnTop(object);
-
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);
@@ -112,6 +154,31 @@ let ItemsGraphicsModule = {
         object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
         object.position.set(0.4, -.25, -0.25);
 
+        this.renderOnTop(object);
+
+        let wrapper = new Object3D();
+        wrapper.rotation.reorder('ZYX');
+        wrapper.add(object);
+        callback(wrapper);
+    },
+
+    finalizeCrossbowMesh(gltf, callback) {
+        let object = gltf.scene.children[0];
+        console.log(object);
+        let m = object.material.map;
+
+        // let newMat = new MeshBasicMaterial({
+        //     color: new Color(4, 4, 4), map: m});
+        // object.material = newMat;
+        object.material.side = FrontSide;
+        object.material.color = new Color(10, 10, 10);
+        m.flatShading = true;
+
+        object.scale.set(0.04, 0.04, 0.04);
+        object.rotation.set(0, Math.PI / 4, 0);
+        object.position.set(0.4, -.25, -0.15);
+
+        // render order
         this.renderOnTop(object);
 
         let wrapper = new Object3D();

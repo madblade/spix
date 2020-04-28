@@ -17,11 +17,15 @@ let SelfComponent = function(clientModel) {
         /**
          * @deprecated
          */
-        isFirstPerson: function() { return this._cameraInteraction === 'first-person'; }.bind(this),
+        isFirstPerson: function() {
+            return this._cameraInteraction === 'first-person';
+        }.bind(this),
         /**
          * @deprecated
          */
-        isThirdPerson: function() { return this._cameraInteraction === 'third-person'; }.bind(this)
+        isThirdPerson: function() {
+            return this._cameraInteraction === 'third-person';
+        }.bind(this)
     };
 
     // Inventory.
@@ -92,9 +96,6 @@ extend(SelfComponent.prototype, {
         let changes = this.changes;
         if (changes.length < 1) return;
 
-        let serverSelfModel = this.clientModel.app.model.server.selfModel;
-        let graphicsEngine = this.clientModel.app.engine.graphics;
-
         // ENHANCEMENT [LOW]: filter & simplify
         changes.forEach(event => {
             let type = event[0];
@@ -102,31 +103,11 @@ extend(SelfComponent.prototype, {
             if (!type || !data) return;
             switch (type) {
                 case 'camera-update':
-                    // TODO [LOW] only once per iteration.
-                    //console.log('camera autoupdate');
-                    //graphicsEngine.cameraManager.updateCameraPosition(data);
-                    graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+                    this.processSimpleCameraUptade();
                     break;
                 case 'camera':
-                    let avatar = serverSelfModel.avatar;
-                    let worldId = serverSelfModel.worldId;
-                    let display;
-                    if (data[0] === 'toggle')
-                        display = !serverSelfModel.displayAvatar;
-                    else
-                        display = false;
-
-                    serverSelfModel.displayAvatar = display;
-
-                    if (display)
-                        this._cameraInteraction = 'third-person';
-                    else
-                        this._cameraInteraction = 'first-person';
-
-                    graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
-                    graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
+                    this.processCameraModeChange(data);
                     break;
-
                 case 'interaction':
                     this.processInteractionChange(data);
                     break;
@@ -139,8 +120,43 @@ extend(SelfComponent.prototype, {
         this.changes = [];
     },
 
+    processSimpleCameraUptade()
+    {
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+        // TODO [LOW] only once per iteration.
+        //console.log('camera autoupdate');
+        //graphicsEngine.cameraManager.updateCameraPosition(data);
+        graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+    },
+
+    processCameraModeChange(data)
+    {
+        let serverSelfModel = this.clientModel.app.model.server.selfModel;
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+
+        let avatar = serverSelfModel.avatar;
+        let worldId = serverSelfModel.worldId;
+        let display;
+        if (data[0] === 'toggle')
+            display = !serverSelfModel.displayAvatar;
+        else
+            display = false;
+
+        serverSelfModel.displayAvatar = display;
+
+        if (display)
+            this._cameraInteraction = 'third-person';
+        else
+            this._cameraInteraction = 'first-person';
+
+        // TODO Change held item size and parent mesh.
+        graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
+        graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
+    },
+
     processInteractionChange(data)
     {
+        let graphicsEngine = this.clientModel.app.engine.graphics;
         let register = this.clientModel.app.register;
         let actionType = data[0];
 
@@ -162,6 +178,7 @@ extend(SelfComponent.prototype, {
             this.currentItemSlot = currentItemSlot;
 
             // TODO graphics change mesh.
+            graphicsEngine.changeHeldItem(this.quickBar[currentItemSlot]);
 
             register.updateSelfState({
                 itemSelect: [currentItemSlot, oldItemSlot]
