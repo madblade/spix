@@ -52,7 +52,11 @@ let ItemsGraphicsModule = {
         object.onBeforeRender = function(renderer) {renderer.clearDepth();};
     },
 
-    finalizeNagamakiPackMesh(gltf, callback) {
+    finalizeKatanaTypePackMesh(gltf,
+        handleTop, handleR, handleG, handleB,
+        ringTop, ringLeft, ringRight, ringR, ringG, ringB,
+        callback)
+    {
         let object = gltf.scene.children[0];
         console.log(object);
 
@@ -73,18 +77,20 @@ let ItemsGraphicsModule = {
         for (let i = 0; i < count; ++i) {
             let x; let y; let z;
             let xCoord = p.getX(i); let yCoord = p.getY(i); let zCoord = p.getZ(i);
-            if (xCoord < -1.975) {
+            if (xCoord < ringTop) {
                 x = 0.5 + 0.5 * Math.random();
                 y = 0.5 + 0.5 * Math.random();
                 z = 0.5 + 0.5 * Math.random();
-            } else if (xCoord > -1.3 &&
-                Math.abs(zCoord) < 0.7 && Math.abs(yCoord) < 0.09)
+            } else if (xCoord > handleTop &&
+                Math.abs(zCoord) < ringLeft && Math.abs(yCoord) < ringRight)
             {
-                y = z = x = 0;
+                x = handleR / 256;
+                y = handleG / 256;
+                z = handleB;
             } else {
-                x = 255 / 256;
-                y = 215 / 256;
-                z = 0;
+                x = ringR / 256;
+                y = ringG / 256;
+                z = ringB;
             }
             colors.setXYZ(i, x, y, z);
         }
@@ -103,63 +109,21 @@ let ItemsGraphicsModule = {
         callback(wrapper);
     },
 
+    finalizeNagamakiPackMesh(gltf, callback) {
+        this.finalizeKatanaTypePackMesh(gltf,
+            -2.4, 61, 31, 0,
+            -3.052,
+            0.7, 0.09,
+            255, 215, 0,
+            callback);
+    },
+
     finalizeKatanaPackMesh(gltf, callback) {
-        let object = gltf.scene.children[0];
-        // let m = object.material.map;
-        console.log(object);
-
-        let newMat = new MeshPhongMaterial({
-            color: 0x707070,
-            shininess: 1000,
-            specular: 0xffffff,
-            vertexColors: true
-        });
-        object.material = newMat;
-
-        let g = object.geometry;
-        let p = g.attributes.position;
-        let count = p.count;
-        g.setAttribute('color',
-            new BufferAttribute(new Float32Array(count * 3), 3)
-        );
-        let colors = g.attributes.color;
-        for (let i = 0; i < count; ++i) {
-            let x; let y; let z;
-            let xCoord = p.getX(i);
-            let yCoord = p.getY(i);
-            let zCoord = p.getZ(i);
-            if (xCoord < -1.975)
-            {
-                x = 0.5 + 0.5 * Math.random();
-                y = 0.5 + 0.5 * Math.random();
-                z = 0.5 + 0.5 * Math.random();
-            } else if (xCoord > -1.3 &&
-                Math.abs(zCoord) < 0.7 && Math.abs(yCoord) < 0.09
-            ) // gltf flipped y and z (._.)
-            {
-                y = z = x = 0;
-            } else {
-                x = 255 / 256;
-                y = 215 / 256;
-                z = 0;
-            }
-
-            colors.setXYZ(i, x, y, z);
-        }
-
-        // Think about setting roughness
-        object.rotation.reorder('ZYX');
-        let sc = object.scale; let f = 0.4;
-        sc.set(f * sc.x, f * sc.y, f * sc.z);
-        object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
-        object.position.set(0.4, -.25, -0.25);
-
-        this.renderOnTop(object);
-
-        let wrapper = new Object3D();
-        wrapper.rotation.reorder('ZYX');
-        wrapper.add(object);
-        callback(wrapper);
+        this.finalizeKatanaTypePackMesh(gltf,
+            -1.3, 0, 0, 0,
+            -1.975, 0.7, 0.09,
+            255, 215, 0,
+            callback);
     },
 
     finalizeCrossbowMesh(gltf, callback) {
