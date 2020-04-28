@@ -65,7 +65,7 @@
 }
 
 #item-table .square {
-    border: 2px solid #495057;
+    border: 2px solid black;
     float: left;
     float-wrap: wrap;
     position: relative;
@@ -75,7 +75,12 @@
     overflow: hidden;
 }
 
+#item-table .content.selected {
+    background-color: #c96530;
+}
+
 #item-table .content {
+    background-color: #cccccc;
     text-align: center;
     position: absolute;
     height: 100%;

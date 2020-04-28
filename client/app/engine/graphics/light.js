@@ -4,7 +4,11 @@
 
 'use strict';
 
-import { AmbientLight, DirectionalLight, HemisphereLight, PointLight } from 'three';
+import {
+    AmbientLight, DirectionalLight, HemisphereLight,
+    CameraHelper,
+    PointLight
+} from 'three';
 
 let LightDefaultIntensities = Object.freeze({
     HEMISPHERE: 0.75,
@@ -28,20 +32,27 @@ let LightModule = {
             case 'sun':
                 light = new DirectionalLight(
                     LightDefaultColors.DIRECTIONAL,
-                    LightDefaultIntensities.HEMISPHERE
+                    LightDefaultIntensities.DIRECTIONAL
                 );
                 // light.castShadow = true;
-                // light.shadow.mapSize.width = 512;
-                // light.shadow.mapSize.height = 512;
-                // light.shadow.camera.near = 0.1;
-                // light.shadow.camera.far = 50000;
+                // light.shadow.bias = -0.01;
+                // light.shadow.mapSize.width = 4096;
+                // light.shadow.mapSize.height = 4096;
+                // light.shadow.camera.near = 1;
+                // light.shadow.camera.far = 100;
+                // light.shadow.camera.top = 100;
+                // light.shadow.camera.bottom = -100;
+                // light.shadow.camera.left = 100;
+                // light.shadow.camera.right = -100;
+                // let helper = new CameraHelper(light.shadow.camera);
+                // light.add(helper);
                 break;
 
             case 'hemisphere':
                 light = new HemisphereLight(
                     LightDefaultColors.HEMISPHERE_SKY,
                     LightDefaultColors.HEMISPHERE_GROUND,
-                    LightDefaultIntensities.DIRECTIONAL
+                    LightDefaultIntensities.HEMISPHERE
                 );
                 break;
 

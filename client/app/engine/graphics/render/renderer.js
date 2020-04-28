@@ -118,6 +118,7 @@ extend(RendererManager.prototype, {
 
         // renderer.shadowMap.enabled = true;
         // renderer.shadowMap.type = PCFSoftShadowMap;
+
         renderer.outputEncoding = sRGBEncoding;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);

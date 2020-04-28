@@ -27,6 +27,7 @@ let EntitiesModule = {
             }));
 
             mesh.scale.set(1.0, 1.0, 1.0);
+            // mesh.castShadow = true;
 
             let mixer = new AnimationMixer(mesh);
             let clip = AnimationClip.CreateFromMorphTargetSequence('run',

@@ -16,7 +16,7 @@ let Hud = function(register)
     this.sigma = null;
 
     this.html = `
-        <div id="hud">
+        <div id="hud" class="noselect">
             <div id="position"></div>
             <div id="diagram"></div>
             <!-- <div id="item_offset"></div> -->
@@ -25,9 +25,9 @@ let Hud = function(register)
             <div id="network-graph"></div>
             <div id="mini-map"></div>
         </div>
-        <div id="items">
+        <div id="items" class="noselect">
             <div id="item-table">
-            <div class="square"><div class="content" id="item1"></div></div>
+            <div class="square"><div class="content selected" id="item1"></div></div>
             <div class="square"><div class="content" id="item2"></div></div>
             <div class="square"><div class="content" id="item3"></div></div>
             <div class="square"><div class="content" id="item4"></div></div>

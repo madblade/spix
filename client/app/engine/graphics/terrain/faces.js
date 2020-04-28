@@ -46,9 +46,9 @@ let FacesModule = {
         cb.normalize();
         let nx = cb.x; let ny = cb.y; let nz = cb.z;
         for (let j = 0; j < 3; ++j) {
-            normals[i + 3 * j]   = nx;
-            normals[i + 3 * j + 1] = ny;
-            normals[i + 3 * j + 2] = nz;
+            normals[i + 3 * j]   = -nx;
+            normals[i + 3 * j + 1] = -ny;
+            normals[i + 3 * j + 2] = -nz;
         }
 
         // Colors
@@ -89,9 +89,9 @@ let FacesModule = {
         cb.normalize();
         let nx = cb.x; let ny = cb.y; let nz = cb.z;
         for (let j = 0; j < 3; ++j) {
-            normals[i + 9 + 3 * j]   = nx;
-            normals[i + 9 + 3 * j + 1] = ny;
-            normals[i + 9 + 3 * j + 2] = nz;
+            normals[i + 9 + 3 * j]   = -nx;
+            normals[i + 9 + 3 * j + 1] = -ny;
+            normals[i + 9 + 3 * j + 2] = -nz;
         }
 
         // Colors

@@ -65,18 +65,21 @@ let SkyModule = {
         // Dir
         let light1 = this.createLight('sun');
         // light1.position.set(-1, -2, -1);
-        light1.position.set(sunPosition.x, sunPosition.y, sunPosition.z);
-        light1.updateMatrixWorld();
+        let np = new Vector3();
+        np.copy(sunPosition)
+            .normalize();
+        light1.position.set(np.x, np.y, np.z);
+        // light1.updateMatrixWorld();
         // Hemisphere
         let light2 = this.createLight('hemisphere');
         // light2.position.set(-1, -2, -10);
-        light2.position.set(sunPosition.x, sunPosition.y, sunPosition.z);
-        light2.updateMatrixWorld();
+        light2.position.set(np.x, np.y, np.z);
+        // light2.updateMatrixWorld();
         // Ambient
         let light3 = this.createLight();
         // light3.position.set(-1, -2, -10);
-        light3.position.set(sunPosition.x, sunPosition.y, sunPosition.z);
-        light3.updateMatrixWorld();
+        light3.position.set(np.x, np.y, np.z);
+        // light3.updateMatrixWorld();
         return {
             directionalLight: light1,
             hemisphereLight: light2,
@@ -155,6 +158,7 @@ let SkyModule = {
             this.addToScene(sky.mesh, worldId);
             this.addToScene(sky.lights.hemisphereLight, worldId);
             this.addToScene(sky.lights.directionalLight, worldId);
+            // this.addToScene(sky.lights.ambientLight, worldId);
 
             this.updateSky(
                 sky.mesh,
@@ -191,8 +195,8 @@ let SkyModule = {
         let theta = this.theta;
 
         phi %= 2 * Math.PI;
-        let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
-        phi += 0.0101 * dist;
+        // let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
+        phi += 0.00101; // * dist;
         skyObject.phi = phi;
 
         let x = distance * cos(phi);
@@ -226,7 +230,6 @@ let SkyModule = {
         // Update lights
         let normSunPosition = new Vector3();
         normSunPosition.copy(sunPosition)
-            .negate()
             .normalize();
         let hl = skyObject.lights.hemisphereLight;
         let dl = skyObject.lights.directionalLight;
@@ -234,15 +237,16 @@ let SkyModule = {
         dl.position.copy(normSunPosition);
         // Sunset and sunrise
         if (skyObject.lights.type === 'flat') {
-            let nz = Math.max(-normSunPosition.z, 0);
-            let intensityFactor = Math.pow(nz, 0.01);
+            let nz = Math.max(normSunPosition.z, 0);
+            let intensityFactor = Math.pow(nz, 0.1);
             hl.intensity = LightDefaultIntensities.HEMISPHERE * intensityFactor;
             dl.intensity = LightDefaultIntensities.DIRECTIONAL * intensityFactor;
             if (nz === 0) {
-                let onz = Math.max(normSunPosition.z, 0);
-                intensityFactor = Math.pow(onz, 0.01);
+                let onz = Math.max(-normSunPosition.z, 0);
+                intensityFactor = Math.pow(onz, 0.1);
                 hl.position.copy(new Vector3(0, 0, -1));
-                hl.intensity = intensityFactor * 0.2;
+                hl.intensity = intensityFactor * 0.3;
+                dl.intensity = 0;
                 hl.groundColor = new Color(0x0000ff);
                 hl.skyColor = new Color(0x0000ff);
             } else {

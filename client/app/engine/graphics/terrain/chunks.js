@@ -96,6 +96,8 @@ let ChunksModule = {
 
         let material = this.createMaterial('textured-phong', 0xaaaaaa);
         let newMesh = new Mesh(geometry, material);
+        // newMesh.castShadow = true;
+        // newMesh.receiveShadow = true;
         if (Math.random() < 0.5) newMesh.userData.bloom = true;
 
         return {
@@ -340,10 +342,10 @@ let ChunksModule = {
                 geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
 
                 // let addedMesh = new Mesh(geometry, materials[meshId]);
-                // addedMesh.castShadow = true;
-                // addedMesh.receiveShadow = true;
                 // meshes[meshId] = addedMesh;
                 let newMesh = new Mesh(geometry, materials[meshId]);
+                // newMesh.castShadow = true;
+                // newMesh.receiveShadow = true;
                 if (Math.random() < 0.25) newMesh.userData.bloom = true;
                 meshes[meshId] = newMesh;
                 this.addToScene(newMesh, worldId);
