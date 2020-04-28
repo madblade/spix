@@ -5,6 +5,7 @@
 'use strict';
 
 import { $ }                from '../../../modules/polyfills/dom.js';
+import { ItemsModelModule } from '../../../model/server/self/items';
 
 let ListenerModule = {
 
@@ -167,12 +168,36 @@ let ListenerModule = {
         clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 
+    requestItemUse()
+    {
+        const clientModel = this.app.model.client;
+        const graphicsEngine = this.app.engine.graphics;
+        let p = graphicsEngine.getCameraCoordinates();
+        let f = graphicsEngine.getCameraForwardVector();
+        clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z]);
+    },
+
+    requestMainHandItemAction() {
+        let clientSelfModel = this.app.model.client.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+            console.warn('[Mouse/Listener] Item ID unsupported.');
+        else if (ItemsModelModule.isItemUseable(activeItemID))
+            this.requestItemUse();
+        else if (ItemsModelModule.isItemPlaceable(activeItemID))
+            this.requestAddBlock();
+    },
+
+    requestSecondaryHandItemAction() {
+        this.requestDelBlock();
+    },
+
     onLeftMouseDown() {
-        this.requestAddBlock();
+        this.requestMainHandItemAction();
     },
 
     onRightMouseDown() {
-        this.requestDelBlock();
+        this.requestSecondaryHandItemAction();
     },
 
     onMiddleMouseDown() {

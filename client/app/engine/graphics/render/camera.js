@@ -5,7 +5,7 @@
 'use strict';
 
 import extend from '../../../extend.js';
-import { Object3D, PerspectiveCamera } from 'three';
+import { Object3D, PerspectiveCamera, Quaternion, Vector3 } from 'three';
 
 let Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 {
@@ -185,6 +185,15 @@ extend(Camera.prototype, {
         p.x = 0;
         p.y = 0;
         p.z = 4;
+    },
+
+    getCameraForwardVector() {
+        let nv = new Vector3(0, -1, 0);
+        // nv.normalize();
+        let camQ = new Quaternion();
+        this.cameraObject.getWorldQuaternion(camQ);
+        nv.applyQuaternion(camQ);
+        return nv;
     }
 
 });

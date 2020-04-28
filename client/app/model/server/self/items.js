@@ -47,6 +47,11 @@ let ItemsModelModule = {
             item === ItemType.PORTAL_GUN_DOUBLE;
     },
 
+    isItemPlaceable(item) {
+        return ItemsModelModule.isItemBlock(item) ||
+            ItemsModelModule.isItemX(item);
+    },
+
     isItemMelee(item) {
         return item >= ItemType.KATANA && item < ItemType.YA;
 
@@ -54,6 +59,11 @@ let ItemsModelModule = {
 
     isItemRanged(item) {
         return item >= ItemType.YUMI && item < 512;
+    },
+
+    isItemUseable(item) {
+        return ItemsModelModule.isItemMelee(item) ||
+            ItemsModelModule.isItemRanged(item);
     },
 
     isItemIDSupported(item) {

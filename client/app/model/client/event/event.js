@@ -36,6 +36,9 @@ extend(EventComponent.prototype, {
             case 'r':
                 this.triggerRotation(type, data);
                 break;
+            case 'u': // use item
+                this.triggerUse(type, data);
+                break;
             case 'ray': // Ray casted.
                 this.triggerRayAction(type, data);
                 break;

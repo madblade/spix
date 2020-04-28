@@ -24,14 +24,14 @@ let ListenerModule = {
             case 'triangle':
                 break;
             case 'cross':
-                if (isHeld) this.requestAddBlock();
+                if (isHeld) this.requestMainHandItemAction();
                 break;
             case 'circle': // jump
                 if (isHeld) clientModel.triggerEvent('m', 'u');
                 else if (!isHeld) clientModel.triggerEvent('m', 'ux');
                 break;
             case 'square':
-                if (isHeld) this.requestDelBlock();
+                if (isHeld) this.requestSecondaryHandItemAction();
                 break;
             case 'dpadLeft':
                 if (isHeld)

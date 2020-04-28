@@ -463,6 +463,11 @@ let CamerasModule = {
         return this.cameraManager.mainCamera.getCameraPosition();
     },
 
+    getCameraForwardVector()
+    {
+        return this.cameraManager.mainCamera.getCameraForwardVector();
+    },
+
     /** @deprecated */
     switchToCamera(oldId, newId) {
         return this.cameraManager.switchToCamera(oldId, newId);

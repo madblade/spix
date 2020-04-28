@@ -8,6 +8,26 @@ import { ItemsModelModule } from '../../server/self/items';
 
 let TriggersModule = {
 
+    triggerUse(type, data)
+    {
+        let clientSelfModel = this.clientModel.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+        if (!ItemsModelModule.isItemIDSupported(activeItemID)) {
+            console.error('[Client/Event] Item ID unsupported');
+        }
+
+        let events = this.eventsToPush;
+        if (ItemsModelModule.isItemMelee(activeItemID)) {
+            data.push('melee');
+            data.push(activeItemID);
+            events.push([type, data]);
+        } else if (ItemsModelModule.isItemRanged(activeItemID)) {
+            data.push('ranged');
+            data.push(activeItemID);
+            events.push([type, data]);
+        }
+    },
+
     triggerRayAction(type, data)
     {
         let clientSelfModel = this.clientModel.selfComponent;
@@ -138,7 +158,7 @@ let TriggersModule = {
     triggerBlock(type, data) {
         let events = this.eventsToPush;
         events.push([type, data]);
-    }
+    },
 
 };
 

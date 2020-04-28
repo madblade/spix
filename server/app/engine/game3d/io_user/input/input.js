@@ -72,6 +72,7 @@ class UserInput {
             this.pushToEngine('block',  avatar, topologyEngine),
             this.pushToEngine('gate',   avatar, consistencyEngine),
             this.pushToEngine('action', avatar, physicsEngine),
+            this.pushToEngine('use',    avatar, physicsEngine),
 
             this._chat.playerInput(player)
         ];
@@ -82,6 +83,7 @@ class UserInput {
         player.on('b', listener[i++]);
         player.on('x', listener[i++]);
         player.on('a', listener[i++]);
+        player.on('u', listener[i++]);
         player.on('chat', listener[i]);
 
         player.on('leave', () => { player.leave(); });
