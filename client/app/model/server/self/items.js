@@ -38,6 +38,24 @@ let ItemType = Object.freeze({
 
 let ItemsModelModule = {
 
+    isItemBlock(item) {
+        return item > ItemType.NONE && item < 256;
+    },
+
+    isItemX(item) {
+        return item === ItemType.PORTAL_GUN_SINGLE ||
+            item === ItemType.PORTAL_GUN_DOUBLE;
+    },
+
+    isItemMelee(item) {
+        return item >= ItemType.KATANA && item < ItemType.YA;
+
+    },
+
+    isItemRanged(item) {
+        return item >= ItemType.YUMI && item < 512;
+    },
+
     isItemIDSupported(item) {
         if (typeof item !== 'number') return false;
         for (let i in ItemType) {

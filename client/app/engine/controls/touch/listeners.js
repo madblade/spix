@@ -33,6 +33,14 @@ let ListenerModule = {
             case 'square':
                 if (isHeld) this.requestDelBlock();
                 break;
+            case 'dpadLeft':
+                if (isHeld)
+                    clientModel.triggerChange('interaction', ['itemSelect', 1]);
+                break;
+            case 'dpadRight':
+                if (isHeld)
+                    clientModel.triggerChange('interaction', ['itemSelect', -1]);
+                break;
             case 'home': // Only on press
                 if (isHeld) this.touchLockChanged(false);
                 break;

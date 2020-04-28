@@ -80,7 +80,7 @@
 }
 
 #item-table .content {
-    background-color: #cccccc;
+    background-color: transparent;
     text-align: center;
     position: absolute;
     height: 100%;

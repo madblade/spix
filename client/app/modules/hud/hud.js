@@ -27,14 +27,14 @@ let Hud = function(register)
         </div>
         <div id="items" class="noselect">
             <div id="item-table">
-            <div class="square"><div class="content selected" id="item1"></div></div>
+            <div class="square"><div class="content selected" id="item0"></div></div>
+            <div class="square"><div class="content" id="item1"></div></div>
             <div class="square"><div class="content" id="item2"></div></div>
             <div class="square"><div class="content" id="item3"></div></div>
             <div class="square"><div class="content" id="item4"></div></div>
             <div class="square"><div class="content" id="item5"></div></div>
             <div class="square"><div class="content" id="item6"></div></div>
             <div class="square"><div class="content" id="item7"></div></div>
-            <div class="square"><div class="content" id="item8"></div></div>
             </div>
         </div>
     `;
@@ -75,11 +75,14 @@ extend(Hud.prototype, {
             this.refreshHUDWorldGraph(newState.diagram);
         }
 
-        if (newState.hasOwnProperty('activeItem')) {
-            let h = newState.activeItem;
-            $('#items')
-                .text(h)
-                .css('color', this.orangeColor);
+        if (newState.hasOwnProperty('itemSelect')) {
+            let newSlot = newState.itemSelect[0];
+            let oldSlot = newState.itemSelect[1];
+            if (newSlot < 0 || newSlot > 7 || oldSlot < 0 || oldSlot > 7) {
+                console.error('[HUD] Invalid item slot.');
+            }
+            $(`#item${oldSlot}`).removeClass('selected');
+            $(`#item${newSlot}`).addClass('selected');
         }
 
         // if (newState.hasOwnProperty('itemOrientation')) {

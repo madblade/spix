@@ -186,7 +186,7 @@ let ListenerModule = {
             let ey = event.deltaY;
             // let df = event.deltaFactor;
 
-            clientModel.triggerChange('interaction', ['itemOffset', ey]);
+            clientModel.triggerChange('interaction', ['itemSelect', ey]);
         });
     },
 

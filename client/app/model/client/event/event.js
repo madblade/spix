@@ -24,10 +24,8 @@ extend(EventComponent.prototype, {
         this.activeControls = this.getActiveControls(); // TODO put in self model
     },
 
-    triggerEvent(type, data) {
-        let clientSelfModel = this.clientModel.selfComponent;
-        let serverSelfModel = this.clientModel.app.model.server.selfModel;
-
+    triggerEvent(type, data)
+    {
         switch (type) {
             case 'm':
                 this.triggerMovement(type, data);
@@ -39,31 +37,7 @@ extend(EventComponent.prototype, {
                 this.triggerRotation(type, data);
                 break;
             case 'ray': // Ray casted.
-                let i = clientSelfModel.clickInteraction;
-                if (i.isBlock()) {
-                    if (data[0] === 'add') {
-                        // From inventory, select block to be added.
-                        data.splice(-3, 3);
-                        let activeItemSlot = clientSelfModel.getCurrentItem();
-                        let itemID = serverSelfModel.getInventory().getItem(activeItemSlot);
-                        data.push(itemID);
-                    }
-                    this.triggerBlock('b', data);
-                } else if (i.isX()) {
-                    let fx1 = data[1]; let fy1 = data[2]; let fz1 = data[3];
-                    let fx2 = data[4]; let fy2 = data[5]; let fz2 = data[6];
-                    if (fx2 < fx1) { data[1] = fx2; data[4] = fx1; }
-                    if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
-                    if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
-                    data.push(clientSelfModel.getItemOffset());
-                    data.push(clientSelfModel.getAngleFromIntersectionPoint());
-                    // data.push(clientSelfModel.getItemOrientation());
-                    this.triggerBlock('x', data);
-                } else {
-                    // TODO [MEDIUM] object, skill...
-                    // Validate server-side? Keep duplicate in selfComponent?
-                }
-
+                this.triggerRayAction(type, data);
                 break;
             default:
                 break;

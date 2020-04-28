@@ -11,6 +11,9 @@ let HUDInventoryModule =
 {
     initInventory() {
         console.log('initing inventory');
+        $('#item0').html(`
+            <img src="app/assets/icons/block-planks.jpg" />
+        `);
         $('#item1').html(`
             <img src="app/assets/icons/katana.png" />
         `);

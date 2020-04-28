@@ -4,7 +4,46 @@
 
 'use strict';
 
+import { ItemsModelModule } from '../../server/self/items';
+
 let TriggersModule = {
+
+    triggerRayAction(type, data)
+    {
+        let clientSelfModel = this.clientModel.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+        if (!ItemsModelModule.isItemIDSupported(activeItemID)) {
+            console.error('[Client/Event] Item ID unsupported');
+            return;
+        }
+
+        if (ItemsModelModule.isItemBlock(activeItemID))
+        {
+            if (data[0] === 'add') {
+                // From inventory, select block to be added.
+                data.splice(-3, 3);
+                // TODO check server-wise if it is in the inventory.
+                data.push(activeItemID);
+            }
+            this.triggerBlock('b', data);
+        }
+        else if (ItemsModelModule.isItemX(activeItemID))
+        {
+            let fx1 = data[1]; let fy1 = data[2]; let fz1 = data[3];
+            let fx2 = data[4]; let fy2 = data[5]; let fz2 = data[6];
+            if (fx2 < fx1) { data[1] = fx2; data[4] = fx1; }
+            if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
+            if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
+            data.push(clientSelfModel.getItemOffset());
+            data.push(clientSelfModel.getAngleFromIntersectionPoint());
+            // data.push(clientSelfModel.getItemOrientation());
+            this.triggerBlock('x', data);
+        } else {
+            // TODO [MEDIUM] object, skill...
+            // Validate server-side? Keep duplicate in selfComponent?
+            console.warn('Unsupported item.');
+        }
+    },
 
     triggerMovement(type, data) {
         let ak = this.activeControls;
