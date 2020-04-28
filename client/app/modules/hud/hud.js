@@ -18,12 +18,10 @@ let Hud = function(register)
     this.html = `
         <div id="hud" class="noselect">
             <div id="position"></div>
-            <div id="diagram"></div>
-            <!-- <div id="item_offset"></div> -->
-            <!-- <div id="item_orientation"></div> -->
-            <!-- <div id="chat"></div>-->
             <div id="network-graph"></div>
+            <div id="diagram"></div>
             <div id="mini-map"></div>
+            <!-- <div id="chat"></div>-->
         </div>
         <div id="items" class="noselect">
             <div id="item-table">
@@ -57,7 +55,8 @@ extend(Hud.prototype, {
     // Game ended
     disposeModule() {
         $('#hud').remove();
-        $('#network-graph').remove();
+        // $('#network-graph').remove();
+        $('#items').remove();
         this.killSigma();
     },
 

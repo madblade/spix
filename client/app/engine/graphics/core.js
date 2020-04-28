@@ -100,6 +100,9 @@ let CoreModule = {
         this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
     },
 
+    /**
+     * @deprecated
+     */
     getCameraInteraction() {
         return this.app.model.client.getCameraInteraction();
     }

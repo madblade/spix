@@ -14,7 +14,13 @@ let SelfComponent = function(clientModel) {
 
     this._cameraInteraction = 'first-person';
     this.cameraInteraction = {
+        /**
+         * @deprecated
+         */
         isFirstPerson: function() { return this._cameraInteraction === 'first-person'; }.bind(this),
+        /**
+         * @deprecated
+         */
         isThirdPerson: function() { return this._cameraInteraction === 'third-person'; }.bind(this)
     };
 
@@ -25,7 +31,7 @@ let SelfComponent = function(clientModel) {
 
     let emptyItem  = ItemType.NONE;
     this.quickBarSize = 8;
-    this.quickBar = [ // Default demo items
+    this.defaultQuickBar = [ // Default demo items
         ItemType.BLOCK_PLANKS,
         ItemType.KATANA,
         ItemType.YUMI,
@@ -33,6 +39,7 @@ let SelfComponent = function(clientModel) {
         ItemType.PORTAL_GUN_DOUBLE,
         emptyItem, emptyItem, emptyItem
     ];
+    this.quickBar = this.defaultQuickBar.slice(); // clones
 
     // Dynamic.
 
@@ -51,6 +58,11 @@ extend(SelfComponent.prototype, {
     init() {
         let register = this.clientModel.app.register;
         register.updateSelfState({itemSelected: this.currentItemSlot});
+    },
+
+    cleanup() {
+        this.quickBar = this.defaultQuickBar.slice();
+        this.currentItemSlot = 0;
     },
 
     getCurrentItemID() {

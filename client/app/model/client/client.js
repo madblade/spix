@@ -45,8 +45,15 @@ extend(Client.prototype, {
         this.selfComponent.triggerChange(type, data);
     },
 
+    /**
+     * @deprecated
+     */
     getCameraInteraction() {
         return this.selfComponent.cameraInteraction;
+    },
+
+    cleanupFullModel() {
+        this.selfComponent.cleanup();
     }
 
 });

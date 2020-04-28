@@ -225,6 +225,7 @@ extend(App.Core.prototype, {
         this.engine.controls.stop();
         this.engine.audio.stop();
         this.model.server.cleanupFullModel();
+        this.model.client.cleanupFullModel();
         this.engine.graphics.cleanupFullGraphics();
         this.state.cleanupDOM();
     },

@@ -68,15 +68,14 @@ extend(StateManager.prototype, {
 
     cleanupDOM() {
         $('#announce').empty();
-        $('#network-graph').empty();
         $('#container').empty();
         // HUD
         $('#position').empty();
-        $('#item_offset').empty();
-        $('#item_orientation').empty();
-        $('#items').empty();
-        $('#diagram').empty();
         $('#chat').empty();
+        $('#network-graph').empty();
+        $('#mini-map').empty();
+        $('#items').empty();
+        $('#hud').empty();
     }
 
 });
