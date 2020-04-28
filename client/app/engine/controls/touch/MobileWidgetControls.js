@@ -256,11 +256,12 @@ MobileWidgetControls.PlaystationControllerButtons = [
         theme: 'gradient'
     },
     {name: 'home',
-        // from: 'l', x: 300, y: 150,
+        from: 'l', x: 25, y: 25,
         // label: 'PS',
-        // labelSize: 10, diameter: 20,
-        // labelOffset: 2,
-        // theme: 'gradient'
+        label: String.fromCharCode(8617),
+        labelSize: 20, diameter: 23,
+        labelOffset: 2,
+        theme: 'gradient'
     },
 ];
 

@@ -16,11 +16,27 @@ let ListenerModule = {
         this.touch.rightY = y;
     },
 
-    onButtonChange(which, isHeld) {
-        if (which === 'triangle') {
-            this.touchLockChanged(false);
-        }
+    onButtonChange(which, isHeld)
+    {
         console.log(`Button ${which} ${isHeld ? 'pressed' : 'released'}.`);
+        let clientModel = this.app.model.client;
+        switch (which) {
+            case 'triangle':
+                break;
+            case 'cross':
+                if (isHeld) this.requestAddBlock();
+                break;
+            case 'circle': // jump
+                if (isHeld) clientModel.triggerEvent('m', 'u');
+                else if (!isHeld) clientModel.triggerEvent('m', 'ux');
+                break;
+            case 'square':
+                if (isHeld) this.requestDelBlock();
+                break;
+            case 'home': // Only on press
+                if (isHeld) this.touchLockChanged(false);
+                break;
+        }
     },
 
     rotateCameraFromRightStick() {

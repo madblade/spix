@@ -7,7 +7,8 @@
 import extend               from '../../../extend.js';
 import { ItemsModelModule, ItemType } from './items';
 
-let InventoryModel = function() {
+let InventoryModel = function()
+{
     this.activeItemId = 0;
     this.inventorySize = 256;
 
@@ -30,16 +31,16 @@ extend(InventoryModel.prototype, {
         this.setItem(4, ItemType.PORTAL_GUN_DOUBLE);
     },
 
-    getActiveItem() {
-        return this.items[this.activeItemId];
-    },
-
-    setActiveItem(id) {
-        if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
-            console.error('[Model/Inventory] Invalid inventory slot.');
-        this.activeItemId = id;
-        return this.items[id];
-    },
+    // These would be client methods.
+    // getActiveItem() {
+    //     return this.items[this.activeItemId];
+    // },
+    // setActiveItem(id) {
+    //     if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
+    //         console.error('[Model/Inventory] Invalid inventory slot.');
+    //     this.activeItemId = id;
+    //     return this.items[id];
+    // },
 
     getItem(id) {
         if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
