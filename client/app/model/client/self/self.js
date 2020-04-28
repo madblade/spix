@@ -10,20 +10,12 @@ import { ItemType } from '../../server/self/items';
 let SelfComponent = function(clientModel) {
     this.clientModel = clientModel;
 
-    /** Model **/
-
     // Camera.
+
     this._cameraInteraction = 'first-person';
     this.cameraInteraction = {
         isFirstPerson: function() { return this._cameraInteraction === 'first-person'; }.bind(this),
         isThirdPerson: function() { return this._cameraInteraction === 'third-person'; }.bind(this)
-    };
-
-    // Selected action.
-    this._clickInteraction = 'block';
-    this.clickInteraction = {
-        isBlock: function() { return this._clickInteraction === 'block'; }.bind(this),
-        isX: function() { return this._clickInteraction === 'x'; }.bind(this)
     };
 
     // Inventory.
@@ -47,11 +39,9 @@ let SelfComponent = function(clientModel) {
     // Buffer filled by engine->controls.
     this.changes = [];
 
-    // Deprecated
+    // Deprecated.
+
     // LEGACY (should NOT be used)
-    this._itemOrientations = [0, 1];
-    this._itemOrientation = this._itemOrientations[0];
-    this._itemPlacementRatio = 0;
     this._itemOffset = 0.999;
 };
 
@@ -61,21 +51,11 @@ extend(SelfComponent.prototype, {
     init() {
         let register = this.clientModel.app.register;
         register.updateSelfState({itemSelected: this.currentItemSlot});
-        // register.updateSelfState({itemOrientation: this._itemOrientation});
-        // register.updateSelfState({itemOffset: this._itemOffset});
     },
 
     getCurrentItemID() {
         return this.quickBar[this.currentItemSlot];
     },
-
-    // Deprecated -> Removed.
-    // getCurrentItem() {
-    //     return this.currentItem;
-    // },
-    // getItemOrientation() {
-    //     return this._itemOrientation;
-    // },
 
     setAngleFromIntersectionPoint(angle) {
         this.angleFromIntersectionPoint = angle;
@@ -151,28 +131,7 @@ extend(SelfComponent.prototype, {
     {
         let register = this.clientModel.app.register;
         let actionType = data[0];
-        // if (actionType === 'toggle')
-        // {
-        // if (scope._clickInteraction === 'block') {
-        //     scope._clickInteraction = 'x';
-        // } else if (scope._clickInteraction === 'x') {
-        //     scope._clickInteraction = 'block';
-        // }
-        // register.updateSelfState({activeItem: scope._clickInteraction});
-        // }
-        // else if (actionType === 'itemOrientation')
-        // {
-        // let newOrientation = scope._itemOrientation;
-        // let orientations = scope._itemOrientations;
-        // let newOrientationId = orientations.indexOf(newOrientation);
-        // let nbOrientations = orientations.length;
-        // newOrientationId++;
-        // newOrientationId %= nbOrientations;
-        // scope._itemOrientation = orientations[newOrientationId];
 
-        // register.updateSelfState({itemOrientation: scope._itemOrientation});
-        // }
-        // else
         if (actionType === 'itemSelect')
         {
             const deltaY = data[1];

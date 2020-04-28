@@ -33,7 +33,7 @@ class Chunk {
 
         // Blocks.
         /** Flatten array. x, then y, then z. */
-        this._blocks = new Uint8Array();
+        this._blocks = new Uint8Array(xSize * ySize * zSize);
         /** Nested z-array. (each z -> i×j layer, without primary offset) */
         this._surfaceBlocks = {}; // TODO [HIGH] refactor to map.
         /** Each face -> index of its connected component. */

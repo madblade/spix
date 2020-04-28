@@ -51,6 +51,14 @@ const ChunkSizes = Object.freeze({
     FLAT_HUGE: [32, 32, 64]
 });
 
+class BlockTypes {
+    static isBlock(id) {
+        return id !== BlockType.AIR &&
+            (id >= BlockType.GRASS && id <= BlockType.BRICKS ||
+                id >= BlockType.SAND && id <= BlockType.IRON);
+    }
+}
+
 class WorldModel
 {
     static serverLoadingRadius = 3;
@@ -167,4 +175,8 @@ class WorldModel
     }
 }
 
-export { WorldModel as default, WorldType, BlockType, HillType, CaveType, ChunkSizes };
+export {
+    WorldModel as default,
+    WorldType, BlockType, HillType, CaveType, ChunkSizes,
+    BlockTypes
+};

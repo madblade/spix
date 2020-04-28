@@ -55,6 +55,7 @@ class UserInput {
 
     pushToEngine(kind, avatar, engine) {
         return data => {
+            // TODO ban users who send too much meta
             engine.addInput({action: kind, meta: data}, avatar);
         };
     }

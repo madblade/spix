@@ -50,8 +50,11 @@ let ListenerModule = {
                     break;
                 case k.leftHandNorthEast2: // R
                     break;
-                case k.pageUp: //
+                case k.pageUp: // Trackpad users without a mousewheel
+                    clientModel.triggerChange('interaction', ['itemSelect', 1]);
+                    break;
                 case k.pageDown:
+                    clientModel.triggerChange('interaction', ['itemSelect', -1]);
                     break;
                 case k.leftHandEast3: // (G)ravity.
                     clientModel.triggerEvent('a', 'g');

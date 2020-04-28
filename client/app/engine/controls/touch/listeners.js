@@ -41,6 +41,13 @@ let ListenerModule = {
                 if (isHeld)
                     clientModel.triggerChange('interaction', ['itemSelect', -1]);
                 break;
+            case 'dpadDown':
+                clientModel.triggerChange('camera', ['toggle']);
+                break;
+            case 'dpadUp':
+                if (isHeld)
+                    clientModel.triggerChange('camera', ['toggle']);
+                break;
             case 'home': // Only on press
                 if (isHeld) this.touchLockChanged(false);
                 break;

@@ -10,7 +10,7 @@ import GeometryUtils from '../../../math/geometry';
 
 class UpdaterAccess {
 
-    static addBlock(originEntity, x, y, z, blockId, world, entityModel) {
+    static addBlock(originEntity, x, y, z, world, entityModel) {
         const dimX = world.xSize;
         const dimY = world.ySize;
         const dimZ = world.zSize;
@@ -44,7 +44,7 @@ class UpdaterAccess {
             return false;
         }
 
-        return [chunk, ...coordsOnChunk, blockId];
+        return [chunk, ...coordsOnChunk];
     }
 
     static delBlock(originEntity, x, y, z, world/*, entityModel*/) {

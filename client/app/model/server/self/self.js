@@ -7,6 +7,7 @@
 import extend               from '../../../extend.js';
 
 import { InventoryModel }   from './inventory.js';
+import { Vector3 }          from 'three';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -18,8 +19,8 @@ let SelfModel = function(app) {
     this.oldWorldId = null;
 
     // Model component.
-    this.position = null;
-    this.rotation = null;
+    this.position = new Vector3(0, 0, 0);
+    this.rotation = new Vector3(0, 0, 0);
     this.inventoryModel = new InventoryModel();
 
     // Graphical component.

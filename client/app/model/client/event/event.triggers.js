@@ -36,12 +36,11 @@ let TriggersModule = {
             if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
             data.push(clientSelfModel.getItemOffset());
             data.push(clientSelfModel.getAngleFromIntersectionPoint());
-            // data.push(clientSelfModel.getItemOrientation());
             this.triggerBlock('x', data);
         } else {
             // TODO [MEDIUM] object, skill...
             // Validate server-side? Keep duplicate in selfComponent?
-            console.warn('Unsupported item.');
+            console.warn('[Client/Event] Unsupported item.');
         }
     },
 
