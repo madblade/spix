@@ -201,7 +201,6 @@ let ScenesModule = {
         this.rendererManager.switchAvatarToScene(newSceneId);
         this.previousFrameWorld = parseInt(oldSceneId, 10);
         this.currentFrameWorld = parseInt(newSceneId, 10);
-        this.rendererManager.thenstop = true;
     }
 
 };

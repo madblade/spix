@@ -30,8 +30,11 @@ let EntitiesModule = {
             // mesh.castShadow = true;
 
             let mixer = new AnimationMixer(mesh);
-            let clip = AnimationClip.CreateFromMorphTargetSequence('run',
-                geometry.morphTargets, 30);
+            let clip = AnimationClip.CreateFromMorphTargetSequence(
+                'run',
+                geometry.morphTargets, 30, false
+            );
+
             mixer.clipAction(clip)
                 .setDuration(1)
                 .play();

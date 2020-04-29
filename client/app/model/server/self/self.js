@@ -68,11 +68,13 @@ extend(SelfModel.prototype, {
             let displayHandItem = this.displayHandItem;
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
-            else if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
+            if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
+
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
+
             if (displayAvatar) graphics.addToScene(avatar, worldId);
-            else if (displayHandItem) graphics.addToScene(handItem, worldId);
+            if (displayHandItem) graphics.addToScene(handItem, worldId);
             xModel.forceUpdate = true;
         }
 
@@ -107,7 +109,11 @@ extend(SelfModel.prototype, {
             // moveCameraFromMouse(0, 0, newX, newY);
 
             // Update animation.
-            if (animate) graphics.updateAnimation(id);
+            if (animate) {
+                graphics.updateAnimation(id);
+                // TODO cleanup animation part
+                // graphics.updateAnimation('yumi');
+            }
 
             // Update camera.
             clientModel.pushForLaterUpdate('camera-position', this.position);
@@ -168,9 +174,10 @@ extend(SelfModel.prototype, {
             if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
         });
 
-        graphics.loadItemMesh('katana', function(gltfObject) {
+        graphics.loadItemMesh('yari', function(gltfObject) {
             selfModel.handItem = gltfObject;
-            if (!selfModel.displayAvatar) graphics.addToScene(gltfObject, worldId);
+            if (!selfModel.displayAvatar && selfModel.displayHandItem)
+                graphics.addToScene(gltfObject, worldId);
         });
     },
 

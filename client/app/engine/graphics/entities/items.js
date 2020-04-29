@@ -3,6 +3,8 @@
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import {
+    AnimationClip,
+    AnimationMixer,
     BufferAttribute, Color, DataTexture, FrontSide, MeshPhongMaterial,
     Object3D, RepeatWrapping, RGBFormat,
 } from 'three';
@@ -16,7 +18,8 @@ let ItemsGraphicsModule = {
     loadItemMesh(modelPath, callback) {
         if (modelPath !== 'portal-gun' &&
             // modelPath !== 'pixel-crossbow' &&
-            modelPath !== 'yari-morph' &&
+            modelPath !== 'yumi-morph' &&
+            modelPath !== 'yari' &&
             modelPath !== 'ya' &&
             modelPath !== 'nagamaki' &&
             modelPath !== 'naginata' &&
@@ -33,15 +36,17 @@ let ItemsGraphicsModule = {
             else if (modelPath === 'katana')
                 this.finalizeKatanaPackMesh(gltf, callback);
             else if (modelPath === 'ya')
-                this.finalizeKatanaPackMesh(gltf, callback);
-            else if (modelPath === 'yari-morph')
-                this.finalizeKatanaPackMesh(gltf, callback);
+                this.finalizeYaPackMesh(gltf, callback);
+            else if (modelPath === 'yumi-morph')
+                this.finalizeYumiMorphPackMesh(gltf, callback);
+            else if (modelPath === 'yari')
+                this.finalizeYariPackMesh(gltf, callback);
             else if (modelPath === 'nagamaki')
                 this.finalizeNagamakiPackMesh(gltf, callback);
             else if (modelPath === 'naginata')
-                this.finalizeKatanaPackMesh(gltf, callback);
+                this.finalizeNaginataPackMesh(gltf, callback);
             else if (modelPath === 'nodachi')
-                this.finalizeKatanaPackMesh(gltf, callback);
+                this.finalizeNodachiPackMesh(gltf, callback);
         }, undefined, function(error) {
             console.error(error);
         });
@@ -52,20 +57,64 @@ let ItemsGraphicsModule = {
         object.onBeforeRender = function(renderer) {renderer.clearDepth();};
     },
 
-    finalizeKatanaTypePackMesh(gltf,
-        handleTop, handleR, handleG, handleB,
-        ringTop, ringLeft, ringRight, ringR, ringG, ringB,
-        callback)
+    finalizeYumiMorphPackMesh(gltf, callback)
     {
         let object = gltf.scene.children[0];
-        console.log(object);
+        this._resetMaterial(object);
 
-        object.material = new MeshPhongMaterial({
-            color: 0x707070,
-            shininess: 1000,
-            specular: 0xffffff,
-            vertexColors: true
-        });
+        // Read animation
+        object.material.morphTargets = true;
+        let mixer = new AnimationMixer(object);
+        let clip = new AnimationClip(
+            'bow-stretch', 1, gltf.animations[0].tracks);
+        console.log(clip);
+        mixer.clipAction(clip)
+            .setDuration(1)
+            .play();
+        this.mixers.set('yumi', mixer); // TODO review
+
+        // Color mesh
+        let g = object.geometry;
+        let p = g.attributes.position;
+        let count = p.count;
+        g.setAttribute('color',
+            new BufferAttribute(new Float32Array(count * 3), 3)
+        );
+        let colors = g.attributes.color;
+        for (let i = 0; i < count; ++i) {
+            let x; let y; let z;
+            let xCoord = p.getX(i); let yCoord = p.getY(i);
+            if (xCoord < -15.4) {
+                x = y = z = 1.0;
+            } else if (xCoord > -3 && Math.abs(yCoord) > 0.02) {
+                x = y = z = 2.0;
+            } else {
+                x = 61 / 256;
+                y = 31 / 256;
+                z = 0;
+            }
+            colors.setXYZ(i, x, y, z);
+        }
+
+        // Think about setting roughness
+        object.rotation.reorder('ZXY');
+        let sc = object.scale; let f = 0.4;
+        sc.set(f * sc.x, f * sc.y, f * sc.z);
+        object.rotation.set(0, Math.PI / 2, Math.PI / 2);
+        // object.rotation.set(-Math.PI / 2, Math.PI / 2, Math.PI / 2);
+        object.position.set(0.4, -.25, -0.25);
+
+        this.renderOnTop(object);
+        let wrapper = new Object3D();
+        wrapper.rotation.reorder('ZYX');
+        wrapper.add(object);
+        callback(wrapper);
+    },
+
+    finalizeYaPackMesh(gltf, callback)
+    {
+        let object = gltf.scene.children[0];
+        this._resetMaterial(object);
 
         let g = object.geometry;
         let p = g.attributes.position;
@@ -73,6 +122,65 @@ let ItemsGraphicsModule = {
         g.setAttribute('color',
             new BufferAttribute(new Float32Array(count * 3), 3)
         );
+        let colors = g.attributes.color;
+        for (let i = 0; i < count; ++i) {
+            let x; let y; let z;
+            let xCoord = p.getX(i); let yCoord = p.getY(i);
+            if (xCoord < -15.4) {
+                x = y = z = 1.0;
+            } else if (xCoord > -3 && Math.abs(yCoord) > 0.02) {
+                x = y = z = 2.0;
+            } else {
+                x = 61 / 256;
+                y = 31 / 256;
+                z = 0;
+            }
+            colors.setXYZ(i, x, y, z);
+        }
+
+        let wrapper = this._packObject(object);
+        callback(wrapper);
+    },
+
+    _resetMaterial(object) {
+        object.material = new MeshPhongMaterial({
+            color: 0x707070,
+            shininess: 1000,
+            specular: 0xffffff,
+            vertexColors: true
+        });
+        let g = object.geometry;
+        let count = g.attributes.position.count;
+        g.setAttribute('color',
+            new BufferAttribute(new Float32Array(count * 3), 3)
+        );
+    },
+    _packObject(object) {
+        // Think about setting roughness
+        object.rotation.reorder('ZYX');
+        let sc = object.scale; let f = 0.4;
+        sc.set(f * sc.x, f * sc.y, f * sc.z);
+        object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
+        object.position.set(0.4, -.25, -0.25);
+
+        this.renderOnTop(object);
+        let wrapper = new Object3D();
+        wrapper.rotation.reorder('ZYX');
+        wrapper.add(object);
+        return wrapper;
+    },
+
+    finalizeKatanaTypePackMesh(gltf,
+        handleTop, handleR, handleG, handleB,
+        ringTop, ringLeft, ringRight, ringR, ringG, ringB,
+        callback)
+    {
+        let object = gltf.scene.children[0];
+        this._resetMaterial(object);
+
+        let g = object.geometry;
+        let p = g.attributes.position;
+        let count = p.count;
         let colors = g.attributes.color;
         for (let i = 0; i < count; ++i) {
             let x; let y; let z;
@@ -95,18 +203,35 @@ let ItemsGraphicsModule = {
             colors.setXYZ(i, x, y, z);
         }
 
-        // Think about setting roughness
-        object.rotation.reorder('ZYX');
-        let sc = object.scale; let f = 0.4;
-        sc.set(f * sc.x, f * sc.y, f * sc.z);
-        object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
-        object.position.set(0.4, -.25, -0.25);
-
-        this.renderOnTop(object);
-        let wrapper = new Object3D();
-        wrapper.rotation.reorder('ZYX');
-        wrapper.add(object);
+        let wrapper = this._packObject(object);
         callback(wrapper);
+    },
+
+    finalizeYariPackMesh(gltf, callback) {
+        this.finalizeKatanaTypePackMesh(gltf,
+            -9.7, 61, 31, 0,
+            -15.7,
+            0.7, 0.05,
+            255, 215, 0,
+            callback);
+    },
+
+    finalizeNodachiPackMesh(gltf, callback) {
+        this.finalizeKatanaTypePackMesh(gltf,
+            -1.3, 61, 31, 0,
+            -1.975,
+            0.7, 0.05,
+            255, 215, 0,
+            callback);
+    },
+
+    finalizeNaginataPackMesh(gltf, callback) {
+        this.finalizeKatanaTypePackMesh(gltf,
+            -7.8, 61, 31, 0,
+            -8.47,
+            0.7, 0.07,
+            255, 215, 0,
+            callback);
     },
 
     finalizeNagamakiPackMesh(gltf, callback) {

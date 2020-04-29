@@ -5,7 +5,13 @@
 'use strict';
 
 import extend from '../../../extend.js';
-import { DoubleSide, Layers, MeshBasicMaterial, PCFSoftShadowMap, ShaderMaterial, sRGBEncoding, Vector2, WebGLRenderer } from 'three';
+import {
+    Layers, PCFSoftShadowMap,
+    DoubleSide, sRGBEncoding,
+    Vector2,
+    MeshBasicMaterial, ShaderMaterial,
+    WebGLRenderer
+} from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -122,6 +128,8 @@ extend(RendererManager.prototype, {
         renderer.outputEncoding = sRGBEncoding;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
+
+        renderer.info.autoReset = false;
         return renderer;
     },
 
@@ -133,7 +141,8 @@ extend(RendererManager.prototype, {
         this.renderRegister = renderRegister;
     },
 
-    render(sceneManager, cameraManager) {
+    render(sceneManager, cameraManager)
+    {
         if (this.stop) return;
         let renderer = this.renderer;
         let renderRegister = this.renderRegister;
@@ -267,14 +276,9 @@ extend(RendererManager.prototype, {
         mainScene.traverse(restoreMaterial);
         composer[1].render();
 
-        // composer.render();
-
-        // renderer.render(mainScene, mainCamera);
-
-
-        //if (this.thenstop) {
-        //this.stop = true;
-        //}
+        // Compute draw calls
+        // console.log(renderer.info.render.calls);
+        renderer.info.reset();
     },
 
     resize(width, height) {
