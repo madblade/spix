@@ -44,7 +44,7 @@ Collision ray_to_sphere(vec3 start, vec3 dir, float radius)
 float phase(float cosangle, float g) {
     return 1.5 * (1. - g * g) / (2. + g * g) *
         (1. + cosangle * cosangle) /
-        pow(1. + g * g - 2. * g * cosangle, 1.5);
+        pow(abs(1. + g * g - 2. * g * cosangle, 1.5));
 }
 
 vec3 out_scatter(vec3 pos, vec3 dir)

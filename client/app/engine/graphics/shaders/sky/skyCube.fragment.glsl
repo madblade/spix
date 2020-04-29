@@ -34,12 +34,12 @@ const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
 const float ONE_OVER_FOURPI = 0.07957747154594767;
 
 float rayleighPhase(float cosTheta) {
-    return THREE_OVER_SIXTEENPI * (1.0 + pow(cosTheta, 2.0));
+    return THREE_OVER_SIXTEENPI * (1.0 + pow(abs(cosTheta), 2.0));
 }
 
 float hgPhase(float cosTheta, float g) {
-    float g2 = pow(g, 2.0);
-    float inverse = 1.0 / pow(1.0 - 2.0 * g * cosTheta + g2, 1.5);
+    float g2 = pow(abs(g), 2.0);
+    float inverse = 1.0 / pow(abs(1.0 - 2.0 * g * cosTheta + g2), 1.5);
     return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);
 }
 
@@ -71,7 +71,7 @@ const float steepness = 2.5; // TODO hack
 const float EE = 10000.0; // TODO hack
 float sunIntensity(float zenithAngleCos) {
     zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
-    return EE * max(0.0, 1.0 - pow( e, -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
+    return EE * max(0.0, 1.0 - pow(abs(e), -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
 }
 
 bool doesCLieOnTheRightOfAB(vec2 a, vec2 b, vec2 c) {
@@ -275,9 +275,9 @@ void main()
         float increaseMe = 20.0; // TODO tweak (200 was default without terrain)
             // increase this to limit the range for interpolation
             // (causes sharper edges at cube vertices)
-        interpolatorFactor = 0.5 * pow(agreement, increaseMe);
+        interpolatorFactor = 0.5 * pow(abs(agreement), increaseMe);
         // PERF [VXS]
-        // interpolatorFactor = 1.0 * pow(agreement, 200.0);
+        // interpolatorFactor = 1.0 * pow(abs(agreement), 200.0);
     }
 
     float iF = 1.0 * interpolatorFactor;
@@ -319,7 +319,7 @@ void main()
     //	float zenithAngle = acos(cutoff);
     // XXX find the right coeff before atan (2019-03[madblade]: whatever this means, not a priority)
     float zenithAngle = 1.05 * atan(-cutoff) + pi * 0.5;
-    float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));
+    float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(abs(93.885 - ((zenithAngle * 180.0) / pi)), -1.253));
     float sR = rayleighZenithLength * inverse;
     float sM = mieZenithLength * inverse;
 
@@ -333,12 +333,12 @@ void main()
     float mPhase = hgPhase(cosTheta, mieDirectionalG);
     vec3 betaMTheta = vBetaM * mPhase;
 
-    vec3 Lin = pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
+    vec3 Lin = pow(abs(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex)), vec3(1.5));
     Lin *= mix(
         vec3(1.0),
-        pow(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex,
+        pow(abs(vse * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex),
         vec3(1.0 / 2.0)),
-        clamp(pow(1.0 - dot(nup, vSunDirection), 5.0), 0.0, 1.0)
+        clamp(pow(abs(1.0 - dot(nup, vSunDirection)), 5.0), 0.0, 1.0)
     );
 
     // nightsky
@@ -348,9 +348,9 @@ void main()
     float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
     L0 += (vse * 19000.0 * Fex) * sundisk;
     vec3 texColor = (Lin + L0) * 0.04 + vec3(0.0, 0.0003, 0.00075);
-    vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(lum, 4.0))) * texColor);
+    vec3 curr = Uncharted2Tonemap((log2(2.0 / pow(abs(lum), 4.0))) * texColor);
     vec3 color = curr * whiteScale;
-    vec3 retColor = pow(color, vec3(1.0 / (1.2 + (1.2 * vsf))));
+    vec3 retColor = pow(abs(color), vec3(1.0 / (1.2 + (1.2 * vsf))));
 
     // Debug here:
     // retColor = vec3(1.0, debugBeta1, 0.0);

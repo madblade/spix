@@ -11,7 +11,8 @@ let ControlsModule = {
         // TODO push item held event to server in normal loop.
         let selfModel = this.app.model.server.selfModel;
         selfModel.updateHandItem();
-        console.log('changing for ' + itemID);
+        if (this._debug)
+            console.log(`[Graphics/Controls] Changing for item ${itemID}.`);
     },
 
     changeAvatarVisibility(display, avatar, worldId) {

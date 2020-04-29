@@ -54,11 +54,6 @@ let ItemsGraphicsModule = {
         });
     },
 
-    renderOnTop(object) {
-        object.renderOrder = 9999;
-        object.onBeforeRender = function(renderer) {renderer.clearDepth();};
-    },
-
     finalizeYumiMorphPackMesh(gltf, callback)
     {
         let object = gltf.scene.children[0];
@@ -164,7 +159,6 @@ let ItemsGraphicsModule = {
         object.rotation.set(Math.PI + 5.0 * Math.PI / 8, 0, -Math.PI / 2);
         object.position.set(0.4, -.25, -0.25);
 
-        this.renderOnTop(object);
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);
@@ -305,30 +299,27 @@ let ItemsGraphicsModule = {
         // object.rotation.set(0, Math.PI / 4, 0);
         object.position.set(0.4, -.25, -0.25);
 
-        this.renderOnTop(object);
-
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');
         wrapper.add(object);
         callback(wrapper);
     },
 
+    // TODO make it one mesh
     finalizePortalMesh(gltf, callback) {
         let object = gltf.scene.children[0]; // portal gun
         object.scale.set(0.08, 0.08, 0.08);
         object.rotation.set(0, Math.PI, 0);
         // object.rotation.reorder('ZYX');
         object.position.set(0.3, -.1, -0.5);
-        let c = object.children[0];
-        c.material = new MeshPhongMaterial({color: 0x000000});
-        c = object.children[1];
-        c.material = new MeshPhongMaterial({color: 0x2222aa});
-        c = object.children[2];
-        c.material = new MeshPhongMaterial({color: 0xffffff});
-        c = object.children[3];
-        c.material = new MeshPhongMaterial({color: 0x999999});
-
-        this.renderOnTop(object);
+        let c1 = object.children[0];
+        c1.material = new MeshPhongMaterial({color: 0x000000});
+        let c2 = object.children[1];
+        c2.material = new MeshPhongMaterial({color: 0x2222aa});
+        let c3 = object.children[2];
+        c3.material = new MeshPhongMaterial({color: 0xffffff});
+        let c4 = object.children[3];
+        c4.material = new MeshPhongMaterial({color: 0x999999});
 
         let wrapper = new Object3D();
         wrapper.rotation.reorder('ZYX');

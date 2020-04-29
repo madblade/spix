@@ -79,6 +79,13 @@ let MeshesModule = {
         });
     },
 
+    renderOnTop(object) {
+        object.renderOrder = 999;
+        object.onBeforeRender = function(renderer) {
+            renderer.clearDepth();
+        };
+    },
+
     loadReferenceMeshFromMemory(id)
     {
         if (!this.referenceMeshes.has(id)) {
@@ -94,8 +101,9 @@ let MeshesModule = {
         clone.rotation.reorder('ZYX');
 
         let inner = clone.children[0];
+        console.log(inner);
         if (inner) this.renderOnTop(inner);
-        // if (inner.children) this.renderOnTop(inner.children[0]);
+        // if (inner.children && inner.children.length === 4) this.renderOnTop(inner);
         // for (let i = 0; i < inner.children.length; ++i)
         //     inner.children[i].renderOrder = 9999;
 

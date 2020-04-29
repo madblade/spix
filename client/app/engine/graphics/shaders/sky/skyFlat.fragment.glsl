@@ -30,12 +30,12 @@ float random(vec2 st) {
 }
 
 float rayleighPhase( float cosTheta ) {
-    return THREE_OVER_SIXTEENPI * ( 1.0 + pow( cosTheta, 2.0 ) );
+    return THREE_OVER_SIXTEENPI * ( 1.0 + pow( abs(cosTheta), 2.0 ) );
 }
 
 float hgPhase( float cosTheta, float g ) {
-    float g2 = pow( g, 2.0 );
-    float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );
+    float g2 = pow( abs(g), 2.0 );
+    float inverse = 1.0 / pow( abs(1.0 - 2.0 * g * cosTheta + g2), 1.5 );
     return ONE_OVER_FOURPI * ( ( 1.0 - g2 ) * inverse );
 }
 
@@ -78,7 +78,7 @@ void main() {
 // optical length
 // cutoff angle at 90 to avoid singularity in next formula.
     float zenithAngle = acos( max( 0.0, dot( up, direction ) ) );
-    float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );
+    float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( abs(93.885 - ( ( zenithAngle * 180.0 ) / pi )), -1.253 ) );
     float sR = rayleighZenithLength * inverse;
     float sM = mieZenithLength * inverse;
 
@@ -94,9 +94,13 @@ void main() {
     float mPhase = hgPhase( cosTheta, mieDirectionalG );
     vec3 betaMTheta = vBetaM * mPhase;
 
-    vec3 Lin = pow( vse * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * ( 1.0 - Fex ), vec3( 1.5 ) );
-    Lin *= mix( vec3( 1.0 ), pow( vse * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) *
-        Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - dot( up, vSunDirection ), 5.0 ), 0.0, 1.0 ) );
+    vec3 Lin = pow( abs(vse * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * ( 1.0 - Fex )), vec3( 1.5 ) );
+    Lin *= mix(
+        vec3( 1.0 ),
+        pow( abs(vse * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex),
+        vec3( 1.0 / 2.0 ) ),
+        clamp( pow( abs(1.0 - dot( up, vSunDirection )), 5.0 ), 0.0, 1.0 )
+    );
 
 // nightsky
     vec3 L0 = vec3( 0.1 ) * Fex;
@@ -107,10 +111,10 @@ void main() {
 
     vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
 
-    vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( luminance, 4.0 ) ) ) * texColor );
+    vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( abs(luminance), 4.0 ) ) ) * texColor );
     vec3 color = curr * whiteScale;
 
-    vec3 retColor = pow( color, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
+    vec3 retColor = pow( abs(color), vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );
 
 // starry sky colorfix
     if (closeToHorizon) {
