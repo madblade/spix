@@ -31,6 +31,7 @@ let PlayerModule = {
 
     loadPlayer(id, updatedEntity, graphics, entities)
     {
+        // TODO [LOW] add handheld item
         let createdEntity = graphics.initializeEntity(id, 'steve');
         let object3D = graphics.finalizeEntity(id, createdEntity);
 

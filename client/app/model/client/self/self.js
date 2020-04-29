@@ -178,7 +178,11 @@ extend(SelfComponent.prototype, {
             this.currentItemSlot = currentItemSlot;
 
             // TODO graphics change mesh.
-            graphicsEngine.changeHeldItem(this.quickBar[currentItemSlot]);
+            // This short-circuits the normal client-server await cycle
+            // because the player could be very fast.
+            graphicsEngine.changeHeldItem(
+                this.quickBar[currentItemSlot]
+            );
 
             register.updateSelfState({
                 itemSelect: [currentItemSlot, oldItemSlot]

@@ -25,7 +25,10 @@ let ItemsGraphicsModule = {
             modelPath !== 'naginata' &&
             modelPath !== 'nodachi' &&
             modelPath !== 'katana'
-        ) return;
+        ) {
+            console.error('[Graphics/Items] Unsupported mesh.');
+            return;
+        }
 
         let loader = new GLTFLoader();
         loader.load(`app/assets/models/${modelPath}.glb`, gltf => {

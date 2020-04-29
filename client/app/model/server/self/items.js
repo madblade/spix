@@ -38,6 +38,10 @@ let ItemType = Object.freeze({
 
 let ItemsModelModule = {
 
+    isItemNaught(item) {
+        return item === ItemType.NONE;
+    },
+
     isItemBlock(item) {
         return item > ItemType.NONE && item < 256;
     },

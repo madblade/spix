@@ -8,6 +8,7 @@ import extend               from '../../../extend.js';
 
 import { InventoryModel }   from './inventory.js';
 import { Vector3 }          from 'three';
+import { ItemsModelModule } from './items';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -37,8 +38,7 @@ let SelfModel = function(app) {
 extend(SelfModel.prototype, {
 
     init() {
-        let graphics = this.app.engine.graphics;
-        this.loadSelf(graphics);
+        this.loadSelf();
     },
 
     refresh() {
@@ -162,21 +162,58 @@ extend(SelfModel.prototype, {
         }
     },
 
-    loadSelf(graphics) {
+    loadSelf()
+    {
+        let selfModel = this;
+        let graphics = this.app.engine.graphics;
+
         // Player id '-1' never used by any other entity.
         let entityId = this.entityId;
         let worldId = this.worldId;
-        let selfModel = this;
 
         let createdEntity = graphics.initializeEntity(entityId, 'steve');
         let object3d = graphics.finalizeEntity(entityId, createdEntity);
         selfModel.avatar = object3d;
         if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
 
-        let handItem = graphics.loadReferenceMeshFromMemory('yari');
-        selfModel.handItem = handItem;
-        if (!selfModel.displayAvatar && selfModel.displayHandItem)
-            graphics.addToScene(handItem, worldId);
+        this.updateHandItem();
+    },
+
+    updateHandItem()
+    {
+        let selfModel = this;
+        let graphics = this.app.engine.graphics;
+
+        let worldId = this.worldId;
+        let handItemID = this.app.model.client.selfComponent.getCurrentItemID();
+        let handItem;
+
+        if (ItemsModelModule.isItemNaught(handItemID)) handItem = null;
+        else if (ItemsModelModule.isItemRanged(handItemID) || ItemsModelModule.isItemMelee(handItemID) ||
+            ItemsModelModule.isItemX(handItemID) || ItemsModelModule.isItemBlock(handItemID)
+        ) {
+            handItem = graphics.getItemMesh(handItemID);
+        } else {
+            console.warn('[ServerSelf] Handheld item unrecognized.');
+            handItem = null;
+        }
+
+        if (selfModel.handItem !== handItem)
+        {
+            if (selfModel.handItem) // is it possible that it is in another world?
+                graphics.removeFromScene(selfModel.handItem, worldId);
+
+            selfModel.handItem = handItem;
+
+            if (handItem) {
+                handItem.position.copy(graphics.cameraManager.mainCamera.up.position);
+                this.cameraMoved(graphics.cameraManager.mainCamera);
+                if (
+                    // !selfModel.displayAvatar &&
+                    selfModel.displayHandItem)
+                    graphics.addToScene(handItem, worldId);
+            }
+        }
     },
 
     getSelfPosition() {

@@ -19,14 +19,14 @@ let TexturesModule = {
     loadTexture(whatTexture)
     {
         let loader = new TextureLoader();
-        let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
+        // let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
 
         // let texture =
         loader.load(`app/assets/textures/${whatTexture}`,
             t => {
                 console.log('[Graphics/Textures] Texture loaded.');
 
-                t.anisotropy = maxAnisotropy;
+                // t.anisotropy = maxAnisotropy;
                 t.magFilter = NearestFilter;
                 t.minFilter = NearestFilter;
                 this.texture = t;
