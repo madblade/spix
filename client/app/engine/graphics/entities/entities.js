@@ -13,6 +13,7 @@ import {
 
 let EntitiesModule = {
 
+    // TODO [CRIT] load first and clone after
     initializeEntity(entityId, model, callbackOnMesh) {
         let loader = new LegacyJSONLoader();
         let mixers = this.mixers;

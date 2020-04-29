@@ -113,7 +113,9 @@ extend(App.Core.prototype, {
 
     start() {
         this.setState('loading');
-        setTimeout(() => this.setState('main'), 1000);
+        this.engine.graphics.preload().then(() =>
+            this.setState('main')
+        );
     },
 
     stop() {

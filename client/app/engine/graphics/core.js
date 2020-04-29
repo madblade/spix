@@ -5,8 +5,37 @@
 'use strict';
 
 import Stats from 'stats.js';
+import { $ } from '../../modules/polyfills/dom';
 
 let CoreModule = {
+
+    preload() {
+        // Textures
+        this.loadTextures();
+
+        // Meshes
+        this.loadReferenceMeshes();
+
+        // Animations
+        this.initializeAnimations();
+
+        return new Promise(resolve => {
+            setTimeout(() =>
+                this.resolveIfLoaded(resolve), 500
+            );
+        });
+    },
+
+    resolveIfLoaded(resolve) {
+        if (this._texturesLoaded && this._nbMeshesToLoad === this._nbMeshesLoadedOrError)
+        {
+            console.log('[Graphics/Core] Everything loaded.');
+            resolve();
+        }
+        else
+            setTimeout(() => this.resolveIfLoaded(resolve), 500);
+    },
+
     run() {
         // Initialize DOM element
         this.initializeDOM();

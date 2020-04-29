@@ -174,11 +174,16 @@ extend(SelfModel.prototype, {
             if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
         });
 
-        graphics.loadItemMesh('yari', function(gltfObject) {
-            selfModel.handItem = gltfObject;
-            if (!selfModel.displayAvatar && selfModel.displayHandItem)
-                graphics.addToScene(gltfObject, worldId);
-        });
+        let handItem = graphics.chargeReferenceMesh('yari');
+        selfModel.handItem = handItem;
+        if (!selfModel.displayAvatar && selfModel.displayHandItem)
+            graphics.addToScene(handItem, worldId);
+
+        // graphics.loadItemMesh('yari', function(gltfObject) {
+        //     selfModel.handItem = gltfObject;
+        //     if (!selfModel.displayAvatar && selfModel.displayHandItem)
+        //         graphics.addToScene(gltfObject, worldId);
+        // });
     },
 
     getSelfPosition() {

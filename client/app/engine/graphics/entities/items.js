@@ -5,7 +5,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import {
     AnimationClip,
     AnimationMixer,
-    BufferAttribute, Color, DataTexture, FrontSide, MeshPhongMaterial,
+    BufferAttribute, Color, DataTexture,
+    MeshPhongMaterial,
     Object3D, RepeatWrapping, RGBFormat,
 } from 'three';
 
@@ -15,9 +16,8 @@ let ItemsGraphicsModule = {
         this.loadItemMesh('portal-gun', callback);
     },
 
-    loadItemMesh(modelPath, callback) {
+    loadItemMesh(modelPath, callback, errorCallback) {
         if (modelPath !== 'portal-gun' &&
-            // modelPath !== 'pixel-crossbow' &&
             modelPath !== 'yumi-morph' &&
             modelPath !== 'yari' &&
             modelPath !== 'ya' &&
@@ -31,8 +31,6 @@ let ItemsGraphicsModule = {
         loader.load(`app/assets/models/${modelPath}.glb`, gltf => {
             if (modelPath === 'portal-gun')
                 this.finalizePortalMesh(gltf, callback);
-            // else if (modelPath === 'pixel-crossbow')
-            //     this.finalizeCrossbowMesh(gltf, callback);
             else if (modelPath === 'katana')
                 this.finalizeKatanaPackMesh(gltf, callback);
             else if (modelPath === 'ya')
@@ -48,6 +46,7 @@ let ItemsGraphicsModule = {
             else if (modelPath === 'nodachi')
                 this.finalizeNodachiPackMesh(gltf, callback);
         }, undefined, function(error) {
+            if (errorCallback) errorCallback();
             console.error(error);
         });
     },
@@ -83,25 +82,24 @@ let ItemsGraphicsModule = {
         let colors = g.attributes.color;
         for (let i = 0; i < count; ++i) {
             let x; let y; let z;
-            let xCoord = p.getX(i); let yCoord = p.getY(i);
-            if (xCoord < -15.4) {
-                x = y = z = 1.0;
-            } else if (xCoord > -3 && Math.abs(yCoord) > 0.02) {
+            let yCoord = p.getY(i);
+            if (Math.abs(yCoord - 5.85) < .3 ||
+                Math.abs(yCoord - 2.46) < .1 ||
+                Math.abs(yCoord - 8) < .1)
+            {
                 x = y = z = 2.0;
             } else {
-                x = 61 / 256;
-                y = 31 / 256;
+                x = 2 * 61 / 256;
+                y = 2 * 31 / 256;
                 z = 0;
             }
             colors.setXYZ(i, x, y, z);
         }
 
-        // Think about setting roughness
         object.rotation.reorder('ZXY');
-        let sc = object.scale; let f = 0.4;
+        let sc = object.scale; let f = 0.2;
         sc.set(f * sc.x, f * sc.y, f * sc.z);
-        object.rotation.set(0, Math.PI / 2, Math.PI / 2);
-        // object.rotation.set(-Math.PI / 2, Math.PI / 2, Math.PI / 2);
+        object.rotation.set(-Math.PI / 2, Math.PI / 2, Math.PI / 2);
         object.position.set(0.4, -.25, -0.25);
 
         this.renderOnTop(object);
@@ -251,31 +249,9 @@ let ItemsGraphicsModule = {
             callback);
     },
 
-    finalizeCrossbowMesh(gltf, callback) {
-        let object = gltf.scene.children[0];
-        console.log(object);
-        let m = object.material.map;
-
-        // let newMat = new MeshBasicMaterial({
-        //     color: new Color(4, 4, 4), map: m});
-        // object.material = newMat;
-        object.material.side = FrontSide;
-        object.material.color = new Color(10, 10, 10);
-        m.flatShading = true;
-
-        object.scale.set(0.04, 0.04, 0.04);
-        object.rotation.set(0, Math.PI / 4, 0);
-        object.position.set(0.4, -.25, -0.15);
-
-        // render order
-        this.renderOnTop(object);
-
-        let wrapper = new Object3D();
-        wrapper.rotation.reorder('ZYX');
-        wrapper.add(object);
-        callback(wrapper);
-    },
-
+    /**
+     * @deprecated
+     */
     finalizeKatanaMesh(gltf, callback) {
         let object = gltf.scene.children[0];
         console.log(object);

@@ -47,11 +47,18 @@ let Graphics = function(app) {
     // Interaction.
     this.controls =     null;
 
-    // Animations
-    this.initializeAnimations();
-
     // Textures
-    this.loadTextures();
+    this.texture = null;
+    this.textureCoordinates = null;
+    this._texturesLoaded = false;
+
+    // Meshes
+    this.referenceMeshes = null;
+    this._nbMeshesToLoad = 0;
+    this._nbMeshesLoadedOrError = 0;
+
+    // Animations
+    this.mixers = null;
 
     // Optimizations
     this.portalUpdates = [];

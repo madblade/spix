@@ -4,7 +4,10 @@
 
 'use strict';
 
-import { NearestFilter, TextureLoader } from 'three';
+import {
+    // LinearMipMapLinearFilter,
+    NearestFilter, TextureLoader
+} from 'three';
 
 let TexturesModule = {
 
@@ -13,16 +16,31 @@ let TexturesModule = {
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
     },
 
-    loadTexture(whatTexture) {
+    loadTexture(whatTexture)
+    {
         let loader = new TextureLoader();
         let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
 
-        let texture = loader.load(`app/assets/textures/${whatTexture}`);
+        // let texture =
+        loader.load(`app/assets/textures/${whatTexture}`,
+            t => {
+                console.log('[Graphics/Textures] Texture loaded.');
 
-        texture.anisotropy = maxAnisotropy;
+                t.anisotropy = maxAnisotropy;
+                t.magFilter = NearestFilter;
+                t.minFilter = NearestFilter;
+                this.texture = t;
+                this._texturesLoaded = true;
+            },
+            undefined,
+            () => {
+                console.error('[Graphics/Textures] Failed to load texture.');
+            });
+
+        // texture.anisotropy = maxAnisotropy;
         // texture.generateMipmaps = false;
-        texture.magFilter = NearestFilter;
-        texture.minFilter = NearestFilter;
+        // texture.magFilter = NearestFilter;
+        // texture.minFilter = NearestFilter;
         // texture.minFilter = LinearMipMapLinearFilter;
 
         // console.log(`Max anisotropy = ${maxAnisotropy}`);
@@ -42,7 +60,7 @@ let TexturesModule = {
         // Where materials is an [] of materials and the faces use a materialIndex parameter to get appointed the right mat.
         // Idea #2: shader
 
-        return texture;
+        // return texture;
     },
 
     /**
