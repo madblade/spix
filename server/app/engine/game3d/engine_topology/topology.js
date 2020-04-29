@@ -55,7 +55,9 @@ class TopologyEngine {
     getOutputForPlayer(p, updatedChunks, newChunks) {
         let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
-        return this._selector.selectUpdatedChunksForPlayer(p, worldModel, consistencyModel, updatedChunks, newChunks);
+        return this._selector.selectUpdatedChunksForPlayer(
+            p, worldModel, consistencyModel, updatedChunks, newChunks
+        );
     }
 
     flushOutput() {

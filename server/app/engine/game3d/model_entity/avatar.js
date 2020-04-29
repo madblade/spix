@@ -15,8 +15,8 @@ class Avatar extends Entity
         this._kind = 'player';
 
         // Counted as a number of chunks.
-        this._chunkRenderDistance = 5;
-        this._chunkUnloadDistance = 5;
+        this._chunkRenderDistance = 2;
+        this._chunkUnloadDistance = 3; // TODO here
         this._portalRenderDistance = 3;
 
         // Counted as a number of blocks.

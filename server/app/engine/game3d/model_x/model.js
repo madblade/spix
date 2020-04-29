@@ -292,6 +292,8 @@ class XModel {
             let i = parseInt(ijk[0], 10);
             let j = parseInt(ijk[1], 10);
             let k = parseInt(ijk[2], 10);
+
+            // Manhattan loading.
             let chks = [
                 `${i + 1},${j},${k}`,  `${i - 1},${j},${k}`,
                 `${i},${j + 1},${k}`,  `${i},${j - 1},${k}`,
@@ -300,6 +302,18 @@ class XModel {
                 // (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
                 // (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
             ];
+
+            if (startWid !== currentWorld) {
+                // add depth
+                // TODO
+            }
+            if (currentWorld) {
+                let world = wModel.getWorld(currentWorld);
+                if (world.isFlat()) {
+                    // add depth
+                    // TODO
+                }
+            }
 
             // TODO [HIGH] discriminate depth k+ and k-
             chks.forEach(c => {

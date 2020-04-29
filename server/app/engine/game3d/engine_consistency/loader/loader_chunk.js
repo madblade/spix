@@ -214,17 +214,19 @@ class ChunkLoader {
         return newChunksForPlayer;
     }
 
-    unloadInnerToOuterSphere(player, starterChunk) {
-        let consistencyModel = this._consistencyModel;
-        let worldModel = this._worldModel;
-        let xModel = this._xModel;
-
-        let minThreshold = player.avatar.chunkRenderDistance;
-        let maxThreshold = WorldModel.serverLoadingRadius;
-        minThreshold = Math.min(minThreshold, maxThreshold);
-
-        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, minThreshold);
-    }
+    // unloadInnerToOuterSphere(player, starterChunk) {
+    //     let consistencyModel = this._consistencyModel;
+    //     let worldModel = this._worldModel;
+    //     let xModel = this._xModel;
+    //
+    //     let minThreshold = player.avatar.chunkRenderDistance;
+    //     let maxThreshold = WorldModel.serverLoadingRadius;
+    //     minThreshold = Math.min(minThreshold, maxThreshold);
+    //
+    //     return ChunkBuilder.getOOBPlayerChunks(player, starterChunk,
+    //         worldModel, xModel, consistencyModel, minThreshold
+    //     );
+    // }
 
     unloadOuterSphere(player, starterChunk) {
         let consistencyModel = this._consistencyModel;
@@ -233,7 +235,9 @@ class ChunkLoader {
 
         let maxThreshold = player.avatar.chunkUnloadDistance;
 
-        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, maxThreshold);
+        return ChunkBuilder.getOOBPlayerChunks(player,
+            starterChunk, worldModel, xModel, consistencyModel,
+            maxThreshold);
     }
 
 }

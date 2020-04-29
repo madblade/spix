@@ -152,6 +152,9 @@ class ChunkBuilder {
         }
     }
 
+    /**
+     * @deprecated
+     */
     static preloadFlatNeighbourChunks(chunk, world) {
         let loadedChunks = world.allChunks;
         let c = chunk;
@@ -234,7 +237,8 @@ class ChunkBuilder {
         }
     }
 
-    static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh) {
+    static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh)
+    {
         let avatar = player.avatar;
         let unloadedChunksForPlayer = {};
         let chunksToUnload = [];

@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { ChunkSizes } from './model';
+import { ChunkSizes, WorldType } from './model';
 
 class World
 {
@@ -38,6 +38,7 @@ class World
     get worldId() { return this._worldId; }
     // get worldType() { return this._worldType; }
     get worldInfo() { return this._worldInfo; }
+    isFlat() { return this._worldInfo.kind === WorldType.FLAT; }
 
     get xSize() { return this._xSize; }
     get ySize() { return this._ySize; }
