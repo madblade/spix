@@ -31,16 +31,14 @@ let PlayerModule = {
 
     loadPlayer(id, updatedEntity, graphics, entities)
     {
-        graphics.initializeEntity(id, 'steve',
-            function(createdEntity) {
-                let object3D = graphics.finalizeEntity(id, createdEntity);
+        let createdEntity = graphics.initializeEntity(id, 'steve');
+        let object3D = graphics.finalizeEntity(id, createdEntity);
 
-                let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
-                graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+        let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
+        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
-                this.updateEntity(id, entity, updatedEntity, graphics, entities);
-                this.entitiesLoading.delete(id);
-            }.bind(this));
+        this.updateEntity(id, entity, updatedEntity, graphics, entities);
+        this.entitiesLoading.delete(id);
     }
 
 };

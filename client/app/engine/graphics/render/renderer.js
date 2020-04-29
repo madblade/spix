@@ -6,7 +6,6 @@
 
 import extend from '../../../extend.js';
 import {
-    Layers, PCFSoftShadowMap,
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
@@ -37,7 +36,9 @@ let RendererManager = function(graphicsEngine) {
     this.thenstop = false;
 
     // Bloom
-    this.darkMaterial = new MeshBasicMaterial({ color: 'black', side: DoubleSide });
+    this.darkMaterial = new MeshBasicMaterial(
+        { color: 'black', side: DoubleSide, morphTargets: true }
+    );
 };
 
 extend(RendererManager.prototype, {

@@ -168,11 +168,10 @@ extend(SelfModel.prototype, {
         let worldId = this.worldId;
         let selfModel = this;
 
-        graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
-            let object3d = graphics.finalizeEntity(entityId, createdEntity);
-            selfModel.avatar = object3d;
-            if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
-        });
+        let createdEntity = graphics.initializeEntity(entityId, 'steve');
+        let object3d = graphics.finalizeEntity(entityId, createdEntity);
+        selfModel.avatar = object3d;
+        if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
 
         let handItem = graphics.loadReferenceMeshFromMemory('yari');
         selfModel.handItem = handItem;

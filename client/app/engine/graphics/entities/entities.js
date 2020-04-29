@@ -37,13 +37,12 @@ let EntitiesModule = {
         return geometry;
     },
 
-    // TODO [CRIT] load first and clone after
-    initializeEntity(entityId, model, callbackOnMesh) {
+    initializeEntity(entityId, model)
+    {
         let mixers = this.mixers;
 
         // TODO [FFF] export model to format glTF
         let geometry = this.loadReferenceGeometryFromMemory(model); // Should be 'steve'.
-        // loader.load(`app/assets/models/${model}.json`, function(geometry) {
         let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
         let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
@@ -65,7 +64,6 @@ let EntitiesModule = {
             .play();
         mixers.set(entityId, mixer);
 
-        callbackOnMesh(mesh);
         return mesh;
     },
 
