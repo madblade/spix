@@ -8,41 +8,65 @@ import LegacyJSONLoader from './LegacyJSONLoader';
 import {
     AnimationMixer, AnimationClip,
     Object3D, Mesh,
-    MeshLambertMaterial, FaceColors, BufferGeometry
+    MeshLambertMaterial, FaceColors, BufferGeometry, Geometry
 } from 'three';
 
 let EntitiesModule = {
 
+    loadMeshFromJSON(model, callback, errorCallback) {
+        let loader = new LegacyJSONLoader();
+        loader.load(`app/assets/models/${model}.json`, geometry => {
+            callback(geometry);
+        }, undefined, error =>
+        {
+            console.log(error);
+            errorCallback();
+        });
+    },
+
+    loadReferenceGeometryFromMemory(id) {
+        if (!this.referenceMeshes.has(id)) {
+            console.error(`[Graphics/Meshes] Could not charge a new "${id}" mesh.`);
+            return;
+        }
+
+        // Beware! ’tis a geometry.
+        let geometry = this.referenceMeshes.get(id);
+        if (!(geometry instanceof Geometry))
+            console.warn('[Graphics/Entities] Should be an instance of Geometry.');
+        return geometry;
+    },
+
     // TODO [CRIT] load first and clone after
     initializeEntity(entityId, model, callbackOnMesh) {
-        let loader = new LegacyJSONLoader();
         let mixers = this.mixers;
 
         // TODO [FFF] export model to format glTF
-        loader.load(`app/assets/models/${model}.json`, function(geometry) {
-            let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
+        let geometry = this.loadReferenceGeometryFromMemory(model); // Should be 'steve'.
+        // loader.load(`app/assets/models/${model}.json`, function(geometry) {
+        let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
-            let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
-                vertexColors: FaceColors,
-                morphTargets: true
-            }));
+        let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
+            vertexColors: FaceColors,
+            morphTargets: true
+        }));
 
-            mesh.scale.set(1.0, 1.0, 1.0);
-            // mesh.castShadow = true;
+        mesh.scale.set(1.0, 1.0, 1.0);
+        // mesh.castShadow = true;
 
-            let mixer = new AnimationMixer(mesh);
-            let clip = AnimationClip.CreateFromMorphTargetSequence(
-                'run',
-                geometry.morphTargets, 30, false
-            );
+        let mixer = new AnimationMixer(mesh);
+        let clip = AnimationClip.CreateFromMorphTargetSequence(
+            'run',
+            geometry.morphTargets, 30, false
+        );
 
-            mixer.clipAction(clip)
-                .setDuration(1)
-                .play();
-            mixers.set(entityId, mixer);
+        mixer.clipAction(clip)
+            .setDuration(1)
+            .play();
+        mixers.set(entityId, mixer);
 
-            callbackOnMesh(mesh);
-        });
+        callbackOnMesh(mesh);
+        return mesh;
     },
 
     // For composite entities, wrap heavy model parts in higher level structure.

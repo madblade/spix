@@ -6,7 +6,7 @@
 
 import {
     Mesh,
-    BoxGeometry, PlaneGeometry
+    BoxGeometry, PlaneGeometry, Object3D
 } from 'three';
 
 let MeshesModule = {
@@ -19,7 +19,7 @@ let MeshesModule = {
             'yumi-morph', 'ya',
             'yari', 'nagamaki', 'naginata', 'nodachi', 'katana'
         ];
-        this._nbMeshesToLoad = meshesToLoad.length;
+        this._nbMeshesToLoad = meshesToLoad.length + 1;
 
         meshesToLoad.forEach(id =>
         {
@@ -30,9 +30,16 @@ let MeshesModule = {
                 this._nbMeshesLoadedOrError++;
             });
         });
+
+        this.loadMeshFromJSON('steve', geometry => {
+            this.referenceMeshes.set('steve', geometry);
+            this._nbMeshesLoadedOrError++;
+        }, () => {
+            this._nbMeshesLoadedOrError++;
+        });
     },
 
-    chargeReferenceMesh(id)
+    loadReferenceMeshFromMemory(id)
     {
         if (!this.referenceMeshes.has(id)) {
             console.error(`[Graphics/Meshes] Could not charge a new "${id}" mesh.`);
@@ -40,6 +47,9 @@ let MeshesModule = {
         }
 
         let mesh = this.referenceMeshes.get(id);
+        if (!(mesh instanceof Object3D))
+            console.warn(`[Graphics/Meshes] "${id}" should be an instance of Object3D.`);
+
         let clone = mesh.clone();
         clone.rotation.reorder('ZYX');
         return clone;

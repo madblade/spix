@@ -15,7 +15,7 @@ import { MeshesModule }  from './meshes.js';
 import { TexturesModule }  from './textures.js';
 import { EntitiesModule }  from './entities/entities.js';
 import { ItemsGraphicsModule }  from './entities/items.js';
-import { AnimationsModule }  from './entities/animations.js'; // Needed
+import { AnimationsModule }  from './entities/animations.js';
 import { PortalsModule }  from './portals/portals.js';
 import { CamerasModule }  from './render/cameras.js';
 import { RenderersModule }  from './render/renderer.js';

@@ -66,7 +66,7 @@ let ItemsGraphicsModule = {
         let mixer = new AnimationMixer(object);
         let clip = new AnimationClip(
             'bow-stretch', 1, gltf.animations[0].tracks);
-        console.log(clip);
+        // console.log(clip);
         mixer.clipAction(clip)
             .setDuration(1)
             .play();
