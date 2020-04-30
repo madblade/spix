@@ -5,7 +5,7 @@
 'use strict';
 
 import CollectionUtils from '../../../math/collections';
-import CSFX from '../../engine_consistency/builder/surface_faces_builder';
+// import CSFX from '../../engine_consistency/builder/surface_faces_builder';
 import { BlockType } from '../../model_world/model'; // Get linkage strategy.
 
 class UpdaterFace
@@ -383,6 +383,9 @@ class UpdaterFace
 
     // BLOCK ADDITION
     // The difficulty is to determine which surface faces belong to which component after an addition.
+    /**
+     * @deprecated
+     */
     static updateSurfaceFacesAfterAddition(chunk, id, x, y, z, blockId)
     {
         let airBlock = BlockType.AIR;
@@ -455,6 +458,9 @@ class UpdaterFace
     }
 
     // ADDITION ONLY
+    /**
+     * @deprecated
+     */
     static getFaceNatureFromIdAndNormal(chunk, x, y, z, direction)
     {
         let currentBlock = chunk.what(x, y, z);
@@ -492,6 +498,10 @@ class UpdaterFace
         return 0;
     }
 
+    /**
+     * very old method, to be removed
+     * @deprecated
+     */
     static rawUpdateAfterEdition(
         chunk, id, x, y, z, addedFaces, removedFaces,
         isAddition, isWater)
@@ -722,6 +732,9 @@ class UpdaterFace
         connectedComponents[faceId] = 0;
     }
 
+    /**
+     * @deprecated
+     */
     static updateFace(w, wOrigin, fid, chunk, isAddition) {
         let updates = chunk.updates;
         // TODO REMOVE FACES FROM MODEL.
@@ -760,6 +773,9 @@ class UpdaterFace
         }
     }
 
+    /**
+     * @deprecated
+     */
     static updateFacesOnBoundary(chunk, x, y, z, isAddition)
     {
         const capacity = chunk.capacity;
@@ -845,6 +861,9 @@ class UpdaterFace
         return updatedChunks;
     }
 
+    /**
+     * @deprecated
+     */
     static updateSurfaceFacesAfterDeletion(chunk, id, x, y, z) {
         let dimensions = chunk.dimensions;
 

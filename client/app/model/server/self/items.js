@@ -61,7 +61,6 @@ let ItemsModelModule = {
 
     isItemMelee(item) {
         return item >= ItemType.KATANA && item < ItemType.YA;
-
     },
 
     isItemRanged(item) {

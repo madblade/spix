@@ -88,7 +88,7 @@ class Chunk
     }
 
     /**
-     * Do not use outside updater_blocks.
+     * Do not use outside updater_block or updater_face.
      * Only queries Manhattan neighborhood, only with max offset of 1.
      */
     queryBlock(x, y, z) {
