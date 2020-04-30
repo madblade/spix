@@ -92,9 +92,13 @@ class Chunk
      * Only queries Manhattan neighborhood, only with max offset of 1.
      */
     queryBlock(x, y, z) {
-        let id = this._toId(x, y, z);
-        if (id < this._capacity && id >= 0)
-            return this._blocks[id];
+        if (x >= 0 && y >= 0 && z >= 0 &&
+            x < this._xSize && y < this._ySize && z < this._zSize)
+        {
+            let id = this._toId(x, y, z);
+            if (id < this._capacity && id >= 0)
+                return this._blocks[id];
+        }
         let nc;
         if (x < 0) { // x-
             nc = ChunkBuilder.getNeighboringChunk(this, 1);
@@ -123,9 +127,13 @@ class Chunk
         }
     }
     queryChunk(x, y, z) {
-        let id = this._toId(x, y, z);
-        if (id < this._capacity && id >= 0)
-            return [this, x, y, z];
+        if (x >= 0 && y >= 0 && z >= 0 &&
+            x < this._xSize && y < this._ySize && z < this._zSize)
+        {
+            let id = this._toId(x, y, z);
+            if (id < this._capacity && id >= 0)
+                return [this, x, y, z];
+        }
         let nc;
         if (x < 0) { // x-
             nc = ChunkBuilder.getNeighboringChunk(this, 1);
