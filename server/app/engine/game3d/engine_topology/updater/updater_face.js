@@ -179,7 +179,8 @@ class UpdaterFace
         return 0;
     }
 
-    static rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, isAddition) {
+    static rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, isAddition)
+    {
         // Compute updated faces.
         let dimensions = chunk.dimensions;
 
@@ -271,8 +272,9 @@ class UpdaterFace
 
             if (isAddition) {
                 if (i % 2 === 0) faceColor *= -1;
-            } else
+            } else if (!isAddition) {
                 if (i % 2 !== 0) faceColor *= -1;
+            }
 
             newColor[i] = faceColor;
             fastIds.splice(location, 0, faceColor);
@@ -341,6 +343,9 @@ class UpdaterFace
         // Beware of component disappearance in client.
     }
 
+    /**
+     * @deprecated
+     */
     static detectTopologyChangeAfterDeletion(chunk, id, x, y, z) {
         // Criterion: pre-existing faces belonged to separate connected components.
         // N.B. We could have considered this a dual of topology change detection after addition.
@@ -557,11 +562,14 @@ class UpdaterFace
         return UpdaterFace.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
+    /**
+     * Never implemented.
+     * @deprecated
+     */
     static mergeComponents(/*chunk, id, x, y, z*/) {
         // TODO deletion version (much easier)
         // Beware of !components in client.
     }
-
 }
 
 export default UpdaterFace;

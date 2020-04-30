@@ -4,13 +4,11 @@
 
 'use strict';
 
-// import BlockExtractor from './../engine_consistency/builder/surface_blocks_builder';
-// import FaceExtractor from './../engine_consistency/builder/surface_faces_builder';
-
 import TimeUtils from '../../math/time';
+import ChunkBuilder from '../engine_consistency/builder/builder_chunks';
 
-class Chunk {
-
+class Chunk
+{
     static debug = false;
 
     constructor(xSize, ySize, zSize, chunkId, world)
@@ -87,6 +85,73 @@ class Chunk {
         let id = this._toId(x, y, z);
         if (id >= this._capacity || id < 0) return 0;
         return this._blocks[id];
+    }
+
+    /**
+     * Do not use outside updater_blocks.
+     * Only queries Manhattan neighborhood, only with max offset of 1.
+     */
+    queryBlock(x, y, z) {
+        let id = this._toId(x, y, z);
+        if (id < this._capacity && id >= 0)
+            return this._blocks[id];
+        let nc;
+        if (x < 0) { // x-
+            nc = ChunkBuilder.getNeighboringChunk(this, 1);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x + this._xSize, y, z);
+        } else if (x >= this._xSize) { // x+
+            nc = ChunkBuilder.getNeighboringChunk(this, 0);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x - this._xSize, y, z);
+        } else if (y < 0) { // y-
+            nc = ChunkBuilder.getNeighboringChunk(this, 3);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x, y + this._ySize, z);
+        } else if (y >= this._ySize) { // y+
+            nc = ChunkBuilder.getNeighboringChunk(this, 2);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x, y - this._ySize, z);
+        } else if (z < 0) { // z-
+            nc = ChunkBuilder.getNeighboringChunk(this, 5);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x, y, z + this._zSize);
+        } else if (z >= this._zSize) { // z+
+            nc = ChunkBuilder.getNeighboringChunk(this, 4);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return nc.queryBlock(x, y, z - this._zSize);
+        }
+    }
+    queryChunk(x, y, z) {
+        let id = this._toId(x, y, z);
+        if (id < this._capacity && id >= 0)
+            return [this, x, y, z];
+        let nc;
+        if (x < 0) { // x-
+            nc = ChunkBuilder.getNeighboringChunk(this, 1);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x + this._xSize, y, z];
+        } else if (x >= this._xSize) { // x+
+            nc = ChunkBuilder.getNeighboringChunk(this, 0);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x - this._xSize, y, z];
+        } else if (y < 0) { // y-
+            nc = ChunkBuilder.getNeighboringChunk(this, 3);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x, y + this._ySize, z];
+        } else if (y >= this._ySize) { // y+
+            nc = ChunkBuilder.getNeighboringChunk(this, 2);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x, y - this._ySize, z];
+        } else if (z < 0) { // z-
+            nc = ChunkBuilder.getNeighboringChunk(this, 5);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x, y, z + this._zSize];
+        } else if (z >= this._zSize) { // z+
+            nc = ChunkBuilder.getNeighboringChunk(this, 4);
+            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            return [nc, x, y, z - this._zSize];
+        }
     }
 
     contains(x, y, z) {
