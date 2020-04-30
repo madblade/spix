@@ -17,6 +17,9 @@ const BlockType = Object.freeze({
     PLANKS: 5,
     STONEBRICKS: 6,
     BRICKS: 7,
+
+    WATER: 16,
+
     SAND: 17,
     IRON: 18
 });

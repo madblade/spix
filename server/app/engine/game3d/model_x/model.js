@@ -316,7 +316,6 @@ class XModel {
                     stack.push([currentWorld, c, newDepth]);
             });
 
-            console.log(`${startWid}, ${currentWorld}`);
             if (startWid !== currentWorld) {
                 push(chksXY, currentDepth + 2);
                 push(chksZ, currentDepth + 2);

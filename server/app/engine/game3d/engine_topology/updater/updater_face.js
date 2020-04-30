@@ -405,7 +405,7 @@ class UpdaterFace {
             }
 
             // Removing a block.
-        } else
+        } else if (!isAddition) {
             if (w !== 0) { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
@@ -419,6 +419,7 @@ class UpdaterFace {
                 else updates[0][fid] = null;
                 UpdaterFace.removeFaceFromModel(chunk, fid);
             }
+        }
     }
 
     static updateFacesOnBoundary(chunk, x, y, z, isAddition) {

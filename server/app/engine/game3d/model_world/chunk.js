@@ -32,7 +32,7 @@ class Chunk {
         this._chunkK = parseInt(ijk[2], 10);
 
         // Blocks.
-        /** Flatten array. x, then y, then z. */
+        /** Flat array. x, then y, then z. */
         this._blocks = new Uint8Array(xSize * ySize * zSize);
         /** Nested z-array. (each z -> i×j layer, without primary offset) */
         this._surfaceBlocks = {}; // TODO [HIGH] refactor to map.

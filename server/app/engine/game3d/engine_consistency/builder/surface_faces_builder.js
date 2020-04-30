@@ -6,9 +6,13 @@
 
 import ChunkBuilder from './builder_chunks';
 import FaceLinker   from './surface_faces_linker';
+import { BlockType } from '../../model_world/model';
 
-class CSFX {
-
+class CSFX
+{
+    /**
+     * @deprecated
+     */
     static forceOneComponentPerChunk = false; // Lazy, inefficient in terms of i/o
 
     static debug = false;
@@ -41,9 +45,22 @@ class CSFX {
         }
     }
 
-    static setFace(direction, bid, blockNature, faces,
-                   surfaceFaces, encounteredFaces, connectedComponents,
-                   capacity, iS, ijS, ccid, dontTranslate)
+    static hasNeighbourOfType(d, b, bs, iS, ijS, blockType) {
+        switch (d) {
+            case 0: return bs[b - 1] === blockType; // iM
+            case 1: return bs[b - iS] === blockType; // jM
+            case 2: return bs[b - ijS] === blockType; // kM
+            case 3: return bs[b + 1] === blockType; // iP
+            case 4: return bs[b + iS] === blockType; // jP
+            case 5: return bs[b + ijS] === blockType; // kP
+            default: return false;
+        }
+    }
+
+    static setFace(
+        direction, bid, blockNature, faces,
+        surfaceFaces, encounteredFaces, connectedComponents,
+        capacity, iS, ijS, ccid, dontTranslate)
     {
         let blockId = bid;
         if (!dontTranslate) { // Boundary faces with reverted normals.
@@ -70,11 +87,103 @@ class CSFX {
         connectedComponents[faceId] = ccid;
     }
 
-    static extractRawFaces(blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces,
-                           connectedComponents, dims)
+    static extractRawFacesPerLayer(
+        z, layer,
+        iS, jS, kS, ijS, capacity,
+        nbX, nbY, nbZ,
+        blocks, faces, surfaceFaces, encounteredFaces, connectedComponents
+    )
     {
-        let ccid = 1;
+        let airBlock = BlockType.AIR;
+        let waterBlock = BlockType.WATER;
+        // !air-air => ccid = 1
+        // !water-water => ccid = 2
 
+        for (let b = 0, length = layer.length; b < length; ++b) {
+            let offset = z * ijS;
+            let idOnCurrentLayer = layer[b];
+
+            let blockId = idOnCurrentLayer + offset;
+            const block = blocks[blockId];
+
+            for (let direction = 0; direction < 6; ++direction) {
+                if (CSFX.inbounds(direction, blockId, iS, ijS, capacity)) {
+                    if (block !== airBlock && CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, airBlock)) {
+                        CSFX.setFace(direction, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                    } else if (block !== waterBlock && CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, waterBlock)) {
+                        CSFX.setFace(direction, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                    }
+                }
+
+                // Not inbounds -> only +
+                // if (direction >= 3) { // x+, y+, z+
+                else if (direction === 3)
+                {
+                    const xblock = nbX[blockId - iS + 1];
+                    if (block !== airBlock && xblock === airBlock) { // i+
+                        CSFX.setFace(3, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                    }
+                    else if (block === airBlock && xblock !== airBlock && xblock !== undefined) { // i+
+                        CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
+                    } else if (block !== waterBlock && xblock === waterBlock) {
+                        CSFX.setFace(3, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                    }
+                    else if (block === waterBlock && xblock !== waterBlock && xblock !== undefined) {
+                        CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                    }
+                }
+                else if (direction === 4)
+                { // j+
+                    const yblock = nbY[blockId - ijS + iS];
+                    if (block !== airBlock && yblock === airBlock) {
+                        CSFX.setFace(4, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                    }
+                    else if (block === airBlock && yblock !== airBlock && yblock !== undefined) {
+                        CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
+                    } else if (block !== waterBlock && yblock === waterBlock) {
+                        CSFX.setFace(4, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                    }
+                    else if (block === waterBlock && yblock !== waterBlock && yblock !== undefined) {
+                        CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                    }
+                }
+                else if (direction === 5)
+                { // k+
+                    const zblock = nbZ[blockId - capacity + ijS];
+                    if (block !== airBlock && zblock === airBlock) {
+                        CSFX.setFace(5, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                    }
+                    else if (block === airBlock && zblock !== airBlock && zblock !== undefined) {
+                        CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
+                    } else if (block !== waterBlock && zblock === waterBlock) {
+                        CSFX.setFace(5, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                    }
+                    else if (block === waterBlock && zblock !== waterBlock && zblock !== undefined) {
+                        CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                    }
+                }
+            }
+        }
+    }
+
+    static extractRawFaces(
+        blocks, neighbourBlocks, surfaceBlocks, faces, surfaceFaces, encounteredFaces,
+        connectedComponents, dims)
+    {
         const iS = dims[0];
         const jS = dims[1];
         const kS = dims[2];
@@ -89,66 +198,14 @@ class CSFX {
         // Extract faces.
         for (let z in surfaceBlocks)
         {
+            if (!surfaceBlocks.hasOwnProperty(z)) continue;
             let layer = surfaceBlocks[z];
-            for (let b = 0, length = layer.length; b < length; ++b) {
-                let offset = z * ijS;
-                let idOnCurrentLayer = layer[b];
-
-                let blockId = idOnCurrentLayer + offset;
-                const block = blocks[blockId];
-
-                for (let direction = 0; direction < 6; ++direction) {
-                    if (CSFX.inbounds(direction, blockId, iS, ijS, capacity)) {
-                        if (block !== 0 && CSFX.empty(direction, blockId, blocks, iS, ijS)) {
-                            CSFX.setFace(direction, blockId, block, faces, surfaceFaces,
-                                encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                            ccid++;
-                        }
-                    } else if (direction >= 3) { // x+, y+, z+
-                        if (direction === 3) {
-                            const xblock = nbX[blockId - iS + 1];
-                            if (block !== 0 && xblock === 0) { // i+
-                                CSFX.setFace(3, blockId, block, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                ccid++;
-                            }
-                            else if (block === 0 && xblock !== 0 && xblock !== undefined) { // i+
-                                CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                ccid++;
-                            }
-                        }
-                        if (direction === 4) { // j+
-                            const yblock = nbY[blockId - ijS + iS];
-                            if (block !== 0 && yblock === 0) {
-                                CSFX.setFace(4, blockId, block, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                ccid++;
-                            }
-                            else if (block === 0 && yblock !== 0 && yblock !== undefined) {
-                                CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                ccid++;
-                            }
-                        }
-                        // TODO [HIGH] check z
-                        if (direction === 5) { // k+
-                            const zblock = nbZ[blockId - capacity + ijS];
-                            if (block !== 0 && zblock === 0) {
-                                CSFX.setFace(5, blockId, block, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid);
-                                ccid++;
-                            }
-                            else if (block === 0 && zblock !== 0 && zblock !== undefined) {
-                                // TODO [LOW] properly manage loading
-                                CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
-                                    encounteredFaces, connectedComponents, capacity, iS, ijS, ccid, true);
-                                ccid++;
-                            }
-                        }
-                    }
-                }
-            }
+            CSFX.extractRawFacesPerLayer(
+                z, layer,
+                iS, jS, kS, ijS, capacity,
+                nbX, nbY, nbZ,
+                blocks, faces, surfaceFaces, encounteredFaces, connectedComponents
+            );
         }
 
         if (CSFX.debug) {
@@ -159,6 +216,9 @@ class CSFX {
         }
     }
 
+    /**
+     * @deprecated
+     */
     static preMerge(
         surfaceFaces, connectedComponents, encounteredFaces,
         faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk)
@@ -233,7 +293,7 @@ class CSFX {
         if (CSFX.debug) console.log(merger);
     }
 
-    static precomputeFastConnectedComponents(connectedComponents, fastCC) {
+    static computeFastConnectedComponents(connectedComponents, fastCC) {
         for (let i = 0, length = connectedComponents.length; i < length; ++i) {
             if (connectedComponents[i] === 0) continue;
             if (!fastCC.hasOwnProperty(connectedComponents[i]))
@@ -242,6 +302,9 @@ class CSFX {
         }
     }
 
+    /**
+     * @deprecated
+     */
     static postMerge(merger, fastCC, connectedComponents) {
         function mergeArrays(a, b) {
             let result = a;
@@ -342,10 +405,12 @@ class CSFX {
 
     static computeFastConnectedComponentIds(fastCC, fastCCIds, capacity, faces) {
         for (let cccid in fastCC) {
+            if (!fastCC.hasOwnProperty(cccid)) continue;
             fastCCIds[cccid] = [];
             let tcur = fastCCIds[cccid];
             let fcc = fastCC[cccid];
             for (let i in fcc) {
+                if (!fcc.hasOwnProperty(i)) continue;
                 let j = fcc[i];
                 let orientation = j < capacity ? 0 : j < 2 * capacity ? 1 : 2;
                 let realId = j % capacity;
@@ -376,8 +441,8 @@ class CSFX {
 
         // Static properties
         const dims = chunk.dimensions;
-        const iS = chunk.dimensions[0];
-        const ijS = chunk.dimensions[0] * chunk.dimensions[1];
+        // const iS = chunk.dimensions[0];
+        // const ijS = chunk.dimensions[0] * chunk.dimensions[1];
         const capacity = blocks.length;
 
         // Temporary variables
@@ -396,19 +461,19 @@ class CSFX {
             faces, surfaceFaces, encounteredFaces, connectedComponents, dims);
 
         // Post merger.
-        let merger = [];
+        // let merger = [];
 
         // Triple PreMerge.
-        CSFX.preMerge(
-            surfaceFaces, connectedComponents, encounteredFaces, faces,
-            merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk);
+        // CSFX.preMerge(
+        //     surfaceFaces, connectedComponents, encounteredFaces, faces,
+        //     merger, capacity, iS, ijS, blocks, neighbourBlocks, chunk);
 
         // Compute fast connected components.
-        CSFX.precomputeFastConnectedComponents(connectedComponents, fastCC);
+        CSFX.computeFastConnectedComponents(connectedComponents, fastCC);
         //console.log(fastCC);
 
         // PostMerge.
-        CSFX.postMerge(merger, fastCC, connectedComponents);
+        // CSFX.postMerge(merger, fastCC, connectedComponents);
         //console.log(merger);
         //for (let i in connectedComponents) {
         //    if (connectedComponents[i] != 0) console.log('\t' + i + ' | ' + connectedComponents[i]);
@@ -446,7 +511,6 @@ class CSFX {
         if (CSFX.debug)
             console.log(`${Object.keys(fastCC).length} connected components extracted...`);
     }
-
 }
 
 export default CSFX;
