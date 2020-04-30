@@ -237,6 +237,10 @@ extend(ChunkModel.prototype, {
         for (let m = 0, l = meshes.length; m < l; ++m) {
             graphics.addToScene(meshes[m], worldId);
         }
+        if (graphics._debugChunkBoundingBoxes) {
+            if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');
+            graphics.addToScene(chunk.debugMesh, worldId);
+        }
     },
 
     updateChunk(worldId, chunkId, components) {
@@ -276,6 +280,10 @@ extend(ChunkModel.prototype, {
         let meshes = chunk.meshes;
         for (let m = 0, l = meshes.length; m < l; ++m) {
             graphics.removeFromScene(meshes[m], worldId);
+        }
+        if (graphics._debugChunkBoundingBoxes) {
+            if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');
+            graphics.removeFromScene(chunk.debugMesh, worldId);
         }
 
         world.delete(chunkId);

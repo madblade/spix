@@ -5,8 +5,9 @@
 'use strict';
 
 import {
+    BoxBufferGeometry,
     BufferAttribute, BufferGeometry,
-    Color, Mesh, Vector3
+    Color, Mesh, MeshBasicMaterial, Vector3
 } from 'three';
 
 let ChunksModule = {
@@ -100,7 +101,7 @@ let ChunksModule = {
         // newMesh.receiveShadow = true;
         if (Math.random() < 0.5) newMesh.userData.bloom = true;
 
-        return {
+        let c = {
             geometries:         [geometry],
             materials:          [material],
             meshes:             [newMesh],
@@ -111,6 +112,21 @@ let ChunksModule = {
             /*whereToFindFace:*/whereToFindFace,
             /*whichFaceIs:    */whichFaceIs
         };
+
+        if (this._debugChunkBoundingBoxes) {
+            c.debugMesh = new Mesh(
+                new BoxBufferGeometry(
+                    chunkSizeX, chunkSizeY, chunkSizeZ,
+                    1, 1, 1),
+                new MeshBasicMaterial({wireframe: true, color: 0x00ff00})
+            );
+            c.debugMesh.position.set(
+                iChunkOffset + chunkSizeX / 2,
+                jChunkOffset + chunkSizeY / 2,
+                kChunkOffset + chunkSizeZ / 2);
+        }
+
+        return c;
     },
 
     updateChunk(worldId, chunk, chunkId, components,

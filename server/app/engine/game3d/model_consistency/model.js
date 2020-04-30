@@ -103,7 +103,9 @@ class ConsistencyModel {
 
         let side = renderDistance * 2 + 1;
 
-        // TODO [CRIT] worldify (with xModel.getConnectivity)
+        // TODO [LOW] worldify
+        // This only counts loaded chunks in the current world
+        // which is fine so far.
         let aid = avatar.entityId;
         let worlds = this._chunkIdsForEntity.get(aid);
 
@@ -121,7 +123,9 @@ class ConsistencyModel {
             }
         });
 
-        // TODO [HIGH] differentiate 3D / 2D.
+        // This is not correct strictly speaking
+        // (a "side"-radius sphere in the 1-norm
+        // is not a "side"-sized square), but so far it does the job.
         const expectedSize = side *  side * side;
 
         return expectedSize <= actualInnerSize;

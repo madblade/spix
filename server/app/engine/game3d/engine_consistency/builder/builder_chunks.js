@@ -27,7 +27,7 @@ class ChunkBuilder {
 
         // Detect connected boundary face components.
         if (ChunkBuilder.debug) console.log('\tComputing connected components...');
-        FaceExtractor.extractConnectedComponents(chunk);
+        FaceExtractor.extractConnectedComponents(chunk); //
 
         chunk.ready = true;
     }

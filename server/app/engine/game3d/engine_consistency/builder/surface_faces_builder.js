@@ -362,6 +362,7 @@ class CSFX {
         }
     }
 
+    //
     static extractConnectedComponents(chunk) {
         let neighbourChunks = [];
         let neighbourBlocks = [];

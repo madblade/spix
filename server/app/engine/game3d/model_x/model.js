@@ -294,32 +294,44 @@ class XModel {
             let k = parseInt(ijk[2], 10);
 
             // Manhattan loading.
-            let chks = [
+            let chksXY = [
                 `${i + 1},${j},${k}`,  `${i - 1},${j},${k}`,
                 `${i},${j + 1},${k}`,  `${i},${j - 1},${k}`,
+            ];
+            let chksZ = [
                 `${i},${j},${k + 1}`,  `${i},${j},${k - 1}`
-                // ((i+1)+','+j+','+k),  ((i-1)+','+j+','+k),
-                // (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
-                // (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
             ];
 
+            // let chks = [
+            //     `${i + 1},${j},${k}`,  `${i - 1},${j},${k}`,
+            //     `${i},${j + 1},${k}`,  `${i},${j - 1},${k}`,
+            //     `${i},${j},${k + 1}`,  `${i},${j},${k - 1}`
+            //    // ((i+1)+','+j+','+k),  ((i-1)+','+j+','+k),
+            //    // (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
+            //    // (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
+            // ];
+
+            let push = (chks, newDepth) => chks.forEach(c => {
+                if (!marks.has(`${currentWorld},${c}`))
+                    stack.push([currentWorld, c, newDepth]);
+            });
+
+            console.log(`${startWid}, ${currentWorld}`);
             if (startWid !== currentWorld) {
-                // add depth
-                // TODO
+                push(chksXY, currentDepth + 2);
+                push(chksZ, currentDepth + 2);
             }
-            if (currentWorld) {
+            else // if (startWid === currentWorld)
+            {
                 let world = wModel.getWorld(currentWorld);
-                if (world.isFlat()) {
-                    // add depth
-                    // TODO
+                if (world && world.isFlat()) {
+                    push(chksXY, currentDepth + 1);
+                    push(chksZ, currentDepth + 2);
+                } else {
+                    push(chksXY, currentDepth + 1);
+                    push(chksZ, currentDepth + 1);
                 }
             }
-
-            // TODO [HIGH] discriminate depth k+ and k-
-            chks.forEach(c => {
-                if (!marks.has(`${currentWorld},${c}`))
-                    stack.push([currentWorld, c, currentDepth + 1]);
-            });
 
             let gates = this.getPortalsFromChunk(currentWorld, currentChunk);
             if (gates) {
