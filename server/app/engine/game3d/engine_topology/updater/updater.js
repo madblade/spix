@@ -58,15 +58,15 @@ class Updater
         let o = this._outputBuffer;
         let em = this._entityModel;
 
-        let a = UpdaterAccess.addBlock(avatar, x, y, z, world, em);
+        let a = UpdaterAccess.requestAddBlock(avatar, x, y, z, world, em);
         if (!a) return;
 
         let $chunk; let $x; let $y; let $z;
         [$chunk, $x, $y, $z] = a;
 
         let $id = $chunk.add($x, $y, $z, blockId);
-        UpdaterBlock.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z);
-        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterAddition($chunk, $id, $x, $y, $z);
+        UpdaterBlock.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z, blockId);
+        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterAddition($chunk, $id, $x, $y, $z, blockId);
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));
@@ -79,7 +79,7 @@ class Updater
         let o = this._outputBuffer;
         let em = this._entityModel;
 
-        let a = UpdaterAccess.delBlock(avatar, x, y, z, world, em);
+        let a = UpdaterAccess.requestDelBlock(avatar, x, y, z, world, em);
         if (!a) return;
 
         let $chunk; let $x; let $y; let $z;

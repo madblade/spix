@@ -108,12 +108,18 @@ class CSFX
 
             for (let direction = 0; direction < 6; ++direction) {
                 if (CSFX.inbounds(direction, blockId, iS, ijS, capacity)) {
-                    if (block !== airBlock && CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, airBlock)) {
+                    if (block !== airBlock &&
+                        CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, airBlock))
+                    {
                         CSFX.setFace(direction, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
-                    } else if (block !== waterBlock && CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, waterBlock)) {
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            block !== waterBlock ? 1 : 2); // this face is rock or water surface
+                    } else if (block !== airBlock && block !== waterBlock &&
+                        CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, waterBlock))
+                    {
                         CSFX.setFace(direction, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1); // this face is underwater
                     }
                 }
 
@@ -124,18 +130,23 @@ class CSFX
                     const xblock = nbX[blockId - iS + 1];
                     if (block !== airBlock && xblock === airBlock) { // i+
                         CSFX.setFace(3, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            block !== waterBlock ? 1 : 2);
                     }
                     else if (block === airBlock && xblock !== airBlock && xblock !== undefined) { // i+
                         CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
-                    } else if (block !== waterBlock && xblock === waterBlock) {
-                        CSFX.setFace(3, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            xblock !== waterBlock ? 1 : 2, true);
                     }
-                    else if (block === waterBlock && xblock !== waterBlock && xblock !== undefined) {
+                    else if (block !== airBlock && block !== waterBlock && xblock === waterBlock) {
+                        CSFX.setFace(3, blockId, block, faces, surfaceFaces,
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1);
+                    }
+                    else if (block === waterBlock && xblock !== airBlock && xblock !== waterBlock && xblock !== undefined) {
                         CSFX.setFace(0, blockId, xblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1, true);
                     }
                 }
                 else if (direction === 4)
@@ -143,18 +154,26 @@ class CSFX
                     const yblock = nbY[blockId - ijS + iS];
                     if (block !== airBlock && yblock === airBlock) {
                         CSFX.setFace(4, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            block !== waterBlock ? 1 : 2);
                     }
-                    else if (block === airBlock && yblock !== airBlock && yblock !== undefined) {
+                    else if (block === airBlock && yblock !== airBlock && yblock !== undefined)
+                    {
                         CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
-                    } else if (block !== waterBlock && yblock === waterBlock) {
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            yblock !== waterBlock ? 1 : 2, true);
+                    }
+                    else if (block !== airBlock && block !== waterBlock && yblock === waterBlock)
+                    {
                         CSFX.setFace(4, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1);
                     }
-                    else if (block === waterBlock && yblock !== waterBlock && yblock !== undefined) {
+                    else if (block === waterBlock && yblock !== airBlock && yblock !== waterBlock && yblock !== undefined)
+                    {
                         CSFX.setFace(1, blockId, yblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1, true);
                     }
                 }
                 else if (direction === 5)
@@ -162,18 +181,26 @@ class CSFX
                     const zblock = nbZ[blockId - capacity + ijS];
                     if (block !== airBlock && zblock === airBlock) {
                         CSFX.setFace(5, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            block !== waterBlock ? 1 : 2);
                     }
-                    else if (block === airBlock && zblock !== airBlock && zblock !== undefined) {
+                    else if (block === airBlock && zblock !== airBlock && zblock !== undefined)
+                    {
                         CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 1, true);
-                    } else if (block !== waterBlock && zblock === waterBlock) {
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            zblock !== waterBlock ? 1 : 2, true);
+                    }
+                    else if (block !== airBlock && block !== waterBlock && zblock === waterBlock)
+                    {
                         CSFX.setFace(5, blockId, block, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1);
                     }
-                    else if (block === waterBlock && zblock !== waterBlock && zblock !== undefined) {
+                    else if (block === waterBlock && zblock !== airBlock && zblock !== waterBlock && zblock !== undefined)
+                    {
                         CSFX.setFace(2, blockId, zblock, faces, surfaceFaces,
-                            encounteredFaces, connectedComponents, capacity, iS, ijS, 2, true);
+                            encounteredFaces, connectedComponents, capacity, iS, ijS,
+                            1, true);
                     }
                 }
             }

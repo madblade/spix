@@ -5,10 +5,14 @@
 'use strict';
 
 import CollectionUtils from '../../../math/collections';
-import CSFX from '../../engine_consistency/builder/surface_faces_builder'; // Get linkage strategy.
+import CSFX from '../../engine_consistency/builder/surface_faces_builder';
+import { BlockType } from '../../model_world/model'; // Get linkage strategy.
 
-class UpdaterFace {
-
+class UpdaterFace
+{
+    /**
+     * @deprecated
+     */
     static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, faces) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
         // i.e. if blocking edges form a cycle.
@@ -65,7 +69,11 @@ class UpdaterFace {
 
     // BLOCK ADDITION
     // The difficulty is to determine which surface faces belong to which component after an addition.
-    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z) {
+    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z, blockId)
+    {
+        let airBlock = BlockType.AIR;
+        let waterBlock = BlockType.WATER;
+
         let dimensions = chunk.dimensions;
 
         // Compute concerned faces.
@@ -311,6 +319,10 @@ class UpdaterFace {
         }
     }
 
+    /**
+     *  This was never implemented (and never will be).
+     *  @deprecated
+     */
     static divideConnectedComponents(/*chunk, id, x, y, z, addedFaces*/) {
         // let nbp = CollectionUtils.numberOfProperties;
         /**

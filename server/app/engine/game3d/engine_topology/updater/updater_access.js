@@ -8,9 +8,9 @@ import GeometryUtils from '../../../math/geometry';
 
 // import NumberUtils      from '../../../math/numbers';
 
-class UpdaterAccess {
-
-    static addBlock(originEntity, x, y, z, world, entityModel) {
+class UpdaterAccess
+{
+    static requestAddBlock(originEntity, x, y, z, world, entityModel) {
         const dimX = world.xSize;
         const dimY = world.ySize;
         const dimZ = world.zSize;
@@ -26,7 +26,7 @@ class UpdaterAccess {
         let coordsOnChunk = [xOnChunk, yOnChunk, zOnChunk];
 
         function failure(reason) {
-            console.log(`Request denied: ${reason}`);
+            console.log(`[UpdaterAccess/AddBlock] Request denied: ${reason}`);
         }
 
         if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z)) {
@@ -47,7 +47,7 @@ class UpdaterAccess {
         return [chunk, ...coordsOnChunk];
     }
 
-    static delBlock(originEntity, x, y, z, world/*, entityModel*/) {
+    static requestDelBlock(originEntity, x, y, z, world/*, entityModel*/) {
         // Translate.
         const dimX = world.xSize;
         const dimY = world.ySize;
@@ -63,7 +63,7 @@ class UpdaterAccess {
 
         // Validate.
         function failure(reason) {
-            console.log(`Request denied: ${reason}`);
+            console.log(`[UpdaterAccess/DelBlock] Request denied: ${reason}`);
         }
 
         if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z)) {
@@ -84,7 +84,6 @@ class UpdaterAccess {
         const d3 = GeometryUtils.euclideanDistance3(originEntity.position, [x + .5, y + .5, z + .5]);
         return d3 < 10;
     }
-
 }
 
 export default UpdaterAccess;

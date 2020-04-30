@@ -6,9 +6,10 @@
 
 import CollectionUtils from '../../../math/collections';
 import ChunkBuilder from '../../engine_consistency/builder/builder_chunks';
+import { BlockType } from '../../model_world/model';
 
-class UpdaterBlock {
-
+class UpdaterBlock
+{
     static removeSurfaceBlock(surfaceBlocks, chunk, x, y, z) {
         surfaceBlocks[z].splice(surfaceBlocks[z].indexOf(chunk._toId(x, y, z)));
     }
@@ -21,8 +22,13 @@ class UpdaterBlock {
 
     // The difficulty is to keep layered surfaceBlocks sorted.
     // TODO [HIGH] I am quite sure this does not work at all for neighbour chunks.
-    static updateSurfaceBlocksAfterAddition(chunk, id, x, y, z)
+    static updateSurfaceBlocksAfterAddition(
+        chunk, id, x, y, z, blockId)
     {
+        let airBlock = BlockType.AIR;
+        let waterBlock = BlockType.WATER;
+        let isAddedBlockWater = blockId === waterBlock;
+
         let surfaceBlocks = chunk.surfaceBlocks;
         let dimensions = chunk.dimensions;
         let xp = false;
@@ -36,7 +42,9 @@ class UpdaterBlock {
 
         // Update (x+1, x-1) blocks.
         if (x > 0) {
-            if (chunk.contains(x - 1, y, z)) {
+            let cbm = chunk.what(x - 1, y, z);
+            if (chunk.contains(x - 1, y, z))
+            {
                 xm = true;
                 if ((y - 1 < 0 || chunk.contains(x - 1, y - 1, z)) &&
                     (y + 1 > dimensions[1] || chunk.contains(x - 1, y + 1, z)) &&
