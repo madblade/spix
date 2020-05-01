@@ -133,6 +133,7 @@ class SimplePerlin
         const air = BlockType.AIR;
         const stone = BlockType.STONE;
         const grass = BlockType.GRASS;
+        const water = BlockType.WATER;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
         const planks = BlockType.PLANKS;
@@ -321,7 +322,10 @@ class SimplePerlin
                     for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
                         const currentBlock = ffz(zz);
-                        blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                        if (zz === bl - 1)
+                            blocks[currentBlock] = water; // ijS * zz + xy
+                        else
+                            blocks[currentBlock] = mainBlockId; // ijS * zz + xy
                     }
                 }
             }
