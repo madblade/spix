@@ -5,13 +5,15 @@
 'use strict';
 
 import {
-    BackSide, VertexColors,
-    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide, MeshStandardMaterial, Color
+    BackSide, MeshStandardMaterial, Color,
+    VertexColors,
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide,
 } from 'three';
 
 let MaterialsModule = {
 
-    createMaterial(whatMaterial, meta) {
+    createMaterial(whatMaterial, meta)
+    {
         let material;
 
         switch (whatMaterial) {
@@ -39,7 +41,7 @@ let MaterialsModule = {
                     // color: 0x110011,
                     side: FrontSide,
                     //vertexColors: VertexColors,
-                    map: this.texture
+                    map: this.textureAtlas
                 });
                 break;
 

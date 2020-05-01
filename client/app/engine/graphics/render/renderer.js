@@ -280,6 +280,8 @@ extend(RendererManager.prototype, {
         // Compute draw calls
         // console.log(renderer.info.render.calls);
         renderer.info.reset();
+
+        // TODO update all chunk water.
     },
 
     resize(width, height) {

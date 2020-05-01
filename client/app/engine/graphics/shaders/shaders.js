@@ -4,19 +4,29 @@
 
 'use strict';
 
-import PortalFragment  from './portal/portal.fragment.glsl';
-import PortalVertex    from './portal/portal.vertex.glsl';
-import SkyFlatFragment from './sky/skyFlat.fragment.glsl';
-import SkyFlatVertex   from './sky/skyFlat.vertex.glsl';
-import SkyCubeFragment from './sky/skyCube.fragment.glsl';
-import SkyCubeVertex   from './sky/skyCube.vertex.glsl';
-import PlanetFragment  from './sky/planet.fragment.glsl';
-import PlanetVertex    from './sky/planet.vertex.glsl';
-import BloomSelectiveFragment  from './postprocessing/bloom.selective.fragment.glsl';
-import BloomSelectiveVertex  from './postprocessing/bloom.selective.vertex.glsl';
+// Portals
+import PortalFragment       from './portal/portal.fragment.glsl';
+import PortalVertex         from './portal/portal.vertex.glsl';
+
+// Sky
+import SkyFlatFragment      from './sky/skyFlat.fragment.glsl';
+import SkyFlatVertex        from './sky/skyFlat.vertex.glsl';
+import SkyCubeFragment      from './sky/skyCube.fragment.glsl';
+import SkyCubeVertex        from './sky/skyCube.vertex.glsl';
+
+// Water
+import WaterFragment        from './water/water.fragment.glsl';
+import WaterVertex          from './water/water.vertex.glsl';
+import OceanFragment        from './water/ocean.fragment.glsl';
+import OceanVertex          from './water/ocean.vertex.glsl';
+
+// Post-proc
+import BloomSelectiveFragment   from './postprocessing/bloom.selective.fragment.glsl';
+import BloomSelectiveVertex     from './postprocessing/bloom.selective.vertex.glsl';
 
 let ShadersModule = {
 
+    // Portal
     getPortalVertexShader() {
         return PortalVertex;
     },
@@ -25,6 +35,7 @@ let ShadersModule = {
         return PortalFragment;
     },
 
+    // Sky
     getSkyCubeVertexShader() {
         return SkyCubeVertex;
     },
@@ -41,14 +52,30 @@ let ShadersModule = {
         return SkyFlatFragment;
     },
 
-    getPlanetVertexShader() {
-        return PlanetVertex;
+    // Water
+    getWaterFragmentShader() {
+        return `
+            #include <common>
+            ${WaterFragment}
+        `;
     },
 
-    getPlanetFragmentShader() {
-        return PlanetFragment;
+    getWaterVertexShader() {
+        return `
+            #include <common>
+            ${WaterVertex}
+        `;
     },
 
+    getOceanFragmentShader() {
+        return OceanFragment;
+    },
+
+    getOceanVertexShader() {
+        return OceanVertex;
+    },
+
+    // Post-proc
     getBloomSelectiveVertexShader() {
         return BloomSelectiveVertex;
     },

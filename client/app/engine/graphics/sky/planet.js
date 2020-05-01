@@ -50,8 +50,8 @@ SimplePlanet.prototype = Object.create(Mesh.prototype);
  */
 let Atmosphere = function(planet)
 {
-    let atmosVertex = ShadersModule.getPlanetVertexShader();
-    let atmosFragment = ShadersModule.getPlanetFragmentShader();
+    let atmosVertex = ''; //ShadersModule.getPlanetVertexShader();
+    let atmosFragment = ''; //ShadersModule.getPlanetFragmentShader();
 
     this.planet = planet;
     // this.planet_scene = new Scene();

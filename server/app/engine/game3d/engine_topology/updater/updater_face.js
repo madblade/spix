@@ -386,11 +386,8 @@ class UpdaterFace
     /**
      * @deprecated
      */
-    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z, blockId)
+    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z)
     {
-        let airBlock = BlockType.AIR;
-        let waterBlock = BlockType.WATER;
-
         let dimensions = chunk.dimensions;
 
         // Compute concerned faces.

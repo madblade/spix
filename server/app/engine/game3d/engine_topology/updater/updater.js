@@ -85,10 +85,10 @@ class Updater
         let $chunk; let $x; let $y; let $z;
         [$chunk, $x, $y, $z] = a;
 
-        let block = $chunk.what($x, $y, $z);
+        let oldBlock = $chunk.what($x, $y, $z);
         let $id = $chunk.del($x, $y, $z);
         UpdaterBlock.updateSurfaceBlocksAfterDeletion($chunk, $id, $x, $y, $z);
-        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterDeletion2($chunk, $id, $x, $y, $z, block);
+        let updatedChunks = UpdaterFace.updateSurfaceFacesAfterDeletion2($chunk, $id, $x, $y, $z, oldBlock);
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));

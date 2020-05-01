@@ -27,7 +27,8 @@ let CoreModule = {
     },
 
     resolveIfLoaded(resolve) {
-        if (this._texturesLoaded && this._nbMeshesToLoad === this._nbMeshesLoadedOrError)
+        if (this._nbTexturesLoaded === this._nbTexturesToLoad &&
+            this._nbMeshesToLoad === this._nbMeshesLoadedOrError)
         {
             console.log('[Graphics/Core] Everything loaded.');
             resolve();

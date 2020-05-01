@@ -6,17 +6,38 @@
 
 import {
     // LinearMipMapLinearFilter,
-    NearestFilter, TextureLoader
+    NearestFilter, RepeatWrapping, TextureLoader
 } from 'three';
 
 let TexturesModule = {
 
-    loadTextures() {
-        this.texture = this.loadTexture('3.jpg');
+    loadTextures()
+    {
+        this._nbTexturesToLoad = 2;
+
+        this.textureAtlas = this.loadTextureAtlas('3.jpg');
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
+
+        this.waterNormals = this.loadTextureNormals('water-normals.jpg');
     },
 
-    loadTexture(whatTexture)
+    loadTextureNormals(whatTexture)
+    {
+        let loader = new TextureLoader();
+        loader.load(`app/assets/textures/${whatTexture}`,
+            t => {
+                console.log('[Graphics/Textures] Water normals loaded.');
+                t.wrapS = t.wrapT = RepeatWrapping;
+                this.texture = t;
+                this._nbTexturesLoaded++;
+            },
+            undefined,
+            () => {
+                console.error('[Graphics/Textures] Failed to load water normals.');
+            });
+    },
+
+    loadTextureAtlas(whatTexture)
     {
         let loader = new TextureLoader();
         // let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
@@ -24,17 +45,17 @@ let TexturesModule = {
         // let texture =
         loader.load(`app/assets/textures/${whatTexture}`,
             t => {
-                console.log('[Graphics/Textures] Texture loaded.');
+                console.log('[Graphics/Textures] Texture Atlas loaded.');
 
                 // t.anisotropy = maxAnisotropy;
                 t.magFilter = NearestFilter;
                 t.minFilter = NearestFilter;
-                this.texture = t;
-                this._texturesLoaded = true;
+                this.textureAtlas = t;
+                this._nbTexturesLoaded++;
             },
             undefined,
             () => {
-                console.error('[Graphics/Textures] Failed to load texture.');
+                console.error('[Graphics/Textures] Failed to load texture atlas.');
             });
 
         // texture.anisotropy = maxAnisotropy;

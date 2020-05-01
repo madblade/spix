@@ -15,6 +15,9 @@ import { LightDefaultColors, LightDefaultIntensities } from '../light';
 
 let SkyModule = {
 
+    /**
+     * @deprecated
+     */
     createPlanet()
     {
         let planet = new SimplePlanet();

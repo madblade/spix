@@ -22,6 +22,7 @@ import { RenderersModule }  from './render/renderer.js';
 import { ScenesModule }  from './render/scene.js';
 import { FacesModule }  from './terrain/faces.js';
 import { ChunksModule }  from './terrain/chunks.js';
+import { ChunksMeshModule } from './terrain/chunkmesh';
 import { ShadersModule }  from './shaders/shaders.js';
 import { SkyModule }  from './sky/skies.js';
 
@@ -51,7 +52,9 @@ let Graphics = function(app) {
     // Textures
     this.texture = null;
     this.textureCoordinates = null;
-    this._texturesLoaded = false;
+    this._nbTexturesLoaded = 0;
+    this._nbTexturesToLoad = 0;
+    this.oneWater = false;
 
     // Meshes
     this.referenceMeshes = null;
@@ -85,6 +88,7 @@ extend(Graphics.prototype, RenderersModule);
 extend(Graphics.prototype, ScenesModule);
 extend(Graphics.prototype, FacesModule);
 extend(Graphics.prototype, ChunksModule);
+extend(Graphics.prototype, ChunksMeshModule);
 extend(Graphics.prototype, ShadersModule);
 extend(Graphics.prototype, SkyModule);
 
