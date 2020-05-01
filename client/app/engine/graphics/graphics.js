@@ -54,6 +54,8 @@ let Graphics = function(app) {
     this.textureCoordinates = null;
     this._nbTexturesLoaded = 0;
     this._nbTexturesToLoad = 0;
+
+    // Water
     this.oneWater = false;
 
     // Meshes

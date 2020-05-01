@@ -37,7 +37,7 @@ void sunLight(
 	diffuseColor += max( dot(sunDirection, surfaceNormal), 0.0 ) * sunColor * diffuse;
 }
 
-//#include <common> // TODO remove webstorm warning
+//#include <common>
 #include <packing>
 #include <bsdfs>
 #include <fog_pars_fragment>

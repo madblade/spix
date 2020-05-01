@@ -6,7 +6,7 @@ varying vec4 mirrorCoord;
 varying vec4 worldPosition;
 
 varying vec3 vvnormal;
-//#include <common> // TODO remove webstorm warning
+//#include <common>
 #include <fog_pars_vertex>
 #include <shadowmap_pars_vertex>
 #include <logdepthbuf_pars_vertex>

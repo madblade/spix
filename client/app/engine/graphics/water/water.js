@@ -80,9 +80,8 @@ let Water = function(geometry, options)
 
     let renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters);
 
-    if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
+    if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight))
         renderTarget.texture.generateMipmaps = false;
-    }
 
     let mirrorShader =
     {

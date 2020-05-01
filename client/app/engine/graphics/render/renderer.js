@@ -117,7 +117,6 @@ extend(RendererManager.prototype, {
     createRenderer() {
         // Configure renderer
         let renderer = new WebGLRenderer({
-            // TODO [MEDIUM] propose different antialiasing strategy
             antialias: false,
             alpha: true,
             // precision: 'mediump'
@@ -142,6 +141,20 @@ extend(RendererManager.prototype, {
         this.renderRegister = renderRegister;
     },
 
+    _darkenNonBloomed(obj, materials) {
+        if (obj.isMesh && obj.userData.bloom !== true) {
+            materials[obj.uuid] = obj.material;
+            obj.material = this.darkMaterial;
+        }
+    },
+
+    _restoreMaterial(obj, materials) {
+        if (materials[obj.uuid]) {
+            obj.material = materials[obj.uuid];
+            delete materials[obj.uuid];
+        }
+    },
+
     render(sceneManager, cameraManager)
     {
         if (this.stop) return;
@@ -150,18 +163,6 @@ extend(RendererManager.prototype, {
 
         // Util.
         let materials = {};
-        let darkenNonBloomed = obj => {
-            if (obj.isMesh && obj.userData.bloom !== true) {
-                materials[obj.uuid] = obj.material;
-                obj.material = this.darkMaterial;
-            }
-        };
-        let restoreMaterial = obj => {
-            if (materials[obj.uuid]) {
-                obj.material = materials[obj.uuid];
-                delete materials[obj.uuid];
-            }
-        };
 
         // Render first pass.
         let mainScene = sceneManager.mainScene;
@@ -172,6 +173,7 @@ extend(RendererManager.prototype, {
         skies.forEach(sky => {
             this.graphics.updateSunPosition(mainCamera, sky);
         });
+        // TODO update all chunk water.
 
         // Render every portal.
         let renderCount = 0;
@@ -240,9 +242,9 @@ extend(RendererManager.prototype, {
                 this.composers.set(id, bufferComposer);
             }
 
-            bufferScene.traverse(darkenNonBloomed);
+            bufferScene.traverse(obj => this._darkenNonBloomed(obj, materials));
             bufferComposer[0].render();
-            bufferScene.traverse(restoreMaterial);
+            bufferScene.traverse(obj => this._restoreMaterial(obj, materials));
             bufferComposer[1].render();
             // composer.render(); // Double render for camera 1frame lag.
             // composer.render();
@@ -272,16 +274,14 @@ extend(RendererManager.prototype, {
         }
 
         // MAIN RENDER
-        mainScene.traverse(darkenNonBloomed);
+        mainScene.traverse(obj => this._darkenNonBloomed(obj, materials));
         composer[0].render();
-        mainScene.traverse(restoreMaterial);
+        mainScene.traverse(obj => this._restoreMaterial(obj, materials));
         composer[1].render();
 
         // Compute draw calls
         // console.log(renderer.info.render.calls);
         renderer.info.reset();
-
-        // TODO update all chunk water.
     },
 
     resize(width, height) {

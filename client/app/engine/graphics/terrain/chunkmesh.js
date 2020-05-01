@@ -1,5 +1,4 @@
 import { BoxBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial, Vector3 } from 'three';
-import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Water } from '../water/water';
 
 let ChunksMeshModule = {
