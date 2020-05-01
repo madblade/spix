@@ -328,14 +328,14 @@ class UpdaterFace
     }
 
     static updateSurfaceFacesAfterDeletion2(
-        chunk, id, x, y, z)
+        chunk, id, x, y, z, blockId)
     {
         let otherUpdatedChunks = [];
 
         let airBlock = BlockType.AIR;
         let waterBlock = BlockType.WATER;
 
-        let blockId = chunk.queryBlock(x, y, z);
+        // let blockId = chunk.queryBlock(x, y, z);
         let isRemovedBlockWater = blockId === waterBlock;
 
         let a = chunk.queryBlock(x - 1, y, z);

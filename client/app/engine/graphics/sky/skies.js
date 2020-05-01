@@ -196,7 +196,8 @@ let SkyModule = {
 
         phi %= 2 * Math.PI;
         // let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
-        phi += 0.00101; // * dist;
+        // phi += 0.00101; // * dist;
+        phi = Math.PI / 2; // * dist;
         skyObject.phi = phi;
 
         let x = distance * cos(phi);

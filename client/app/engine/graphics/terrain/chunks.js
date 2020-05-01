@@ -7,8 +7,9 @@
 import {
     BoxBufferGeometry,
     BufferAttribute, BufferGeometry,
-    Color, DoubleSide, Mesh, MeshBasicMaterial, Vector3
+    Color, DoubleSide, FrontSide, Mesh, MeshBasicMaterial, Vector3
 } from 'three';
+import { ItemType } from '../../../model/server/self/items';
 
 let ChunksModule = {
 
@@ -96,7 +97,7 @@ let ChunksModule = {
         let chunkJ = parseInt(chunkIndices[1], 10); let jChunkOffset = chunkJ * chunkSizeY;
         let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
 
-        let sunCapacity = 16; // Math.floor(3 / 2 * triangles);
+        let sunCapacity = this._defaultEmptyChunkSize; // Math.floor(3 / 2 * triangles);
         if (this.debug) {
             console.log(`On chunk ${chunkId}, init geometry will be ${sunCapacity * 3 * 3}-capable.`);
         }
@@ -267,6 +268,7 @@ let ChunksModule = {
         let meshes =            chunk.meshes;
         let capacities =        chunk.capacities;
         let sizes =             chunk.sizes;
+        let water =             chunk.water;
         let whereToFindFace =   chunk.whereToFindFace;
         let whichFaceIs =       chunk.whichFaceIs;
 
@@ -274,15 +276,29 @@ let ChunksModule = {
         let added =     components[1];
         let updated =   components[2];
 
+        if (this.debug) {
+            console.log('BUD');
+            console.log(removed);
+            console.log(added);
+            console.log(updated);
+        }
+
+        // Bundle updated faces.
+        for (let uid in updated) {
+            if (!updated.hasOwnProperty(uid)) continue;
+            let update = updated[uid];
+            removed[uid] = null;
+            added[uid] = update;
+        }
+
         this.removeChunkFaces(
             worldId, removed,
             geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
 
         this.addChunkFaces(
-            worldId, added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
+            worldId, added, geometries, materials, meshes, capacities, sizes,
+            water, whereToFindFace, whichFaceIs,
             chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
-
-        this.updateChunkFaces(worldId, updated, geometries);
     },
 
     removeChunkFaces(worldId, removed,
@@ -387,7 +403,7 @@ let ChunksModule = {
     },
 
     addChunkFaces(worldId, added,
-        geometries, materials, meshes, capacities, sizes,
+        geometries, materials, meshes, capacities, sizes, water,
         whereToFindFace, whichFaceIs,
         chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
     {
@@ -404,7 +420,9 @@ let ChunksModule = {
         let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
         let defaultGeometrySize = this.defaultGeometrySize;
 
-        for (let aaid in added) {
+        for (let aaid in added)
+        {
+            if (!added.hasOwnProperty(aaid)) continue;
             let aid = parseInt(aaid, 10);
 
             // Get graphic data
@@ -414,10 +432,19 @@ let ChunksModule = {
                 continue;
             }
 
+            let nature = added[aid];
+            // If water, add into water mesh.
+            let isWater = Math.abs(nature) === ItemType.BLOCK_WATER;
+
             // Compute mesh id.
             meshId = 0;
             let meshHasToBeAdded = false;
-            while (sizes[meshId] !== undefined && sizes[meshId] === capacities[meshId]) ++meshId;
+            while (meshes[meshId] !== undefined &&
+                (sizes[meshId] === capacities[meshId] ||
+                water[meshId] !== isWater))
+            {
+                ++meshId;
+            }
 
             // Add new mesh if necessary.
             meshHasToBeAdded = sizes[meshId] === undefined;
@@ -438,8 +465,16 @@ let ChunksModule = {
                 // Create geometry.
                 geometry = new BufferGeometry();
                 geometries[meshId] = geometry;
-                materials[meshId] = this.createMaterial('textured-phong', 0xb8860b);
+                let newMaterial = this.createMaterial('textured-phong', 0xb8860b);
+                if (isWater) {
+                    newMaterial.transparent = true;
+                    newMaterial.opacity = 0.3;
+                    newMaterial.side = FrontSide;
+                }
+                materials[meshId] = newMaterial;
+
                 sizes[meshId] = 1;
+                water[meshId] = isWater;
                 whichFaceIs.set(meshId, new Map());
 
                 let triangles = 2 * defaultGeometrySize;
@@ -473,7 +508,6 @@ let ChunksModule = {
             let color = new Color();
             let pos = sizes[meshId] - 1;
 
-            let nature = added[aid]; // Corresponds to block id.
             let normal = nature > 0;
             whereToFindFace.set(aid, [meshId, pos]);
             whichFaceIs.get(meshId).set(pos, aid);
@@ -508,17 +542,6 @@ let ChunksModule = {
             geometry.computeBoundingSphere();
         }
     },
-
-    // TODO [LONG-TERM] manage changes
-    updateChunkFaces(worldId, updated, geometries) {
-        // for (let uid in updated) {
-        // }
-        if (window.debug) {
-            console.log(worldId);
-            console.log(updated);
-            console.log(geometries);
-        }
-    }
 
 };
 

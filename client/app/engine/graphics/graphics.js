@@ -37,6 +37,7 @@ let Graphics = function(app) {
     this.windowHalfY = window.innerHeight / 2;
     // TODO [LOW] customize newMesh size variable
     this.defaultGeometrySize = 64;
+    this._defaultEmptyChunkSize = 16;
 
     // Rendering.
     this.requestId          = null;
