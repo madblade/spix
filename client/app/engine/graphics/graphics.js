@@ -50,7 +50,8 @@ let Graphics = function(app) {
     this.controls =     null;
 
     // Textures
-    this.texture = null;
+    this.textureAtlas = null;
+    this.textureWaterNormals = null;
     this.textureCoordinates = null;
     this._nbTexturesLoaded = 0;
     this._nbTexturesToLoad = 0;

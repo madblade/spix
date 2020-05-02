@@ -6,9 +6,10 @@
 
 import extend from '../../../extend.js';
 import { Camera } from './camera.js';
-import { Matrix4, Plane, Raycaster, Vector2, Vector3, Vector4 } from 'three';
+import { CameraHelper, LinearFilter, Matrix4, PerspectiveCamera, Plane, Raycaster, RGBFormat, Vector2, Vector3, Vector4, WebGLRenderTarget } from 'three';
 
-let CameraManager = function(graphicsEngine) {
+let CameraManager = function(graphicsEngine)
+{
     this.graphicsEngine = graphicsEngine;
 
     // Camera properties.
@@ -20,13 +21,34 @@ let CameraManager = function(graphicsEngine) {
     // Cameras.
     this.mainCamera = this.createCamera(false, -1);
     this.mainCamera.setCameraId(-1);
-    this.subCameras = new Map();
 
+    // Raycast with different near plane
     this.mainRaycasterCamera = this.createCamera(true, -1);
     this.raycaster = this.createRaycaster();
 
-    this.screen = null;
+    // Portals
+    this.subCameras = new Map();
+    // Water
+    this.waterCamera = new PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
+    this.waterRenderTarget = new WebGLRenderTarget(512, 512, {
+        minFilter: LinearFilter, magFilter: LinearFilter,
+        format: RGBFormat, stencilBuffer: false
+    });
+    this.mirrorPlane = new Plane();
+    this.normal = new Vector3();
+    this.mirrorWorldPosition = new Vector3();
+    this.cameraWorldPosition = new Vector3();
+    this.rotationMatrix = new Matrix4();
+    this.lookAtPosition = new Vector3(0, 0, -1);
+    this.clipPlane = new Vector4();
+    this.view = new Vector3();
+    this.target = new Vector3();
+    this.q = new Vector4();
+    this.textureMatrix = new Matrix4();
+    this.clipBias = 0.0;
+    this.waterCameraHelper = new CameraHelper(this.waterCamera);
 
+    // Optimization
     this.incomingRotationEvents = [];
 };
 

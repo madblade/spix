@@ -18,7 +18,7 @@ let TexturesModule = {
         this.textureAtlas = this.loadTextureAtlas('3.jpg');
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
 
-        this.waterNormals = this.loadTextureNormals('water-normals.jpg');
+        this.textureWaterNormals = this.loadTextureNormals('water-normals.jpg');
     },
 
     loadTextureNormals(whatTexture)
@@ -28,7 +28,7 @@ let TexturesModule = {
             t => {
                 console.log('[Graphics/Textures] Water normals loaded.');
                 t.wrapS = t.wrapT = RepeatWrapping;
-                this.texture = t;
+                this.textureWaterNormals = t;
                 this._nbTexturesLoaded++;
             },
             undefined,

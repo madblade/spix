@@ -12,6 +12,7 @@ varying vec3 vvnormal;
 #include <logdepthbuf_pars_vertex>
 
 // Ref. in GPU Gems 1
+// https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
 vec3 gerstnerPositions(float x, float y) {
     float ox = x;
     float oy = y;
@@ -49,7 +50,8 @@ vec3 gerstnerNormals(float x, float y, vec3 p) {
     return vec3(nx, ny, nz);
 }
 
-void main() {
+void main()
+{
 	mirrorCoord = modelMatrix * vec4( position, 1.0 );
 	worldPosition = mirrorCoord.xyzw;
 	mirrorCoord = textureMatrix * mirrorCoord;

@@ -18,8 +18,8 @@ let ChunksModule = {
         let components = all[0];
         let natures = all[1];
 
-        console.log(components);
-        console.log(natures);
+        // console.log(components);
+        // console.log(natures);
 
         let currentComponent;
         let currentNatures;

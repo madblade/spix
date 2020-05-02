@@ -5,7 +5,6 @@
 'use strict';
 
 import Stats from 'stats.js';
-import { $ } from '../../modules/polyfills/dom';
 
 let CoreModule = {
 
@@ -128,6 +127,7 @@ let CoreModule = {
         let worldId = selfModel.worldId;
         this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
         this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
+        this.addToScene(this.cameraManager.waterCameraHelper, worldId);
     },
 
     /**
