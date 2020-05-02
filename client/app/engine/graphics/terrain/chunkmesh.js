@@ -3,41 +3,39 @@ import { Water } from '../water/water';
 
 let ChunksMeshModule = {
 
-    createChunkMesh(geometry, isWater)
+    createChunkMesh(geometry, isWater, isWorldFlat)
     {
         if (isWater)
         {
             // low-res
-            if (this.oneWater) {
+            if (!isWorldFlat) {
                 let material = this.createMaterial('textured-phong', 0xaaaaaa);
                 material.transparent = true;
                 material.opacity = 0.3;
                 material.side = DoubleSide;
                 return new Mesh(geometry, material);
             }
-            this.oneWater = true;
-            let nm = new Water(
+            // this.oneWater = true;
+            return new Water(
                 this,
-                new PlaneBufferGeometry(32, 32, 1, 1),
+                geometry,
+                // new PlaneBufferGeometry(32, 32, 1, 1),
                 {
                     textureWidth: 512,
                     textureHeight: 512,
                     waterNormals: this.textureWaterNormals,
-                    alpha: 1.0,
+                    alpha: 0.5,
                     sunDirection: new Vector3(0.70707, 0.70707, 0.0),
                     sunColor: 0xffffff,
-                    waterColor: 0x001e0f,
+                    waterColor: 0x7b8a99,
                     distortionScale: 0.1,
                     size: 10.0,
                     fog: false
                 }
             );
-            nm.position.set(16, 16, 16);
-            return nm;
+            // return nm;
         } else {
             let material = this.createMaterial('textured-phong', 0xaaaaaa);
-            // material.transparent = true;
-            // material.opacity = 0;
             return new Mesh(geometry, material);
         }
     },

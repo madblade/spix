@@ -11,7 +11,9 @@ import {
     BoxBufferGeometry, SphereBufferGeometry, Vector3, Color
 } from 'three';
 import { WorldType } from '../../../model/server/chunks';
-import { LightDefaultColors, LightDefaultIntensities } from '../light';
+import {
+    LightDefaultColors, LightDefaultIntensities
+} from '../light';
 
 let SkyModule = {
 

@@ -68,11 +68,17 @@ let ShadersModule = {
     },
 
     getOceanFragmentShader() {
-        return OceanFragment;
+        return `
+            #include <common>
+            ${OceanFragment}
+        `;
     },
 
     getOceanVertexShader() {
-        return OceanVertex;
+        return `
+            #include <common>
+            ${OceanVertex}
+        `;
     },
 
     // Post-proc

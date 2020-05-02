@@ -224,7 +224,10 @@ extend(ChunkModel.prototype, {
         let sizeY = property.chunkSizeY;
         let sizeZ = property.chunkSizeZ;
 
-        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ);
+        let worldMeta = this.worldProperties.get(worldId);
+        if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat);
         world.set(chunkId, chunk);
 
         // Add to scene.
@@ -243,7 +246,8 @@ extend(ChunkModel.prototype, {
         }
     },
 
-    updateChunk(worldId, chunkId, components) {
+    updateChunk(worldId, chunkId, components)
+    {
         let graphics = this.app.engine.graphics;
 
         let world = this.worlds.get(worldId);
@@ -263,7 +267,13 @@ extend(ChunkModel.prototype, {
         let sizeY = property.chunkSizeY;
         let sizeZ = property.chunkSizeZ;
 
-        graphics.updateChunk(worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ);
+        let worldMeta = this.worldProperties.get(worldId);
+        if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        graphics.updateChunk(
+            worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ,
+            isWorldFlat
+        );
     },
 
     unloadChunk(worldId, chunkId) {

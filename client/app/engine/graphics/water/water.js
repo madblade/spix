@@ -115,6 +115,7 @@ let Water = function(
         vertexShader: mirrorShader.vertexShader,
         uniforms: UniformsUtils.clone(mirrorShader.uniforms),
         lights: true,
+        transparent: true,
         side,
         fog,
         //wireframe: true
@@ -143,7 +144,7 @@ let Water = function(
         // scope.material.uniforms.eye.value.copy(eyePosition).normalize();
     };
 
-    scope.onBeforeRender = function()//renderer, scene, camera)
+    // scope.onBeforeRender = function()//renderer, scene, camera)
     {
         // mirrorWorldPosition.setFromMatrixPosition(scope.matrixWorld);
         // cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);
