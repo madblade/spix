@@ -6,7 +6,12 @@
 
 import extend from '../../../extend.js';
 import { Camera } from './camera.js';
-import { CameraHelper, LinearFilter, Matrix4, PerspectiveCamera, Plane, Raycaster, RGBFormat, Vector2, Vector3, Vector4, WebGLRenderTarget } from 'three';
+import {
+    Matrix4,
+    Plane, Raycaster,
+    Vector2, Vector3, Vector4,
+} from 'three';
+import { WaterCameraModule } from '../water/watercamera';
 
 let CameraManager = function(graphicsEngine)
 {
@@ -28,25 +33,9 @@ let CameraManager = function(graphicsEngine)
 
     // Portals
     this.subCameras = new Map();
+
     // Water
-    this.waterCamera = new PerspectiveCamera(this.mainFOV, this.mainAspect, this.mainNear, this.mainFar);
-    this.waterRenderTarget = new WebGLRenderTarget(512, 512, {
-        minFilter: LinearFilter, magFilter: LinearFilter,
-        format: RGBFormat, stencilBuffer: false
-    });
-    this.mirrorPlane = new Plane();
-    this.normal = new Vector3();
-    this.mirrorWorldPosition = new Vector3();
-    this.cameraWorldPosition = new Vector3();
-    this.rotationMatrix = new Matrix4();
-    this.lookAtPosition = new Vector3(0, 0, -1);
-    this.clipPlane = new Vector4();
-    this.view = new Vector3();
-    this.target = new Vector3();
-    this.q = new Vector4();
-    this.textureMatrix = new Matrix4();
-    this.clipBias = 0.0;
-    this.waterCameraHelper = new CameraHelper(this.waterCamera);
+    this.waterCamera = this.createWaterCamera();
 
     // Optimization
     this.incomingRotationEvents = [];
@@ -423,23 +412,31 @@ extend(CameraManager.prototype, {
         }.bind(this));
     },
 
-    resize(width, height) {
+    resize(width, height)
+    {
         // TODO [HIGH] apply to other cameras AND RENDER TARGETS (DONT FORGET).
         let aspect = width / height;
 
+        // Main cam
         let camera = this.mainCamera.getRecorder();
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
 
+        // Raycast
         let raycasterCamera = this.mainRaycasterCamera.getRecorder();
         raycasterCamera.aspect = aspect;
         raycasterCamera.updateProjectionMatrix();
 
+        // Portals
         this.subCameras.forEach(function(currentCamera/*, cameraId*/) {
             let recorder = currentCamera.getRecorder();
             recorder.aspect = aspect;
             recorder.updateProjectionMatrix();
         });
+
+        // Water
+        this.waterCamera.camera.aspect = aspect;
+        this.waterCamera.camera.updateProjectionMatrix();
     },
 
     // Raycasting.
@@ -472,6 +469,8 @@ extend(CameraManager.prototype, {
     }
 
 });
+
+extend(CameraManager.prototype, WaterCameraModule);
 
 /** Interface with graphics engine. **/
 

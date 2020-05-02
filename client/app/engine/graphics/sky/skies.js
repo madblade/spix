@@ -185,6 +185,18 @@ let SkyModule = {
         return sky;
     },
 
+    getSunDirection(skyObject) {
+        let distance = this.distance;
+        let phi = skyObject.phi || 0;
+        let theta = this.theta;
+        let x = distance * Math.cos(phi);
+        let y = distance * Math.sin(phi) * Math.sin(theta);
+        let z = distance * Math.sin(phi) * Math.cos(theta);
+        let sunDirection = new Vector3(-x, y, z);
+        sunDirection.normalize().negate();
+        return sunDirection;
+    },
+
     updateSunPosition(camera, skyObject) {
         let sky = skyObject.mesh;
         if (!sky || !this.distance) return;

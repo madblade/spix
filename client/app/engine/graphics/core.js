@@ -127,7 +127,7 @@ let CoreModule = {
         let worldId = selfModel.worldId;
         this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
         this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
-        this.addToScene(this.cameraManager.waterCameraHelper, worldId);
+        // this.addToScene(this.cameraManager.waterCameraHelper, worldId);
     },
 
     /**

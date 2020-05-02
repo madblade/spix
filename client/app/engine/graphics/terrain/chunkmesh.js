@@ -26,12 +26,13 @@ let ChunksMeshModule = {
                     alpha: 1.0,
                     sunDirection: new Vector3(0.70707, 0.70707, 0.0),
                     sunColor: 0xffffff,
-                    waterColor: 0x0000ff,
-                    distortionScale: 0.0,
+                    waterColor: 0x001e0f,
+                    distortionScale: 0.1,
+                    size: 10.0,
                     fog: false
                 }
             );
-            nm.position.set(16, 16, 17);
+            nm.position.set(16, 16, 16);
             return nm;
         } else {
             let material = this.createMaterial('textured-phong', 0xaaaaaa);

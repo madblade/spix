@@ -12,19 +12,12 @@
 import {
     Color,
     FrontSide,
-    LinearFilter,
-    MathUtils,
     Matrix4,
     Mesh,
-    PerspectiveCamera,
-    Plane,
-    RGBFormat,
     ShaderMaterial,
     UniformsLib,
     UniformsUtils,
     Vector3,
-    Vector4,
-    WebGLRenderTarget
 } from 'three';
 import { ShadersModule } from '../shaders/shaders';
 
@@ -42,15 +35,20 @@ let Water = function(
 
     let alpha = options.alpha !== undefined ? options.alpha : 1.0;
     let time = options.time !== undefined ? options.time : 0.0;
-    // TODO wire in texture sampler
+
     let normalSampler = options.waterNormals !== undefined ? options.waterNormals : null;
+
     // TODO wire in sun direction
     let sunDirection = options.sunDirection !== undefined ? options.sunDirection : new Vector3(0.70707, 0.70707, 0.0);
+
     let sunColor = new Color(options.sunColor !== undefined ? options.sunColor : 0xffffff);
     let waterColor = new Color(options.waterColor !== undefined ? options.waterColor : 0x7F7F7F);
 
     // TODO wire in eye
     let eye = options.eye !== undefined ? options.eye : new Vector3(0, 0, 0);
+
+    let size = options.size !== undefined ? options.size : 1.0;
+
     let distortionScale = options.distortionScale !== undefined ? options.distortionScale : 20.0;
     let side = options.side !== undefined ? options.side : FrontSide;
     let fog = options.fog !== undefined ? options.fog : false;
@@ -98,13 +96,14 @@ let Water = function(
                 mirrorSampler: { value: null },
                 alpha: { value: 1.0 },
                 time: { value: 0.0 },
-                size: { value: 1.0 },
+                size: { value: size },
                 distortionScale: { value: 20.0 },
                 textureMatrix: { value: new Matrix4() },
                 sunColor: { value: new Color(0x7F7F7F) },
                 sunDirection: { value: new Vector3(0.70707, 0.70707, 0) },
                 eye: { value: new Vector3() },
-                waterColor: { value: new Color(0x555555) }
+                // waterColor: { value: new Color(0x555555) },
+                waterColor: { value: new Color(0x001e0f) }
             }
         ]),
         vertexShader: ShadersModule.getWaterVertexShader(),
@@ -121,8 +120,8 @@ let Water = function(
         //wireframe: true
     });
 
-    let renderTarget = graphics.cameraManager.waterRenderTarget;
-    let textureMatrix = graphics.cameraManager.textureMatrix;
+    let renderTarget = graphics.cameraManager.waterCamera.waterRenderTarget;
+    let textureMatrix = graphics.cameraManager.waterCamera.textureMatrix;
 
     material.uniforms.mirrorSampler.value = renderTarget.texture;
     material.uniforms.textureMatrix.value = textureMatrix;
