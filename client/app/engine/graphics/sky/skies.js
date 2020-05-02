@@ -5,7 +5,6 @@
 'use strict';
 
 import { SkyFlat, SkyCube } from './sky';
-import { SimplePlanet, Atmosphere } from './planet';
 import {
     Mesh, MeshBasicMaterial, MeshNormalMaterial,
     BoxBufferGeometry, SphereBufferGeometry, Vector3, Color
@@ -16,17 +15,6 @@ import {
 } from '../light';
 
 let SkyModule = {
-
-    /**
-     * @deprecated
-     */
-    createPlanet()
-    {
-        let planet = new SimplePlanet();
-        let atmosphere = new Atmosphere(planet);
-        // atmosphere.render(renderer);
-        return {planet, atmosphere};
-    },
 
     createFlatSky()
     {

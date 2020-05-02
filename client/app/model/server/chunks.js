@@ -61,19 +61,6 @@ extend(ChunkModel.prototype, {
         return properties;
     },
 
-    /**
-     * @deprecated
-     */
-    addPlanet(worldId, worldInfo) {
-        if (!worldInfo)
-            console.log('[Chunks] Default sky creation.');
-
-        let graphics = this.app.engine.graphics;
-        let p = graphics.createPlanet();
-        graphics.addToScene(p.planet, worldId);
-        graphics.addToScene(p.atmosphere.mesh, worldId);
-    },
-
     /** Dynamics **/
 
     init() {},
