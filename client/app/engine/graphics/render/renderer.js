@@ -124,6 +124,7 @@ extend(RendererManager.prototype, {
 
         // renderer.shadowMap.enabled = true;
         // renderer.shadowMap.type = PCFSoftShadowMap;
+        renderer.autoClear = false;
 
         renderer.outputEncoding = sRGBEncoding;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
@@ -354,7 +355,7 @@ extend(RendererManager.prototype, {
         if (this.composers.has(id)) {
             composer = this.composers.get(id);
         } else {
-            composer = this.createComposer(renderer, mainScene, mainCamera, null);
+            composer = this.createComposer(renderer, mainScene, mainCamera, false);
             this.composers.set(id, composer);
         }
 

@@ -68,6 +68,7 @@ extend(SelfModel.prototype, {
             let displayHandItem = this.displayHandItem;
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+            // TODO differentiate 3d person and 1st person
             if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
 
             graphics.switchToScene(oldWorldId, worldId);
@@ -200,6 +201,7 @@ extend(SelfModel.prototype, {
 
         if (selfModel.handItem !== handItem)
         {
+            // TODO link hand item and mesh when camera is third person.
             if (selfModel.handItem) // is it possible that it is in another world?
                 graphics.removeFromScene(selfModel.handItem, worldId);
 

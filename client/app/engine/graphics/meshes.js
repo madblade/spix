@@ -79,11 +79,27 @@ let MeshesModule = {
         });
     },
 
-    renderOnTop(object) {
-        object.renderOrder = 999;
-        object.onBeforeRender = function(renderer) {
-            renderer.clearDepth();
-        };
+    renderOnTop(object)
+    {
+        if (object.children && object.children.length === 4)
+        {
+            let c0 = object.children[0];
+            let c1 = object.children[1];
+            let c2 = object.children[2];
+            let c3 = object.children[3];
+            c0.renderOrder = 996; c0.material.transparent = true;
+            c1.renderOrder = 997; c1.material.transparent = true;
+            c2.renderOrder = 998; c2.material.transparent = true;
+            c3.renderOrder = 996; c3.material.transparent = true;
+            c0.onBeforeRender = renderer => renderer.clearDepth();
+        }
+
+        if (object.material)
+        {
+            object.material.transparent = true;
+            object.renderOrder = 999;
+            object.onBeforeRender = renderer => renderer.clearDepth();
+        }
     },
 
     loadReferenceMeshFromMemory(id)

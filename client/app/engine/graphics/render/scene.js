@@ -7,7 +7,8 @@
 import extend from '../../../extend.js';
 import { Scene } from 'three';
 
-let SceneManager = function() {
+let SceneManager = function()
+{
     this.mainScene = this.createScene(-1);
     this.subScenes  = new Map();
     this.screens = new Map();

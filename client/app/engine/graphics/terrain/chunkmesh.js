@@ -1,4 +1,7 @@
-import { BoxBufferGeometry, DoubleSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry, Vector3 } from 'three';
+import {
+    BoxBufferGeometry, Mesh, MeshBasicMaterial,
+    DoubleSide, Vector3
+} from 'three';
 import { Water } from '../water/water';
 
 let ChunksMeshModule = {
