@@ -46,8 +46,10 @@ class Entity {
         this._speed         = null;
         this._acceleration  = null;
         this._mass          = 1;
-        this._adherence     = [!1, !1, !1, // Right, Into, Up
-                               !1, !1, !1]; // Left, From, Down
+        this._adherence     = [
+            !1, !1, !1, // Right, Into, Up
+            !1, !1, !1 // Left, From, Down
+        ];
 
         this._impulseSpeedStamp = null;
         this._needsEuler        = true;

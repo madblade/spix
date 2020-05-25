@@ -97,13 +97,16 @@ extend(SelfComponent.prototype, {
         if (changes.length < 1) return;
 
         // ENHANCEMENT [LOW]: filter & simplify
-        changes.forEach(event => {
+        for (let c = 0; c < changes.length; ++c)
+        {
+            const event = changes[c];
+
             let type = event[0];
             let data = event[1];
             if (!type || !data) return;
             switch (type) {
                 case 'camera-update':
-                    this.processSimpleCameraUptade();
+                    this.processSimpleCameraUpdate();
                     break;
                 case 'camera':
                     this.processCameraModeChange(data);
@@ -115,12 +118,12 @@ extend(SelfComponent.prototype, {
                 default:
                     break;
             }
-        });
+        }
 
         this.changes = [];
     },
 
-    processSimpleCameraUptade()
+    processSimpleCameraUpdate()
     {
         let graphicsEngine = this.clientModel.app.engine.graphics;
         // TODO [LOW] only once per iteration.

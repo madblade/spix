@@ -322,10 +322,21 @@ class SimplePerlin
                     for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
                         const currentBlock = ffz(zz);
-                        if (zz === bl - 1)
-                            blocks[currentBlock] = water; // ijS * zz + xy
-                        else
-                            blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                        // if (zz === bl - 1)
+                        //     blocks[currentBlock] = water; // ijS * zz + xy
+                        // else
+                        blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                    }
+
+                    if (bl < 16 && rl > 0) {
+                        for (let zz = bl; zz < 16; ++zz) {
+                            // Grass or sand.
+                            const currentBlock = ffz(zz);
+                            if (zz === bl)
+                                blocks[currentBlock] = sand; // ijS * zz + xy
+                            else
+                                blocks[currentBlock] = water; // ijS * zz + xy
+                        }
                     }
                 }
             }

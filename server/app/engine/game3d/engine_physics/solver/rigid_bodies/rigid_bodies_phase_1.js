@@ -162,8 +162,8 @@ class RigidBodiesPhase1 {
             const factor = Math.sqrt(maxV * 1.05);
             // TODO [MILESTONE0] gravity gp
             let g =
-                [0, 0, 0];
-                // rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+                // [0, 0, 0];
+                rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
             // let vector = RigidBodiesPhase1.getForwardVector(d); // Project 2D

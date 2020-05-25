@@ -18,8 +18,8 @@ import { WorldType } from '../../../model_world/model';
 // TODO [HIGH] rayleigh
 // TODO [HIGH] p2p interaction
 
-class RigidBodies {
-
+class RigidBodies
+{
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
     // static gravityConstant = 0;
@@ -30,7 +30,7 @@ class RigidBodies {
         this._gravity = [0, 0, RigidBodies.gravityConstant];
         // this._gravity = [0, 0, 0];
         this._globalTimeDilatation = 25;
-        //this._globalTimeDilatation = 0.05;
+        // this._globalTimeDilatation = 0.05;
         this._refreshRate = refreshRate;
 
         this._variableGravity = false;
@@ -44,7 +44,8 @@ class RigidBodies {
     get refreshRate() { return this._refreshRate; }
 
     // Advanced gravity management.
-    getGravity(world, worldId, x, y, z) {
+    getGravity(world, worldId, x, y, z)
+    {
         if (this._variableGravity &&
             //parseInt(worldId, 10) === -1
             world.worldInfo.type === WorldType.CUBE)
@@ -122,9 +123,9 @@ class RigidBodies {
                 ff * Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
                 ff * Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
             ];
-
             // return direction;
         }
+
         return this._gravity;
     }
 

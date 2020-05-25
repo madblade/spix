@@ -183,7 +183,8 @@ class UserOutput {
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
             // TODO [HIGH] bundle, detect change.
-            p.send('ent', UserOutput.pack(addedOrRemovedEntities));
+            if (Object.keys(addedOrRemovedEntities).length > 0)
+                p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
             if (!av) return;
 

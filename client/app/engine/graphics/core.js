@@ -50,7 +50,7 @@ let CoreModule = {
 
         // Init stats.
         // Benches.
-        // document.body.appendChild(this.fps.dom);
+        document.body.appendChild(this.fps.dom);
     },
 
     initializeDOM() {

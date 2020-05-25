@@ -104,7 +104,7 @@ extend(SelfModel.prototype, {
             let rotationX = cam.getXRotation();
             graphics.cameraManager.setAbsRotation(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
-            graphics.cameraManager.setRelRotation(r[0], rotationX);
+            // graphics.cameraManager.setRelRotation(r[0], rotationX);
 
             // mainCamera.setUpRotation(theta1, 0, theta0);
             // moveCameraFromMouse(0, 0, newX, newY);

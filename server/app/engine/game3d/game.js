@@ -33,7 +33,7 @@ const GameType = Object.freeze({
 
 class Game3D extends Game
 {
-    static serverRefreshRate = 8;
+    static serverRefreshRate = 16;
     // static serverRefreshRate = 420; // blaze it
 
     constructor(hub, gameId, connector, gameInfo) {
