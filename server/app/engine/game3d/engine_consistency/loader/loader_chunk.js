@@ -10,6 +10,7 @@ import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
 // import ChunkIterator        from '../builder/iterator_chunks';
 import ChunkBuilder         from '../builder/builder_chunks';
+import TimeUtils from '../../../math/time';
 
 class ChunkLoader {
 
@@ -112,8 +113,9 @@ class ChunkLoader {
         // Get current chunk.
         let starterChunk = world.getChunkById(nearestChunkId);
         if (!starterChunk) {
-            console.log('Could not load chunk on which current entity is.');
-            return;
+            console.log('[WARN] Could not load chunk on which current entity is.');
+            starterChunk = ChunkBuilder.addChunk(world.xSize, world.ySize, world.zSize, nearestChunkId, world);
+            // return;
         }
 
         // Return variables.
@@ -125,14 +127,14 @@ class ChunkLoader {
         if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
-                // if !P.has(i,j,k)
-                    // Load (i,j,k) and break
+            //     if !P.has(i,j,k)
+            //         Load (i,j,k) and break
 
             // unloadedChunksForPlayer = this.unloadInnerToOuterSphere(player, starterChunk);
             unloadedChunksForPlayer = this.unloadOuterSphere(player, starterChunk);
             // For (i,j,k) s.t. P.has(i,j,k)
-                // if d({i,j,k}, P) > P.thresh
-                    // Unload (i,j,k)
+            //     if d({i,j,k}, P) > P.thresh
+            //         Unload (i,j,k)
             avatar.nearestChunkId = nearestChunkId;
         }
 
@@ -181,26 +183,26 @@ class ChunkLoader {
         let newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
-        let t = process.hrtime();
+        let t = TimeUtils.getTimeSecNano();
 
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
         ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, false);
 
-        let dt1 = process.hrtime(t)[1] / 1000;
+        let dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         // TODO [HIGH] check on Z+/-.
         // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
 
         let newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, true);
 
-        dt1 = process.hrtime(t)[1] / 1000;
+        dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
         if (newChunk) {
@@ -212,17 +214,19 @@ class ChunkLoader {
         return newChunksForPlayer;
     }
 
-    unloadInnerToOuterSphere(player, starterChunk) {
-        let consistencyModel = this._consistencyModel;
-        let worldModel = this._worldModel;
-        let xModel = this._xModel;
-
-        let minThreshold = player.avatar.chunkRenderDistance;
-        let maxThreshold = WorldModel.serverLoadingRadius;
-        minThreshold = Math.min(minThreshold, maxThreshold);
-
-        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, minThreshold);
-    }
+    // unloadInnerToOuterSphere(player, starterChunk) {
+    //     let consistencyModel = this._consistencyModel;
+    //     let worldModel = this._worldModel;
+    //     let xModel = this._xModel;
+    //
+    //     let minThreshold = player.avatar.chunkRenderDistance;
+    //     let maxThreshold = WorldModel.serverLoadingRadius;
+    //     minThreshold = Math.min(minThreshold, maxThreshold);
+    //
+    //     return ChunkBuilder.getOOBPlayerChunks(player, starterChunk,
+    //         worldModel, xModel, consistencyModel, minThreshold
+    //     );
+    // }
 
     unloadOuterSphere(player, starterChunk) {
         let consistencyModel = this._consistencyModel;
@@ -231,7 +235,9 @@ class ChunkLoader {
 
         let maxThreshold = player.avatar.chunkUnloadDistance;
 
-        return ChunkBuilder.getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, maxThreshold);
+        return ChunkBuilder.getOOBPlayerChunks(player,
+            starterChunk, worldModel, xModel, consistencyModel,
+            maxThreshold);
     }
 
 }

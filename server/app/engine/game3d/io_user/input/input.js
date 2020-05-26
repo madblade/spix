@@ -55,6 +55,7 @@ class UserInput {
 
     pushToEngine(kind, avatar, engine) {
         return data => {
+            // TODO ban users who send too much meta
             engine.addInput({action: kind, meta: data}, avatar);
         };
     }
@@ -71,6 +72,7 @@ class UserInput {
             this.pushToEngine('block',  avatar, topologyEngine),
             this.pushToEngine('gate',   avatar, consistencyEngine),
             this.pushToEngine('action', avatar, physicsEngine),
+            this.pushToEngine('use',    avatar, physicsEngine),
 
             this._chat.playerInput(player)
         ];
@@ -81,7 +83,10 @@ class UserInput {
         player.on('b', listener[i++]);
         player.on('x', listener[i++]);
         player.on('a', listener[i++]);
+        player.on('u', listener[i++]);
         player.on('chat', listener[i]);
+
+        player.on('leave', () => { player.leave(); });
     }
 
     unlistenPlayer(player) {
@@ -100,6 +105,8 @@ class UserInput {
         player.off('x', listener[i++]);
         player.off('a', listener[i++]);
         player.off('chat', listener[i]);
+
+        player.off('leave', () => { player.leave(); });
 
         delete this._listeners[player];
     }

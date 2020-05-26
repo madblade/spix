@@ -21,6 +21,8 @@ class Game {
         this._refreshRate = 200;
         this._isRunning = false;
         this._ready = false;
+        this._killed = false;
+        this._awaitingJoin = 0;
 
         //
         this._playerManager = Factory.createPlayerManager();
@@ -31,6 +33,7 @@ class Game {
     get connector()     { return this._connection; }
 
     get ready()         { return this._ready; }
+    get killed()        { return this._killed; }
     get kind()          { return this._kind; }
     get gameId()        { return this._gameId; }
     get isRunning()     { return this._isRunning; }
@@ -78,7 +81,20 @@ class Game {
 
     /** Players **/
 
+    hasPlayerForSocket(socket) {
+        return this._playerManager.hasPlayerForSocket(socket);
+    }
+
     addPlayer(player) {
+        if (!this._ready) {
+            console.warn('WARN: A player tries to join although the game is not ready.');
+            if (this._awaitingJoin < 10) {
+                console.warn('Retrying in 300ms.');
+                setTimeout(() => { this.addPlayer(player); }, 300);
+            }
+            ++this._awaitingJoin;
+            return;
+        }
         console.log('A player joined.');
 
         // Join channel.
@@ -100,8 +116,7 @@ class Game {
         this._playerManager.removePlayer(player);
 
         // Stop game if need be.
-        if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
-        this.pause(true); // Stop with idle timeout.
+        // if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
     }
 
     removeAllPlayers() {
@@ -117,6 +132,7 @@ class Game {
 
     // To be triggered from Hub only.
     destroy() {
+        this._killed = true;
         if (this._isRunning) this.pause(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();
         this._playerManager.destroy();

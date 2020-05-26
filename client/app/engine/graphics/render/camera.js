@@ -4,18 +4,18 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
+import { Object3D, PerspectiveCamera, Quaternion, Vector3 } from 'three';
 
 let Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 {
     // Wrap for primitive manipulation simplicity.
-    let camera = new THREE.PerspectiveCamera(fov, aspect, nearPlane, farPlane);
+    let camera = new PerspectiveCamera(fov, aspect, nearPlane, farPlane);
     camera.position.set(0, 0, 0);
     camera.rotation.set(0, 0, 0);
-    let pitch = new THREE.Object3D();
-    let yaw = new THREE.Object3D();
-    let up = new THREE.Object3D();
+    let pitch = new Object3D();
+    let yaw = new Object3D();
+    let up = new Object3D();
     pitch.add(camera);
     yaw.add(pitch);
     up.add(yaw);
@@ -84,6 +84,8 @@ extend(Camera.prototype, {
     },
 
     setUpRotation(x, y, z) {
+        // TODO use local transform
+
         let up = this.up;
         up.rotation.x = x;
         up.rotation.y = y;
@@ -95,6 +97,8 @@ extend(Camera.prototype, {
     },
 
     setXRotation(rotationX) {
+        // TODO use local transform
+
         this.pitch.rotation.x = rotationX;
     },
 
@@ -103,10 +107,14 @@ extend(Camera.prototype, {
     },
 
     setZRotation(rotationZ) {
+        // TODO use local transform
+
         this.yaw.rotation.z = rotationZ;
     },
 
     copyCameraPosition(otherCamera) {
+        // TODO [CRIT] maybe apply local transform here?
+
         if (otherCamera) {
             let up = this.up.position;
             let oup = otherCamera.getCameraPosition();
@@ -117,6 +125,8 @@ extend(Camera.prototype, {
     },
 
     copyCameraUpRotation(otherCamera) {
+        // TODO [CRIT] maybe use local transform here?
+
         if (otherCamera) {
             let ur = this.up.rotation;
             let our = otherCamera.getUpRotation();
@@ -127,6 +137,8 @@ extend(Camera.prototype, {
     },
 
     setCameraPosition(x, y, z) {
+        // TODO [CRIT] maybe use local transform here?
+
         let up = this.up;
 
         let sin = Math.sin;
@@ -173,6 +185,15 @@ extend(Camera.prototype, {
         p.x = 0;
         p.y = 0;
         p.z = 4;
+    },
+
+    getCameraForwardVector() {
+        let nv = new Vector3(0, -1, 0);
+        // nv.normalize();
+        let camQ = new Quaternion();
+        this.cameraObject.getWorldQuaternion(camQ);
+        nv.applyQuaternion(camQ);
+        return nv;
     }
 
 });

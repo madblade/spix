@@ -28,6 +28,9 @@ let KeyboardModule = {
     },
 
     startKeyboardListeners() {
+        if (this.isTouch)
+            console.warn('[Keyboard] requested keyboard listeners on a touch device.');
+
         this.registerKeyDown();
         this.registerKeyUp();
     },

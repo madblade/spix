@@ -90,7 +90,8 @@ extend(WorldMap.prototype, {
     // Representation
     renderString() {
         this.computeWorldMap();
-        this.string = this.xGraph.computeFlatGraph().toString();
+        this.xGraph.computeFlatGraph();
+        this.string = this.xGraph.toString();
         this.needsUpdate = false;
         return this.string;
     },

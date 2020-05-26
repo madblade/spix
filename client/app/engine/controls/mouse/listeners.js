@@ -5,6 +5,7 @@
 'use strict';
 
 import { $ }                from '../../../modules/polyfills/dom.js';
+import { ItemsModelModule } from '../../../model/server/self/items';
 
 let ListenerModule = {
 
@@ -36,28 +37,23 @@ let ListenerModule = {
         });
     },
 
-    onLeftMouseDown() {
-        let clientModel = this.app.model.client;
-        //let serverModel = this.app.model.server;
+    getRaycastCoordinates()
+    {
         let graphicsEngine = this.app.engine.graphics;
 
         // Perform intersection.
         let intersects = graphicsEngine.cameraManager.performRaycast();
         if (intersects.length <= 0) {
-            console.log('Nothing intersected.');
+            console.log('[Listeners] Nothing intersected.');
             return;
         }
+
         intersects.sort(function(a, b) { return a.distance > b.distance; });
         let point = intersects[0].point;
 
         // Compute blocks.
         let flo = Math.floor;
         let abs = Math.abs;
-        //let p1 = serverModel.getSelfModel().getSelfPosition();
-        //let p2 = serverModel.getSelfModel().getHeadPosition();
-        //let px = p1[0]+p2.x, py = p1[1]+p2.y, pz = p1[2]+p2.z;
-        let p = graphicsEngine.getCameraCoordinates();
-        let px = p.x; let py = p.y; let pz = p.z;
 
         let rx = point.x; let ry = point.y; let rz = point.z;
         let dx = abs(abs(flo(rx)) - abs(rx));
@@ -67,9 +63,25 @@ let ListenerModule = {
 
         if (ex + ey + ez !== 1) {
             // TODO [HIGH] how do I remove an X?
-            console.log('Error: precision on intersection @addBlock');
+            console.warn('[OnLeftMouse] Error: precision on intersection @addBlock');
             return;
         }
+
+        return [ex, ey, ez, rx, ry, rz];
+    },
+
+    requestAddBlock()
+    {
+        let clientModel = this.app.model.client;
+        let graphicsEngine = this.app.engine.graphics;
+
+        let r = this.getRaycastCoordinates();
+        if (!r) return;
+        let [ex, ey, ez, rx, ry, rz] = r;
+
+        let flo = Math.floor;
+        let p = graphicsEngine.getCameraCoordinates();
+        let px = p.x; let py = p.y; let pz = p.z;
 
         let fx1; let fy1; let fz1;
         let positiveIsFree = true; // direct + axis is empty
@@ -97,52 +109,40 @@ let ListenerModule = {
         }
 
         let fx2; let fy2; let fz2;
+        let angle = 0;
         if (ex) {
             fx2 = positiveIsFree ? fx1 + 1 : fx1 - 1;
             fy2 = fy1;
             fz2 = fz1;
+            angle = Math.atan2(fz2 + 0.5 - pz, fy2 + 0.5 - py);
         } else if (ey) {
             fx2 = fx1;
             fy2 = positiveIsFree ? fy1 + 1 : fy1 - 1;
             fz2 = fz1;
+            angle = Math.atan2(fz2 + 0.5 - pz, fx2 + 0.5 - px);
         } else if (ez) {
             fx2 = fx1;
             fy2 = fy1;
             fz2 = positiveIsFree ? fz1 + 1 : fz1 - 1;
+            angle = Math.atan2(fy2 + 0.5 - py, fx2 + 0.5 - px);
         }
+        clientModel.selfComponent.setAngleFromIntersectionPoint(angle.toFixed(4));
 
         clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2]);
     },
 
-    onRightMouseDown() {
-        let clientModel = this.app.model.client;
-        // let serverModel = this.app.model.server;
-        let graphicsEngine = this.app.engine.graphics;
+    requestDelBlock()
+    {
+        const clientModel = this.app.model.client;
+        const graphicsEngine = this.app.engine.graphics;
 
-        let intersects = graphicsEngine.cameraManager.performRaycast();
-        if (intersects.length <= 0) {
-            console.log('Nothing intersected.');
-            return;
-        }
-        intersects.sort(function(a, b) { return a.distance > b.distance; });
-        let point = intersects[0].point;
+        let r = this.getRaycastCoordinates();
+        if (!r) return;
+        let [ex, ey, ez, rx, ry, rz] = r;
 
-        // Compute blocks.
         let flo = Math.floor;
-        let abs = Math.abs;
         let p = graphicsEngine.getCameraCoordinates();
         let px = p.x; let py = p.y; let pz = p.z;
-
-        let rx = point.x; let ry = point.y; let rz = point.z;
-        let dx = abs(abs(flo(rx)) - abs(rx));
-        let dy = abs(abs(flo(ry)) - abs(ry));
-        let dz = abs(abs(flo(rz)) - abs(rz));
-        let ex = dx < 0.0000001; let ey = dy < 0.0000001; let ez = dz < 0.0000001;
-
-        if (ex + ey + ez !== 1) {
-            console.log('Error: precision on intersection @addBlock');
-            return;
-        }
 
         let fx; let fy; let fz;
         if (ex) {
@@ -168,6 +168,38 @@ let ListenerModule = {
         clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 
+    requestItemUse()
+    {
+        const clientModel = this.app.model.client;
+        const graphicsEngine = this.app.engine.graphics;
+        let p = graphicsEngine.getCameraCoordinates();
+        let f = graphicsEngine.getCameraForwardVector();
+        clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z]);
+    },
+
+    requestMainHandItemAction() {
+        let clientSelfModel = this.app.model.client.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+            console.warn('[Mouse/Listener] Item ID unsupported.');
+        else if (ItemsModelModule.isItemUseable(activeItemID))
+            this.requestItemUse();
+        else if (ItemsModelModule.isItemPlaceable(activeItemID))
+            this.requestAddBlock();
+    },
+
+    requestSecondaryHandItemAction() {
+        this.requestDelBlock();
+    },
+
+    onLeftMouseDown() {
+        this.requestMainHandItemAction();
+    },
+
+    onRightMouseDown() {
+        this.requestSecondaryHandItemAction();
+    },
+
     onMiddleMouseDown() {
     },
 
@@ -179,7 +211,7 @@ let ListenerModule = {
             let ey = event.deltaY;
             // let df = event.deltaFactor;
 
-            clientModel.triggerChange('interaction', ['itemOffset', ey]);
+            clientModel.triggerChange('interaction', ['itemSelect', ey]);
         });
     },
 

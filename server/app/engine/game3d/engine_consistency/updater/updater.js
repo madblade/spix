@@ -7,6 +7,7 @@
 import XUpdater from './updater_x';
 import XLoader  from '../loader/loader_x';
 import XBuffer  from '../buffer_x';
+import TimeUtils from '../../../math/time';
 
 class Updater {
 
@@ -102,7 +103,7 @@ class Updater {
         let forEach = (object, callback) => { for (let id in object) { callback(id); } };
 
         // For each player...
-        let t = process.hrtime();
+        let t = TimeUtils.getTimeSecNano();
         let dt1;
         let debugThresh = 1000;
         // TODO [OPT] use arrays
@@ -119,9 +120,9 @@ class Updater {
             if (u) [addedEntities, removedEntities] = u;
             // TODO [MEDIUM] filter: updated entities and entities that enter in range.
 
-            dt1 = process.hrtime(t)[1] / 1000;
+            dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
             if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
-            t = process.hrtime();
+            t = TimeUtils.getTimeSecNano();
 
             // Compute change for chunks in range.
             let addedChunks;
@@ -129,13 +130,14 @@ class Updater {
             let v = cLoader.computeNewChunksInRange(p);
             if (v) [addedChunks, removedChunks] = v;
 
-            dt1 = process.hrtime(t)[1] / 1000;
+            dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
             if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Chunks.`);
-            t = process.hrtime();
+            t = TimeUtils.getTimeSecNano();
 
             let addedX;
             let removedX;
             let addedW;
+            let addedWMeta;
             let x = xLoader.computeNewXInRange(p);
             if (x) [addedX, removedX] = x;
 
@@ -150,13 +152,18 @@ class Updater {
 
             if (addedChunks)        {
                 addedW = {};
+                addedWMeta = {};
                 forEach(addedChunks, wid => {
                     if (!(wid in addedW)) {
                         let w = worldModel.getWorld(parseInt(wid, 10));
                         addedW[wid] = [w.xSize, w.ySize, w.zSize];
+                        if (!consistencyModel.hasWorld(wid)) {
+                            addedWMeta[wid] = [w.worldInfo.type, w.worldInfo.radius, w.worldInfo.center.x, w.worldInfo.center.y, w.worldInfo.center.z];
+                        }
                     }
-                    forEach(addedChunks[wid], c =>
-                        {consistencyModel.setChunkLoaded(pid, parseInt(wid, 10), c);});
+                    forEach(addedChunks[wid], c => {
+                        consistencyModel.setChunkLoaded(pid, parseInt(wid, 10), c);
+                    });
                 });
             }
             if (removedChunks)
@@ -165,9 +172,10 @@ class Updater {
                         consistencyModel.setChunkOutOfRange(pid, parseInt(wid, 10), c));
                 });
 
+            // TODO [OPT] pack everything in just one send
             // Update output buffers.
             if (addedChunks || removedChunks)
-                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW);
+                cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW, addedWMeta);
             if (addedEntities || removedEntities)
                 ebuf.updateEntitiesForPlayer(pid, addedEntities, removedEntities);
             if (addedX || removedX)

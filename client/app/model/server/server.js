@@ -23,6 +23,7 @@ let Server = function(app) {
     this.selfModel.xModel = this.xModel;
 
     this.isRunning = false;
+    this.isDirty = false;
 };
 
 extend(Server.prototype, UpdateModule);
@@ -51,6 +52,13 @@ extend(Server.prototype, {
 
     getSelfModel() {
         return this.selfModel;
+    },
+
+    cleanupFullModel() {
+        this.selfModel.cleanup();
+        this.chunkModel.cleanup();
+        this.entityModel.cleanup();
+        this.xModel.cleanup();
     }
 
 });

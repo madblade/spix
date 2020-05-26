@@ -4,77 +4,112 @@
 
 'use strict';
 
-import $ from 'jquery';
-
 let ListenerModule = {
 
-    registerTouch() {
-        // Low-level swipe manipulation
-        $(window).on('touchstart', function(ev) {
-            let e = ev.originalEvent;
-            console.log(e);
-
-            /** Usage:
-             *
-             * var touches = e.touches;
-             * var nbFingers = e.touches.length;
-             * var touchObj = e.changedTouches[0];
-             * var startX = touchObj.pageX;
-             * var startY = touchObj.pageY;
-             * var startTime = new Date().getTime();
-             *
-             */
-        });
-
-        $(window).on('touchmove', function(ev) {
-            let e = ev.originalEvent;
-            console.log(e);
-
-            /** Usage:
-             *
-             * e.changedTouches[0].pageX;
-             * e.changedTouches[0].pageY;
-             *
-             */
-        });
-
-        $(window).on('touchend', function(ev) {
-            let e = ev.originalEvent;
-            console.log(e);
-
-            /** Example:
-             *
-             * var touchobj = e.changedTouches[0];
-             *
-             * var dX = touchobj.pageX - startX; var daX = Math.abs(dX); // px
-             * var dY = touchobj.pageY - startY; var daY = Math.abs(dY); // px
-             * var elapsedTime = new Date().getTime() - startTime; // get time elapsed
-             * var hasSwiped = elapsedTime <= allowedTime;
-             *
-             * var toRight =   (hasSwiped && daX > threshold && daY <= 100 && dX >= 0);
-             * var toLeft =    (hasSwiped && daX > threshold && daY <= 100 && dX < 0);
-             * var toTop =     (hasSwiped && daY > threshold && daX <= 100 && dY < 0);
-             * var toBottom =  (hasSwiped && daY > threshold && daX <= 100 && dY >= 0);
-             *
-             */
-        });
-
-        // Higher level API
-        $(window).on('tap', function(ev) {console.log(ev);});
-        $(window).on('swipe', function(ev) {console.log(ev);});
-        $(window).on('swipeleft', function(ev) {console.log(ev);});
-        $(window).on('swiperight', function(ev) {console.log(ev);});
+    onLeftStickMove(x, y) {
+        this.touch.leftX = x;
+        this.touch.leftY = y;
     },
 
-    unregisterTouch() {
-        $(window).off('touchstart');
-        $(window).off('touchend');
-        $(window).off('touchmove');
+    onRightStickMove(x, y) {
+        this.touch.rightX = x;
+        this.touch.rightY = y;
+    },
 
-        $(window).on('tap');
-        $(window).on('swipe');
-        $(window).on('swipeleft');
-        $(window).on('swiperight');
+    onButtonChange(which, isHeld)
+    {
+        console.log(`Button ${which} ${isHeld ? 'pressed' : 'released'}.`);
+        let clientModel = this.app.model.client;
+        switch (which) {
+            case 'triangle':
+                break;
+            case 'cross':
+                if (isHeld) this.requestMainHandItemAction();
+                break;
+            case 'circle': // jump
+                if (isHeld) clientModel.triggerEvent('m', 'u');
+                else if (!isHeld) clientModel.triggerEvent('m', 'ux');
+                break;
+            case 'square':
+                if (isHeld) this.requestSecondaryHandItemAction();
+                break;
+            case 'dpadLeft':
+                if (isHeld)
+                    clientModel.triggerChange('interaction', ['itemSelect', 1]);
+                break;
+            case 'dpadRight':
+                if (isHeld)
+                    clientModel.triggerChange('interaction', ['itemSelect', -1]);
+                break;
+            case 'dpadDown':
+                clientModel.triggerChange('camera', ['toggle']);
+                break;
+            case 'dpadUp':
+                if (isHeld)
+                    clientModel.triggerChange('camera', ['toggle']);
+                break;
+            case 'home': // Only on press
+                if (isHeld) this.touchLockChanged(false);
+                break;
+        }
+    },
+
+    rotateCameraFromRightStick() {
+        let graphics = this.app.engine.graphics;
+        let movementX = this.touch.rightX * 8;
+        let movementY = this.touch.rightY * 6;
+        if (Math.abs(movementX) > 0 || Math.abs(movementY) > 0)
+            graphics.cameraManager.addCameraRotationEvent(movementX, movementY, 0, 0);
+    },
+
+    movePlayerFromLeftStick()
+    {
+        let clientModel = this.app.model.client;
+        let lx = this.touch.leftX;
+        let ly = this.touch.leftY;
+        let lastLeft = this.touch.leftLast;
+        let newLeft = [];
+        if (ly !== 0 && lx !== 0) {
+            let angle = Math.atan2(ly, lx);
+            let pi8 = Math.PI / 8;
+            switch (true) {
+                case angle < -7 * pi8 || angle > 7 * pi8:
+                    newLeft.push('l');
+                    break;
+                case angle < -5 * pi8:
+                    newLeft.push('f', 'l');
+                    break;
+                case angle < -3 * pi8:
+                    newLeft.push('f');
+                    break;
+                case angle < -pi8:
+                    newLeft.push('f', 'r');
+                    break;
+                case angle > 5 * pi8:
+                    newLeft.push('b');
+                    break;
+                case angle > 3 * pi8:
+                    newLeft.push('b', 'l');
+                    break;
+                case angle > pi8:
+                    newLeft.push('b', 'r');
+                    break;
+                default:
+                    newLeft.push('r');
+                    break;
+            }
+        }
+
+        if (newLeft.length > 2) console.error('[Touch] too many events detected.');
+        for (let i = 0; i < newLeft.length; ++i) {
+            let t = newLeft[i];
+            if (lastLeft.indexOf(t) < 0) clientModel.triggerEvent('m', `${t}`);
+        }
+        for (let i = 0; i < lastLeft.length; ++i) {
+            let t = lastLeft[i];
+            if (newLeft.indexOf(t) < 0) clientModel.triggerEvent('m', `${t}x`);
+        }
+        this.touch.leftLast = newLeft;
     }
 
 };

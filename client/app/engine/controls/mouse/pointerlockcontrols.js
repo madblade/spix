@@ -20,16 +20,25 @@ let PointerLockModule = {
         let b = document.body;
 
         if ('webkitPointerLockElement' in d) {
+            if (!this.pointerLockFunction) this.pointerLockFunction = function() {
+                scope.pointerLockChanged(d.webkitRequestPointerLock === b);
+            };
             b.requestPointerLock = b.webkitRequestPointerLock;
-            d.addEventListener('webkitpointerlockchange',
-                function() {scope.pointerLockChanged(d.webkitRequestPointerLock === b);}, false);
+            d.removeEventListener('webkitpointerlockchange', this.pointerLockFunction);
+            d.addEventListener('webkitpointerlockchange', this.pointerLockFunction, false);
         } else if ('mozPointerLockElement' in d) {
+            if (!this.pointerLockFunction) this.pointerLockFunction = function() {
+                scope.pointerLockChanged(d.mozPointerLockElement === b);
+            };
             b.requestPointerLock = b.mozRequestPointerLock;
-            d.addEventListener('mozpointerlockchange',
-                function() {scope.pointerLockChanged(d.mozPointerLockElement === b);}, false);
+            d.removeEventListener('mozpointerlockchange', this.pointerLockFunction);
+            d.addEventListener('mozpointerlockchange', this.pointerLockFunction, false);
         } else if ('pointerLockElement' in d) {
-            d.addEventListener('pointerlockchange',
-                function() {scope.pointerLockChanged(d.pointerLockElement === b);}, false);
+            if (!this.pointerLockFunction) this.pointerLockFunction = function() {
+                scope.pointerLockChanged(d.pointerLockElement === b);
+            };
+            d.removeEventListener('pointerlockchange', this.pointerLockFunction);
+            d.addEventListener('pointerlockchange', this.pointerLockFunction, false);
         } else {
             console.log('ERROR: POINTER LOCK NOT SUPPORTED.');
         }
@@ -40,18 +49,18 @@ let PointerLockModule = {
 
             switch (event.which) {
                 case 1: // Left
-                    break;
+                    // break;
                 case 2: // Middle
                 case 3: // Right
                 default:
-                    return;
+                    // return;
             }
 
             // Ask the browser to lock the pointer.
-            event.preventDefault();
-            event.stopPropagation();
-            scope.requestPointerLock();
-            app.setFocused(true);
+            // event.preventDefault();
+            // event.stopPropagation();
+            // scope.requestPointerLock();
+            // app.setFocused(true);
         });
     },
 

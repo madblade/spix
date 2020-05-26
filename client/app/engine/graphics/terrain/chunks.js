@@ -4,40 +4,169 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import {
+    BufferAttribute, BufferGeometry,
+    Color,
+    Vector3
+} from 'three';
+import { ItemType } from '../../../model/server/self/items';
 
 let ChunksModule = {
 
-    createChunk(chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ)
+    createChunk(
+        chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ,
+        isWorldFlat)
     {
-        // TODO don't discriminate components
-        // TODO discriminate components server-side
         let components = all[0];
         let natures = all[1];
 
+        // console.log(components);
+        // console.log(natures);
+
         let currentComponent;
         let currentNatures;
-        for (let cid in components) {
-            currentComponent = components[cid];
-            currentNatures = natures[cid];
-            break;
-        }
-        if (!currentComponent && !currentNatures) {
-            console.log('Got an empty chunk.');
-            currentComponent = [];
-            currentNatures = [];
-        }
-        // console.log(currentComponent);
-        // console.log(currentNatures);
 
-        if (!currentComponent) {
-            console.log('Warn: missed an update'); return;
+        if (!components.hasOwnProperty('1') && !components.hasOwnProperty('2')) {
+            console.log(`[Terrain/Chunks] Empty chunk "${chunkId}".`);
+            return this.createEmptyChunkComponent(chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
         }
 
+        let hasTerrain = components.hasOwnProperty('1') && natures.hasOwnProperty('1');
+        let hasWater = components.hasOwnProperty('2') && natures.hasOwnProperty('2');
+
+        if (!hasTerrain) console.log('New chunk with empty terrain.');
+        if (!hasWater) console.log('New chunk with empty water.');
+
+        let component1;
+        if (hasTerrain && hasWater)
+        {
+            currentComponent = components['1'];
+            currentNatures = natures['1'];
+            component1 = this.createChunkComponent(
+                chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+                currentComponent, currentNatures, false, 0,
+                isWorldFlat
+            );
+
+            currentComponent = components['2'];
+            currentNatures = natures['2'];
+            let component2 = this.createChunkComponent(
+                chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+                currentComponent, currentNatures, true, 1,
+                isWorldFlat
+            );
+
+            // Merge
+            component1.capacities.push(component2.capacities[0]);
+            component1.geometries.push(component2.geometries[0]);
+            // component1.materials.push(component2.materials[0]);
+            component1.sizes.push(component2.sizes[0]);
+            component1.water.push(component2.water[0]);
+            component1.meshes.push(component2.meshes[0]);
+            // let s1 = component1.whereToFindFace.size;
+            // let s2 = component2.whereToFindFace.size;
+
+            component1.whereToFindFace =
+                new Map([...component1.whereToFindFace, ...component2.whereToFindFace]);
+            component1.whichFaceIs =
+                new Map([...component1.whichFaceIs, ...component2.whichFaceIs]);
+
+            // let s3 = component1.whereToFindFace.size;
+            // console.log(`${s1} + ${s2} = ${s3}`);
+        } else if (hasTerrain) {
+            currentComponent = components['1'];
+            currentNatures = natures['1'];
+            component1 = this.createChunkComponent(
+                chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+                currentComponent, currentNatures, false, 0,
+                isWorldFlat // although not water so no care
+            );
+        } else if (hasWater) {
+            currentComponent = components['2'];
+            currentNatures = natures['2'];
+            component1 = this.createChunkComponent(
+                chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+                currentComponent, currentNatures, true, 0,
+                isWorldFlat
+            );
+        }
+
+        return component1;
+    },
+
+    createDebugMesh(chunk,
+        chunkSizeX, chunkSizeY, chunkSizeZ,
+        iChunkOffset, jChunkOffset, kChunkOffset)
+    {
+        chunk.debugMesh = this.createChunkDebugMesh(chunkSizeX, chunkSizeY, chunkSizeZ);
+        chunk.debugMesh.position.set(
+            iChunkOffset + chunkSizeX / 2,
+            jChunkOffset + chunkSizeY / 2,
+            kChunkOffset + chunkSizeZ / 2);
+    },
+
+    createEmptyChunkComponent(
+        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
+    {
+        let sunCapacity = this._defaultEmptyChunkSize; // Math.floor(3 / 2 * triangles);
+        if (this.debug) {
+            console.log(`On chunk ${chunkId}, init geometry will be ${sunCapacity * 3 * 3}-capable.`);
+        }
+
+        let geometry = new BufferGeometry();
+        geometry.setAttribute('position', new BufferAttribute(new Float32Array(sunCapacity * 3 * 3), 3));
+        geometry.setAttribute('normal', new BufferAttribute(new Float32Array(sunCapacity * 3 * 3), 3));
+        geometry.setAttribute('color', new BufferAttribute(new Float32Array(sunCapacity * 3 * 3), 3));
+        geometry.setAttribute('uv', new BufferAttribute(new Float32Array(sunCapacity * 3 * 2), 2));
+        geometry.computeBoundingSphere();
+
+        let newMesh = this.createChunkMesh(geometry, false,
+            false); // flat world or not, no creating water
+        // let material = newMesh.material;
+        // let material = this.createMaterial('textured-phong', 0xaaaaaa);
+        // let newMesh = new Mesh(geometry, material);
+
+        // newMesh.castShadow = true;
+        // newMesh.receiveShadow = true;
+        // if (Math.random() < 0.5) newMesh.userData.bloom = true;
+
+        let c = {
+            geometries:         [geometry],
+            // materials:          [material],
+            meshes:             [newMesh],
+            water:              [false], // is water
+
+            capacities:         [sunCapacity / 2], // 2 triangles per face
+            sizes:              [0 / 2],
+
+            whereToFindFace:    new Map(),
+            whichFaceIs:        new Map()
+        };
+
+        if (this._debugChunkBoundingBoxes) {
+            let chunkIndices = chunkId.split(',');
+            let iChunkOffset = parseInt(chunkIndices[0], 10) * chunkSizeX;
+            let jChunkOffset = parseInt(chunkIndices[1], 10) * chunkSizeY;
+            let kChunkOffset = parseInt(chunkIndices[2], 10) * chunkSizeZ;
+            this.createDebugMesh(c,
+                chunkSizeX, chunkSizeY, chunkSizeZ,
+                iChunkOffset, jChunkOffset, kChunkOffset
+            );
+        }
+
+        return c;
+    },
+
+    createChunkComponent(
+        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+        currentComponent, currentNatures,
+        isWater, componentIndex, isWorldFlat
+    )
+    {
         let chunkIndices = chunkId.split(',');
-        let chunkI = parseInt(chunkIndices[0], 10); let iChunkOffset = chunkI * chunkSizeX;
-        let chunkJ = parseInt(chunkIndices[1], 10); let jChunkOffset = chunkJ * chunkSizeY;
-        let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
+        let iChunkOffset = parseInt(chunkIndices[0], 10) * chunkSizeX;
+        let jChunkOffset = parseInt(chunkIndices[1], 10) * chunkSizeY;
+        let kChunkOffset = parseInt(chunkIndices[2], 10) * chunkSizeZ;
 
         let iS = chunkSizeX;
         let ijS = chunkSizeX * chunkSizeY;
@@ -54,9 +183,9 @@ let ChunksModule = {
         let colors = new Float32Array(sunCapacity * 3 * 3);
         let uvs = new Float32Array(sunCapacity * 3 * 2);
 
-        let pA = new THREE.Vector3(); let pB = new THREE.Vector3();
-        let pC = new THREE.Vector3(); let cb = new THREE.Vector3();
-        let ab = new THREE.Vector3(); let color = new THREE.Color();
+        let pA = new Vector3(); let pB = new Vector3();
+        let pC = new Vector3(); let cb = new Vector3();
+        let ab = new Vector3(); let color = new Color();
 
         let whereToFindFace = new Map();
         let whichFaceIs = new Map();
@@ -65,11 +194,13 @@ let ChunksModule = {
         for (let f = 0; f < currentComponent.length; ++f) {
             let faceId = Math.abs(currentComponent[f]);
 
-            whereToFindFace.set(faceId, [0, f]); // [In which geometry a given face is, at which position]
-            let wf0 = whichFaceIs.get(0);
+            let newGeometryId = componentIndex;
+            whereToFindFace.set(faceId, [newGeometryId, f]);
+            // [In which geometry a given face is, at which position]
+            let wf0 = whichFaceIs.get(newGeometryId);
             if (wf0 === undefined) {
                 wf0 = new Map();
-                whichFaceIs.set(0, wf0);
+                whichFaceIs.set(newGeometryId, wf0);
             }
             wf0.set(f, faceId);
 
@@ -84,19 +215,33 @@ let ChunksModule = {
             i += 18;
         }
 
-        let geometry = new THREE.BufferGeometry();
-        geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-        geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        let geometry = new BufferGeometry();
+        geometry.setAttribute('position', new BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+        geometry.setAttribute('color', new BufferAttribute(colors, 3));
+        geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
         geometry.computeBoundingSphere();
 
-        let material = this.createMaterial('textured-phong', 0xaaaaaa);
+        // let material;
+        // material = this.createMaterial('textured-phong', 0xaaaaaa);
+        // if (isWater) { // transparency
+        //     material.transparent = true;
+        //     material.opacity = 0.3;
+        //     material.side = DoubleSide;
+        // }
 
-        return {
+        let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat);
+        // let material = newMesh.material;
+        // let newMesh = new Mesh(geometry, material);
+        // newMesh.castShadow = true;
+        // newMesh.receiveShadow = true;
+        // if (Math.random() < 0.5) newMesh.userData.bloom = true;
+
+        let c = {
             geometries:         [geometry],
-            materials:          [material],
-            meshes:             [new THREE.Mesh(geometry, material)],
+            // materials:          [material],
+            meshes:             [newMesh],
+            water:              [isWater], // is water
 
             capacities:         [sunCapacity / 2],
             sizes:              [triangles / 2],
@@ -104,16 +249,28 @@ let ChunksModule = {
             /*whereToFindFace:*/whereToFindFace,
             /*whichFaceIs:    */whichFaceIs
         };
+
+        if (this._debugChunkBoundingBoxes) {
+            this.createDebugMesh(c,
+                chunkSizeX, chunkSizeY, chunkSizeZ,
+                iChunkOffset, jChunkOffset, kChunkOffset
+            );
+        }
+
+        return c;
     },
 
-    updateChunk(worldId, chunk, chunkId, components,
-                           chunkSizeX, chunkSizeY, chunkSizeZ)
+    updateChunk(
+        worldId, chunk, chunkId, components,
+        chunkSizeX, chunkSizeY, chunkSizeZ,
+        isWorldFlat)
     {
         let geometries =        chunk.geometries;
-        let materials =         chunk.materials;
+        // let materials =         chunk.materials;
         let meshes =            chunk.meshes;
         let capacities =        chunk.capacities;
         let sizes =             chunk.sizes;
+        let water =             chunk.water;
         let whereToFindFace =   chunk.whereToFindFace;
         let whichFaceIs =       chunk.whichFaceIs;
 
@@ -121,25 +278,43 @@ let ChunksModule = {
         let added =     components[1];
         let updated =   components[2];
 
+        if (this.debug) {
+            console.log('BUD');
+            console.log(removed);
+            console.log(added);
+            console.log(updated);
+        }
+
+        // Bundle updated faces.
+        for (let uid in updated) {
+            if (!updated.hasOwnProperty(uid)) continue;
+            let update = updated[uid];
+            removed[uid] = null;
+            added[uid] = update;
+        }
+
         this.removeChunkFaces(
             worldId, removed,
-            geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
+            geometries, meshes, capacities, sizes, whereToFindFace, whichFaceIs);
 
         this.addChunkFaces(
-            worldId, added, geometries, materials, meshes, capacities, sizes, whereToFindFace, whichFaceIs,
-            chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
-
-        this.updateChunkFaces(worldId, updated, geometries);
+            worldId, added, geometries, meshes, capacities, sizes,
+            water, whereToFindFace, whichFaceIs,
+            chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+            isWorldFlat);
     },
 
     removeChunkFaces(worldId, removed,
-                                geometries, materials, meshes, capacities, sizes,
-                                whereToFindFace, whichFaceIs)
+        geometries, meshes, capacities, sizes,
+        whereToFindFace, whichFaceIs)
     {
         let geometry; let vertices; let colors; let normals; let uvs;
         let meshId;
 
-        for (let rrid in removed) {
+        for (let rrid in removed)
+        {
+            if (!removed.hasOwnProperty(rrid)) continue;
+
             let rid = parseInt(rrid, 10);
             // Get graphic data
             if (!whereToFindFace.has(rid)) {
@@ -214,7 +389,7 @@ let ChunksModule = {
                 // Remove mesh from scene.
                 this.removeFromScene(meshes[meshId], worldId);
                 geometries[meshId]  = undefined;
-                materials[meshId]   = undefined;
+                // materials[meshId]   = undefined;
                 meshes[meshId]      = undefined;
                 sizes[meshId]       = undefined;
                 capacities[meshId]  = undefined;
@@ -231,9 +406,10 @@ let ChunksModule = {
     },
 
     addChunkFaces(worldId, added,
-                             geometries, materials, meshes, capacities, sizes,
-                             whereToFindFace, whichFaceIs,
-                             chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
+        geometries, meshes, capacities, sizes, water,
+        whereToFindFace, whichFaceIs,
+        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
+        isWorldFlat)
     {
         let geometry; let vertices; let colors; let normals; let uvs;
         let meshId; let faceId;
@@ -248,7 +424,9 @@ let ChunksModule = {
         let chunkK = parseInt(chunkIndices[2], 10); let kChunkOffset = chunkK * chunkSizeZ;
         let defaultGeometrySize = this.defaultGeometrySize;
 
-        for (let aaid in added) {
+        for (let aaid in added)
+        {
+            if (!added.hasOwnProperty(aaid)) continue;
             let aid = parseInt(aaid, 10);
 
             // Get graphic data
@@ -258,10 +436,19 @@ let ChunksModule = {
                 continue;
             }
 
+            let nature = added[aid];
+            // If water, add into water mesh.
+            let isWater = Math.abs(nature) === ItemType.BLOCK_WATER;
+
             // Compute mesh id.
             meshId = 0;
             let meshHasToBeAdded = false;
-            while (sizes[meshId] !== undefined && sizes[meshId] === capacities[meshId]) ++meshId;
+            while (meshes[meshId] !== undefined &&
+                (sizes[meshId] === capacities[meshId] ||
+                water[meshId] !== isWater))
+            {
+                ++meshId;
+            }
 
             // Add new mesh if necessary.
             meshHasToBeAdded = sizes[meshId] === undefined;
@@ -280,10 +467,18 @@ let ChunksModule = {
                 }
 
                 // Create geometry.
-                geometry = new THREE.BufferGeometry();
+                geometry = new BufferGeometry();
                 geometries[meshId] = geometry;
-                materials[meshId] = this.createMaterial('textured-phong', 0xb8860b);
+                // let newMaterial = this.createMaterial('textured-phong', 0xb8860b);
+                // if (isWater) {
+                //     newMaterial.transparent = true;
+                //     newMaterial.opacity = 0.3;
+                //     newMaterial.side = FrontSide;
+                // }
+                // materials[meshId] = newMaterial;
+
                 sizes[meshId] = 1;
+                water[meshId] = isWater;
                 whichFaceIs.set(meshId, new Map());
 
                 let triangles = 2 * defaultGeometrySize;
@@ -308,16 +503,15 @@ let ChunksModule = {
             }
 
             // Add face.
-            let pA = new THREE.Vector3();
-            let pB = new THREE.Vector3();
-            let pC = new THREE.Vector3();
-            let cb = new THREE.Vector3();
-            let ab = new THREE.Vector3();
+            let pA = new Vector3();
+            let pB = new Vector3();
+            let pC = new Vector3();
+            let cb = new Vector3();
+            let ab = new Vector3();
             let n = 800;
-            let color = new THREE.Color();
+            let color = new Color();
             let pos = sizes[meshId] - 1;
 
-            let nature = added[aid]; // Corresponds to block id.
             let normal = nature > 0;
             whereToFindFace.set(aid, [meshId, pos]);
             whichFaceIs.get(meshId).set(pos, aid);
@@ -329,13 +523,21 @@ let ChunksModule = {
                 normal, color, n);
 
             if (meshHasToBeAdded) {
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-                geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-                geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+                geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+                geometry.setAttribute('normal', new BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
 
-                meshes[meshId] = new THREE.Mesh(geometry, materials[meshId]);
-                this.addToScene(meshes[meshId], worldId);
+                // let addedMesh = new Mesh(geometry, materials[meshId]);
+                // meshes[meshId] = addedMesh;
+                let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat);
+                // let newMesh = new Mesh(geometry, materials[meshId]);
+
+                // newMesh.castShadow = true;
+                // newMesh.receiveShadow = true;
+                if (Math.random() < 0.25) newMesh.userData.bloom = true;
+                meshes[meshId] = newMesh;
+                this.addToScene(newMesh, worldId);
             }
 
             // Notify object.
@@ -346,17 +548,6 @@ let ChunksModule = {
             geometry.computeBoundingSphere();
         }
     },
-
-    // TODO [LONG-TERM] manage changes
-    updateChunkFaces(worldId, updated, geometries) {
-        // for (let uid in updated) {
-        // }
-        if (window.debug) {
-            console.log(worldId);
-            console.log(updated);
-            console.log(geometries);
-        }
-    }
 
 };
 

@@ -1,4 +1,5 @@
 /* eslint-disable */
+var should = require('chai').should();
 
 import RigidBodiesPhase3 from '../../../../app/engine/game3d/engine_physics/solver/rigid_bodies/rigid_bodies_phase_3';
 

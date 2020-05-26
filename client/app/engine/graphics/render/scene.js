@@ -4,10 +4,11 @@
 
 'use strict';
 
-import * as THREE from 'three';
 import extend from '../../../extend.js';
+import { Scene } from 'three';
 
-let SceneManager = function() {
+let SceneManager = function()
+{
     this.mainScene = this.createScene(-1);
     this.subScenes  = new Map();
     this.screens = new Map();
@@ -16,7 +17,7 @@ let SceneManager = function() {
 extend(SceneManager.prototype, {
 
     createScene(newSceneId) {
-        let scene = new THREE.Scene();
+        let scene = new Scene();
         scene.sceneId = newSceneId;
         scene.autoUpdate = false;
         return scene;
@@ -56,12 +57,14 @@ extend(SceneManager.prototype, {
         if (scene) scene.add(object);
     },
 
-    removeObject(object, sceneId) {
+    removeObject(object, sceneId, doNotDispose) {
         let scene = this.getScene(sceneId);
         if (scene) {
             scene.remove(object);
-            if (object.geometry) { object.geometry.dispose(); object.geometry = null; }
-            if (object.material) { object.material.dispose(); object.material = null; }
+            if (!doNotDispose) {
+                if (object.geometry) { object.geometry.dispose(); object.geometry = null; }
+                if (object.material) { object.material.dispose(); object.material = null; }
+            }
         }
     },
 
@@ -92,8 +95,31 @@ extend(SceneManager.prototype, {
         let screen = this.screens.get(screenId);
         if (!screen) return;
 
-        this.removeObject(screen.getMesh(), screen.getWorldId());
-        this.screens.delete(screenId);
+        let scene = this.getScene(screen.getWorldId());
+        if (scene) scene.remove(screen);
+
+        // Do not dispose of the object! Later use for screen when we get back to this world.
+        this.removeObject(screen.getMesh(), screen.getWorldId(), true);
+        // this.screens.delete(screenId);
+    },
+
+    cleanup() {
+        this.mainScene.dispose();
+        this.mainScene = this.createScene(-1);
+        this.subScenes.forEach(s => {
+            s.dispose();
+        });
+        this.subScenes.clear();
+        this.screens.forEach(s => {
+            if (s.mesh) {
+                s.mesh.geometry.dispose();
+                s.mesh.material.dispose();
+            }
+            if (s.renderTarget) {
+                s.renderTarget.dispose();
+            }
+        });
+        this.screens.clear();
     }
 
 });
@@ -113,11 +139,11 @@ let ScenesModule = {
         sceneManager.addObject(object3D, sceneId);
     },
 
-    removeFromScene(object3D, sceneId) {
+    removeFromScene(object3D, sceneId, doNotDispose) {
         let sceneManager = this.sceneManager;
         if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
         sceneId = parseInt(sceneId, 10);
-        sceneManager.removeObject(object3D, sceneId);
+        sceneManager.removeObject(object3D, sceneId, doNotDispose);
     },
 
     addScene(newSceneId) {
@@ -176,7 +202,6 @@ let ScenesModule = {
         this.rendererManager.switchAvatarToScene(newSceneId);
         this.previousFrameWorld = parseInt(oldSceneId, 10);
         this.currentFrameWorld = parseInt(newSceneId, 10);
-        this.rendererManager.thenstop = true;
     }
 
 };

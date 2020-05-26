@@ -4,16 +4,15 @@
 
 'use strict';
 
-import * as THREE from 'three';
-
 import { Entity } from './entity.js';
+import { Object3D } from 'three';
 
 let PlayerModule = {
 
     loadCube(id, updatedEntity, graphics, entities)
     {
         // TODO [LOW] do it in graphics
-        let wrapper = new THREE.Object3D();
+        let wrapper = new Object3D();
         let cube = graphics.createMesh(
             graphics.createGeometry('box'),
             graphics.createMaterial('flat-phong')
@@ -32,16 +31,15 @@ let PlayerModule = {
 
     loadPlayer(id, updatedEntity, graphics, entities)
     {
-        graphics.initializeEntity(id, 'steve',
-            function(createdEntity) {
-                let object3D = graphics.finalizeEntity(id, createdEntity);
+        // TODO [LOW] add handheld item
+        let createdEntity = graphics.initializeEntity(id, 'steve');
+        let object3D = graphics.finalizeEntity(id, createdEntity);
 
-                let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
-                graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+        let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
+        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
-                this.updateEntity(id, entity, updatedEntity, graphics, entities);
-                this.entitiesLoading.delete(id);
-            }.bind(this));
+        this.updateEntity(id, entity, updatedEntity, graphics, entities);
+        this.entitiesLoading.delete(id);
     }
 
 };

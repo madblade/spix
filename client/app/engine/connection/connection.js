@@ -6,46 +6,79 @@
 
 import extend           from '../../extend.js';
 import io               from 'socket.io-client';
+import { RTCService }   from './rtc';
 
 let Connection = function(app) {
     this.app = app;
     this.socket = {};
+    this.rtc = new RTCService(app);
 };
 
 extend(Connection.prototype, {
 
-    connect(autoconfig) {
-        let socketAddress = '';
-        let app = this.app;
-        let hub = app.model.hub;
+    connectSocket(socketAddress, port, autoconfig) {
+        let remoteAddress = '';
 
-        if (!autoconfig && location.hostname !== 'localhost') {
-            socketAddress = `ws://${location.hostname}:8000`;
+        if (!autoconfig && socketAddress === '' && location.hostname !== 'localhost') {
+            remoteAddress = `ws://${location.hostname}:${port}`;
+        } else if (!autoconfig) {
+            remoteAddress = `ws://${socketAddress}:${port}`;
         }
 
-        this.socket = io(socketAddress, {
+        this.socket = io(remoteAddress, {
             // Send auth token on connection, you will need to DI the Auth service above
             // 'query': 'token=' + Auth.getToken()
             path: '/socket.io-client'
         });
+    },
+
+    setupLocalSocket(s) {
+        this.socket = s;
+    },
+
+    listen() {
+        let app = this.app;
+        let hub = app.model.hub;
 
         // Custom listeners.
-        this.socket.on('hub',               function(data) {hub.update(data);});
-        this.socket.on('joined',            function() {app.joinedServer();});
-        this.socket.on('cantjoin',          function() {location.reload();});
-        this.socket.on('connected',         function() {app.connectionEstablished();});
+        this.socket.on('hub',               function(data) { hub.update(data); });
+        this.socket.on('joined',            function() { app.joinedServer(); });
+        this.socket.on('cantjoin',          function() {console.error('Server refused!');});
+        this.socket.on('connected',         function() { app.connectionEstablished(); });
 
         // Default listeners
         this.socket.on('connect',           function() {console.log('Connecting...');});
-        this.socket.on('disconnect',        function() {console.log('Disconected! :(');});
+        this.socket.on('disconnect',        function() {console.log('Disconnected!');});
         this.socket.on('reconnect',         function() {console.log('Reconnecting...');});
         this.socket.on('reconnect_failed',  function() {console.log('Could not reconnect after MANY attempts.');});
         this.socket.on('reconnect_error',   function() {console.log('Reconnection failed! :(');});
     },
 
+    listenQuick() {
+        let app = this.app;
+        this.socket.on('hub',               function(data) {
+            data = JSON.parse(data);
+            let d = 'demo';
+            if (!data.hasOwnProperty(d)) {
+                console.log(data);
+                console.error('could not join demo'); return;
+            }
+            let array = data[d];
+            if (array.length !== 1) {
+                console.log(array);
+                console.log('WARN: Demo already present in the local sandbox.');
+            }
+            if (array.length < 1) {
+                console.error('Failed to create demo.'); return;
+            }
+            app._forceJoin(d, array[0]);
+        });
+        this.socket.on('joined',            function() { app.joinedServer(); });
+    },
+
     disconnect() {
-        let scope = this;
-        scope.unregisterSocketForGame3D();
+        this.socket.disconnect();
+        this.unregisterSocketForGame3D();
 
         ['hub', 'joined', 'cantjoin', 'connected', 'connect', 'disconnect',
             'reconnect', 'reconnect_failed', 'reconnect_error']
@@ -72,17 +105,24 @@ extend(Connection.prototype, {
         this.send('util', {request: 'hub'});
     },
 
-    requestGameCreation(gameType) {
-        this.send('util', {request: 'createGame', gameType});
+    requestGameCreation(gameType, options) {
+        this.send('util', {
+            request: 'createGame', gameType, options
+        });
     },
 
     configureGame(gameType, gid) {
         switch (gameType) {
-            case 'game3d':
+            case 'cube':
+            case 'flat':
+            case 'demo':
                 this.registerSocketForGame3D();
                 break;
+            case 'unstructured':
+                console.error('[Client/Connection] Unstructured not yet supported.');
+                break;
             default:
-                throw Error('Could not configure ' +
+                console.error('Could not configure ' +
                     'socket listeners for an unknown game type' +
                     `on game ${gid}.`);
         }

@@ -1,4 +1,5 @@
 /* eslint-disable */
+var should = require('chai').should();
 
 import RigidBodies      from '../../../../app/engine/game3d/engine_physics/solver/rigid_bodies/rigid_bodies';
 import EventOrderer     from '../../../../app/engine/game3d/engine_physics/solver/rigid_bodies/orderer_events';
@@ -34,7 +35,8 @@ describe('Rigid (AABB) solver routines:', function () {
         entityModel = new EntityModel(null);
         xModel = new XModel(null, worldModel);
 
-        // TODO push random objects in models.
+        // Here push random objects in models.
+        // ...
 
         outputBuffer  = new OutputBuffer();
         objectOrderer = new ObjectOrderer(entityModel, xModel);
@@ -80,6 +82,5 @@ describe('Rigid (AABB) solver routines:', function () {
         // return Table.removeAsync();
         done();
         process.exit(); // This is to remove hooks, to call last
-        // TODO put that in a z-file
     });
 });

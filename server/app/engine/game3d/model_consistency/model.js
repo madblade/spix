@@ -24,7 +24,7 @@ class ConsistencyModel {
     }
 
     spawnPlayer(player) {
-        let playerId = player.avatar.entityId;
+        let playerId = parseInt(player.avatar.entityId, 10);
         let chunksMap = new Map();
         chunksMap.set(player.avatar.worldId, new Set());
 
@@ -37,6 +37,7 @@ class ConsistencyModel {
     }
 
     removePlayer(playerId) {
+        playerId = parseInt(playerId, 10);
         this._entityIdsForEntity.delete(playerId);
         this._chunkIdsForEntity.delete(playerId);
         this._chunkIdAndPartsForEntity.delete(playerId);
@@ -51,6 +52,14 @@ class ConsistencyModel {
         playerId = parseInt(playerId, 10);
 
         return this._chunkIdsForEntity.get(playerId);
+    }
+
+    hasWorld(playerId, worldId) {
+        playerId = parseInt(playerId, 10);
+        worldId = parseInt(worldId, 10);
+
+        let chunkIdsForEntity = this._chunkIdsForEntity.get(playerId);
+        return chunkIdsForEntity && chunkIdsForEntity.has(worldId);
     }
 
     hasChunk(playerId, worldId, chunkId) {
@@ -82,6 +91,9 @@ class ConsistencyModel {
 
         let chunksForPlayerInWorld = this._chunkIdsForEntity.get(playerId).get(worldId);
         chunksForPlayerInWorld.delete(chunkId);
+        if (chunksForPlayerInWorld.size < 1) {
+            this._chunkIdsForEntity.get(playerId).delete(worldId);
+        }
     }
 
     doneChunkLoadingPhase(player, starterChunk) {
@@ -91,7 +103,9 @@ class ConsistencyModel {
 
         let side = renderDistance * 2 + 1;
 
-        // TODO [CRIT] worldify (with xModel.getConnectivity)
+        // TODO [LOW] worldify
+        // This only counts loaded chunks in the current world
+        // which is fine so far.
         let aid = avatar.entityId;
         let worlds = this._chunkIdsForEntity.get(aid);
 
@@ -109,7 +123,9 @@ class ConsistencyModel {
             }
         });
 
-        // TODO [HIGH] differentiate 3D / 2D.
+        // This is not correct strictly speaking
+        // (a "side"-radius sphere in the 1-norm
+        // is not a "side"-sized square), but so far it does the job.
         const expectedSize = side *  side * side;
 
         return expectedSize <= actualInnerSize;

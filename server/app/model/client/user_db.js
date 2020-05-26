@@ -7,8 +7,8 @@
 import Factory from './../factory';
 import CollectionUtils from '../../engine/math/collections';
 
-class UserDataBase {
-
+class UserDataBase
+{
     constructor(connector) {
         this._connection = connector;
         this._users = new Map();
@@ -38,6 +38,10 @@ class UserDataBase {
         return this._users.get(id);
     }
 
+    getUsers() {
+        return this._users;
+    }
+
     removeUser(user) {
         // Remove references to this user
         this._users.delete(user.id);
@@ -50,10 +54,10 @@ class UserDataBase {
 
         let users = this._users;
         users.forEach(user/*, userId*/ => {
-            user.send('hub', JSON.stringify(game));
+            user.fetchHubState();
+            // user.send('hub', JSON.stringify(game));
         });
     }
-
 }
 
 export default UserDataBase;

@@ -6,13 +6,14 @@
 
 import Factory from '../factory';
 
-class Connector {
-
+class Connector
+{
     constructor(app) {
         this._app = app;
         this._userDB = Factory.createUserDB(this);
         this._io = null;
         this._debug = false;
+        this._sandboxConnections = new Set();
     }
 
     // Model
@@ -30,6 +31,10 @@ class Connector {
 
         // Inform the user that its connection is established
         // Make him wait a little... Server does not hurry.
+        this.confirmUserConnection(socket);
+    }
+
+    confirmUserConnection(socket) {
         setTimeout(() => socket.emit('connected', ''), 50);
     }
 
@@ -49,6 +54,10 @@ class Connector {
             this._userDB.removeUser(user);
 
             if (this._debug) socket.log('DISCONNECTED');
+
+            if (socket.isWebRTC) {
+                socket.closeConnection();
+            }
         });
     }
 
@@ -91,24 +100,60 @@ class Connector {
      * @param socketio
      */
     configure(socketio) {
-        if (this._io) throw new Error('Trying to configure a running app.');
+        if (this._io) {
+            console.log('[Server/Connector] Trying to configure a running app, ' +
+                'using the last configuration!');
+            return;
+        }
+        console.log('configuration socketIO.......');
 
         this._io = socketio;
 
         socketio.on('connection', socket => {
-            // Define debug functions and attributes
-            this.setupDebug(socket);
-
-            // Define disconnect behaviour
-            this.setupDisconnect(socket);
-
-            // Register user
-            this.setupUser(socket);
-
-            if (this._debug) socket.log('CONNECTED');
+            this.configureFromSocket(socket);
         });
     }
 
+    configureFromSocket(socket, userID) {
+        if (userID) {
+            let hasUser = this._sandboxConnections.has(userID);
+            if (hasUser) {
+                // Find user with the connection id.
+                let users = this._userDB.getUsers();
+                let userReplace = null;
+                users.forEach(user => {
+                    // replace user socket
+                    if (user.connection.socket.name === userID) {
+                        userReplace = user;
+                    }
+                });
+                if (userReplace) {
+                    console.log('CLEANUP OLD SOCKET');
+                    // CAUTION! Setter handles cleanup.
+                    userReplace.connection.socket = socket;
+                    if (userReplace.player) {
+                        let playerCo = userReplace.player.connection;
+                        // CAUTION! Setter handles cleanup here too.
+                        playerCo.socket = socket;
+                    }
+                    this.confirmUserConnection(socket);
+                    return;
+                }
+            }
+            else this._sandboxConnections.add(userID);
+        }
+
+        // Define debug functions and attributes
+        this.setupDebug(socket);
+
+        // Define disconnect behaviour
+        this.setupDisconnect(socket);
+
+        // Register user
+        this.setupUser(socket);
+
+        if (this._debug) socket.log('CONNECTED');
+    }
 }
 
 export default Connector;

@@ -4,34 +4,41 @@
 
 'use strict';
 
-class World {
+import { ChunkSizes, WorldType } from './model';
 
-    constructor(id, worldType, worldModel)
+class World
+{
+    constructor(id, worldInfo, worldModel)
     {
         this._worldId = id; // Identifier
         this._worldModel = worldModel;
-        // this._worldType = worldType;
         this._worldInfo = {
-            type: worldType,
-            center: {x: 0, y: 0, z: -2},
-            radius: 2
+            hills: worldInfo.hills,
+            caves: worldInfo.caves,
+            type: worldInfo.kind,
+
+            // Only for CubeWorld
+            radius: worldInfo.sideSize,
+            center: {x: 0, y: 0, z: -worldInfo.sideSize},
         };
 
         // Chunk id (i+','+j+','+k) -> chunk
         this._chunks = new Map();
 
-        // Keep same generation method
-        this._generationMethod = 'flat';
-
+        let chunkSizes = worldInfo.chunkSizes || ChunkSizes.CUBE_SMALL;
         // Constants
-        this._xSize = 4; // MUST BE EVEN (ideally a power of two)
-        this._ySize = 4; // MUST BE EVEN (ideally a power of two)
-        this._zSize = 4; // MUST BE EVEN (ideally a power of two)
+        this._xSize = chunkSizes[0] * 2;
+        this._ySize = chunkSizes[1] * 2;
+        this._zSize = chunkSizes[2] * 2;
+        if (this._xSize % 2 !== 0 || this._ySize % 2 !== 0 || this._zSize % 2 !== 0) {
+            console.error('World creation: chunk sizes must be even.');
+        }
     }
 
     get worldId() { return this._worldId; }
     // get worldType() { return this._worldType; }
     get worldInfo() { return this._worldInfo; }
+    isFlat() { return this._worldInfo.type === WorldType.FLAT; }
 
     get xSize() { return this._xSize; }
     get ySize() { return this._ySize; }
@@ -39,9 +46,6 @@ class World {
 
     get allChunks() { return this._chunks; }
     set allChunks(newChunks) { this._chunks = newChunks; }
-
-    get generationMethod() { return this._generationMethod; }
-    set generationMethod(newGenerationMethod) { this._generationMethod = newGenerationMethod; }
 
     addChunk(id, chunk) {
         this._chunks.set(id, chunk);
@@ -76,7 +80,7 @@ class World {
 
         const chunkId = `${i},${j},${k}`;
         let chunk = this._chunks.get(chunkId);
-        if (!chunk || chunk === undefined) {
+        if (!chunk) {
             console.log(`ChkMgr@whatBlock: could not find chunk ${chunkId} from (${x},${y},${z})!`);
             // TODO [MEDIUM] load concerned chunk.
             // TODO [MEDIUM] check minus
@@ -89,11 +93,12 @@ class World {
     getFreePosition() {
         let zLimit = this._zSize;
         let z = zLimit - 2;
-        let centerInteger = parseInt(zLimit / 2, 10);
-        let centerFloat = parseFloat(zLimit / 2) + 0.01;
+        let centerInteger = Math.trunc(zLimit / 2); // parseInt(zLimit / 2, 10);
+        let centerFloat = zLimit / 2 + 0.01; // parseFloat(zLimit / 2) + 0.01;
         while (
-            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 || this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
-            z < 100 * zLimit) ++z;
+            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 ||
+                this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
+            z < 2 * zLimit) ++z; // check 2 chunks and abort
         return [centerFloat, centerFloat, z];
     }
 

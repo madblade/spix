@@ -4,24 +4,37 @@
 
 'use strict';
 
-import Game3D from './game3d/game';
+import Game3D, { GameType } from './game3d/game';
 
-class GameFactory {
-
-    static createGame(hub, kind, gameId, connector) {
+class GameFactory
+{
+    static createGame(hub, kind, gameId, connector, options)
+    {
         let game;
         switch (kind) {
-            case 'game2d':
+            case 'flat':
+                let flatHillsType = parseInt(options.hills, 10);
+                let caves = parseInt(options.caves, 10);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.FLAT, flatHillsType, caves });
                 break;
-            case 'game3d':
-                game = new Game3D(hub, gameId, connector);
+            case 'cube':
+                let threeHillsType = parseInt(options.hills, 10);
+                let size = parseInt(options.size, 10);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.CUBE, threeHillsType, size });
                 break;
-            default: console.log('Unknown game kind requested @ GameFactory.');
+            case 'demo':
+                game = new Game3D(hub, gameId, connector, { kind: GameType.DEMO });
+                break;
+            case 'unstructured':
+                console.log('[Server/GameFactory] Unstructured not yet supported.');
+                return;
+            default:
+                console.error('[Server/GameFactory] Unknown game kind requested.');
+                return;
         }
 
         return game;
     }
-
 }
 
 export default GameFactory;

@@ -11,9 +11,10 @@ class ChunkBuffer {
     }
 
     // addedChunks:     world id => chunk id => [fast components, fast component ids]
+    //     on the first: world metadata (type, radius, center.xyz)
     // removedChunks:   world id => chunk id => null
     // updatedChunks:   (topologyEngine)
-    updateChunksForPlayer(playerId, addedChunks, removedChunks, addedWorlds) {
+    updateChunksForPlayer(playerId, addedChunks, removedChunks, addedWorlds, addedWorldsMeta) {
         // Check.
         if (!addedChunks && !removedChunks) return;
 
@@ -32,6 +33,7 @@ class ChunkBuffer {
         else if (removedChunks) addedChunks = removedChunks;
 
         if (addedWorlds) addedChunks.worlds = addedWorlds;
+        if (addedWorldsMeta) addedChunks.worldsMeta = addedWorldsMeta;
 
         // Output.
         this._outputBuffer.set(playerId, addedChunks);
@@ -39,6 +41,7 @@ class ChunkBuffer {
 
     // Shallow.
     getOutput() {
+        // TODO [OPT] remove copy
         return new Map(this._outputBuffer);
     }
 

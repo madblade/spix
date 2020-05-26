@@ -4,10 +4,8 @@
 
 'use strict';
 
-// import GeometryUtils        from '../../../math/geometry';
-
-class XLoader {
-
+class XLoader
+{
     constructor(consistencyEngine) {
         this._xModel = consistencyEngine.xModel;
         this._worldModel = consistencyEngine.worldModel;
@@ -46,11 +44,11 @@ class XLoader {
             if (partial) {
                 if (array) {
                     addedPortals[portalId] = [...array];
-                        // API: Other end id, chunk id, world id, xyzp, orientation, world id,
-                        // x1,y1,z1, x2,y2,z2, partial position, orientation
+                    // API: Other end id, chunk id, world id, xyzp, orientation, world id,
+                    // x1,y1,z1, x2,y2,z2, partial position, orientation
                     cm.unsetPartialX(avatarId, portalId);
                 } // Else, nothing to do still.
-            } else
+            } else if (!partial) {
                 if (array) {
                     addedPortals[portalId] = [...array];
                 } else {
@@ -59,6 +57,7 @@ class XLoader {
                     // Then they are flagged as 'partial' in consistency model.
                     cm.setPartialX(avatarId, portalId);
                 }
+            }
         });
 
         // Update out of range portals.
@@ -82,7 +81,6 @@ class XLoader {
 
         return [addedPortals, removedPortals];
     }
-
 }
 
 export default XLoader;

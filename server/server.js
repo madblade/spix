@@ -39,7 +39,7 @@ function startServer() {
         config.ip,
         function() {
             console.log('Express server listening on %s :: %d, in %s mode',
-            config.ip, config.port, server.get('env'));
+                config.ip, config.port, server.get('env'));
         });
 }
 

@@ -8,15 +8,19 @@ import Entity from './entity';
 
 class Avatar extends Entity
 {
-
     constructor(id) {
         super(id);
 
         this._kind = 'player';
 
         // Counted as a number of chunks.
-        this._chunkRenderDistance = 5;
-        this._chunkUnloadDistance = 5;
+        this._chunkRenderDistance = 3;
+        // If you increase this, also increase model_x/model.push(chksZ, currentDepth + 2);
+        // For flat worlds
+        this._chunkUnloadDistance = 5; // TODO here
+        // Might be a good idea to keep the unload distance as big as possible client-wise
+        // When games don’t contain many players.
+
         this._portalRenderDistance = 3;
 
         // Counted as a number of blocks.

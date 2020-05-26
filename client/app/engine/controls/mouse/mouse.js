@@ -13,35 +13,23 @@ import { PointerLockModule } from './pointerlockcontrols.js';
 let MouseModule = {
 
     setupMouse() {
-        this.buttons = {left: 1, middle: 2, right: 3};
+        this.buttons = Object.freeze({left: 1, middle: 2, right: 3});
 
         // Click / move handlers.
         this.setupPointerLock();
     },
 
-    getControls(controlType) {
-        let controls;
-
-        if (controlType === 'first-person') {
-            controls = this.getFirstPersonControls();
-            controls.type = 'fp';
-        } else {
-            controls = undefined;
-        }
-
-        return controls;
-    },
-
     startMouseListeners() {
-        let graphicsEngine = this.app.engine.graphics;
-        graphicsEngine.startListeners();
+        if (this.isTouch)
+            console.warn('[Keyboard] requested keyboard listeners on a touch device.');
+
+        this.registerMouseMove();
         this.registerMouseDown();
         this.registerMouseWheel();
     },
 
     stopMouseListeners() {
-        let graphicsEngine = this.app.engine.graphics;
-        graphicsEngine.stopListeners();
+        this.unregisterMouseMove();
         this.unregisterMouseDown();
         this.unregisterMouseWheel();
     }

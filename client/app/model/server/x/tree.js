@@ -273,20 +273,64 @@ extend(XGraph.prototype, {
         return string;
     },
 
-    computeCameraTransform(pidPath/*, portals, cameraManager*/) {
+    computeCameraTransform(pidPath, portals, cameraManager) {
         // let root = cameraManager.mainCamera;
         let cameraTransform = [
             0, 0, 0, // Position
             0, 0, 0  // Rotation
         ];
 
+        console.log('CAMERA TRANSFORMATION');
+        console.log(pidPath);
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
-            // let currentPid = parseInt(pidPath[pathId][0], 10);
-            // let currentP = portals.get(currentPid);
+            let currentTunnel = pidPath[pathId].split(',');
+            let sourcePortalId = currentTunnel[0];
+            let sourcePortal = portals.get(sourcePortalId);
+            let destinationPortalId = currentTunnel[1];
+            let destinationPortal = portals.get(destinationPortalId);
+            if (!destinationPortal || !sourcePortal) continue;
 
-            // TODO [CRIT] compute transform
+            let P0B0 = sourcePortal.tempPosition;
+            let P0B1 = sourcePortal.tempOtherPosition;
+            let P1B0 = destinationPortal.tempPosition;
+            let P1B1 = destinationPortal.tempOtherPosition;
+            let isX0 = P0B0[0] !== P0B1[0]; let isX1 = P1B0[0] !== P1B1[0];
+            let isY0 = P0B0[1] !== P0B1[1]; let isY1 = P1B0[1] !== P1B1[1];
+            let isZ0 = P0B0[2] !== P0B1[2]; let isZ1 = P1B0[2] !== P1B1[2];
+            if (isX0 + isY0 + isZ0 !== 1 || isX1 + isY1 + isZ1 !== 1) {
+                console.warn('[Tree/CameraTransform]: unmanaged portal type.');
+                return;
+            }
+            let p0x = 0; let p0y = 0; let p0z = 0;
+            let p1x = 0; let p1y = 0; let p1z = 0;
+            switch (true) {
+                case isX0: p0x = 0.5 * (P0B0[0] +  P0B1[0]); p0y = 0.5 + P0B0[1]; p0z = 0.5 + P0B1[2]; break;
+                case isY0: p0y = 0.5 * (P0B0[1] +  P0B1[1]); p0x = 0.5 + P0B0[0]; p0z = 0.5 + P0B1[2]; break;
+                case isZ0: p0z = 0.5 * (P0B0[2] +  P0B1[2]); p0y = 0.5 + P0B0[1]; p0x = 0.5 + P0B1[0]; break;
+            }
+            switch (true) {
+                case isX1: p1x = 0.5 * (P1B0[0] +  P1B1[0]); p1y = 0.5 + P1B0[1]; p1z = 0.5 + P1B1[2]; break;
+                case isY1: p1y = 0.5 * (P1B0[1] +  P1B1[1]); p1x = 0.5 + P1B0[0]; p1z = 0.5 + P1B1[2]; break;
+                case isZ1: p1z = 0.5 * (P1B0[2] +  P1B1[2]); p1y = 0.5 + P1B0[1]; p1x = 0.5 + P1B1[0]; break;
+            }
+
+            if (p0x !== p1x || p0y !== p1y || p0z !== p1z) {
+                console.warn('[Tree/CameraTransform]: // TODO Compute camera chain transform.');
+            }
+            // let thetaP0 = sourcePortal.tempOrientation;
+            // let thetaP1 = destinationPortal.tempOrientation;
+            // let portalRelativeOrientation = [o1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
+
+            // TODO [CRIT] compute chain transformation.
+            console.log(destinationPortalId);
+            console.log(destinationPortal.tempPosition);
+            console.log(destinationPortal.tempOrientation);
+
+            // compose everything but NOT THE MAIN CAMERA!
         }
 
+        console.log('Computed Camera Transform.');
+        console.log(cameraTransform);
         return cameraTransform;
     },
 
@@ -303,7 +347,8 @@ extend(XGraph.prototype, {
 
         let currentStep; let destinationWid; let originPid; let destinationPid;
         // let originWid; let widPath;
-        let pidPathString; let pidPath; let depth;
+        let pidPathString; let pidPath;
+        let depth;
         let cameraTransform;
         for (let i = 0, l = flatGraph.length; i < l; ++i) {
             currentStep = flatGraph[i];
@@ -316,8 +361,8 @@ extend(XGraph.prototype, {
             // widPath         = currentStep.wpath.split(';');
             depth           = currentStep.depth;
 
-            switch (currentStep.type) {
-
+            switch (currentStep.type)
+            {
                 case 'lime': // Regular.
                     // Add screen.
                     // Add camera.
@@ -496,7 +541,7 @@ extend(XGraph.prototype, {
         }
 
         this.flatGraph = flatGraph;
-        return this;
+        return this.flatGraph;
     }
 
 });

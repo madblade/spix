@@ -5,10 +5,14 @@
 'use strict';
 
 import CollectionUtils from '../../../math/collections';
-import CSFX from '../../engine_consistency/builder/surface_faces_builder'; // Get linkage strategy.
+// import CSFX from '../../engine_consistency/builder/surface_faces_builder';
+import { BlockType } from '../../model_world/model'; // Get linkage strategy.
 
-class UpdaterFace {
-
+class UpdaterFace
+{
+    /**
+     * @deprecated
+     */
     static detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, faces) {
         // Criterion: at least 2 surface faces that do not link on the inserted cube.
         // i.e. if blocking edges form a cycle.
@@ -63,9 +67,327 @@ class UpdaterFace {
         return false;
     }
 
+    static addFaceToChunk(
+        chunk, x, y, z,
+        direction, faceNature, fromAddition)
+    {
+        if (faceNature === BlockType.AIR) {
+            console.error('[UpdaterFace] Can’t add air face.');
+        }
+
+        let blockStride = chunk._toId(x, y, z);
+        let dimensions = chunk.dimensions;
+        let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(blockStride, direction, dimensions);
+
+        let connectedComponents = chunk.connectedComponents;
+        let fastComponents = chunk.fastComponents;
+        let fastComponentsIds = chunk.fastComponentsIds;
+
+        let componentId = faceNature === BlockType.WATER ? 2 : 1; // water
+
+        if (!fastComponents[componentId])
+        {
+            console.error(`BLD: invalid component id: ${componentId} for insertion.`);
+            console.log(fastComponents);
+            console.log(fastComponentsIds);
+            console.log(connectedComponents);
+            fastComponents[componentId] = [];
+            fastComponentsIds[componentId] = [];
+        }
+
+        connectedComponents[faceId] = componentId;
+        const location = CollectionUtils.insert(faceId, fastComponents[componentId]);
+        let fastIds = fastComponentsIds[componentId];
+        if (fromAddition) {
+            if (direction % 2 === 0) faceNature *= -1;
+        } else if (!fromAddition) {
+            if (direction % 2 !== 0) faceNature *= -1;
+        }
+        fastIds.splice(location, 0, faceNature);
+
+        // Apply update.
+        let updates = chunk.updates;
+        let removedUpdt = updates[0];
+        let addedUpdt = updates[1];
+        let changedUpdt = updates[2];
+        let nbp = CollectionUtils.numberOfProperties;
+        const updatesEmpty = nbp(removedUpdt) === 0 && nbp(addedUpdt) === 0 && nbp(changedUpdt) === 0;
+        if (!updatesEmpty && removedUpdt.hasOwnProperty(faceId)) {
+            delete removedUpdt[faceId]; // if it is marked as 'removed', then it exists in the original array
+            changedUpdt[faceId] = faceNature; //connectedComponents[fid];
+        } else {
+            addedUpdt[faceId] = faceNature; // connectedComponents[fid];
+        }
+    }
+
+    static removeFaceFromChunk(
+        chunk, x, y, z,
+        direction)
+    {
+        let blockStride = chunk._toId(x, y, z);
+        let dimensions = chunk.dimensions;
+        let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(blockStride, direction, dimensions);
+
+        let connectedComponents = chunk.connectedComponents;
+        let fastComponents = chunk.fastComponents;
+        let fastComponentsIds = chunk.fastComponentsIds;
+
+        const componentId = connectedComponents[faceId];
+        if (!componentId) {
+            console.error(`[UpdaterFace] Face id ${faceId} not in connected components.`);
+            console.log(componentId);
+        }
+        if (componentId < 1) {
+            console.warn(`WARN: trying to remove a face that is not
+                    registered as boundary: component id = ${faceId}.
+                `);
+            return;
+        }
+
+        let currentComponent = fastComponents[componentId];
+        if (!currentComponent) {
+            let e = new Error(`BLD: skipping removal on component ${componentId}`);
+            console.error(`BLD: skipping removal on component ${componentId}`);
+            console.log(e.stack);
+            return;
+        }
+
+        let index = CollectionUtils.removeFromArray(currentComponent, faceId);
+        if (currentComponent.length === 0)
+            delete fastComponents[componentId];
+
+        let currentComponentsIds = fastComponentsIds[componentId];
+        CollectionUtils.removeFromArrayWithId(currentComponentsIds, index);
+        if (currentComponentsIds.length === 0)
+            delete fastComponentsIds[componentId];
+
+        connectedComponents[faceId] = 0;
+
+        // Push update.
+        let updates = chunk.updates;
+        let removedUpdt = updates[0];
+        let addedUpdt = updates[1];
+        let changedUpdt = updates[2];
+
+        let nbp = CollectionUtils.numberOfProperties;
+        const updatesEmpty = nbp(removedUpdt) === 0 && nbp(addedUpdt) === 0 && nbp(changedUpdt) === 0;
+
+        if (!updatesEmpty && addedUpdt.hasOwnProperty(faceId)) {
+            delete addedUpdt[faceId]; // if it is marked as 'added', then it does not exist in the original array
+        } else {
+            removedUpdt[faceId] = null;
+        }
+    }
+
+    static updateOneFaceFromAddition(
+        chunk, otherUpdatedChunks,
+        airBlock, waterBlock, isAddedBlockWater,
+        blockId, otherBlockId,
+        x, y, z, xTest, yTest, zTest, condition, direction)
+    {
+        let current;
+        if (condition) {
+            current = chunk.queryChunk(xTest, yTest, zTest);
+            if (x !== xTest) current[1] += 1;
+            if (y !== yTest) current[2] += 1;
+            if (z !== zTest) current[3] += 1;
+            otherUpdatedChunks.push(current[0]);
+        } else {
+            current = [chunk, x, y, z];
+        }
+
+        if (otherBlockId === airBlock)
+        {
+            // add face to this.
+            UpdaterFace.addFaceToChunk(
+                current[0], current[1], current[2], current[3],
+                direction, blockId, true
+            );
+        }
+        else if (otherBlockId === waterBlock && !isAddedBlockWater)
+        {
+            // delete other block face and add face to this.
+            UpdaterFace.removeFaceFromChunk(
+                current[0], current[1], current[2], current[3],
+                direction
+            );
+            UpdaterFace.addFaceToChunk(
+                current[0], current[1], current[2], current[3],
+                direction, blockId, true);
+        }
+        else if (
+            otherBlockId === waterBlock && isAddedBlockWater ||
+            otherBlockId !== airBlock && otherBlockId !== waterBlock && !isAddedBlockWater)
+        {
+            // delete other block face.
+            UpdaterFace.removeFaceFromChunk(
+                current[0], current[1], current[2], current[3],
+                direction
+            );
+        }
+    }
+
+    static updateSurfaceFacesAfterAddition2(chunk, id, x, y, z, blockId)
+    {
+        let otherUpdatedChunks = [];
+
+        let airBlock = BlockType.AIR;
+        let waterBlock = BlockType.WATER;
+        let isAddedBlockWater = blockId === waterBlock;
+
+        let a = chunk.queryBlock(x - 1, y, z);
+        let b = chunk.queryBlock(x + 1, y, z);
+        let c = chunk.queryBlock(x, y - 1, z);
+        let d = chunk.queryBlock(x, y + 1, z);
+        let e = chunk.queryBlock(x, y, z - 1);
+        let f = chunk.queryBlock(x, y, z + 1);
+
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            a, x, y, z,
+            x - 1, y, z, x === 0, 0
+        );
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            b, x, y, z,
+            x + 1, y, z, false, 1
+        );
+
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            c, x, y, z,
+            x, y - 1, z, y === 0, 2
+        );
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            d, x, y, z,
+            x, y + 1, z, false, 3
+        );
+
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            e, x, y, z,
+            x, y, z - 1, z === 0, 4
+        );
+        UpdaterFace.updateOneFaceFromAddition(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isAddedBlockWater, blockId,
+            f, x, y, z,
+            x, y, z + 1, false, 5
+        );
+
+        return otherUpdatedChunks;
+    }
+
+    static updateOneFaceFromDeletion(
+        chunk, otherUpdatedChunks,
+        airBlock, waterBlock, isRemovedBlockWater,
+        otherBlockId,
+        x, y, z, xTest, yTest, zTest, condition, direction)
+    {
+        // Removed
+        let current;
+        if (condition) {
+            current = chunk.queryChunk(xTest, yTest, zTest);
+            if (x !== xTest) current[1] += 1;
+            if (y !== yTest) current[2] += 1;
+            if (z !== zTest) current[3] += 1;
+            otherUpdatedChunks.push(current[0]);
+        } else {
+            current = [chunk, x, y, z];
+        }
+
+        if (otherBlockId === airBlock)
+        {
+            // delete this face.
+            UpdaterFace.removeFaceFromChunk(
+                current[0], current[1], current[2], current[3],
+                direction
+            );
+        }
+        else if (otherBlockId === waterBlock && !isRemovedBlockWater)
+        {
+            // delete this face and add other block face water.
+            UpdaterFace.removeFaceFromChunk(
+                current[0], current[1], current[2], current[3],
+                direction
+            );
+            UpdaterFace.addFaceToChunk(
+                current[0], current[1], current[2], current[3],
+                direction, otherBlockId, false
+            );
+        }
+        else if (otherBlockId === waterBlock && isRemovedBlockWater ||
+            otherBlockId !== airBlock && otherBlockId !== waterBlock && !isRemovedBlockWater)
+        {
+            // add other block face.
+            UpdaterFace.addFaceToChunk(
+                current[0], current[1], current[2], current[3],
+                direction, otherBlockId, false
+            );
+        }
+    }
+
+    static updateSurfaceFacesAfterDeletion2(
+        chunk, id, x, y, z, blockId)
+    {
+        let otherUpdatedChunks = [];
+
+        let airBlock = BlockType.AIR;
+        let waterBlock = BlockType.WATER;
+
+        // let blockId = chunk.queryBlock(x, y, z);
+        let isRemovedBlockWater = blockId === waterBlock;
+
+        let a = chunk.queryBlock(x - 1, y, z);
+        let b = chunk.queryBlock(x + 1, y, z);
+        let c = chunk.queryBlock(x, y - 1, z);
+        let d = chunk.queryBlock(x, y + 1, z);
+        let e = chunk.queryBlock(x, y, z - 1);
+        let f = chunk.queryBlock(x, y, z + 1);
+
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            a, x, y, z,
+            x - 1, y, z, x === 0, 0
+        );
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            b, x, y, z,
+            x + 1, y, z, false, 1
+        );
+
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            c, x, y, z,
+            x, y - 1, z, y === 0, 2
+        );
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            d, x, y, z,
+            x, y + 1, z, false, 3
+        );
+
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            e, x, y, z,
+            x, y, z - 1, z === 0, 4
+        );
+        UpdaterFace.updateOneFaceFromDeletion(
+            chunk, otherUpdatedChunks, airBlock, waterBlock, isRemovedBlockWater,
+            f, x, y, z,
+            x, y, z + 1, false, 5
+        );
+
+        return otherUpdatedChunks;
+    }
+
     // BLOCK ADDITION
     // The difficulty is to determine which surface faces belong to which component after an addition.
-    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z) {
+    /**
+     * @deprecated
+     */
+    static updateSurfaceFacesAfterAddition(chunk, id, x, y, z)
+    {
         let dimensions = chunk.dimensions;
 
         // Compute concerned faces.
@@ -95,7 +417,7 @@ class UpdaterFace {
             // N.B. whatever the block update, there will always be 6 modified faces (non-boundary case).
         ];
 
-        UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true);
+        UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, true, true);
 
         if (UpdaterFace.detectProbableTopologyChangeAfterAddition(chunk, id, x, y, z, addedFaces))
         // N.B. a necessary yet not sufficient condition for effective division of components within the chunk.
@@ -115,70 +437,80 @@ class UpdaterFace {
     static getFaceIdFromCoordinatesAndNormal(id, normal, dimensions) {
         let ddd = dimensions[0] * dimensions[1] * dimensions[2];
         switch (normal) { // TODO boundary management...
-            case 0:
+            case 0: // x-
                 return id - 1;
-            case 2:
+            case 2: // y-
                 return ddd + id - dimensions[0];
-            case 4:
+            case 4: // z-
                 return 2 * ddd + id - dimensions[0] * dimensions[1];
 
-            case 1:
+            case 1: // x+
                 return id;
-            case 3:
+            case 3: // y+
                 return ddd + id;
-            case 5:
+            case 5: // z+
                 return 2 * ddd + id;
             default:
         }
     }
 
     // ADDITION ONLY
-    static getFaceColorFromIdAndNormal(chunk, x, y, z, direction) {
-        let _this = chunk.what(x, y, z);
-        let thisEmpty = _this === 0;
+    /**
+     * @deprecated
+     */
+    static getFaceNatureFromIdAndNormal(chunk, x, y, z, direction)
+    {
+        let currentBlock = chunk.what(x, y, z);
+        let thisEmpty = currentBlock === 0;
+        if (!thisEmpty) return currentBlock;
+
         let dimensions = chunk.dimensions;
-        if (thisEmpty) {
-            switch (direction) {
-                case 0: // x-
-                    if (x > 0) return chunk.what(x - 1, y, z);
-                    break;
+        switch (direction) {
+            case 0: // x-
+                if (x > 0) return chunk.what(x - 1, y, z);
+                break;
 
-                case 1: // x+
-                    if (x + 1 < dimensions[0]) return chunk.what(x + 1, y, z);
-                    break;
+            case 1: // x+
+                if (x + 1 < dimensions[0]) return chunk.what(x + 1, y, z);
+                break;
 
-                case 2: // y-
-                    if (y > 0) return chunk.what(x, y - 1, z);
-                    break;
+            case 2: // y-
+                if (y > 0) return chunk.what(x, y - 1, z);
+                break;
 
-                case 3: // y+
-                    if (y + 1 < dimensions[1]) return chunk.what(x, y + 1, z);
-                    break;
+            case 3: // y+
+                if (y + 1 < dimensions[1]) return chunk.what(x, y + 1, z);
+                break;
 
-                case 4: // z-
-                    if (z > 0) return chunk.what(x, y, z - 1);
-                    break;
+            case 4: // z-
+                if (z > 0) return chunk.what(x, y, z - 1);
+                break;
 
-                case 5: // z+
-                    if (z + 1 < dimensions[2]) return chunk.what(x, y, z + 1);
-                    break;
+            case 5: // z+
+                if (z + 1 < dimensions[2]) return chunk.what(x, y, z + 1);
+                break;
 
-                default:
-            }
-        } else {
-            return _this;
+            default: break;
         }
         return 0;
     }
 
-    static rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, isAddition) {
+    /**
+     * very old method, to be removed
+     * @deprecated
+     */
+    static rawUpdateAfterEdition(
+        chunk, id, x, y, z, addedFaces, removedFaces,
+        isAddition, isWater)
+    {
         // Compute updated faces.
         let dimensions = chunk.dimensions;
 
         let removedFaceIds = new Int32Array(removedFaces.length);
         let addedFaceIds = new Int32Array(addedFaces.length);
 
-        for (let normal = 0, l = removedFaces.length; normal < l; ++normal) {
+        for (let normal = 0, l = removedFaces.length; normal < l; ++normal)
+        {
             if (!removedFaces[normal] && !addedFaces[normal]) {
                 removedFaceIds[normal] = addedFaceIds[normal] = -1;
                 continue;
@@ -201,23 +533,26 @@ class UpdaterFace {
         let fastComponentsIds = chunk.fastComponentsIds;
 
         // Remove
-        let oldComponent = null;
-        for (let i = 0, l = removedFaceIds.length; i < l; ++i) {
+        for (let i = 0, l = removedFaceIds.length; i < l; ++i)
+        {
             const fid = removedFaceIds[i];
             if (fid === -1) continue;
 
             const componentId = connectedComponents[fid];
-            if (componentId === undefined) console.log(`Face id ${fid}`);
+            if (!componentId) {
+                console.error(`[UpdaterFace] Face id ${fid} not in connected components.`);
+            }
             if (componentId < 1) {
-                console.log('WARN: trying to remove a face that is not registered as boundary: ' +
-                    `component id = ${componentId}.`);
+                console.warn(`WARN: trying to remove a face that is not
+                    registered as boundary: component id = ${componentId}.
+                `);
                 continue;
             }
-            oldComponent = componentId;
 
             let currentComponent = fastComponents[componentId];
-            if (currentComponent === undefined) {
+            if (!currentComponent) {
                 let e = new Error(`BLD: skipping removal on component ${componentId}`);
+                console.error(`BLD: skipping removal on component ${componentId}`);
                 console.log(e.stack);
                 continue;
             }
@@ -232,42 +567,45 @@ class UpdaterFace {
         }
 
         // Insert
-        let newColor = {};
-        for (let i = 0, l = addedFaceIds.length; i < l; ++i) {
+        let newFaceNature = {};
+        for (let i = 0, l = addedFaceIds.length; i < l; ++i)
+        {
             const fid = addedFaceIds[i];
             if (fid === -1) continue;
 
-            // WARN this step is not topology-aware. Components are to be recomputed properly in the 'divide' stage.
-            const componentId = CSFX.forceOneComponentPerChunk ?
-                1 :
-                oldComponent === null ? CollectionUtils.generateId(fastComponents) : oldComponent;
+            // Dropped topology support. Now only using a preset of components.
+            const componentId = isWater ? 2 : 1;
 
-            if (fastComponents[componentId] === undefined) {
-                // TODO check in divide...
+            if (fastComponents[componentId] === undefined)
+            {
                 // TODO check borders with this approach
-                // TODO provide non-topo approach
                 // Somehow getting here means that the added block isn't topologically linked to any other
                 // component. So we have to create a new component id.
                 let e = new Error(`BLD: invalid component id: ${componentId} for insertion... BLDing.`);
+                console.error(`BLD: invalid component id: ${componentId} for insertion.`);
                 console.log(e.stack);
+                console.log(fastComponents);
+                console.log(fastComponentsIds);
+                console.log(connectedComponents);
 
                 fastComponents[componentId] = [];
                 fastComponentsIds[componentId] = [];
-                oldComponent = componentId;
             }
+
             const location = CollectionUtils.insert(fid, fastComponents[componentId]);
             let fastIds = fastComponentsIds[componentId];
 
-            let faceColor = UpdaterFace.getFaceColorFromIdAndNormal(chunk, x, y, z, i);
-            if (faceColor === 0) continue; // TODO [FIX] face color change hint
+            let faceNature = UpdaterFace.getFaceNatureFromIdAndNormal(chunk, x, y, z, i);
+            if (faceNature === 0) continue; // TODO [FIX] face color change hint
 
             if (isAddition) {
-                if (i % 2 === 0) faceColor *= -1;
-            } else
-                if (i % 2 !== 0) faceColor *= -1;
+                if (i % 2 === 0) faceNature *= -1;
+            } else if (!isAddition) {
+                if (i % 2 !== 0) faceNature *= -1;
+            }
 
-            newColor[i] = faceColor;
-            fastIds.splice(location, 0, faceColor);
+            newFaceNature[i] = faceNature;
+            fastIds.splice(location, 0, faceNature);
             connectedComponents[fid] = componentId;
         }
 
@@ -293,9 +631,9 @@ class UpdaterFace {
 
             if (!updatesEmpty && removedUpdt.hasOwnProperty(fid)) {
                 delete removedUpdt[fid]; // if it is marked as 'removed', then it exists in the original array
-                changedUpdt[fid] = newColor[i]; //connectedComponents[fid];
+                changedUpdt[fid] = newFaceNature[i]; //connectedComponents[fid];
             } else {
-                addedUpdt[fid] = newColor[i]; // connectedComponents[fid];
+                addedUpdt[fid] = newFaceNature[i]; // connectedComponents[fid];
             }
         }
 
@@ -311,6 +649,10 @@ class UpdaterFace {
         }
     }
 
+    /**
+     *  This was never implemented (and never will be).
+     *  @deprecated
+     */
     static divideConnectedComponents(/*chunk, id, x, y, z, addedFaces*/) {
         // let nbp = CollectionUtils.numberOfProperties;
         /**
@@ -329,6 +671,9 @@ class UpdaterFace {
         // Beware of component disappearance in client.
     }
 
+    /**
+     * @deprecated
+     */
     static detectTopologyChangeAfterDeletion(chunk, id, x, y, z) {
         // Criterion: pre-existing faces belonged to separate connected components.
         // N.B. We could have considered this a dual of topology change detection after addition.
@@ -384,6 +729,9 @@ class UpdaterFace {
         connectedComponents[faceId] = 0;
     }
 
+    /**
+     * @deprecated
+     */
     static updateFace(w, wOrigin, fid, chunk, isAddition) {
         let updates = chunk.updates;
         // TODO REMOVE FACES FROM MODEL.
@@ -405,7 +753,7 @@ class UpdaterFace {
             }
 
             // Removing a block.
-        } else
+        } else if (!isAddition) {
             if (w !== 0) { // add face
                 if (updates[0].hasOwnProperty(fid)) {
                     delete updates[0][fid];
@@ -419,9 +767,14 @@ class UpdaterFace {
                 else updates[0][fid] = null;
                 UpdaterFace.removeFaceFromModel(chunk, fid);
             }
+        }
     }
 
-    static updateFacesOnBoundary(chunk, x, y, z, isAddition) {
+    /**
+     * @deprecated
+     */
+    static updateFacesOnBoundary(chunk, x, y, z, isAddition)
+    {
         const capacity = chunk.capacity;
         const dimensions = chunk.dimensions;
 
@@ -505,6 +858,9 @@ class UpdaterFace {
         return updatedChunks;
     }
 
+    /**
+     * @deprecated
+     */
     static updateSurfaceFacesAfterDeletion(chunk, id, x, y, z) {
         let dimensions = chunk.dimensions;
 
@@ -518,6 +874,7 @@ class UpdaterFace {
             false  // z+
         ];
 
+        // Works with water because the new block is air.
         if (x > 0 && chunk.contains(x - 1, y, z)) addedFaces[0] = true;
         if (x < dimensions[0] - 1 && chunk.contains(x + 1, y, z)) addedFaces[1] = true;
         if (y > 0 && chunk.contains(x, y - 1, z)) addedFaces[2] = true;
@@ -534,7 +891,9 @@ class UpdaterFace {
             !addedFaces[5] && z < dimensions[2] - 1  // z+
         ];
 
-        UpdaterFace.rawUpdateAfterEdition(chunk, id, x, y, z, addedFaces, removedFaces, false);
+        UpdaterFace.rawUpdateAfterEdition(
+            chunk, id, x, y, z, addedFaces, removedFaces, false, false
+        );
 
         if (UpdaterFace.detectTopologyChangeAfterDeletion(chunk, id, x, y, z))
         // N.B. the provided criterion gives an immediate, exact answer to the topology request.
@@ -544,11 +903,14 @@ class UpdaterFace {
         return UpdaterFace.updateFacesOnBoundary(chunk, x, y, z, false);
     }
 
+    /**
+     * Never implemented.
+     * @deprecated
+     */
     static mergeComponents(/*chunk, id, x, y, z*/) {
         // TODO deletion version (much easier)
         // Beware of !components in client.
     }
-
 }
 
 export default UpdaterFace;

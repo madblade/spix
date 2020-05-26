@@ -6,8 +6,8 @@
 
 import Factory from './../factory';
 
-class User {
-
+class User
+{
     constructor(hub, socket, nick, id) {
         // Model
         this._hub = hub;
@@ -24,6 +24,7 @@ class User {
     get hub() { return this._hub; }
     get id() { return this._id; }
     get connection() { return this._userConnection; }
+    get player() { return this._player; }
 
     get nick() { return this._nick; }
     set nick(nick) { this._nick = nick; }
@@ -36,8 +37,8 @@ class User {
     }
 
     // Requests the hub to create a new gaming pool.
-    requestNewGame(data) {
-        return this._hub.requestNewGame(this, data);
+    requestNewGame(kind, options) {
+        return this._hub.requestNewGame(this, kind, options);
     }
 
     // Join a specific game.
@@ -46,11 +47,15 @@ class User {
 
         this._ingame = true;
         let game = this._hub.getGame(kind, gameId);
-        if (!game) return false;
+        if (!game || game.killed) return false;
 
         // Stop listening for general game management events...
         // Prevents the user from joining multiple games.
         this._userConnection.idle();
+
+        // Check if the game already contains a player with the same socket
+        if (game.hasPlayerForSocket(this._userConnection.socket)) return true;
+        // TODO consistency for Terrain and Entity and X update on spawn / respawn / rejoin.
 
         // Create a player associated to this game and spawn it
         let player = Factory.createPlayer(this, game);
@@ -76,6 +81,7 @@ class User {
 
     // Leave all games (current game). Stay idle.
     leave() {
+        console.log('USER LEFT');
         this._ingame = false;
         if (this._player) {
             this._player.leave();
@@ -83,6 +89,10 @@ class User {
             // So player does not belong to its game model.
             this._player = null;
         }
+        this.listen();
+    }
+
+    listen() {
         this._userConnection.listen();
     }
 
@@ -107,7 +117,6 @@ class User {
         delete this._id;
         delete this._ingame;
     }
-
 }
 
 export default User;

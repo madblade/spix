@@ -53,6 +53,7 @@ extend(XModel.prototype, {
             let data = updates[i];
 
             for (let portalId in data) {
+                if (!data.hasOwnProperty(portalId)) continue;
                 let meta = data[portalId];
                 let isArray = meta instanceof Array;
 
@@ -86,11 +87,11 @@ extend(XModel.prototype, {
             let s = worldMap
                 .invalidate()
                 .computeWorldMap()
-                .computeFlatGraph()
-                .toString();
+                .computeFlatGraph();
+            // Alternatively, use worldMap.toString();
 
             register.updateSelfState({diagram: s});
-            // TODO [HIGH] this should be heavily optimized.
+            // TODO [OPTI] possible perf improvements.
             worldMap.computeRenderingGraph(graphics);
             this.forceUpdate = false;
         }
@@ -125,6 +126,16 @@ extend(XModel.prototype, {
         newWorldId = parseInt(newWorldId, 10);
         this.worldMap.switchRoot(oldWorldId, newWorldId);
         //this.forceUpdate = true;
+    },
+
+    cleanup() {
+        this.portals.clear();
+        this.worldToPortals.clear();
+        this.worldMap = new WorldMap(this);
+        this.xUpdates = [];
+        this.needsUpdate = false;
+        this.forceUpdate = false;
+        // TODO [LEAK] cleanup graphical component, scenes and render targets.
     }
 
 });

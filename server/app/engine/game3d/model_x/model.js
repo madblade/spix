@@ -56,7 +56,7 @@ class XModel {
 
         // Check parameters.
         // Orientation should be correct.
-        if (orientation !== 'first' && orientation !== 'next') return;
+        // if (orientation !== 'first' && orientation !== 'next') return;
         // Portal must be orthogonal an axis: exactly one block coordinate in common.
         let bx = x1 === x2;
         let by = y1 === y2;
@@ -77,7 +77,10 @@ class XModel {
         if (chunk1 && chunk1 !== chunk2) return;
 
         let portalId = CollectionUtils.generateId(portals);
-        let portal = new Portal(worldId, portalId, [x1, y1, z1], [x2, y2, z2], offset, orientation, chunk1);
+        let portal = new Portal(
+            worldId, portalId, [x1, y1, z1], [x2, y2, z2],
+            offset, orientation, chunk1
+        );
 
         let chunkId = chunk1.chunkId;
         portals.set(portalId, portal);
@@ -289,20 +292,45 @@ class XModel {
             let i = parseInt(ijk[0], 10);
             let j = parseInt(ijk[1], 10);
             let k = parseInt(ijk[2], 10);
-            let chks = [
+
+            // Manhattan loading.
+            let chksXY = [
                 `${i + 1},${j},${k}`,  `${i - 1},${j},${k}`,
                 `${i},${j + 1},${k}`,  `${i},${j - 1},${k}`,
+            ];
+            let chksZ = [
                 `${i},${j},${k + 1}`,  `${i},${j},${k - 1}`
-                // ((i+1)+','+j+','+k),  ((i-1)+','+j+','+k),
-                // (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
-                // (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
             ];
 
-            // TODO [HIGH] discriminate depth k+ and k-
-            chks.forEach(c => {
+            // let chks = [
+            //     `${i + 1},${j},${k}`,  `${i - 1},${j},${k}`,
+            //     `${i},${j + 1},${k}`,  `${i},${j - 1},${k}`,
+            //     `${i},${j},${k + 1}`,  `${i},${j},${k - 1}`
+            //    // ((i+1)+','+j+','+k),  ((i-1)+','+j+','+k),
+            //    // (i+','+(j+1)+','+k),  (i+','+(j-1)+','+k),
+            //    // (i+','+j+','+(k+1)),  (i+','+j+','+(k-1))
+            // ];
+
+            let push = (chks, newDepth) => chks.forEach(c => {
                 if (!marks.has(`${currentWorld},${c}`))
-                    stack.push([currentWorld, c, currentDepth + 1]);
+                    stack.push([currentWorld, c, newDepth]);
             });
+
+            if (startWid !== currentWorld) {
+                push(chksXY, currentDepth + 2);
+                push(chksZ, currentDepth + 2);
+            }
+            else // if (startWid === currentWorld)
+            {
+                let world = wModel.getWorld(currentWorld);
+                if (world && world.isFlat()) {
+                    push(chksXY, currentDepth + 1);
+                    push(chksZ, currentDepth + 2);
+                } else {
+                    push(chksXY, currentDepth + 1);
+                    push(chksZ, currentDepth + 1);
+                }
+            }
 
             let gates = this.getPortalsFromChunk(currentWorld, currentChunk);
             if (gates) {
@@ -310,21 +338,21 @@ class XModel {
                     let currentPortal = this.getPortal(g);
                     let otherSide = this.getOtherSide(g);
                     if (!otherSide) {
-                        recursedPortals.set(g, [null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state]);
+                        recursedPortals.set(g, [
+                            null, currentPortal.chunkId, currentPortal.worldId, ...currentPortal.state
+                        ]);
                     } else {
                         let otherChunk = otherSide.chunk;
                         if (XModel.debug)
                             console.log(`origin: world ${currentPortal.worldId}, portal ${currentPortal.portalId}`);
                         if (XModel.debug)
                             console.log(`destin: world ${otherSide.worldId}, portal ${otherSide.portalId}`);
-                        recursedPortals.set(
-                            g,
-                            [
-                                otherSide.portalId,
-                                currentPortal.chunkId,
-                                currentPortal.worldId,
-                                ...currentPortal.state
-                            ]);
+                        recursedPortals.set(g, [
+                            otherSide.portalId,
+                            currentPortal.chunkId,
+                            currentPortal.worldId,
+                            ...currentPortal.state
+                        ]);
                         if (otherChunk) {
                             let otherWorld = otherChunk.world.worldId;
                             let otherChunkId = otherChunk.chunkId;

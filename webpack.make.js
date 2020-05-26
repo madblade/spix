@@ -20,6 +20,7 @@ module.exports = function makeWebpackConfig(options) {
     var BUILD = !!options.BUILD;
     var TEST = !!options.TEST;
     var DEV = !!options.DEV;
+    var LOCALSERVER = !!options.LOCALSERVER;
 
     /**
      * Config
@@ -116,9 +117,27 @@ module.exports = function makeWebpackConfig(options) {
     //     }
     // };
 
+    var clientIncludes = [
+        path.resolve(__dirname, 'client/'),
+        path.resolve(__dirname, 'node_modules/lodash-es/')
+    ];
+
+    // standalone model
+    if (LOCALSERVER) clientIncludes.push(path.resolve(__dirname, 'server/'));
+
+    const opts = {
+        BUNDLE: LOCALSERVER,
+        'ifdef-triple-slash': true,
+        'ifdef-verbose': true,
+    };
+
     // Initialize module
     config.module = {
         rules: [
+            {
+                test: /sigma.*/,
+                use: 'imports-loader?this=>window',
+            },
             {
             // preLoaders: [],
             // loaders: [{
@@ -127,11 +146,11 @@ module.exports = function makeWebpackConfig(options) {
                 // Transpile .js files using babel-loader
                 // Compiles ES6 and ES7 into ES5 code
                 test: /\.js$/,
-                loader: 'babel-loader',
-                include: [
-                    path.resolve(__dirname, 'client/'),
-                    path.resolve(__dirname, 'node_modules/lodash-es/')
-                ]
+                use: [
+                    { loader: 'babel-loader' },
+                    { loader: 'ifdef-loader', options: opts }
+                ],
+                include: clientIncludes
             },
             //     {
             //     // TS LOADER

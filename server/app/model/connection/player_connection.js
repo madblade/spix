@@ -6,12 +6,20 @@
 
 import CollectionUtils from '../../engine/math/collections';
 
-class PlayerConnection {
-
+class PlayerConnection
+{
     constructor(socket) {
         this._socket = socket;
         this._rooms = [];
         this._listeners = [];
+        this._savedListeners = {};
+    }
+
+    get socket() { return this._socket; }
+    set socket(newSocket) {
+        this.dropListenersAndSave();
+        this._socket = newSocket;
+        this.resetListenersFromSave();
     }
 
     send(kind, data) {
@@ -28,6 +36,7 @@ class PlayerConnection {
             console.log('WARN: invalid socket definition.');
         else {
             this._listeners.push(message);
+            this._savedListeners[message] = behaviour;
             this._socket.on(message, behaviour);
         }
     }
@@ -44,8 +53,16 @@ class PlayerConnection {
 
     // Remove all listeners.
     offAll() {
-        this._listeners.forEach(message => this._socket.removeAllListeners(message));
+        this._listeners.forEach(() => this._socket.removeAllListeners());
         this._listeners = [];
+    }
+
+    dropListenersAndSave() {
+        this._listeners.forEach(message => this._socket.off(message, this._savedListeners[message]));
+    }
+
+    resetListenersFromSave() {
+        this._listeners.forEach(message => this._socket.on(message, this._savedListeners[message]));
     }
 
     /**
@@ -53,7 +70,7 @@ class PlayerConnection {
      * @param room
      */
     join(room) {
-        this._socket.join(room);
+        // this._socket.join(room);
         this._rooms.push(room);
     }
 
@@ -62,13 +79,15 @@ class PlayerConnection {
      * @param room
      */
     leave(room) {
-        this._socket.leave(room);
+        // this._socket.leave(room);
+        // TODO think about the following question:
+        //  is there a reason for using rooms?
         CollectionUtils.removeFromArray(this._rooms, room);
     }
 
     // Leave all chans this player was connected to.
     leaveAll() {
-        this._rooms.forEach(room => this._socket.leave(room));
+        // this._rooms.forEach(room => this._socket.leave(room));
         this._rooms = [];
     }
 

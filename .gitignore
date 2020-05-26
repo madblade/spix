@@ -9,6 +9,7 @@ public
 
 /server/config/local.env.js
 
+.nyc_output/
 .yo-rc.json
 npm-debug.log
 dependencies.txt
@@ -101,3 +102,6 @@ $RECYCLE.BIN/
 
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
+
+# MD
+*.backup

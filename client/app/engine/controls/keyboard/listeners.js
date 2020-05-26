@@ -45,15 +45,16 @@ let ListenerModule = {
                 case k.space:
                     clientModel.triggerEvent('m', 'u');
                     break;
-                case k.leftHandEast2: // F
+                case k.leftHandEast2: // F, toggle third-person
                     clientModel.triggerChange('camera', ['toggle']);
                     break;
                 case k.leftHandNorthEast2: // R
-                    clientModel.triggerChange('interaction', ['toggle']);
                     break;
-                case k.pageUp: // Change item orientation
-                case k.pageDown: // Same as there are only 2 possible item orientation ATM.
-                    clientModel.triggerChange('interaction', ['itemOrientation', 1]);
+                case k.pageUp: // Trackpad users without a mousewheel
+                    clientModel.triggerChange('interaction', ['itemSelect', 1]);
+                    break;
+                case k.pageDown:
+                    clientModel.triggerChange('interaction', ['itemSelect', -1]);
                     break;
                 case k.leftHandEast3: // (G)ravity.
                     clientModel.triggerEvent('a', 'g');

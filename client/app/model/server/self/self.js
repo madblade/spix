@@ -6,7 +6,9 @@
 
 import extend               from '../../../extend.js';
 
-import { InventoryModule }  from './inventory.js';
+import { InventoryModel }   from './inventory.js';
+import { Vector3 }          from 'three';
+import { ItemsModelModule } from './items';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -18,26 +20,25 @@ let SelfModel = function(app) {
     this.oldWorldId = null;
 
     // Model component.
-    this.position = null;
-    this.rotation = null;
-    // this.inventory = this.getInventory();
+    this.position = new Vector3(0, 0, 0);
+    this.rotation = new Vector3(0, 0, 0);
+    this.inventoryModel = new InventoryModel();
 
     // Graphical component.
     // let graphics = app.engine.graphics;
     this.worldNeedsUpdate = false;
     this.needsUpdate = false;
     this.displayAvatar = false;
+    this.displayHandItem = true;
 
     this.avatar = null;
+    this.handItem = null;
 };
-
-extend(SelfModel.prototype, InventoryModule);
 
 extend(SelfModel.prototype, {
 
     init() {
-        let graphics = this.app.engine.graphics;
-        this.loadSelf(graphics);
+        this.loadSelf();
     },
 
     refresh() {
@@ -48,11 +49,12 @@ extend(SelfModel.prototype, {
         let clientModel = this.app.model.client;
 
         let avatar = this.avatar;
+        let handItem = this.handItem;
         let up = this.position;
         let r = this.rotation;
         let id = this.entityId;
 
-        if (!graphics.controls || !avatar) return;
+        if (!avatar) return;
 
         let p = avatar.position;
 
@@ -63,11 +65,17 @@ extend(SelfModel.prototype, {
             let worldId = this.worldId;
             let oldWorldId = this.oldWorldId;
             let displayAvatar = this.displayAvatar;
+            let displayHandItem = this.displayHandItem;
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+            // TODO differentiate 3d person and 1st person
+            if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
+
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
+
             if (displayAvatar) graphics.addToScene(avatar, worldId);
+            if (displayHandItem) graphics.addToScene(handItem, worldId);
             xModel.forceUpdate = true;
         }
 
@@ -96,22 +104,41 @@ extend(SelfModel.prototype, {
             let rotationX = cam.getXRotation();
             graphics.cameraManager.setAbsRotation(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
-            graphics.cameraManager.setRelRotation(r[0], rotationX);
+            // graphics.cameraManager.setRelRotation(r[0], rotationX);
 
             // mainCamera.setUpRotation(theta1, 0, theta0);
             // moveCameraFromMouse(0, 0, newX, newY);
 
             // Update animation.
-            if (animate) graphics.updateAnimation(id);
+            if (animate) {
+                graphics.updateAnimation(id);
+                // TODO cleanup animation part
+                // graphics.updateAnimation('yumi');
+            }
 
             // Update camera.
             clientModel.pushForLaterUpdate('camera-position', this.position);
             //clientModel.selfComponent.processChanges();
             graphics.cameraManager.updateCameraPosition(this.position);
+
+            if (handItem) {
+                let mc = graphics.cameraManager.mainCamera;
+                handItem.position.copy(mc.up.position);
+                // handItem.rotation.x = mc.pitch.rotation.x;
+                // handItem.rotation.z = mc.yaw.rotation.z;
+            }
         }
 
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
+    },
+
+    cameraMoved(cameraObject) {
+        let handItem = this.handItem;
+        if (!handItem) return;
+        handItem.rotation.x = cameraObject.pitch.rotation.x;
+        handItem.rotation.z = cameraObject.yaw.rotation.z;
+        // handItem.children[0].rotation.x += 0.01;
     },
 
     updateSelf(p, r, w) {
@@ -136,16 +163,59 @@ extend(SelfModel.prototype, {
         }
     },
 
-    loadSelf(graphics) {
+    loadSelf()
+    {
+        let selfModel = this;
+        let graphics = this.app.engine.graphics;
+
         // Player id '-1' never used by any other entity.
         let entityId = this.entityId;
         let worldId = this.worldId;
 
-        graphics.initializeEntity(entityId, 'steve', function(createdEntity) {
-            let object3d = graphics.finalizeEntity(entityId, createdEntity);
-            this.avatar = object3d;
-            if (this.displayAvatar) graphics.addToScene(object3d, worldId);
-        }.bind(this));
+        let createdEntity = graphics.initializeEntity(entityId, 'steve');
+        let object3d = graphics.finalizeEntity(entityId, createdEntity);
+        selfModel.avatar = object3d;
+        if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
+
+        this.updateHandItem();
+    },
+
+    updateHandItem()
+    {
+        let selfModel = this;
+        let graphics = this.app.engine.graphics;
+
+        let worldId = this.worldId;
+        let handItemID = this.app.model.client.selfComponent.getCurrentItemID();
+        let handItem;
+
+        if (ItemsModelModule.isItemNaught(handItemID)) handItem = null;
+        else if (ItemsModelModule.isItemRanged(handItemID) || ItemsModelModule.isItemMelee(handItemID) ||
+            ItemsModelModule.isItemX(handItemID) || ItemsModelModule.isItemBlock(handItemID)
+        ) {
+            handItem = graphics.getItemMesh(handItemID);
+        } else {
+            console.warn('[ServerSelf] Handheld item unrecognized.');
+            handItem = null;
+        }
+
+        if (selfModel.handItem !== handItem)
+        {
+            // TODO link hand item and mesh when camera is third person.
+            if (selfModel.handItem) // is it possible that it is in another world?
+                graphics.removeFromScene(selfModel.handItem, worldId);
+
+            selfModel.handItem = handItem;
+
+            if (handItem) {
+                handItem.position.copy(graphics.cameraManager.mainCamera.up.position);
+                this.cameraMoved(graphics.cameraManager.mainCamera);
+                if (
+                    // !selfModel.displayAvatar &&
+                    selfModel.displayHandItem)
+                    graphics.addToScene(handItem, worldId);
+            }
+        }
     },
 
     getSelfPosition() {
@@ -156,6 +226,30 @@ extend(SelfModel.prototype, {
         let head = this.avatar.getHead();
         if (!head) return null;
         return head.position;
+    },
+
+    getInventory() {
+        return this.inventoryModel;
+    },
+
+    cleanup() {
+        // General
+        this.entityId = '-1';
+        this.worldId = '-1';
+        this.oldWorldId = null;
+
+        // Model component.
+        this.position = [0, 0, 0];
+        this.rotation = [0, 0, 0];
+        this.inventoryModel.reset();
+
+        // Graphical component.
+        this.worldNeedsUpdate = false;
+        this.needsUpdate = false;
+        this.displayAvatar = false;
+
+        this.avatar = null;
+        // TODO [LEAK] cleanup graphical component of avatar.
     }
 
 });

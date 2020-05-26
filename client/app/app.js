@@ -23,6 +23,11 @@ import { Settings }     from './engine/settings/settings.js';
 import { Hub }          from './model/hub/hub.js';
 import { Server }       from './model/server/server.js';
 import { Client }       from './model/client/client.js';
+import { LocalServer }  from './model/localserver/localserver.js';
+
+// Local Netcode
+import { Standalone }   from './localserver/standalone';
+import { Middleware }   from './localserver/middleware';
 
 // Modules
 import { Register }     from './modules/register/register.js';
@@ -30,19 +35,19 @@ import { Register }     from './modules/register/register.js';
 
 // Global application structure.
 let App = App || {Core : {}};
-// var App = App || {
-//     State: {},
-//     Core: {},
-//     Engine: {},
-//     Model: {},
-//     Modules: {}
-// };
 
 // Main entry point.
 App.Core = function() {
     // State pattern manages in-game, loading, menus.
     // Also acts as a Mediator between engine, model(s) and modules
     this.state =      new StateManager(this);
+
+    // Standalone server for solo mode (or local client)
+    // Middleware for high latency discrepancy networks (non-LAN)
+    this.localServer = {
+        standalone:   new Standalone(this),
+        middleware:   new Middleware(this)
+    };
 
     // Engine manages client-side rendering, audio, inputs/outputs
     this.engine = {
@@ -57,7 +62,8 @@ App.Core = function() {
     this.model = {
         hub:          new Hub(this),
         server:       new Server(this),
-        client:       new Client(this)
+        client:       new Client(this),
+        localServer:  new LocalServer(this)
     };
 
     // Modules can be registered to add custom behaviours
@@ -68,9 +74,48 @@ App.Core = function() {
 // Application entry point.
 extend(App.Core.prototype, {
 
+    // The only intended way to play.
+    startFromRemoteServer(socketAddress, port) {
+        this.setState('loading');
+        this.engine.connection.connectSocket(socketAddress, port, true); // connects
+        this.engine.connection.listen(); // listens
+    },
+
+    startDemo() {
+        this.setState('loading');
+        let s = this.localServer.standalone.io.socketClient;
+        this.engine.connection.setupLocalSocket(s);
+        this.engine.connection.listenQuick(); // only listen to hub and join
+        this.model.server.isDirty = true;
+        this.localServer.standalone.start();
+        this._forceRequestGameCreation('demo');
+    },
+
+    startFromLocalServer() {
+        this.setState('loading');
+        let s = this.localServer.standalone.io.socketClient;
+        this.engine.connection.setupLocalSocket(s);
+        this.engine.connection.listen();
+        this.localServer.standalone.start();
+    },
+
+    startFromRemoteSandbox(socket) {
+        this.setState('loading');
+        this.engine.connection.setupLocalSocket(socket);
+        this.engine.connection.listen();
+        console.log('[App/Core] Awaiting remote sandbox answer...');
+    },
+
+    // Careful with what clients may execute in the local sandbox!
+    clientConnectedToLocalSandbox(userID, socket) {
+        this.localServer.standalone.connectUser(userID, socket);
+    },
+
     start() {
         this.setState('loading');
-        this.engine.connection.connect();
+        this.engine.graphics.preload().then(() =>
+            this.setState('main')
+        );
     },
 
     stop() {
@@ -119,13 +164,25 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'creation' request is emitted from Hub state.
-    requestGameCreation(gameType) {
-        if (this.getState() !== 'hub')
-            throw Error('Could not request game creation outside of Hub.');
+    requestGameCreation(gameType, options) {
+        if (this.getState() !== 'hub') {
+            console.error('Could not request game creation outside of Hub.');
+            return;
+        }
 
-        this.engine.connection.requestGameCreation(gameType);
-        // TODO single-page without reloading every time a new game is asked...
-        //location.reload();
+        this.engine.connection.requestGameCreation(gameType, options);
+    },
+
+    _forceRequestGameCreation(gameType, options) {
+        this.engine.connection.requestGameCreation(gameType, options);
+    },
+
+    _forceJoin(gameType, gameId) {
+        this.setState('preingame');
+        this.engine.connection.configureGame(gameType, gameId);
+        this.model.client.init(gameType);
+        this.model.server.init(gameType);
+        this.engine.connection.join(gameType, gameId);
     },
 
     // Called when a 'join' request is emitted from Hub state.
@@ -136,7 +193,7 @@ extend(App.Core.prototype, {
         console.log('Join request...');
 
         // Configuration.
-        this.setState('ingame');
+        this.setState('preingame');
         this.engine.connection.configureGame(gameType, gameId);
 
         // Start model loop.
@@ -157,15 +214,22 @@ extend(App.Core.prototype, {
     },
 
     runGame() {
+        this.register.gameStarted();
         this.engine.graphics.run();
         this.engine.controls.run();
         this.engine.audio.run();
     },
 
     stopGame() {
+        this.register.gameStopped();
+        this.engine.connection.unregisterSocketForGame3D();
         this.engine.graphics.stop();
         this.engine.controls.stop();
         this.engine.audio.stop();
+        this.model.server.cleanupFullModel();
+        this.model.client.cleanupFullModel();
+        this.engine.graphics.cleanupFullGraphics();
+        this.state.cleanupDOM();
     },
 
 });
@@ -190,5 +254,3 @@ window.register = (function() {
     app.start();
     return app.register;
 }());
-
-// module.exports = App.Core;

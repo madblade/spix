@@ -30,7 +30,7 @@ class Generator {
             world.allChunks = chunkMap;
 
             // Finalize chunks (extract surface faces).
-            let chunks = new Map(chunkMap); // Shallow copy.
+            let chunks = new Map(chunkMap); // TODO Shallow copy instead.
             // Adds chunks in worldModel, so mutable chunkMapCollection does not fit.
             chunks.forEach(chunk/*, id)*/ => ChunkBuilder.computeChunkFaces(chunk));
 

@@ -32,7 +32,7 @@ class ChunkGenerator {
         //GenSimple.fillChunk(c, 40, 1);
         //GenAnalytic.waveChunk(c, 40, 48, 1);
         //try {
-            // GenPerlin.perlinGeneration(c);
+        // GenPerlin.perlinGeneration(c);
         let shuffleChunks = false; // Can be set to activated to test for initial chunk.
         GenSimplePerlin.simplePerlinGeneration(c, shuffleChunks, world.worldId, world.worldInfo);
         //} catch (e) {

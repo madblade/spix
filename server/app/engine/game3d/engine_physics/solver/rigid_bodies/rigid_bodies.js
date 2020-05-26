@@ -11,14 +11,15 @@ import Phase2 from './rigid_bodies_phase_2';
 import Phase3 from './rigid_bodies_phase_3';
 import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
+import { WorldType } from '../../../model_world/model';
 
 // TODO [HIGH] rotate collision model
 // TODO [HIGH] find angles and interpolate rotation
 // TODO [HIGH] rayleigh
 // TODO [HIGH] p2p interaction
 
-class RigidBodies {
-
+class RigidBodies
+{
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
     // static gravityConstant = 0;
@@ -29,7 +30,7 @@ class RigidBodies {
         this._gravity = [0, 0, RigidBodies.gravityConstant];
         // this._gravity = [0, 0, 0];
         this._globalTimeDilatation = 25;
-        //this._globalTimeDilatation = 0.05;
+        // this._globalTimeDilatation = 0.05;
         this._refreshRate = refreshRate;
 
         this._variableGravity = false;
@@ -43,8 +44,11 @@ class RigidBodies {
     get refreshRate() { return this._refreshRate; }
 
     // Advanced gravity management.
-    getGravity(world, worldId, x, y, z) {
-        if (this._variableGravity && parseInt(worldId, 10) === -1)
+    getGravity(world, worldId, x, y, z)
+    {
+        if (this._variableGravity &&
+            //parseInt(worldId, 10) === -1
+            world.worldInfo.type === WorldType.CUBE)
         {
             // let direction = [0, 0, 0];
             // let distance = 0;
@@ -119,9 +123,9 @@ class RigidBodies {
                 ff * Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
                 ff * Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
             ];
-
             // return direction;
         }
+
         return this._gravity;
     }
 

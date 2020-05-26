@@ -6,23 +6,13 @@
 
 let ControlsModule = {
 
-    initializeControls() {
-        let controlsEngine = this.app.engine.controls;
+    changeHeldItem(itemID) {
+        // Warn! this short-circuits client-server validation.
+        // TODO push item held event to server in normal loop.
         let selfModel = this.app.model.server.selfModel;
-        let worldId = selfModel.worldId;
-
-        this.controls = controlsEngine.getControls('first-person');
-
-        this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
-        this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
-    },
-
-    startListeners() {
-        this.controls.startListeners();
-    },
-
-    stopListeners() {
-        this.controls.stopListeners();
+        selfModel.updateHandItem();
+        if (this._debug)
+            console.log(`[Graphics/Controls] Changing for item ${itemID}.`);
     },
 
     changeAvatarVisibility(display, avatar, worldId) {

@@ -27,7 +27,7 @@ class ChunkBuilder {
 
         // Detect connected boundary face components.
         if (ChunkBuilder.debug) console.log('\tComputing connected components...');
-        FaceExtractor.extractConnectedComponents(chunk);
+        FaceExtractor.extractConnectedComponents(chunk); //
 
         chunk.ready = true;
     }
@@ -152,6 +152,9 @@ class ChunkBuilder {
         }
     }
 
+    /**
+     * @deprecated
+     */
     static preloadFlatNeighbourChunks(chunk, world) {
         let loadedChunks = world.allChunks;
         let c = chunk;
@@ -234,7 +237,8 @@ class ChunkBuilder {
         }
     }
 
-    static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh) {
+    static getOOBPlayerChunks(player, starterChunk, worldModel, xModel, consistencyModel, thresh)
+    {
         let avatar = player.avatar;
         let unloadedChunksForPlayer = {};
         let chunksToUnload = [];

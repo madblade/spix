@@ -4,6 +4,8 @@
 
 'use strict';
 
+import TimeUtils from '../../../math/time';
+
 class UserOutput {
 
     static debug = false;
@@ -27,29 +29,29 @@ class UserOutput {
         let t1;
         let t2;
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         //this.spawnPlayers();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to spawn players.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateChunks();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateEntities();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateX();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send x updates.`);
 
-        t1 = process.hrtime();
+        t1 = TimeUtils.getTimeSecNano();
         this.updateMeta();
-        t2 = process.hrtime(t1)[1] / 1000;
+        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send other stuff.`);
 
         this._consistencyEngine.flushBuffers();
@@ -122,11 +124,12 @@ class UserOutput {
 
                 // Format:
                 // {
-                //  'worlds': {worldId:[x,y,z]} ............... World metadata
+                //  'worldsMeta': {worldId:[type, r, cx,cy,cz]} . World metadata
+                //  'worlds': {worldId:[x,y,z]} ................. World chunk dimensions
                 //  worldId:
-                //      {chunkId: [fastCC, fastCCId]} ......... Added chunk
-                //      {chunkId: [removed, added, updated]} .. Updated chunk
-                //      {chunkId: null} ....................... Removed chunk
+                //      {chunkId: [fastCC, fastCCId]} ........... Added chunk
+                //      {chunkId: [removed, added, updated]} .... Updated chunk
+                //      {chunkId: null} ......................... Removed chunk
                 // }
 
                 let output = UserOutput.pack(addedOrRemovedChunks);
@@ -180,7 +183,8 @@ class UserOutput {
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
             // TODO [HIGH] bundle, detect change.
-            p.send('ent', UserOutput.pack(addedOrRemovedEntities));
+            if (Object.keys(addedOrRemovedEntities).length > 0)
+                p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
             if (!av) return;
 
@@ -203,7 +207,10 @@ class UserOutput {
 
         // TODO [OPT] use arrays
         game.players.forEach(p => {
-            let pid = p.avatar.entityId;
+            let pav = p.avatar;
+            if (!pav) return;
+
+            let pid = pav.entityId;
             let addedOrRemovedX = xOutput.get(pid);
 
             if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0) {

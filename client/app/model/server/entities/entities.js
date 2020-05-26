@@ -123,6 +123,14 @@ extend(EntityModel.prototype, {
 
         // Set dirty flag.
         this.needsUpdate = true;
+    },
+
+    cleanup() {
+        this.entitiesIngame.clear();
+        this.entitiesOutdated.clear();
+        this.entitiesLoading.clear();
+        this.needsUpdate = false;
+        // TODO [LEAK] cleanup graphical component and all meshes.
     }
 
 });

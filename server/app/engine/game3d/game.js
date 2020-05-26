@@ -22,17 +22,26 @@ import XModel           from './model_x/model';
 import ConsistencyModel from './model_consistency/model';
 
 import Chat             from './../../model/connection/chat';
+import TimeUtils from '../math/time';
 
-class Game3D extends Game {
+const GameType = Object.freeze({
+    FLAT: Symbol('flat'),
+    CUBE: Symbol('cube'),
+    DEMO: Symbol('demo'),
+    UNSTRUCTURED: Symbol('unstructured')
+});
 
+class Game3D extends Game
+{
     static serverRefreshRate = 16;
     // static serverRefreshRate = 420; // blaze it
 
-    constructor(hub, gameId, connector) {
+    constructor(hub, gameId, connector, gameInfo) {
         super(hub, gameId, connector);
 
         // Utility parameters
-        this._kind = 'game3d';
+        this._kind = gameInfo.kind;
+        this._gameInfo = gameInfo;
         this._refreshRate = Game3D.serverRefreshRate;
         //this._refreshRate = 1000;
         this._tt = 0;
@@ -64,6 +73,8 @@ class Game3D extends Game {
 
     // Model
 
+    get gameInfo()          { return this._gameInfo; }
+
     get entityModel()       { return this._entityModel; }
     get worldModel()        { return this._worldModel; }
     get xModel()            { return this._xModel; }
@@ -81,46 +92,50 @@ class Game3D extends Game {
     //^
     update() {
         // Idea maybe split in several loops (purposes).
-        let t;
-        let dt1; let dt2; let dt3; let dt4; let dt5;
-        let debugThresh = 1000; // ms
+        let debugThresh = 4000; // microsecs
 
         /** Inputs **/
-        t = process.hrtime();
+        let t = TimeUtils.getTimeSecNano();
+        const t0 = t;
         this._ai.update();                // Update intents.
-        dt1 = process.hrtime(t)[1] / 1000;
+        const dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt1 > debugThresh) console.log(`${dt1} µs to update intents.`);
 
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
         this._externalInput.update();     // Update human spawn/leave requests.
         this._internalInput.update();     // Update artificial inputs.
-        dt2 = process.hrtime(t)[1] / 1000;
+        const dt2 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt2 > debugThresh) console.log(`${dt2} µs to update inputs.`);
 
         /** Updates **/
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
         this._topologyEngine.update();    // Update topological model.
         this._physicsEngine.update();     // Update physical simulation.
-        dt3 = process.hrtime(t)[1] / 1000;
+        const dt3 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt3 > debugThresh) console.log(`${dt3} µs to update engines.`);
 
         /** Consistency solving: mediator between player and server models **/
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
         this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
-        dt4 = process.hrtime(t)[1] / 1000;
+        const dt4 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt4 > debugThresh) console.log(`${dt4} µs to update consistency.`);
 
         /** Outputs **/
-        t = process.hrtime();
+        t = TimeUtils.getTimeSecNano();
         this._externalOutput.update();    // Send updates.
         this._internalOutput.update();    // Update perceptions.
-        dt5 = process.hrtime(t)[1] / 1000;
+        const dt5 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt5 > debugThresh) console.log(`${dt5} µs to update outputs.`);
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
         // this._tt += 1;
-        // if (this._tt % 1000 === 0) console.log((process.hrtime(time)[1]/1000) + " µs a loop.");
+        // if (this._tt % 1000 === 0) console.log((TimeUtils.getTimeSecNano(time)[1]/1000) + " µs a loop.");
+        const t1 = TimeUtils.getTimeSecNano(t0)[1] / 1000;
+        if (t1 > 4000 && Game3D.bench) console.log(`${t1} µs.`);
+
+        if (this._playerManager.nbPlayers < 1)
+            this.pause(false); // Stop with idle timeout.
     }
 
     generate() {
@@ -146,4 +161,4 @@ class Game3D extends Game {
 
 }
 
-export default Game3D;
+export { Game3D as default, GameType };

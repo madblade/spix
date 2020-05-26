@@ -5,37 +5,55 @@
 'use strict';
 
 import extend       from '../../../extend.js';
+import { ItemType } from '../../server/self/items';
 
 let SelfComponent = function(clientModel) {
     this.clientModel = clientModel;
 
-    /** Model **/
-
     // Camera.
+
     this._cameraInteraction = 'first-person';
     this.cameraInteraction = {
-        isFirstPerson: function() { return this._cameraInteraction === 'first-person'; }.bind(this),
-        isThirdPerson: function() { return this._cameraInteraction === 'third-person'; }.bind(this)
-    };
-
-    // Selected action.
-    this._clickInteraction = 'block';
-    this.clickInteraction = {
-        isBlock: function() { return this._clickInteraction === 'block'; }.bind(this),
-        isX: function() { return this._clickInteraction === 'x'; }.bind(this)
+        /**
+         * @deprecated
+         */
+        isFirstPerson: function() {
+            return this._cameraInteraction === 'first-person';
+        }.bind(this),
+        /**
+         * @deprecated
+         */
+        isThirdPerson: function() {
+            return this._cameraInteraction === 'third-person';
+        }.bind(this)
     };
 
     // Inventory.
-    this.currentItem = 0; // Index of current item in inventory.
-    this._itemOrientations = [0, 1]; // In case of ambiguity.
-    this._itemOrientation = this._itemOrientations[0];
-    this._itemPlacementRatio = 0;
-    this._itemOffset = 0.999;
 
-    /** Dynamic **/
+    this.currentItemSlot = 0; // Index of current item in inventory.
+    this.angleFromIntersectionPoint = 0; // For portal placement.
+
+    let emptyItem  = ItemType.NONE;
+    this.quickBarSize = 8;
+    this.defaultQuickBar = [ // Default demo items
+        ItemType.BLOCK_PLANKS,
+        ItemType.KATANA,
+        ItemType.YUMI,
+        ItemType.PORTAL_GUN_SINGLE,
+        ItemType.PORTAL_GUN_DOUBLE,
+        emptyItem, emptyItem, emptyItem
+    ];
+    this.quickBar = this.defaultQuickBar.slice(); // clones
+
+    // Dynamic.
 
     // Buffer filled by engine->controls.
     this.changes = [];
+
+    // Deprecated.
+
+    // LEGACY (should NOT be used)
+    this._itemOffset = 0.999;
 };
 
 
@@ -43,20 +61,29 @@ extend(SelfComponent.prototype, {
 
     init() {
         let register = this.clientModel.app.register;
-        register.updateSelfState({activeItem: this._clickInteraction});
-        register.updateSelfState({itemOrientation: this._itemOrientation});
-        register.updateSelfState({itemOffset: this._itemOffset});
+        register.updateSelfState({itemSelected: this.currentItemSlot});
     },
 
-    // TODO [MEDIUM] implement items
-    getCurrentItem() {
-        return this.currentItem;
+    cleanup() {
+        this.quickBar = this.defaultQuickBar.slice();
+        this.currentItemSlot = 0;
     },
 
-    getItemOrientation() {
-        return this._itemOrientation;
+    getCurrentItemID() {
+        return this.quickBar[this.currentItemSlot];
     },
 
+    setAngleFromIntersectionPoint(angle) {
+        this.angleFromIntersectionPoint = angle;
+    },
+
+    getAngleFromIntersectionPoint() {
+        return this.angleFromIntersectionPoint;
+    },
+
+    /**
+     * @deprecated
+     */
     getItemOffset() {
         return this._itemOffset;
     },
@@ -69,82 +96,101 @@ extend(SelfComponent.prototype, {
         let changes = this.changes;
         if (changes.length < 1) return;
 
-        let scope = this;
-        let serverSelfModel = this.clientModel.app.model.server.selfModel;
-        let graphicsEngine = this.clientModel.app.engine.graphics;
-        let register = this.clientModel.app.register;
-
         // ENHANCEMENT [LOW]: filter & simplify
-        changes.forEach(function(event) {
+        for (let c = 0; c < changes.length; ++c)
+        {
+            const event = changes[c];
+
             let type = event[0];
             let data = event[1];
             if (!type || !data) return;
             switch (type) {
                 case 'camera-update':
-                    // TODO [LOW] only once per iteration.
-                    //console.log('camera autoupdate');
-                    //graphicsEngine.cameraManager.updateCameraPosition(data);
-                    graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+                    this.processSimpleCameraUpdate();
                     break;
                 case 'camera':
-                    let avatar = serverSelfModel.avatar;
-                    let worldId = serverSelfModel.worldId;
-                    let display;
-                    if (data[0] === 'toggle')
-                        display = !serverSelfModel.displayAvatar;
-                    else
-                        display = false;
-
-                    serverSelfModel.displayAvatar = display;
-
-                    if (display)
-                        scope._cameraInteraction = 'third-person';
-                    else
-                        scope._cameraInteraction = 'first-person';
-
-                    graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
-                    graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
+                    this.processCameraModeChange(data);
                     break;
-
                 case 'interaction':
-                    let actionType = data[0];
-                    if (actionType === 'toggle') {
-                        if (scope._clickInteraction === 'block') {
-                            scope._clickInteraction = 'x';
-                        } else if (scope._clickInteraction === 'x') {
-                            scope._clickInteraction = 'block';
-                        }
-                        register.updateSelfState({activeItem: scope._clickInteraction});
-                    } else if (actionType === 'itemOrientation') {
-                        let newOrientation = scope._itemOrientation;
-                        let orientations = scope._itemOrientations;
-                        let newOrientationId = orientations.indexOf(newOrientation);
-                        let nbOrientations = orientations.length;
-                        newOrientationId++; newOrientationId %= nbOrientations;
-                        scope._itemOrientation = orientations[newOrientationId];
-
-                        register.updateSelfState({itemOrientation: scope._itemOrientation});
-                    } else if (actionType === 'itemOffset') {
-                        let deltaY = data[1];
-                        let offset = Number(scope._itemOffset);
-                        let d = Math.abs(deltaY);
-                        if (deltaY > 0) { // Previous
-                            scope._itemOffset = Math.min(offset + d / 100, 0.999).toFixed(3);
-                        } else if (deltaY < 0) { // Next
-                            scope._itemOffset = Math.max(offset - d / 100, 0.001).toFixed(3);
-                        }
-
-                        register.updateSelfState({itemOffset: scope._itemOffset});
-                    }
-
+                    this.processInteractionChange(data);
                     break;
 
                 default:
                     break;
             }
-        });
+        }
 
         this.changes = [];
+    },
+
+    processSimpleCameraUpdate()
+    {
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+        // TODO [LOW] only once per iteration.
+        //console.log('camera autoupdate');
+        //graphicsEngine.cameraManager.updateCameraPosition(data);
+        graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+    },
+
+    processCameraModeChange(data)
+    {
+        let serverSelfModel = this.clientModel.app.model.server.selfModel;
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+
+        let avatar = serverSelfModel.avatar;
+        let worldId = serverSelfModel.worldId;
+        let display;
+        if (data[0] === 'toggle')
+            display = !serverSelfModel.displayAvatar;
+        else
+            display = false;
+
+        serverSelfModel.displayAvatar = display;
+
+        if (display)
+            this._cameraInteraction = 'third-person';
+        else
+            this._cameraInteraction = 'first-person';
+
+        // TODO Change held item size and parent mesh.
+        graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
+        graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
+    },
+
+    processInteractionChange(data)
+    {
+        let graphicsEngine = this.clientModel.app.engine.graphics;
+        let register = this.clientModel.app.register;
+        let actionType = data[0];
+
+        if (actionType === 'itemSelect')
+        {
+            const deltaY = data[1];
+            let currentItemSlot = this.currentItemSlot;
+            const oldItemSlot = currentItemSlot;
+            const quickBarSize = this.quickBarSize;
+
+            if (deltaY > 0) { // Previous
+                currentItemSlot--;
+                if (currentItemSlot < 0) currentItemSlot = quickBarSize - 1;
+            } else if (deltaY < 0) { // Next
+                currentItemSlot++;
+                currentItemSlot %= quickBarSize;
+            }
+
+            this.currentItemSlot = currentItemSlot;
+
+            // TODO graphics change mesh.
+            // This short-circuits the normal client-server await cycle
+            // because the player could be very fast.
+            graphicsEngine.changeHeldItem(
+                this.quickBar[currentItemSlot]
+            );
+
+            register.updateSelfState({
+                itemSelect: [currentItemSlot, oldItemSlot]
+            });
+        }
     }
 
 });

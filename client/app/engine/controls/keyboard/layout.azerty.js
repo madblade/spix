@@ -7,7 +7,7 @@
 let LayoutAZERTY = {
 
     getAZERTY() {
-        return {
+        return Object.freeze({
             // Arrow directional controls.
             arrowUp: 38,
             arrowDown: 40,
@@ -99,7 +99,7 @@ let LayoutAZERTY = {
             rightHandSouthEast: 191,    // /
             rightHandSouthEast2: 223    // ß
 
-        };
+        });
     }
 };
 

@@ -5,34 +5,49 @@
 
 'use strict';
 
-import {WorldType, BlockType}        from '../../model_world/model';
+import { WorldType, BlockType, HillType } from '../../model_world/model';
 
-class SimplePerlin {
-
-    constructor() {
-        this.p = [151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194,
-            233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
-            23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219,
-            203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87,
-            174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48,
-            27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211,
-            133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54,
-            65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208,
-            89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109,
-            198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5,
-            202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16,
-            58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119,
-            248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172,
-            9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232,
-            178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238,
-            210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249,
-            14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84,
-            204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205,
-            93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180];
-
-        for (let i = 0; i < 256; ++i)
-            this.p[256 + i] = this.p[i];
-    }
+class SimplePerlin
+{
+    static p = [151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194,
+        233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
+        23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219,
+        203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87,
+        174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48,
+        27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211,
+        133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54,
+        65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208,
+        89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109,
+        198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5,
+        202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16,
+        58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119,
+        248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172,
+        9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232,
+        178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238,
+        210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249,
+        14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84,
+        204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205,
+        93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180,
+        151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194,
+        233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
+        23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219,
+        203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87,
+        174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48,
+        27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211,
+        133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54,
+        65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208,
+        89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109,
+        198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5,
+        202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16,
+        58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119,
+        248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172,
+        9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232,
+        178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238,
+        210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249,
+        14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84,
+        204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205,
+        93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180,
+    ];
 
     static fade(t)
     {
@@ -52,12 +67,12 @@ class SimplePerlin {
         return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
     }
 
-    noise(x, y, z)
+    static noise(x, y, z)
     {
         let fade = SimplePerlin.fade;
         let lerp = SimplePerlin.lerp;
         let grad = SimplePerlin.grad;
-        let p = this.p;
+        let p = SimplePerlin.p;
 
         let floorX = Math.floor(x);
         let floorY = Math.floor(y);
@@ -118,10 +133,12 @@ class SimplePerlin {
         const air = BlockType.AIR;
         const stone = BlockType.STONE;
         const grass = BlockType.GRASS;
+        const water = BlockType.WATER;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
         const planks = BlockType.PLANKS;
         let worldType = worldInfo.type;
+        let hillsType = worldInfo.hills;
 
         // Detect cube or flat world.
         let directions = [];
@@ -137,15 +154,27 @@ class SimplePerlin {
                 const deltaX = center.x - parseInt(ci, 10);
                 const deltaY = center.y - parseInt(cj, 10);
                 const deltaZ = center.z - parseInt(ck, 10);
-                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius) {
+
+                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius)
+                {
                     blocks.fill(air);
                     chunk.blocks = blocks;
                     return; // Blocks are filled with zeros.
                 }
+
+                // full stone inside the cubeworld
                 if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
-                    blocks.fill(stone);
-                    chunk.blocks = blocks;
-                    return;
+                    if (abs(deltaX) < abs(deltaZ) && abs(deltaY) < abs(deltaZ) && abs(deltaZ) > 0) {
+                        directions.push(ck > center.z ? 3 : -3);
+                    } else if (abs(deltaX) < abs(deltaY) && abs(deltaZ) < abs(deltaY) && abs(deltaY) > 0) {
+                        directions.push(cj > center.y ? 2 : -2);
+                    } else if (abs(deltaY) < abs(deltaX) && abs(deltaZ) < abs(deltaX) && abs(deltaX) > 0) {
+                        directions.push(ci > center.x ? 1 : -1);
+                    } else {
+                        blocks.fill(stone);
+                        chunk.blocks = blocks;
+                        return;
+                    }
                 }
 
                 // TODO [CRIT] manage empty chunks
@@ -163,6 +192,8 @@ class SimplePerlin {
                     directions.push(ck > center.z ? 3 : -3);
 
                 break;
+            default:
+                console.error('[Generator Simple Perlin] Unknown world type.');
         }
 
         // Fill with grass on main world, sand everywhere else.
@@ -177,7 +208,8 @@ class SimplePerlin {
                         blocks[i + j * dx + k * ijS] = planks;
             }
         }
-        else if (directions.length === 2) {
+
+        if (directions.length === 2) {
             // Quarter-full generation.
             // 1 or 2, then 2 or 3!
             for (let a1 = abs(directions[0]), l1 = a1 === 1 ? dx / 2 : dy / 2, ij = directions[0] > 0 ? 0 : l1, c1 = 0; c1 < l1; ++c1, ++ij)
@@ -200,18 +232,16 @@ class SimplePerlin {
                     }
                 }
         }
-        else {
+
+        if (directions.length === 1) {
             // Perlin generation.
-            let perlin = new SimplePerlin();
 
             const v1 = directions[0]; // For signum & value.
             const a1 = abs(v1);
-            let [d1, d2, d3, normalSize, offset1, offset2, perm] =
-                a1 > 2 ?
-                    [dx, dy, dz, dx * dy, offsetX, offsetY, 0] :
-                a1 > 1 ?
-                    [dx, dz, dy, dx * dz, offsetX, offsetZ, 1] :
-                    [dy, dz, dx, dy * dz, offsetY, offsetZ, 2]; // Can factor normalSize outside.
+            let [d1, d2, d3, normalSize, offset1, offset2, offset3, perm] = a1 > 2 ?
+                [dx, dy, dz, dx * dy, offsetX, offsetY, offsetZ, 0] : a1 > 1 ?
+                    [dx, dz, dy, dx * dz, offsetX, offsetZ, offsetY, 1] :
+                    [dy, dz, dx, dy * dz, offsetY, offsetZ, offsetX, 2]; // Can factor normalSize outside.
 
             // let normalSize = a1 > 2 ? dx * dy : a1 > 1 ? dx * dz : dy * dz;
 
@@ -220,14 +250,13 @@ class SimplePerlin {
             // const z = shuffleChunks ? Math.random() * 100 : 50;
             const z = 4 * (shuffleChunks ? Math.random() * d3 : Math.floor(d3 / 2));
 
+            for (let i = 0; i < normalSize; ++i) data[i] = 0;
             for (let iteration = 0; iteration < 4; ++iteration)
             {
-                if (iteration === 0) for (let i = 0; i < normalSize; ++i) data[i] = 0;
-
                 for (let i = 0; i < normalSize; ++i) {
                     let x = offset1 + i % d1;
                     let y = offset2 + (i / d1 | 0); // / priority > | priority
-                    data[i] += perlin.noise(x / quality, y / quality, z) * quality;
+                    data[i] += SimplePerlin.noise(x / quality, y / quality, z) * quality;
                 }
 
                 quality *= 4;
@@ -237,25 +266,50 @@ class SimplePerlin {
             //     return data[x + y * d1] * 0.2 | 0; // * priority > | priority
             // };
 
+            // Get vertical generation direction.
+            let fz = v1 > 0 ?
+                (
+                    perm === 0 ? (xy => zed => xy + normalSize * zed) :
+                        perm === 1 ? (xy => zed => xy + zed * d1) : (xy => zed => xy + zed)
+                ) : (
+                    perm === 0 ? (xy => zed => xy + normalSize * (d3 - zed - 1)) :
+                        perm === 1 ? (xy => zed => xy + (d3 - zed - 1) * d1) : (xy => zed => xy + (d3 - zed - 1))
+                );
+
+            if (worldType === WorldType.CUBE) {
+                let r = parseInt(worldInfo.radius, 10);
+                switch (v1) {
+                    case 1:  offset3 = (-worldInfo.center.x - r + parseInt(ci, 10)) * d1; break;
+                    case -1: offset3 = (worldInfo.center.x - r - parseInt(ci, 10)) * d1; break;
+                    case 2:  offset3 = (-worldInfo.center.y - r + parseInt(cj, 10)) * d2; break;
+                    case -2: offset3 = (worldInfo.center.y - r - parseInt(cj, 10)) * d2; break;
+                    case 3:  offset3 = (-worldInfo.center.z - r + parseInt(ck, 10)) * d3; break;
+                    case -3: offset3 = (worldInfo.center.z - r - parseInt(ck, 10)) * d3; break;
+                }
+            }
+
+            let perlinIntensity;
+            switch (hillsType) {
+                case HillType.NO_HILLS: perlinIntensity = 0; break;
+                case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
+                case HillType.GIANT_HILLS: perlinIntensity = 1.0; break;
+                default: perlinIntensity = 0.1; break;
+            }
+
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
-                    let h = d3 / 2 + (data[x + y * d1] * 0.2 | 0); // getY(x, y);
-                    const rockLevel = Math.floor(5 * h / 6);
+                    let h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0); // getY(x, y);
+                    let rockLevel = Math.floor(5 * h / 6);
                     let xy = perm === 0 ? x + y * d1 :
-                             perm === 1 ? x + y * d1 * d2 :
-                                          x * d1 + y * d1 * d2;
+                        perm === 1 ? x + y * d1 * d2 :
+                            x * d1 + y * d1 * d2;
+                    let ffz = fz(xy);
 
-                    let fz = v1 > 0 ?
-                        (perm === 0 ? (zed => xy + normalSize * zed) :
-                         perm === 1 ? (zed => xy + zed * d1) :
-                                      (zed => xy + zed))
-                        :
-                        (perm === 0 ? (zed => xy + normalSize * (d3 - zed - 1)) :
-                         perm === 1 ? (zed => xy + (d3 - zed - 1) * d1) :
-                                      (zed => xy + (d3 - zed - 1)));
-
-                    for (let zz = 0; zz < rockLevel; ++zz) {
-                        const currentBlock = fz(zz); // ijS * zz + xy;
+                    h -= offset3;
+                    rockLevel -= offset3;
+                    let rl = Math.max(0, Math.min(rockLevel, d3));
+                    for (let zz = 0; zz < rl; ++zz) {
+                        const currentBlock = ffz(zz); // ijS * zz + xy;
 
                         // Rock.
                         blocks[currentBlock] = stone;
@@ -264,10 +318,25 @@ class SimplePerlin {
                         if (Math.random() > 0.99) blocks[currentBlock] = iron;
                     }
 
-                    for (let zz = rockLevel; zz < h; ++zz) {
+                    let bl = Math.max(0, Math.min(h, d3));
+                    for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
-                        const currentBlock = fz(zz);
+                        const currentBlock = ffz(zz);
+                        // if (zz === bl - 1)
+                        //     blocks[currentBlock] = water; // ijS * zz + xy
+                        // else
                         blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                    }
+
+                    if (bl < 16 && rl > 0) {
+                        for (let zz = bl; zz < 16; ++zz) {
+                            // Grass or sand.
+                            const currentBlock = ffz(zz);
+                            if (zz === bl)
+                                blocks[currentBlock] = sand; // ijS * zz + xy
+                            else
+                                blocks[currentBlock] = water; // ijS * zz + xy
+                        }
                     }
                 }
             }
@@ -275,7 +344,6 @@ class SimplePerlin {
 
         chunk.blocks = blocks;
     }
-
 }
 
 export default SimplePerlin;

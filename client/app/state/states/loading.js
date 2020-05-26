@@ -10,21 +10,25 @@ import { $ }                from '../../modules/polyfills/dom.js';
 let LoadingState = function(stateManager) {
     this.stateManager = stateManager;
     this.stateName = 'loading';
+    this.html = `
+        <div style="" class="title noselect">
+        <p>spix<br/>engineering version</p>
+        </div>
+        <div id="cube" class="sk-folding-cube">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+        </div>`;
 };
 
 extend(LoadingState.prototype, {
 
     start() {
         $('#announce')
-            .append('<div style="" class="title noselect">' +
-                '<p>spix<br/>engineering version</p>' +
-                '</div>')
-            .append('<div id="cube" class="sk-folding-cube">' +
-                '<div class="sk-cube1 sk-cube"></div>' +
-                '<div class="sk-cube2 sk-cube"></div>' +
-                '<div class="sk-cube4 sk-cube"></div>' +
-                '<div class="sk-cube3 sk-cube"></div>' +
-                '</div>')
+            .empty()
+            .removeClass()
+            .append(this.html)
             .center();
     },
 

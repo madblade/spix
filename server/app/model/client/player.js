@@ -19,6 +19,7 @@ class Player {
     // Model
     get game() { return this._game; }
     get user() { return this._user; }
+    get connection() { return this._playerConnection; }
 
     /**
      * Join a socket room.
@@ -40,12 +41,14 @@ class Player {
     // Leave game and make the game forget.
     leave() {
         this.disconnect();
-        this._game.removePlayer(this);
+        if (this._game)
+            this._game.removePlayer(this);
     }
 
     // Close player connection.
     disconnect() {
-        this._playerConnection.close();
+        if (this._playerConnection)
+            this._playerConnection.close();
     }
 
     /**

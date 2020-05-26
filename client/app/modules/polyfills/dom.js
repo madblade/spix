@@ -19,12 +19,10 @@ $.fn.center = function() {
     return this;
 };
 
-$(window).resize(function() {$('#announce').center();});
-
 (function(jQuery) {
     let toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
     let toBind = 'onwheel' in document || document.documentMode >= 9 ?
-            ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'];
+        ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'];
     let slice  = Array.prototype.slice;
     let nullLowestDeltaTimeout; let lowestDelta;
 
@@ -221,5 +219,10 @@ $(window).resize(function() {$('#announce').center();});
         return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
     }
 }($));
+
+$(window).resize(function() {
+    $('.settings').center();
+    $('.reticle').center();
+});
 
 export { $ };

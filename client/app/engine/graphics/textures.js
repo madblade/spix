@@ -4,30 +4,67 @@
 
 'use strict';
 
-import * as THREE from 'three';
+import {
+    // LinearMipMapLinearFilter,
+    NearestFilter, RepeatWrapping, TextureLoader
+} from 'three';
 
 let TexturesModule = {
 
-    loadTextures() {
-        this.texture = this.loadTexture('3.png');
+    loadTextures()
+    {
+        this._nbTexturesToLoad = 2;
+
+        this.textureAtlas = this.loadTextureAtlas('3.jpg');
         this.textureCoordinates = this.getTextureCoordinates('minecraft>1.5');
+
+        this.textureWaterNormals = this.loadTextureNormals('water-normals.jpg');
     },
 
-    loadTexture(whatTexture) {
-        let loader = new THREE.TextureLoader();
-        let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
+    loadTextureNormals(whatTexture)
+    {
+        let loader = new TextureLoader();
+        loader.load(`app/assets/textures/${whatTexture}`,
+            t => {
+                console.log('[Graphics/Textures] Water normals loaded.');
+                t.wrapS = t.wrapT = RepeatWrapping;
+                this.textureWaterNormals = t;
+                this._nbTexturesLoaded++;
+            },
+            undefined,
+            () => {
+                console.error('[Graphics/Textures] Failed to load water normals.');
+            });
+    },
 
-        let texture = loader.load(`app/assets/textures/${whatTexture}`);
+    loadTextureAtlas(whatTexture)
+    {
+        let loader = new TextureLoader();
+        // let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
 
-        // TODO [MEDIUM] propose different anisotropy filtering
-        texture.anisotropy = maxAnisotropy;
-        // texture.generateMipmaps = true;
-        // texture.magFilter = THREE.NearestFilter;
-        // texture.minFilter = THREE.NearestFilter;
-        // TODO [MEDIUM] graphical effects
-        // texture.minFilter = THREE.LinearMipMapLinearFilter;
+        // let texture =
+        loader.load(`app/assets/textures/${whatTexture}`,
+            t => {
+                console.log('[Graphics/Textures] Texture Atlas loaded.');
 
-        console.log(`Max anisotropy = ${maxAnisotropy}`);
+                // t.anisotropy = maxAnisotropy;
+                t.magFilter = NearestFilter;
+                t.minFilter = NearestFilter;
+                this.textureAtlas = t;
+                this._nbTexturesLoaded++;
+            },
+            undefined,
+            () => {
+                console.error('[Graphics/Textures] Failed to load texture atlas.');
+            });
+
+        // texture.anisotropy = maxAnisotropy;
+        // texture.generateMipmaps = false;
+        // texture.magFilter = NearestFilter;
+        // texture.minFilter = NearestFilter;
+        // texture.minFilter = LinearMipMapLinearFilter;
+
+        // console.log(`Max anisotropy = ${maxAnisotropy}`);
 
         // Mipmapping...
         // let p = 512;
@@ -44,7 +81,7 @@ let TexturesModule = {
         // Where materials is an [] of materials and the faces use a materialIndex parameter to get appointed the right mat.
         // Idea #2: shader
 
-        return texture;
+        // return texture;
     },
 
     /**
@@ -56,6 +93,7 @@ let TexturesModule = {
         if (modelType === 'minecraft>1.5') {
             coordinates = {
                 // 1. only green grass
+                // 1: [[4, 15], [4, 15], [4, 15], [4, 15], [4, 15], [4, 15]], // Planks
                 1: [[0, 15], [0, 15], [0, 15], [0, 15], [0, 15], [0, 15]], // Grass
                 // 1: [[3, 15], [3, 15], [0, 15], [3, 15], [3, 15], [2, 15]], // Grass
                 2: [[1, 15], [1, 15], [1, 15], [1, 15], [1, 15], [1, 15]], // Stone
@@ -65,6 +103,7 @@ let TexturesModule = {
                 6: [[5, 15], [5, 15], [6, 15], [5, 15], [5, 15], [6, 15]], // Stone bricks
                 7: [[7, 15], [7, 15], [7, 15], [7, 15], [7, 15], [7, 15]], // Bricks
                 //8': [[14, 0], [14, 0], [14, 0], [14, 0], [14, 0], [14, 0]],  // Leaves (special)
+                16: [[14, 3], [14, 3], [14, 3], [14, 3], [14, 3], [14, 3]],  // Water
                 17: [[2, 14], [2, 14], [2, 14], [2, 14], [2, 14], [2, 14]],  // Sand
                 18: [[1, 13], [1, 13], [1, 13], [1, 13], [1, 13], [1, 13]] // Iron
             };

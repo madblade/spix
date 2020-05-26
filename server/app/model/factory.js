@@ -17,8 +17,8 @@ import PlayerConnection from './connection/player_connection';
 
 import GameFactory      from '../engine/factory';
 
-class Factory {
-
+class Factory
+{
     /** App-level classes */
 
     static createUserDB(connector) {
@@ -35,8 +35,8 @@ class Factory {
 
     /** Gaming classes */
 
-    static createGame(hub, kind, gameId, connector) {
-        return GameFactory.createGame(hub, kind, gameId, connector);
+    static createGame(hub, kind, gameId, connector, options) {
+        return GameFactory.createGame(hub, kind, gameId, connector, options);
     }
 
     static createPlayer(user, game) {
@@ -60,7 +60,6 @@ class Factory {
     static createPlayerConnection(socket) {
         return new PlayerConnection(socket);
     }
-
 }
 
 export default Factory;

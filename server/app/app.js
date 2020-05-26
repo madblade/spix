@@ -6,8 +6,8 @@
 
 import Factory from './model/factory';
 
-class App {
-
+class App
+{
     constructor() {
         this._hub = Factory.createHub(this);
         this._connection = Factory.createConnection(this);
@@ -19,6 +19,10 @@ class App {
 
     connect(socketio) {
         this._connection.configure(socketio);
+    }
+
+    connectRTC(userID, socket) {
+        this._connection.configureFromSocket(socket, userID);
     }
 }
 

@@ -4,83 +4,58 @@
 
 'use strict';
 
-import { sigma } from 'sigma';
+import Stats from 'stats.js';
 
 let CoreModule = {
+
+    preload() {
+        // Textures
+        this.loadTextures();
+
+        // Meshes
+        this.loadReferenceMeshes();
+
+        // Animations
+        this.initializeAnimations();
+
+        return new Promise(resolve => {
+            setTimeout(() =>
+                this.resolveIfLoaded(resolve), 500
+            );
+        });
+    },
+
+    resolveIfLoaded(resolve) {
+        if (this._nbTexturesLoaded === this._nbTexturesToLoad &&
+            this._nbMeshesToLoad === this._nbMeshesLoadedOrError)
+        {
+            console.log('[Graphics/Core] Everything loaded.');
+            resolve();
+        }
+        else
+            setTimeout(() => this.resolveIfLoaded(resolve), 500);
+    },
+
     run() {
+        // Initialize DOM element
+        this.initializeDOM();
+        this.fps = new Stats();
+
         // Controls are tightly linked to camera.
-        this.initializeControls();
+        this.initializeCameras();
 
         // Init animation.
         this.resize();
         this.animate();
 
         // Init stats.
-        // document.body.appendChild(this.fps.dom);
-        this.runSigma();
+        // Benches.
+        document.body.appendChild(this.fps.dom);
     },
 
-    runSigma() {
-        let data = {
-            nodes: [
-                {
-                    id: 'n0',
-                    label: 'A node',
-                    x: 0,
-                    y: 0,
-                    size: 3
-                },
-                {
-                    id: 'n1',
-                    label: 'Another node',
-                    x: 3,
-                    y: 1,
-                    size: 2
-                },
-                {
-                    id: 'n2',
-                    label: 'And a last one',
-                    x: 1,
-                    y: 3,
-                    size: 1
-                },
-                {
-                    id: 'n5',
-                    label: 'And a last one',
-                    x: 4,
-                    y: 3,
-                    size: 4
-                }
-            ],
-            edges: [
-                {
-                    id: 'e0',
-                    source: 'n0',
-                    target: 'n1'
-                },
-                {
-                    id: 'e1',
-                    source: 'n1',
-                    target: 'n2'
-                },
-                {
-                    id: 'e2',
-                    source: 'n2',
-                    target: 'n0'
-                }
-            ]
-        };
-
-        let s = new sigma({
-            graph: data,
-            container: 'network-graph',
-            settings: {
-                defaultNodeColor: '#ec5148'
-                // defaultNodeColor: '#ffffff'
-            }
-        });
-
-        s.refresh();
+    initializeDOM() {
+        this.container = document.getElementById('container');
+        this.container.appendChild(this.rendererManager.renderer.domElement);
     },
 
     /** Main loop. **/
@@ -88,6 +63,7 @@ let CoreModule = {
     animate() {
         let clientModel = this.app.model.client;
         let serverModel = this.app.model.server;
+        let controlsEngine = this.app.engine.controls;
 
         // Request animation frame.
         this.requestId = requestAnimationFrame(this.animate.bind(this));
@@ -95,16 +71,13 @@ let CoreModule = {
         // Bench.
         this.fps.update();
 
+        // Update controls for Touch/Gamepad devices.
+        controlsEngine.updateControlsDevice();
+
         // Render.
         serverModel.refresh();
         this.render();
         clientModel.refresh();
-
-        // Rendering twice fixes inertia artifacts on WebGL render targets AND I DON'T KNOW WHY.
-        // Perf loss is visually compensated by the decoupled camera movement aggregation scheme.
-        //serverModel.refresh();
-        //this.render();
-        //clientModel.refresh();
     },
 
     render() {
@@ -129,6 +102,12 @@ let CoreModule = {
         }
     },
 
+    cleanupFullGraphics() {
+        this.sceneManager.cleanup();
+        this.cameraManager.cleanup();
+        this.rendererManager.cleanup();
+    },
+
     resize() {
         let width = window.innerWidth;
         let height = window.innerHeight;
@@ -143,6 +122,17 @@ let CoreModule = {
         this.sceneManager.resize(width, height);
     },
 
+    initializeCameras() {
+        let selfModel = this.app.model.server.selfModel;
+        let worldId = selfModel.worldId;
+        this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
+        this.addToScene(this.cameraManager.mainRaycasterCamera.get3DObject(), worldId);
+        // this.addToScene(this.cameraManager.waterCameraHelper, worldId);
+    },
+
+    /**
+     * @deprecated
+     */
     getCameraInteraction() {
         return this.app.model.client.getCameraInteraction();
     }

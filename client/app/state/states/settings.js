@@ -14,11 +14,11 @@ let SettingsState = function(stateManager) {
 extend(SettingsState.prototype, {
 
     start() {
-        this.app.engine.settings.run();
+        this.stateManager.app.engine.settings.run();
     },
 
     end() {
-        return this.app.engine.settings.stop();
+        return this.stateManager.app.engine.settings.stop();
     }
 
 });

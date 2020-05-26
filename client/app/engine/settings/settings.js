@@ -33,26 +33,19 @@ extend(Settings.prototype, {
 
         // Add content, then fade in and add listeners.
         $('#announce')
+            .empty()
+            .removeClass()
             .addClass('settings')
             .append(this.getHomeHTML())
             .center()
             .fadeIn();
 
         this.listenHome();
-
-        $(document).keydown(function(event) {
-            if (!event.keyCode) { return; }
-            if (event.keyCode === this.controlsEngine.keyControls.escape) {
-                // Remove listeners and get away from the bike.
-                $(document).off('keydown');
-                this.unlistenHome();
-                this.stateManager.setState('ingame');
-            }
-        }.bind(this));
     },
 
     stop() {
         // Fade out settings menu.
+        this.unlistenSettingsMenu();
         return new Promise(function(resolve) {
             let settings = $('#announce');
             settings.fadeOut(200, function() {

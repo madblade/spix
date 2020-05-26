@@ -26,6 +26,9 @@ class Updater {
 
                 else if (e.action === 'action' && typeof e.meta === 'string')
                     this.action(e.meta, avatar);
+
+                else if (e.action === 'use' && e.meta instanceof Array)
+                    this.use(e.meta, avatar);
             });
         });
     }
@@ -79,6 +82,14 @@ class Updater {
         if (meta === 'g') {
             this._physicsEngine.shuffleGravity();
         }
+    }
+
+    use(meta, avatar) {
+        // TODO validate item in inventory
+        // TODO give inventory state to players
+        console.warn('[Physics/Updater] Player wants to use item. To implement.');
+        console.log(meta);
+        console.log(avatar.id);
     }
 
 }

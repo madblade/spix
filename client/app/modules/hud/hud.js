@@ -4,14 +4,61 @@
 
 'use strict';
 
-import extend           from '../../extend.js';
-import $                from 'jquery';
+import extend                   from '../../extend.js';
+import $                        from 'jquery';
+import { HUDWorldsModule }      from './hud.worlds';
+import { HUDInventoryModule }   from './hud.inventory';
 
-let Hud = function(register) {
+let Hud = function(register)
+{
     this.register = register;
+    this.orangeColor = '#c96530';
+    this.sigma = null;
+
+    this.html = `
+        <div id="hud" class="noselect">
+            <div id="position"></div>
+            <div id="network-graph"></div>
+            <div id="diagram"></div>
+            <div id="mini-map"></div>
+            <!-- <div id="chat"></div>-->
+        </div>
+        <div id="items" class="noselect">
+            <div id="item-table">
+            <div class="square"><div class="content selected" id="item0"></div></div>
+            <div class="square"><div class="content" id="item1"></div></div>
+            <div class="square"><div class="content" id="item2"></div></div>
+            <div class="square"><div class="content" id="item3"></div></div>
+            <div class="square"><div class="content" id="item4"></div></div>
+            <div class="square"><div class="content" id="item5"></div></div>
+            <div class="square"><div class="content" id="item6"></div></div>
+            <div class="square"><div class="content" id="item7"></div></div>
+            </div>
+        </div>
+    `;
 };
 
 extend(Hud.prototype, {
+
+    // Game started
+    initModule() {
+        let announce = $('#announce');
+        announce.before(this.html);
+
+        // World map renderer
+        this.initSigma();
+
+        // Quick items
+        this.initInventory();
+    },
+
+    // Game ended
+    disposeModule() {
+        $('#hud').remove();
+        // $('#network-graph').remove();
+        $('#items').remove();
+        this.killSigma();
+    },
 
     updateSelfState(newState) {
         if (newState.hasOwnProperty('position')) {
@@ -20,58 +67,41 @@ extend(Hud.prototype, {
             let text = `${f(p[0])}, ${f(p[1])}, ${f(p[2])}`;
             $('#position')
                 .text(text)
-                .css('color', 'orange');
+                .css('color', this.orangeColor);
         }
 
         if (newState.hasOwnProperty('diagram')) {
-            let d = newState.diagram;
+            this.refreshHUDWorldGraph(newState.diagram);
+        }
 
-            let s = d.split(/\r?\n/g);
-            let colors = ['lime', 'orange', 'red', 'cyan'];
-            for (let is = 0, il = s.length; is < il; ++is) {
-                // Display
-                let color = 'white';
-
-                for (let ic = 0; ic < colors.length; ++ic)
-                    if (s[is].indexOf(colors[ic]) > -1) {
-                        color = colors[ic];
-                        break;
-                    }
-
-                s[is] = s[is].replace(color, '');
-                s[is] = s[is].replace('{', `<span style="color:${color};">`);
-                s[is] = s[is].replace('}', '</span>');
+        if (newState.hasOwnProperty('itemSelect')) {
+            let newSlot = newState.itemSelect[0];
+            let oldSlot = newState.itemSelect[1];
+            if (newSlot < 0 || newSlot > 7 || oldSlot < 0 || oldSlot > 7) {
+                console.error('[HUD] Invalid item slot.');
             }
-
-            s = s.join('<br />');
-
-            // Wrap
-            s = `<p style="color:white;">${s}</p>`;
-            $('#diagram').html(s); // .css('color', 'cyan');
+            $(`#item${oldSlot}`).removeClass('selected');
+            $(`#item${newSlot}`).addClass('selected');
         }
 
-        if (newState.hasOwnProperty('activeItem')) {
-            let h = newState.activeItem;
-            $('#items')
-                .text(h)
-                .css('color', 'orange');
-        }
+        // if (newState.hasOwnProperty('itemOrientation')) {
+        // let or = newState.itemOrientation;
+        // $('#item_orientation')
+        //     .text(or)
+        //     .css('color', this.orangeColor);
+        // }
 
-        if (newState.hasOwnProperty('itemOrientation')) {
-            let or = newState.itemOrientation;
-            $('#item_orientation')
-                .text(or)
-                .css('color', 'orange');
-        }
-
-        if (newState.hasOwnProperty('itemOffset')) {
-            let of = newState.itemOffset;
-            $('#item_offset')
-                .text(of)
-                .css('color', 'orange');
-        }
+        // if (newState.hasOwnProperty('itemOffset')) {
+        // let of = newState.itemOffset;
+        // $('#item_offset')
+        //     .text(of)
+        //     .css('color', this.orangeColor);
+        // }
     }
 
 });
+
+extend(Hud.prototype, HUDWorldsModule);
+extend(Hud.prototype, HUDInventoryModule);
 
 export { Hud };

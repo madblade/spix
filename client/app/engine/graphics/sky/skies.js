@@ -4,80 +4,268 @@
 
 'use strict';
 
-import * as THREE from 'three';
-import { Sky } from './sky';
-import { SimplePlanet, Atmosphere } from './planet';
+import { SkyFlat, SkyCube } from './sky';
+import {
+    Mesh, MeshBasicMaterial, MeshNormalMaterial,
+    BoxBufferGeometry, SphereBufferGeometry, Vector3, Color
+} from 'three';
+import { WorldType } from '../../../model/server/chunks';
+import {
+    LightDefaultColors, LightDefaultIntensities
+} from '../light';
 
 let SkyModule = {
 
-    createPlanet()
+    createFlatSky()
     {
-        let planet = new SimplePlanet();
-        let atmosphere = new Atmosphere(planet);
-        // atmosphere.render(renderer);
-        return {planet, atmosphere};
+        // Mesh
+        let sky = new SkyFlat();
+        sky.scale.setScalar(450000);
+
+        // Light
+        let lights = this.createSkyLight(
+            new Vector3(-1, -2, -1), 'flat'
+        );
+
+        return { mesh: sky, lights };
     },
 
-    createSky()
+    createCubeSky(center, radius)
     {
-        let sky = new Sky();
+        // Mesh
+        let sky = new SkyCube(center.x, center.y, center.z, radius);
         sky.scale.setScalar(450000);
-        this.skyBox = sky;
-        return sky;
+
+        // Colored cube helper
+        let g = new BoxBufferGeometry(2 * radius, 2 * radius, 2 * radius);
+        let m = new MeshNormalMaterial({wireframe: true});
+        let helper = new Mesh(g, m);
+        helper.position.y = center.y;
+        helper.position.z = center.z;
+        helper.position.x = center.x;
+
+        // Light
+        let lights = this.createSkyLight(
+            new Vector3(-1, -2, -1), 'cube'
+        );
+
+        return { mesh: sky, helper, lights };
+    },
+
+    // TODO [CRIT] light update
+    createSkyLight(sunPosition, lightType)
+    {
+        // Dir
+        let light1 = this.createLight('sun');
+        // light1.position.set(-1, -2, -1);
+        let np = new Vector3();
+        np.copy(sunPosition)
+            .normalize();
+        light1.position.set(np.x, np.y, np.z);
+        // light1.updateMatrixWorld();
+        // Hemisphere
+        let light2 = this.createLight('hemisphere');
+        // light2.position.set(-1, -2, -10);
+        light2.position.set(np.x, np.y, np.z);
+        // light2.updateMatrixWorld();
+        // Ambient
+        let light3 = this.createLight();
+        // light3.position.set(-1, -2, -10);
+        light3.position.set(np.x, np.y, np.z);
+        // light3.updateMatrixWorld();
+        return {
+            directionalLight: light1,
+            hemisphereLight: light2,
+            ambientLight: light3,
+            type: lightType
+        };
     },
 
     createSunSphere()
     {
-        let sunSphere = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(20000, 16, 8),
-            new THREE.MeshBasicMaterial({color: 0xffffff})
+        let sunSphere = new Mesh(
+            new SphereBufferGeometry(20000, 16, 8),
+            new MeshBasicMaterial({color: 0xffffff})
         );
         sunSphere.position.y = -700000;
         sunSphere.visible = false;
         return sunSphere;
     },
 
-    updateSunPosition(camera) {
-        if (!this.sky || !this.distance) return;
-        let s = this.sky;
+    // TODO [MILESTONE1] make sky creation api serverwise
+    // or seed behaviour
+    addSky(worldId, worldMeta)
+    {
+        if (!worldMeta)
+            console.log('[Chunks] Default sky creation.');
+
+        let sunPosition = new Vector3(0, -700000, 0);
+
+        let sky;
+        let skyType = worldMeta.type;
+        if (skyType === WorldType.CUBE)
+        {
+            if (!worldMeta.center || !worldMeta.radius) {
+                console.error('[Chunks/NewSky]: No center and radius specified.');
+                return;
+            }
+            if (worldMeta.chunkSizeX !== worldMeta.chunkSizeY ||
+                worldMeta.chunkSizeX !== worldMeta.chunkSizeZ) {
+                console.error('[Chunks/NewSky]: Cube world must have cube chunks.');
+                return;
+            }
+            let chunkSize = worldMeta.chunkSizeX;
+            let center = new Vector3(
+                (worldMeta.center.x + 0.5) * chunkSize,
+                (worldMeta.center.y + 0.5) * chunkSize,
+                (worldMeta.center.z + 0.5) * chunkSize - 1);
+            let radius = Math.max(worldMeta.radius, 1) * chunkSize - 1;
+
+            sky = this.createCubeSky(center, radius);
+            this.addToScene(sky.mesh, worldId);
+            this.addToScene(sky.lights.hemisphereLight, worldId);
+            this.addToScene(sky.lights.directionalLight, worldId);
+            // this.addToScene(sky.helper, worldId);
+            // let sunSphere = this.createSunSphere();
+            // this.addToScene(sunSphere, worldId);
+
+            // turbidity = 1
+            // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
+            // mieDirectionalG = 0.0
+            this.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.0, // Facing front
+                true // isSunSphereVisible
+            );
+        }
+        else if (skyType === WorldType.FLAT)
+        {
+            sky = this.createFlatSky();
+            this.addToScene(sky.mesh, worldId);
+            this.addToScene(sky.lights.hemisphereLight, worldId);
+            this.addToScene(sky.lights.directionalLight, worldId);
+            // this.addToScene(sky.lights.ambientLight, worldId);
+
+            this.updateSky(
+                sky.mesh,
+                sunPosition,
+                10,
+                2,
+                0.005,
+                0.8,
+                1.0,
+                -0.15, // 0.49; // elevation / inclination
+                0.0, // Facing front
+                true // isSunSphereVisible
+            );
+        }
+        else
+        {
+            console.error('Unsupported sky type.');
+            return;
+        }
+
+        return sky;
+    },
+
+    getSunDirection(skyObject) {
+        let distance = this.distance;
+        let phi = skyObject.phi || 0;
+        let theta = this.theta;
+        let x = distance * Math.cos(phi);
+        let y = distance * Math.sin(phi) * Math.sin(theta);
+        let z = distance * Math.sin(phi) * Math.cos(theta);
+        let sunDirection = new Vector3(-x, y, z);
+        sunDirection.normalize().negate();
+        return sunDirection;
+    },
+
+    updateSunPosition(camera, skyObject) {
+        let sky = skyObject.mesh;
+        if (!sky || !this.distance) return;
+        let s = sky;
 
         let cos = Math.cos;
         let sin = Math.sin;
 
         let distance = this.distance;
-        let phi = this.phi;
+        let phi = skyObject.phi || 0;
         let theta = this.theta;
-        // phi += 0.0101;
-        this.phi = phi;
+
+        phi %= 2 * Math.PI;
+        // let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
+        phi += 0.00101; // * dist;
+        // phi = Math.PI / 2; // * dist;
+        skyObject.phi = phi;
 
         let x = distance * cos(phi);
         let y = distance * sin(phi) * sin(theta);
         let z = distance * sin(phi) * cos(theta);
-        let vec3 = new THREE.Vector3(x, y, z);
+        let sunPosition = new Vector3(x, y, z);
+
+        // TODO [CRIT] update light position
 
         if (camera.projectionMatrix) {
-            let mat4 = new THREE.Matrix4();
-            mat4.set(
-                camera.fov, camera.aspect, camera.far, camera.near,
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0);
+            // let mat4 = new THREE.Matrix4();
+            // mat4.set(
+            //     camera.fov, camera.aspect, camera.far, camera.near,
+            //     0, 0, 0, 0,
+            //     0, 0, 0, 0,
+            //     0, 0, 0, 0);
             // mat4.getInverse(camera.projectionMatrix);
-            s.material.uniforms.viewInverse.value.copy(mat4);
+            // s.material.uniforms.viewInverse.value.copy(mat4);
+            let camPosition = new Vector3();
+            camera.getWorldPosition(camPosition);
+            s.material.uniforms.cameraPos.value.copy(camPosition);
         }
-        s.material.uniforms.sunPosition.value.copy(vec3);
+        s.material.uniforms.sunPosition.value.copy(sunPosition);
         // Better not touch this!
         // This accounts for skybox translations in sky shaders.
         let p = this.app.model.server.selfModel.position;
         if (!p) return;
-        this.skyBox.position.set(p[0], p[1], p[2]);
-        this.skyBox.updateMatrix();
+        sky.position.set(p[0], p[1], p[2]);
+        sky.updateMatrix();
+
+        // Update lights
+        let normSunPosition = new Vector3();
+        normSunPosition.copy(sunPosition)
+            .normalize();
+        let hl = skyObject.lights.hemisphereLight;
+        let dl = skyObject.lights.directionalLight;
+        hl.position.copy(normSunPosition);
+        dl.position.copy(normSunPosition);
+        // Sunset and sunrise
+        if (skyObject.lights.type === 'flat') {
+            let nz = Math.max(normSunPosition.z, 0);
+            let intensityFactor = Math.pow(nz, 0.1);
+            hl.intensity = LightDefaultIntensities.HEMISPHERE * intensityFactor;
+            dl.intensity = LightDefaultIntensities.DIRECTIONAL * intensityFactor;
+            if (nz === 0) {
+                let onz = Math.max(-normSunPosition.z, 0);
+                intensityFactor = Math.pow(onz, 0.1);
+                hl.position.copy(new Vector3(0, 0, -1));
+                hl.intensity = intensityFactor * 0.3;
+                dl.intensity = 0;
+                hl.groundColor = new Color(0x0000ff);
+                hl.skyColor = new Color(0x0000ff);
+            } else {
+                hl.skyColor = new Color(LightDefaultColors.HEMISPHERE_SKY);
+                hl.groundColor = new Color(LightDefaultColors.HEMISPHERE_GROUND);
+            }
+        }
     },
 
     // TODO [MILESTONE1] update suns position throughout day and year
     updateSky(
         sky,
-        sunSphere,
+        sunPosition,
         turbidity, //: 10,
         rayleigh, //: 2,
         mieCoefficient, //: 0.005,
@@ -85,36 +273,32 @@ let SkyModule = {
         luminance, //: 1,
         inclination, // 0.49, elevation / inclination
         azimuth,
-        isSunSphereVisible) //: 0.25, Facing front
+    ) //: 0.25, Facing front
     {
         let sin = Math.sin;
         let cos = Math.cos;
 
         let uniforms = sky.material.uniforms;
+        if (!uniforms) return;
         uniforms.turbidity.value = turbidity;
         uniforms.rayleigh.value = rayleigh;
         uniforms.luminance.value = luminance;
         uniforms.mieCoefficient.value = mieCoefficient;
         uniforms.mieDirectionalG.value = mieDirectionalG;
 
-        let theta = Math.PI * (inclination - 0.5);
-        let phi = 2 * Math.PI * (azimuth - 0.5);
+        let theta = 0; // 2 * Math.PI * (inclination - 0.5);
+        let phi = 4 * Math.PI * (azimuth - 0.5);
         let distance = 400000;
 
-        // TODO [CRIT] remove hack
-        // TODO [CRIT] remove temporary hack
-        this.sky = sky;
         this.distance = distance;
         this.phi = phi;
         this.theta = theta;
 
-        sunSphere.position.x = distance * cos(phi);
-        sunSphere.position.y = distance * sin(phi) * sin(theta);
-        sunSphere.position.z = distance * sin(phi) * cos(theta);
+        sunPosition.x = distance * cos(phi);
+        sunPosition.y = distance * sin(phi) * sin(theta);
+        sunPosition.z = distance * sin(phi) * cos(theta);
 
-        sunSphere.visible = isSunSphereVisible;
-
-        uniforms.sunPosition.value.copy(sunSphere.position);
+        uniforms.sunPosition.value.copy(sunPosition);
     }
 };
 

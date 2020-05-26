@@ -7,6 +7,7 @@
 import RigidBodies from './rigid_bodies/rigid_bodies';
 import EventOrderer from './rigid_bodies/orderer_events';
 import ObjectOrderer from './rigid_bodies/orderer_objects';
+import TimeUtils from '../../../math/time';
 
 class FrontEnd {
 
@@ -20,7 +21,7 @@ class FrontEnd {
         this._rigidBodies = new RigidBodies(refreshRate);
         this._objectOrderer = new ObjectOrderer(entityModel, xModel);
         this._eventOrderer = new EventOrderer();
-        this._stamp = process.hrtime();
+        this._stamp = TimeUtils.getTimeSecNano();
 
         // Note! this must be done before the first physics pass,
         // when entities are just loaded from the disk during a (to be implemented) resume.
@@ -49,7 +50,7 @@ class FrontEnd {
 
         // Compute adaptive time step.
         // TODO [CRIT] remember to reactivate lag correction.
-        let relativeDt = 16.667; // process.hrtime(this._stamp)[1] / 1e6;
+        let relativeDt = 16.667; // TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
 
         // Solve physics constraints with basic ordering optimization.
         let maxTimeStepDuration = rigidBodies.refreshRate;
@@ -70,7 +71,7 @@ class FrontEnd {
         // console.log('######### Current physics passes: ' + numberOfEntirePasses + ' #########');
 
         // Stamp.
-        this._stamp = process.hrtime();
+        this._stamp = TimeUtils.getTimeSecNano();
     }
 
     // Can be triggered to change physics behaviour.

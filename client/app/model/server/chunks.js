@@ -8,7 +8,12 @@
 
 import extend           from '../../extend.js';
 
-import * as THREE from 'three';
+const WorldType = Object.freeze({
+    FLAT: 0, // Symbol('flat'),
+    CUBE: 1, // Symbol('cube'),
+    SHRIKE: 2, // Symbol('shrike'),
+    UNSTRUCTURED: 3 // Symbol('unstructured')
+});
 
 let ChunkModel = function(app) {
     this.app = app;
@@ -28,18 +33,23 @@ let ChunkModel = function(app) {
 
 extend(ChunkModel.prototype, {
 
-    addWorld(worldId, worldInfo) {
-        if (this.worlds.has(worldId)) {
-            // console.log('This world I know... (' + typeof worldId +')');
-            return;
-        }
+    hasWorld(worldId) {
+        return this.worlds.has(worldId);
+    },
 
+    addWorldIfNotPresent(worldId, worldInfo, worldInfoMeta)
+    {
         // console.log('This world I don\'t know... ' + worldId);
         let world = new Map();
         let properties = {
             chunkSizeX : worldInfo[0], // 16,
             chunkSizeY : worldInfo[1], // 16,
-            chunkSizeZ : worldInfo[2]  // 32
+            chunkSizeZ : worldInfo[2],  // 32
+            type : worldInfoMeta[0],
+            radius : worldInfoMeta[1],
+            center : {
+                x: worldInfoMeta[2], y: worldInfoMeta[3], z: worldInfoMeta[4]
+            }
         };
 
         properties.chunkCapacity =
@@ -49,76 +59,6 @@ extend(ChunkModel.prototype, {
         this.worldProperties.set(worldId, properties);
 
         return properties;
-    },
-
-    addPlanet(worldId, worldInfo) {
-        if (!worldInfo)
-            console.log('[Chunks] Default sky creation.');
-
-        let graphics = this.app.engine.graphics;
-        let p = graphics.createPlanet();
-        graphics.addToScene(p.planet, worldId);
-        graphics.addToScene(p.atmosphere.mesh, worldId);
-    },
-
-    // TODO [MILESTONE1] make sky creation api serverwise
-    // or seed behaviour
-    addSky(worldId, worldInfo) {
-        if (!worldInfo)
-            console.log('[Chunks] Default sky creation.');
-
-        let graphics = this.app.engine.graphics;
-        let sky = graphics.createSky();
-        let sunSphere = graphics.createSunSphere();
-        graphics.addToScene(sky, worldId);
-        graphics.addToScene(sunSphere, worldId);
-
-        let g = new THREE.BoxBufferGeometry(50, 50, 50);
-        let m = new THREE.MeshNormalMaterial({wireframe: true});
-        let mm = new THREE.Mesh(g, m);
-        mm.position.x = -100;
-        mm.position.y = 100;
-        mm.position.z = 50;
-        graphics.addToScene(mm, worldId);
-
-        // TODO from space:
-        // turbidity = 1
-        // rayleigh = 0.25   or 0.5 and mieCoeff = 0.0
-        // mieDirectionalG = 0.0
-
-        let turbidity = 10;
-        let rayleigh = 2;
-        let mieCoefficient = 0.005;
-        let mieDirectionalG = 0.8;
-        let luminance = 0.5;
-        let inclination = -0.15;// 0.49; // elevation / inclination;
-        let azimuth = 0.25; // Facing front;
-        let isSunSphereVisible = true;
-        graphics.updateSky(
-            sky,
-            sunSphere,
-            turbidity,
-            rayleigh,
-            mieCoefficient,
-            mieDirectionalG,
-            luminance,
-            inclination,
-            azimuth,
-            isSunSphereVisible
-        );
-
-        this.skies.set(worldId, sky);
-    },
-
-    // TODO [MILESTONE1] make sky update api serverwise
-    // or seed behaviour
-    updateSky(worldId, worldInfo) {
-        if (!worldInfo)
-            console.log('[Chunks] Warn! Nothing to update in the sky.');
-
-        let currentSky = this.skies.get(worldId);
-        if (!currentSky)
-            console.log('[Chunks] Warn! Could not get required sky.');
     },
 
     /** Dynamics **/
@@ -142,37 +82,47 @@ extend(ChunkModel.prototype, {
                 //console.log('World metadata:');
                 //console.log(updates['worlds']);
                 let worlds = updates.worlds;
+                let worldsMeta = updates.worldsMeta;
                 for (let wid in worlds) {
+                    if (!worlds.hasOwnProperty(wid)) continue;
+
                     let wif = worlds[wid];
                     for (let id = 0, wl = wif.length; id < wl; ++id)
                         wif[id] = parseInt(wif[id], 10);
 
                     // Add new world and matching scene.
-                    let properties = this.addWorld(wid, wif);
-                    if (properties) {
-                        // 1 world <-> 1 scene, multiple cameras
-                        graphics.addScene(wid);
-                        let light = graphics.createLight('hemisphere');
-                        light.position.set(0.5, 1, 0.75);
-                        light.updateMatrixWorld();
-                        graphics.addToScene(light, wid);
-
-                        this.addSky(wid, wif);
-
-                        // this.addPlanet(wid, wif);
+                    if (this.hasWorld(wid)) {
+                        // console.log(`Update for a world I already have: ${wid}.`);
+                        continue;
                     }
+
+                    if (!worldsMeta || !worldsMeta.hasOwnProperty(wid)) {
+                        console.error(`NO METADATA FOR NEW WORLD: ${wid}.`);
+                        continue;
+                    }
+                    let wifm = worldsMeta[wid];
+                    this.addWorldIfNotPresent(wid, wif, wifm);
+
+                    // 1 world <-> 1 scene, multiple cameras
+                    graphics.addScene(wid);
+
+                    let newSky = graphics.addSky(wid, this.worldProperties.get(wid));
+                    if (newSky)
+                        this.skies.set(wid, newSky);
                 }
             }
 
             for (let worldId in updates) {
-                if (worldId === 'worlds') {
+                if (!updates.hasOwnProperty(worldId) ||
+                    worldId === 'worlds' || worldId === 'worldsMeta')
                     continue;
-                }
 
                 let subdates = updates[worldId];
                 let sup = {};
 
                 for (let chunkId in subdates) {
+                    if (!subdates.hasOwnProperty(chunkId)) continue;
+
                     let update = subdates[chunkId];
 
                     if (!update) {
@@ -185,7 +135,7 @@ extend(ChunkModel.prototype, {
 
                     else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3) {
                         // TODO [HIGH] server-side, use distinct channels for chunk updates.
-                        console.log('WARN: corrupt update or model @refresh / updateChunk.');
+                        console.error(`WARN: corrupt update or model @refresh / updateChunk ${chunkId}.`);
                         console.log(update);
                         this.chunkUpdates = [];
                         return;
@@ -193,7 +143,7 @@ extend(ChunkModel.prototype, {
 
                     // Non-loaded chunk.
                     else if (update.length !== 2) {
-                        console.log('WARN: corrupt update or model @refresh / initChunk.');
+                        console.error('WARN: corrupt update or model @refresh / initChunk.');
                         console.log(update);
                         return;
 
@@ -252,7 +202,7 @@ extend(ChunkModel.prototype, {
         // Initialize model if a new world is transmitted.
         let world = this.worlds.get(worldId);
         if (!world) {
-            console.log(`Got chunk ${chunkId} (${typeof worldId}) from an unknown world: ${worldId}`);
+            console.error(`Got chunk ${chunkId} (${typeof worldId}) from an unknown world: ${worldId}`);
             return;
         }
 
@@ -261,12 +211,15 @@ extend(ChunkModel.prototype, {
         let sizeY = property.chunkSizeY;
         let sizeZ = property.chunkSizeZ;
 
-        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ);
+        let worldMeta = this.worldProperties.get(worldId);
+        if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat);
         world.set(chunkId, chunk);
 
         // Add to scene.
         if (!chunk || !chunk.hasOwnProperty('meshes')) {
-            console.log(`WARN. Update miss @ initializeChunk: ${chunkId}`);
+            console.error(`WARN. Update miss @ initializeChunk: ${chunkId}`);
             console.log(all);
             return;
         }
@@ -274,9 +227,14 @@ extend(ChunkModel.prototype, {
         for (let m = 0, l = meshes.length; m < l; ++m) {
             graphics.addToScene(meshes[m], worldId);
         }
+        if (graphics._debugChunkBoundingBoxes) {
+            if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');
+            graphics.addToScene(chunk.debugMesh, worldId);
+        }
     },
 
-    updateChunk(worldId, chunkId, components) {
+    updateChunk(worldId, chunkId, components)
+    {
         let graphics = this.app.engine.graphics;
 
         let world = this.worlds.get(worldId);
@@ -296,7 +254,13 @@ extend(ChunkModel.prototype, {
         let sizeY = property.chunkSizeY;
         let sizeZ = property.chunkSizeZ;
 
-        graphics.updateChunk(worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ);
+        let worldMeta = this.worldProperties.get(worldId);
+        if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        graphics.updateChunk(
+            worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ,
+            isWorldFlat
+        );
     },
 
     unloadChunk(worldId, chunkId) {
@@ -313,6 +277,10 @@ extend(ChunkModel.prototype, {
         let meshes = chunk.meshes;
         for (let m = 0, l = meshes.length; m < l; ++m) {
             graphics.removeFromScene(meshes[m], worldId);
+        }
+        if (graphics._debugChunkBoundingBoxes) {
+            if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');
+            graphics.removeFromScene(chunk.debugMesh, worldId);
         }
 
         world.delete(chunkId);
@@ -335,12 +303,50 @@ extend(ChunkModel.prototype, {
                 return;
             }
 
-            currentChunk.meshes.forEach(function(mesh) {meshes.push(mesh);});
+            currentChunk.meshes.forEach(function(mesh) {
+                if (!!mesh && !!mesh.geometry) { // empty chunk or geometry
+                    meshes.push(mesh);
+                }
+            });
         });
 
         return meshes;
-    }
+    },
 
+    cleanup() {
+        this.worlds.forEach(w => {
+            w.forEach(currentChunk => {
+                if (!!currentChunk && currentChunk.hasOwnProperty('meshes')) {
+                    currentChunk.meshes.forEach(mesh => {
+                        mesh.geometry.dispose();
+                        mesh.material.dispose();
+                    });
+                }
+            });
+            w.clear();
+        });
+        this.worlds.clear();
+        this.worldProperties.clear();
+        this.chunkUpdates = [];
+
+        // Sky collection.
+        this.skies.forEach(s => {
+            if (s.mesh) {
+                s.mesh.geometry.dispose();
+                s.mesh.material.dispose();
+            }
+            if (s.helper && s.helper.mesh) {
+                s.helper.mesh.geometry.dispose();
+                s.helper.mesh.material.dispose();
+            }
+        });
+        this.skies.clear();
+
+        // Graphical component.
+        this.needsUpdate = false;
+        this.debug = false;
+        // TODO [LEAK] cleanup graphical component and all meshes.
+    }
 });
 
-export { ChunkModel };
+export { ChunkModel, WorldType };
