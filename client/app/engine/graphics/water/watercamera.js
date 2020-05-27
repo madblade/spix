@@ -59,10 +59,14 @@ let WaterCameraModule = {
         let rotationMatrix = waterCamera.rotationMatrix; // for mirror mesh.
         let eye = waterCamera.eye;
 
-        let scope = new Object3D();
-        scope.position.set(0, 0, 16);
-        scope.rotation.set(0, 0, 0);
-        scope.updateMatrixWorld();
+        if (!this._waterCameraObject)
+        {
+            this._waterCameraObject = new Object3D();
+            this._waterCameraObject.position.set(0, 0, 16);
+            this._waterCameraObject.rotation.set(0, 0, 0);
+            this._waterCameraObject.updateMatrixWorld();
+        }
+        let scope = this._waterCameraObject;
 
         mirrorWorldPosition.setFromMatrixPosition(scope.matrixWorld);
         cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld);

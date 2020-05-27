@@ -241,7 +241,7 @@ let PortalsModule = {
         this.lastRenderGates.add(originPid);
 
         // Sort in reverse order! (high depth to low depth).
-        renderRegister.sort(function(a, b) { return a.depth < b.depth; });
+        renderRegister.sort(function(a, b) { return b.depth - a.depth; });
 
         // Update renderer.
         this.rendererManager.setRenderRegister(renderRegister);

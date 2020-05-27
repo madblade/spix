@@ -59,8 +59,8 @@ extend(RendererManager.prototype, {
         let fxaa = new ShaderPass(FXAAShader);
         let u = 'resolution';
         fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        composer.addPass(fxaa);
-        composer.addPass(fxaa);
+        // composer.addPass(fxaa);
+        // composer.addPass(fxaa);
 
         // Bloom
         let bloomPass = new UnrealBloomPass(
@@ -251,6 +251,12 @@ extend(RendererManager.prototype, {
         let mainScene = sceneManager.mainScene;
         let mainCamera = cameraManager.mainCamera.getRecorder();
 
+        // Update main camera.
+        mainCamera.updateProjectionMatrix();
+        mainCamera.updateMatrixWorld();
+        mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
+        mainScene.updateMatrixWorld();
+
         // Updates.
         try {
             this._updateSkies(mainCamera);
@@ -264,7 +270,6 @@ extend(RendererManager.prototype, {
         // Render every portal.
         let renderCount = 0;
         let renderMax = this.renderMax;
-        mainScene.updateMatrixWorld();
 
         let currentPass; let screen1; let screen2; let camera;
         let bufferScene; let bufferCamera; let bufferTexture;
@@ -313,10 +318,10 @@ extend(RendererManager.prototype, {
             //bufferCamera.updateProjectionMatrix();
 
             //bufferCamera.updateProjectionMatrix();
-            //bufferCamera.updateMatrixWorld();
+            // bufferCamera.updateMatrixWorld();
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
             this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
-            //bufferScene.updateMatrixWorld();
+            // bufferScene.updateMatrixWorld();
 
             // renderer.setRenderTarget(bufferTexture);
             let id = currentPass.id.toString();
@@ -344,10 +349,6 @@ extend(RendererManager.prototype, {
         }
 
         //console.log(renderCount);
-
-        mainCamera.updateProjectionMatrix();
-        mainCamera.updateMatrixWorld();
-        mainCamera.matrixWorldInverse.getInverse(mainCamera.matrixWorld);
         //this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
         //mainScene.updateMatrixWorld();
         let id = this.graphics.app.model.server.selfModel.worldId.toString();
