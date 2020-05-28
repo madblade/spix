@@ -203,16 +203,17 @@ let ListenerModule = {
     onMiddleMouseDown() {
     },
 
-    registerMouseWheel() {
+    mouseWheelCallback(event)
+    {
         let clientModel = this.app.model.client;
+        let ey = event.deltaY;
+        // let df = event.deltaFactor;
 
-        $(window).mousewheel(function(event) {
-            // let ex = event.deltaX;
-            let ey = event.deltaY;
-            // let df = event.deltaFactor;
+        clientModel.triggerChange('interaction', ['itemSelect', ey]);
+    },
 
-            clientModel.triggerChange('interaction', ['itemSelect', ey]);
-        });
+    registerMouseWheel() {
+        $(window).mousewheel(this.mouseWheelCallback.bind(this));
     },
 
     unregisterMouseDown() {

@@ -108,7 +108,8 @@ let CoreModule = {
         this.rendererManager.cleanup();
     },
 
-    resize() {
+    resize()
+    {
         let width = window.innerWidth;
         let height = window.innerHeight;
 

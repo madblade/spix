@@ -43,8 +43,8 @@ let HUDWorldsModule =
 
     killSigma() {
         if (!this.sigma || !this.sigma.graph) return;
-        this.sigma.graph.clear();
-        this.sigma.graph.kill();
+        this.sigma.kill();
+        this.sigma = null;
     },
 
     refreshHUDWorldGraph(newDiagram)

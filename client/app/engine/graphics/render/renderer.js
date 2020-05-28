@@ -49,9 +49,9 @@ extend(RendererManager.prototype, {
 
     createComposer(rendrr, sc, cam, target)
     {
-        let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        // let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
         let scenePass = new RenderPass(sc, cam);
-        composer.addPass(scenePass);
+        // composer.addPass(scenePass);
 
         // Anti-alias
         let resolutionX = 1 / window.innerWidth;
@@ -111,7 +111,7 @@ extend(RendererManager.prototype, {
             finalComposer.addPass(sao);
         }
 
-        return [bloomComposer, finalComposer, composer];
+        return [bloomComposer, finalComposer]; // , composer];
     },
 
     createRenderer() {
@@ -320,7 +320,7 @@ extend(RendererManager.prototype, {
             //bufferCamera.updateProjectionMatrix();
             // bufferCamera.updateMatrixWorld();
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
-            this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+            // this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
             // bufferScene.updateMatrixWorld();
 
             // renderer.setRenderTarget(bufferTexture);

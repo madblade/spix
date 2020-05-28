@@ -214,10 +214,10 @@ extend(App.Core.prototype, {
     },
 
     runGame() {
-        this.register.gameStarted();
         this.engine.graphics.run();
         this.engine.controls.run();
         this.engine.audio.run();
+        this.register.gameStarted();
     },
 
     stopGame() {
