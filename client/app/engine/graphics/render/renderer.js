@@ -282,6 +282,7 @@ extend(RendererManager.prototype, {
             bufferScene.updateMatrixWorld();
         }
 
+        this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
         for (let i = 0, n = renderRegister.length; i < n; ++i) {
             if (renderCount++ > renderMax) break;
             currentPass = renderRegister[i];
