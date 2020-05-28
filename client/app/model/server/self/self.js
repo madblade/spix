@@ -247,6 +247,7 @@ extend(SelfModel.prototype, {
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
         this.displayAvatar = false;
+        this.displayHandItem = true;
 
         this.avatar = null;
         // TODO [LEAK] cleanup graphical component of avatar.

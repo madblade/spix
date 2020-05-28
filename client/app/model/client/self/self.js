@@ -67,6 +67,7 @@ extend(SelfComponent.prototype, {
     cleanup() {
         this.quickBar = this.defaultQuickBar.slice();
         this.currentItemSlot = 0;
+        this._cameraInteraction = 'first-person';
     },
 
     getCurrentItemID() {
