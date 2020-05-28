@@ -13,15 +13,22 @@ import {
 } from 'three';
 import { WaterCameraModule } from '../water/watercamera';
 
+const DEFAULT_CAMERA = {
+    fov: 90,
+    aspect: window.innerWidth / window.innerHeight,
+    near: 0.0001,
+    far: 100000
+};
+
 let CameraManager = function(graphicsEngine)
 {
     this.graphicsEngine = graphicsEngine;
 
     // Camera properties.
-    this.mainFOV = 90;
+    this.mainFOV = DEFAULT_CAMERA.fov;
     this.mainAspect = window.innerWidth / window.innerHeight;
-    this.mainNear = 0.0001;
-    this.mainFar = 100000;
+    this.mainNear = DEFAULT_CAMERA.near;
+    this.mainFar = DEFAULT_CAMERA.far;
 
     // Cameras.
     this.mainCamera = this.createCamera(false, -1);
@@ -33,6 +40,10 @@ let CameraManager = function(graphicsEngine)
 
     // Portals
     this.subCameras = new Map();
+    this.stencilCamera = new PerspectiveCamera(
+        this.mainFOV, this.mainAspect, this.mainNear, this.mainFar
+    );
+    this.stencilCamera.matrixAutoUpdate = false;
 
     // Water
     this.waterCamera = this.createWaterCamera();
@@ -433,6 +444,8 @@ extend(CameraManager.prototype, {
             recorder.aspect = aspect;
             recorder.updateProjectionMatrix();
         });
+        this.stencilCamera.aspect = aspect;
+        this.stencilCamera.updateProjectionMatrix();
 
         // Water
         this.waterCamera.camera.aspect = aspect;
@@ -496,4 +509,4 @@ let CamerasModule = {
 
 };
 
-export { CamerasModule };
+export { CamerasModule, DEFAULT_CAMERA };

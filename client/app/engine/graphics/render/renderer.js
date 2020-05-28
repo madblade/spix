@@ -9,7 +9,7 @@ import {
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer,
+    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh,
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -17,18 +17,33 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { ClearMaskPass, MaskPass } from 'three/examples/jsm/postprocessing/MaskPass';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
+import { ClearPass } from 'three/examples/jsm/postprocessing/ClearPass';
 
-let RendererManager = function(graphicsEngine) {
+let RendererManager = function(graphicsEngine)
+{
     this.graphics = graphicsEngine;
 
+    // Graphical settings
+    this.ambientOcclusion = false;
+    this.selectiveBloom = true;
+
     // Cap number of passes.
-    this.renderMax = Number.POSITIVE_INFINITY;
+    this.renderMax = 10; // Number.POSITIVE_INFINITY;
 
     this.renderer = this.createRenderer();
+    this.renderer.autoClear = false;
     this.composers = new Map();
 
     // Lightweight screen, camera and scene manager for portals.
     this.renderRegister = [];
+    this.stencilScene = new Scene();
+    this.stencilScreen = new Mesh(
+        new PlaneBufferGeometry(1, 2),
+        new MeshBasicMaterial({ color: 0xaaaaaa, side: DoubleSide, transparent: false })
+    );
+    this.stencilScene.add(this.stencilScreen);
 
     this.corrupted = 0;
 
@@ -47,11 +62,25 @@ extend(RendererManager.prototype, {
         return 0 | cssColor.replace('#', '0x');
     },
 
-    createComposer(rendrr, sc, cam, target)
+    createPortalComposer(rendrr, sc, cam, target, maskScene, maskCamera)
     {
-        // let composer = !target ? new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        let maskPass = new MaskPass(maskScene, maskCamera);
+        let clearPass = new ClearPass();
+        let clearMaskPass = new ClearMaskPass();
+        let copy = new ShaderPass(CopyShader);
+
+        let composer = new EffectComposer(rendrr, target);
+        composer.renderTarget1.stencilBuffer = true;
+        composer.renderTarget2.stencilBuffer = true;
         let scenePass = new RenderPass(sc, cam);
-        // composer.addPass(scenePass);
+        scenePass.clear = false;
+        maskPass.inverse = false;
+        composer.addPass(clearPass);
+        composer.addPass(maskPass);
+        composer.addPass(scenePass);
+        composer.addPass(copy);
+        composer.addPass(clearMaskPass);
+        // composer.addPass(copy);
 
         // Anti-alias
         let resolutionX = 1 / window.innerWidth;
@@ -60,6 +89,65 @@ extend(RendererManager.prototype, {
         let u = 'resolution';
         fxaa.uniforms[u].value.set(resolutionX, resolutionY);
         // composer.addPass(fxaa);
+        // composer.addPass(fxaa);
+        // composer.addPass(copy);
+
+        // Bloom
+        let bloomPass = new UnrealBloomPass(
+            new Vector2(window.innerWidth, window.innerHeight),
+            1.5, 0.4, 0.85);
+        bloomPass.exposure = 0.5;
+        bloomPass.threshold = 0.3;
+        bloomPass.strength = 1.0;
+        bloomPass.radius = 0;
+        let bloomComposer = new EffectComposer(rendrr, target);
+        bloomComposer.renderToScreen = false;
+        bloomComposer.renderTarget1.stencilBuffer = true;
+        bloomComposer.renderTarget2.stencilBuffer = true;
+        bloomComposer.addPass(clearPass);
+        bloomComposer.addPass(maskPass);
+        bloomComposer.addPass(scenePass);
+        bloomComposer.addPass(clearMaskPass);
+        bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
+
+        let bloomMergePass = new ShaderPass(
+            new ShaderMaterial({
+                uniforms: {
+                    baseTexture: { value: null },
+                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
+                },
+                vertexShader: this.graphics.getBloomSelectiveVertexShader(),
+                fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
+                defines: {}
+            }), 'baseTexture'
+        );
+        bloomMergePass.needsSwap = true;
+        let finalComposer = new EffectComposer(rendrr, target);
+        finalComposer.renderTarget1.stencilBuffer = true;
+        finalComposer.renderTarget2.stencilBuffer = true;
+        finalComposer.addPass(clearPass);
+        finalComposer.addPass(maskPass);
+        finalComposer.addPass(scenePass);
+        finalComposer.addPass(bloomMergePass);
+        finalComposer.addPass(fxaa);
+        finalComposer.addPass(clearMaskPass);
+
+        return [bloomComposer, finalComposer, composer];
+    },
+
+    createMainComposer(rendrr, sc, cam)
+    {
+        let composer = new EffectComposer(rendrr);
+        let scenePass = new RenderPass(sc, cam);
+        composer.addPass(scenePass);
+
+        // Anti-alias
+        let resolutionX = 1 / window.innerWidth;
+        let resolutionY = 1 / window.innerHeight;
+        let fxaa = new ShaderPass(FXAAShader);
+        let u = 'resolution';
+        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
+        composer.addPass(fxaa);
         // composer.addPass(fxaa);
 
         // Bloom
@@ -70,8 +158,7 @@ extend(RendererManager.prototype, {
         bloomPass.threshold = 0.3;
         bloomPass.strength = 1.0;
         bloomPass.radius = 0;
-        let bloomComposer = !target ?
-            new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        let bloomComposer = new EffectComposer(rendrr);
         bloomComposer.renderToScreen = false;
         bloomComposer.addPass(scenePass);
         bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
@@ -88,15 +175,14 @@ extend(RendererManager.prototype, {
             }), 'baseTexture'
         );
         bloomMergePass.needsSwap = true;
-        let finalComposer = !target ?
-            new EffectComposer(rendrr) : new EffectComposer(rendrr, target);
+        let finalComposer = new EffectComposer(rendrr);
         finalComposer.addPass(scenePass);
         finalComposer.addPass(bloomMergePass);
         finalComposer.addPass(fxaa);
 
         // Ambient occlusion
-        let ultraGraphics = false;
-        if (!target && ultraGraphics) {
+        let ambientOcclusion = this.ambientOcclusion;
+        if (ambientOcclusion) {
             let sao = new SAOPass(sc, cam, false, false);
             sao.params.output = SAOPass.OUTPUT.Default;
             sao.params.saoBias = 0.1;
@@ -111,7 +197,7 @@ extend(RendererManager.prototype, {
             finalComposer.addPass(sao);
         }
 
-        return [bloomComposer, finalComposer]; // , composer];
+        return [bloomComposer, finalComposer, composer];
     },
 
     createRenderer() {
@@ -282,6 +368,8 @@ extend(RendererManager.prototype, {
             bufferScene.updateMatrixWorld();
         }
 
+        let stc = cameraManager.stencilCamera;
+        this.stencilScene.updateMatrixWorld();
         this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
         for (let i = 0, n = renderRegister.length; i < n; ++i) {
             if (renderCount++ > renderMax) break;
@@ -309,8 +397,10 @@ extend(RendererManager.prototype, {
             if (!bufferTexture) { console.log('Could not get buffer texture.'); continue; }
 
             if (screen2) {
+                console.log('screen2');
                 otherSceneId = currentPass.sceneId;
                 otherEnd = screen2.getMesh();
+                // otherEnd.visible = false;
                 sceneManager.removeObject(otherEnd, otherSceneId, true);
             }
             //console.log('[Renderer] Rendering.');
@@ -324,48 +414,74 @@ extend(RendererManager.prototype, {
             // this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
             // bufferScene.updateMatrixWorld();
 
+            // Render scene into screen1
+            const s1 = screen1.getMesh();
+            // s1.updateMatrixWorld();
+            // this.stencilScreen.matrixWorld.copy(s1.matrixWorld);
+            let sts = this.stencilScreen;
+            sts.position.copy(s1.position);
+            sts.rotation.copy(s1.rotation);
+            sts.updateMatrixWorld();
+            // sts.position.set(s1.position.x, s1.position.y + 0.1, s1.position.z);
+
+            // bufferCamera.updateProjectionMatrix();
+            // stc.position.copy(bufferCamera.position);
+            // stc.rotation.copy(bufferCamera.rotation);
+            // bufferCamera.updateMatrixWorld(true);
+            stc.matrixWorld.copy(bufferCamera.matrixWorld);
+            // stc.updateProjectionMatrix();
+            // stc.matrixWorld.copy(bufferCamera.matrixWorld);
+            // stc.projectionMatrix.copy(bufferCamera.projectionMatrix);
+
             // renderer.setRenderTarget(bufferTexture);
             let id = currentPass.id.toString();
             let bufferComposer;
             if (this.composers.has(id)) {
                 bufferComposer = this.composers.get(id);
             } else {
-                bufferComposer = this.createComposer(renderer, bufferScene, bufferCamera, bufferTexture);
+                bufferComposer = this.createPortalComposer(
+                    renderer, bufferScene, bufferCamera, bufferTexture, this.stencilScene, stc
+                );
                 this.composers.set(id, bufferComposer);
             }
 
-            bufferScene.traverse(obj => this._darkenNonBloomed(obj, materials));
-            bufferComposer[0].render();
-            bufferScene.traverse(obj => this._restoreMaterial(obj, materials));
-            bufferComposer[1].render();
-            // composer.render(); // Double render for camera 1frame lag.
-            // composer.render();
-            // renderer.render(bufferScene, bufferCamera);
-            // renderer.setRenderTarget(null);
+            if (this.selectiveBloom) {
+                bufferScene.traverse(obj => this._darkenNonBloomed(obj, materials));
+                bufferComposer[0].render();
+                bufferScene.traverse(obj => this._restoreMaterial(obj, materials));
+                bufferComposer[1].render();
+            } else {
+                bufferComposer[2].render();
+            }
+            // s1.visible = false;
+            // s1.visible = true;
 
             if (screen2) {
                 sceneManager.addObject(otherEnd, otherSceneId);
-                //otherEnd.updateMatrixWorld();
+                // otherEnd.visible = true;
             }
         }
 
-        //console.log(renderCount);
-        //this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
-        //mainScene.updateMatrixWorld();
+        // Make composer
+        // TODO optimise composer creation
         let id = this.graphics.app.model.server.selfModel.worldId.toString();
         let composer;
         if (this.composers.has(id)) {
             composer = this.composers.get(id);
         } else {
-            composer = this.createComposer(renderer, mainScene, mainCamera, false);
+            composer = this.createMainComposer(renderer, mainScene, mainCamera);
             this.composers.set(id, composer);
         }
 
         // MAIN RENDER
-        mainScene.traverse(obj => this._darkenNonBloomed(obj, materials));
-        composer[0].render();
-        mainScene.traverse(obj => this._restoreMaterial(obj, materials));
-        composer[1].render();
+        if (this.selectiveBloom) {
+            mainScene.traverse(obj => this._darkenNonBloomed(obj, materials));
+            composer[0].render();
+            mainScene.traverse(obj => this._restoreMaterial(obj, materials));
+            composer[1].render();
+        } else {
+            composer[2].render();
+        }
 
         // Compute draw calls
         // console.log(renderer.info.render.calls);
