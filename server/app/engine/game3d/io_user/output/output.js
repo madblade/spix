@@ -6,8 +6,8 @@
 
 import TimeUtils from '../../../math/time';
 
-class UserOutput {
-
+class UserOutput
+{
     static debug = false;
 
     constructor(game) {
@@ -233,7 +233,6 @@ class UserOutput {
         let game = this._game;
         game.chat.updateOutput();
     }
-
 }
 
 export default UserOutput;

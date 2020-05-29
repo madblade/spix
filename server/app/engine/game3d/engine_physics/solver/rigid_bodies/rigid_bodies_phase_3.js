@@ -2,34 +2,35 @@
  * Island solving.
  */
 
-class RigidBodiesPhase3 {
-
-    static solveBabylon(a, b, c, sup, debug) {
+class RigidBodiesPhase3
+{
+    static solveBabylon(a, b, c, sup)
+    {
         if (a === 0) {
             if (b === 0)
                 return sup;
             else
                 return -c / b;
         }
-        let r = 0;
         let delta = b * b - 4 * a * c;
         if (delta > 0) {
-            let r1 = (-b - Math.sqrt(delta)) / (2 * a);
-            let r2 = (-b + Math.sqrt(delta)) / (2 * a);
+            const sd = Math.sqrt(delta);
+            const r1 = (-b - sd) / (2 * a);
+            const r2 = (-b + sd) / (2 * a);
             if (r1 >= 0 && r2 >= 0)
-                r = Math.min(r1, r2);
+                return Math.min(r1, r2);
             else if (r1 >= 0 || r2 >= 0)
-                r = Math.max(Math.max(r1, r2), 0);
+                return Math.max(Math.max(r1, r2), 0);
             else
-                r = sup;
+                return sup;
         } else if (delta === 0) {
-            if (debug) console.log('delta = 0');
+            // if (debug) console.log('delta = 0');
             if (a === 0)
-                r = sup;
+                return sup;
             else
-                r = -b / (2 * a);
+                return -b / (2 * a);
         }
-        return r;
+        return 0;
     }
 
     static solveSecondOrder(
@@ -41,7 +42,8 @@ class RigidBodiesPhase3 {
         fw, relativeDt)
     {
         // Check for snapping on first trajectory.
-        let dbg = true; // TODO [HIGH] solve this farther entity problem.
+        let dbg = false; // TODO [LOW] solve the farther entity problem.
+
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
         if (p10 < p11 && a1 * relativeDt * relativeDt + b1 * relativeDt + p10 < p11 ||
             p10 > p11 && p11 < a1 * relativeDt * relativeDt + b1 * relativeDt + p10)
@@ -60,7 +62,7 @@ class RigidBodiesPhase3 {
         }
 
         // Solve free 2-collision.
-        let rp12 = RigidBodiesPhase3.solveBabylon(a1 - a2, b1 - b2, fw * w1 + fw * w2 + p10 - p20, 2 * relativeDt, true);
+        let rp12 = RigidBodiesPhase3.solveBabylon(a1 - a2, b1 - b2, fw * w1 + fw * w2 + p10 - p20, 2 * relativeDt); //, true);
         // let rp12 = 2 * relativeDt;
         // if (a1 !== a2)
         // else if (b1 !== b2)
@@ -94,14 +96,15 @@ class RigidBodiesPhase3 {
         }
 
         if (rp12 < 0 || rp12 >= relativeDt) {
-            // TODO [CRIT] reset this comment to enable debug
-            // console.log('r computation error');
-            // console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
-            //     `\tw1, w2 = ${w1}, ${w2}\n` +
-            //     `\tp01, p02 = ${p10}, ${p20}\n` +
-            //     `\tp11, p12 = ${p11}, ${p21}\n` +
-            //     `\tfw = ${fw}\n`);
-            // console.log(`r=${r} (z), reldt=${relativeDt}`);
+            if (dbg) {
+                console.log('r computation error');
+                console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
+                    `\tw1, w2 = ${w1}, ${w2}\n` +
+                    `\tp01, p02 = ${p10}, ${p20}\n` +
+                    `\tp11, p12 = ${p11}, ${p21}\n` +
+                    `\tfw = ${fw}\n`);
+                console.log(`r=${rp12} (z), reldt=${relativeDt}`);
+            }
             rp12 = 2 * relativeDt;
         }
 
@@ -112,8 +115,11 @@ class RigidBodiesPhase3 {
             if (dbg) console.log('[SecondOrder] Zero-collision.');
         }
 
-        // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
-        console.log(rp12);
+        if (dbg) {
+            // console.log('deg 1 ' + (b2-b1) + ', ' + (fw*w1x + fw*w2x+p10x-p20x));
+            console.log(rp12);
+        }
+
         return rp12;
     }
 
@@ -233,29 +239,26 @@ class RigidBodiesPhase3 {
         mapCollidingPossible)
     {
         // let abs = Math.abs;
-        let nbI = island.length;
+        const nbI = island.length;
 
-        for (let i = 0; i < nbI; ++i) {
+        for (let i = 0; i < nbI; ++i)
+        {
             let xIndex1 = island[i];
             // let lfa1 = leapfrogArray[xIndex1];
             let id1 = oxAxis[xIndex1].id;
             let e1 = entities[id1];
             let p10 = e1.p0;
-            let p10x = p10[0];
-            let p10y = p10[1];
-            let p10z = p10[2];
+            const p10x = p10[0]; const p10y = p10[1]; const p10z = p10[2];
             let p11 = e1.p1;
-            let p11x = p11[0];
-            let p11y = p11[1];
-            let p11z = p11[2];
+            const p11x = p11[0]; const p11y = p11[1]; const p11z = p11[2];
             let p1adh = e1.adherence;
             //e1.p2 = [p11x, p11y, p11z];
             //let p1_2 = e1.p2;
             let p1v0 = e1.v0;
             let p1a0 = e1.a0;
             let p1n0 = e1.nu1;
-            let w1x = e1.widthX; let w1y = e1.widthY; let w1z = e1.widthZ;
-            let ltd1 = e1.dtr; // this.getTimeDilatation(worldId, p1_0[0], p1_0[1], p1_0[2]);
+            const w1x = e1.widthX; const w1y = e1.widthY; const w1z = e1.widthZ;
+            const ltd1 = e1.dtr; // this.getTimeDilation(worldId, p1_0[0], p1_0[1], p1_0[2]);
             // const dta1 = absoluteDt * ltd1;
             // const dtr1 = relativeDt * ltd1;
 
@@ -265,33 +268,27 @@ class RigidBodiesPhase3 {
                 let id2 = oxAxis[xIndex2].id;
                 let e2 = entities[id2];
                 let p20 = e2.p0;
-                let p20x = p20[0];
-                let p20y = p20[1];
-                let p20z = p20[2];
+                const p20x = p20[0]; const p20y = p20[1]; const p20z = p20[2];
                 let p21 = e2.p1;
-                let p21x = p21[0];
-                let p21y = p21[1];
-                let p21z = p21[2];
+                const p21x = p21[0]; const p21y = p21[1]; const p21z = p21[2];
                 let p2adh = e2.adherence;
                 //e2.p2 = [p21x, p21y, p21z];
                 //let p2_2 = e2.p2;
                 let p2v0 = e2.v0;
                 let p2a0 = e2.a0;
                 let p2n0 = e2.nu1;
-                let w2x = e2.widthX;
-                let w2y = e2.widthY;
-                let w2z = e2.widthZ;
-                let ltd2 = e2.dtr; // this.getTimeDilatation(worldId, p2_0[0], p2_0[1], p2_0[2]);
-                // TODO [OPT] verify integration with time dilatation.
+                const w2x = e2.widthX; const w2y = e2.widthY; const w2z = e2.widthZ;
+                const ltd2 = e2.dtr; // this.getTimeDilation(worldId, p2_0[0], p2_0[1], p2_0[2]);
+                // TODO [OPT] verify integration with time dilation.
                 // const dta2 = absoluteDt * ltd2;
                 // const dtr2 = relativeDt * ltd2;
 
                 //for (let k = 0; k < 3; ++k) {
                 //con-st cxm =
-                let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
-                let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
-                let x0r = p10x - w1x >= p20x + w2x; let y0r = p10y - w1y >= p20y + w2y; let z0r = p10z - w1z >= p20z + w2z;
-                let x1r = p11x - w1x >= p21x + w2x; let y1r = p11y - w1y >= p21y + w2y; let z1r = p11z - w1z >= p21z + w2z;
+                const x0l = p10x + w1x <= p20x - w2x; const y0l = p10y + w1y <= p20y - w2y; const z0l = p10z + w1z <= p20z - w2z;
+                const x1l = p11x + w1x <= p21x - w2x; const y1l = p11y + w1y <= p21y - w2y; const z1l = p11z + w1z <= p21z - w2z;
+                const x0r = p10x - w1x >= p20x + w2x; const y0r = p10y - w1y >= p20y + w2y; const z0r = p10z - w1z >= p20z + w2z;
+                const x1r = p11x - w1x >= p21x + w2x; const y1r = p11y - w1y >= p21y + w2y; const z1r = p11z - w1z >= p21z + w2z;
 
                 if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
                 {
@@ -300,12 +297,12 @@ class RigidBodiesPhase3 {
                     continue;
                 }
 
-                let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
-                // let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
-                let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
-                let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
+                const xl = x0l && !x1l;  const yl = y0l && !y1l;  const zl = z0l && !z1l;
+                // const xr = x0r && !x1r;  const yr = y0r && !y1r;  const zr = z0r && !z1r;
+                const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
+                const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
 
-                let debugCollision = false;
+                const debugCollision = false;
                 // TODO [CRIT] reset this debug flag
                 if (xm && ym && zm) {
                     if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip detected.');
@@ -334,22 +331,22 @@ class RigidBodiesPhase3 {
                 // Quadratic solve thrice
                 if (!xm) {
                     //console.log('colx');
-                    let fw = xl ? 1 : -1;
+                    const fw = xl ? 1 : -1;
 
-                    let adh10 = p1adh[0];
-                    let adh11 = p1adh[3];
+                    const adh10 = p1adh[0];
+                    const adh11 = p1adh[3];
                     let a1 = ltd1 * ltd1 * .5 * p1a0[0];
                     if (p10x <= p11x && adh11 || p10x >= p11x && adh10) a1 = 0;
 
-                    let adh20 = p2adh[0];
-                    let adh21 = p2adh[3];
+                    const adh20 = p2adh[0];
+                    const adh21 = p2adh[3];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[0];
                     if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
 
                     //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                    let b1 = ltd1 * (p1v0[0] + p1n0[0]);
-                    let b2 = ltd2 * (p2v0[0] + p2n0[0]);
+                    const b1 = ltd1 * (p1v0[0] + p1n0[0]);
+                    const b2 = ltd2 * (p2v0[0] + p2n0[0]);
 
                     // TODO [CRIT] solve same for leapfrog version.
                     let r = RigidBodiesPhase3.solveSecondOrder(
@@ -369,22 +366,22 @@ class RigidBodiesPhase3 {
 
                 if (!ym) {
                     //console.log('coly');
-                    let fw = yl ? 1 : -1;
+                    const fw = yl ? 1 : -1;
 
-                    let adh10 = p1adh[1];
-                    let adh11 = p1adh[4];
+                    const adh10 = p1adh[1];
+                    const adh11 = p1adh[4];
                     let a1 = ltd1 * ltd1 * .5 * p1a0[1];
                     if (p10y <= p11y && adh11 || p10y >= p11y && adh10) a1 = 0;
 
-                    let adh20 = p2adh[1];
-                    let adh21 = p2adh[4];
+                    const adh20 = p2adh[1];
+                    const adh21 = p2adh[4];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[1];
                     if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
 
                     //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                    let b1 = ltd1 * (p1v0[1] + p1n0[1]);
-                    let b2 = ltd2 * (p2v0[1] + p2n0[1]);
+                    const b1 = ltd1 * (p1v0[1] + p1n0[1]);
+                    const b2 = ltd2 * (p2v0[1] + p2n0[1]);
 
                     // TODO [Refactor] extract method.
                     let r = RigidBodiesPhase3.solveSecondOrder(
@@ -408,21 +405,20 @@ class RigidBodiesPhase3 {
 
                 if (!zm) {
                     //console.log('colz');
-                    let fw = zl ? 1 : -1;
+                    const fw = zl ? 1 : -1;
 
-                    let adh10 = p1adh[2]; let adh11 = p1adh[5];
+                    const adh10 = p1adh[2]; const adh11 = p1adh[5];
                     let a1 = ltd1 * ltd1 * .5 * p1a0[2];
                     if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0;
 
-                    let adh20 = p2adh[2]; let adh21 = p2adh[5];
+                    const adh20 = p2adh[2]; const adh21 = p2adh[5];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[2];
                     if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
 
-
                     //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
 
-                    let b1 = ltd1 * (p1v0[2] + p1n0[2]);
-                    let b2 = ltd2 * (p2v0[2] + p2n0[2]);
+                    const b1 = ltd1 * (p1v0[2] + p1n0[2]);
+                    const b2 = ltd2 * (p2v0[2] + p2n0[2]);
 
                     // TODO [Refactor] extract method.
                     let r = RigidBodiesPhase3.solveSecondOrder(
@@ -542,7 +538,7 @@ class RigidBodiesPhase3 {
             subIslandJ.push(indexI);
         } else {
             // Insert new sub island.
-            let newId = subIslandArray.length;
+            const newId = subIslandArray.length;
             newSubIsland = [indexI, indexJ];
             subIslandArray.push(newSubIsland);
             toSubIslandIndex[indexI] = newId;
@@ -560,46 +556,32 @@ class RigidBodiesPhase3 {
         let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
         let id1 = oxAxis[xIndex1].id;
         let e1 = entities[id1];
-        let p10 = e1.p0;
-        let p10x = p10[0];
-        let p10y = p10[1];
-        let p10z = p10[2];
-        let p11 = e1.p1;
-        let p11x = p11[0];
-        let p11y = p11[1];
-        let p11z = p11[2];
-        let p1v0 = e1.v0;
-        let p1a0 = e1.a0;
+        let p10 = e1.p0; const p10x = p10[0]; const p10y = p10[1]; const p10z = p10[2];
+        let p11 = e1.p1; const p11x = p11[0]; const p11y = p11[1]; const p11z = p11[2];
+        let p1v0 = e1.v0; let p1v1 = e1.v1;
+        let p1a0 = e1.a0; let p1a1 = e1.a1;
         let p1n0 = e1.nu1;
-        let w1 = [e1.widthX, e1.widthY, e1.widthZ];
-        let w1x = w1[0]; let w1y = w1[1]; let w1z = w1[2];
+        const w1x = e1.widthX; const w1y = e1.widthY; const w1z = e1.widthZ;
         let ltd1 = e1.dtr;
         const sndtr1 = r; // * ltd1;
 
         let xIndex2 = island[j]; // let lfa2 = leapfrogArray[xIndex2];
         let id2 = oxAxis[xIndex2].id;
         let e2 = entities[id2];
-        let p20 = e2.p0;
-        let p20x = p20[0];
-        let p20y = p20[1];
-        let p20z = p20[2];
-        let p21 = e2.p1;
-        let p21x = p21[0];
-        let p21y = p21[1];
-        let p21z = p21[2];
-        let p2v0 = e2.v0;
-        let p2a0 = e2.a0;
+        let p20 = e2.p0; const p20x = p20[0]; const p20y = p20[1]; const p20z = p20[2];
+        let p21 = e2.p1; const p21x = p21[0]; const p21y = p21[1]; const p21z = p21[2];
+        let p2v0 = e2.v0; let p2v1 = e2.v1;
+        let p2a0 = e2.a0; let p2a1 = e2.a1;
         let p2n0 = e2.nu1;
-        let w2 = [e2.widthX, e2.widthY, e2.widthZ];
-        let w2x = w1[0]; let w2y = w1[1]; let w2z = w1[2];
-        let ltd2 = e2.dtr;
+        const w2x = e2.widthX; const w2y = e2.widthY; const w2z = e2.widthZ;
+        const ltd2 = e2.dtr;
         const sndtr2 = r; // * ltd2;
 
         // Snap p1.
-        let x0l = p10x + w1x <= p20x - w2x; let y0l = p10y + w1y <= p20y - w2y; let z0l = p10z + w1z <= p20z - w2z;
-        let x1l = p11x + w1x <= p21x - w2x; let y1l = p11y + w1y <= p21y - w2y; let z1l = p11z + w1z <= p21z - w2z;
-        let x0r = p10x - w1x >= p20x + w2x; let y0r = p10y - w1y >= p20y + w2y; let z0r = p10z - w1z >= p20z + w2z;
-        let x1r = p11x - w1x >= p21x + w2x; let y1r = p11y - w1y >= p21y + w2y; let z1r = p11z - w1z >= p21z + w2z;
+        const x0l = p10x + w1x <= p20x - w2x; const y0l = p10y + w1y <= p20y - w2y; const z0l = p10z + w1z <= p20z - w2z;
+        const x1l = p11x + w1x <= p21x - w2x; const y1l = p11y + w1y <= p21y - w2y; const z1l = p11z + w1z <= p21z - w2z;
+        const x0r = p10x - w1x >= p20x + w2x; const y0r = p10y - w1y >= p20y + w2y; const z0r = p10z - w1z >= p20z + w2z;
+        const x1r = p11x - w1x >= p21x + w2x; const y1r = p11y - w1y >= p21y + w2y; const z1r = p11z - w1z >= p21z + w2z;
 
         if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
         {
@@ -607,12 +589,12 @@ class RigidBodiesPhase3 {
             return;
         }
 
-        // let xl = x0l && !x1l;  let yl = y0l && !y1l;  let zl = z0l && !z1l;
-        // let xr = x0r && !x1r;  let yr = y0r && !y1r;  let zr = z0r && !z1r;
-        let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
-        let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
+        // const xl = x0l && !x1l;  const yl = y0l && !y1l;  const zl = z0l && !z1l;
+        // const xr = x0r && !x1r;  const yr = y0r && !y1r;  const zr = z0r && !z1r;
+        const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
+        const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
 
-        if (xm && ym && zm) console.log('[RigidBodies/Solve] two bodies clipped.');
+        if (xm && ym && zm) console.warn('[RigidBodies/Solve] two bodies clipped.');
         if (xw && yw && zw) {
             let m2 = [];
             let wm1 = [w1x, w1y, w1z];
@@ -620,14 +602,13 @@ class RigidBodiesPhase3 {
             let nep1 = [];
             let nep2 = [];
 
-            let ax = 0;
-            switch (axis) {
-                case 'x': ax = 0; break;
-                case 'y': ax = 1; break;
-                case 'z': ax = 2; break;
-                default: console.log('Error collision nil error.');
+            let ax = axis === 'x' ? 0 : axis === 'y' ? 1 : axis === 'z' ? 2 : -1;
+            if (ax < 0) {
+                console.error('[Phase III] Invalid axis.');
+                return;
             }
-            for (let m = 0; m < 3; ++m) // Account for server congestion / lag with relative dilatation.
+
+            for (let m = 0; m < 3; ++m) // Account for server congestion / lag with relative dilation.
             {
                 if (m !== ax) continue;
 
@@ -641,20 +622,20 @@ class RigidBodiesPhase3 {
                     timestep2 = ltd2;
                 }
 
-                let gamma = epsilon;
+                const gamma = epsilon;
 
-                let e1p1i = e1.p1[m];
-                let e1p0i = e1.p0[m];
-                let e1p1n = e1p0i + (p1v0[m] + p1n0[m]) * timestep1 + .5 * p1a0[m] * timestep1 * timestep1;
+                const e1p1i = p11[m];
+                const e1p0i = p10[m];
+                const e1p1n = e1p0i + (p1v0[m] + p1n0[m]) * timestep1 + .5 * p1a0[m] * timestep1 * timestep1;
                 nep1[m] =
                     e1p1i < e1p0i && e1p1n < e1p0i && e1p1i < e1p1n ? // && e1p1n+e < e1p0i && e1p1i < e1p1n+e
                         e1p1n + gamma :
                         e1p0i < e1p1i && e1p0i < e1p1n && e1p1n < e1p1i ?
                             e1p1n - gamma : e1p1i;
 
-                let e2p1i = e2.p1[m];
-                let e2p0i = e2.p0[m];
-                let e2p1n = e2p0i + (p2v0[m] + p2n0[m]) * timestep2 + .5 * p2a0[m] * timestep2 * timestep2;
+                const e2p1i = p21[m];
+                const e2p0i = p20[m];
+                const e2p1n = e2p0i + (p2v0[m] + p2n0[m]) * timestep2 + .5 * p2a0[m] * timestep2 * timestep2;
                 nep2[m] =
                     e2p1i < e2p0i && e2p1n < e2p0i && e2p1i < e2p1n ?
                         e2p1n + gamma :
@@ -671,10 +652,10 @@ class RigidBodiesPhase3 {
 
                 // // Forward E1
                 // if (e1p0i <= e1p1n && e1p1n <= e1p1i && e1p0i < e2p0i) {
-                //     let e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
+                //     const e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
                 //     if (e2p1n2 > max(e2p0i, e2p1i)) {
                 //         // TODO [LOW] possible to do better than e2p1n - gamma
-                //         let e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         const e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
                 //         if (e1p1n2 < min(e1p0i, e1p1i))
                 //             nep1[m] = e1p0i;
                 //         else
@@ -685,9 +666,9 @@ class RigidBodiesPhase3 {
                 //         nep2[m] = e2p1n2;
                 //     }
                 // } else if (e1p0i <= e1p1n && e1p1n <= e1p1i && e2p0i < e1p0i) {
-                //     let e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
+                //     const e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
                 //     if (e1p1n2 > max(e1p0i, e1p1i)) {
-                //         let e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         const e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
                 //         if (e2p1n2 < min(e2p0i, e2p1i))
                 //             nep2[m] = e2p0i;
                 //         else
@@ -700,10 +681,10 @@ class RigidBodiesPhase3 {
                 // }
                 // // Backwards E1
                 // else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e1p0i < e2p0i) {
-                //     let e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
+                //     const e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
                 //     if (e2p1n2 > max(e2p0i, e2p1i)) {
                 //         // TODO [LOW] possible to do better than e2p1n - gamma
-                //         let e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         const e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
                 //         if (e1p1n2 < min(e1p0i, e1p1i))
                 //             nep1[m] = e1p0i;
                 //         else
@@ -714,9 +695,9 @@ class RigidBodiesPhase3 {
                 //         nep2[m] = e2p1n2;
                 //     }
                 // } else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e2p0i < e1p0i) {
-                //     let e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
+                //     const e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
                 //     if (e1p1n2 > max(e1p0i, e1p1i)) {
-                //         let e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
+                //         const e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
                 //         if (e2p1n2 < min(e2p0i, e2p1i))
                 //             nep2[m] = e2p0i;
                 //         else
@@ -728,7 +709,7 @@ class RigidBodiesPhase3 {
                 //     }
                 // }
 
-                //const eeps = 1e-30; // TODO [LOW] quite important to beware of numerical errors here.
+                //const eeps = 1e-30; // beware of numerical errors here
                 m2[m] = nep1[m] + wm1[m] + epsilon / 2.0 > nep2[m] - wm2[m] - epsilon / 2.0 &&
                         nep1[m] - wm1[m] - epsilon / 2.0 < nep2[m] + wm2[m] + epsilon / 2.0;
                 // !x1l && !x1r
@@ -736,21 +717,21 @@ class RigidBodiesPhase3 {
                 // if (m === ax) {
                 //     if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
                 //         e2.a1[m] = 0;
-                        // e2.v1[m] = e1.v1[m];
-                        // TODO [HIGH] check that
-                        // e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                    // }
-                    // if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
-                    //     e1.a1[m] = 0;
-                        // e1.v1[m] = e2.v1[m];
-                        // TODO [HIGH] check that
-                        // e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                    // }
+                //         e2.v1[m] = e1.v1[m];
+                //         TODO [HIGH] check that
+                //         e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
+                //     }
+                //     if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
+                //         e1.a1[m] = 0;
+                //         e1.v1[m] = e2.v1[m];
+                //         TODO [HIGH] check that
+                //         e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
+                //     }
                 // }
             }
             // Temporary security measure.
             // {
-            // let l = newSubIsland.length;
+            // const l = newSubIsland.length;
             // TODO [HIGH] this is a projection... check collision
 
             // TODO [CRIT] verify this lastR mechanism
@@ -760,16 +741,13 @@ class RigidBodiesPhase3 {
             for (let m = 0; m < 3; ++m) {
                 if (m !== ax) continue;
                 // Check terrain...
-                let e1p1 = e1.p1[m];
-                let e2p1 = e2.p1[m];
-                let ne1p1 = nep1[m];
-                let ne2p1 = nep2[m];
-                let e1p0 = e1.p0[m];
-                let e2p0 = e2.p0[m];
+                const e1p1 = p11[m]; const e2p1 = p21[m];
+                const e1p0 = p10[m]; const e2p0 = p20[m];
+                const ne1p1 = nep1[m]; const ne2p1 = nep2[m];
                 if (e1p0 < e1p1 && ne1p1 < e1p1 || e1p0 > e1p1 && ne1p1 > e1p1)
-                    e1.p1[m] = nep1[m];
+                    p11[m] = nep1[m];
                 if (e2p0 < e2p1 && ne2p1 < e2p1 || e2p0 > e2p1 && ne2p1 > e2p1)
-                    e2.p1[m] = nep2[m];
+                    p21[m] = nep2[m];
             }
             // }
 
@@ -781,39 +759,43 @@ class RigidBodiesPhase3 {
             let mv = abs(e1v1) < abs(e2v1) ? e1v1 : e2v1; // min(, e2v1); // (mass1 * e1v1 + mass2 * e2v1) / (mass1 + mass2);
             let ma = abs(e1a1) < abs(e2a1) ? e1a1 : e2a1; // min(e1a1, e2a1); // (mass1 * e1a1 + mass2 * e2a1) / (mass1 + mass2);
             if (collidedbg) console.log(`${e1v1} | ${e2v1}`);
-            e1.v1[ax] = mv;
-            e2.v1[ax] = mv;
+            p1v1[ax] = mv;
+            p2v1[ax] = mv;
 
             if (m2[ax]) {
                 if (collidedbg) console.log('\tyes!');
                 // console.log('Correction.');
-                let e1p0 = e1.p0[ax];
-                let e1p1 = e1.p1[ax];
-                let e2p0 = e2.p0[ax];
-                let e2p1 = e2.p1[ax];
-                let e1w = w1[ax];
+                const e1p0 = p10[ax];
+                const e1p1 = p11[ax];
+                const e2p0 = p20[ax];
+                const e2p1 = p21[ax];
+                const e1w = axis === 'x' ? w1x : axis === 'y' ? w1y : /* axis === 'z' ? */ w1z;
+                const e2w = axis === 'x' ? w2x : axis === 'y' ? w2y : /* axis === 'z' ? */ w2z;
 
-                let e2w = w2[ax];
                 let sgn = Math.sign;
                 if (e1p0 < e2p0) {
-                    e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
-                    e2.a1[ax] = e1.a1[ax];
+                    p1a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    p2a1[ax] = p1a1[ax];
                     RigidBodiesPhase3.correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon);
                 } else if (e1p0 > e2p0) {
-                    e1.a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
-                    e2.a1[ax] = e1.a1[ax];
+                    p1a1[ax] = sgn(e1v1) !== sgn(e2v1) ? 0 : ma;
+                    p2a1[ax] = p1a1[ax];
                     RigidBodiesPhase3.correctCollision(e2, e2p0, e2p1, e2w, e1, e1p0, e1p1, e1w, ax, epsilon);
                 } else {
                     console.log('[Phase III] - on correction, e1p0 == e2p0; this is worrying.');
-                    e1.p1[ax] = e1p0;
-                    e2.p1[ax] = e2p0;
+                    p11[ax] = e1p0;
+                    p21[ax] = e2p0;
                 }
 
                 // TODO [CRIT] reset if collision stability problems.
                 // e1.p1[ax] = e1p0;
                 // e2.p1[ax] = e2p0;
             }
-            console.log('\tz = ' + e1.p0[2] + ' -> ' + e1.p1[2] + ' , ' + e2.p0[2] + ' -> ' + e2.p1[2]);
+
+            const debug = false;
+            if (debug) {
+                console.log(`\tz = ${e1.p0[2]} -> ${e1.p1[2]} , ${e2.p0[2]} -> ${e2.p1[2]}`);
+            }
         }
     }
 
@@ -823,8 +805,6 @@ class RigidBodiesPhase3 {
         let seps = 1e-6;
         let min = Math.min;
         let max = Math.max;
-        // let abs = Math.abs;
-        // let debg = true; // TODO [HIGH] debug this with branching.
         let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon + seps;
         if (overlap >= max(e2p0, e2p1)) {
             e1.p1[ax] = e1p0;
@@ -842,7 +822,7 @@ class RigidBodiesPhase3 {
             let e1t = e1p0 + (num / den) * alpha;
             let e2t = e2p0 + (num / den) * beta;
 
-            // console.log('[CUCURBITE]\t\t\t\t' + e1t + ', ' + e2t);
+            // console.log('[Phase III]\t\t\t\t' + e1t + ', ' + e2t);
             if (e1t <= max(e1p0, e1p1) && e1t >= min(e1p0, e1p1) &&
                 e2t <= max(e2p0, e2p1) && e2t >= min(e2p0, e1p1) &&
                 e1t + e1w + e2w + epsilon + seps <= e2t)
@@ -888,7 +868,6 @@ class RigidBodiesPhase3 {
             // }
         }
     }
-
 }
 
 export default RigidBodiesPhase3;

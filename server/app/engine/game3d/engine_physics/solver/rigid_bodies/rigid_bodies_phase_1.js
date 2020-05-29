@@ -7,8 +7,8 @@
 import EventOrderer from './orderer_events';
 import Entity from '../../../model_entity/entity';
 
-class RigidBodiesPhase1 {
-
+class RigidBodiesPhase1
+{
     static processLocalEvents(
         eventOrderer,
         entities,
@@ -120,10 +120,10 @@ class RigidBodiesPhase1 {
             let nu1 = currentEntity.nu1;
             // console.log(p0);
 
-            let localTimeDilatation = rigidBodiesSolver.getTimeDilatation(worldId, p0[0], p0[1], p0[2]);
-            // const dta = absoluteDt * localTimeDilatation;
-            const dtr = relativeDt * localTimeDilatation;
-            currentEntity.dtr = localTimeDilatation; // dtr;
+            let localTimeDilation = rigidBodiesSolver.getTimeDilation(worldId, p0[0], p0[1], p0[2]);
+            // const dta = absoluteDt * localTimeDilation;
+            const dtr = relativeDt * localTimeDilation;
+            currentEntity.dtr = localTimeDilation; // dtr;
 
             // REAL PHYSICS, PART 1
             // Rules: the only non-gp physics entry point should be
@@ -135,13 +135,13 @@ class RigidBodiesPhase1 {
 
             // x_i+1 = x_i + v_i*T + (a_i/2)*T²
             let inc = [0, 0, 0, entityIndex];
-            let sum = 0;
-            for (let i = 0; i < 3; ++i) // Account for server congestion / lag with relative dilatation.
+            // let sum = 0;
+            for (let i = 0; i < 3; ++i) // Account for server congestion / lag with relative dilation.
             {
                 nu1[i] = nu[i];
                 let increment = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
                 inc[i] = increment;
-                sum += increment * increment;
+                // sum += increment * increment;
             }
 
             // Max speed correction.
@@ -178,7 +178,7 @@ class RigidBodiesPhase1 {
             for (let i = 0; i < 3; ++i)
             {
                 let vi = vector[i];
-                if (adh[i] && vi > 0.05 && g[i] < 0) {
+                if (adh[i] && vi > 0.0005 && g[i] < 0) {
                     console.log(`jump ${passId}`);
                     //vi = 0.1;
                     a1[i] += 0.22;
@@ -205,12 +205,12 @@ class RigidBodiesPhase1 {
             // Apply velocity formula with absolute time
             // (lag would undesirably change topologies).
             // v_i+1 = v_i< + T*(a_i + a_i+1)/2
-            sum = 0;
+            // sum = 0;
             for (let i = 0; i < 3; ++i)
             {
                 let v1i = v0[i] + dtr * .5 * (a0[i] + a1[i]);
                 v1[i] = v1i;
-                sum += v1i * v1i;
+                // sum += v1i * v1i;
             }
 
             // Velocity correction.
@@ -326,8 +326,8 @@ class RigidBodiesPhase1 {
             let t0 = relTheta0;
             let t1 = relTheta1;
 
-            switch (true) {
-
+            switch (true)
+            {
                 case fw && up: relTheta1 += PI4; break;
                 case fw && dn: relTheta1 -= PI4; break;
                 case bw && up: relTheta1 += PI34; break;
@@ -388,8 +388,8 @@ class RigidBodiesPhase1 {
             let t0 = relTheta0;
             let t1 = relTheta1;
 
-            switch (true) {
-
+            switch (true)
+            {
                 case fw && up && rg:
                     relTheta0 = getPsy0(t0, t1 + PI4, t0 - PI2, PI2) || 0;
                     relTheta1 = getPsy1(t0, t1 + PI4, t0 - PI2, PI2) || 0;
@@ -491,10 +491,10 @@ class RigidBodiesPhase1 {
         // + relFrontVector[1].toFixed(4) + ', ' +
         // relFrontVector[2].toFixed(4));
 
-        let sq = 0;
+        // let sq = 0;
         for (let i = 0; i < 3; ++i) {
-            let c = relFrontVector[i];
-            sq += c * c;
+            // let c = relFrontVector[i];
+            // sq += c * c;
             frontVector3D[i] = relFrontVector[i] * factor;
         }
         // console.log(sqrt(sq)); // Must be 1
@@ -508,7 +508,6 @@ class RigidBodiesPhase1 {
         return frontVector3D;
         //else if (!0) return [0, 0, 0];
     }
-
 }
 
 export default RigidBodiesPhase1;

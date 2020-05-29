@@ -4,10 +4,10 @@
 
 import XCollider from '../collision/x';
 
-class RigidBodiesPhase5 {
-
-    // TODO [MILESTONE0] gravity gp
-    static applyGravityRotation(entity, gravity) {
+class RigidBodiesPhase5
+{
+    static applyGravityRotation(entity, gravity)
+    {
         let rot = entity.rotation;
         if (rot === null) return;
         // Represents self rotation.
@@ -55,11 +55,8 @@ class RigidBodiesPhase5 {
         if (relPitch !== rot[0] || relYaw !== rot[1] ||
             absPitch !== rot[2] || absYaw !== rot[3])
         {
-            let deltaP =
-                absYaw < Math.PI / 4 ?
-                    relPitch - deltaAbsPitch :
-                absYaw > 3 * Math.PI / 4 ?
-                    relPitch + deltaAbsPitch :
+            let deltaP = absYaw < Math.PI / 4 ? relPitch - deltaAbsPitch :
+                absYaw > 3 * Math.PI / 4 ? relPitch + deltaAbsPitch :
                     relPitch;
             entity.rotate(deltaP, relYaw, absPitch, absYaw);
             return true;
@@ -76,7 +73,7 @@ class RigidBodiesPhase5 {
         entities.forEach(currentEntity => {
             if (!currentEntity) return;
             let oldWorldId = currentEntity.worldId;
-            if (oldWorldId !== worldId) return; // TODO [HIGH] make this pas afterwards
+            if (oldWorldId !== worldId) return;
 
             let oi = currentEntity.indexX;
             let entityIndex = currentEntity.entityId;
@@ -90,7 +87,6 @@ class RigidBodiesPhase5 {
             // // if (oxToIslandIndex[oi] !== -1) return;
 
             //let entityIndex = oxAxis[oi].id;
-            //currentEntity = entities[entityIndex];
             let p0 = currentEntity.p0; let p1 = currentEntity.p1;
             let v0 = currentEntity.v0; let v1 = currentEntity.v1;
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
@@ -104,9 +100,11 @@ class RigidBodiesPhase5 {
             //    console.log(p1);
             //}
 
-            // TODO [CRIT] 1. if free (pyr, terrain) at gate, switch wld, else snap to gate
-            // TODO [CRIT] 2. cast from gate to transform(p1)
-            // TODO [CRIT] 3. think recursion
+            // TODO [LOW] cross-w collision
+            //  e.g
+            //  1. if free (pyr, terrain) at gate, switch wld, else snap to gate
+            //  2. cast from gate to transform(p1)
+            //  3. think recursion
             //currentEntity.metaX = xCrossed;
             //let xCrossed = currentEntity.metaX;
 
@@ -124,12 +122,15 @@ class RigidBodiesPhase5 {
             }
 
 
-            if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2]) {
+            if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2])
+            {
                 //console.log('LetsUpdate!');
                 //console.log(p0);
                 //console.log(p1);
                 //console.log(currentEntity.nu);
-                currentEntity.p0 = currentEntity.p1;
+
+                currentEntity.p0 = p1;
+                currentEntity.p1 = p0;
                 if (!xCrossed) {
                     searcher.updateObjectAxis(entityIndex);
                     objectOrderer.moveObject(currentEntity);
@@ -144,12 +145,13 @@ class RigidBodiesPhase5 {
                 let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
                 if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
                     entityUpdated = true;
-                    // TODO [CRITICAL] rotate collision model.
+                    // TODO [HIGH] rotate collision model.
                 }
             }
 
             if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {
-                currentEntity.v0 = currentEntity.v1;
+                currentEntity.v0 = v1;
+                currentEntity.v1 = v0;
                 // Velocity updates not visible by clients.
                 entityUpdated = true;
             }
@@ -159,7 +161,8 @@ class RigidBodiesPhase5 {
                     currentEntity.v0[axis] = 0;
 
             if (a0[0] !== a1[0] || a0[1] !== a1[1] || a0[2] !== a1[2]) {
-                currentEntity.a0 = currentEntity.a1;
+                currentEntity.a0 = a1;
+                currentEntity.a1 = a0;
                 // Acceleration updates not visible by clients.
                 entityUpdated = true;
             }
@@ -169,14 +172,19 @@ class RigidBodiesPhase5 {
                 o.entityUpdated(entityIndex);
             }
 
-            currentEntity.p1 = [p0[0], p0[1], p0[2]];
-            currentEntity.v1 = [0, 0, 0];
-            currentEntity.a1 = [0, 0, 0];
+            // Swap
+            p1 = currentEntity.p1; p0 = currentEntity.p0;
+            v1 = currentEntity.v1;
+            a1 = currentEntity.a1;
+            for (let i = 0; i < 3; ++i) {
+                p1[i] = p0[i];
+                v1[i] = 0;
+                a1[i] = 0;
+            }
             // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
             currentEntity.metaX = 0;
         });
     }
-
 }
 
 export default RigidBodiesPhase5;

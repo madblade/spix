@@ -4,8 +4,8 @@
 
 'use strict';
 
-class Entity {
-
+class Entity
+{
     constructor(id) {
         // Properties
         this._entityId      = id;
@@ -91,9 +91,7 @@ class Entity {
     get lastR()             { return this._lastR; }
     set lastR(r)            { this._lastR = r; }
 
-    //get rotation()          { return this._rotation; }
     get rotation()          { return this._r; }
-    //get position()          { return this._position; }
     get position()          { return this._p0; }
 
     get directions()        { return this._directions; }
@@ -105,9 +103,7 @@ class Entity {
 
     set adherence(na)       { this._adherence = na; }
 
-    //set rotation(nr)        { this._rotation = nr; }
     set rotation(nr)        { this._r = nr; }
-    //set position(np)        { this._position = np; }
     set position(np)        { this._p0 = np; }
 
     set speed(ns)           { this._speed = ns; }
@@ -157,13 +153,6 @@ class Entity {
         console.log('Entity stopping.');
     }
 
-    //goForward()     { this._directions[0] = true; }
-    //goRight()       { this._directions[1] = true; }
-    //goLeft()        { this._directions[2] = true; }
-    //goBackwards()   { this._directions[3] = true; }
-    //goUp()          { this._directions[4] = true; }
-    //goDown()        { this._directions[5] = true; }
-
     goForward()     { this._d[0] = !0; }
     goBackwards()   { this._d[1] = !0; }
     goRight()       { this._d[2] = !0; }
@@ -171,12 +160,6 @@ class Entity {
     goUp()          { this._d[4] = !0; }
     goDown()        { this._d[5] = !0; }
 
-    //stopForward()   { this._directions[0] = false; }
-    //stopRight()     { this._directions[1] = false; }
-    //stopLeft()      { this._directions[2] = false; }
-    //stopBackwards() { this._directions[3] = false; }
-    //stopUp()        { this._directions[4] = false; }
-    //stopDown()      { this._directions[5] = false; }
     stopForward()   { this._d[0] = !1; }
     stopBackwards() { this._d[1] = !1; }
     stopRight()     { this._d[2] = !1; }
@@ -184,9 +167,8 @@ class Entity {
     stopUp()        { this._d[4] = !1; }
     stopDown()      { this._d[5] = !1; }
 
-    rotate(relPitch, relYaw, absPitch, absYaw) {
-        //this._rotation[0] = p;
-        //this._rotation[1] = y;
+    rotate(relPitch, relYaw, absPitch, absYaw)
+    {
         this._r[0] = relPitch;
         this._r[1] = relYaw;
         this._r[2] = absPitch;
@@ -249,9 +231,6 @@ class Entity {
     get nu1()               { return this._nu1; }
     set nu1(nu1)            { this._nu1 = nu1; }
 
-    //get rabs()                { return this._rabs; }
-    //set rabs(up)              { this._rabs = up; }
-
     get d()                 { return this._d; }
     set d(d)                { this._d = d; }
     get r()                 { return this._r; }
@@ -266,7 +245,6 @@ class Entity {
     getVelocity() {
         return this.walkVelocity;
     }
-
 }
 
 export default Entity;

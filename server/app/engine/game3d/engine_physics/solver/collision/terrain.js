@@ -4,8 +4,8 @@
 
 'use strict';
 
-class TerrainCollider {
-
+class TerrainCollider
+{
     static eps = .00000001;
 
     /**
@@ -210,17 +210,17 @@ class TerrainCollider {
 
         const threshold = 10000000.0;
 
-        let dx = sgn(x2 - x1);
+        const dx = sgn(x2 - x1);
         let i = Math.floor(x1);
         if (dx !== 0) tDeltaX = min(dx / (x2 - x1), threshold); else tDeltaX = threshold;
         if (dx > 0) tMaxX = tDeltaX * frac1(x1); else tMaxX = tDeltaX * frac0(x1);
 
-        let dy = sgn(y2 - y1);
+        const dy = sgn(y2 - y1);
         let j = Math.floor(y1);
         if (dy !== 0) tDeltaY = min(dy / (y2 - y1), threshold); else tDeltaY = threshold;
         if (dy > 0) tMaxY = tDeltaY * frac1(y1); else tMaxY = tDeltaY * frac0(y1);
 
-        let dz = sgn(z2 - z1);
+        const dz = sgn(z2 - z1);
         let k = Math.floor(z1);
         if (dz !== 0) tDeltaZ = min(dz / (z2 - z1), threshold); else tDeltaZ = threshold;
         if (dz > 0) tMaxZ = tDeltaZ * frac1(z1); else tMaxZ = tDeltaZ * frac0(z1);
@@ -230,59 +230,52 @@ class TerrainCollider {
                 if (tMaxX < tMaxZ) {
                     i += dx;
                     tMaxX += tDeltaX;
-                    ntx = true;
-                    nty = false;
-                    ntz = false;
+                    ntx = true;  nty = false; ntz = false;
                 } else {
                     k += dz;
                     tMaxZ += tDeltaZ;
-                    ntx = false;
-                    nty = false;
-                    ntz = true;
+                    ntx = false; nty = false; ntz = true;
                 }
-            } else
-                if (tMaxY < tMaxZ) {
-                    j += dy;
-                    tMaxY += tDeltaY;
-                    ntx = false;
-                    nty = true;
-                    ntz = false;
-                } else {
-                    k += dz;
-                    tMaxZ += tDeltaZ;
-                    ntx = false;
-                    nty = false;
-                    ntz = true;
-                }
+            } else // if (tMaxX >= tMaxY)
+            if (tMaxY < tMaxZ) {
+                j += dy;
+                tMaxY += tDeltaY;
+                ntx = false; nty = true;  ntz = false;
+            } else {
+                k += dz;
+                tMaxZ += tDeltaZ;
+                ntx = false; nty = false; ntz = true;
+            }
 
             if (TerrainCollider.simpleCollide(
-                    world, entity,                 // objects
-                    i, j, k,                    // next voxel coordinates
-                    tMaxX, tMaxY, tMaxZ,        // current value of t at which p1p2 crosses (x,y,z) orth. comp.
-                    tDeltaX, tDeltaY, tDeltaZ,  // delta between crosses on orth. comp.
-                    dx, dy, dz,                 // orth. directions of p1p2
-                    x1, y1, z1,                 // starting point
-                    x2, y2, z2,                 // ending point
-                    ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
-                    p2, // Crop arrival position.
-                    doProject // apply projection effect (stable if object is not in an island)
-                )) return true;
+                world, entity,              // objects
+                i, j, k,                    // next voxel coordinates
+                tMaxX, tMaxY, tMaxZ,        // current value of t at which p1p2 crosses (x,y,z) orth. comp.
+                tDeltaX, tDeltaY, tDeltaZ,  // delta between crosses on orth. comp.
+                dx, dy, dz,                 // orth. directions of p1p2
+                x1, y1, z1,                 // starting point
+                x2, y2, z2,                 // ending point
+                ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
+                p2,             // Crop arrival position.
+                doProject       // apply projection effect (stable if object is not in an island)
+            )) return true;
         }
 
         // No collision
         return false;
     }
 
-    static simpleCollide(world, entity,                 // objects
-                         i, j, k,                    // next voxel coordinates
-                         tMaxX, tMaxY, tMaxZ,        // current value of t at which p1p2 crosses (x,y,z) orth. comp.
-                         tDeltaX, tDeltaY, tDeltaZ,  // delta between crosses on orth. comp.
-                         dx, dy, dz,                 // orth. directions of p1p2
-                         x1, y1, z1,                 // starting point
-                         x2, y2, z2,                 // ending point
-                         ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
-                         newPosition, // position to be cropped to
-                         doProject) // use free projection for slippin along cubes
+    static simpleCollide(
+        world, entity,              // objects
+        i, j, k,                    // next voxel coordinates
+        tMaxX, tMaxY, tMaxZ,        // current value of t at which p1p2 crosses (x,y,z) orth. comp.
+        tDeltaX, tDeltaY, tDeltaZ,  // delta between crosses on orth. comp.
+        dx, dy, dz,                 // orth. directions of p1p2
+        x1, y1, z1,                 // starting point
+        x2, y2, z2,                 // ending point
+        ntx, nty, ntz,              // last orth. to be updated (current shift coordinate)
+        newPosition,    // position to be cropped to
+        doProject)      // use free projection for slippin along cubes
     {
         if (world.isFree([i, j, k])) return false;
 
@@ -599,7 +592,6 @@ class TerrainCollider {
 
         return true;
     }
-
 }
 
 export default TerrainCollider;

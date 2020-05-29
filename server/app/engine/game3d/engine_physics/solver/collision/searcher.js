@@ -15,8 +15,8 @@
  * s.updateObjectAxis(object.index);
  *
  */
-class Searcher {
-
+class Searcher
+{
     // Fast intern. math. util.
     // No getters/setters.
 
@@ -195,7 +195,6 @@ class Searcher {
 
         return xAxisIsland;
     }
-
 }
 
 /**
@@ -207,8 +206,8 @@ class Searcher {
  * }
  *
  */
-class ObjectsIterator {
-
+class ObjectsIterator
+{
     constructor(searcher, objectIndexX, thresholdX, thresholdY, thresholdZ)
     {
         this.axisX = searcher.objectsAxisX;
@@ -311,7 +310,7 @@ class ObjectsIterator {
         let done = this.done;
         let locked = this.locked;
         let debugObject = id => {
-            if (!objects[id]) throw Error(`[Searcher] Couldn\'t find object ${id}`);
+            if (!objects[id]) throw Error(`[Searcher] Couldn’t find object ${id}`);
         };
 
         if (done.size >= axisX.length - 1) {

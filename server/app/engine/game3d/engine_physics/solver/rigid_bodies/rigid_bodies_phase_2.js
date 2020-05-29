@@ -5,8 +5,8 @@
 
 import TerrainCollider from '../collision/terrain';
 
-class RigidBodiesPhase2 {
-
+class RigidBodiesPhase2
+{
     static computeIslands(leapfrogArray, searcher, oxToIslandIndex, islands)
     {
         let numberOfEntities = leapfrogArray.length;

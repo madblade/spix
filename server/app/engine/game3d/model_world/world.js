@@ -123,7 +123,6 @@ class World
         return this.whatBlock(p[0], p[1], p[2]) === 0;
         // && this.whatBlock(p[0], p[1], p[2]+1) === 0;
     }
-
 }
 
 export default World;

@@ -13,10 +13,12 @@ import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
 import { WorldType } from '../../../model_world/model';
 
+// TODO [TODAY] flag for entity cross-collision
+// TODO [HIGH] toggle gravity integration
+// TODO [HIGH] jump gameplay
+// TODO [HIGH] gravity on edges
 // TODO [HIGH] rotate collision model
-// TODO [HIGH] find angles and interpolate rotation
-// TODO [HIGH] rayleigh
-// TODO [HIGH] p2p interaction
+// TODO [HIGH] levitate and feedback
 
 class RigidBodies
 {
@@ -29,8 +31,8 @@ class RigidBodies
         //
         this._gravity = [0, 0, RigidBodies.gravityConstant];
         // this._gravity = [0, 0, 0];
-        this._globalTimeDilatation = 25;
-        // this._globalTimeDilatation = 0.05;
+        this._globalTimeDilation = 25;
+        // this._globalTimeDilation = 0.05;
         this._refreshRate = refreshRate;
 
         this._variableGravity = false;
@@ -40,7 +42,7 @@ class RigidBodies
 
     get gravity() { return this._gravity; }
     set gravity(g) { this._gravity = g; }
-    get globalTimeDilatation() { return this._globalTimeDilatation; }
+    get globalTimeDilation() { return this._globalTimeDilation; }
     get refreshRate() { return this._refreshRate; }
 
     // Advanced gravity management.
@@ -52,7 +54,8 @@ class RigidBodies
         {
             // let direction = [0, 0, 0];
             // let distance = 0;
-            let center = world.worldInfo.center; // this._worldCenter;
+            const center = world.worldInfo.center; // this._worldCenter;
+            const radius = world.worldInfo.sideSize;
             let abs = Math.abs;
             let max = Math.max;
             const sX = world.xSize;
@@ -73,7 +76,6 @@ class RigidBodies
             // direction[1] = center[1] - y;
             // direction[2] = center[2] - z;
 
-            // TODO [LOW] compute attractor mass and force intensity
             // Keep in mind Gauss' Flow Theorem which states that
             // it should integrate over the radius from the center
             // to the min of (object position, attractor surface)
@@ -92,7 +94,7 @@ class RigidBodies
             // console.log(cX + ',' + cY + ',' + cZ + ' ; ' + x + ',' + y + ',' + z);
             // console.log(res[0].toFixed(10) + ',' + res[1].toFixed(10) + ',' + res[2].toFixed(10));
 
-            // TODO [MILESTONE0] gravity gp
+            // TODO [MILESTONE0] here variable gravity gp
             let squaredWithSmoothBorders = false;
             let squaredRadius = 2;
             if (squaredWithSmoothBorders) {
@@ -130,7 +132,7 @@ class RigidBodies
     }
 
     // Advanced time flow customization.
-    getTimeDilatation(worldId, x, y, z) {
+    getTimeDilation(worldId, x, y, z) {
         if (worldId === 666) {
             return 1 + Math.abs(x * y * z);
         }
@@ -139,14 +141,12 @@ class RigidBodies
 
     solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs)
     {
-        // TODO [HIGH] solve several times according to delta timestep
-
         // const epsilon = RigidBodies.eps;
 
         const passId = Math.random();
-        let timeDilatation = this.globalTimeDilatation;
-        let absoluteDt = this.refreshRate / timeDilatation;
-        let relativeDt = relativeDtMs / timeDilatation;
+        let timeDilation = this.globalTimeDilation;
+        let absoluteDt = this.refreshRate / timeDilation;
+        let relativeDt = relativeDtMs / timeDilation;
         //if (relativeDt !== 0.64) console.log(relativeDt);
         //let relativeDt = absoluteDt;
         // let maxSpeed = Entity.maxSpeed;
@@ -164,8 +164,7 @@ class RigidBodies
         let events = eventOrderer.events;
         let abs = Math.abs;
 
-        // TODO [HIGH] fill islands spanning in several worlds
-        // TODO keep islands on place with double map (join/split islands)
+        // TODO cache islands
         // let crossWorldIslands = new Map();
 
         // For each world,
@@ -185,7 +184,7 @@ class RigidBodies
             // 1. Sum inputs/impulses, fields.
 
             // 2. Compute (x_i+1, a_i+1, v_i+1), order Leapfrog's incremental term.
-            //    Computation takes into account local time dilatation.
+            //    Computation takes into account local time dilation.
             // Summing constraints is done by summing globals (i.e. global gravity)
             // with local functional events (i.e. position-dependant gravity)
             // with local custom events (applied from the events array).
@@ -199,8 +198,6 @@ class RigidBodies
             Phase1.processGlobalEvents(entities, world, worldId, relativeDt, oxAxis, leapfrogArray, passId, this);
 
             // Sort entities according to incremental term.
-            // TODO [OPT] ideally, use states
-            // TODO [OPT] ignore leapfrog == 0
             // Remember leapfrogs within objects, reordering them within islands
             // is probably better than sorting a potentially huge array.
             let inf = x => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
@@ -229,7 +226,6 @@ class RigidBodies
             // as bounce components with coefficient & threshold (heat).
             Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world);
 
-            // TODO [MEDIUM] crossWorldIslands;
             // add leapfrog term
             // get array of all xs sorted by axis
 
@@ -251,9 +247,6 @@ class RigidBodies
             {
                 let island = islands[currentIslandIndex];
 
-                // if (island.length > 2) {
-                //     console.log(island);
-                // }
                 // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
                 let mapCollidingPossible = [];
                 // let bannedPairs = [];
@@ -265,7 +258,6 @@ class RigidBodies
                     island,
                     oxAxis, entities, relativeDt,
                     mapCollidingPossible);
-                // TODO [MEDIUM think order by mass
 
                 if (mapCollidingPossible.length < 1) continue;
 
@@ -282,7 +274,6 @@ class RigidBodies
                 mapCollidingPossible.sort((a, b) => a[2] - b[2]);
                 // console.log('first collision at ' + mapCollidingPossible[0][2]);
 
-                // TODO [CRIT] iterate
                 // 2. First colliding ->
                 //      join
                 //      move to collision point
@@ -303,14 +294,9 @@ class RigidBodies
                 objectIndexInIslandToSubIslandYIndex.fill(-1);
                 objectIndexInIslandToSubIslandZIndex.fill(-1);
 
-                // TODO [remember] displace from extreme position towards + to avoid terrain intercollision
-                // TODO [remember] no tunneling: use a temporary position for successively adjusting collisions
                 // TODO [remember] increase island widths with a possible displacement from a w-width impact object
-                // TODO [CRIT] account for last point!!!!!!!!
-                // TODO [MEDIUM] study island caching.
 
-                // Pour chaque entité dans l'île courante:
-                // console.log(mapCollidingPossible);
+                // For each entity in current island
                 let complicatedFlag = mapCollidingPossible.length > 1;
                 let solverPassId = 1;
                 let debugFlag = false;
@@ -318,11 +304,12 @@ class RigidBodies
                 {
                     if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
                     else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
+
+                    console.log('New island pass');
+                    console.log(island);
                 }
 
-                console.log('New island pass');
-                console.log(island);
-                let dbg = true;
+                let dbg = false;
                 if (dbg) {
                     let eids = [];
                     for (let isl = 0; isl < island.length; ++isl)
@@ -333,10 +320,12 @@ class RigidBodies
 
                 while (mapCollidingPossible.length > 0)
                 {
-                    console.log(
-                        `\t${mapCollidingPossible[0]} ` +
-                        `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
-                    );
+                    if (dbg) {
+                        console.log(
+                            `\t${mapCollidingPossible[0]} ` +
+                            `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
+                        );
+                    }
                     reloop = false;
                     let ii = mapCollidingPossible[0][0];     // island 1 index
                     let jj = mapCollidingPossible[0][1];     // island 2 index
@@ -348,12 +337,12 @@ class RigidBodies
                         for (let m = 0; m < mapCollidingPossible.length; ++m) {
                             msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
                         }
-                        let xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
-                        let xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
-                        let id1 = oxAxis[xIndex1].id;
-                        let id2 = oxAxis[xIndex2].id;
-                        let e1 = entities[id1];
-                        let e2 = entities[id2];
+                        const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                        const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
+                        const id1 = oxAxis[xIndex1].id;
+                        const id2 = oxAxis[xIndex2].id;
+                        const e1 = entities[id1];
+                        const e2 = entities[id2];
                         msg += `\n\tEntity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
                         msg += `\n\tEntity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
                         msg += `\n\tColliding on ${axis} axis, at t = ${rr.toFixed(10)}`;
@@ -375,7 +364,7 @@ class RigidBodies
 
                     if (debugFlag && complicatedFlag)
                         console.log('\tApplying collision...');
-                    let eps = 1e-6;
+                    const eps = 1e-6;
                     Phase3.applyCollision(
                         ii, jj, rr, axis,
                         island, oxAxis, entities, relativeDt, eps);
@@ -387,7 +376,6 @@ class RigidBodies
 
                     // Warn: account for numerical errors.
 
-                    // TODO [CRIT] extract routine for Leapfrog computaiton.
                     // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
                     // TODO [CRIT] et p1 = solve(dt = dt0-r, entité).
                     // Si dt0-r = 0
@@ -407,6 +395,7 @@ class RigidBodies
                     // et stocker le résultat avec r inchangé dans mapCollidingPossible.
                     if (debugFlag && complicatedFlag)
                         console.log('\tSolving the island step...');
+
                     let oldLength = mapCollidingPossible.length;
                     Phase4.solveIslandStepLinear(
                         mapCollidingPossible,
@@ -416,15 +405,17 @@ class RigidBodies
                         objectIndexInIslandToSubIslandYIndex,
                         objectIndexInIslandToSubIslandZIndex,
                         oxAxis, island, world, relativeDt);
+
                     if (mapCollidingPossible.length >= oldLength)
                         reloop = true;
+
                     if (debugFlag && complicatedFlag) {
-                        let xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
-                        let xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
-                        let id1 = oxAxis[xIndex1].id;
-                        let id2 = oxAxis[xIndex2].id;
-                        let e1 = entities[id1];
-                        let e2 = entities[id2];
+                        const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                        const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
+                        const id1 = oxAxis[xIndex1].id;
+                        const id2 = oxAxis[xIndex2].id;
+                        const e1 = entities[id1];
+                        const e2 = entities[id2];
                         let msg = `\t\t/Entity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
                         msg +=  `\n\t\t/Entity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
                         console.log(msg);
@@ -442,8 +433,9 @@ class RigidBodies
                     if (debugFlag && complicatedFlag)
                         console.log('\tMerged!');
                 }
-                // console.log('Solveth!');
-            } // );
+
+                // Solved!
+            }
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
             //    smoothly slice along constrained boundaries until component is extinct.
@@ -470,19 +462,22 @@ class RigidBodies
     }
 
     // Legacy.
-    // linearSolve(orderer, entity, em, wm, xm, world, dt) {
-    //     if (!entity || !entity.rotation) return;
-    //     const theta = entity.rotation[0];
-    //     const ds = entity.directions;
-    //     const pos = entity.position;
-    //     let impulseSpeed = [0, 0, 0];
-    //     let force = [0, 0, 0];
-    //     this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-    //     this.sumGlobalFields(force, pos, entity);
+    /**
+     * @deprecated
+     */
+    linearSolve(orderer, entity, em, wm, xm, world, dt) {
+        if (!entity || !entity.rotation) return;
+        const theta = entity.rotation[0];
+        const ds = entity.directions;
+        const pos = entity.position;
+        let impulseSpeed = [0, 0, 0];
+        let force = [0, 0, 0];
+        this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+        this.sumGlobalFields(force, pos, entity);
         // RigidBodies.sumLocalFields(force, pos, EM);
-    //     let hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
-    //     return hasUpdated;
-    // }
+        // let hasUpdated = Integrator.updatePosition(orderer, dt, impulseSpeed, force, entity, em, wm, xm, world);
+        // return hasUpdated;
+    }
 
     // quadraticSolve(entity, em, wm, xm, world, dt) {
     //     const theta = entity.rotation[0];
@@ -491,12 +486,11 @@ class RigidBodies
     //     let impulseSpeed = [0, 0, 0];
     //     let force = [0, 0, 0];
     //     let hasUpdated = false;
-        // this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
-        // this.sumGlobalFields(force, pos, entity);
-        // this.sumLocalFields(force, pos, em);
-        // TODO [TEST] n^2 engine
-        // hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, world, xm);
-        // return hasUpdated;
+    //     this.computeDesiredSpeed(entity, impulseSpeed, theta, ds, dt);
+    //     this.sumGlobalFields(force, pos, entity);
+    //     this.sumLocalFields(force, pos, em);
+    //     hasUpdated = Integrator.updatePosition(dt, impulseSpeed, force, entity, em, world, xm);
+    //     return hasUpdated;
     // }
 
     static add(result, toAdd) {
@@ -505,89 +499,91 @@ class RigidBodies
         result[2] += toAdd[2];
     }
 
-    // TODO [CRIT] rename to FreeForwardVector
-    // TODO [CRIT] implement constrained 2D-3D rotation need vector.
+    // TODO [HIGH] switch to quaternions.
 
-    // computeDesiredSpeed(entity, speed, theta, ds, dt) {
-    //     let desiredSpeed = [0, 0, 0];
-    //     const gravity = this.gravity;
-    //     const pi4 = Math.PI / 4;
-    //
-    //     if (ds[0] && !ds[3]) // forward quarter
-    //     {
-    //         let theta2 = theta;
-    //         if (ds[1] && !ds[2]) // right
-    //             theta2 -= pi4;
-    //         else if (ds[2] && !ds[1]) // left
-    //             theta2 += pi4;
-    //         desiredSpeed[0] = -Math.sin(theta2);
-    //         desiredSpeed[1] = Math.cos(theta2);
-    //     }
-    //     else if (ds[3] && !ds[0]) // backward quarter
-    //     {
-    //         let theta2 = theta;
-    //         if (ds[1] && !ds[2]) // right
-    //             theta2 += pi4;
-    //         else if (ds[2] && !ds[1]) // left
-    //             theta2 -= pi4;
-    //         desiredSpeed[0] = Math.sin(theta2);
-    //         desiredSpeed[1] = -Math.cos(theta2);
-    //     }
-    //     else if (ds[1] && !ds[2]) // exact right
-    //     {
-    //         desiredSpeed[0] = Math.cos(theta);
-    //         desiredSpeed[1] = Math.sin(theta);
-    //     }
-    //     else if (ds[2] && !ds[1]) // exact left
-    //     {
-    //         desiredSpeed[0] = -Math.cos(theta);
-    //         desiredSpeed[1] = -Math.sin(theta);
-    //     }
-    //
-    //     let godMode = false;
-    //     if (godMode) {
-    //         desiredSpeed[2] = ds[4] && !ds[5] ?
-    //             1 :
-    //             ds[5] && !ds[4] ? -1 : 0;
-    //     } else
-    //         if (ds[4] && !ds[5]) {
-    //             for (let i = 0; i < 3; ++i) {
-    //                 if (gravity[i] < 0 && entity.adherence[i]) {
-    //                     entity.acceleration[i] = 3.3 / dt;
-    //                     entity.jump(i); // In which direction I jump
-    //                 }
-    //             }
-    //             for (let i = 3; i < 6; ++i) {
-    //                 if (gravity[i - 3] > 0 && entity.adherence[i]) {
-    //                     entity.acceleration[i - 3] = -3.3 / dt;
-    //                     entity.jump(i); // In which direction I jump
-    //                 }
-    //             }
-    //         }
-    //
-    //     desiredSpeed[0] *= 0.65;
-    //     desiredSpeed[1] *= 0.65;
-    //     desiredSpeed[2] *= 0.65;
-    //
-    //     RigidBodies.add(speed, desiredSpeed);
-    // }
-    //
-    // sumGlobalFields(force, pos, entity) {
-    //     // Gravity
-    //     let g = this.gravity;
-    //     let m = entity.mass;
-    //     let sum = [g[0] * m, g[1] * m, g[2] * m];
-    //
-    //     // sum[2] = 0; // ignore grav
-    //
-    //     RigidBodies.add(force, sum);
-    // }
-    //
-    // sumLocalFields(force/*, pos, EM*/) {
-    //     let sum = [0, 0, 0];
-    //     RigidBodies.add(force, sum);
-    // }
+    /**
+     * @deprecated
+     */
+    computeDesiredSpeed(entity, speed, theta, ds, dt) {
+        let desiredSpeed = [0, 0, 0];
+        const gravity = this.gravity;
+        const pi4 = Math.PI / 4;
 
+        if (ds[0] && !ds[3]) // forward quarter
+        {
+            let theta2 = theta;
+            if (ds[1] && !ds[2]) theta2 -= pi4; // right
+            else if (ds[2] && !ds[1]) theta2 += pi4; // left
+            desiredSpeed[0] = -Math.sin(theta2);
+            desiredSpeed[1] = Math.cos(theta2);
+        }
+        else if (ds[3] && !ds[0]) // backward quarter
+        {
+            let theta2 = theta;
+            if (ds[1] && !ds[2]) theta2 += pi4; // right
+            else if (ds[2] && !ds[1]) theta2 -= pi4; // left
+            desiredSpeed[0] = Math.sin(theta2);
+            desiredSpeed[1] = -Math.cos(theta2);
+        }
+        else if (ds[1] && !ds[2]) // exact right
+        {
+            desiredSpeed[0] = Math.cos(theta);
+            desiredSpeed[1] = Math.sin(theta);
+        }
+        else if (ds[2] && !ds[1]) // exact left
+        {
+            desiredSpeed[0] = -Math.cos(theta);
+            desiredSpeed[1] = -Math.sin(theta);
+        }
+
+        let godMode = false;
+        if (godMode) {
+            desiredSpeed[2] = ds[4] && !ds[5] ?
+                1 :
+                ds[5] && !ds[4] ? -1 : 0;
+        } else if (ds[4] && !ds[5]) {
+            for (let i = 0; i < 3; ++i) {
+                if (gravity[i] < 0 && entity.adherence[i]) {
+                    entity.acceleration[i] = 3.3 / dt;
+                    entity.jump(i); // In which direction I jump
+                }
+            }
+            for (let i = 3; i < 6; ++i) {
+                if (gravity[i - 3] > 0 && entity.adherence[i]) {
+                    entity.acceleration[i - 3] = -3.3 / dt;
+                    entity.jump(i); // In which direction I jump
+                }
+            }
+        }
+
+        desiredSpeed[0] *= 0.65;
+        desiredSpeed[1] *= 0.65;
+        desiredSpeed[2] *= 0.65;
+
+        RigidBodies.add(speed, desiredSpeed);
+    }
+
+    /**
+     * @deprecated
+     */
+    sumGlobalFields(force, pos, entity) {
+        // Gravity
+        let g = this.gravity;
+        let m = entity.mass;
+        let sum = [g[0] * m, g[1] * m, g[2] * m];
+
+        // sum[2] = 0; // ignore grav
+
+        RigidBodies.add(force, sum);
+    }
+
+    /**
+     * @deprecated
+     */
+    sumLocalFields(force/*, pos, EM*/) {
+        let sum = [0, 0, 0];
+        RigidBodies.add(force, sum);
+    }
 }
 
 export default RigidBodies;

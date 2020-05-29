@@ -38,7 +38,6 @@ class Avatar extends Entity
     get entityRenderDistance()                  { return this._entityRenderDistance; }
     get portalRenderDistance()                  { return this._portalRenderDistance; }
     get nearestChunkId()                        { return this._nearestChunkId; }
-    //get entityModel()                           { return this._entityModel; }
 
     set role(role)                              { this._role = role; }
     set chunkRenderDistance(renderDistance)     { this._chunkRenderDistance = renderDistance; }
