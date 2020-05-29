@@ -42,7 +42,7 @@ class RigidBodiesPhase3
         fw, relativeDt)
     {
         // Check for snapping on first trajectory.
-        let dbg = false; // TODO [LOW] solve the farther entity problem.
+        let dbg = false; // There is a farther entity problem.
 
         let rp1 = RigidBodiesPhase3.solveBabylon(a1, b1, p10 - p11, 2 * relativeDt);
         if (p10 < p11 && a1 * relativeDt * relativeDt + b1 * relativeDt + p10 < p11 ||
@@ -228,6 +228,7 @@ class RigidBodiesPhase3
         }
     }
 
+    // Does not account for time dilation, but can with minor modifications.
     static solveLeapfrogQuadratic(
         island,
         oxAxis,
@@ -235,13 +236,11 @@ class RigidBodiesPhase3
         relativeDt,
         mapCollidingPossible)
     {
-        // let abs = Math.abs;
         const nbI = island.length;
 
         for (let i = 0; i < nbI; ++i)
         {
             let xIndex1 = island[i];
-            // let lfa1 = leapfrogArray[xIndex1];
             let id1 = oxAxis[xIndex1].id;
             let e1 = entities[id1];
             let p10 = e1.p0;
@@ -249,8 +248,6 @@ class RigidBodiesPhase3
             let p11 = e1.p1;
             const p11x = p11[0]; const p11y = p11[1]; const p11z = p11[2];
             let p1adh = e1.adherence;
-            //e1.p2 = [p11x, p11y, p11z];
-            //let p1_2 = e1.p2;
             let p1v0 = e1.v0;
             let p1a0 = e1.a0;
             let p1n0 = e1.nu1;
@@ -261,7 +258,6 @@ class RigidBodiesPhase3
 
             for (let j = i + 1; j < nbI; ++j) {
                 let xIndex2 = island[j];
-                //let lfa2 = leapfrogArray[xIndex2];
                 let id2 = oxAxis[xIndex2].id;
                 let e2 = entities[id2];
                 let p20 = e2.p0;
@@ -269,19 +265,14 @@ class RigidBodiesPhase3
                 let p21 = e2.p1;
                 const p21x = p21[0]; const p21y = p21[1]; const p21z = p21[2];
                 let p2adh = e2.adherence;
-                //e2.p2 = [p21x, p21y, p21z];
-                //let p2_2 = e2.p2;
                 let p2v0 = e2.v0;
                 let p2a0 = e2.a0;
                 let p2n0 = e2.nu1;
                 const w2x = e2.widthX; const w2y = e2.widthY; const w2z = e2.widthZ;
                 const ltd2 = e2.dtr; // this.getTimeDilation(worldId, p2_0[0], p2_0[1], p2_0[2]);
-                // TODO [OPT] verify integration with time dilation.
                 // const dta2 = absoluteDt * ltd2;
                 // const dtr2 = relativeDt * ltd2;
 
-                //for (let k = 0; k < 3; ++k) {
-                //con-st cxm =
                 const x0l = p10x + w1x <= p20x - w2x; const y0l = p10y + w1y <= p20y - w2y; const z0l = p10z + w1z <= p20z - w2z;
                 const x1l = p11x + w1x <= p21x - w2x; const y1l = p11y + w1y <= p21y - w2y; const z1l = p11z + w1z <= p21z - w2z;
                 const x0r = p10x - w1x >= p20x + w2x; const y0r = p10y - w1y >= p20y + w2y; const z0r = p10z - w1z >= p20z + w2z;
@@ -289,21 +280,16 @@ class RigidBodiesPhase3
 
                 if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
                 {
-                    // console.log('\tNope. ' + [x0l, x1l, x0r, x1r, y0l, y1l, y0r, y1r, z0l, z1l, z0r, z1r]);
-                    // console.log('\t' + (p11x + w1x) + ',' + (p21x - w2x));
                     continue;
                 }
 
                 const xl = x0l && !x1l;  const yl = y0l && !y1l;  const zl = z0l && !z1l;
-                // const xr = x0r && !x1r;  const yr = y0r && !y1r;  const zr = z0r && !z1r;
                 const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
                 const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
 
                 const debugCollision = false;
-                // TODO [CRIT] reset this debug flag
                 if (xm && ym && zm) {
                     if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip detected.');
-                    // mapCollidingPossible.push([i, j, 0]);
                     continue;
                 }
 
@@ -311,22 +297,15 @@ class RigidBodiesPhase3
                     console.log('[Phase III - PreCollision] Corner 2D clip detected.');
                 }
 
-                //if ((xl || xr || xm) && (yl || yr || ym) && (zl || zr || zm)) {
                 if (!(xw && yw && zw)) {
-                    // console.log('xw yw zw misfit');
                     continue;
                 }
 
-                // if (xw && yw && zw) {
-                // console.log('Collision');
-                //let min_dtr1 = dtr1;
-                //let min_dtr2 = dtr2;
                 let rrel = relativeDt;
                 let axis = 'none';
 
                 // Quadratic solve thrice
                 if (!xm) {
-                    //console.log('colx');
                     const fw = xl ? 1 : -1;
 
                     const adh10 = p1adh[0];
@@ -339,28 +318,19 @@ class RigidBodiesPhase3
                     let a2 = ltd2 * ltd2 * .5 * p2a0[0];
                     if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
 
-                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
-
                     const b1 = ltd1 * (p1v0[0] + p1n0[0]);
                     const b2 = ltd2 * (p2v0[0] + p2n0[0]);
 
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10x, p20x, p11x, p21x, w1x, w2x, fw, relativeDt);
 
-                    //console.log('r=' + r + ' (x), reldt=' + relativeDt);
-
                     if (r >= 0 && r < rrel) {
-                        //min_dtr1 = r * ltd1;
-                        //min_dtr2 = r * ltd2;
                         axis = 'x';
                         rrel = r;
-                        // if () {
-                        // }
                     }
                 }
 
                 if (!ym) {
-                    //console.log('coly');
                     const fw = yl ? 1 : -1;
 
                     const adh10 = p1adh[1];
@@ -373,32 +343,19 @@ class RigidBodiesPhase3
                     let a2 = ltd2 * ltd2 * .5 * p2a0[1];
                     if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
 
-                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
-
                     const b1 = ltd1 * (p1v0[1] + p1n0[1]);
                     const b2 = ltd2 * (p2v0[1] + p2n0[1]);
 
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10y, p20y, p11y, p21y, w1y, w2y, fw, relativeDt);
 
-                    //console.log('r=' + r + ' (y), reldt=' + relativeDt);
-
-                    // if (abs(r) < 1e-7) r = 0;
                     if (r >= 0 && r < rrel) {
-                        //let ndtr1 = r * ltd1;
-                        //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
-                        //let ndtr2 = r * ltd2;
-                        //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
-                        //rrel = r;
                         axis = 'y';
                         rrel = r;
-                        // if (r < rrel) {
-                        // }
                     }
                 }
 
                 if (!zm) {
-                    //console.log('colz');
                     const fw = zl ? 1 : -1;
 
                     const adh10 = p1adh[2]; const adh11 = p1adh[5];
@@ -409,35 +366,19 @@ class RigidBodiesPhase3
                     let a2 = ltd2 * ltd2 * .5 * p2a0[2];
                     if (p20z <= p21z && adh21 || p20z >= p21z && adh20) a2 = 0;
 
-                    //console.log('a1/2 ' + a1 + ', ' + a2 + ', adh ' + p1_adh + ' ; ' + p2_adh);
-
                     const b1 = ltd1 * (p1v0[2] + p1n0[2]);
                     const b2 = ltd2 * (p2v0[2] + p2n0[2]);
 
-                    // TODO [Refactor] extract method.
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10z, p20z, p11z, p21z, w1z, w2z, fw, relativeDt);
 
-                    //console.log('r=' + r + ' (z), reldt=' + relativeDt);
-
                     if (r >= 0 && r < rrel) {
-                        //let ndtr1 = r * ltd1;
-                        //if (ndtr1 < min_dtr1) min_dtr1 = ndtr1;
-                        //let ndtr2 = r * ltd2;
-                        //if (ndtr2 < min_dtr2) min_dtr2 = ndtr2;
                         axis = 'z';
                         rrel = r;
-                        // if (r < rrel) {
-                        // }
-                        //if (rrel < 0) rrel = r;
                     }
                 }
 
-                // console.log('\tcomputed t=' + rrel + ' on ' + xm + ', ' + ym + ', ' + zm);
-                //if (min_dtr1 < dtr1 || min_dtr2 < dtr2)
                 if (rrel < relativeDt) {
-                    //e1.copyP01();
-                    //e2.copyP01();
                     mapCollidingPossible.push([i, j, rrel, axis]);
                 }
             }
@@ -547,7 +488,7 @@ class RigidBodiesPhase3
         island, oxAxis, entities, relativeDt,
         epsilon)
     {
-        let xIndex1 = island[i]; // let lfa1 = leapfrogArray[xIndex1];
+        let xIndex1 = island[i];
         let id1 = oxAxis[xIndex1].id;
         let e1 = entities[id1];
         let p10 = e1.p0; const p10x = p10[0]; const p10y = p10[1]; const p10z = p10[2];
@@ -559,7 +500,7 @@ class RigidBodiesPhase3
         let ltd1 = e1.dtr;
         const sndtr1 = r; // * ltd1;
 
-        let xIndex2 = island[j]; // let lfa2 = leapfrogArray[xIndex2];
+        let xIndex2 = island[j];
         let id2 = oxAxis[xIndex2].id;
         let e2 = entities[id2];
         let p20 = e2.p0; const p20x = p20[0]; const p20y = p20[1]; const p20z = p20[2];
@@ -583,8 +524,6 @@ class RigidBodiesPhase3
             return;
         }
 
-        // const xl = x0l && !x1l;  const yl = y0l && !y1l;  const zl = z0l && !z1l;
-        // const xr = x0r && !x1r;  const yr = y0r && !y1r;  const zr = z0r && !z1r;
         const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
         const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
 
@@ -612,7 +551,7 @@ class RigidBodiesPhase3
                     timestep1 = sndtr1;
                     timestep2 = sndtr2;
                 } else {
-                    timestep1 = ltd1; // TODO dispense re-solving here.
+                    timestep1 = ltd1;
                     timestep2 = ltd2;
                 }
 
@@ -644,91 +583,12 @@ class RigidBodiesPhase3
                     e2p0i <= e2p1i && (nep2[m] > e2p1i || nep2[m] < e2p0i))
                     nep2[m] = e2p0i;
 
-                // // Forward E1
-                // if (e1p0i <= e1p1n && e1p1n <= e1p1i && e1p0i < e2p0i) {
-                //     const e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
-                //     if (e2p1n2 > max(e2p0i, e2p1i)) {
-                //         // TODO [LOW] possible to do better than e2p1n - gamma
-                //         const e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
-                //         if (e1p1n2 < min(e1p0i, e1p1i))
-                //             nep1[m] = e1p0i;
-                //         else
-                //             nep1[m] = e1p1n2;
-                //         nep2[m] = e2p1n;
-                //     } else {
-                //         nep1[m] = e1p1n;
-                //         nep2[m] = e2p1n2;
-                //     }
-                // } else if (e1p0i <= e1p1n && e1p1n <= e1p1i && e2p0i < e1p0i) {
-                //     const e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
-                //     if (e1p1n2 > max(e1p0i, e1p1i)) {
-                //         const e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
-                //         if (e2p1n2 < min(e2p0i, e2p1i))
-                //             nep2[m] = e2p0i;
-                //         else
-                //             nep2[m] = e2p1n2;
-                //         nep1[m] = e1p1n;
-                //     } else {
-                //         nep2[m] = e2p1n;
-                //         nep1[m] = e1p1n2;
-                //     }
-                // }
-                // // Backwards E1
-                // else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e1p0i < e2p0i) {
-                //     const e2p1n2 = e1p1n + w1[m] + w2[m] + gamma;
-                //     if (e2p1n2 > max(e2p0i, e2p1i)) {
-                //         // TODO [LOW] possible to do better than e2p1n - gamma
-                //         const e1p1n2 = e2p1n - w1[m] - w2[m] - gamma;
-                //         if (e1p1n2 < min(e1p0i, e1p1i))
-                //             nep1[m] = e1p0i;
-                //         else
-                //             nep1[m] = e1p1n2;
-                //         nep2[m] = e2p1n;
-                //     } else {
-                //         nep1[m] = e1p1n;
-                //         nep2[m] = e2p1n2;
-                //     }
-                // } else if (e1p1i <= e1p1n && e1p1n <= e1p0i && e2p0i < e1p0i) {
-                //     const e1p1n2 = e2p1n + w1[m] + w2[m] + gamma;
-                //     if (e1p1n2 > max(e1p0i, e1p1i)) {
-                //         const e2p1n2 = e2p1n - w1[m] - w2[m] - gamma;
-                //         if (e2p1n2 < min(e2p0i, e2p1i))
-                //             nep2[m] = e2p0i;
-                //         else
-                //             nep2[m] = e2p1n2;
-                //         nep1[m] = e1p1n;
-                //     } else {
-                //         nep2[m] = e2p1n;
-                //         nep1[m] = e1p1n2;
-                //     }
-                // }
-
-                //const eeps = 1e-30; // beware of numerical errors here
+                // const eeps = 1e-30; // beware of numerical errors here
                 m2[m] = nep1[m] + wm1[m] + epsilon / 2.0 > nep2[m] - wm2[m] - epsilon / 2.0 &&
                         nep1[m] - wm1[m] - epsilon / 2.0 < nep2[m] + wm2[m] + epsilon / 2.0;
-                // !x1l && !x1r
-                // p11x+w1x < p21x-w2x && p11x-w1x > p21x+w2x
-                // if (m === ax) {
-                //     if (e2p1i < e2p0i && e2.a1[m] < 0 || e2p1i > e2p0i && e2.a1[m] > 0) {
-                //         e2.a1[m] = 0;
-                //         e2.v1[m] = e1.v1[m];
-                //         TODO [HIGH] check that
-                //         e2.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                //     }
-                //     if (e1p1i < e1p0i && e1.a1[m] < 0 || e1p1i > e1p0i && e1.a1[m] > 0) {
-                //         e1.a1[m] = 0;
-                //         e1.v1[m] = e2.v1[m];
-                //         TODO [HIGH] check that
-                //         e1.v1[m] = (mass1 * e1.v1[m] + mass2 * e2.v1[m]) / (mass1 + mass2);
-                //     }
-                // }
             }
-            // Temporary security measure.
-            // {
-            // const l = newSubIsland.length;
-            // TODO [HIGH] this is a projection... check collision
 
-            // TODO [CRIT] verify this lastR mechanism
+            // Remains to check this "lastR" mechanism...
             // e1.lastR = r;
             // e2.lastR = r;
 
@@ -750,8 +610,8 @@ class RigidBodiesPhase3
             let abs = Math.abs;
             let e1a1 = e1.a1[ax]; let e1v1 = e1.v1[ax];
             let e2a1 = e2.a1[ax]; let e2v1 = e2.v1[ax];
-            let mv = abs(e1v1) < abs(e2v1) ? e1v1 : e2v1; // min(, e2v1); // (mass1 * e1v1 + mass2 * e2v1) / (mass1 + mass2);
-            let ma = abs(e1a1) < abs(e2a1) ? e1a1 : e2a1; // min(e1a1, e2a1); // (mass1 * e1a1 + mass2 * e2a1) / (mass1 + mass2);
+            let mv = abs(e1v1) < abs(e2v1) ? e1v1 : e2v1;
+            let ma = abs(e1a1) < abs(e2a1) ? e1a1 : e2a1;
             if (collidedbg) console.log(`${e1v1} | ${e2v1}`);
             p1v1[ax] = mv;
             p2v1[ax] = mv;
@@ -781,7 +641,7 @@ class RigidBodiesPhase3
                     p21[ax] = e2p0;
                 }
 
-                // TODO [CRIT] reset if collision stability problems.
+                // Reset this if there are collision stability problems.
                 // e1.p1[ax] = e1p0;
                 // e2.p1[ax] = e2p0;
             }
@@ -816,7 +676,6 @@ class RigidBodiesPhase3
             let e1t = e1p0 + (num / den) * alpha;
             let e2t = e2p0 + (num / den) * beta;
 
-            // console.log('[Phase III]\t\t\t\t' + e1t + ', ' + e2t);
             if (e1t <= max(e1p0, e1p1) && e1t >= min(e1p0, e1p1) &&
                 e2t <= max(e2p0, e2p1) && e2t >= min(e2p0, e1p1) &&
                 e1t + e1w + e2w + epsilon + seps <= e2t)
@@ -827,39 +686,6 @@ class RigidBodiesPhase3
                 e1.p1[ax] = e1p0;
                 e2.p1[ax] = e2p0;
             }
-
-            // let d = abs((e1p1 + e1w) - (e2p1 - e2w));
-            // let projP2 = e2p1 + (d + epsilon) / 2;
-            // let projP1 = e1p1 - (d + epsilon) / 2;
-            // // Test sign
-            // let okProjP1 = (projP1 >= min(e1p1, e1p0));
-            // let okProjP2 = (projP2 <= max(e2p0, e2p1));
-            // if (okProjP1 && okProjP2) {
-            //     e1.p1[ax] = projP1;
-            //     e2.p1[ax] = projP2;
-            // } else if (okProjP1) {
-            //     let proj2P1 = e1p1 - (d + epsilon);
-            //     if (proj2P1 > min(e1p1, e1p0)) {
-            //         e1.p1[ax] = proj2P1;
-            //     } else {
-            //         if (debg) console.log('[Phase III] - Branching [projP1] should have been discarded by overlap.');
-            //         e1.p1[ax] = e1p0;
-            //     }
-            //     e2.p1[ax] = e2p0;
-            // } else if (okProjP2) {
-            //     let proj2P2 = e2p1 + (d + epsilon);
-            //     if (proj2P2 < max(e2p0, e2p1)) {
-            //         e2.p1[ax] = proj2P2;
-            //     } else {
-            //         if (debg) console.log('[Phase III] - Branching [projP2] should have been discarded by overlap.');
-            //         e2.p1[ax] = e2p0;
-            //     }
-            //     e1.p1[ax] = e1p0;
-            // } else {
-            //     if (debg) console.log('[Phase III] - Branching [noProj] should be prevented by overlap check.');
-            //     e1.p1[ax] = e1p0;
-            //     e2.p1[ax] = e2p0;
-            // }
         }
     }
 }

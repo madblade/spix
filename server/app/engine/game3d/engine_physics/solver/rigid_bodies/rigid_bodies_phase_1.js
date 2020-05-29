@@ -18,12 +18,9 @@ class RigidBodiesPhase1
         oxAxis)
     {
         let exAxis = eventWorldAxes[0];
-        // TODO [MEDIUM] use other axes for faster solving.
-        // let eyAxis = eventWorldAxes[1];
-        // let ezAxis = eventWorldAxes[2];
+        // This uses only one axis to optimize solving
+        // but could absolutely use the others.
         let lastEX = 0;
-        // let lastEY;
-        // let lastEZ;
         let eventIndex; let entityIndex; let currentEvent;
         let op; let ep;
         let ox; let oy; let oz; let ex; let range;
@@ -118,7 +115,6 @@ class RigidBodiesPhase1
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
             let nu = currentEntity.nu; // Instantaneous speed.
             let nu1 = currentEntity.nu1;
-            // console.log(p0);
 
             let localTimeDilation = rigidBodiesSolver.getTimeDilation(worldId, p0[0], p0[1], p0[2]);
             // const dta = absoluteDt * localTimeDilation;
@@ -167,9 +163,6 @@ class RigidBodiesPhase1
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
             // let vector = RigidBodiesPhase1.getForwardVector(d); // Project 2D
-            // console.log(vector);
-            // let abs = Math.abs;
-            // let sgn = Math.sign;
             let adh = currentEntity.adherence;
 
             // TODO [CRIT] compute acc.: impulses with speed constraints, gravity.
@@ -243,15 +236,14 @@ class RigidBodiesPhase1
         return [0, 0, 0];
     }
 
+    // TODO use quaternions instead
     static getEntityForwardVector(d, rotation, factor, project2D)
     {
         let PI  = Math.PI;
         let cos = Math.cos;
         let sin = Math.sin;
         let acos = Math.acos;
-        // let abs = Math.abs;
         let sgn = Math.sign;
-        // let atan = Math.atan;
         let sqrt = Math.sqrt;
         let square = x => x * x;
         let PI2 = PI / 2;
@@ -260,10 +252,6 @@ class RigidBodiesPhase1
 
         let relTheta0 = rotation[0]; let relTheta1 = rotation[1];
         let absTheta0 = rotation[2]; let absTheta1 = rotation[3];
-
-        //if (absTheta0 != 0 || absTheta1 != 0)
-        //    console.log(relTheta0.toFixed(4) + ', ' + relTheta1.toFixed(4) + ' ; ' +
-        //       absTheta0.toFixed(4) + ', ' + absTheta1.toFixed(4));
 
         // d[0], d[1]: fw, bw
         // d[2], d[3]: rg, lf
@@ -275,7 +263,8 @@ class RigidBodiesPhase1
 
         if (project2D) {
             relTheta1 = PI2;
-            // TODO [CRIT] THIS IS WRONG!!!!!!!!!!!!!!!!!!!!!!!
+            // I left a comment here saying this was wrong
+            // but as I am dropping support for this project it will stay like this.
         }
 
         let nb0 = (fw || bw) + (rg || lf) + (up || dn);
@@ -293,9 +282,9 @@ class RigidBodiesPhase1
 
         let getPsy0 = function(theta0, theta1, phi0, phi1) {
             let st0 = sin(theta0); let st1 = sin(theta1);
-            let ct0 = cos(theta0); // ct1 = cos(theta1),
+            let ct0 = cos(theta0);
             let sp0 = sin(phi0); let sp1 = sin(phi1);
-            let cp0 = cos(phi0); // , cp1 = cos(phi1);
+            let cp0 = cos(phi0);
 
             let s = sgn(st1 * st0 + sp1 * sp0);
             return s *
@@ -303,10 +292,6 @@ class RigidBodiesPhase1
                     sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0))
                 );
         };
-
-        // TODO [HIGH] refactor
-        // let getPsy = function() {
-        // };
 
         if (nb0 === 1)
         {
@@ -333,11 +318,10 @@ class RigidBodiesPhase1
                 case bw && up: relTheta1 += PI34; break;
                 case bw && dn: relTheta1 -= PI34; break;
 
-                // TODO Debug send forward arrow object
                 case fw && rg:
                     // Faster.
-                    //relTheta0 = relTheta0 - (PI2 - PI4*sin(relTheta1));
-                    //relTheta1 = PI2 - PI4*cos(relTheta1);
+                    // relTheta0 = relTheta0 - (PI2 - PI4*sin(relTheta1));
+                    // relTheta1 = PI2 - PI4*cos(relTheta1);
 
                     // More accurate.
                     relTheta0 = getPsy0(t0, t1, t0 - PI2, PI2) || 0;
@@ -437,10 +421,10 @@ class RigidBodiesPhase1
         let sinAbs0 = sin(absTheta0); let sinRel0 = sin(relTheta0);
         let sinAbs1 = sin(absTheta1); let sinRel1 = sin(relTheta1);
 
-        // let absUpVector = [sinAbs1 * cosAbs0, sinAbs1 * sinAbs0, cosAbs1];
+        // let absUpVector =    [sinAbs1 * cosAbs0, sinAbs1 * sinAbs0, cosAbs1];
         // let absFrontVector = [cosAbs1 * cosAbs0, cosAbs1 * sinAbs0, -sinAbs1];
-        // let relUpVector =       [sinRel1 * cosRel0, sinRel1 * sinRel0, cosRel1];
-        // let relFrontVector =    [- sinRel1 * sinRel0, sinRel1 * cosRel0, -cosRel1];
+        // let relUpVector =    [sinRel1 * cosRel0, sinRel1 * sinRel0, cosRel1];
+        // let relFrontVector = [- sinRel1 * sinRel0, sinRel1 * cosRel0, -cosRel1];
 
         let relFrontVector;
 
@@ -477,36 +461,15 @@ class RigidBodiesPhase1
             -sinRel1 * sinRel0 * sinAbs0   +   sinRel1 * cosRel0 * cosAbs0 * cosAbs1   +   cosRel1 * cosAbs0 * sinAbs1,
             /**/                               sinRel1 * cosRel0 * sinAbs1             -   cosRel1 * cosAbs1
         ];
+        // The norm of this vector should be 1.
 
-        // TODO [CRIT] compute contributions in relTheta
-        // TODO [CRIT] compute plane and project on 2D constrained mode
-        // TODO [CRIT] correct verlet
+        let frontVector3D = [];
 
-        //let relX = relFrontVector[0];
-        //let relY = relFrontVector[1];
-        //let relZ = relFrontVector[2];
-
-        let frontVector3D = []; // [];
-        //console.log(relFrontVector[0].toFixed(4) + ', '
-        // + relFrontVector[1].toFixed(4) + ', ' +
-        // relFrontVector[2].toFixed(4));
-
-        // let sq = 0;
         for (let i = 0; i < 3; ++i) {
-            // let c = relFrontVector[i];
-            // sq += c * c;
             frontVector3D[i] = relFrontVector[i] * factor;
         }
-        // console.log(sqrt(sq)); // Must be 1
 
-        // let frontVector2D = [];
-
-        //let x, y, z;
-        //x = - sin(relTheta1) * sin(relTheta0);
-        //y = sin(relTheta1) * cos(relTheta0);
-        //z = - cos(relTheta1);
         return frontVector3D;
-        //else if (!0) return [0, 0, 0];
     }
 }
 

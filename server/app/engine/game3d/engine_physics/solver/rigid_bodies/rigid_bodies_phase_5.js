@@ -20,9 +20,8 @@ class RigidBodiesPhase5
         const y = gravity[1];
         const z = gravity[2];
 
-        let v1 = 0;
-        let v2 = 0;
-        // let v3 = 0;
+        let v1;
+        let v2;
 
         if (y > 0) {
             v1 = Math.atan(-x / y);
@@ -40,16 +39,9 @@ class RigidBodiesPhase5
             v2 = pi / 2;
         }
 
-        // v3 = x !== 0 && y !== 0 && z !== 0 ? Math.acos(Math.sqrt(x * x + z * z) / Math.sqrt(x * x + y * y + z * z)) : 0;
+        let absPitch = v1;
+        let absYaw = v2;
 
-        let absPitch = v1; // = x !== 0 && y !== 0 ? Math.atan2(x, y) : 0; // Math.asin(-y); // rot[2];
-        let absYaw = v2; // Math.PI + Math.acos(z / Math.sqrt(x * x + y * y + z * z)); // Math.atan2(x, z); // rot[3];
-
-        // absPitch = pi / 2;
-        // console.log(v1 + ',' + v2 + ' <- ' + x + ',' + y + ',' + z);
-        // absYaw = v3;
-        // console.log(absPitch.toFixed(5) + ', ' + absYaw.toFixed(5) + ' -> ' + gravity);
-        // let oldRelPitch = rot[0];
         let oldAbsPitch = rot[2];
         let deltaAbsPitch = absPitch - oldAbsPitch;
         if (relPitch !== rot[0] || relYaw !== rot[1] ||
@@ -62,7 +54,6 @@ class RigidBodiesPhase5
             return true;
         }
 
-        // return (entity === gravity);
         return false;
     }
 
@@ -100,8 +91,7 @@ class RigidBodiesPhase5
             //    console.log(p1);
             //}
 
-            // TODO [LOW] cross-w collision
-            //  e.g
+            // For cross-w collision one can do the following:
             //  1. if free (pyr, terrain) at gate, switch wld, else snap to gate
             //  2. cast from gate to transform(p1)
             //  3. think recursion
@@ -114,28 +104,23 @@ class RigidBodiesPhase5
                 let newWorldId = xCrossed.worldId;
                 objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
 
-                // Collide with terrain on the other side (no second x crossing enabled)
-                // TODO [HIGH] translate [p0, p1] to [x.position, x.transform(p1, newWorldId)]
-                //let hasCollidedAfterwards =
-                //    TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
+                // To collide with terrain on the other side, do the following:
+                // REMEMBER to TRANSLATE [p0, p1] to [x.position, x.transform(p1, newWorldId)]
+                // let hasCollidedAfterwards =
+                //   TerrainCollider.linearCollide(currentEntity, wm.getWorld(newWorldId), p0, p1, dtr);
                 entityUpdated = true;
             }
 
 
             if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2])
             {
-                //console.log('LetsUpdate!');
-                //console.log(p0);
-                //console.log(p1);
-                //console.log(currentEntity.nu);
-
                 currentEntity.p0 = p1;
                 currentEntity.p1 = p0;
                 if (!xCrossed) {
                     searcher.updateObjectAxis(entityIndex);
                     objectOrderer.moveObject(currentEntity);
                 } else {
-                    // TODO [HIGH] objectOrderer.switchEntityToWorld(...)
+                    // Here one should call a function objectOrderer.switchEntityToWorld(...)
                 }
                 entityUpdated = true;
             }
@@ -145,7 +130,7 @@ class RigidBodiesPhase5
                 let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
                 if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
                     entityUpdated = true;
-                    // TODO [HIGH] rotate collision model.
+                    // TODO [HIGH] update rotated collision model.
                 }
             }
 
@@ -181,6 +166,7 @@ class RigidBodiesPhase5
                 v1[i] = 0;
                 a1[i] = 0;
             }
+            // To reset adherence:
             // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
             currentEntity.metaX = 0;
         });

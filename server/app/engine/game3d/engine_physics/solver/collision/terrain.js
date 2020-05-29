@@ -16,10 +16,8 @@ class TerrainCollider
      *
      * I know (highly suspect) it can be done way more efficiently.
      * The first thing to optimise is the BSP lookup phase: world.isFree([x, y, z]).
-     * Some suggestions:
-     * - TODO [OPT] flag empty chunks
-     * - TODO [OPT] fast integer chunk lookup
-     * - TODO [OPT] chunk caching
+     * Suggestion:
+     * - TODO [OPT] flag empty chunks and full chunks
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
      * - TODO [HIGH] investigate acceleration resets (adherence to walls).
      */

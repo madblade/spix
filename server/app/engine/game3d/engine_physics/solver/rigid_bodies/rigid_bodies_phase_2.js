@@ -10,11 +10,8 @@ class RigidBodiesPhase2
     static computeIslands(leapfrogArray, searcher, oxToIslandIndex, islands)
     {
         let numberOfEntities = leapfrogArray.length;
-        // let oxToIslandIndex = new Int32Array(numberOfEntities);
-        // let islands = [];
         let islandIndex = 0;
         oxToIslandIndex.fill(-2); // -2 unaffected, -1 isolated, 0+ index of island
-        //console.log(numberOfEntities + ' entities');
         for (let i = 0; i < numberOfEntities; ++i) {
             let xIndex = leapfrogArray[i][3];
             let inheritedIslandIndex = oxToIslandIndex[xIndex];
@@ -50,7 +47,7 @@ class RigidBodiesPhase2
             else {
                 switch (il) {
                     case 0:
-                        // throw Error('[RigidBodies] got a 0-length island.');
+                        // console.error('[RigidBodies] got a 0-length island.');
                         break;
                     case 1:
                         oxToIslandIndex[newIsland[0]] = -1; // May move freely.
@@ -63,12 +60,10 @@ class RigidBodiesPhase2
                         break;
                 }
             }
-
-            // TODO [DBG] check new island and former for redundancy.
         }
 
         // Merge islands.
-        // TODO [HIGH] this can be heavily optimised.
+        // This could be optimised but I will drop support for this solver.
         for (let i = 0; i < islands.length; ++i)
         {
             let islandI = islands[i];
@@ -106,12 +101,8 @@ class RigidBodiesPhase2
         world
     )
     {
-        for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
-        // for (let islandId = 0, nbIslands = islands.length; islandId < nbIslands; ++islandId) {
-        //     let currentIsland = islands[islandId];
-        //     if (currentIsland.length !== 1) continue;
-        //     let oi = currentIsland[0];
-
+        for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
+        {
             let currentObject = oxAxis[oi];
             if (!currentObject || currentObject.kind !== 'e') continue;
 
@@ -121,13 +112,13 @@ class RigidBodiesPhase2
             let p1 = currentEntity.p1;
 
             // Cast on current world to prevent x crossing through matter.
-            // const dtr = currentEntity.dtr; //TODO [HIGH] use dtr
+            // const dtr = currentEntity.dtr; // To use time dilation
 
-            // TODO [HIGH] filter for lonely islands.
+            // Filter here for lonely islands.
             // let islandId = oxToIslandIndex[oi];
             // let doProject = islandId === -1 || islandId === -2;
-            /*let hasCollided = */TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
-            // TODO [MEDIUM] report bounce components.
+            TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            // Remember to apply the same kind of changes to the simple entity + terrain solver (just below).
         }
     }
 
@@ -145,14 +136,14 @@ class RigidBodiesPhase2
             let p1 = currentEntity.p1;
 
             // Cast on current world to prevent x crossing through matter.
-            // const dtr = currentEntity.dtr; //TODO [HIGH] use dtr
+            // const dtr = currentEntity.dtr;
 
             const hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             const dbg = false;
             if (dbg && hasCollided) {
                 console.log(entityIndex);
             }
-            // TODO report bounce components.
+            // Here bounce components could be reported as the inverse velocity at the impact point.
         }
     }
 }
