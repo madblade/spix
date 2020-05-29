@@ -6,6 +6,7 @@
 
 import EventOrderer from './orderer_events';
 import Entity from '../../../model_entity/entity';
+import RigidBodies from "./rigid_bodies";
 
 class RigidBodiesPhase1
 {
@@ -156,10 +157,11 @@ class RigidBodiesPhase1
             let r = currentEntity.r; // Rotation.
             const maxV = currentEntity.getVelocity();
             const factor = Math.sqrt(maxV * 1.05);
-            // TODO [MILESTONE0] gravity gp
-            let g =
-                // [0, 0, 0];
+
+            // This gravity should be fetched per entity instead.
+            let g = RigidBodies.creativeMode ? [0, 0, 0] :
                 rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
             // let vector = RigidBodiesPhase1.getForwardVector(d); // Project 2D
@@ -171,16 +173,18 @@ class RigidBodiesPhase1
             for (let i = 0; i < 3; ++i)
             {
                 let vi = vector[i];
-                if (adh[i] && vi > 0.0005 && g[i] < 0) {
+                if (adh[i] && vi > 0.05 && g[i] < 0) {
                     console.log(`jump ${passId}`);
-                    //vi = 0.1;
-                    a1[i] += 0.22;
-                    adh[i] = false; // TODO [CRIT] FIX ADHERENCE SETUP
+                    // vi = .1;
+                    a1[i] += 0.6;
+                    p1[i] = p0[i];
+                    adh[i] = false;
                 }
                 else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
-                    console.log('antijump');
-                    //vi = -.1;
-                    a1[i] -= 0.22;
+                    console.log(`antijump ${passId}`);
+                    // vi = -.1;
+                    a1[i] -= 0.6;
+                    p1[i] = p0[i];
                     adh[3 + i] = false;
                 }
 

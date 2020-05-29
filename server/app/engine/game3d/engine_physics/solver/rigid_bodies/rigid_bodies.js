@@ -13,7 +13,6 @@ import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
 import { WorldType } from '../../../model_world/model';
 
-// TODO [TODAY] flag for entity cross-collision
 // TODO [HIGH] toggle gravity integration
 // TODO [HIGH] jump gameplay
 // TODO [HIGH] gravity on edges
@@ -25,7 +24,9 @@ class RigidBodies
 {
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
+
     static crossEntityCollision = false; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
+    static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
     // static gravityConstant = 0;
 
     constructor(refreshRate)
@@ -37,7 +38,7 @@ class RigidBodies
         // this._globalTimeDilation = 0.05;
         this._refreshRate = refreshRate;
 
-        this._variableGravity = false;
+        this._variableGravity = true;
         this._worldCenter = [0, 0, -100];
         //
     }
