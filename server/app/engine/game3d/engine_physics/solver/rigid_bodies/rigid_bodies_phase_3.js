@@ -126,12 +126,11 @@ class RigidBodiesPhase3
     static solveLeapfrogPostCollision(
         island,
         newSubIsland,
-        terrain, // entityIdsInIslandWhichNeedTerrainPostSolving,
+        entityIdsInIslandWhichNeedTerrainPostSolving,
         oxAxis, entities, relativeDt, mapCollidingPossible)
     {
         let islandLength = island.length;
         // let newSubIslandLength = newSubIsland.length;
-        // let terrainLength = terrain.length;
 
         // Solve in newSubIsland x island\newSubIsland
         for (let i = 0; i < islandLength; ++i)
@@ -154,13 +153,11 @@ class RigidBodiesPhase3
                 let newSubIslandIndexJ = newSubIsland.indexOf(j);
                 let jInNewSubIsland = newSubIslandIndexJ > -1;
 
-                // TODO [HIGH] check my elementary set theory abilities
+                // does this work as expected?
                 let goOn = !iInNewSubIsland && jInNewSubIsland ||
                             iInNewSubIsland && !jInNewSubIsland;
                 if (!goOn) {
                     // Also solve in island x entityIdsInIslandWhichNeedTerrainPostSolving\{currentInIsland}
-                    // if (terrain.indexOf(j) < 0 && terrain.indexOf(i) < 0)
-                    //     continue;
                 }
 
                 let id2 = oxAxis[xIndexJ].id;
@@ -184,11 +181,11 @@ class RigidBodiesPhase3
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
                 if (xm && ym && zm) {
-                    console.log('[Phase III - PostCollision] Full 3D clip detected.');
+                    console.warn('[Phase III - PostCollision] Full 3D clip detected.');
                     continue;
                 }
                 if (!xm + !ym + !zm !== 1) {
-                    console.log('[Phase III - PostCollision] Corner 2D clip detected.');
+                    console.warn('[Phase III - PostCollision] Corner 2D clip detected.');
                 }
                 if (!(xw && yw && zw)) continue;
                 let rrel = relativeDt;
@@ -321,7 +318,6 @@ class RigidBodiesPhase3
                 }
 
                 // if (xw && yw && zw) {
-                // TODO [] push into colliding pairs
                 // console.log('Collision');
                 //let min_dtr1 = dtr1;
                 //let min_dtr2 = dtr2;
@@ -348,7 +344,6 @@ class RigidBodiesPhase3
                     const b1 = ltd1 * (p1v0[0] + p1n0[0]);
                     const b2 = ltd2 * (p2v0[0] + p2n0[0]);
 
-                    // TODO [CRIT] solve same for leapfrog version.
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10x, p20x, p11x, p21x, w1x, w2x, fw, relativeDt);
 
@@ -383,7 +378,6 @@ class RigidBodiesPhase3
                     const b1 = ltd1 * (p1v0[1] + p1n0[1]);
                     const b2 = ltd2 * (p2v0[1] + p2n0[1]);
 
-                    // TODO [Refactor] extract method.
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10y, p20y, p11y, p21y, w1y, w2y, fw, relativeDt);
 
@@ -585,7 +579,7 @@ class RigidBodiesPhase3
 
         if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
         {
-            console.log('This was ah mmmost unnnuseful collision aha.');
+            // Nothing to collide.
             return;
         }
 

@@ -100,7 +100,11 @@ class RigidBodiesPhase2
      * Solving terrain collisions globally at the moment.
      * Not only lonely islands.
      */
-    static collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world)
+    static collideLonelyIslandsWithTerrain(
+        oxAxis, entities,
+        oxToIslandIndex, islands,
+        world
+    )
     {
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
         // for (let islandId = 0, nbIslands = islands.length; islandId < nbIslands; ++islandId) {
@@ -124,6 +128,31 @@ class RigidBodiesPhase2
             // let doProject = islandId === -1 || islandId === -2;
             /*let hasCollided = */TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
             // TODO [MEDIUM] report bounce components.
+        }
+    }
+
+    static simbleCollideEntitiesWithTerrain(
+        oxAxis, entities, world
+    )
+    {
+        for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+            let currentObject = oxAxis[oi];
+            if (!currentObject || currentObject.kind !== 'e') continue;
+
+            let entityIndex = oxAxis[oi].id;
+            let currentEntity = entities[entityIndex];
+            let p0 = currentEntity.p0;
+            let p1 = currentEntity.p1;
+
+            // Cast on current world to prevent x crossing through matter.
+            // const dtr = currentEntity.dtr; //TODO [HIGH] use dtr
+
+            const hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            const dbg = false;
+            if (dbg && hasCollided) {
+                console.log(entityIndex);
+            }
+            // TODO report bounce components.
         }
     }
 }

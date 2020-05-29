@@ -18,12 +18,13 @@ import { WorldType } from '../../../model_world/model';
 // TODO [HIGH] jump gameplay
 // TODO [HIGH] gravity on edges
 // TODO [HIGH] rotate collision model
-// TODO [HIGH] levitate and feedback
+// TODO [HIGH] levitate, feedback, walljump
 
 class RigidBodies
 {
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
+    static crossEntityCollision = false; // THIS TO ACTIVATE CROSS-COLLISION, EXPERIMENTAL
     // static gravityConstant = 0;
 
     constructor(refreshRate)
@@ -162,7 +163,6 @@ class RigidBodies
         // A given entity can span across multiple worlds.
         let entities = em.entities;
         let events = eventOrderer.events;
-        let abs = Math.abs;
 
         // TODO cache islands
         // let crossWorldIslands = new Map();
@@ -197,244 +197,15 @@ class RigidBodies
             let leapfrogArray = new Array(oxAxis.length);
             Phase1.processGlobalEvents(entities, world, worldId, relativeDt, oxAxis, leapfrogArray, passId, this);
 
-            // Sort entities according to incremental term.
-            // Remember leapfrogs within objects, reordering them within islands
-            // is probably better than sorting a potentially huge array.
-            let inf = x => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
-            leapfrogArray.sort((a, b) =>
-                inf(b) - inf(a)
-            );
-            // Note: a - b natural order, b - a reverse order
-            // abs(b[0]) + abs(b[1]) + abs(b[2]) - abs(a[0]) - abs(a[1]) - abs(a[2])
-
-            // Rebuild mapping after having sorted leapfrogs.
-            let reverseLeapfrogArray = new Int32Array(leapfrogArray.length);
-            for (let i = 0, l = leapfrogArray.length; i < l; ++i)
-                reverseLeapfrogArray[leapfrogArray[i][3]] = i;
-
-            // 4. Compute islands, cross world, by axis order.
-            let numberOfEntities = leapfrogArray.length;
-            let oxToIslandIndex = new Int32Array(numberOfEntities);
-            let islands = [];
-
-            Phase2.computeIslands(leapfrogArray, searcher, oxToIslandIndex, islands);
-            //console.log(numberOfEntities + ' entities');
-            // console.log(islands);
-            //console.log(oxToIslandIndex);
-
-            // 3. Snap x_i+1 with terrain collide, save non-integrated residuals
-            // as bounce components with coefficient & threshold (heat).
-            Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world);
-
-            // add leapfrog term
-            // get array of all xs sorted by axis
-
-            // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
-            //    check neighbours for min distance in linearized trajectory
-            //    detect and push PROBABLY COLLIDING PAIRS.
-
-            // 6. Narrow phase, part 1: for all probably colliding pairs,
-            //    solve X² leapfrog, save first all valid Ts
-            //    keep list of ordered Ts across pairs.
-            if (islands.length > 0) {
-                // console.log('Islands: ');
-                // console.log(islands);
-                // console.log(islands[0]);
-            }
-
-            for (let currentIslandIndex = 0; currentIslandIndex  < islands.length; ++currentIslandIndex)
-            // islands.forEach(island =>
+            if (RigidBodies.crossEntityCollision)
             {
-                let island = islands[currentIslandIndex];
-
-                // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
-                let mapCollidingPossible = [];
-                // let bannedPairs = [];
-
-                // 1. Sort colliding possible.
-
-                // Solve leapfrog and sort according to time.
-                Phase3.solveLeapfrogQuadratic(
-                    island,
-                    oxAxis, entities, relativeDt,
-                    mapCollidingPossible);
-
-                if (mapCollidingPossible.length < 1) continue;
-
-                // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
-
-                // Narrow phase, part 2: for all Ts in order,
-                //    set bodies as 'in contact' or 'terminal' (terrain),
-                //    compute new paths (which )are not more than common two previous) while compensating forces
-                //    so as to project the result into directions that are not occluded
-                //      -> bouncing will be done in next iteration to ensure convergence
-                //      -> possible to keep track of the energy as unsatisfied work of forces
-                //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)
-                //    End when there is no more collision to be solved.
-                mapCollidingPossible.sort((a, b) => a[2] - b[2]);
-                // console.log('first collision at ' + mapCollidingPossible[0][2]);
-
-                // 2. First colliding ->
-                //      join
-                //      move to collision point
-                //      compute new trajectory (leapfrog²)
-                //      collide again with terrain
-                //      compute colliding possible with all others
-                //      (invalidate collision with others) -> optional (discarded afterwards anyway)
-
-                let subIslandsX = []; // For sub-sampled physics, must be sorted and
-                let subIslandsY = []; // kept coherent before every pass in the I/J collider.
-                let subIslandsZ = [];
-
-                let objectIndexInIslandToSubIslandXIndex = new Int16Array(island.length);
-                let objectIndexInIslandToSubIslandYIndex = new Int16Array(island.length);
-                let objectIndexInIslandToSubIslandZIndex = new Int16Array(island.length);
-
-                objectIndexInIslandToSubIslandXIndex.fill(-1);
-                objectIndexInIslandToSubIslandYIndex.fill(-1);
-                objectIndexInIslandToSubIslandZIndex.fill(-1);
-
-                // TODO [remember] increase island widths with a possible displacement from a w-width impact object
-
-                // For each entity in current island
-                let complicatedFlag = mapCollidingPossible.length > 1;
-                let solverPassId = 1;
-                let debugFlag = false;
-                if (debugFlag)
-                {
-                    if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
-                    else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
-
-                    console.log('New island pass');
-                    console.log(island);
-                }
-
-                let dbg = false;
-                if (dbg) {
-                    let eids = [];
-                    for (let isl = 0; isl < island.length; ++isl)
-                        eids.push(oxAxis[island[isl]].id);
-                    console.log(eids);
-                }
-                let reloop = false;
-
-                while (mapCollidingPossible.length > 0)
-                {
-                    if (dbg) {
-                        console.log(
-                            `\t${mapCollidingPossible[0]} ` +
-                            `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
-                        );
-                    }
-                    reloop = false;
-                    let ii = mapCollidingPossible[0][0];     // island 1 index
-                    let jj = mapCollidingPossible[0][1];     // island 2 index
-                    let rr = mapCollidingPossible[0][2];     // time got by solver
-                    let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
-
-                    if (debugFlag && complicatedFlag) {
-                        let msg = `\tPass ${solverPassId++} : ${mapCollidingPossible.length} elements to process `;
-                        for (let m = 0; m < mapCollidingPossible.length; ++m) {
-                            msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
-                        }
-                        const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
-                        const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
-                        const id1 = oxAxis[xIndex1].id;
-                        const id2 = oxAxis[xIndex2].id;
-                        const e1 = entities[id1];
-                        const e2 = entities[id2];
-                        msg += `\n\tEntity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
-                        msg += `\n\tEntity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
-                        msg += `\n\tColliding on ${axis} axis, at t = ${rr.toFixed(10)}`;
-                        console.log(msg);
-                    }
-                    // \DEBUG
-
-                    let subIslandI = Phase3.getSubIsland(ii, axis,
-                        objectIndexInIslandToSubIslandXIndex,
-                        objectIndexInIslandToSubIslandYIndex,
-                        objectIndexInIslandToSubIslandZIndex,
-                        subIslandsX, subIslandsY, subIslandsZ);
-
-                    let subIslandJ = Phase3.getSubIsland(jj, axis,
-                        objectIndexInIslandToSubIslandXIndex,
-                        objectIndexInIslandToSubIslandYIndex,
-                        objectIndexInIslandToSubIslandZIndex,
-                        subIslandsX, subIslandsY, subIslandsZ);
-
-                    if (debugFlag && complicatedFlag)
-                        console.log('\tApplying collision...');
-                    const eps = 1e-6;
-                    Phase3.applyCollision(
-                        ii, jj, rr, axis,
-                        island, oxAxis, entities, relativeDt, eps);
-
-                    // 1. apply step to newSubIsland
-                    // 2.1. invalidate for each (newSubIslandMember)
-                    // 2.2. resolve for each (newSubIslandMember x anyother)
-                    // 3. update mapCollidingPossible
-
-                    // Warn: account for numerical errors.
-
-                    // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
-                    // TODO [CRIT] et p1 = solve(dt = dt0-r, entité).
-                    // Si dt0-r = 0
-                    // TODO [CRIT] calculer dx(i),dy(i),dz(i) et dx(j),dy(j),dz(j)
-                    // puis pour tout x€Sub(i), y€Sub(j), appliquer le même différentiel.
-                    // -> optimisation dans le cas où d(dt) = 0.
-                    // sinon, si pour un certain (x,y,z), d(dt)(x,y,z) != 0, alors utiliser
-                    // la formule Leapfrog.
-
-                    // (*) On calcule v_newIsland et a_newIsland (additif).
-                    // (*) à t0 + r, toutes les entités dans island1 + island2
-                    // sont mises à p0(entité) = p0(entité) + solve(r, v_entité, a_entité).
-                    // (*) puis, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIsland).
-                    // (*) enfin, v0(entité) = v_newIsland et a0(entité) = a_newIsland
-                    // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
-                    // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
-                    // et stocker le résultat avec r inchangé dans mapCollidingPossible.
-                    if (debugFlag && complicatedFlag)
-                        console.log('\tSolving the island step...');
-
-                    let oldLength = mapCollidingPossible.length;
-                    Phase4.solveIslandStepLinear(
-                        mapCollidingPossible,
-                        ii, jj, rr, axis, subIslandI, subIslandJ, //newSubIsland,
-                        entities,
-                        objectIndexInIslandToSubIslandXIndex,
-                        objectIndexInIslandToSubIslandYIndex,
-                        objectIndexInIslandToSubIslandZIndex,
-                        oxAxis, island, world, relativeDt);
-
-                    if (mapCollidingPossible.length >= oldLength)
-                        reloop = true;
-
-                    if (debugFlag && complicatedFlag) {
-                        const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
-                        const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
-                        const id1 = oxAxis[xIndex1].id;
-                        const id2 = oxAxis[xIndex2].id;
-                        const e1 = entities[id1];
-                        const e2 = entities[id2];
-                        let msg = `\t\t/Entity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
-                        msg +=  `\n\t\t/Entity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
-                        console.log(msg);
-                    }
-
-                    // let newSubIsland =
-                    if (debugFlag && complicatedFlag)
-                        console.log('\tMerging sub-islands...');
-                    Phase3.mergeSubIslands(
-                        ii, jj, subIslandI, subIslandJ,
-                        objectIndexInIslandToSubIslandXIndex,
-                        objectIndexInIslandToSubIslandYIndex,
-                        objectIndexInIslandToSubIslandZIndex,
-                        subIslandsX, subIslandsY, subIslandsZ, axis);
-                    if (debugFlag && complicatedFlag)
-                        console.log('\tMerged!');
-                }
-
-                // Solved!
+                RigidBodies.solveCrossEntityHardCollision(
+                    world, entities, leapfrogArray, searcher, oxAxis, relativeDt
+                );
+            }
+            else
+            {
+                Phase2.simbleCollideEntitiesWithTerrain(oxAxis, entities, world)
             }
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
@@ -459,6 +230,254 @@ class RigidBodies
             //     if (entityUpdated) o.entityUpdated(entityId);
             // }
         });
+    }
+
+    static solveCrossEntityHardCollision(
+        world, entities,
+        leapfrogArray, searcher, oxAxis, relativeDt,
+    )
+    {
+        let abs = Math.abs;
+
+        // Sort entities according to incremental term.
+        // Remember leapfrogs within objects, reordering them within islands
+        // is probably better than sorting a potentially huge array.
+        let inf = x => Math.max(abs(x[0]), abs(x[1]), abs(x[2]));
+        leapfrogArray.sort((a, b) =>
+            inf(b) - inf(a)
+        );
+        // Note: a - b natural order, b - a reverse order
+        // abs(b[0]) + abs(b[1]) + abs(b[2]) - abs(a[0]) - abs(a[1]) - abs(a[2])
+
+        // Rebuild mapping after having sorted leapfrogs.
+        let reverseLeapfrogArray = new Int32Array(leapfrogArray.length);
+        for (let i = 0, l = leapfrogArray.length; i < l; ++i)
+            reverseLeapfrogArray[leapfrogArray[i][3]] = i;
+
+        // 4. Compute islands, cross world, by axis order.
+        let numberOfEntities = leapfrogArray.length;
+        let oxToIslandIndex = new Int32Array(numberOfEntities);
+        let islands = [];
+
+        Phase2.computeIslands(leapfrogArray, searcher, oxToIslandIndex, islands);
+        //console.log(numberOfEntities + ' entities');
+        // console.log(islands);
+        //console.log(oxToIslandIndex);
+
+        // 3. Snap x_i+1 with terrain collide, save non-integrated residuals
+        // as bounce components with coefficient & threshold (heat).
+        Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world);
+
+        // add leapfrog term
+        // get array of all xs sorted by axis
+
+        // 5. Broad phase: in every island, recurse from highest to lowest leapfrog's term
+        //    check neighbours for min distance in linearized trajectory
+        //    detect and push PROBABLY COLLIDING PAIRS.
+
+        // 6. Narrow phase, part 1: for all probably colliding pairs,
+        //    solve X² leapfrog, save first all valid Ts
+        //    keep list of ordered Ts across pairs.
+        if (islands.length > 0) {
+            // console.log('Islands: ');
+            // console.log(islands);
+            // console.log(islands[0]);
+        }
+
+        // islands.forEach(island =>
+        for (let currentIslandIndex = 0, il = islands.length; currentIslandIndex < il; ++currentIslandIndex)
+        {
+            let island = islands[currentIslandIndex];
+
+            // island.sort((a,b) => reverseLeapfrogArray[b] - reverseLeapfrogArray[a]);
+            let mapCollidingPossible = [];
+            // let bannedPairs = [];
+
+            // 1. Sort colliding possible.
+
+            // Solve leapfrog and sort according to time.
+            Phase3.solveLeapfrogQuadratic(
+                island,
+                oxAxis, entities, relativeDt,
+                mapCollidingPossible);
+
+            if (mapCollidingPossible.length < 1) continue;
+
+            // if (mapCollidingPossible.length > 0) console.log(mapCollidingPossible);
+
+            // Narrow phase, part 2: for all Ts in order,
+            //    set bodies as 'in contact' or 'terminal' (terrain),
+            //    compute new paths (which )are not more than common two previous) while compensating forces
+            //    so as to project the result into directions that are not occluded
+            //      -> bouncing will be done in next iteration to ensure convergence
+            //      -> possible to keep track of the energy as unsatisfied work of forces
+            //    solve X² leapfrog for impacted trajectories and insert new Ts in the list (map?)
+            //    End when there is no more collision to be solved.
+            mapCollidingPossible.sort((a, b) => a[2] - b[2]);
+            // console.log('first collision at ' + mapCollidingPossible[0][2]);
+
+            // 2. First colliding ->
+            //      join
+            //      move to collision point
+            //      compute new trajectory (leapfrog²)
+            //      collide again with terrain
+            //      compute colliding possible with all others
+            //      (invalidate collision with others) -> optional (discarded afterwards anyway)
+
+            let subIslandsX = []; // For sub-sampled physics, must be sorted and
+            let subIslandsY = []; // kept coherent before every pass in the I/J collider.
+            let subIslandsZ = [];
+
+            let objectIndexInIslandToSubIslandXIndex = new Int16Array(island.length);
+            let objectIndexInIslandToSubIslandYIndex = new Int16Array(island.length);
+            let objectIndexInIslandToSubIslandZIndex = new Int16Array(island.length);
+
+            objectIndexInIslandToSubIslandXIndex.fill(-1);
+            objectIndexInIslandToSubIslandYIndex.fill(-1);
+            objectIndexInIslandToSubIslandZIndex.fill(-1);
+
+            // TODO [remember] increase island widths with a possible displacement from a w-width impact object
+
+            // For each entity in current island
+            let complicatedFlag = mapCollidingPossible.length > 1;
+            let solverPassId = 1;
+            let debugFlag = false;
+            if (debugFlag)
+            {
+                if (complicatedFlag) console.log(`Complicated collision solving: ${island}`);
+                else console.log(`Collision solving: island ${island}, map ${mapCollidingPossible}`);
+
+                console.log('New island pass');
+                console.log(island);
+            }
+
+            let dbg = false;
+            if (dbg) {
+                let eids = [];
+                for (let isl = 0; isl < island.length; ++isl)
+                    eids.push(oxAxis[island[isl]].id);
+                console.log(eids);
+            }
+            let reloop = false;
+
+            while (mapCollidingPossible.length > 0)
+            {
+                if (dbg) {
+                    console.log(
+                        `\t${mapCollidingPossible[0]} ` +
+                        `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
+                    );
+                }
+                reloop = false;
+                let ii = mapCollidingPossible[0][0];     // island 1 index
+                let jj = mapCollidingPossible[0][1];     // island 2 index
+                let rr = mapCollidingPossible[0][2];     // time got by solver
+                let axis = mapCollidingPossible[0][3];  // 'x', 'y', 'z' or 'none'
+
+                if (debugFlag && complicatedFlag) {
+                    let msg = `\tPass ${solverPassId++} : ${mapCollidingPossible.length} elements to process `;
+                    for (let m = 0; m < mapCollidingPossible.length; ++m) {
+                        msg += `(${mapCollidingPossible[m][0]}, ${mapCollidingPossible[m][1]}); `;
+                    }
+                    const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                    const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
+                    const id1 = oxAxis[xIndex1].id;
+                    const id2 = oxAxis[xIndex2].id;
+                    const e1 = entities[id1];
+                    const e2 = entities[id2];
+                    msg += `\n\tEntity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
+                    msg += `\n\tEntity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
+                    msg += `\n\tColliding on ${axis} axis, at t = ${rr.toFixed(10)}`;
+                    console.log(msg);
+                }
+                // \DEBUG
+
+                let subIslandI = Phase3.getSubIsland(ii, axis,
+                    objectIndexInIslandToSubIslandXIndex,
+                    objectIndexInIslandToSubIslandYIndex,
+                    objectIndexInIslandToSubIslandZIndex,
+                    subIslandsX, subIslandsY, subIslandsZ);
+
+                let subIslandJ = Phase3.getSubIsland(jj, axis,
+                    objectIndexInIslandToSubIslandXIndex,
+                    objectIndexInIslandToSubIslandYIndex,
+                    objectIndexInIslandToSubIslandZIndex,
+                    subIslandsX, subIslandsY, subIslandsZ);
+
+                if (debugFlag && complicatedFlag)
+                    console.log('\tApplying collision...');
+                const eps = 1e-6;
+                Phase3.applyCollision(
+                    ii, jj, rr, axis,
+                    island, oxAxis, entities, relativeDt, eps);
+
+                // 1. apply step to newSubIsland
+                // 2.1. invalidate for each (newSubIslandMember)
+                // 2.2. resolve for each (newSubIslandMember x anyother)
+                // 3. update mapCollidingPossible
+
+                // Warn: account for numerical errors.
+
+                // TODO [CRIT] changer applyCollision (p1 juste changé) pour mettre p0 = p1(c)
+                // TODO [CRIT] et p1 = solve(dt = dt0-r, entité).
+                // Si dt0-r = 0
+                // TODO [CRIT] calculer dx(i),dy(i),dz(i) et dx(j),dy(j),dz(j)
+                // puis pour tout x€Sub(i), y€Sub(j), appliquer le même différentiel.
+                // -> optimisation dans le cas où d(dt) = 0.
+                // sinon, si pour un certain (x,y,z), d(dt)(x,y,z) != 0, alors utiliser
+                // la formule Leapfrog.
+
+                // (*) On calcule v_newIsland et a_newIsland (additif).
+                // (*) à t0 + r, toutes les entités dans island1 + island2
+                // sont mises à p0(entité) = p0(entité) + solve(r, v_entité, a_entité).
+                // (*) puis, p1(entité) = p0(entité) + solve(t1-r, v_newIsland, a_newIsland).
+                // (*) enfin, v0(entité) = v_newIsland et a0(entité) = a_newIsland
+                // (*) retirer tout membre appartenant à newIsland de mapCollidingPossible
+                // (*) effectuer un leapfrog sur NewIsland \cross Complementaire(NewIsland)
+                // et stocker le résultat avec r inchangé dans mapCollidingPossible.
+                if (debugFlag && complicatedFlag)
+                    console.log('\tSolving the island step...');
+
+                let oldLength = mapCollidingPossible.length;
+                Phase4.solveIslandStepLinear(
+                    mapCollidingPossible,
+                    ii, jj, rr, axis, subIslandI, subIslandJ, //newSubIsland,
+                    entities,
+                    objectIndexInIslandToSubIslandXIndex,
+                    objectIndexInIslandToSubIslandYIndex,
+                    objectIndexInIslandToSubIslandZIndex,
+                    oxAxis, island, world, relativeDt);
+
+                if (mapCollidingPossible.length >= oldLength)
+                    reloop = true;
+
+                if (debugFlag && complicatedFlag) {
+                    const xIndex1 = island[ii]; // let lfa1 = leapfrogArray[xIndex1];
+                    const xIndex2 = island[jj]; // let lfa1 = leapfrogArray[xIndex1];
+                    const id1 = oxAxis[xIndex1].id;
+                    const id2 = oxAxis[xIndex2].id;
+                    const e1 = entities[id1];
+                    const e2 = entities[id2];
+                    let msg = `\t\t/Entity ${e1.entityId} : ${e1.p0[2].toFixed(5)} -> ${e1.p1[2].toFixed(5)}`;
+                    msg +=  `\n\t\t/Entity ${e2.entityId} : ${e2.p0[2].toFixed(5)} -> ${e2.p1[2].toFixed(5)}`;
+                    console.log(msg);
+                }
+
+                // let newSubIsland =
+                if (debugFlag && complicatedFlag)
+                    console.log('\tMerging sub-islands...');
+                Phase3.mergeSubIslands(
+                    ii, jj, subIslandI, subIslandJ,
+                    objectIndexInIslandToSubIslandXIndex,
+                    objectIndexInIslandToSubIslandYIndex,
+                    objectIndexInIslandToSubIslandZIndex,
+                    subIslandsX, subIslandsY, subIslandsZ, axis);
+                if (debugFlag && complicatedFlag)
+                    console.log('\tMerged!');
+            }
+
+            // Solved!
+        }
     }
 
     // Legacy.

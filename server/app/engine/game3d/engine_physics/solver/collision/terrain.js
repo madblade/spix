@@ -23,7 +23,8 @@ class TerrainCollider
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
      * - TODO [HIGH] investigate acceleration resets (adherence to walls).
      */
-    static collideLinear(entity, world, position, newPosition, doProject) {
+    static collideLinear(entity, world, position, newPosition, doProject)
+    {
         let p0 = position;
         let p1 = newPosition;
         let x0 = p0[0]; let y0 = p0[1]; let z0 = p0[2];
@@ -194,12 +195,12 @@ class TerrainCollider
         let frac1 = x => 1.0 - x + Math.floor(x);
         let min = (x, y) => Math.min(x, y);
 
-        let x1 = p1[0];
-        let x2 = p2[0];
-        let y1 = p1[1];
-        let y2 = p2[1];
-        let z1 = p1[2];
-        let z2 = p2[2];
+        const x1 = p1[0];
+        const x2 = p2[0];
+        const y1 = p1[1];
+        const y2 = p2[1];
+        const z1 = p1[2];
+        const z2 = p2[2];
 
         // p1p2 is parametrized as p(t) = p1 + (p2-p1)*t
         // tDeltaX def. how far one has to move, in units of t, s. t. the horiz. comp. of the mvt. eq. the wdth. of a v.
@@ -305,22 +306,20 @@ class TerrainCollider
                 if (dby < 2) {
                     if (dy < 0) {
                         const free = world.isFree([i + ddx, j - 1, k]);
-                        if (!free && dby < 1 && ny > ny0 - 1 || free) {
+                        if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
                             adherence[1] = false;
-                        }
-                        else {
+                        } else {
                             nyt = ny0 - 1;
                             if (dby > 0 && !free) adherence[1] = true;
                         }
                     }
                     if (dy > 0) {
                         const free = world.isFree([i + ddx, j + 1, k]);
-                        if (!free && dby < 1 && ny < ny0 + 1 || free) {
+                        if (free || dby < 1 && ny < ny0 + 1) {
                             nyt = ny;
                             adherence[4] = false;
-                        }
-                        else {
+                        } else {
                             nyt = ny0 + 1;
                             if (dby > 0 && !free) adherence[4] = true;
                         }
@@ -335,7 +334,7 @@ class TerrainCollider
                 if (dbz < 2) {
                     if (dz < 0) {
                         const free = world.isFree([i + ddx, j, k - 1]);
-                        if (!free && dbz < 1 && nz > nz0 - 1 || free) {
+                        if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
                             adherence[2] = false;
                         }
@@ -346,7 +345,7 @@ class TerrainCollider
                     }
                     if (dz > 0) {
                         const free = world.isFree([i + ddx, j, k + 1]);
-                        if (!free && dbz < 1 && nz < nz0 + 1 || free) {
+                        if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
                             adherence[5] = false;
                         }
@@ -394,7 +393,7 @@ class TerrainCollider
                 if (dbx < 2) {
                     if (dx < 0) {
                         const free = world.isFree([i - 1, j + ddy, k]);
-                        if (!free && dbx < 1 && nx > nx0 - 1 || free) {
+                        if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
                             adherence[0] = false;
                         }
@@ -405,7 +404,7 @@ class TerrainCollider
                     }
                     if (dx > 0) {
                         const free = world.isFree([i + 1, j + ddy, k]);
-                        if (!free && dbx < 1 && nx < nx0 + 1 || free) {
+                        if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
                             adherence[3] = false;
                         }
@@ -424,7 +423,7 @@ class TerrainCollider
                 if (dbz < 2) {
                     if (dz < 0) {
                         const free = world.isFree([i, j + ddy, k - 1]);
-                        if (!free && dbz < 1 && nz > nz0 - 1 || free) {
+                        if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
                             adherence[2] = false;
                         }
@@ -435,7 +434,7 @@ class TerrainCollider
                     }
                     if (dz > 0) {
                         const free = world.isFree([i, j + ddy, k + 1]);
-                        if (!free && dbz < 1 && nz < nz0 + 1 || free) {
+                        if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
                             adherence[5] = false;
                         }
@@ -483,7 +482,7 @@ class TerrainCollider
                 if (dbx < 2) {
                     if (dx < 0) {
                         const free = world.isFree([i - 1, j, k + ddz]);
-                        if (!free && dbx < 1 && nx > nx0 - 1 || free) {
+                        if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
                             adherence[0] = false;
                         }
@@ -494,7 +493,7 @@ class TerrainCollider
                     }
                     if (dx > 0) {
                         const free = world.isFree([i + 1, j, k + ddz]);
-                        if (!free && dbx < 1 && nx < nx0 + 1 || free) {
+                        if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
                             adherence[3] = false;
                         }
@@ -513,7 +512,7 @@ class TerrainCollider
                 if (dby < 2) {
                     if (dy < 0) {
                         const free = world.isFree([i, j - 1, k + ddz]);
-                        if (!free && dby < 1 && ny > ny0 - 1 || free) {
+                        if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
                             adherence[1] = false;
                         }
@@ -524,7 +523,7 @@ class TerrainCollider
                     }
                     if (dy > 0) {
                         const free = world.isFree([i, j + 1, k + ddz]);
-                        if (!free && dby < 1 && ny < ny0 + 1 || free) { // || is done last
+                        if (free || dby < 1 && ny < ny0 + 1) { // || is done last
                             nyt = ny;
                             adherence[4] = false;
                         }
