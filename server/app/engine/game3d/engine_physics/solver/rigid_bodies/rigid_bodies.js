@@ -25,7 +25,7 @@ class RigidBodies
     static gravityConstant = 2 * -0.00980665;
 
     static crossEntityCollision = false; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
-    static creativeMode = true; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
+    static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
     // static gravityConstant = 0;
 
     constructor(refreshRate)
@@ -86,7 +86,7 @@ class RigidBodies
         }
 
         // take at -2 (under feet and not only on raw border)
-        let rad = max(max(radius * sX, radius * sY), radius * sZ);
+        let rad = max(max(radius * sX, radius * sY), radius * sZ) - 1;
         if (
             abs(cX - x) < radius * sX &&
             abs(cY - y) < radius * sY &&
@@ -96,11 +96,11 @@ class RigidBodies
 
         // const rsx = radius * sX;
         // const rsxm = cX - rsx; const rsxp = cX + rsx;
-        const rsxm = cX - rad + 1; const rsxp = cX + rad - 1;
+        const rsxm = cX - rad; const rsxp = cX + rad;
         cX = x < rsxm ? rsxm : x > rsxp ? rsxp : x;
-        const rsym = cY - rad + 1; const rsyp = cY + rad - 1;
+        const rsym = cY - rad; const rsyp = cY + rad;
         cY = y < rsym ? rsym : y > rsyp ? rsyp : y;
-        const rszm = cZ - rad + 1; const rszp = cZ + rad - 1;
+        const rszm = cZ - rad; const rszp = cZ + rad;
         cZ = z < rszm ? rszm : z > rszp ? rszp : z;
 
         let power = 4.0;
@@ -117,7 +117,6 @@ class RigidBodies
         direction[0] /= norm;
         direction[1] /= norm;
         direction[2] /= norm;
-        console.log(direction);
         return direction;
     }
 

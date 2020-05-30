@@ -128,6 +128,23 @@ class RigidBodiesPhase5
                 if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
                     entityUpdated = true;
                     // TODO [HIGH] update rotated collision model.
+                    const gx = gravity[0]; const gy = gravity[1]; const gz = gravity[2];
+                    const gx0 = gx !== 0; const gy0 = gy !== 0; const gz0 = gz !== 0;
+                    if (gx0 ^ gy0 ^ gz0) {
+                        if (gz0) {
+                            currentEntity.widthX = 0.25;
+                            currentEntity.widthY = 0.25;
+                            currentEntity.widthZ = 0.9;
+                        } else if (gx0) {
+                            currentEntity.widthX = 0.9;
+                            currentEntity.widthY = 0.25;
+                            currentEntity.widthZ = 0.25;
+                        } else if (gy0) {
+                            currentEntity.widthX = 0.25;
+                            currentEntity.widthY = 0.9;
+                            currentEntity.widthZ = 0.25;
+                        }
+                    }
                 }
             }
 

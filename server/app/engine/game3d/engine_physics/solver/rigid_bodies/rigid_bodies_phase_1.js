@@ -7,6 +7,7 @@
 import EventOrderer from './orderer_events';
 import Entity from '../../../model_entity/entity';
 import RigidBodies from "./rigid_bodies";
+import {WorldType} from "../../../model_world/model";
 
 class RigidBodiesPhase1
 {
@@ -103,6 +104,7 @@ class RigidBodiesPhase1
         let vS = [];
         let aS = [];
         const debug = false;
+        const isCubeWorld = world.worldInfo.type === WorldType.CUBE;
 
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
         {
@@ -161,6 +163,10 @@ class RigidBodiesPhase1
             // This gravity should be fetched per entity instead.
             let g = RigidBodies.creativeMode ? [0, 0, 0] :
                 rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+            // Only one non-zeno gravity compenent accepted on cube worlds.
+            if (isCubeWorld && !(g[0] !== 0 ^ g[1] !== 0 ^ g[2] !== 0)) {
+                g[0] = g[1] = g[2] = 0;
+            }
 
             //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
             let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
