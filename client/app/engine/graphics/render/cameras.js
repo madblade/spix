@@ -363,8 +363,18 @@ extend(CameraManager.prototype, {
         let camera = this.mainCamera;
         let raycasterCamera = this.mainRaycasterCamera;
         theta1 = Math.max(0, Math.min(Math.PI, theta1));
-        camera.setUpRotation(theta1, 0, theta0); // TODO smoothly modify orientation
+
+        // | this line is unsafe
+        // V
+        camera.setUpRotation(theta1, 0, theta0);
+        // because the camera rotation has changed since the last update,
+        // therefore the new angle set here is outdated
+        // resulting in camera jitters whenever this is called
+        // (for variable gravity or on the edge of 3D worlds)
+        // Solution: client-wise gravity computation (milestone).
+
         raycasterCamera.setUpRotation(theta1, 0, theta0);
+        // TODO rotate hand-held item
     },
 
     setRelRotation(theta0, theta1) {
