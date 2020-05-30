@@ -50,6 +50,8 @@ let CameraManager = function(graphicsEngine)
 
     // Optimization
     this.incomingRotationEvents = [];
+    this.oldTheta0 = 0;
+    this.oldTheta1 = 0;
 };
 
 // Factory.
@@ -347,7 +349,17 @@ extend(CameraManager.prototype, {
         projectionMatrix.elements[14] = c.w;
     },
 
-    setAbsRotation(theta0, theta1) {
+    setAbsRotationFromServer(theta0, theta1)
+    {
+        if (this.oldTheta1 === theta1 && this.oldTheta0 === theta0) return false;
+        this.setAbsRotation(theta0, theta1);
+        this.oldTheta0 = theta0;
+        this.oldTheta1 = theta1;
+        return true;
+    },
+
+    setAbsRotation(theta0, theta1)
+    {
         let camera = this.mainCamera;
         let raycasterCamera = this.mainRaycasterCamera;
         theta1 = Math.max(0, Math.min(Math.PI, theta1));
@@ -479,6 +491,8 @@ extend(CameraManager.prototype, {
         this.subCameras.clear();
         this.mainRaycasterCamera = this.createCamera(true, -1);
         this.raycaster = this.createRaycaster();
+        this.oldTheta0 = 0;
+        this.oldTheta1 = 0;
     }
 
 });

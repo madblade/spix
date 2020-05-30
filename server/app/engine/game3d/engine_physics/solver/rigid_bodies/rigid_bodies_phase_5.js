@@ -75,7 +75,7 @@ class RigidBodiesPhase5
             currentEntity.lastR = -1;
 
             // Temporarily discard insulated objects.
-            // // if (oxToIslandIndex[oi] !== -1) return;
+            // if (oxToIslandIndex[oi] !== -1) return;
 
             //let entityIndex = oxAxis[oi].id;
             let p0 = currentEntity.p0; let p1 = currentEntity.p1;
@@ -84,12 +84,9 @@ class RigidBodiesPhase5
 
             // Cast through potential x.
             let xCrossed = XCollider.xCollide(p0, p1, world, xm);
-            //if (oldWorldId == -1) {
-            //    console.log('Position: ');
-            //    console.log(p0);
-            //    console.log('->');
-            //    console.log(p1);
-            //}
+            // if (oldWorldId == -1) {
+            //    console.log(`Position: ${p0} -> ${p1}`);
+            // }
 
             // For cross-w collision one can do the following:
             //  1. if free (pyr, terrain) at gate, switch wld, else snap to gate

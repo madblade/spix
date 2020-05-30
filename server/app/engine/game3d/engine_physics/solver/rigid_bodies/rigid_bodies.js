@@ -13,7 +13,6 @@ import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
 import { WorldType } from '../../../model_world/model';
 
-// TODO [HIGH] toggle gravity integration
 // TODO [HIGH] jump gameplay
 // TODO [HIGH] gravity on edges
 // TODO [HIGH] rotate collision model
@@ -26,7 +25,7 @@ class RigidBodies
     static gravityConstant = 2 * -0.00980665;
 
     static crossEntityCollision = false; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
-    static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
+    static creativeMode = true; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
     // static gravityConstant = 0;
 
     constructor(refreshRate)
@@ -58,6 +57,7 @@ class RigidBodies
             const radius = world.worldInfo.sideSize;
             let abs = Math.abs;
             let max = Math.max;
+            let min = Math.min;
             const sX = world.xSize;
             const sY = world.ySize;
             const sZ = world.zSize;
@@ -95,34 +95,39 @@ class RigidBodies
             // console.log(res[0].toFixed(10) + ',' + res[1].toFixed(10) + ',' + res[2].toFixed(10));
 
             // TODO [MILESTONE0] here variable gravity gp
-            let squaredWithSmoothBorders = false;
-            let squaredRadius = 2;
+            let squaredWithSmoothBorders = true;
+            let squaredRadius = 2;// sX * radius;
+            const gravityNorm = RigidBodies.gravityConstant;
             if (squaredWithSmoothBorders) {
-                const thirdFactor = RigidBodies.gravityConstant;
                 if (dX > max(dY, dZ) + squaredRadius)
-                    return [(xPlus ? 1 : -1) * thirdFactor, 0, 0];
+                    return [(xPlus ? 1 : -1) * gravityNorm, 0, 0];
                 else if (dY > max(dX, dZ) + squaredRadius)
-                    return [0, (yPlus ? 1 : -1) * thirdFactor, 0];
+                    return [0, (yPlus ? 1 : -1) * gravityNorm, 0];
                 else if (dZ > max(dX, dY) + squaredRadius)
-                    return [0, 0, (zPlus ? 1 : -1) * thirdFactor];
+                    return [0, 0, (zPlus ? 1 : -1) * gravityNorm];
                 // else
-                // return [0, 0, 0]; // this._gravity; // -z by default...
+                    // return [0, 0, 0]; // this._gravity; // -z by default...
+
+                // const trueX =
             }
 
-            const ff = 0.0000001;
+            // const ff = 0.0000001;
             let power = 8.0;
             let ddx = parseFloat(cX) - parseFloat(x); // ddx *= ddx;
             let ddy = parseFloat(cY) - parseFloat(y); // ddy *= ddy;
             let ddz = parseFloat(cZ) - parseFloat(z); // ddz *= ddz;
-            let dd =
-                Math.pow(Math.pow(ddx, power) + Math.pow(ddy, power) + Math.pow(ddz, power), 1 / power);
-            dd = Math.max(5.0, dd); // Cap. max acceleration.
-            return [
-                ff * Math.pow(Math.abs(ddx), power + 1) / (ddx * dd),
-                ff * Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
-                ff * Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
+            let dd = Math.pow(Math.pow(ddx, power) + Math.pow(ddy, power) + Math.pow(ddz, power), 1 / power);
+            // dd = Math.max(5.0, dd); // Cap. max acceleration.
+            let direction = [
+                Math.pow(Math.abs(ddx), power + 1) / (ddx * dd),
+                Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
+                Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
             ];
-            // return direction;
+            let norm = Math.sqrt(Math.pow(direction[0], 2) + Math.pow(direction[1], 2) + Math.pow(direction[2], 2));
+            direction[0] /= norm;
+            direction[1] /= norm;
+            direction[2] /= norm;
+            return direction;
         }
 
         return this._gravity;

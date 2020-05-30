@@ -102,9 +102,9 @@ extend(SelfModel.prototype, {
             let cam = graphics.cameraManager.mainCamera;
             // let rotationZ = cam.getZRotation();
             let rotationX = cam.getXRotation();
-            graphics.cameraManager.setAbsRotation(theta0, theta1);
+            const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
-            // graphics.cameraManager.setRelRotation(r[0], rotationX);
+            if (changed) graphics.cameraManager.setRelRotation(r[0], rotationX);
 
             // mainCamera.setUpRotation(theta1, 0, theta0);
             // moveCameraFromMouse(0, 0, newX, newY);
