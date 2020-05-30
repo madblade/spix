@@ -50,87 +50,75 @@ class RigidBodies
     // Advanced gravity management.
     getGravity(world, worldId, x, y, z)
     {
-        if (this._variableGravity &&
-            world.worldInfo.type === WorldType.CUBE)
-        {
-            const center = world.worldInfo.center; // this._worldCenter;
-            const radius = world.worldInfo.sideSize;
-            let abs = Math.abs;
-            let max = Math.max;
-            let min = Math.min;
-            const sX = world.xSize;
-            const sY = world.ySize;
-            const sZ = world.zSize;
-            const cX = sX * center.x + sX / 2;
-            const cY = sY * center.y + sY / 2;
-            const cZ = sZ * center.z + sZ / 2;
+        if (!this._variableGravity || world.worldInfo.type !== WorldType.CUBE)
+            return this._gravity;
 
-            const dX = abs(x - cX);
-            const dY = abs(y - cY);
-            const dZ = abs(z - cZ);
-            const xPlus = x > cX;
-            const yPlus = y > cY;
-            const zPlus = z > cZ;
+        const center = world.worldInfo.center; // this._worldCenter;
+        let radius = parseFloat(world.worldInfo.radius);
+        let abs = Math.abs;
+        let max = Math.max;
+        let min = Math.min;
+        const sX = world.xSize;
+        const sY = world.ySize;
+        const sZ = world.zSize;
+        let cX = sX * center.x + sX / 2;
+        let cY = sY * center.y + sY / 2;
+        let cZ = sZ * center.z + sZ / 2;
 
-            // direction[0] = center[0] - x;
-            // direction[1] = center[1] - y;
-            // direction[2] = center[2] - z;
+        const dX = abs(x - cX);
+        const dY = abs(y - cY);
+        const dZ = abs(z - cZ);
+        const xPlus = x > cX;
+        const yPlus = y > cY;
+        const zPlus = z > cZ;
 
-            // Keep in mind Gauss' Flow Theorem which states that
-            // it should integrate over the radius from the center
-            // to the min of (object position, attractor surface)
-            // yielding 4/3 PI min(center-pos, attr radius)^3
-
-            // distance += (x - center[0]) * (x - center[0]);
-            // distance += (y - center[1]) * (y - center[1]);
-            // distance += (z - center[2]) * (z - center[2]);
-
-            // if (distance === 0)
-            //     return [0, 0, 0];
-
-            // for (let i = 0; i < 3; ++i)
-            //     direction[i] /= distance * distance; // Affectation occurs last.
-
-            // console.log(cX + ',' + cY + ',' + cZ + ' ; ' + x + ',' + y + ',' + z);
-            // console.log(res[0].toFixed(10) + ',' + res[1].toFixed(10) + ',' + res[2].toFixed(10));
-
-            // TODO [MILESTONE0] here variable gravity gp
-            let squaredWithSmoothBorders = true;
-            let squaredRadius = 2;// sX * radius;
-            const gravityNorm = RigidBodies.gravityConstant;
-            if (squaredWithSmoothBorders) {
-                if (dX > max(dY, dZ) + squaredRadius)
-                    return [(xPlus ? 1 : -1) * gravityNorm, 0, 0];
-                else if (dY > max(dX, dZ) + squaredRadius)
-                    return [0, (yPlus ? 1 : -1) * gravityNorm, 0];
-                else if (dZ > max(dX, dY) + squaredRadius)
-                    return [0, 0, (zPlus ? 1 : -1) * gravityNorm];
-                // else
-                    // return [0, 0, 0]; // this._gravity; // -z by default...
-
-                // const trueX =
-            }
-
-            // const ff = 0.0000001;
-            let power = 8.0;
-            let ddx = parseFloat(cX) - parseFloat(x); // ddx *= ddx;
-            let ddy = parseFloat(cY) - parseFloat(y); // ddy *= ddy;
-            let ddz = parseFloat(cZ) - parseFloat(z); // ddz *= ddz;
-            let dd = Math.pow(Math.pow(ddx, power) + Math.pow(ddy, power) + Math.pow(ddz, power), 1 / power);
-            // dd = Math.max(5.0, dd); // Cap. max acceleration.
-            let direction = [
-                Math.pow(Math.abs(ddx), power + 1) / (ddx * dd),
-                Math.pow(Math.abs(ddy), power + 1) / (ddy * dd),
-                Math.pow(Math.abs(ddz), power + 1) / (ddz * dd)
-            ];
-            let norm = Math.sqrt(Math.pow(direction[0], 2) + Math.pow(direction[1], 2) + Math.pow(direction[2], 2));
-            direction[0] /= norm;
-            direction[1] /= norm;
-            direction[2] /= norm;
-            return direction;
+        // Clamp on main faces to keep camera rotation updates to a minimum.
+        let squaredWithSmoothBorders = true;
+        let squaredRadius = 2; // Should this equal 1.6, the entity height?
+        const gravityNorm = RigidBodies.gravityConstant;
+        if (squaredWithSmoothBorders) {
+            if (dX > max(dY, dZ) + squaredRadius)
+                return [(xPlus ? 1 : -1) * gravityNorm, 0, 0];
+            else if (dY > max(dX, dZ) + squaredRadius)
+                return [0, (yPlus ? 1 : -1) * gravityNorm, 0];
+            else if (dZ > max(dX, dY) + squaredRadius)
+                return [0, 0, (zPlus ? 1 : -1) * gravityNorm];
         }
 
-        return this._gravity;
+        // take at -2 (under feet and not only on raw border)
+        let rad = max(max(radius * sX, radius * sY), radius * sZ);
+        if (
+            abs(cX - x) < radius * sX &&
+            abs(cY - y) < radius * sY &&
+            abs(cZ - z) < radius * sZ
+        )
+            rad = min(min(abs(cX - x), abs(cY - y)), abs(cZ - z)) - 1;
+
+        // const rsx = radius * sX;
+        // const rsxm = cX - rsx; const rsxp = cX + rsx;
+        const rsxm = cX - rad + 1; const rsxp = cX + rad - 1;
+        cX = x < rsxm ? rsxm : x > rsxp ? rsxp : x;
+        const rsym = cY - rad + 1; const rsyp = cY + rad - 1;
+        cY = y < rsym ? rsym : y > rsyp ? rsyp : y;
+        const rszm = cZ - rad + 1; const rszp = cZ + rad - 1;
+        cZ = z < rszm ? rszm : z > rszp ? rszp : z;
+
+        let power = 4.0;
+        let ddx = parseFloat(cX) - parseFloat(x);
+        let ddy = parseFloat(cY) - parseFloat(y);
+        let ddz = parseFloat(cZ) - parseFloat(z);
+        let dd = Math.pow(Math.pow(ddx, power) + Math.pow(ddy, power) + Math.pow(ddz, power), 1 / power);
+        let direction = [
+            ddx !== 0 ? Math.pow(Math.abs(ddx), power + 1) / (ddx * dd) : 0,
+            ddy !== 0 ? Math.pow(Math.abs(ddy), power + 1) / (ddy * dd) : 0,
+            ddz !== 0 ? Math.pow(Math.abs(ddz), power + 1) / (ddz * dd) : 0
+        ];
+        let norm = Math.sqrt(Math.pow(direction[0], 2) + Math.pow(direction[1], 2) + Math.pow(direction[2], 2));
+        direction[0] /= norm;
+        direction[1] /= norm;
+        direction[2] /= norm;
+        console.log(direction);
+        return direction;
     }
 
     // Advanced time flow customization.
