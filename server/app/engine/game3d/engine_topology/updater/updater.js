@@ -33,9 +33,18 @@ class Updater
             if (action === 'add') {
                 let blockId = meta[4];
                 if (this.isValidBlock(blockId))
-                    this.addBlock(avatar, meta[1], meta[2], meta[3], blockId);
+                {
+                    const x = parseInt(meta[1], 10);
+                    const y = parseInt(meta[2], 10);
+                    const z = parseInt(meta[3], 10);
+                    const bid = parseInt(blockId, 10);
+                    this.addBlock(avatar, x, y, z, bid);
+                }
             } else if (action === 'del') {
-                this.delBlock(avatar, meta[1], meta[2], meta[3]);
+                const x = parseInt(meta[1], 10);
+                const y = parseInt(meta[2], 10);
+                const z = parseInt(meta[3], 10);
+                this.delBlock(avatar, x, y, z);
             }
         });
     }
@@ -94,7 +103,6 @@ class Updater
         updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));
         o.chunkUpdated(worldId, $chunk.chunkId);
     }
-
 }
 
 export default Updater;
