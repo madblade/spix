@@ -55,11 +55,11 @@ let ListenerModule = {
         let flo = Math.floor;
         let abs = Math.abs;
 
-        let rx = point.x; let ry = point.y; let rz = point.z;
-        let dx = abs(abs(flo(rx)) - abs(rx));
-        let dy = abs(abs(flo(ry)) - abs(ry));
-        let dz = abs(abs(flo(rz)) - abs(rz));
-        let ex = dx < 0.0000001; let ey = dy < 0.0000001; let ez = dz < 0.0000001;
+        const rx = point.x; const ry = point.y; const rz = point.z;
+        const dx = abs(abs(flo(rx)) - abs(rx));
+        const dy = abs(abs(flo(ry)) - abs(ry));
+        const dz = abs(abs(flo(rz)) - abs(rz));
+        const ex = dx < 0.0000001; const ey = dy < 0.0000001; const ez = dz < 0.0000001;
 
         if (ex + ey + ez !== 1) {
             // TODO [HIGH] how do I remove an X?

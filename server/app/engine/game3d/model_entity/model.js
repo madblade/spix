@@ -95,8 +95,12 @@ class EntityModel {
             const entity = entities[e];
             if (!entity || entity.worldId !== worldId) continue;
             let p = entity.position;
-            if (p[0] >= x && p[0] <= x + 1 && p[1] >= y && p[1] <= y + 1 && p[2] >= z && p[2] <= z + 1)
-                return true;
+            const px = p[0]; const wx = entity.widthX;
+            const py = p[1]; const wy = entity.widthY;
+            const pz = p[2]; const wz = entity.widthZ;
+            return x + 1 >= px - wx && x <= px + wx &&
+                   y + 1 >= py - wy && y <= py + wy &&
+                   z + 1 >= pz - wz && z <= pz + wz;
         }
 
         return false;

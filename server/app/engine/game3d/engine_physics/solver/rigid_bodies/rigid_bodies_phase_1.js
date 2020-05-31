@@ -6,8 +6,8 @@
 
 import EventOrderer from './orderer_events';
 import Entity from '../../../model_entity/entity';
-import RigidBodies from "./rigid_bodies";
-import {WorldType} from "../../../model_world/model";
+import RigidBodies from './rigid_bodies';
+import { WorldType } from '../../../model_world/model';
 
 class RigidBodiesPhase1
 {
@@ -181,6 +181,7 @@ class RigidBodiesPhase1
                 let vi = vector[i];
                 if (adh[i] && vi > 0.05 && g[i] < 0) {
                     console.log(`jump ${passId}`);
+                    console.log(`${p1} -> ${p0}`);
                     // vi = .1;
                     a1[i] += 0.6;
                     p1[i] = p0[i];
