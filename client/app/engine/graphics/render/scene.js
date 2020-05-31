@@ -54,7 +54,7 @@ extend(SceneManager.prototype, {
 
     addObject(object, sceneId) {
         let scene = this.getScene(sceneId);
-        if (scene) scene.add(object);
+        if (scene && object.parent !== scene) scene.add(object);
     },
 
     removeObject(object, sceneId, doNotDispose) {

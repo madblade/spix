@@ -212,6 +212,7 @@ let ListenerModule = {
         clientModel.triggerChange('interaction', ['itemSelect', ey]);
     },
 
+    // TODO replace jquery-mousewheel with something better
     registerMouseWheel() {
         $(window).mousewheel(this.mouseWheelCallback.bind(this));
     },

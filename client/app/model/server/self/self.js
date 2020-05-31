@@ -4,11 +4,11 @@
 
 'use strict';
 
-import extend               from '../../../extend.js';
+import extend                from '../../../extend.js';
 
-import { InventoryModel }   from './inventory.js';
-import { Vector3 }          from 'three';
-import { ItemsModelModule } from './items';
+import { InventoryModel }    from './inventory.js';
+import { Object3D, Vector3 } from 'three';
+import { ItemsModelModule }  from './items';
 
 let SelfModel = function(app) {
     this.app = app;
@@ -33,6 +33,8 @@ let SelfModel = function(app) {
 
     this.avatar = null;
     this.handItem = null;
+    this.handItemWrapper = new Object3D();
+    this.handItemWrapper.rotation.reorder('ZYX');
 };
 
 extend(SelfModel.prototype, {
@@ -49,7 +51,7 @@ extend(SelfModel.prototype, {
         let clientModel = this.app.model.client;
 
         let avatar = this.avatar;
-        let handItem = this.handItem;
+        let handItemWrapper = this.handItemWrapper;
         let up = this.position;
         let r = this.rotation;
         let id = this.entityId;
@@ -69,13 +71,13 @@ extend(SelfModel.prototype, {
 
             if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
             // TODO differentiate 3d person and 1st person
-            if (displayHandItem) graphics.removeFromScene(handItem, oldWorldId);
+            if (displayHandItem) graphics.removeFromScene(handItemWrapper, oldWorldId);
 
             graphics.switchToScene(oldWorldId, worldId);
             xModel.switchAvatarToWorld(oldWorldId, worldId);
 
             if (displayAvatar) graphics.addToScene(avatar, worldId);
-            if (displayHandItem) graphics.addToScene(handItem, worldId);
+            if (displayHandItem) graphics.addToScene(handItemWrapper, worldId);
             xModel.forceUpdate = true;
         }
 
@@ -121,11 +123,13 @@ extend(SelfModel.prototype, {
             //clientModel.selfComponent.processChanges();
             graphics.cameraManager.updateCameraPosition(this.position);
 
-            if (handItem) {
+            let handItem = this.handItem;
+            if (handItem && handItemWrapper) {
                 let mc = graphics.cameraManager.mainCamera;
-                handItem.position.copy(mc.up.position);
-                // handItem.rotation.x = mc.pitch.rotation.x;
-                // handItem.rotation.z = mc.yaw.rotation.z;
+                handItemWrapper.position.copy(mc.up.position);
+                handItemWrapper.rotation.copy(mc.up.rotation);
+                handItem.rotation.x = mc.pitch.rotation.x;
+                handItem.rotation.z = mc.yaw.rotation.z;
             }
         }
 
@@ -138,6 +142,8 @@ extend(SelfModel.prototype, {
         if (!handItem) return;
         handItem.rotation.x = cameraObject.pitch.rotation.x;
         handItem.rotation.z = cameraObject.yaw.rotation.z;
+        let handItemWrapper = this.handItemWrapper;
+        handItemWrapper.rotation.copy(cameraObject.up.rotation);
         // handItem.children[0].rotation.x += 0.01;
     },
 
@@ -199,21 +205,24 @@ extend(SelfModel.prototype, {
             handItem = null;
         }
 
+        // TODO link hand item and mesh when camera is third person.
         if (selfModel.handItem !== handItem)
         {
-            // TODO link hand item and mesh when camera is third person.
+            let handItemWrapper = selfModel.handItemWrapper;
             if (selfModel.handItem) // is it possible that it is in another world?
-                graphics.removeFromScene(selfModel.handItem, worldId);
+                handItemWrapper.remove(selfModel.handItem);
+                // graphics.removeFromScene(selfModel.handItem, worldId);
 
             selfModel.handItem = handItem;
 
             if (handItem) {
-                handItem.position.copy(graphics.cameraManager.mainCamera.up.position);
+                handItemWrapper.position.copy(graphics.cameraManager.mainCamera.up.position);
                 this.cameraMoved(graphics.cameraManager.mainCamera);
-                if (
-                    // !selfModel.displayAvatar &&
-                    selfModel.displayHandItem)
-                    graphics.addToScene(handItem, worldId);
+                handItemWrapper.add(handItem);
+                if (selfModel.displayHandItem)
+                {
+                    graphics.addToScene(handItemWrapper, worldId);
+                }
             }
         }
     },
