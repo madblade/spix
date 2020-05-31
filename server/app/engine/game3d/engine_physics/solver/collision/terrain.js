@@ -6,7 +6,8 @@
 
 class TerrainCollider
 {
-    static eps = .00000001;
+    static eps = 1e-8;
+    static inveps = 1e8;
 
     /**
      * Network casting:
@@ -32,7 +33,8 @@ class TerrainCollider
         let zW = entity.widthZ;
 
         let cropX = x1; let cropY = y1; let cropZ = z1;
-        let epsilon = TerrainCollider.eps;
+        const epsilon = TerrainCollider.eps;
+        const inveps = TerrainCollider.inveps;
 
         if (x0 !== x1) {
             let xNetwork = [];
@@ -58,11 +60,17 @@ class TerrainCollider
                         cropX = newCrops[0] - xW;
                         cropY = newCrops[1] + y0 - net[1];
                         cropZ = newCrops[2] + z0 - net[2];
+                        cropX = Math.round(cropX * inveps) / inveps;
+                        cropY = Math.round(cropY * inveps) / inveps;
+                        cropZ = Math.round(cropZ * inveps) / inveps;
                     }
                     else if (x1 < x0 && newCrops[0] + xW > cropX + epsilon) {
                         cropX = newCrops[0] + xW;
                         cropY = newCrops[1] + y0 - net[1];
                         cropZ = newCrops[2] + z0 - net[2];
+                        cropX = Math.round(cropX * inveps) / inveps;
+                        cropY = Math.round(cropY * inveps) / inveps;
+                        cropZ = Math.round(cropZ * inveps) / inveps;
                     }
                 }
             }
@@ -92,6 +100,9 @@ class TerrainCollider
                         let nx = newCrops[0] + x0 - net[0];
                         let ny = newCrops[1] - yW;
                         let nz = newCrops[2] + z0 - net[2];
+                        nx = Math.round(nx * inveps) / inveps;
+                        ny = Math.round(ny * inveps) / inveps;
+                        nz = Math.round(nz * inveps) / inveps;
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                             cropX = nx;
                         cropY = ny;
@@ -102,6 +113,9 @@ class TerrainCollider
                         let nx = newCrops[0] + x0 - net[0];
                         let ny = newCrops[1] + yW;
                         let nz = newCrops[2] + z0 - net[2];
+                        nx = Math.round(nx * inveps) / inveps;
+                        ny = Math.round(ny * inveps) / inveps;
+                        nz = Math.round(nz * inveps) / inveps;
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                             cropX = nx;
                         cropY = ny;
@@ -136,6 +150,9 @@ class TerrainCollider
                         let nx = newCrops[0] + x0 - net[0];
                         let ny = newCrops[1] + y0 - net[1];
                         let nz = newCrops[2] - zW;
+                        nx = Math.round(nx * inveps) / inveps;
+                        ny = Math.round(ny * inveps) / inveps;
+                        nz = Math.round(nz * inveps) / inveps;
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                             cropX = nx;
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
@@ -146,6 +163,9 @@ class TerrainCollider
                         let nx = newCrops[0] + x0 - net[0];
                         let ny = newCrops[1] + y0 - net[1];
                         let nz = newCrops[2] + zW;
+                        nx = Math.round(nx * inveps) / inveps;
+                        ny = Math.round(ny * inveps) / inveps;
+                        nz = Math.round(nz * inveps) / inveps;
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                             cropX = nx;
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
