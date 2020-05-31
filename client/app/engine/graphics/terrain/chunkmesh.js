@@ -14,7 +14,7 @@ let ChunksMeshModule = {
             if (!isWorldFlat) {
                 let material = this.createMaterial('textured-phong', 0xaaaaaa);
                 material.transparent = true;
-                material.opacity = 0.3;
+                material.opacity = 0.5;
                 material.side = DoubleSide;
                 return new Mesh(geometry, material);
             }

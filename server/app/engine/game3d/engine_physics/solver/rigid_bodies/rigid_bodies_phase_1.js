@@ -184,6 +184,7 @@ class RigidBodiesPhase1
                     // vi = .1;
                     a1[i] += 0.6;
                     p1[i] = p0[i];
+                    leapfrogArray[oi][i] = 0;
                     adh[i] = false;
                 }
                 else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
@@ -191,6 +192,7 @@ class RigidBodiesPhase1
                     // vi = -.1;
                     a1[i] -= 0.6;
                     p1[i] = p0[i];
+                    leapfrogArray[oi][i] = 0;
                     adh[3 + i] = false;
                 }
 

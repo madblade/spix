@@ -84,21 +84,22 @@ class EntityModel {
         this._freedEntities.push(entityId);
     }
 
-    anEntityIsPresentOn(worldId, x, y, z) {
-        // TODO [HIGH] optimize with chunks structure.
+    // TODO [HIGH] optimize.
+    anEntityIsPresentOn(worldId, x, y, z)
+    {
         let entities = this._entities;
-        let result = false;
-        if (!entities) return result;
-        // O(n) -> not good -> REFACTOR QUIIICK
-        entities.forEach(entity => {
-            if (!entity || entity.worldId !== worldId) return;
-            // TODO [HIGH] use width
+        if (!entities) return false;
+        // O(n) -> not good
+        for (let e = 0, l = entities.length; e < l; ++e)
+        {
+            const entity = entities[e];
+            if (!entity || entity.worldId !== worldId) continue;
             let p = entity.position;
             if (p[0] >= x && p[0] <= x + 1 && p[1] >= y && p[1] <= y + 1 && p[2] >= z && p[2] <= z + 1)
-                result = true;
-        });
+                return true;
+        }
 
-        return result;
+        return false;
     }
 
 }

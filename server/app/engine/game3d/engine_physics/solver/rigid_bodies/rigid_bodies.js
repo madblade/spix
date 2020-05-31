@@ -32,6 +32,7 @@ class RigidBodies
     {
         //
         this._gravity = [0, 0, RigidBodies.gravityConstant];
+        this._gravityWater = [0, 0, 0.1 * RigidBodies.gravityConstant];
         // this._gravity = [0, 0, 0];
         this._globalTimeDilation = 25;
         // this._globalTimeDilation = 0.05;
@@ -51,7 +52,9 @@ class RigidBodies
     getGravity(world, worldId, x, y, z)
     {
         if (!this._variableGravity || world.worldInfo.type !== WorldType.CUBE)
-            return this._gravity;
+        {
+            return world.isWater(x, y, z) ? this._gravityWater : this._gravity;
+        }
 
         const center = world.worldInfo.center; // this._worldCenter;
         let radius = parseFloat(world.worldInfo.radius);
@@ -75,7 +78,8 @@ class RigidBodies
         // Clamp on main faces to keep camera rotation updates to a minimum.
         let squaredWithSmoothBorders = true;
         let squaredRadius = 2; // Should this equal 1.6, the entity height?
-        const gravityNorm = RigidBodies.gravityConstant;
+        const gravityNorm = (world.isWater(x, y, z) ? 0.1 : 1) * RigidBodies.gravityConstant;
+
         if (squaredWithSmoothBorders) {
             if (dX > max(dY, dZ) + squaredRadius)
                 return [(xPlus ? 1 : -1) * gravityNorm, 0, 0];
@@ -114,9 +118,9 @@ class RigidBodies
             ddz !== 0 ? Math.pow(Math.abs(ddz), power + 1) / (ddz * dd) : 0
         ];
         let norm = Math.sqrt(Math.pow(direction[0], 2) + Math.pow(direction[1], 2) + Math.pow(direction[2], 2));
-        direction[0] /= norm;
-        direction[1] /= norm;
-        direction[2] /= norm;
+        direction[0] *= -gravityNorm / norm;
+        direction[1] *= -gravityNorm / norm;
+        direction[2] *= -gravityNorm / norm;
         return direction;
     }
 

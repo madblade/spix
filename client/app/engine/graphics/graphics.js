@@ -63,7 +63,7 @@ let Graphics = function(app) {
     this.referenceMeshes = null;
     this._nbMeshesToLoad = 0;
     this._nbMeshesLoadedOrError = 0;
-    this._debugChunkBoundingBoxes = false;
+    this._debugChunkBoundingBoxes = true;
 
     // Animations
     this.mixers = null;

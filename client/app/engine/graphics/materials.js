@@ -5,7 +5,6 @@
 'use strict';
 
 import {
-    BackSide, MeshStandardMaterial, Color,
     VertexColors,
     MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide,
 } from 'three';

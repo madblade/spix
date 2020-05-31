@@ -276,7 +276,7 @@ class TerrainCollider
         newPosition,    // position to be cropped to
         doProject)      // use free projection for slippin along cubes
     {
-        if (world.isFree([i, j, k])) return false;
+        if (world.isFree(i, j, k)) return false;
 
         // Collision
         // Damping on first encountered NFB (collision later on)
@@ -303,7 +303,7 @@ class TerrainCollider
                 let dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
                 if (dby < 2) {
                     if (dy < 0) {
-                        const free = world.isFree([i + ddx, j - 1, k]);
+                        const free = world.isFree(i + ddx, j - 1, k);
                         if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
                             adherence[1] = false;
@@ -313,7 +313,7 @@ class TerrainCollider
                         }
                     }
                     if (dy > 0) {
-                        const free = world.isFree([i + ddx, j + 1, k]);
+                        const free = world.isFree(i + ddx, j + 1, k);
                         if (free || dby < 1 && ny < ny0 + 1) {
                             nyt = ny;
                             adherence[4] = false;
@@ -331,7 +331,7 @@ class TerrainCollider
                 let dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
                 if (dbz < 2) {
                     if (dz < 0) {
-                        const free = world.isFree([i + ddx, j, k - 1]);
+                        const free = world.isFree(i + ddx, j, k - 1);
                         if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
                             adherence[2] = false;
@@ -342,7 +342,7 @@ class TerrainCollider
                         }
                     }
                     if (dz > 0) {
-                        const free = world.isFree([i + ddx, j, k + 1]);
+                        const free = world.isFree(i + ddx, j, k + 1);
                         if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
                             adherence[5] = false;
@@ -390,7 +390,7 @@ class TerrainCollider
                 let dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
                 if (dbx < 2) {
                     if (dx < 0) {
-                        const free = world.isFree([i - 1, j + ddy, k]);
+                        const free = world.isFree(i - 1, j + ddy, k);
                         if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
                             adherence[0] = false;
@@ -401,7 +401,7 @@ class TerrainCollider
                         }
                     }
                     if (dx > 0) {
-                        const free = world.isFree([i + 1, j + ddy, k]);
+                        const free = world.isFree(i + 1, j + ddy, k);
                         if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
                             adherence[3] = false;
@@ -420,7 +420,7 @@ class TerrainCollider
                 let dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
                 if (dbz < 2) {
                     if (dz < 0) {
-                        const free = world.isFree([i, j + ddy, k - 1]);
+                        const free = world.isFree(i, j + ddy, k - 1);
                         if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
                             adherence[2] = false;
@@ -431,7 +431,7 @@ class TerrainCollider
                         }
                     }
                     if (dz > 0) {
-                        const free = world.isFree([i, j + ddy, k + 1]);
+                        const free = world.isFree(i, j + ddy, k + 1);
                         if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
                             adherence[5] = false;
@@ -479,7 +479,7 @@ class TerrainCollider
                 let dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
                 if (dbx < 2) {
                     if (dx < 0) {
-                        const free = world.isFree([i - 1, j, k + ddz]);
+                        const free = world.isFree(i - 1, j, k + ddz);
                         if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
                             adherence[0] = false;
@@ -490,7 +490,7 @@ class TerrainCollider
                         }
                     }
                     if (dx > 0) {
-                        const free = world.isFree([i + 1, j, k + ddz]);
+                        const free = world.isFree(i + 1, j, k + ddz);
                         if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
                             adherence[3] = false;
@@ -509,7 +509,7 @@ class TerrainCollider
                 let dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
                 if (dby < 2) {
                     if (dy < 0) {
-                        const free = world.isFree([i, j - 1, k + ddz]);
+                        const free = world.isFree(i, j - 1, k + ddz);
                         if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
                             adherence[1] = false;
@@ -520,7 +520,7 @@ class TerrainCollider
                         }
                     }
                     if (dy > 0) {
-                        const free = world.isFree([i, j + 1, k + ddz]);
+                        const free = world.isFree(i, j + 1, k + ddz);
                         if (free || dby < 1 && ny < ny0 + 1) { // || is done last
                             nyt = ny;
                             adherence[4] = false;
@@ -537,10 +537,10 @@ class TerrainCollider
             // TODO eliucidate why
             if (dz < 0) {
                 adherence[2] = true;
-                adherence[5] = false;
+                // adherence[5] = false;
             }
             else if (dz > 0) {
-                adherence[2] = false;
+                // adherence[2] = false;
                 adherence[5] = true;
             }
 

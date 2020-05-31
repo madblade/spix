@@ -4,7 +4,7 @@
 
 'use strict';
 
-import { ChunkSizes, WorldType } from './model';
+import {BlockType, ChunkSizes, WorldType} from './model';
 
 class World
 {
@@ -119,8 +119,14 @@ class World
         return !!this.getChunk(i, j, k);
     }
 
-    isFree(p) {
-        return this.whatBlock(p[0], p[1], p[2]) === 0;
+    isWater(p0, p1, p2) {
+        const n = this.whatBlock(Math.floor(p0), Math.floor(p1), Math.floor(p2));
+        return n === BlockType.WATER;
+    }
+
+    isFree(p0, p1, p2) {
+        const n = this.whatBlock(p0, p1, p2);
+        return n === BlockType.AIR || n === BlockType.WATER;
         // && this.whatBlock(p[0], p[1], p[2]+1) === 0;
     }
 }

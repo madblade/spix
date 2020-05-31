@@ -39,7 +39,7 @@ let CoreModule = {
     run() {
         // Initialize DOM element
         this.initializeDOM();
-        this.fps = new Stats();
+        this.fps = this.fps || new Stats();
 
         // Controls are tightly linked to camera.
         this.initializeCameras();
@@ -50,7 +50,11 @@ let CoreModule = {
 
         // Init stats.
         // Benches.
-        document.body.appendChild(this.fps.dom);
+        let fpsElement = this.fps.dom;
+        fpsElement.setAttribute('id', 'stats');
+        fpsElement.style.left = '300px';
+        if (!document.getElementById('stats'))
+            document.body.appendChild(fpsElement);
     },
 
     initializeDOM() {

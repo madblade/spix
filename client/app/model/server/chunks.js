@@ -196,7 +196,8 @@ extend(ChunkModel.prototype, {
         return world && world.has(chunkId);
     },
 
-    initializeChunk(worldId, chunkId, all) {
+    initializeChunk(worldId, chunkId, all)
+    {
         let graphics = this.app.engine.graphics;
 
         // Initialize model if a new world is transmitted.

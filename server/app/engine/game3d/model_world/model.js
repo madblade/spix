@@ -50,7 +50,7 @@ const ChunkSizes = Object.freeze({
     CUBE_REGULAR: [8, 8, 8],
     CUBE_HUGE: [16, 16, 16],
     FLAT_SMALL: [8, 8, 16],
-    FLAT_REGULAR: [16, 16, 16], // TODO 32
+    FLAT_REGULAR: [16, 16, 16],
     FLAT_HUGE: [32, 32, 64]
 });
 
