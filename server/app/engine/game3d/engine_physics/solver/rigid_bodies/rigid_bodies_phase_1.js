@@ -164,7 +164,8 @@ class RigidBodiesPhase1
             let g = RigidBodies.creativeMode ? [0, 0, 0] :
                 rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
             // Only one non-zeno gravity compenent accepted on cube worlds.
-            if (isCubeWorld && !(g[0] !== 0 ^ g[1] !== 0 ^ g[2] !== 0)) {
+            if (isCubeWorld && (g[0] !== 0) + (g[1] !== 0) + (g[2] !== 0) > 1)
+            {
                 g[0] = g[1] = g[2] = 0;
             }
 
