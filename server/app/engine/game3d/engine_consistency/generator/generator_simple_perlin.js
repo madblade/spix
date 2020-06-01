@@ -216,12 +216,17 @@ class SimplePerlin
         const sand = BlockType.SAND;
         const obsidian = BlockType.OBSIDIAN;
         let abs = Math.abs;
+        let max = Math.max;
 
-        const deltaX = center.x - parseInt(ci, 10);
-        const deltaY = center.y - parseInt(cj, 10);
-        const deltaZ = center.z - parseInt(ck, 10);
+        const deltaX = center.x - parseInt(ci, 10); const adx = abs(deltaX);
+        const deltaY = center.y - parseInt(cj, 10); const ady = abs(deltaY);
+        const deltaZ = center.z - parseInt(ck, 10); const adz = abs(deltaZ);
 
-        if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius)
+        if (
+            (max(adx, max(ady, adz)) > radius ||
+            (adx === radius) + (ady === radius) + (adz === radius) < 2) &&
+            (adx > radius - 1) + (ady > radius - 1) + (adz > radius - 1) > 1
+        )
         {
             blocks.fill(air);
             chunk.isEmpty = true;
@@ -229,12 +234,12 @@ class SimplePerlin
         }
 
         // full stone inside the cubeworld
-        if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
-            if (abs(deltaX) < abs(deltaZ) && abs(deltaY) < abs(deltaZ) && abs(deltaZ) > 0) {
+        if (adx < radius && ady < radius && adz < radius) {
+            if (adx < adz && ady < adz && adz > 0) {
                 directions.push(ck > center.z ? 3 : -3);
-            } else if (abs(deltaX) < abs(deltaY) && abs(deltaZ) < abs(deltaY) && abs(deltaY) > 0) {
+            } else if (adx < ady && adz < ady && ady > 0) {
                 directions.push(cj > center.y ? 2 : -2);
-            } else if (abs(deltaY) < abs(deltaX) && abs(deltaZ) < abs(deltaX) && abs(deltaX) > 0) {
+            } else if (ady < adx && adz < adx && adx > 0) {
                 directions.push(ci > center.x ? 1 : -1);
             } else {
                 blocks.fill(stone);
@@ -245,11 +250,11 @@ class SimplePerlin
 
         // TODO manage full / empty chunks
 
-        if (abs(deltaX) === radius)
+        if (adx === radius)
             directions.push(ci > center.x ? 1 : -1);
-        if (abs(deltaY) === radius)
+        if (ady === radius)
             directions.push(cj > center.y ? 2 : -2);
-        if (abs(deltaZ) === radius)
+        if (adz === radius)
             directions.push(ck > center.z ? 3 : -3);
 
         // Fill with grass on main world, sand everywhere else.
