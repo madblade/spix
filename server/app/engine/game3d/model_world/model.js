@@ -26,23 +26,23 @@ const BlockType = Object.freeze({
 });
 
 const WorldType = Object.freeze({
-    FLAT: 0, // Symbol('flat'),
-    CUBE: 1, // Symbol('cube'),
-    SHRIKE: 2, // Symbol('shrike'),
-    UNSTRUCTURED: 3 // Symbol('unstructured')
+    FLAT: 0,
+    CUBE: 1,
+    SHRIKE: 2,
+    UNSTRUCTURED: 3
 });
 
 const HillType = Object.freeze({
-    NO_HILLS: 0, // Symbol('no-hills'),
-    REGULAR_HILLS: 1, // Symbol('regular-hills'),
-    GIANT_HILLS: 2, // Symbol('giant-hills'),
-    ERODED: 3, // Symbol('eroded-formations'),
-    SPIKES: 4 // Symbol('spikes'),
+    NO_HILLS: 0,
+    REGULAR_HILLS: 1,
+    GIANT_HILLS: 2,
+    ERODED: 3,
+    SPIKES: 4
 });
 
 const CaveType = Object.freeze({
-    NO_CAVES: 0, // Symbol('no-caves'),
-    SUBSURFACE_CAVES: 1 // Symbol('subsurface-caves'),
+    NO_CAVES: 0,
+    SUBSURFACE_CAVES: 1
 });
 
 const ChunkSizes = Object.freeze({

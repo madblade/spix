@@ -225,7 +225,7 @@ class SimplePerlin
         {
             blocks.fill(air);
             chunk.isEmpty = true;
-            return; // Blocks are filled with zeros.
+            return;
         }
 
         // full stone inside the cubeworld
@@ -326,13 +326,19 @@ class SimplePerlin
             }
 
             // Get vertical generation direction.
-            let fz = v1 > 0 ?
-                perm === 0 ? xy => zed => xy + normalSize * zed :
-                    perm === 1 ? xy => zed => xy + zed * d1 :
-                        xy => zed => xy + zed : // v1 <= 0
-                perm === 0 ? xy => zed => xy + normalSize * (d3 - zed - 1) :
-                    perm === 1 ? xy => zed => xy + (d3 - zed - 1) * d1 :
-                        xy => zed => xy + (d3 - zed - 1);
+            let getStride;
+            if (v1 > 0)
+            {
+                if (perm === 0) getStride = (x1, y1, z1) => z1 * dx * dy + y1 * dx + x1;
+                else if (perm === 1) getStride = (x1, y1, z1) => y1 * dx * dy + z1 * dx + x1;
+                else getStride = (x1, y1, z1) => y1 * dx * dy + x1 * dx + z1;
+            }
+            else if (v1 < 0)
+            {
+                if (perm === 0) getStride =  (x1, y1, z1) => (dz - 1 - z1) * dx * dy + y1 * dx + x1;
+                else if (perm === 1) getStride = (x1, y1, z1) => y1 * dx * dy + (dz - 1 - z1) * dx + x1;
+                else getStride = (x1, y1, z1) => y1 * dx * dy + x1 * dx + (dz - 1 - z1);
+            }
 
             let r = parseInt(radius, 10);
             switch (v1) {
@@ -346,18 +352,16 @@ class SimplePerlin
 
             for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y) {
-                    let h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0); // getY(x, y);
-                    let rockLevel = Math.floor(5 * h / 6);
-                    let xy = perm === 0 ? x + y * d1 :
-                        perm === 1 ? x + y * d1 * d2 :
-                            x * d1 + y * d1 * d2;
-                    let ffz = fz(xy);
+                    // let xy = perm === 0 ? x + y * d1 :
+                    //     perm === 1 ? x + y * d1 * d2 :
+                    //         x * d1 + y * d1 * d2;
+                    // let ffz = fz(xy);
 
-                    h -= offset3;
-                    rockLevel -= offset3;
+                    const h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0) - offset3;
+                    const rockLevel = Math.floor(5 * h / 6) - offset3;
                     let rl = Math.max(0, Math.min(rockLevel, d3));
                     for (let zz = 0; zz < rl; ++zz) {
-                        const currentBlock = ffz(zz); // ijS * zz + xy;
+                        const currentBlock = getStride(x, y, zz); // ffz(zz); // ijS * zz + xy;
 
                         // Rock.
                         blocks[currentBlock] = stone;
@@ -369,18 +373,18 @@ class SimplePerlin
                     let bl = Math.max(0, Math.min(h, d3));
                     for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
-                        const currentBlock = ffz(zz);
+                        const currentBlock = getStride(x, y, zz); // ffz(zz);
                         // if (zz === bl - 1)
                         //     blocks[currentBlock] = water; // ijS * zz + xy
                         // else
                         blocks[currentBlock] = mainBlockId; // ijS * zz + xy
                     }
 
-                    if (bl < 0 && rl > 0) {
-                        for (let zz = bl; zz < 16; ++zz) {
+                    if (bl < 8) {
+                        for (let zz = bl; zz < 8; ++zz) {
                             // Grass or sand.
-                            const currentBlock = ffz(zz);
-                            if (zz === bl)
+                            const currentBlock = getStride(x, y, zz); // ffz(zz);
+                            if (zz <= bl)
                                 blocks[currentBlock] = sand; // ijS * zz + xy
                             else
                                 blocks[currentBlock] = water; // ijS * zz + xy
