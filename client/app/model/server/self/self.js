@@ -25,7 +25,6 @@ let SelfModel = function(app) {
     this.inventoryModel = new InventoryModel();
 
     // Graphical component.
-    // let graphics = app.engine.graphics;
     this.worldNeedsUpdate = false;
     this.needsUpdate = false;
     this.displayAvatar = false;
@@ -81,10 +80,8 @@ extend(SelfModel.prototype, {
             xModel.forceUpdate = true;
         }
 
-        if (up !== null && r !== null && p !== null) {
-            //console.log('Updating position!');
-            //console.log(up);
-
+        if (up !== null && r !== null && p !== null)
+        {
             let animate = p.x !== up[0] || p.y !== up[1];
             p.x = up[0]; p.y = up[1]; p.z = up[2];
 
@@ -95,14 +92,9 @@ extend(SelfModel.prototype, {
             avatar.rotation.x = r[3];
             avatar.getWrapper().rotation.y = Math.PI + r[0];
 
-            // let camr = graphics.cameraManager.mainCamera.get3DObject().rotation;
             let theta0 = r[2];
             let theta1 = r[3];
-            // let upv = graphics.cameraManager.mainCamera.get3DObject().rotation;
-            // let theta0Old = upv.z;
-            // let theta1Old = upv.x;
             let cam = graphics.cameraManager.mainCamera;
-            // let rotationZ = cam.getZRotation();
             let rotationX = cam.getXRotation();
             const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
@@ -120,7 +112,6 @@ extend(SelfModel.prototype, {
 
             // Update camera.
             clientModel.pushForLaterUpdate('camera-position', this.position);
-            //clientModel.selfComponent.processChanges();
             graphics.cameraManager.updateCameraPosition(this.position);
 
             let handItem = this.handItem;
@@ -211,7 +202,6 @@ extend(SelfModel.prototype, {
             let handItemWrapper = selfModel.handItemWrapper;
             if (selfModel.handItem) // is it possible that it is in another world?
                 handItemWrapper.remove(selfModel.handItem);
-                // graphics.removeFromScene(selfModel.handItem, worldId);
 
             selfModel.handItem = handItem;
 

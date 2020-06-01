@@ -24,7 +24,7 @@ class RigidBodies
     static eps = .00000001;// .00001;
     static gravityConstant = 2 * -0.00980665;
 
-    static crossEntityCollision = false; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
+    static crossEntityCollision = true; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
     static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
     // static gravityConstant = 0;
 
@@ -53,7 +53,7 @@ class RigidBodies
     {
         if (!this._variableGravity || world.worldInfo.type !== WorldType.CUBE)
         {
-            return world.isWater(x, y, z) ? this._gravityWater : this._gravity;
+            return this._gravity; // world.isWater(x, y, z) ? this._gravityWater : this._gravity;
         }
 
         const center = world.worldInfo.center; // this._worldCenter;

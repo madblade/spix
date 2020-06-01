@@ -5,8 +5,7 @@
 'use strict';
 
 import GeometryUtils from '../../../math/geometry';
-
-// import NumberUtils      from '../../../math/numbers';
+import { BlockType } from '../../model_world/model';
 
 class UpdaterAccess
 {
@@ -21,7 +20,6 @@ class UpdaterAccess
         let xOnChunk = (x >= 0 ? x : dimX - -x % dimX) % dimX;
         let yOnChunk = (y >= 0 ? y : dimY - -y % dimY) % dimY;
         let zOnChunk = (z >= 0 ? z : dimZ - -z % dimZ) % dimZ;
-        //console.log(xOnChunk + ',' + yOnChunk + ',' + zOnChunk);
 
         let coordsOnChunk = [xOnChunk, yOnChunk, zOnChunk];
 
@@ -47,7 +45,8 @@ class UpdaterAccess
         return [chunk, ...coordsOnChunk];
     }
 
-    static requestDelBlock(originEntity, x, y, z, world/*, entityModel*/) {
+    static requestDelBlock(originEntity, x, y, z, world)
+    {
         // Translate.
         const dimX = world.xSize;
         const dimY = world.ySize;
@@ -71,8 +70,14 @@ class UpdaterAccess
             return;
         }
 
-        if (chunk.what(...coordsOnChunk) === 0) {
+        const oldBlock = chunk.what(...coordsOnChunk);
+        if (oldBlock === BlockType.AIR) {
             failure('Cannot delete an empty block.');
+            return;
+        }
+
+        if (oldBlock === BlockType.OBSIDIAN) {
+            failure('Cannot delete an obsidian block.');
             return;
         }
 

@@ -27,8 +27,8 @@ class RigidBodiesPhase1
         let op; let ep;
         let ox; let oy; let oz; let ex; let range;
         let wx; let wy; let wz;
-        let maxRange = EventOrderer.maxRange;
-        let maxWidth = Entity.maxWidth;
+        const maxRange = EventOrderer.maxRange;
+        const maxWidth = Entity.maxWidth;
 
         // For all entities.
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
@@ -105,6 +105,8 @@ class RigidBodiesPhase1
         let aS = [];
         const debug = false;
         const isCubeWorld = world.worldInfo.type === WorldType.CUBE;
+        const maxSpeedInAir = Entity.maxSpeed;
+        const maxSpeedInWater = Entity.maxSpeedInWater;
 
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
         {
@@ -124,6 +126,7 @@ class RigidBodiesPhase1
             const dtr = relativeDt * localTimeDilation;
             currentEntity.dtr = localTimeDilation; // dtr;
 
+            const maxSpeed = world.isWater(p0[0], p0[1], p0[2]) ? maxSpeedInWater : maxSpeedInAir;
             // REAL PHYSICS, PART 1
             // Rules: the only non-gp physics entry point should be
             // acceleration. Speed might be accessed for lookup,
@@ -134,18 +137,18 @@ class RigidBodiesPhase1
 
             // x_i+1 = x_i + v_i*T + (a_i/2)*T²
             let inc = [0, 0, 0, entityIndex];
-            // let sum = 0;
+            let sum = 0;
             for (let i = 0; i < 3; ++i) // Account for server congestion / lag with relative dilation.
             {
                 nu1[i] = nu[i];
                 let increment = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
                 inc[i] = increment;
-                // sum += increment * increment;
+                sum += increment * increment;
             }
 
             // Max speed correction.
-            // if (sum > maxSpeed2 * dtr)
-            //     for (let i = 0; i < 3; ++i) inc[i] *= (maxSpeed * dtr) / sum;
+            if (sum > maxSpeed * dtr)
+                for (let i = 0; i < 3; ++i) inc[i] *= maxSpeed * dtr / sum;
 
             for (let i = 0; i < 3; ++i)
                 p1[i] = p0[i] + inc[i];
@@ -163,7 +166,7 @@ class RigidBodiesPhase1
             // This gravity should be fetched per entity instead.
             let g = RigidBodies.creativeMode ? [0, 0, 0] :
                 rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
-            // Only one non-zeno gravity compenent accepted on cube worlds.
+            // Only one non-zeno gravity component accepted on cube worlds.
             if (isCubeWorld && (g[0] !== 0) + (g[1] !== 0) + (g[2] !== 0) > 1)
             {
                 g[0] = g[1] = g[2] = 0;
@@ -212,17 +215,17 @@ class RigidBodiesPhase1
             // Apply velocity formula with absolute time
             // (lag would undesirably change topologies).
             // v_i+1 = v_i< + T*(a_i + a_i+1)/2
-            // sum = 0;
+            sum = 0;
             for (let i = 0; i < 3; ++i)
             {
                 let v1i = v0[i] + dtr * .5 * (a0[i] + a1[i]);
                 v1[i] = v1i;
-                // sum += v1i * v1i;
+                sum += v1i * v1i;
             }
 
             // Velocity correction.
-            // if (sum > maxSpeed * dtr)
-            //     for (let i = 0; i < 3; ++i) v1[i] *= (maxSpeed * dtr / sum);
+            if (sum > maxSpeed * dtr)
+                for (let i = 0; i < 3; ++i) v1[i] *= maxSpeed * dtr / sum;
             // console.log(p0);
 
             if (debug) {
@@ -253,16 +256,16 @@ class RigidBodiesPhase1
     // TODO use quaternions instead
     static getEntityForwardVector(d, rotation, factor, project2D)
     {
-        let PI  = Math.PI;
         let cos = Math.cos;
         let sin = Math.sin;
         let acos = Math.acos;
         let sgn = Math.sign;
         let sqrt = Math.sqrt;
         let square = x => x * x;
-        let PI2 = PI / 2;
-        let PI4 = PI / 4;
-        let PI34 = 3 * PI4;
+        const PI  = Math.PI;
+        const PI2 = PI / 2;
+        const PI4 = PI / 4;
+        const PI34 = 3 * PI4;
 
         let relTheta0 = rotation[0]; let relTheta1 = rotation[1];
         let absTheta0 = rotation[2]; let absTheta1 = rotation[3];
@@ -271,9 +274,9 @@ class RigidBodiesPhase1
         // d[2], d[3]: rg, lf
         // d[4], d[5]: up, dn
 
-        let fw = d[0] && !d[1]; let bw = !d[0] && d[1];
-        let rg = d[2] && !d[3]; let lf = !d[2] && d[3];
-        let up = d[4] && !d[5]; let dn = !d[4] && d[5];
+        const fw = d[0] && !d[1]; const bw = !d[0] && d[1];
+        const rg = d[2] && !d[3]; const lf = !d[2] && d[3];
+        const up = d[4] && !d[5]; const dn = !d[4] && d[5];
 
         if (project2D) {
             relTheta1 = PI2;
@@ -285,22 +288,22 @@ class RigidBodiesPhase1
         if (nb0 === 0) return [0, 0, 0];
 
         let getPsy1 = function(theta0, theta1, phi0, phi1) {
-            let st0 = sin(theta0); let st1 = sin(theta1); let ct0 = cos(theta0);
-            let ct1 = cos(theta1);
-            let sp0 = sin(phi0); let sp1 = sin(phi1); let cp0 = cos(phi0);
-            let cp1 = cos(phi1);
+            const st0 = sin(theta0); const st1 = sin(theta1); const ct0 = cos(theta0);
+            const ct1 = cos(theta1);
+            const sp0 = sin(phi0); const sp1 = sin(phi1); const cp0 = cos(phi0);
+            const cp1 = cos(phi1);
             return acos((ct1 + cp1) /
                 sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0) + square(ct1 + cp1))
             );
         };
 
         let getPsy0 = function(theta0, theta1, phi0, phi1) {
-            let st0 = sin(theta0); let st1 = sin(theta1);
-            let ct0 = cos(theta0);
-            let sp0 = sin(phi0); let sp1 = sin(phi1);
-            let cp0 = cos(phi0);
+            const st0 = sin(theta0); let st1 = sin(theta1);
+            const ct0 = cos(theta0);
+            const sp0 = sin(phi0); let sp1 = sin(phi1);
+            const cp0 = cos(phi0);
 
-            let s = sgn(st1 * st0 + sp1 * sp0);
+            const s = sgn(st1 * st0 + sp1 * sp0);
             return s *
                 acos((st1 * ct0 + sp1 * cp0) /
                     sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0))
@@ -322,8 +325,8 @@ class RigidBodiesPhase1
         }
         else if (nb0 === 2)
         {
-            let t0 = relTheta0;
-            let t1 = relTheta1;
+            const t0 = relTheta0;
+            const t1 = relTheta1;
 
             switch (true)
             {
@@ -383,8 +386,8 @@ class RigidBodiesPhase1
         }
         else if (nb0 === 3)
         {
-            let t0 = relTheta0;
-            let t1 = relTheta1;
+            const t0 = relTheta0;
+            const t1 = relTheta1;
 
             switch (true)
             {
@@ -430,10 +433,10 @@ class RigidBodiesPhase1
             }
         }
 
-        let cosAbs0 = cos(absTheta0); let cosRel0 = cos(relTheta0);
-        let cosAbs1 = cos(absTheta1); let cosRel1 = cos(relTheta1);
-        let sinAbs0 = sin(absTheta0); let sinRel0 = sin(relTheta0);
-        let sinAbs1 = sin(absTheta1); let sinRel1 = sin(relTheta1);
+        const cosAbs0 = cos(absTheta0); const cosRel0 = cos(relTheta0);
+        const cosAbs1 = cos(absTheta1); const cosRel1 = cos(relTheta1);
+        const sinAbs0 = sin(absTheta0); const sinRel0 = sin(relTheta0);
+        const sinAbs1 = sin(absTheta1); const sinRel1 = sin(relTheta1);
 
         // let absUpVector =    [sinAbs1 * cosAbs0, sinAbs1 * sinAbs0, cosAbs1];
         // let absFrontVector = [cosAbs1 * cosAbs0, cosAbs1 * sinAbs0, -sinAbs1];

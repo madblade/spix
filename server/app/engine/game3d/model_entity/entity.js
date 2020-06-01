@@ -79,7 +79,8 @@ class Entity
     }
 
     static maxWidth = 10.; // 10 blocks.
-    static maxSpeed = 10.;  // 1 blocks per time unit.
+    static maxSpeed = 8.;  // 8 blocks per time unit.
+    static maxSpeedInWater = 0.005;  // 1 blocks per time unit.
 
     get entityId()          { return this._entityId; }
     get kind()              { return this._kind; }

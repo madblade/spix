@@ -156,7 +156,7 @@ class SimplePerlin
 
         for (let x = 0; x < dx; ++x) {
             for (let y = 0; y < dy; ++y) {
-                let h = dz / 2 + (data[x + y * dx] * perlinIntensity | 0); // getY(x, y);
+                let h = dz / 2 + (data[x + y * dx] * perlinIntensity | 0);
                 let rockLevel = Math.floor(5 * h / 6);
                 const xy = x + y * dx;
 
@@ -178,9 +178,9 @@ class SimplePerlin
                     // Grass or sand.
                     const currentBlock = xy + normalSize * zz;
                     // if (zz === bl - 1)
-                    //     blocks[currentBlock] = water; // ijS * zz + xy
+                    //     blocks[currentBlock] = water;
                     // else
-                    blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                    blocks[currentBlock] = mainBlockId;
                 }
 
                 if (bl < 16 && rl > 0) {
@@ -188,9 +188,9 @@ class SimplePerlin
                         // Grass or sand.
                         const currentBlock = xy + normalSize * zz;
                         if (zz === bl)
-                            blocks[currentBlock] = sand; // ijS * zz + xy
+                            blocks[currentBlock] = sand;
                         else
-                            blocks[currentBlock] = water; // ijS * zz + xy
+                            blocks[currentBlock] = water;
                     }
                 }
             }
@@ -311,8 +311,6 @@ class SimplePerlin
                     [dx, dz, dy, dx * dz, offsetX, offsetZ, offsetY, 1] :
                     [dy, dz, dx, dy * dz, offsetY, offsetZ, offsetX, 2]; // Can factor normalSize outside.
 
-            // let normalSize = a1 > 2 ? dx * dy : a1 > 1 ? dx * dz : dy * dz;
-
             let data = [];
             let quality = 2;
             // const z = shuffleChunks ? Math.random() * 100 : 50;
@@ -355,18 +353,15 @@ class SimplePerlin
                 case -3: offset3 = (center.z - r - parseInt(ck, 10)) * d3; break;
             }
 
-            for (let x = 0; x < d1; ++x) {
-                for (let y = 0; y < d2; ++y) {
-                    // let xy = perm === 0 ? x + y * d1 :
-                    //     perm === 1 ? x + y * d1 * d2 :
-                    //         x * d1 + y * d1 * d2;
-                    // let ffz = fz(xy);
-
+            for (let x = 0; x < d1; ++x)
+            {
+                for (let y = 0; y < d2; ++y)
+                {
                     const h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0) - offset3;
                     const rockLevel = Math.floor(5 * h / 6) - offset3;
                     let rl = Math.max(0, Math.min(rockLevel, d3));
                     for (let zz = 0; zz < rl; ++zz) {
-                        const currentBlock = getStride(x, y, zz); // ffz(zz); // ijS * zz + xy;
+                        const currentBlock = getStride(x, y, zz);
 
                         // Rock.
                         blocks[currentBlock] = stone;
@@ -378,21 +373,21 @@ class SimplePerlin
                     let bl = Math.max(0, Math.min(h, d3));
                     for (let zz = rl; zz < bl; ++zz) {
                         // Grass or sand.
-                        const currentBlock = getStride(x, y, zz); // ffz(zz);
+                        const currentBlock = getStride(x, y, zz);
                         // if (zz === bl - 1)
-                        //     blocks[currentBlock] = water; // ijS * zz + xy
+                        //     blocks[currentBlock] = water;
                         // else
-                        blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                        blocks[currentBlock] = mainBlockId;
                     }
 
                     if (bl < 8) {
                         for (let zz = bl; zz < 8; ++zz) {
                             // Grass or sand.
-                            const currentBlock = getStride(x, y, zz); // ffz(zz);
+                            const currentBlock = getStride(x, y, zz);
                             if (zz <= bl)
-                                blocks[currentBlock] = sand; // ijS * zz + xy
+                                blocks[currentBlock] = sand;
                             else
-                                blocks[currentBlock] = water; // ijS * zz + xy
+                                blocks[currentBlock] = water;
                         }
                     }
                 }
@@ -427,7 +422,6 @@ class SimplePerlin
                 SimplePerlin.simpleGeneration2D(
                     chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
                 );
-                // directions.push(3);
                 // 1: x, 2: y, 3: z, 4: full, 5: empty
                 break;
             case WorldType.CUBE:
