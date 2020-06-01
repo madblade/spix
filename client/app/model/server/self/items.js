@@ -18,6 +18,7 @@ let ItemType = Object.freeze({
 
     BLOCK_SAND: 17,
     BLOCK_IRON: 18,
+    BLOCK_OBSIDIAN: 19,
     // ...
     // server-side: (model_world / model)
 

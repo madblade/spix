@@ -21,7 +21,8 @@ const BlockType = Object.freeze({
     WATER: 16,
 
     SAND: 17,
-    IRON: 18
+    IRON: 18,
+    OBSIDIAN: 19,
 });
 
 const WorldType = Object.freeze({

@@ -74,33 +74,33 @@ class SimplePerlin
         let grad = SimplePerlin.grad;
         let p = SimplePerlin.p;
 
-        let floorX = Math.floor(x);
-        let floorY = Math.floor(y);
-        let floorZ = Math.floor(z);
+        const floorX = Math.floor(x);
+        const floorY = Math.floor(y);
+        const floorZ = Math.floor(z);
 
-        let X = floorX & 255;
-        let Y = floorY & 255;
-        let Z = floorZ & 255;
+        const X = floorX & 255;
+        const Y = floorY & 255;
+        const Z = floorZ & 255;
 
         x -= floorX;
         y -= floorY;
         z -= floorZ;
 
-        let xMinus1 = x - 1;
-        let yMinus1 = y - 1;
-        let zMinus1 = z - 1;
+        const xMinus1 = x - 1;
+        const yMinus1 = y - 1;
+        const zMinus1 = z - 1;
 
-        let u = fade(x);
-        let v = fade(y);
-        let w = fade(z);
+        const u = fade(x);
+        const v = fade(y);
+        const w = fade(z);
 
-        let A = p[X] + Y;
-        let AA = p[A] + Z;
-        let AB = p[A + 1] + Z;
+        const A = p[X] + Y;
+        const AA = p[A] + Z;
+        const AB = p[A + 1] + Z;
 
-        let B = p[X + 1] + Y;
-        let BA = p[B] + Z;
-        let BB = p[B + 1] + Z;
+        const B = p[X + 1] + Y;
+        const BA = p[B] + Z;
+        const BB = p[B + 1] + Z;
 
         return lerp(w,
             lerp(v,
@@ -113,7 +113,8 @@ class SimplePerlin
         );
     }
 
-    static simplePerlinGeneration(chunk, shuffleChunks, worldId, worldInfo) {
+    static simpleGeneration2D(chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks)
+    {
         let dims = chunk.dimensions;
         const dx = dims[0];
         const dy = dims[1];
@@ -121,121 +122,183 @@ class SimplePerlin
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
         const ck = chunk.chunkK;
-        const offsetX = dx * ci;
-        const offsetY = dy * cj;
-        const offsetZ = dz * ck;
+        const offsetX = dx * ci; const offsetY = dy * cj; const offsetZ = dz * ck;
 
-        const abs = Math.abs;
+        // const air = BlockType.AIR;
+        const stone = BlockType.STONE;
+        const grass = BlockType.GRASS;
+        const water = BlockType.WATER;
+        const iron = BlockType.IRON;
+        const sand = BlockType.SAND;
+        // const planks = BlockType.PLANKS;
 
-        // Create blocks.
-        let blocks = new Uint8Array(dx * dy * dz);
+        // Fill with grass on main world, sand everywhere else.
+        const mainBlockId = parseInt(worldId, 10) === -1 ? grass : sand;
 
+        const normalSize = dx * dy;
+
+        let data = [];
+        let quality = 2;
+        // const z = shuffleChunks ? Math.random() * 100 : 50;
+        const z = 4 * (shuffleChunks ? Math.random() * dz : Math.floor(dz / 2));
+
+        for (let i = 0; i < normalSize; ++i) data[i] = 0;
+        for (let iteration = 0; iteration < 4; ++iteration)
+        {
+            for (let i = 0; i < normalSize; ++i) {
+                let x = offsetX + i % dx;
+                let y = offsetY + (i / dx | 0); // / priority > | priority
+                data[i] += SimplePerlin.noise(x / quality, y / quality, z) * quality;
+            }
+
+            quality *= 4;
+        }
+
+        for (let x = 0; x < dx; ++x) {
+            for (let y = 0; y < dy; ++y) {
+                let h = dz / 2 + (data[x + y * dx] * perlinIntensity | 0); // getY(x, y);
+                let rockLevel = Math.floor(5 * h / 6);
+                const xy = x + y * dx;
+
+                h -= offsetZ;
+                rockLevel -= offsetZ;
+                let rl = Math.max(0, Math.min(rockLevel, dz));
+                for (let zz = 0; zz < rl; ++zz) {
+                    const currentBlock = xy + normalSize * zz;
+
+                    // Rock.
+                    blocks[currentBlock] = stone;
+
+                    // Iron.
+                    if (Math.random() > 0.99) blocks[currentBlock] = iron;
+                }
+
+                let bl = Math.max(0, Math.min(h, dz));
+                for (let zz = rl; zz < bl; ++zz) {
+                    // Grass or sand.
+                    const currentBlock = xy + normalSize * zz;
+                    // if (zz === bl - 1)
+                    //     blocks[currentBlock] = water; // ijS * zz + xy
+                    // else
+                    blocks[currentBlock] = mainBlockId; // ijS * zz + xy
+                }
+
+                if (bl < 16 && rl > 0) {
+                    for (let zz = bl; zz < 16; ++zz) {
+                        // Grass or sand.
+                        const currentBlock = xy + normalSize * zz;
+                        if (zz === bl)
+                            blocks[currentBlock] = sand; // ijS * zz + xy
+                        else
+                            blocks[currentBlock] = water; // ijS * zz + xy
+                    }
+                }
+            }
+        }
+    }
+
+    static simpleGeneration3D(chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks)
+    {
+        let directions = [];
+
+        let dims = chunk.dimensions;
+        const dx = dims[0]; const dy = dims[1]; const dz = dims[2];
+        const ci = chunk.chunkI; const cj = chunk.chunkJ; const ck = chunk.chunkK;
+        const offsetX = dx * ci; const offsetY = dy * cj; const offsetZ = dz * ck;
+
+        const center = worldInfo.center;
+        const radius = worldInfo.radius;
         const air = BlockType.AIR;
         const stone = BlockType.STONE;
         const grass = BlockType.GRASS;
         const water = BlockType.WATER;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
-        const planks = BlockType.PLANKS;
-        let worldType = worldInfo.type;
-        let hillsType = worldInfo.hills;
+        const obsidian = BlockType.OBSIDIAN;
+        let abs = Math.abs;
 
-        // Detect cube or flat world.
-        let directions = [];
-        switch (worldType) {
-            case WorldType.FLAT:
-                directions.push(3); // === z (starting at 1 for signa)
-                // 1: x, 2: y, 3: z, 4: full, 5: empty
-                break;
-            case WorldType.CUBE:
-                let center = worldInfo.center;
-                const radius = worldInfo.radius;
+        const deltaX = center.x - parseInt(ci, 10);
+        const deltaY = center.y - parseInt(cj, 10);
+        const deltaZ = center.z - parseInt(ck, 10);
 
-                const deltaX = center.x - parseInt(ci, 10);
-                const deltaY = center.y - parseInt(cj, 10);
-                const deltaZ = center.z - parseInt(ck, 10);
-
-                if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius)
-                {
-                    blocks.fill(air);
-                    chunk.blocks = blocks;
-                    return; // Blocks are filled with zeros.
-                }
-
-                // full stone inside the cubeworld
-                if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
-                    if (abs(deltaX) < abs(deltaZ) && abs(deltaY) < abs(deltaZ) && abs(deltaZ) > 0) {
-                        directions.push(ck > center.z ? 3 : -3);
-                    } else if (abs(deltaX) < abs(deltaY) && abs(deltaZ) < abs(deltaY) && abs(deltaY) > 0) {
-                        directions.push(cj > center.y ? 2 : -2);
-                    } else if (abs(deltaY) < abs(deltaX) && abs(deltaZ) < abs(deltaX) && abs(deltaX) > 0) {
-                        directions.push(ci > center.x ? 1 : -1);
-                    } else {
-                        blocks.fill(stone);
-                        chunk.blocks = blocks;
-                        return;
-                    }
-                }
-
-                // TODO [CRIT] manage empty chunks
-
-                // Debug
-                // blocks.fill(air);
-                // chunk.blocks = blocks;
-                // if (true) return;
-
-                if (abs(deltaX) === radius)
-                    directions.push(ci > center.x ? 1 : -1);
-                if (abs(deltaY) === radius)
-                    directions.push(cj > center.y ? 2 : -2);
-                if (abs(deltaZ) === radius)
-                    directions.push(ck > center.z ? 3 : -3);
-
-                break;
-            default:
-                console.error('[Generator Simple Perlin] Unknown world type.');
+        if (abs(deltaX) > radius || abs(deltaY) > radius || abs(deltaZ) > radius)
+        {
+            blocks.fill(air);
+            chunk.isEmpty = true;
+            return; // Blocks are filled with zeros.
         }
+
+        // full stone inside the cubeworld
+        if (abs(deltaX) < radius && abs(deltaY) < radius && abs(deltaZ) < radius) {
+            if (abs(deltaX) < abs(deltaZ) && abs(deltaY) < abs(deltaZ) && abs(deltaZ) > 0) {
+                directions.push(ck > center.z ? 3 : -3);
+            } else if (abs(deltaX) < abs(deltaY) && abs(deltaZ) < abs(deltaY) && abs(deltaY) > 0) {
+                directions.push(cj > center.y ? 2 : -2);
+            } else if (abs(deltaY) < abs(deltaX) && abs(deltaZ) < abs(deltaX) && abs(deltaX) > 0) {
+                directions.push(ci > center.x ? 1 : -1);
+            } else {
+                blocks.fill(stone);
+                chunk.isFull = true;
+                return;
+            }
+        }
+
+        // TODO manage full / empty chunks
+
+        if (abs(deltaX) === radius)
+            directions.push(ci > center.x ? 1 : -1);
+        if (abs(deltaY) === radius)
+            directions.push(cj > center.y ? 2 : -2);
+        if (abs(deltaZ) === radius)
+            directions.push(ck > center.z ? 3 : -3);
 
         // Fill with grass on main world, sand everywhere else.
         const mainBlockId = parseInt(worldId, 10) === -1 ? grass : sand;
         const ijS = dx * dy;
+        const nbDirections = directions.length;
 
-        if (directions.length === 3) {
+        if (nbDirections === 3)
+        {
             // Eighth-full generation.
             for (let lx = dx / 2, i = directions[0] > 0 ? 0 : lx, cx = 0; cx < lx; ++cx, ++i) {
                 for (let ly = dy / 2, j = directions[1] > 0 ? 0 : ly, cy = 0; cy < ly; ++cy, ++j)
                     for (let lz = dz / 2, k = directions[2] > 0 ? 0 : lz, cz = 0; cz < lz; ++cz, ++k)
-                        blocks[i + j * dx + k * ijS] = planks;
+                        blocks[i + j * dx + k * ijS] = obsidian;
             }
         }
-
-        if (directions.length === 2) {
+        else if (nbDirections === 2)
+        {
             // Quarter-full generation.
             // 1 or 2, then 2 or 3!
-            for (let a1 = abs(directions[0]), l1 = a1 === 1 ? dx / 2 : dy / 2, ij = directions[0] > 0 ? 0 : l1, c1 = 0; c1 < l1; ++c1, ++ij)
-                for (let a2 = abs(directions[1]), l2 = a2 === 2 ? dy / 2 : dz / 2, jk = directions[1] > 0 ? 0 : l2, c2 = 0; c2 < l2; ++c2, ++jk)
+            for (
+                let a1 = abs(directions[0]),
+                    l1 = a1 === 1 ? dx / 2 : dy / 2,
+                    ij = directions[0] > 0 ? 0 : l1,
+                    c1 = 0;
+                c1 < l1; ++c1, ++ij
+            )
+                for (
+                    let a2 = abs(directions[1]),
+                        l2 = a2 === 2 ? dy / 2 : dz / 2,
+                        jk = directions[1] > 0 ? 0 : l2,
+                        c2 = 0;
+                    c2 < l2; ++c2, ++jk
+                )
                 {
                     if (a1 > 1) {
                         const ijk = ij * dx + jk * ijS;
-                        for (let x = 0; x < dx; ++x)
-                            blocks[x + ijk] = planks;
-                    }
-                    else if (a2 > 2) {
+                        for (let x = 0; x < dx; ++x) blocks[x + ijk] = obsidian;
+                    } else if (a2 > 2) {
                         const ijk = ij + jk * ijS;
-                        for (let y = 0; y < dy; ++y)
-                            blocks[ijk + y * dx] = planks;
-                    }
-                    else {
+                        for (let y = 0; y < dy; ++y) blocks[ijk + y * dx] = obsidian;
+                    } else {
                         const ijk = ij + jk * dx;
-                        for (let z = 0; z < dz; ++z)
-                            blocks[ijk + z * ijS] = planks;
+                        for (let z = 0; z < dz; ++z) blocks[ijk + z * ijS] = obsidian;
                     }
                 }
         }
-
-        if (directions.length === 1) {
-            // Perlin generation.
-
+        else if (nbDirections === 1)
+        {
             const v1 = directions[0]; // For signum & value.
             const a1 = abs(v1);
             let [d1, d2, d3, normalSize, offset1, offset2, offset3, perm] = a1 > 2 ?
@@ -262,38 +325,23 @@ class SimplePerlin
                 quality *= 4;
             }
 
-            // let getY = function(x, y) {
-            //     return data[x + y * d1] * 0.2 | 0; // * priority > | priority
-            // };
-
             // Get vertical generation direction.
             let fz = v1 > 0 ?
-                (
-                    perm === 0 ? (xy => zed => xy + normalSize * zed) :
-                        perm === 1 ? (xy => zed => xy + zed * d1) : (xy => zed => xy + zed)
-                ) : (
-                    perm === 0 ? (xy => zed => xy + normalSize * (d3 - zed - 1)) :
-                        perm === 1 ? (xy => zed => xy + (d3 - zed - 1) * d1) : (xy => zed => xy + (d3 - zed - 1))
-                );
+                perm === 0 ? xy => zed => xy + normalSize * zed :
+                    perm === 1 ? xy => zed => xy + zed * d1 :
+                        xy => zed => xy + zed : // v1 <= 0
+                perm === 0 ? xy => zed => xy + normalSize * (d3 - zed - 1) :
+                    perm === 1 ? xy => zed => xy + (d3 - zed - 1) * d1 :
+                        xy => zed => xy + (d3 - zed - 1);
 
-            if (worldType === WorldType.CUBE) {
-                let r = parseInt(worldInfo.radius, 10);
-                switch (v1) {
-                    case 1:  offset3 = (-worldInfo.center.x - r + parseInt(ci, 10)) * d1; break;
-                    case -1: offset3 = (worldInfo.center.x - r - parseInt(ci, 10)) * d1; break;
-                    case 2:  offset3 = (-worldInfo.center.y - r + parseInt(cj, 10)) * d2; break;
-                    case -2: offset3 = (worldInfo.center.y - r - parseInt(cj, 10)) * d2; break;
-                    case 3:  offset3 = (-worldInfo.center.z - r + parseInt(ck, 10)) * d3; break;
-                    case -3: offset3 = (worldInfo.center.z - r - parseInt(ck, 10)) * d3; break;
-                }
-            }
-
-            let perlinIntensity;
-            switch (hillsType) {
-                case HillType.NO_HILLS: perlinIntensity = 0; break;
-                case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
-                case HillType.GIANT_HILLS: perlinIntensity = 1.0; break;
-                default: perlinIntensity = 0.1; break;
+            let r = parseInt(radius, 10);
+            switch (v1) {
+                case 1:  offset3 = (-center.x - r + parseInt(ci, 10)) * d1; break;
+                case -1: offset3 = (center.x - r - parseInt(ci, 10)) * d1; break;
+                case 2:  offset3 = (-center.y - r + parseInt(cj, 10)) * d2; break;
+                case -2: offset3 = (center.y - r - parseInt(cj, 10)) * d2; break;
+                case 3:  offset3 = (-center.z - r + parseInt(ck, 10)) * d3; break;
+                case -3: offset3 = (center.z - r - parseInt(ck, 10)) * d3; break;
             }
 
             for (let x = 0; x < d1; ++x) {
@@ -328,7 +376,7 @@ class SimplePerlin
                         blocks[currentBlock] = mainBlockId; // ijS * zz + xy
                     }
 
-                    if (bl < 16 && rl > 0) {
+                    if (bl < 0 && rl > 0) {
                         for (let zz = bl; zz < 16; ++zz) {
                             // Grass or sand.
                             const currentBlock = ffz(zz);
@@ -340,6 +388,47 @@ class SimplePerlin
                     }
                 }
             }
+        }
+    }
+
+    static simplePerlinGeneration(chunk, shuffleChunks, worldId, worldInfo)
+    {
+        let dims = chunk.dimensions;
+        const dx = dims[0];
+        const dy = dims[1];
+        const dz = dims[2];
+
+        // Create blocks.
+        let blocks = new Uint8Array(dx * dy * dz);
+
+        // Detect intensity
+        const hillsType = worldInfo.hills;
+        let perlinIntensity;
+        switch (hillsType) {
+            case HillType.NO_HILLS: perlinIntensity = 0; break;
+            case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
+            case HillType.GIANT_HILLS: perlinIntensity = 1.0; break;
+            default: perlinIntensity = 0.1; break;
+        }
+
+        // Detect cube or flat world.
+        const worldType = worldInfo.type;
+        switch (worldType) {
+            case WorldType.FLAT:
+                SimplePerlin.simpleGeneration2D(
+                    chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
+                );
+                // directions.push(3);
+                // 1: x, 2: y, 3: z, 4: full, 5: empty
+                break;
+            case WorldType.CUBE:
+                SimplePerlin.simpleGeneration3D(
+                    chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
+                );
+
+                break;
+            default:
+                console.error('[Generator Simple Perlin] Unknown world type.');
         }
 
         chunk.blocks = blocks;

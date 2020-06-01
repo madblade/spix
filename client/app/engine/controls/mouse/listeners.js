@@ -48,21 +48,31 @@ let ListenerModule = {
             return;
         }
 
-        intersects.sort(function(a, b) { return a.distance > b.distance; });
-        let point = intersects[0].point;
+        // Get closest intersection point.
+        let min = intersects[0];
+        for (let i = 1; i < intersects.length; ++i) {
+            let ii = intersects[i];
+            if (ii.distance < min.distance) min = ii;
+        }
+        let point = min.point;
 
         // Compute blocks.
-        let flo = Math.floor;
+        let flo = Math.round;
         let abs = Math.abs;
 
-        const rx = point.x; const ry = point.y; const rz = point.z;
+        let rx = point.x;
+        let ry = point.y;
+        let rz = point.z;
         const dx = abs(abs(flo(rx)) - abs(rx));
         const dy = abs(abs(flo(ry)) - abs(ry));
         const dz = abs(abs(flo(rz)) - abs(rz));
-        const ex = dx < 0.0000001; const ey = dy < 0.0000001; const ez = dz < 0.0000001;
+        const ex = dx < 0.0000001; if (ex) rx = flo(rx);
+        const ey = dy < 0.0000001; if (ey) ry = flo(ry);
+        const ez = dz < 0.0000001; if (ez) rz = flo(rz);
 
         if (ex + ey + ez !== 1) {
             // TODO [HIGH] how do I remove an X?
+            console.log(`${ex},${ey},${ez}`);
             console.warn('[OnLeftMouse] Error: precision on intersection @addBlock');
             return;
         }

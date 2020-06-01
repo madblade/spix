@@ -41,6 +41,9 @@ class Chunk
         this._fastConnectedComponentsIds = {}; // Signed.
         this._ready = false;
 
+        this.isEmpty = false;
+        this.isFull = false;
+
         // Events.
         this._lastUpdated = TimeUtils.getTimeSecNano();
         this._updates = [{}, {}, {}];
@@ -70,6 +73,11 @@ class Chunk
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
     set ready(newReady) { this._ready = newReady; }
+
+    // Do not use! Used for getting blocks that might exceed capacity.
+    _toIdUnsafe(x, y, z) {
+        return x + y * this._xSize + z * this._xSize * this._ySize;
+    }
 
     _toId(x, y, z) {
         let id = x + y * this._xSize + z * this._xSize * this._ySize;

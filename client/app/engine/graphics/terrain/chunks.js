@@ -514,7 +514,14 @@ let ChunksModule = {
 
             let normal = nature > 0;
             whereToFindFace.set(aid, [meshId, pos]);
-            whichFaceIs.get(meshId).set(pos, aid);
+            let wfi = whichFaceIs.get(meshId);
+            if (!wfi) {
+                let m = new Map();
+                m.set(pos, aid);
+                whichFaceIs.set(meshId, m);
+            } else {
+                wfi.set(pos, aid);
+            }
 
             this.addFace(faceId, pos * 18, iS, ijS, ijkS,
                 vertices, normals, colors, uvs, Math.abs(nature),

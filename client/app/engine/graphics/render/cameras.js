@@ -7,6 +7,7 @@
 import extend from '../../../extend.js';
 import { Camera } from './camera.js';
 import {
+    CameraHelper,
     Matrix4, PerspectiveCamera,
     Plane, Raycaster,
     Vector2, Vector3, Vector4,
@@ -486,6 +487,9 @@ extend(CameraManager.prototype, {
 
         let raycaster = this.raycaster;
         let camera = this.mainRaycasterCamera.getRecorder();
+        let mc = this.mainCamera.getRecorder();
+        mc.updateMatrixWorld();
+        camera.matrixWorld.copy(mc.matrixWorld);
         let terrain = chunkModel.getCloseTerrain(selfModel.worldId);
 
         let intersects;

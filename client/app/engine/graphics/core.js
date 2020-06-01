@@ -5,6 +5,7 @@
 'use strict';
 
 import Stats from 'stats.js';
+import { CameraHelper } from 'three';
 
 let CoreModule = {
 

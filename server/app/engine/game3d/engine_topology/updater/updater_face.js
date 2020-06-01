@@ -75,7 +75,7 @@ class UpdaterFace
             console.error('[UpdaterFace] Can’t add air face.');
         }
 
-        let blockStride = chunk._toId(x, y, z);
+        let blockStride = chunk._toIdUnsafe(x, y, z);
         let dimensions = chunk.dimensions;
         let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(blockStride, direction, dimensions);
 
@@ -85,25 +85,27 @@ class UpdaterFace
 
         let componentId = faceNature === BlockType.WATER ? 2 : 1; // water
 
-        if (!fastComponents[componentId])
-        {
-            console.error(`BLD: invalid component id: ${componentId} for insertion.`);
-            console.log(fastComponents);
-            console.log(fastComponentsIds);
-            console.log(connectedComponents);
-            fastComponents[componentId] = [];
-            fastComponentsIds[componentId] = [];
-        }
-
-        connectedComponents[faceId] = componentId;
-        const location = CollectionUtils.insert(faceId, fastComponents[componentId]);
-        let fastIds = fastComponentsIds[componentId];
         if (fromAddition) {
             if (direction % 2 === 0) faceNature *= -1;
         } else if (!fromAddition) {
             if (direction % 2 !== 0) faceNature *= -1;
         }
-        fastIds.splice(location, 0, faceNature);
+        connectedComponents[faceId] = componentId;
+
+        if (!fastComponents[componentId])
+        {
+            // console.error(`BLD: invalid component id: ${componentId} for insertion.`);
+            // console.log(fastComponents);
+            // console.log(fastComponentsIds);
+            // console.log(connectedComponents);
+            // Create new components.
+            fastComponents[componentId] = [faceId];
+            fastComponentsIds[componentId] = [faceNature];
+        } else {
+            const location = CollectionUtils.insert(faceId, fastComponents[componentId]);
+            let fastIds = fastComponentsIds[componentId];
+            fastIds.splice(location, 0, faceNature);
+        }
 
         // Apply update.
         let updates = chunk.updates;
@@ -124,7 +126,7 @@ class UpdaterFace
         chunk, x, y, z,
         direction)
     {
-        let blockStride = chunk._toId(x, y, z);
+        let blockStride = chunk._toIdUnsafe(x, y, z);
         let dimensions = chunk.dimensions;
         let faceId = UpdaterFace.getFaceIdFromCoordinatesAndNormal(blockStride, direction, dimensions);
 
