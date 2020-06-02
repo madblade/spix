@@ -9,6 +9,11 @@ class TerrainCollider
     static eps = 1e-8;
     static inveps = 1e8;
 
+    static numericClamp(n) {
+        const ie = TerrainCollider.inveps;
+        return Math.round(n * ie) / ie;
+    }
+
     /**
      * Network casting:
      * 1. Define a 2D network of 1-spaced points on the entity's 3 forward-moving faces.
@@ -34,7 +39,8 @@ class TerrainCollider
 
         let cropX = x1; let cropY = y1; let cropZ = z1;
         const epsilon = TerrainCollider.eps;
-        const inveps = TerrainCollider.inveps;
+        let numClamp = TerrainCollider.numericClamp;
+        let adx = false; let ady = false; let adz = false;
 
         if (x0 !== x1) {
             let xNetwork = [];
@@ -56,21 +62,16 @@ class TerrainCollider
                 let net = xNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
-                    if (x1 > x0 && newCrops[0] - xW < cropX - epsilon) {
-                        cropX = newCrops[0] - xW;
-                        cropY = newCrops[1] + y0 - net[1];
-                        cropZ = newCrops[2] + z0 - net[2];
-                        cropX = Math.round(cropX * inveps) / inveps;
-                        cropY = Math.round(cropY * inveps) / inveps;
-                        cropZ = Math.round(cropZ * inveps) / inveps;
+                    adx = true;
+                    if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon)) {
+                        cropX = numClamp(newCrops[0] - xW);
+                        cropY = numClamp(newCrops[1] + y0 - net[1]);
+                        cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
-                    else if (x1 < x0 && newCrops[0] + xW > cropX + epsilon) {
-                        cropX = newCrops[0] + xW;
-                        cropY = newCrops[1] + y0 - net[1];
-                        cropZ = newCrops[2] + z0 - net[2];
-                        cropX = Math.round(cropX * inveps) / inveps;
-                        cropY = Math.round(cropY * inveps) / inveps;
-                        cropZ = Math.round(cropZ * inveps) / inveps;
+                    else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon)) {
+                        cropX = numClamp(newCrops[0] + xW);
+                        cropY = numClamp(newCrops[1] + y0 - net[1]);
+                        cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
                 }
             }
@@ -96,28 +97,27 @@ class TerrainCollider
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
-                    if (y1 > y0 && newCrops[1] - yW < cropY - epsilon) {
-                        let nx = newCrops[0] + x0 - net[0];
-                        let ny = newCrops[1] - yW;
-                        let nz = newCrops[2] + z0 - net[2];
-                        nx = Math.round(nx * inveps) / inveps;
-                        ny = Math.round(ny * inveps) / inveps;
-                        nz = Math.round(nz * inveps) / inveps;
+                    ady = true;
+                    if (y1 > y0 && numClamp(newCrops[1] - yW) < numClamp(cropY - epsilon)) {
+                        const nx = numClamp(newCrops[0] + x0 - net[0]);
+                        const ny = numClamp(newCrops[1] - yW);
+                        const nz = numClamp(newCrops[2] + z0 - net[2]);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                        {
                             cropX = nx;
+                        }
                         cropY = ny;
                         if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
                             cropZ = nz;
                     }
-                    else if (y1 < y0 && newCrops[1] + yW > cropY + epsilon) {
-                        let nx = newCrops[0] + x0 - net[0];
-                        let ny = newCrops[1] + yW;
-                        let nz = newCrops[2] + z0 - net[2];
-                        nx = Math.round(nx * inveps) / inveps;
-                        ny = Math.round(ny * inveps) / inveps;
-                        nz = Math.round(nz * inveps) / inveps;
+                    else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon)) {
+                        const nx = numClamp(newCrops[0] + x0 - net[0]);
+                        const ny = numClamp(newCrops[1] + yW);
+                        const nz = numClamp(newCrops[2] + z0 - net[2]);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                        {
                             cropX = nx;
+                        }
                         cropY = ny;
                         if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
                             cropZ = nz;
@@ -146,37 +146,69 @@ class TerrainCollider
                 let net = zNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
-                    if (z1 > z0 && newCrops[2] - zW < cropZ - epsilon) {
-                        let nx = newCrops[0] + x0 - net[0];
-                        let ny = newCrops[1] + y0 - net[1];
-                        let nz = newCrops[2] - zW;
-                        nx = Math.round(nx * inveps) / inveps;
-                        ny = Math.round(ny * inveps) / inveps;
-                        nz = Math.round(nz * inveps) / inveps;
+                    adz = true;
+                    if (z1 > z0 && numClamp(newCrops[2] - zW) < numClamp(cropZ - epsilon)) {
+                        const nx = numClamp(newCrops[0] + x0 - net[0]);
+                        const ny = numClamp(newCrops[1] + y0 - net[1]);
+                        const nz = numClamp(newCrops[2] - zW);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                        {
                             cropX = nx;
+                        }
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
+                        {
                             cropY = ny;
+                        }
                         cropZ = nz;
                     }
-                    else if (z1 < z0 && newCrops[2] + zW > cropZ + epsilon) {
-                        let nx = newCrops[0] + x0 - net[0];
-                        let ny = newCrops[1] + y0 - net[1];
-                        let nz = newCrops[2] + zW;
-                        nx = Math.round(nx * inveps) / inveps;
-                        ny = Math.round(ny * inveps) / inveps;
-                        nz = Math.round(nz * inveps) / inveps;
+                    else if (z1 < z0 && numClamp(newCrops[2] + zW) > numClamp(cropZ + epsilon)) {
+                        const nx = numClamp(newCrops[0] + x0 - net[0]);
+                        const ny = numClamp(newCrops[1] + y0 - net[1]);
+                        const nz = numClamp(newCrops[2] + zW);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                        {
                             cropX = nx;
+                        }
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
+                        {
                             cropY = ny;
+                        }
                         cropZ = nz;
                     }
                 }
             }
         }
 
-        if (cropX !== x1 || cropY !== y1 || cropZ !== z1) {
+        let adh = entity.adherence;
+        let acc0 = entity.a0;
+        if (adx) {
+            adh[x0 > x1 ? 0 : 3] = true;
+            adh[x0 > x1 ? 3 : 0] = false;
+        } else { adh[0] = adh[3] = false; }
+        if (ady) {
+            adh[y0 > y1 ? 1 : 4] = true;
+            adh[y0 > y1 ? 4 : 1] = false;
+        } else { adh[1] = adh[4] = false; }
+        if (adz) {
+            adh[z0 > z1 ? 2 : 5] = true;
+            adh[z0 > z1 ? 5 : 2] = false;
+        } else { adh[2] = adh[5] = false; }
+
+        if (adh[2] && acc0[2] || adh[5] && acc0[5]) {
+            entity.v1[0] = 0;
+            entity.v1[1] = 0;
+        }
+        if (adh[0] && acc0[0] || adh[3] && acc0[3]) {
+            entity.v1[1] = 0;
+            entity.v1[2] = 0;
+        }
+        if (adh[1] && acc0[1] || adh[4] && acc0[4]) {
+            entity.v1[0] = 0;
+            entity.v1[2] = 0;
+        }
+
+        if (cropX !== x1 || cropY !== y1 || cropZ !== z1)
+        {
             newPosition[0] = cropX;
             newPosition[1] = cropY;
             newPosition[2] = cropZ;
@@ -189,12 +221,12 @@ class TerrainCollider
         // Update entity position.
         //entity.position = newPosition;
         // let ep1 = entity.p1;
-        let ep0 = entity.p0;
-        let adh = entity.adherence;
+        // let ep0 = entity.p0;
 
         for (let i = 0; i < 3; ++i) {
-            if (adh[i] && newPosition[i] !== ep0[i]) adh[i] = false;
-            if (adh[3 + i] && newPosition[i] !== ep0[i]) adh[3 + i] = false;
+            // adh[i] = adh[3 + i] = false;
+            // if (adh[i] && newPosition[i] !== ep0[i]) adh[i] = false;
+            // if (adh[3 + i] && newPosition[i] !== ep0[i]) adh[3 + i] = false;
 
             //ep1[i] = newPosition[i];
             //entity.adherence[ii] = false;
@@ -306,11 +338,11 @@ class TerrainCollider
         const ny0 = dy > 0 ? j - tol : j + 1 + tol;
         const nz0 = dz > 0 ? k - tol : k + 1 + tol;
         // let newPosition = [0, 0, 0];
-        let oldAdherence = [false, false, false, false, false, false];
-        let adherence = entity.adherence;
-        for (let ii = 0; ii < 6; ++ii) {
-            oldAdherence[ii] = adherence[ii];
-        }
+        // let oldAdherence = [false, false, false, false, false, false];
+        // let adherence = entity.adherence;
+        // for (let ii = 0; ii < 6; ++ii) {
+        //     oldAdherence[ii] = adherence[ii];
+        // }
 
         if (ntx) {
             const t = tMaxX - tDeltaX;
@@ -326,20 +358,20 @@ class TerrainCollider
                         const free = world.isFree(i + ddx, j - 1, k);
                         if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
-                            adherence[1] = false;
+                            // adherence[1] = false;
                         } else {
                             nyt = ny0 - 1;
-                            if (dby > 0 && !free) adherence[1] = true;
+                            // if (dby > 0 && !free) adherence[1] = true;
                         }
                     }
                     if (dy > 0) {
                         const free = world.isFree(i + ddx, j + 1, k);
                         if (free || dby < 1 && ny < ny0 + 1) {
                             nyt = ny;
-                            adherence[4] = false;
+                            // adherence[4] = false;
                         } else {
                             nyt = ny0 + 1;
-                            if (dby > 0 && !free) adherence[4] = true;
+                            // if (dby > 0 && !free) adherence[4] = true;
                         }
                     }
                 }
@@ -354,29 +386,34 @@ class TerrainCollider
                         const free = world.isFree(i + ddx, j, k - 1);
                         if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
-                            adherence[2] = false;
+                            // adherence[2] = false;
                         }
                         else {
                             nzt = nz0 - 1;
-                            if (dbz > 0 && !free) adherence[2] = true;
+                            // if (dbz > 0 && !free) adherence[2] = true;
                         }
                     }
                     if (dz > 0) {
                         const free = world.isFree(i + ddx, j, k + 1);
                         if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
-                            adherence[5] = false;
+                            // adherence[5] = false;
                         }
                         else {
                             nzt = nz0 + 1;
-                            if (dbz > 0 && !free) adherence[5] = true;
+                            // if (dbz > 0 && !free) adherence[5] = true;
                         }
                     }
                 }
             }
 
-            if (dx < 0) adherence[0] = true;
-            else if (dx > 0) adherence[3] = true;
+            if (dx < 0) {
+                // adherence[0] = true;
+                // adherence[3] = false;
+            } else if (dx > 0) {
+                // adherence[3] = true;
+                // adherence[0] = false;
+            }
 
             // {
             newPosition[0] = nx0;
@@ -385,11 +422,11 @@ class TerrainCollider
             newPosition[2] = nzt;
             // }
 
-            let acc0 = entity.a0;
-            if (adherence[0] && acc0[0] || adherence[3] && acc0[3]) {
-                entity.v1[1] = 0;
-                entity.v1[2] = 0;
-            }
+            // let acc0 = entity.a0;
+            // if (adherence[0] && acc0[0] || adherence[3] && acc0[3]) {
+            //     entity.v1[1] = 0;
+            //     entity.v1[2] = 0;
+            // }
             //if (adherence[0] || adherence[3]) {
             //}
 
@@ -413,22 +450,22 @@ class TerrainCollider
                         const free = world.isFree(i - 1, j + ddy, k);
                         if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
-                            adherence[0] = false;
+                            // adherence[0] = false;
                         }
                         else {
                             nxt = nx0 - 1;
-                            if (dbx > 0 && !free) adherence[0] = true;
+                            // if (dbx > 0 && !free) adherence[0] = true;
                         }
                     }
                     if (dx > 0) {
                         const free = world.isFree(i + 1, j + ddy, k);
                         if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
-                            adherence[3] = false;
+                            // adherence[3] = false;
                         }
                         else {
                             nxt = nx0 + 1;
-                            if (dbx > 0 && !free) adherence[3] = true;
+                            // if (dbx > 0 && !free) adherence[3] = true;
                         }
                     }
                 }
@@ -443,29 +480,34 @@ class TerrainCollider
                         const free = world.isFree(i, j + ddy, k - 1);
                         if (free || dbz < 1 && nz > nz0 - 1) {
                             nzt = nz;
-                            adherence[2] = false;
+                            // adherence[2] = false;
                         }
                         else {
                             nzt = nz0 - 1;
-                            if (dbz > 0 && !free) adherence[2] = true;
+                            // if (dbz > 0 && !free) adherence[2] = true;
                         }
                     }
                     if (dz > 0) {
                         const free = world.isFree(i, j + ddy, k + 1);
                         if (free || dbz < 1 && nz < nz0 + 1) {
                             nzt = nz;
-                            adherence[5] = false;
+                            // adherence[5] = false;
                         }
                         else {
                             nzt = nz0 + 1;
-                            if (dbz > 0 && !free) adherence[5] = true;
+                            // if (dbz > 0 && !free) adherence[5] = true;
                         }
                     }
                 }
             }
 
-            if (dy < 0) adherence[1] = true;
-            else if (dy > 0) adherence[4] = true;
+            if (dy < 0) {
+                // adherence[1] = true;
+                // adherence[4] = false;
+            } else if (dy > 0) {
+                // adherence[4] = true;
+                // adherence[1] = false;
+            }
 
             // {
             newPosition[0] = nxt;
@@ -474,11 +516,11 @@ class TerrainCollider
             newPosition[2] = nzt;
             // }
 
-            let acc0 = entity.a0;
-            if (adherence[1] && acc0[1] || adherence[4] && acc0[4]) {
-                entity.v1[0] = 0;
-                entity.v1[2] = 0;
-            }
+            // let acc0 = entity.a0;
+            // if (adherence[1] && acc0[1] || adherence[4] && acc0[4]) {
+            //     entity.v1[0] = 0;
+            //     entity.v1[2] = 0;
+            // }
             //if (adherence[1] || adherence[4]) {
             //}
 
@@ -502,22 +544,22 @@ class TerrainCollider
                         const free = world.isFree(i - 1, j, k + ddz);
                         if (free || dbx < 1 && nx > nx0 - 1) {
                             nxt = nx;
-                            adherence[0] = false;
+                            // adherence[0] = false;
                         }
                         else {
                             nxt = nx0 - 1;
-                            if (dbx > 0 && !free) adherence[0] = true;
+                            // if (dbx > 0 && !free) adherence[0] = true;
                         }
                     }
                     if (dx > 0) {
                         const free = world.isFree(i + 1, j, k + ddz);
                         if (free || dbx < 1 && nx < nx0 + 1) {
                             nxt = nx;
-                            adherence[3] = false;
+                            // adherence[3] = false;
                         }
                         else {
                             nxt = nx0 + 1;
-                            if (dbx > 0 && !free) adherence[3] = true;
+                            // if (dbx > 0 && !free) adherence[3] = true;
                         }
                     }
                 }
@@ -532,36 +574,34 @@ class TerrainCollider
                         const free = world.isFree(i, j - 1, k + ddz);
                         if (free || dby < 1 && ny > ny0 - 1) {
                             nyt = ny;
-                            adherence[1] = false;
+                            // adherence[1] = false;
                         }
                         else {
                             nyt = ny0 - 1;
-                            if (dby > 0 && !free) adherence[1] = true;
+                            // if (dby > 0 && !free) adherence[1] = true;
                         }
                     }
                     if (dy > 0) {
                         const free = world.isFree(i, j + 1, k + ddz);
                         if (free || dby < 1 && ny < ny0 + 1) { // || is done last
                             nyt = ny;
-                            adherence[4] = false;
+                            // adherence[4] = false;
                         }
                         else {
                             nyt = ny0 + 1;
-                            if (dby > 0 && !free) adherence[4] = true;
+                            // if (dby > 0 && !free) adherence[4] = true;
                         }
                     }
                 }
             }
 
             // One impulse allowed
-            // TODO eliucidate why
             if (dz < 0) {
-                adherence[2] = true;
+                // adherence[2] = true;
                 // adherence[5] = false;
-            }
-            else if (dz > 0) {
+            } else if (dz > 0) {
+                // adherence[5] = true;
                 // adherence[2] = false;
-                adherence[5] = true;
             }
 
             // {
@@ -571,11 +611,11 @@ class TerrainCollider
             entity.v1[2] = 0;
             // }
 
-            let acc0 = entity.a0;
-            if (adherence[2] && acc0[2] || adherence[5] && acc0[5]) {
-                entity.v1[0] = 0;
-                entity.v1[1] = 0;
-            }
+            // let acc0 = entity.a0;
+            // if (adherence[2] && acc0[2] || adherence[5] && acc0[5]) {
+            //     entity.v1[0] = 0;
+            //     entity.v1[1] = 0;
+            // }
             //if (adherence[2] || adherence[5]) {
             //}
 

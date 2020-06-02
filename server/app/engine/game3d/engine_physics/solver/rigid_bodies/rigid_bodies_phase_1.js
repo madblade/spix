@@ -172,31 +172,70 @@ class RigidBodiesPhase1
             if (sum > maxSpeed * dtr)
                 for (let i = 0; i < 3; ++i) inc[i] *= maxSpeed * dtr / sum;
 
+            console.log(`${adh}, ${vector}`);
             for (let i = 0; i < 3; ++i)
             {
                 const vi = vector[i];
+                const gi = g[i];
                 nu[i] = vi;
-                if (!inWater && (!adh[i] && g[i] < 0 || !adh[3 + i] && g[i] > 0)) {
-                    // Cannot jump in air.
-                    // Does not apply to gods because for them g = 0.
+                if (
+                    // Cannot jump in air (does not apply to gods because for them g = 0)
+                    !inWater && (!adh[i] && gi < 0 || !adh[3 + i] && gi > 0)
+                    // Clamp when marching toward a wall
+                    // adh[i] && nu[i] < 0 || adh[3 + i] && nu[i] > 0
+                )
+                {
                     nu[i] = 0;
                 }
                 nu1[i] = nu[i];
                 inc[i] += nu[i] * dtr;
 
-                if (adh[i] && vi > 0.05 && g[i] < 0) {
+                if (gi === 0) {
+                    // if (vi > 0.05) adh[i] = false;
+                    // if (vi < -0.05) adh[3 + i] = false;
+                }
+
+                if (adh[i] && vi > 0.05 && gi < 0) {
                     console.log(`jump ${p1} -> ${p0}`);
                     // vi = .1;
                     a1[i] += 0.7;
                     inc[i] = 0;
                     adh[i] = false;
                 }
-                else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
+                else if (adh[3 + i] && vi < -0.05 && gi > 0) {
                     console.log(`antijump ${passId}`);
                     // vi = -.1;
                     a1[i] -= 0.7;
                     inc[i] = 0;
                     adh[3 + i] = false;
+                }
+            }
+
+            let min = Math.min;
+            let max = Math.max;
+            if (!inWater) {
+                if (g[0] < 0 && vector[0] > 0.05 && world.isWater(p0[0] - 1, p0[1], p0[2])) {
+                    inc[0] = max(inc[0], 0);
+                    if (adh[1] || adh[2] || adh[4] || adh[5]) inc[0] = vector[0] * dtr;
+                } else if (g[0] > 0 && vector[0] < -0.05 && world.isWater(p0[0] - 1, p0[1], p0[2])) {
+                    inc[0] = min(inc[0], 0);
+                    if (adh[1] || adh[2] || adh[4] || adh[5]) inc[0] = vector[0] * dtr;
+                }
+
+                if (g[1] < 0 && vector[1] > 0.05 && world.isWater(p0[0], p0[1] - 1, p0[2])) {
+                    inc[1] = max(inc[1], 0);
+                    if (adh[0] || adh[2] || adh[3] || adh[5]) inc[1] = vector[1] * dtr;
+                } else if (g[1] > 0 && vector[1] < -0.05 && world.isWater(p0[0], p0[1] + 1, p0[2])) {
+                    inc[1] = min(inc[1], 0);
+                    if (adh[0] || adh[2] || adh[3] || adh[5]) inc[1] = vector[1] * dtr;
+                }
+
+                if (g[2] < 0 && vector[2] > 0.05 && world.isWater(p0[0], p0[1], p0[2] - 1)) {
+                    inc[2] = max(inc[2], 0);
+                    if (adh[1] || adh[0] || adh[4] || adh[3]) inc[2] = vector[2] * dtr;
+                } else if (g[2] > 0 && vector[2] < -0.05 && world.isWater(p0[0], p0[1], p0[2] + 1)) {
+                    inc[2] = min(inc[2], 0);
+                    if (adh[1] || adh[0] || adh[4] || adh[3]) inc[2] = vector[2] * dtr;
                 }
             }
 

@@ -32,7 +32,7 @@ let SkyCube = function(centerX, centerY, centerZ, radius)
             // viewInverse: { value: new Matrix4() },
             cameraPos: { value: new Vector3() },
             worldCenter: { value: new Vector3(centerX, centerY, centerZ) },
-            cubeRadius: { value: radius }
+            cubeRadius: { value: radius - 2 }
         },
         vertexShader: ShadersModule.getSkyCubeVertexShader(),
         fragmentShader: ShadersModule.getSkyCubeFragmentShader()
