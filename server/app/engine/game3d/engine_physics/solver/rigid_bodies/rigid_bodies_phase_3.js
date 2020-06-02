@@ -181,11 +181,11 @@ class RigidBodiesPhase3
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
                 if (xm && ym && zm) {
-                    console.warn('[Phase III - PostCollision] Full 3D clip detected.');
+                    if (debugFlag) console.warn('[Phase III - PostCollision] Full 3D clip detected.');
                     continue;
                 }
                 if (!xm + !ym + !zm !== 1) {
-                    console.warn('[Phase III - PostCollision] Corner 2D clip detected.');
+                    if (debugFlag) console.warn('[Phase III - PostCollision] Corner 2D clip detected.');
                 }
                 if (!(xw && yw && zw)) continue;
                 let rrel = relativeDt;
@@ -294,7 +294,7 @@ class RigidBodiesPhase3
                 }
 
                 if (!xm + !ym + !zm !== 1) {
-                    console.log('[Phase III - PreCollision] Corner 2D clip detected.');
+                    if (debugCollision) console.log('[Phase III - PreCollision] Corner 2D clip detected.');
                 }
 
                 if (!(xw && yw && zw)) {

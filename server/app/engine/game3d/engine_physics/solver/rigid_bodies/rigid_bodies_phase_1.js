@@ -101,9 +101,10 @@ class RigidBodiesPhase1
         passId,
         rigidBodiesSolver)
     {
-        let vS = [];
-        let aS = [];
-        const debug = false;
+        // let vS = [];
+        // let aS = [];
+        // const debug = false;
+
         const isCubeWorld = world.worldInfo.type === WorldType.CUBE;
         const maxSpeedInAir = Entity.maxSpeed;
         const maxSpeedInWater = Entity.maxSpeedInWater;
@@ -126,7 +127,8 @@ class RigidBodiesPhase1
             const dtr = relativeDt * localTimeDilation;
             currentEntity.dtr = localTimeDilation; // dtr;
 
-            const maxSpeed = world.isWater(p0[0], p0[1], p0[2]) ? maxSpeedInWater : maxSpeedInAir;
+            const inWater = world.isWater(p0[0], p0[1], p0[2]);
+            const maxSpeed = inWater ? maxSpeedInWater : maxSpeedInAir;
             // REAL PHYSICS, PART 1
             // Rules: the only non-gp physics entry point should be
             // acceleration. Speed might be accessed for lookup,
@@ -135,13 +137,33 @@ class RigidBodiesPhase1
             // should a collision occur with the terrain or another
             // entity (or x).
 
+            let d = currentEntity.d; // Directions.
+            let r = currentEntity.r; // Rotation.
+            const maxV = currentEntity.getVelocity();
+            const factor = Math.sqrt(maxV * 1.05);
+
+            let g = RigidBodies.creativeMode ? [0, 0, 0] :
+                rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+            // Only one non-zeno gravity component accepted on cube worlds.
+            if (isCubeWorld && (g[0] !== 0) + (g[1] !== 0) + (g[2] !== 0) > 1)
+            {
+                g[0] = g[1] = g[2] = 0;
+            }
+
+            // let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
+            let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true);
+            let adh = currentEntity.adherence;
+
+            // Compute the exact acceleration which is necessary
+            // to get to the cap speed at the next iteration.
+
             // x_i+1 = x_i + v_i*T + (a_i/2)*T²
             let inc = [0, 0, 0, entityIndex];
             let sum = 0;
             for (let i = 0; i < 3; ++i) // Account for server congestion / lag with relative dilation.
             {
                 nu1[i] = nu[i];
-                let increment = (v0[i] + nu[i]) * dtr + .5 * a0[i] * dtr * dtr;
+                let increment = v0[i] * dtr + .5 * a0[i] * dtr * dtr;
                 inc[i] = increment;
                 sum += increment * increment;
             }
@@ -151,6 +173,34 @@ class RigidBodiesPhase1
                 for (let i = 0; i < 3; ++i) inc[i] *= maxSpeed * dtr / sum;
 
             for (let i = 0; i < 3; ++i)
+            {
+                const vi = vector[i];
+                nu[i] = vi;
+                if (!inWater && (!adh[i] && g[i] < 0 || !adh[3 + i] && g[i] > 0)) {
+                    // Cannot jump in air.
+                    // Does not apply to gods because for them g = 0.
+                    nu[i] = 0;
+                }
+                nu1[i] = nu[i];
+                inc[i] += nu[i] * dtr;
+
+                if (adh[i] && vi > 0.05 && g[i] < 0) {
+                    console.log(`jump ${p1} -> ${p0}`);
+                    // vi = .1;
+                    a1[i] += 0.7;
+                    inc[i] = 0;
+                    adh[i] = false;
+                }
+                else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
+                    console.log(`antijump ${passId}`);
+                    // vi = -.1;
+                    a1[i] -= 0.7;
+                    inc[i] = 0;
+                    adh[3 + i] = false;
+                }
+            }
+
+            for (let i = 0; i < 3; ++i)
                 p1[i] = p0[i] + inc[i];
 
             // Associate incremental term with entity index.
@@ -158,57 +208,6 @@ class RigidBodiesPhase1
 
             // Apply globals and inputs.
             // a_i+1 = sum(constraints)
-            let d = currentEntity.d; // Directions.
-            let r = currentEntity.r; // Rotation.
-            const maxV = currentEntity.getVelocity();
-            const factor = Math.sqrt(maxV * 1.05);
-
-            // This gravity should be fetched per entity instead.
-            let g = RigidBodies.creativeMode ? [0, 0, 0] :
-                rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
-            // Only one non-zeno gravity component accepted on cube worlds.
-            if (isCubeWorld && (g[0] !== 0) + (g[1] !== 0) + (g[2] !== 0) > 1)
-            {
-                g[0] = g[1] = g[2] = 0;
-            }
-
-            //let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
-            let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true); // Project 2D
-            // let vector = RigidBodiesPhase1.getForwardVector(d); // Project 2D
-            let adh = currentEntity.adherence;
-
-            // TODO [CRIT] compute acc.: impulses with speed constraints, gravity.
-            // Compute the exact acceleration which is necessary
-            // to get to the cap speed at the next iteration.
-            for (let i = 0; i < 3; ++i)
-            {
-                let vi = vector[i];
-                if (adh[i] && vi > 0.05 && g[i] < 0) {
-                    console.log(`jump ${passId}`);
-                    console.log(`${p1} -> ${p0}`);
-                    // vi = .1;
-                    a1[i] += 0.6;
-                    p1[i] = p0[i];
-                    leapfrogArray[oi][i] = 0;
-                    adh[i] = false;
-                }
-                else if (adh[3 + i] && vi < -0.05 && g[i] > 0) {
-                    console.log(`antijump ${passId}`);
-                    // vi = -.1;
-                    a1[i] -= 0.6;
-                    p1[i] = p0[i];
-                    leapfrogArray[oi][i] = 0;
-                    adh[3 + i] = false;
-                }
-
-                nu[i] = vi;
-            }
-
-            // TODO [HIGH] gp calibration (velocity++, curved jmp, gen3D)
-            if (!adh[2] && g[2] < 0) {
-                // nu[2] = 0;
-            }
-
             for (let i = 0; i < 3; ++i)
                 a1[i] += g[i]; // N.B. f=ma => a=f/m => a=(P=mg)/m => a=g
 
@@ -218,7 +217,7 @@ class RigidBodiesPhase1
             sum = 0;
             for (let i = 0; i < 3; ++i)
             {
-                let v1i = v0[i] + dtr * .5 * (a0[i] + a1[i]);
+                const v1i = v0[i] + dtr * .5 * (a0[i] + a1[i]);
                 v1[i] = v1i;
                 sum += v1i * v1i;
             }
@@ -228,16 +227,16 @@ class RigidBodiesPhase1
                 for (let i = 0; i < 3; ++i) v1[i] *= maxSpeed * dtr / sum;
             // console.log(p0);
 
-            if (debug) {
-                vS.push(v1[2]);
-                aS.push([a0[2], a1[2]]);
-            }
+            // if (debug) {
+            //     vS.push(v1[2]);
+            //     aS.push([a0[2], a1[2]]);
+            // }
         }
 
-        if (debug && (vS.length > 1 && vS[0] !== vS[1])) {
-            console.log(vS);
-            console.log(aS);
-        }
+        // if (debug && (vS.length > 1 && vS[0] !== vS[1])) {
+        //     console.log(vS);
+        //     console.log(aS);
+        // }
     }
 
     static getForwardVector(d) {
