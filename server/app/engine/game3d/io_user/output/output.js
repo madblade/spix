@@ -190,7 +190,9 @@ class UserOutput
 
             // Array of [1. position, 2. rotation, 3. worldId] for each world.
             // First one is the main world.
-            let selfState = [[av.position, av.rotation, av.worldId]];
+            let rot = av.rotation;
+            let oldRot = av.oldRotation;
+            let selfState = [[av.position, [rot[0], oldRot[0], rot[2], rot[3]], av.worldId]];
             let otherStates = av.otherWorlds;
             otherStates.forEach((state, worldId) => selfState.push([state.position, state.rotation, worldId]));
             p.send('me', UserOutput.pack(selfState));

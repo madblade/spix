@@ -42,6 +42,9 @@ extend(SelfModel.prototype, {
         this.loadSelf();
     },
 
+    interpolatePredictSelfPosition() {
+    },
+
     refresh() {
         if (!this.needsUpdate) return;
 
@@ -98,7 +101,8 @@ extend(SelfModel.prototype, {
             let rotationX = cam.getXRotation();
             const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
             // TODO [HIGH] compute delta transmitted from last time
-            if (changed) graphics.cameraManager.setRelRotation(r[0], rotationX);
+            let rotationZ = cam.getZRotation();
+            if (changed) graphics.cameraManager.setRelRotation(rotationZ + r[0] - r[1], rotationX);
 
             // mainCamera.setUpRotation(theta1, 0, theta0);
             // moveCameraFromMouse(0, 0, newX, newY);
@@ -138,7 +142,8 @@ extend(SelfModel.prototype, {
         // handItem.children[0].rotation.x += 0.01;
     },
 
-    updateSelf(p, r, w) {
+    updateSelf(p, r, w)
+    {
         w = w.toString();
 
         let pos = this.position;

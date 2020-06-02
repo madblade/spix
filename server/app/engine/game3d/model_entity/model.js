@@ -98,9 +98,9 @@ class EntityModel {
             const px = p[0]; const wx = entity.widthX;
             const py = p[1]; const wy = entity.widthY;
             const pz = p[2]; const wz = entity.widthZ;
-            return x + 1 >= px - wx && x <= px + wx &&
-                   y + 1 >= py - wy && y <= py + wy &&
-                   z + 1 >= pz - wz && z <= pz + wz;
+            if (x + 1 >= px - wx && x <= px + wx &&
+               y + 1 >= py - wy && y <= py + wy &&
+               z + 1 >= pz - wz && z <= pz + wz) return true;
         }
 
         return false;

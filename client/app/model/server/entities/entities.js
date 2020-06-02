@@ -29,8 +29,8 @@ extend(EntityModel.prototype, {
     addEntity(id, updatedEntity, graphics, entities) {
         this.entitiesLoading.add(id);
 
-        switch (updatedEntity.k) {
-
+        switch (updatedEntity.k)
+        {
             case 'player':
                 this.loadPlayer(id, updatedEntity, graphics, entities);
                 break;
@@ -52,8 +52,12 @@ extend(EntityModel.prototype, {
         entities.delete(id);
     },
 
+    interpolatePredictEntity() {
+    },
+
     // TODO [HIGH] an entity model...
-    updateEntity(id, currentEntity, updatedEntity, graphics, entities) {
+    updateEntity(id, currentEntity, updatedEntity, graphics, entities)
+    {
         // Update positions and rotation
         let object3D = currentEntity.getObject3D();
 

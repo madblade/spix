@@ -11,10 +11,7 @@ class Entity
         this._entityId      = id;
         this._kind          = 'abstract';
 
-        // Inputs
-        this._directions    = null;
-
-        // NEW physics engine
+        // New physics engine
         this._p0            = [0, 0, 0];
         this._p1            = [0, 0, 0];
         this._v0            = [0, 0, 0];
@@ -22,15 +19,9 @@ class Entity
         this._a0            = [0, 0, 0];
         this._a1            = [0, 0, 0];
 
-        this._p01           = [0, 0, 0];
-        this._v01           = [0, 0, 0];
-        this._a01           = [0, 0, 0];
-        this._delta01       = 0;
-
         this._d             = [!0, !0, !0, !0, !0, !0];
         this._r             = [0, 0, 0, 0]; // rel, abs
-        //this._rrel          = [0, 0];
-        //this._rabs          = [0, 0];
+        this._olR           = [0, 0, 0, 0]; // rel, abs
 
         this._metaX         = null;
 
@@ -40,19 +31,11 @@ class Entity
         this._capR          = .03;
 
         // LEGACY PhysicsEngine
-        this._rotation      = null;
-        this._directions    = null;
-        this._position      = null;
-        this._speed         = null;
-        this._acceleration  = null;
         this._mass          = 1;
         this._adherence     = [
             !1, !1, !1, // Right, Into, Up
-            !1, !1, !1 // Left, From, Down
+            !1, !1, !1  // Left, From, Down
         ];
-
-        this._impulseSpeedStamp = null;
-        this._needsEuler        = true;
 
         // Situation.
         // Barycenter.
@@ -93,47 +76,31 @@ class Entity
     set lastR(r)            { this._lastR = r; }
 
     get rotation()          { return this._r; }
+    get oldRotation()       { return this._olR; }
     get position()          { return this._p0; }
 
-    get directions()        { return this._directions; }
-    get speed()             { return this._speed; }
-    get acceleration()      { return this._acceleration; }
     get adherence()         { return this._adherence; }
     get otherWorlds()       { return this._otherWorlds; }
-    get _impulseSpeed()     { return this._impulseSpeedStamp; }
 
     set adherence(na)       { this._adherence = na; }
 
     set rotation(nr)        { this._r = nr; }
+    set oldRotation(nr)     { this._olR = nr; }
     set position(np)        { this._p0 = np; }
 
-    set speed(ns)           { this._speed = ns; }
-
-    set acceleration(na)    { this._acceleration = na; }
-
-    set _impulseSpeed(nis)  { this._impulseSpeedStamp = nis; }
-
-    jump(direction) {
-        this._adherence[direction] = false;
-    }
-
-    spawn(position, worldId) {
+    spawn(position, worldId)
+    {
         this._worldId           = worldId;
 
-        this._position          = position;
-        this._rotation          = [0, Math.PI / 2];
-        this._directions        = [!1, !1, !1, !1, !1, !1];
-        this._speed             = [0, 0, 0];
-        this._acceleration      = [0, 0, 0];
-        this._impulseSpeedStamp = [0, 0, 0];
-
-        this._p                 = position;
         this._r                 = [0, Math.PI / 2, 0, 0];
         this._d                 = [!1, !1, !1, !1, !1, !1];
 
-        this._p0 = [0, 0, 0];   this._p1 = [0, 0, 0];
-        this._v0 = [0, 0, 0];   this._v1 = [0, 0, 0];
-        this._a0 = [0, 0, 0];   this._a1 = [0, 0, 0];
+        this._p0 = [0, 0, 0];
+        this._p1 = [0, 0, 0];
+        this._v0 = [0, 0, 0];
+        this._v1 = [0, 0, 0];
+        this._a0 = [0, 0, 0];
+        this._a1 = [0, 0, 0];
         this._nu = [0, 0, 0];
         this._nu1 = [0, 0, 0];
 
@@ -141,16 +108,11 @@ class Entity
     }
 
     die() {
-        this._position          = null;
-        this._rotation          = null;
-        this._speed             = null;
-        this._directions        = null;
+        // Here deallocate arrays.
     }
 
     stop() {
-        //this._directions = [!1, !1, !1, !1, !1, !1];
         this._d = [!1, !1, !1, !1, !1, !1];
-        this._impulseSpeedStamp = [0, 0, 0];
         console.log('Entity stopping.');
     }
 
@@ -170,6 +132,7 @@ class Entity
 
     rotate(relPitch, relYaw, absPitch, absYaw)
     {
+        for (let i = 0; i < 4; ++i) this._olR[i] = this._r[i];
         this._r[0] = relPitch;
         this._r[1] = relYaw;
         this._r[2] = absPitch;
@@ -209,22 +172,6 @@ class Entity
 
     get mass()              { return this._mass; }
     set mass(m)             { this._mass = m; }
-
-    get p01()               { return this._p01; }
-    get v01()               { return this._v01; }
-    get a01()               { return this._a01; }
-    set p01(p01)            { this._p01 = p01; }
-    set v01(v01)            { this._v01 = v01; }
-    set a01(a01)            { this._a01 = a01; }
-    get delta01()           { return this._delta01; }
-    set delta01(delta01)    { this._delta01 = delta01; }
-    copyP01() {
-        for (let i = 0; i < 0; ++i) {
-            this._p01[i] = this._p0[i];
-            this._v01[i] = this._v0[i];
-            this._a01[i] = this._a0[i];
-        }
-    }
 
     get nu()                { return this._nu; }
     set nu(nu)              { this._nu = nu; }
