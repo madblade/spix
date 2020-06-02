@@ -54,8 +54,8 @@ class TerrainCollider
                     ]);
                     xArrival.push([
                         x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
-                        numClamp(y0 + currentY - y0),
-                        numClamp(z0 + currentZ - z0)
+                        currentY,
+                        currentZ
                     ]);
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
@@ -73,13 +73,9 @@ class TerrainCollider
                     adx = true;
                     if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon)) {
                         cropX = numClamp(newCrops[0] - xW);
-                        // cropY = numClamp(newCrops[1] + y0 - net[1]);
-                        // cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
                     else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon)) {
                         cropX = numClamp(newCrops[0] + xW);
-                        // cropY = numClamp(newCrops[1] + y0 - net[1]);
-                        // cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
                 }
             }
@@ -96,9 +92,9 @@ class TerrainCollider
                         currentZ
                     ]);
                     yArrival.push([
-                        numClamp(x0 + currentX - x0),
+                        currentX,
                         y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
-                        numClamp(z0 + currentZ - z0)
+                        currentZ
                     ]);
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
@@ -115,32 +111,10 @@ class TerrainCollider
                 if (c) {
                     ady = true;
                     if (y1 > y0 && numClamp(newCrops[1] - yW) < numClamp(cropY - epsilon)) {
-                        const nx = numClamp(newCrops[0] + x0 - net[0]);
-                        const ny = numClamp(newCrops[1] - yW);
-                        const nz = numClamp(newCrops[2] + z0 - net[2]);
-                        if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
-                        {
-                            // cropX = nx;
-                        }
-                        cropY = ny;
-                        if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
-                        {
-                            // cropZ = nz;
-                        }
+                        cropY = numClamp(newCrops[1] - yW);
                     }
                     else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon)) {
-                        const nx = numClamp(newCrops[0] + x0 - net[0]);
-                        const ny = numClamp(newCrops[1] + yW);
-                        const nz = numClamp(newCrops[2] + z0 - net[2]);
-                        if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
-                        {
-                            // cropX = nx;
-                        }
-                        cropY = ny;
-                        if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
-                        {
-                            // cropZ = nz;
-                        }
+                        cropY = numClamp(newCrops[1] + yW);
                     }
                 }
             }
@@ -157,8 +131,8 @@ class TerrainCollider
                         z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
                     ]);
                     zArrival.push([
-                        numClamp(x0 + currentX - x0),
-                        numClamp(y0 + currentY - y0),
+                        currentX,
+                        currentY,
                         z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
                     ]);
                     if (currentY >= lastY) break;
@@ -176,32 +150,10 @@ class TerrainCollider
                 if (c) {
                     adz = true;
                     if (z1 > z0 && numClamp(newCrops[2] - zW) < numClamp(cropZ - epsilon)) {
-                        const nx = numClamp(newCrops[0] + x0 - net[0]);
-                        const ny = numClamp(newCrops[1] + y0 - net[1]);
-                        const nz = numClamp(newCrops[2] - zW);
-                        if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
-                        {
-                            // cropX = nx;
-                        }
-                        if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
-                        {
-                            // cropY = ny;
-                        }
-                        cropZ = nz;
+                        cropZ = numClamp(newCrops[2] - zW);
                     }
                     else if (z1 < z0 && numClamp(newCrops[2] + zW) > numClamp(cropZ + epsilon)) {
-                        const nx = numClamp(newCrops[0] + x0 - net[0]);
-                        const ny = numClamp(newCrops[1] + y0 - net[1]);
-                        const nz = numClamp(newCrops[2] + zW);
-                        if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
-                        {
-                            // cropX = nx;
-                        }
-                        if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
-                        {
-                            // cropY = ny;
-                        }
-                        cropZ = nz;
+                        cropZ = numClamp(newCrops[2] + zW);
                     }
                 }
             }
@@ -365,315 +317,186 @@ class TerrainCollider
         const nx0 = dx > 0 ? i - tol : i + 1 + tol;
         const ny0 = dy > 0 ? j - tol : j + 1 + tol;
         const nz0 = dz > 0 ? k - tol : k + 1 + tol;
-        // let newPosition = [0, 0, 0];
-        // let oldAdherence = [false, false, false, false, false, false];
-        // let adherence = entity.adherence;
-        // for (let ii = 0; ii < 6; ++ii) {
-        //     oldAdherence[ii] = adherence[ii];
-        // }
 
-        if (ntx) {
+        if (ntx)
+        {
             const t = tMaxX - tDeltaX;
             const ddx = dx < 0 ? 1 : -1;
 
             // Projections
             let nyt = y1 + (y2 - y1) * t;
-            if (doProject) {
-                let ny = y1 + (y2 - y1);
-                let dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
-                if (dby < 2) {
-                    if (dy < 0) {
-                        const free = world.isFree(i + ddx, j - 1, k);
-                        if (free || dby < 1 && ny > ny0 - 1) {
-                            nyt = ny;
-                            // adherence[1] = false;
-                        } else {
-                            nyt = ny0 - 1;
-                            // if (dby > 0 && !free) adherence[1] = true;
-                        }
+            const ny = y1 + (y2 - y1);
+            const dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
+            if (doProject && dby < 2) {
+                if (dy < 0) {
+                    const free = world.isFree(i + ddx, j - 1, k);
+                    if (free || dby < 1 && ny > ny0 - 1) {
+                        nyt = ny;
+                    } else {
+                        nyt = ny0 - 1;
                     }
-                    if (dy > 0) {
-                        const free = world.isFree(i + ddx, j + 1, k);
-                        if (free || dby < 1 && ny < ny0 + 1) {
-                            nyt = ny;
-                            // adherence[4] = false;
-                        } else {
-                            nyt = ny0 + 1;
-                            // if (dby > 0 && !free) adherence[4] = true;
-                        }
+                }
+                if (dy > 0) {
+                    const free = world.isFree(i + ddx, j + 1, k);
+                    if (free || dby < 1 && ny < ny0 + 1) {
+                        nyt = ny;
+                    } else {
+                        nyt = ny0 + 1;
                     }
                 }
             }
 
             let nzt = z1 + (z2 - z1) * t;
-            if (doProject) {
-                let nz = z1 + (z2 - z1);
-                let dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
-                if (dbz < 2) {
-                    if (dz < 0) {
-                        const free = world.isFree(i + ddx, j, k - 1);
-                        if (free || dbz < 1 && nz > nz0 - 1) {
-                            nzt = nz;
-                            // adherence[2] = false;
-                        }
-                        else {
-                            nzt = nz0 - 1;
-                            // if (dbz > 0 && !free) adherence[2] = true;
-                        }
+            const nz = z1 + (z2 - z1);
+            const dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
+            if (doProject && dbz < 2) {
+                if (dz < 0) {
+                    const free = world.isFree(i + ddx, j, k - 1);
+                    if (free || dbz < 1 && nz > nz0 - 1) {
+                        nzt = nz;
                     }
-                    if (dz > 0) {
-                        const free = world.isFree(i + ddx, j, k + 1);
-                        if (free || dbz < 1 && nz < nz0 + 1) {
-                            nzt = nz;
-                            // adherence[5] = false;
-                        }
-                        else {
-                            nzt = nz0 + 1;
-                            // if (dbz > 0 && !free) adherence[5] = true;
-                        }
+                    else {
+                        nzt = nz0 - 1;
+                    }
+                }
+                if (dz > 0) {
+                    const free = world.isFree(i + ddx, j, k + 1);
+                    if (free || dbz < 1 && nz < nz0 + 1) {
+                        nzt = nz;
+                    }
+                    else {
+                        nzt = nz0 + 1;
                     }
                 }
             }
 
-            if (dx < 0) {
-                // adherence[0] = true;
-                // adherence[3] = false;
-            } else if (dx > 0) {
-                // adherence[3] = true;
-                // adherence[0] = false;
-            }
-
-            // {
             newPosition[0] = nx0;
             entity.v1[0] = 0;
             newPosition[1] = nyt;
             newPosition[2] = nzt;
-            // }
-
-            // let acc0 = entity.a0;
-            // if (adherence[0] && acc0[0] || adherence[3] && acc0[3]) {
-            //     entity.v1[1] = 0;
-            //     entity.v1[2] = 0;
-            // }
-            //if (adherence[0] || adherence[3]) {
-            //}
-
-            // entity.acceleration[0] = 0;
-            //entity.speed[0] = 0;
-            //entity.speed[1] = entity._impulseSpeed[1];
-            //if (entity.acceleration[2] === 0) entity.speed[2] = 0;
         }
-
-        else if (nty) {
+        else if (nty)
+        {
             const t = tMaxY - tDeltaY;
             const ddy = dy < 0 ? 1 : -1;
 
             // Projections
             let nxt = x1 + (x2 - x1) * t;
-            if (doProject) {
-                let nx = x1 + (x2 - x1);
-                let dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
-                if (dbx < 2) {
-                    if (dx < 0) {
-                        const free = world.isFree(i - 1, j + ddy, k);
-                        if (free || dbx < 1 && nx > nx0 - 1) {
-                            nxt = nx;
-                            // adherence[0] = false;
-                        }
-                        else {
-                            nxt = nx0 - 1;
-                            // if (dbx > 0 && !free) adherence[0] = true;
-                        }
+            const nx = x1 + (x2 - x1);
+            const dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
+            if (doProject && dbx < 2) {
+                if (dx < 0) {
+                    const free = world.isFree(i - 1, j + ddy, k);
+                    if (free || dbx < 1 && nx > nx0 - 1) {
+                        nxt = nx;
                     }
-                    if (dx > 0) {
-                        const free = world.isFree(i + 1, j + ddy, k);
-                        if (free || dbx < 1 && nx < nx0 + 1) {
-                            nxt = nx;
-                            // adherence[3] = false;
-                        }
-                        else {
-                            nxt = nx0 + 1;
-                            // if (dbx > 0 && !free) adherence[3] = true;
-                        }
+                    else {
+                        nxt = nx0 - 1;
+                    }
+                }
+                if (dx > 0) {
+                    const free = world.isFree(i + 1, j + ddy, k);
+                    if (free || dbx < 1 && nx < nx0 + 1) {
+                        nxt = nx;
+                    }
+                    else {
+                        nxt = nx0 + 1;
                     }
                 }
             }
 
             let nzt = z1 + (z2 - z1) * t;
-            if (doProject) {
-                let nz = z1 + (z2 - z1);
-                let dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
-                if (dbz < 2) {
-                    if (dz < 0) {
-                        const free = world.isFree(i, j + ddy, k - 1);
-                        if (free || dbz < 1 && nz > nz0 - 1) {
-                            nzt = nz;
-                            // adherence[2] = false;
-                        }
-                        else {
-                            nzt = nz0 - 1;
-                            // if (dbz > 0 && !free) adherence[2] = true;
-                        }
+            const nz = z1 + (z2 - z1);
+            const dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
+            if (doProject && dbz < 2) {
+                if (dz < 0) {
+                    const free = world.isFree(i, j + ddy, k - 1);
+                    if (free || dbz < 1 && nz > nz0 - 1) {
+                        nzt = nz;
                     }
-                    if (dz > 0) {
-                        const free = world.isFree(i, j + ddy, k + 1);
-                        if (free || dbz < 1 && nz < nz0 + 1) {
-                            nzt = nz;
-                            // adherence[5] = false;
-                        }
-                        else {
-                            nzt = nz0 + 1;
-                            // if (dbz > 0 && !free) adherence[5] = true;
-                        }
+                    else {
+                        nzt = nz0 - 1;
+                    }
+                }
+                if (dz > 0) {
+                    const free = world.isFree(i, j + ddy, k + 1);
+                    if (free || dbz < 1 && nz < nz0 + 1) {
+                        nzt = nz;
+                    }
+                    else {
+                        nzt = nz0 + 1;
                     }
                 }
             }
 
-            if (dy < 0) {
-                // adherence[1] = true;
-                // adherence[4] = false;
-            } else if (dy > 0) {
-                // adherence[4] = true;
-                // adherence[1] = false;
-            }
-
-            // {
             newPosition[0] = nxt;
             newPosition[1] = ny0;
             entity.v1[1] = 0;
             newPosition[2] = nzt;
-            // }
-
-            // let acc0 = entity.a0;
-            // if (adherence[1] && acc0[1] || adherence[4] && acc0[4]) {
-            //     entity.v1[0] = 0;
-            //     entity.v1[2] = 0;
-            // }
-            //if (adherence[1] || adherence[4]) {
-            //}
-
-            // entity.acceleration[1] = 0;
-            //entity.speed[0] = entity._impulseSpeed[0];
-            //entity.speed[1] = 0;
-            //if (entity.acceleration[2] === 0) entity.speed[2] = 0;
         }
-
-        else if (ntz) {
+        else if (ntz)
+        {
             const t = tMaxZ - tDeltaZ;
             const ddz = dz < 0 ? 1 : -1;
 
             // Projections
             let nxt = x1 + (x2 - x1) * t;
-            if (doProject) {
-                let nx = x1 + (x2 - x1);
-                let dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
-                if (dbx < 2) {
-                    if (dx < 0) {
-                        const free = world.isFree(i - 1, j, k + ddz);
-                        if (free || dbx < 1 && nx > nx0 - 1) {
-                            nxt = nx;
-                            // adherence[0] = false;
-                        }
-                        else {
-                            nxt = nx0 - 1;
-                            // if (dbx > 0 && !free) adherence[0] = true;
-                        }
+            const nx = x1 + (x2 - x1);
+            const dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
+            if (doProject && dbx < 2) {
+                if (dx < 0) {
+                    const free = world.isFree(i - 1, j, k + ddz);
+                    if (free || dbx < 1 && nx > nx0 - 1) {
+                        nxt = nx;
                     }
-                    if (dx > 0) {
-                        const free = world.isFree(i + 1, j, k + ddz);
-                        if (free || dbx < 1 && nx < nx0 + 1) {
-                            nxt = nx;
-                            // adherence[3] = false;
-                        }
-                        else {
-                            nxt = nx0 + 1;
-                            // if (dbx > 0 && !free) adherence[3] = true;
-                        }
+                    else {
+                        nxt = nx0 - 1;
+                    }
+                }
+                if (dx > 0) {
+                    const free = world.isFree(i + 1, j, k + ddz);
+                    if (free || dbx < 1 && nx < nx0 + 1) {
+                        nxt = nx;
+                    }
+                    else {
+                        nxt = nx0 + 1;
                     }
                 }
             }
 
             let nyt = y1 + (y2 - y1) * t;
-            if (doProject) {
-                let ny = y1 + (y2 - y1);
-                let dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
-                if (dby < 2) {
-                    if (dy < 0) {
-                        const free = world.isFree(i, j - 1, k + ddz);
-                        if (free || dby < 1 && ny > ny0 - 1) {
-                            nyt = ny;
-                            // adherence[1] = false;
-                        }
-                        else {
-                            nyt = ny0 - 1;
-                            // if (dby > 0 && !free) adherence[1] = true;
-                        }
+            const ny = y1 + (y2 - y1);
+            const dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
+            if (doProject && dby < 2) {
+                if (dy < 0) {
+                    const free = world.isFree(i, j - 1, k + ddz);
+                    if (free || dby < 1 && ny > ny0 - 1) {
+                        nyt = ny;
                     }
-                    if (dy > 0) {
-                        const free = world.isFree(i, j + 1, k + ddz);
-                        if (free || dby < 1 && ny < ny0 + 1) { // || is done last
-                            nyt = ny;
-                            // adherence[4] = false;
-                        }
-                        else {
-                            nyt = ny0 + 1;
-                            // if (dby > 0 && !free) adherence[4] = true;
-                        }
+                    else {
+                        nyt = ny0 - 1;
+                    }
+                }
+                if (dy > 0) {
+                    const free = world.isFree(i, j + 1, k + ddz);
+                    if (free || dby < 1 && ny < ny0 + 1) { // || is done last
+                        nyt = ny;
+                    }
+                    else {
+                        nyt = ny0 + 1;
                     }
                 }
             }
 
-            // One impulse allowed
-            if (dz < 0) {
-                // adherence[2] = true;
-                // adherence[5] = false;
-            } else if (dz > 0) {
-                // adherence[5] = true;
-                // adherence[2] = false;
-            }
-
-            // {
             newPosition[0] = nxt;
             newPosition[1] = nyt;
             newPosition[2] = nz0;
             entity.v1[2] = 0;
-            // }
-
-            // let acc0 = entity.a0;
-            // if (adherence[2] && acc0[2] || adherence[5] && acc0[5]) {
-            //     entity.v1[0] = 0;
-            //     entity.v1[1] = 0;
-            // }
-            //if (adherence[2] || adherence[5]) {
-            //}
-
-            // entity.acceleration[2] = 0;
-            //entity.speed = entity._impulseSpeed;
-            //entity.speed[2] = 0;
         }
 
         // Bounce
         // entity.speed[2] = -(entity.speed[2]-entity._impulseSpeed[2]);
         // entity.acceleration = [0, 0, 0]; // Use Euler with collisions
-
-        // for (let ii = 0; ii < 3; ++ii) {
-
-        //if (ltNew && entity.adherence[ii]) {
-        //    entity.position[ii] = Math.floor(entity.position[ii])+tol;
-        //} else if (gtNew && entity.adherence[ii+3]) {
-        //    entity.position[ii] = Math.ceil(entity.position[ii])-tol;
-        //} else {
-        //    entity.position[ii] = newPosition[ii];
-        //}
-
-        //if (entity.adherence[ii] && newPosition[ii] > entity.position[ii]) entity.adherence[ii] = false;
-        //if (entity.adherence[3+ii] && newPosition[ii] < entity.position[ii]) entity.adherence[3+ii] = false;
-        // if (newPosition[ii] < entity.position[ii] && oldAdherence[ii]) continue;
-        // if (newPosition[ii] > entity.position[ii] && oldAdherence[3+ii]) continue;
-        // entity.position[ii] = newPosition[ii];
-
-        //entity.adherence[ii+ (ltNew ? 0 : 3)] = false;
-        //}
 
         return true;
     }

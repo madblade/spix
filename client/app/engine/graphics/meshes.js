@@ -28,6 +28,7 @@ let MeshesModule = {
             let ms = this.createMesh(g, m);
             ms.scale.set(0.4, 0.4, 0.4);
             ms.position.set(0.4, -.25, -0.25);
+            this.renderOnTop(ms);
             let wrapper = new Object3D();
             wrapper.rotation.reorder('ZYX');
             wrapper.add(ms);

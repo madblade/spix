@@ -207,6 +207,10 @@ extend(MainMenuState.prototype, {
 
         $('.error-message').remove();
         let offer = $('#remote-client-offer').val();
+        if (!offer) {
+            console.error('[MainMenu/RTC] Expected offer.');
+            return;
+        }
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.setLocalClientOffer(offer);
 
