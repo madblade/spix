@@ -188,53 +188,93 @@ class RigidBodiesPhase1
                 }
                 nu1[i] = nu[i];
                 inc[i] += nu[i] * dtr;
-
-                if (gi === 0) {
-                    // if (vi > 0.05) adh[i] = false;
-                    // if (vi < -0.05) adh[3 + i] = false;
-                }
-
-                if (adh[i] && vi > 0.05 && gi < 0) {
-                    console.log(`jump ${p1} -> ${p0}`);
-                    // vi = .1;
-                    a1[i] += 0.7;
-                    inc[i] = 0;
-                    adh[i] = false;
-                }
-                else if (adh[3 + i] && vi < -0.05 && gi > 0) {
-                    console.log(`antijump ${passId}`);
-                    // vi = -.1;
-                    a1[i] -= 0.7;
-                    inc[i] = 0;
-                    adh[3 + i] = false;
-                }
             }
 
             let min = Math.min;
             let max = Math.max;
+            let gettingOutOfWater = false;
             if (!inWater) {
                 if (g[0] < 0 && vector[0] > 0.05 && world.isWater(p0[0] - 1, p0[1], p0[2])) {
                     inc[0] = max(inc[0], 0);
+                    gettingOutOfWater = true;
                     if (adh[1] || adh[2] || adh[4] || adh[5]) inc[0] = vector[0] * dtr;
                 } else if (g[0] > 0 && vector[0] < -0.05 && world.isWater(p0[0] - 1, p0[1], p0[2])) {
+                    gettingOutOfWater = true;
                     inc[0] = min(inc[0], 0);
                     if (adh[1] || adh[2] || adh[4] || adh[5]) inc[0] = vector[0] * dtr;
                 }
 
                 if (g[1] < 0 && vector[1] > 0.05 && world.isWater(p0[0], p0[1] - 1, p0[2])) {
+                    gettingOutOfWater = true;
                     inc[1] = max(inc[1], 0);
                     if (adh[0] || adh[2] || adh[3] || adh[5]) inc[1] = vector[1] * dtr;
                 } else if (g[1] > 0 && vector[1] < -0.05 && world.isWater(p0[0], p0[1] + 1, p0[2])) {
+                    gettingOutOfWater = true;
                     inc[1] = min(inc[1], 0);
                     if (adh[0] || adh[2] || adh[3] || adh[5]) inc[1] = vector[1] * dtr;
                 }
 
                 if (g[2] < 0 && vector[2] > 0.05 && world.isWater(p0[0], p0[1], p0[2] - 1)) {
+                    gettingOutOfWater = true;
                     inc[2] = max(inc[2], 0);
                     if (adh[1] || adh[0] || adh[4] || adh[3]) inc[2] = vector[2] * dtr;
                 } else if (g[2] > 0 && vector[2] < -0.05 && world.isWater(p0[0], p0[1], p0[2] + 1)) {
+                    gettingOutOfWater = true;
                     inc[2] = min(inc[2], 0);
                     if (adh[1] || adh[0] || adh[4] || adh[3]) inc[2] = vector[2] * dtr;
+                }
+            }
+
+            for (let i = 0; i < 3; ++i) {
+                const gi = g[i];
+                const vi = vector[i];
+                if (gi < 0 && vi > 0.05) {
+                    if (adh[i]) {
+                        // console.log(`jump ${p1} -> ${p0}`);
+                        a1[i] += 0.7;
+                        inc[i] = 0;
+                        adh[i] = false;
+                    } else if (!gettingOutOfWater && !adh[3 + i] && inc[i] < 0 && adh.reduce((a, v) => a + v) === 1) {
+                        a1[i] += 0.7;
+                        inc[i] = 0;
+                        // console.log('walljump');
+                        for (let j = 0; j < 3; ++j) {
+                            if (j === i) continue;
+                            if (adh[j]) {
+                                a1[j] += 0.7;
+                                inc[j] = 0;
+                                adh[j] = false;
+                            } else if (adh[3 + j]) {
+                                a1[j] -= 0.7;
+                                inc[j] = 0;
+                                adh[j] = false;
+                            }
+                        }
+                    }
+                }
+                else if (gi > 0 && vi < -0.05) {
+                    if (adh[3 + i]) {
+                        // console.log(`antijump ${passId}`);
+                        a1[i] -= 0.7;
+                        inc[i] = 0;
+                        adh[3 + i] = false;
+                    } else if (!gettingOutOfWater && !adh[i] && inc[i] > 0 && adh.reduce((a, v) => a + v) === 1) {
+                        a1[i] -= 0.7;
+                        inc[i] = 0;
+                        // console.log('antiwalljump');
+                        for (let j = 0; j < 3; ++j) {
+                            if (j === i) continue;
+                            if (adh[j]) {
+                                a1[j] += 0.7;
+                                inc[j] = 0;
+                                adh[j] = false;
+                            } else if (adh[3 + j]) {
+                                a1[j] -= 0.7;
+                                inc[j] = 0;
+                                adh[j] = false;
+                            }
+                        }
+                    }
                 }
             }
 

@@ -174,15 +174,15 @@ class TerrainCollider
             adh[z0 > z1 ? 5 : 2] = false;
         } else { adh[2] = adh[5] = false; }
 
-        if (adh[2] && acc0[2] || adh[5] && acc0[5]) {
+        if (adh[2] && acc0[2] < 0 || adh[5] && acc0[2] > 0) {
             entity.v1[0] = 0;
             entity.v1[1] = 0;
         }
-        if (adh[0] && acc0[0] || adh[3] && acc0[3]) {
+        if (adh[0] && acc0[0] < 0 || adh[3] && acc0[0] > 0) {
             entity.v1[1] = 0;
             entity.v1[2] = 0;
         }
-        if (adh[1] && acc0[1] || adh[4] && acc0[4]) {
+        if (adh[1] && acc0[1] < 0 || adh[4] && acc0[1] > 0) {
             entity.v1[0] = 0;
             entity.v1[2] = 0;
         }
