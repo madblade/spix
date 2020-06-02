@@ -45,10 +45,18 @@ class TerrainCollider
         if (x0 !== x1) {
             let xNetwork = [];
             let xArrival = [];
-            for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                for (let currentZ = z0 - zW, lastZ = z0 + zW; ;) {
-                    xNetwork.push([x1 < x0 ? x0 - xW : x0 + xW, currentY, currentZ]);
-                    xArrival.push([x1 < x0 ? x1 - xW : x1 + xW, y1 + currentY - y0, z1 + currentZ - z0]);
+            for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
+                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                    xNetwork.push([
+                        x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
+                        currentY,
+                        currentZ
+                    ]);
+                    xArrival.push([
+                        x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                        numClamp(y0 + currentY - y0),
+                        numClamp(z0 + currentZ - z0)
+                    ]);
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
                 }
@@ -65,13 +73,13 @@ class TerrainCollider
                     adx = true;
                     if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon)) {
                         cropX = numClamp(newCrops[0] - xW);
-                        cropY = numClamp(newCrops[1] + y0 - net[1]);
-                        cropZ = numClamp(newCrops[2] + z0 - net[2]);
+                        // cropY = numClamp(newCrops[1] + y0 - net[1]);
+                        // cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
                     else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon)) {
                         cropX = numClamp(newCrops[0] + xW);
-                        cropY = numClamp(newCrops[1] + y0 - net[1]);
-                        cropZ = numClamp(newCrops[2] + z0 - net[2]);
+                        // cropY = numClamp(newCrops[1] + y0 - net[1]);
+                        // cropZ = numClamp(newCrops[2] + z0 - net[2]);
                     }
                 }
             }
@@ -80,10 +88,18 @@ class TerrainCollider
         if (y0 !== y1) {
             let yNetwork = [];
             let yArrival = [];
-            for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                for (let currentZ = z0 - zW, lastZ = z0 + zW; ;) {
-                    yNetwork.push([currentX, y1 < y0 ? y0 - yW : y0 + yW, currentZ]);
-                    yArrival.push([x1 + currentX - x0, y1 < y0 ? y1 - yW : y1 + yW, z1 + currentZ - z0]);
+            for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
+                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                    yNetwork.push([
+                        currentX,
+                        y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
+                        currentZ
+                    ]);
+                    yArrival.push([
+                        numClamp(x0 + currentX - x0),
+                        y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                        numClamp(z0 + currentZ - z0)
+                    ]);
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
                 }
@@ -104,11 +120,13 @@ class TerrainCollider
                         const nz = numClamp(newCrops[2] + z0 - net[2]);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                         {
-                            cropX = nx;
+                            // cropX = nx;
                         }
                         cropY = ny;
                         if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
-                            cropZ = nz;
+                        {
+                            // cropZ = nz;
+                        }
                     }
                     else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon)) {
                         const nx = numClamp(newCrops[0] + x0 - net[0]);
@@ -116,11 +134,13 @@ class TerrainCollider
                         const nz = numClamp(newCrops[2] + z0 - net[2]);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                         {
-                            cropX = nx;
+                            // cropX = nx;
                         }
                         cropY = ny;
                         if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
-                            cropZ = nz;
+                        {
+                            // cropZ = nz;
+                        }
                     }
                 }
             }
@@ -131,8 +151,16 @@ class TerrainCollider
             let zArrival = [];
             for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
                 for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                    zNetwork.push([currentX, currentY, z1 < z0 ? z0 - zW + epsilon : z0 + zW]);
-                    zArrival.push([x1 + currentX - x0, y1 + currentY - y0, z1 < z0 ? z1 - zW : z1 + zW]);
+                    zNetwork.push([
+                        currentX,
+                        currentY,
+                        z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
+                    ]);
+                    zArrival.push([
+                        numClamp(x0 + currentX - x0),
+                        numClamp(y0 + currentY - y0),
+                        z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                    ]);
                     if (currentY >= lastY) break;
                     currentY = currentY + 1 > lastY ? lastY : currentY + 1;
                 }
@@ -153,11 +181,11 @@ class TerrainCollider
                         const nz = numClamp(newCrops[2] - zW);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                         {
-                            cropX = nx;
+                            // cropX = nx;
                         }
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
                         {
-                            cropY = ny;
+                            // cropY = ny;
                         }
                         cropZ = nz;
                     }
@@ -167,11 +195,11 @@ class TerrainCollider
                         const nz = numClamp(newCrops[2] + zW);
                         if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
                         {
-                            cropX = nx;
+                            // cropX = nx;
                         }
                         if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
                         {
-                            cropY = ny;
+                            // cropY = ny;
                         }
                         cropZ = nz;
                     }

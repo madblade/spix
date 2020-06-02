@@ -172,7 +172,6 @@ class RigidBodiesPhase1
             if (sum > maxSpeed * dtr)
                 for (let i = 0; i < 3; ++i) inc[i] *= maxSpeed * dtr / sum;
 
-            console.log(`${adh}, ${vector}`);
             for (let i = 0; i < 3; ++i)
             {
                 const vi = vector[i];
