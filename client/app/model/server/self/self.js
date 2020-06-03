@@ -34,6 +34,17 @@ let SelfModel = function(app) {
     this.handItem = null;
     this.handItemWrapper = new Object3D();
     this.handItemWrapper.rotation.reorder('ZYX');
+
+    // Interpolation-prediction
+    this.lastPositionFromServer = new Vector3(0, 0, 0);
+    this.currentPositionFromServer = new Vector3(0, 0, 0);
+    this.interpolatingPosition = new Vector3(0, 0, 0);
+    this.lastServerUpdateTime = this.getTime();
+    this.averageDeltaT = -1;
+    // this.lastInterpolatingPosition = new Vector3(0, 0, 0);
+    // this.maxDelta = 500; // ms
+    // this.predictedVelocity = new Vector3(0, 0, 0);
+    // this.lastClientUpdateTime = this.getTime();
 };
 
 extend(SelfModel.prototype, {
@@ -42,90 +53,181 @@ extend(SelfModel.prototype, {
         this.loadSelf();
     },
 
-    interpolatePredictSelfPosition() {
+    interpolatePredictSelfPosition()
+    {
+        let last = this.lastPositionFromServer;
+        let current = this.currentPositionFromServer;
+        let p = this.position;
+        let upToDatePosition = new Vector3(p[0], p[1], p[2]); // "up-to-date" server position
+        const updateTime = this.getTime();
+        // const deltaClient = updateTime - this.lastClientUpdateTime;
+        this.lastClientUpdateTime = updateTime;
+
+        if (current.distanceTo(upToDatePosition) > 0) {
+            // changed!
+            last.copy(current);
+            current.copy(upToDatePosition);
+
+            // compute average delta.
+            const deltaServer = updateTime - this.lastServerUpdateTime;
+            if (this.averageDeltaT < 16 || this.averageDeltaT > 100) {
+                this.averageDeltaT = deltaServer;
+            }
+            this.lastServerUpdateTime = updateTime;
+        }
+
+        const t = updateTime - this.lastServerUpdateTime;
+        const deltaServer = this.averageDeltaT;
+        if (t < deltaServer) {
+            // interpolate
+            const tdt = t / deltaServer;
+            const dx = current.x - last.x;
+            const dy = current.y - last.y;
+            const dz = current.z - last.z;
+            // let pv = this.predictedVelocity;
+            // let ip = this.interpolatingPosition;
+            // pv.copy(ip);
+            this.setLerp(last.x + tdt * dx, last.y + tdt * dy, last.z + tdt * dz);
+            // pv.set(ip.x - pv.x, ip.y - pv.y, ip.z - pv.z);
+        }
+        // Prediction goes there (but must be queried for every game update,
+        // this pass here is already filtered)
+        // } else if (t < 2 * deltaServer) {
+        //     let pv = this.predictedVelocity;
+        //     let ip = this.interpolatingPosition;
+        //     this.setLerp(ip.x + pv.x, ip.y + pv.y, ip.z + pv.z);
+        //     this.lastInterpolatingPosition.copy(this.interpolatingPosition);
+        else if (this.interpolatingPosition.distanceTo(current) > 0) {
+            this.setLerp(current.x, current.y, current.z);
+            // }
+            // Correction goes there (go back to the last updated)
+            // const tdt = (t - 2 * deltaServer) / deltaServer;
+            // if (tdt < 1) {
+            //     const cp = this.lastInterpolatingPosition;
+            //     const dx = last.x - cp.x;
+            //     const dy = last.x - cp.y;
+            //     const dz = last.x - cp.z;
+            //     this.setLerp(last.x + tdt * dx, last.y + tdt * dy, last.z + tdt * dz);
+            // } else
+        }
     },
 
-    refresh() {
-        if (!this.needsUpdate) return;
+    setLerp(x, y, z)
+    {
+        this.interpolatingPosition.set(x, y, z);
+        this.updatePosition(this.avatar, this.interpolatingPosition);
+    },
 
+    updatePosition(avatar, newP)
+    {
         let register = this.app.register;
         let graphics = this.app.engine.graphics;
         let clientModel = this.app.model.client;
+        let handItemWrapper = this.handItemWrapper;
+        const id = this.entityId;
 
+        let p = avatar.position;
+        p.copy(newP);
+
+        // Notify modules.
+        register.updateSelfState({ position: [p.x, p.y, p.z] });
+
+        // Update animation.
+        const animate = p.x !== newP.x || p.y !== newP.y;
+        if (animate) {
+            graphics.updateAnimation(id);
+            // TODO cleanup animation part
+            // graphics.updateAnimation('yumi');
+        }
+
+        // Update camera.
+        clientModel.pushForLaterUpdate('camera-position', p);
+        graphics.cameraManager.updateCameraPosition(p);
+
+        let handItem = this.handItem;
+        if (handItem && handItemWrapper) {
+            let mc = graphics.cameraManager.mainCamera;
+            handItemWrapper.position.copy(mc.up.position);
+        }
+    },
+
+    updateRotation(avatar, r)
+    {
+        let graphics = this.app.engine.graphics;
+        let handItemWrapper = this.handItemWrapper;
+
+        avatar.rotation.z = r[2];
+        avatar.rotation.x = r[3];
+        avatar.getWrapper().rotation.y = Math.PI + r[0];
+
+        let theta0 = r[2];
+        let theta1 = r[3];
+        let cam = graphics.cameraManager.mainCamera;
+        let rotationX = cam.getXRotation();
+        const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
+        // TODO [HIGH] compute delta transmitted from last time
+        let rotationZ = cam.getZRotation();
+        if (changed) graphics.cameraManager.setRelRotation(rotationZ + r[0] - r[1], rotationX);
+
+        // mainCamera.setUpRotation(theta1, 0, theta0);
+        // moveCameraFromMouse(0, 0, newX, newY);
+
+        let handItem = this.handItem;
+        if (handItem && handItemWrapper) {
+            let mc = graphics.cameraManager.mainCamera;
+            handItemWrapper.rotation.copy(mc.up.rotation);
+            handItem.rotation.x = mc.pitch.rotation.x;
+            handItem.rotation.z = mc.yaw.rotation.z;
+        }
+    },
+
+    updateWorld()
+    {
+        let graphics = this.app.engine.graphics;
         let avatar = this.avatar;
         let handItemWrapper = this.handItemWrapper;
-        let up = this.position;
+
+        console.log('Updating world!');
+        console.log(this.worldId);
+        let xModel = this.xModel;
+        let worldId = this.worldId;
+        let oldWorldId = this.oldWorldId;
+        let displayAvatar = this.displayAvatar;
+        let displayHandItem = this.displayHandItem;
+
+        if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
+        // TODO differentiate 3d person and 1st person
+        if (displayHandItem) graphics.removeFromScene(handItemWrapper, oldWorldId);
+
+        graphics.switchToScene(oldWorldId, worldId);
+        xModel.switchAvatarToWorld(oldWorldId, worldId);
+
+        if (displayAvatar) graphics.addToScene(avatar, worldId);
+        if (displayHandItem) graphics.addToScene(handItemWrapper, worldId);
+        xModel.forceUpdate = true;
+    },
+
+    refresh()
+    {
+        this.interpolatePredictSelfPosition();
+        if (!this.needsUpdate) return;
+
+        let avatar = this.avatar;
         let r = this.rotation;
-        let id = this.entityId;
 
         if (!avatar) return;
 
-        let p = avatar.position;
-
         if (this.worldNeedsUpdate && this.oldWorldId) {
-            console.log('Updating world!');
-            console.log(this.worldId);
-            let xModel = this.xModel;
-            let worldId = this.worldId;
-            let oldWorldId = this.oldWorldId;
-            let displayAvatar = this.displayAvatar;
-            let displayHandItem = this.displayHandItem;
-
-            if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
-            // TODO differentiate 3d person and 1st person
-            if (displayHandItem) graphics.removeFromScene(handItemWrapper, oldWorldId);
-
-            graphics.switchToScene(oldWorldId, worldId);
-            xModel.switchAvatarToWorld(oldWorldId, worldId);
-
-            if (displayAvatar) graphics.addToScene(avatar, worldId);
-            if (displayHandItem) graphics.addToScene(handItemWrapper, worldId);
-            xModel.forceUpdate = true;
+            this.updateWorld();
         }
 
-        if (up !== null && r !== null && p !== null)
-        {
-            let animate = p.x !== up[0] || p.y !== up[1];
-            p.x = up[0]; p.y = up[1]; p.z = up[2];
+        // let p = this.position;
+        // if (avatar.position !== null && p !== null) {
+        //     this.updatePosition(avatar, new Vector3(p[0], p[1], p[2]));
+        // }
 
-            // Notify modules.
-            register.updateSelfState({position: [p.x, p.y, p.z]});
-
-            avatar.rotation.z = r[2];
-            avatar.rotation.x = r[3];
-            avatar.getWrapper().rotation.y = Math.PI + r[0];
-
-            let theta0 = r[2];
-            let theta1 = r[3];
-            let cam = graphics.cameraManager.mainCamera;
-            let rotationX = cam.getXRotation();
-            const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
-            // TODO [HIGH] compute delta transmitted from last time
-            let rotationZ = cam.getZRotation();
-            if (changed) graphics.cameraManager.setRelRotation(rotationZ + r[0] - r[1], rotationX);
-
-            // mainCamera.setUpRotation(theta1, 0, theta0);
-            // moveCameraFromMouse(0, 0, newX, newY);
-
-            // Update animation.
-            if (animate) {
-                graphics.updateAnimation(id);
-                // TODO cleanup animation part
-                // graphics.updateAnimation('yumi');
-            }
-
-            // Update camera.
-            clientModel.pushForLaterUpdate('camera-position', this.position);
-            graphics.cameraManager.updateCameraPosition(this.position);
-
-            let handItem = this.handItem;
-            if (handItem && handItemWrapper) {
-                let mc = graphics.cameraManager.mainCamera;
-                handItemWrapper.position.copy(mc.up.position);
-                handItemWrapper.rotation.copy(mc.up.rotation);
-                handItem.rotation.x = mc.pitch.rotation.x;
-                handItem.rotation.z = mc.yaw.rotation.z;
-            }
+        if (r !== null) {
+            this.updateRotation(avatar, r);
         }
 
         this.worldNeedsUpdate = false;
@@ -236,6 +338,10 @@ extend(SelfModel.prototype, {
         return this.inventoryModel;
     },
 
+    getTime() {
+        return window.performance.now();
+    },
+
     cleanup() {
         // General
         this.entityId = '-1';
@@ -254,6 +360,8 @@ extend(SelfModel.prototype, {
         this.displayHandItem = true;
 
         this.avatar = null;
+        this.lastServerUpdateTime = this.getTime();
+        this.averageDeltaT = -1;
         // TODO [LEAK] cleanup graphical component of avatar.
     }
 

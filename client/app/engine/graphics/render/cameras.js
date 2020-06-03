@@ -188,9 +188,9 @@ extend(CameraManager.prototype, {
             f * cos(theta1)
         ];
 
-        let x = vector[0] + upVector[0];
-        let y = vector[1] + upVector[1];
-        let z = vector[2] + upVector[2];
+        let x = vector.x + upVector[0];
+        let y = vector.y + upVector[1];
+        let z = vector.z + upVector[2];
         // let x = vector[0];
         // let y = vector[1];
         // let z = vector[2] + 1.6;

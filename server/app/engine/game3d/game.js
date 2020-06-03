@@ -34,9 +34,11 @@ const GameType = Object.freeze({
 class Game3D extends Game
 {
     static serverRefreshRate = 16;
-    // static serverRefreshRate = 420; // blaze it
+    static waitFramesToOutputEntities = 1; // Increase to reduce the netload!
+    // Client must have entity / self interpolation activated.
 
-    constructor(hub, gameId, connector, gameInfo) {
+    constructor(hub, gameId, connector, gameInfo)
+    {
         super(hub, gameId, connector);
 
         // Utility parameters
@@ -45,6 +47,7 @@ class Game3D extends Game
         this._refreshRate = Game3D.serverRefreshRate;
         //this._refreshRate = 1000;
         this._tt = 0;
+        this._frameMod1000 = 0;
 
         // Misc.
         this._chat = new Chat(this);
@@ -90,7 +93,9 @@ class Game3D extends Game
     static bench = false;
 
     //^
-    update() {
+    update()
+    {
+        this._frameMod1000 = (this._frameMod1000 + 1) % 1000;
         // Idea maybe split in several loops (purposes).
         let debugThresh = 4000; // microsecs
 
@@ -122,7 +127,8 @@ class Game3D extends Game
 
         /** Outputs **/
         t = TimeUtils.getTimeSecNano();
-        this._externalOutput.update();    // Send updates.
+        const updateEntities = this._frameMod1000 % Game3D.waitFramesToOutputEntities === 0;
+        this._externalOutput.update(updateEntities);    // Send updates.
         this._internalOutput.update();    // Update perceptions.
         const dt5 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt5 > debugThresh) console.log(`${dt5} µs to update outputs.`);

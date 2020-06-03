@@ -25,7 +25,8 @@ class UserOutput
     static bench = false;
 
     // TODO [HIGH] -> don't recurse over every player, rather over updates...
-    update() {
+    update(updateEntities)
+    {
         let t1;
         let t2;
 
@@ -40,7 +41,8 @@ class UserOutput
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
 
         t1 = TimeUtils.getTimeSecNano();
-        this.updateEntities();
+        if (updateEntities)
+            this.updateEntities();
         t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
         if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
 
