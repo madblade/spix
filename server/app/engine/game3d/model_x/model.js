@@ -8,12 +8,11 @@ import Knot             from './knot';
 import Portal           from './portal';
 
 import CollectionUtils  from '../../math/collections';
-// import GeometryUtils    from '../../math/geometry';
 
 import WorldGenerator   from '../engine_consistency/generator/worldgenerator';
 
-class XModel {
-
+class XModel
+{
     constructor(game, worldModel) {
         this._game = game;
         this._worldModel = worldModel;
@@ -375,7 +374,6 @@ class XModel {
         this._cachedConnectivity[1].set(aggregate, recursedChunks);
         return [recursedPortals, recursedChunks];
     }
-
 }
 
 export default XModel;

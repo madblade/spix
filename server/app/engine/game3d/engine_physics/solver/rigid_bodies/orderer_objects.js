@@ -7,8 +7,8 @@
 import Entity from '../../../model_entity/entity';
 import Portal from '../../../model_x/portal';
 
-class ObjectOrderer {
-
+class ObjectOrderer
+{
     constructor(entityModel, xModel)
     {
         // Model.
@@ -50,9 +50,9 @@ class ObjectOrderer {
 
     // Compute sorted axes from scratch entity arrays.
     // Xs are taken into account to achieve efficient physics.
-        // N.B. Chunk caches and specific x storage has nothing
-        // to do with physics specifically.
-        // Disclaimer: inefficient, but done at startup.
+    //  N.B. Chunk caches and specific x storage has nothing
+    //  to do with physics specifically.
+    //  Warning: inefficient, but done at startup.
     orderObjects()
     {
         let portals = this._xModel.portals;
@@ -318,7 +318,6 @@ class ObjectOrderer {
         // Set new world.
         entity.worldId = newWorldId;
     }
-
 }
 
 export default ObjectOrderer;

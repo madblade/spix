@@ -4,14 +4,12 @@
 
 'use strict';
 
-class Selector {
-
-    // constructor(topologyEngine) {
-    // }
-
-    selectUpdatedChunksForPlayer(player, worldModel, consistencyModel,
-                                 modelUpdatedChunks,    // topology output      Map(world id -> set of updtd chks)
-                                 addedOrDeletedChunks   // consistency output   {world id => {cid => [fc, fcids]} }
+class Selector
+{
+    selectUpdatedChunksForPlayer(
+        player, worldModel, consistencyModel,
+        modelUpdatedChunks,    // topology output      Map(world id -> set of updtd chks)
+        addedOrDeletedChunks   // consistency output   {world id => {cid => [fc, fcids]} }
     ) {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
@@ -59,7 +57,6 @@ class Selector {
         // TODO [LOW] extract connected subsurface.
         return chunks.size > 0;
     }
-
 }
 
 export default Selector;

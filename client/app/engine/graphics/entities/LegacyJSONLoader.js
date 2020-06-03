@@ -15,7 +15,7 @@ import {
     Vector3,
     Vector4,
     AnimationClip
-} from "three";
+} from 'three';
 
 function LegacyJSONLoader(manager)
 {
@@ -24,21 +24,20 @@ function LegacyJSONLoader(manager)
         manager = undefined;
     }
 
-    this.manager = (manager !== undefined) ? manager : DefaultLoadingManager;
+    this.manager = manager !== undefined ? manager : DefaultLoadingManager;
 
     this.withCredentials = false;
-
 }
 
 Object.assign(LegacyJSONLoader.prototype, {
 
     crossOrigin: 'anonymous',
 
-    load: function(url, onLoad, onProgress, onError)
+    load(url, onLoad, onProgress, onError)
     {
         var scope = this;
 
-        var path = (this.path === undefined) ? LoaderUtils.extractUrlBase(url) : this.path;
+        var path = this.path === undefined ? LoaderUtils.extractUrlBase(url) : this.path;
 
         var loader = new FileLoader(this.manager);
         loader.setPath(this.path);
@@ -52,7 +51,7 @@ Object.assign(LegacyJSONLoader.prototype, {
 
                 if (type !== undefined) {
                     if (type.toLowerCase() === 'object') {
-                        console.error('THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.');
+                        console.error(`THREE.JSONLoader: ${url} should be loaded with THREE.ObjectLoader instead.`);
                         return;
                     }
                 }
@@ -63,17 +62,17 @@ Object.assign(LegacyJSONLoader.prototype, {
         }, onProgress, onError);
     },
 
-    setPath: function(value) {
+    setPath(value) {
         this.path = value;
         return this;
     },
 
-    setResourcePath: function(value) {
+    setResourcePath(value) {
         this.resourcePath = value;
         return this;
     },
 
-    setCrossOrigin: function(value) {
+    setCrossOrigin(value) {
         this.crossOrigin = value;
         return this;
     },
@@ -81,34 +80,34 @@ Object.assign(LegacyJSONLoader.prototype, {
     parse: (function() {
         function parseModel(json, geometry) {
             function isBitSet(value, position) {
-                return value & (1 << position);
+                return value & 1 << position;
             }
 
-            var i, j, fi,
+            var i; var j; var fi;
 
-                offset, zLength,
+            var offset; var zLength;
 
-                colorIndex, normalIndex, uvIndex, materialIndex,
+            var colorIndex; var normalIndex; var uvIndex; var materialIndex;
 
-                type,
-                isQuad,
-                hasMaterial,
-                hasFaceVertexUv,
-                hasFaceNormal, hasFaceVertexNormal,
-                hasFaceColor, hasFaceVertexColor,
+            var type;
+            var isQuad;
+            var hasMaterial;
+            var hasFaceVertexUv;
+            var hasFaceNormal; var hasFaceVertexNormal;
+            var hasFaceColor; var hasFaceVertexColor;
 
-                vertex, face, faceA, faceB, hex, normal,
+            var vertex; var face; var faceA; var faceB; var hex; var normal;
 
-                uvLayer, uv, u, v,
+            var uvLayer; var uv; var u; var v;
 
-                faces = json.faces,
-                vertices = json.vertices,
-                normals = json.normals,
-                colors = json.colors,
+            var faces = json.faces;
+            var vertices = json.vertices;
+            var normals = json.normals;
+            var colors = json.colors;
 
-                scale = json.scale,
+            var scale = json.scale;
 
-                nUvLayers = 0;
+            var nUvLayers = 0;
 
 
             if (json.uvs !== undefined) {
@@ -166,11 +165,9 @@ Object.assign(LegacyJSONLoader.prototype, {
                     offset += 4;
 
                     if (hasMaterial) {
-
                         materialIndex = faces[offset++];
                         faceA.materialIndex = materialIndex;
                         faceB.materialIndex = materialIndex;
-
                     }
 
                     // to get face <=> uv index correspondence
@@ -199,7 +196,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                     }
 
                     if (hasFaceNormal) {
-
                         normalIndex = faces[offset++] * 3;
 
                         faceA.normal.set(
@@ -209,13 +205,10 @@ Object.assign(LegacyJSONLoader.prototype, {
                         );
 
                         faceB.normal.copy(faceA.normal);
-
                     }
 
                     if (hasFaceVertexNormal) {
-
                         for (i = 0; i < 4; i++) {
-
                             normalIndex = faces[offset++] * 3;
 
                             normal = new Vector3(
@@ -230,7 +223,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                         }
                     }
 
-
                     if (hasFaceColor) {
                         colorIndex = faces[offset++];
                         hex = colors[colorIndex];
@@ -238,7 +230,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                         faceA.color.setHex(hex);
                         faceB.color.setHex(hex);
                     }
-
 
                     if (hasFaceVertexColor) {
                         for (i = 0; i < 4; i++) {
@@ -274,7 +265,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                             geometry.faceVertexUvs[i][fi] = [];
 
                             for (j = 0; j < 3; j++) {
-
                                 uvIndex = faces[offset++];
 
                                 u = uvLayer[uvIndex * 2];
@@ -314,7 +304,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                     if (hasFaceColor) {
                         colorIndex = faces[offset++];
                         face.color.setHex(colors[colorIndex]);
-
                     }
 
 
@@ -330,25 +319,25 @@ Object.assign(LegacyJSONLoader.prototype, {
         }
 
         function parseSkin(json, geometry) {
-            var influencesPerVertex = (json.influencesPerVertex !== undefined) ? json.influencesPerVertex : 2;
+            var influencesPerVertex = json.influencesPerVertex !== undefined ? json.influencesPerVertex : 2;
 
             if (json.skinWeights) {
                 for (var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex) {
                     var x = json.skinWeights[i];
-                    var y = (influencesPerVertex > 1) ? json.skinWeights[i + 1] : 0;
-                    var z = (influencesPerVertex > 2) ? json.skinWeights[i + 2] : 0;
-                    var w = (influencesPerVertex > 3) ? json.skinWeights[i + 3] : 0;
+                    var y = influencesPerVertex > 1 ? json.skinWeights[i + 1] : 0;
+                    var z = influencesPerVertex > 2 ? json.skinWeights[i + 2] : 0;
+                    var w = influencesPerVertex > 3 ? json.skinWeights[i + 3] : 0;
 
                     geometry.skinWeights.push(new Vector4(x, y, z, w));
                 }
             }
 
             if (json.skinIndices) {
-                for (var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex) {
+                for (var ii = 0, ll = json.skinIndices.length; i < ll; ii += influencesPerVertex) {
                     var a = json.skinIndices[i];
-                    var b = (influencesPerVertex > 1) ? json.skinIndices[i + 1] : 0;
-                    var c = (influencesPerVertex > 2) ? json.skinIndices[i + 2] : 0;
-                    var d = (influencesPerVertex > 3) ? json.skinIndices[i + 3] : 0;
+                    var b = influencesPerVertex > 1 ? json.skinIndices[ii + 1] : 0;
+                    var c = influencesPerVertex > 2 ? json.skinIndices[ii + 2] : 0;
+                    var d = influencesPerVertex > 3 ? json.skinIndices[ii + 3] : 0;
 
                     geometry.skinIndices.push(new Vector4(a, b, c, d));
                 }
@@ -357,9 +346,8 @@ Object.assign(LegacyJSONLoader.prototype, {
             geometry.bones = json.bones;
 
             if (geometry.bones && geometry.bones.length > 0 && (geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length)) {
-
-                console.warn('When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
-                    geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.');
+                console.warn(`When skinning, number of vertices (${geometry.vertices.length}), skinIndices (${
+                    geometry.skinIndices.length}), and skinWeights (${geometry.skinWeights.length}) should match.`);
             }
         }
 
@@ -376,7 +364,6 @@ Object.assign(LegacyJSONLoader.prototype, {
                     var srcVertices = json.morphTargets[i].vertices;
 
                     for (var v = 0, vl = srcVertices.length; v < vl; v += 3) {
-
                         var vertex = new Vector3();
                         vertex.x = srcVertices[v] * scale;
                         vertex.y = srcVertices[v + 1] * scale;
@@ -393,9 +380,8 @@ Object.assign(LegacyJSONLoader.prototype, {
                 var faces = geometry.faces;
                 var morphColors = json.morphColors[0].colors;
 
-                for (var i = 0, l = faces.length; i < l; i++) {
-
-                    faces[i].color.fromArray(morphColors, i * 3);
+                for (var ii = 0, ll = faces.length; ii < ll; ii++) {
+                    faces[ii].color.fromArray(morphColors, ii * 3);
                 }
             }
         }
@@ -434,7 +420,6 @@ Object.assign(LegacyJSONLoader.prototype, {
         }
 
         return function parse(json, path) {
-
             if (json.data !== undefined) {
                 // Geometry 4.0 spec
                 json = json.data;
@@ -457,15 +442,14 @@ Object.assign(LegacyJSONLoader.prototype, {
             geometry.computeBoundingSphere();
 
             if (json.materials === undefined || json.materials.length === 0) {
-                return {geometry: geometry};
+                return {geometry};
             } else {
                 var materials = Loader.prototype.initMaterials(json.materials, this.resourcePath || path, this.crossOrigin);
 
-                return {geometry: geometry, materials: materials};
+                return {geometry, materials};
             }
         };
-    })()
-
+    }())
 });
 
 export default LegacyJSONLoader;

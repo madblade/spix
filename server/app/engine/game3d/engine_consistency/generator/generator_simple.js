@@ -6,8 +6,8 @@
 
 import ChunkGenerator from './chunkgenerator';
 
-class Simple {
-
+class Simple
+{
     // Set all cubes until a given height to a given id.
     static fillChunk(chunk, toZ, blockId) {
         if (typeof toZ !== 'number') return;
@@ -39,7 +39,6 @@ class Simple {
 
         if (ChunkGenerator.debug) console.log(`\t${chunk.blocks.length} blocks generated.`);
     }
-
 }
 
 export default Simple;

@@ -6,8 +6,6 @@
 
 import {
     AmbientLight, DirectionalLight, HemisphereLight,
-    CameraHelper,
-    PointLight
 } from 'three';
 
 let LightDefaultIntensities = Object.freeze({

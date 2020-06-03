@@ -5,8 +5,8 @@
 
 'use strict';
 
-class OutputBuffer {
-
+class OutputBuffer
+{
     constructor() {
         // Contains ids of updated chunks.
         // Chunks themselves hold information about their being updated.
@@ -43,7 +43,6 @@ class OutputBuffer {
 
         this._buffer = new Map();
     }
-
 }
 
 export default OutputBuffer;

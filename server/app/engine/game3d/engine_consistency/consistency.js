@@ -13,8 +13,8 @@ import EntityLoader     from './loader/loader_entity';
 import Generator        from './generator/generator';
 import Updater          from './updater/updater';
 
-class ConsistencyEngine {
-
+class ConsistencyEngine
+{
     constructor(game) {
         this._game = game;
 
@@ -150,7 +150,6 @@ class ConsistencyEngine {
     generateWorld() {
         return this._generator.generateWorld();
     }
-
 }
 
 export default ConsistencyEngine;

@@ -4,14 +4,12 @@
 
 'use strict';
 
-// import GeometryUtils        from '../../../math/geometry';
-
 import ChunkGenerator       from './../generator/chunkgenerator';
 import BlockExtractor       from './surface_blocks_builder';
 import FaceExtractor        from './surface_faces_builder';
 
-class ChunkBuilder {
-
+class ChunkBuilder
+{
     static debug = false;
 
     static computeChunkFaces(chunk) {
@@ -278,7 +276,6 @@ class ChunkBuilder {
 
         return unloadedChunksForPlayer;
     }
-
 }
 
 export default ChunkBuilder;

@@ -6,8 +6,8 @@
 
 // import ObjectOrderer from './orderer_objects';
 
-class EventOrderer {
-
+class EventOrderer
+{
     static maxRange = 32.;
 
     constructor() {
@@ -86,7 +86,6 @@ class EventOrderer {
             zAxis.splice(zAxis.indexOf(eventIndex), 1);
         }
     }
-
 }
 
 export default EventOrderer;

@@ -4,8 +4,8 @@
 
 'use strict';
 
-class AIOutput {
-
+class AIOutput
+{
     // constructor() {
 
     // }
@@ -13,7 +13,6 @@ class AIOutput {
     update() {
 
     }
-
 }
 
 export default AIOutput;

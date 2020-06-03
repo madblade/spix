@@ -6,8 +6,8 @@
 
 import Factory from './../factory';
 
-class Player {
-
+class Player
+{
     constructor(user, game) {
         this._user = user;
         this._game = game;
@@ -77,7 +77,6 @@ class Player {
         delete this._game;
         delete this._user;
     }
-
 }
 
 export default Player;

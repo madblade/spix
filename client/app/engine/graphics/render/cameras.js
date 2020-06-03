@@ -7,7 +7,6 @@
 import extend from '../../../extend.js';
 import { Camera } from './camera.js';
 import {
-    CameraHelper,
     Matrix4, PerspectiveCamera,
     Plane, Raycaster,
     Vector2, Vector3, Vector4,

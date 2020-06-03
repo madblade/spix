@@ -462,7 +462,7 @@ let ChunksModule = {
                 if (this.debug) {
                     console.log('INFO: Geometry addition: ' +
                         `${meshId}` +
-                        `${(meshId % 10 === 1 ? 'st' : meshId % 10 === 2 ? 'nd' : meshId % 10 === 3 ? 'rd' : 'th')}` +
+                        `${meshId % 10 === 1 ? 'st' : meshId % 10 === 2 ? 'nd' : meshId % 10 === 3 ? 'rd' : 'th'}` +
                         ' geometry.');
                 }
 

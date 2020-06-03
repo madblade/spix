@@ -4,8 +4,8 @@
 
 'use strict';
 
-class XBuffer {
-
+class XBuffer
+{
     constructor() {
         // Don't implement add/removeX
         // For they'll be updated next frame.
@@ -30,7 +30,6 @@ class XBuffer {
     flush() {
         this._outputBuffer = new Map();
     }
-
 }
 
 export default XBuffer;

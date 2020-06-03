@@ -27,7 +27,9 @@ class UpdaterBlock
     {
         let changed = false;
         let neighbourBlock = chunk.queryBlock(xs[0], ys[0], zs[0]);
-        if (neighbourBlock !== airBlock && (neighbourBlock === waterBlock) === isAddedBlockWater)
+        if (neighbourBlock !== airBlock &&
+            neighbourBlock === waterBlock === isAddedBlockWater // (N.B. eval from left to right)
+        )
         {
             changed = true;
             let a = chunk.queryBlock(xs[1], ys[1], zs[1]);
@@ -64,12 +66,8 @@ class UpdaterBlock
         let isAddedBlockWater = blockId === waterBlock;
 
         let surfaceBlocks = chunk.surfaceBlocks;
-        let xp = false;
-        let xm = false;
-        let yp = false;
-        let ym = false;
-        let zp = false;
-        let zm = false;
+        let xm; let ym; let zm;
+        let xp; let yp; let zp;
 
         // x+ and x-
         xm = UpdaterBlock.processNeighbourSurfaceBlockAfterAddition(

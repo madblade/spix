@@ -10,8 +10,8 @@ import OutputBuffer     from './output_buffer';
 import Selector         from './selector/selector';
 import Updater          from './updater/updater';
 
-class TopologyEngine {
-
+class TopologyEngine
+{
     constructor(game) {
         // Models.
         this._entityModel       = game.entityModel;
@@ -63,7 +63,6 @@ class TopologyEngine {
     flushOutput() {
         this._outputBuffer.flushOutput(this._worldModel);
     }
-
 }
 
 export default TopologyEngine;

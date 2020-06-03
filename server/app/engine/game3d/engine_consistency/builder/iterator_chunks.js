@@ -4,8 +4,8 @@
 
 'use strict';
 
-class ChunkIterator {
-
+class ChunkIterator
+{
     /**
      *
      * @param world

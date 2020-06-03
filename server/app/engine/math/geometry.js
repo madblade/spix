@@ -4,8 +4,8 @@
 
 'use strict';
 
-class GeometryUtils {
-
+class GeometryUtils
+{
     /** Common topology distances **/
 
     static infiniteNormDistance(pos1, pos2) {
@@ -57,7 +57,6 @@ class GeometryUtils {
         let z = v1[2] - v2[2]; z *= z;
         return Math.sqrt(x + y + z);
     }
-
 }
 
 export default GeometryUtils;

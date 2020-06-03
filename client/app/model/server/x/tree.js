@@ -273,7 +273,8 @@ extend(XGraph.prototype, {
         return string;
     },
 
-    computeCameraTransform(pidPath, portals, cameraManager) {
+    computeCameraTransform(pidPath, portals) //, cameraManager
+    {
         // let root = cameraManager.mainCamera;
         let cameraTransform = [
             0, 0, 0, // Position

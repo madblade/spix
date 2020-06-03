@@ -13,12 +13,12 @@ class TimeUtils {
                 performance.msNow      ||
                 performance.oNow       ||
                 performance.webkitNow  ||
-                function() { return (new Date()).getTime(); };
+                function() { return new Date().getTime(); };
 
             let hrt = function(previousTimestamp) {
                 let clocktime = performanceNow.call(performance) * 1e-3;
                 let seconds = Math.floor(clocktime);
-                let nanoseconds = Math.floor((clocktime % 1) * 1e9);
+                let nanoseconds = Math.floor(clocktime % 1 * 1e9);
                 if (previousTimestamp) {
                     seconds = seconds - previousTimestamp[0];
                     nanoseconds = nanoseconds - previousTimestamp[1];

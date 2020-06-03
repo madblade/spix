@@ -5,7 +5,7 @@
 'use strict';
 
 import extend               from '../../../extend.js';
-import { ItemsModelModule, ItemType } from './items';
+import { ItemsModelModule } from './items';
 
 let InventoryModel = function()
 {

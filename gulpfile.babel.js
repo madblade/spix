@@ -16,6 +16,7 @@ import { Server as KarmaServer } from 'karma';
 import webpack from 'webpack-stream';
 import makeWebpackConfig from './webpack.make';
 import shell from 'gulp-shell';
+import * as gutil from 'gulp-util';
 
 let plugins = gulpLoadPlugins();
 let config;
@@ -209,7 +210,8 @@ var webpackdist = function(packLocal){ return function() {
 var transpileserver = () => {
     return gulp.src(_.union(paths.server.scripts, paths.server.json))
         .pipe(transpileServer())
-        .pipe(gulp.dest(`${paths.dist}/${serverPath}`));
+        .pipe(gulp.dest(`${paths.dist}/${serverPath}`))
+        .pipe(gutil.noop());
 };
 
 // Code style
@@ -218,13 +220,15 @@ var lintscriptsclient = () => {
         paths.client.scripts,
         _.map(paths.client.test, blob => '!' + blob)
     ))
-        .pipe(lintClientScripts());
+        .pipe(lintClientScripts())
+        .pipe(gutil.noop());
 };
 
 var lintscriptsserver = () => {
     return gulp.src(_.union(paths.server.scripts,
         _.map(paths.server.test, blob => '!' + blob)))
-        .pipe(lintServerScripts());
+        .pipe(lintServerScripts())
+        .pipe(gutil.noop());
 };
 
 gulp.task('lint:scripts',

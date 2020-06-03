@@ -23,8 +23,8 @@
 
 let seedrandom = require('seedrandom');
 
-class Perlin {
-
+class Perlin
+{
     static F2 = 0.3660254037844386;
     static G2 = 0.21132486540518713;
     static F3 = (1.0 / 3.0);
@@ -94,7 +94,6 @@ class Perlin {
         for (let i = 255; i > 0; i--) {
             let j;
             let n = i + 1;
-            // TODO [FIX] check this no-body while
             while (n <= (j = Math.floor(rng() * n)));
 
             let a = PERM[i];
@@ -198,7 +197,7 @@ class Perlin {
                 Perlin.ASSIGN(o1, 0, 0, 1);
                 Perlin.ASSIGN(o2, 1, 0, 1);
             }
-        } else
+        } else if (pos[0][0] < pos[0][1]) {
             if (pos[0][1] < pos[0][2]) {
                 Perlin.ASSIGN(o1, 0, 0, 1);
                 Perlin.ASSIGN(o2, 0, 1, 1);
@@ -209,6 +208,7 @@ class Perlin {
                 Perlin.ASSIGN(o1, 0, 1, 0);
                 Perlin.ASSIGN(o2, 1, 1, 0);
             }
+        }
 
         for (c = 0; c <= 2; c++) {
             pos[3][c] = pos[0][c] - 1.0 + 3.0 * Perlin.G3;
@@ -240,7 +240,7 @@ class Perlin {
     }
 
     static simplex2(handle, x, y, octaves, persistence, lacunarity)
-        // [], float, float, int, float, float
+    // [], float, float, int, float, float
     {
         let freq = 1.;
         let amp = 1.;
@@ -257,7 +257,7 @@ class Perlin {
     }
 
     static simplex3(handle, x, y, z, octaves, persistence, lacunarity)
-        // [], float, float, int, float, float
+    // [], float, float, int, float, float
     {
         let freq = 1.;
         let amp = 1.;
@@ -378,13 +378,12 @@ class Perlin {
     static makeClouds(x, y, handle, func, flag, arg) {
         for (let z = 64; z < 72; z++) {
             if (Perlin.simplex3(handle,
-                    x * 0.01, y * 0.01, z * 0.1, 8, 0.5, 2) > 0.75)
+                x * 0.01, y * 0.01, z * 0.1, 8, 0.5, 2) > 0.75)
             {
                 func(x, y, z, 16 * flag, arg);
             }
         }
     }
-
 }
 
 export default Perlin;

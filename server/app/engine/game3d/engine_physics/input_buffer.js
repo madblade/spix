@@ -4,8 +4,8 @@
 
 'use strict';
 
-class InputBuffer {
-
+class InputBuffer
+{
     constructor() {
         this._buffer = new Map();
     }
@@ -23,7 +23,6 @@ class InputBuffer {
     flush() {
         this._buffer = new Map();
     }
-
 }
 
 export default InputBuffer;

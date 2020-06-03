@@ -4,8 +4,8 @@
 
 'use strict';
 
-class Chat {
-
+class Chat
+{
     constructor(game) {
         this._game = game;
         this._temporaryMessages = [];
@@ -47,7 +47,6 @@ class Chat {
         let game = this._game;
         game.connection.io.to(game.gameId).emit(kind, data);
     }
-
 }
 
 export default Chat;

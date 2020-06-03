@@ -176,7 +176,6 @@ class XCollider
 
         return false;
     }
-
 }
 
 export default XCollider;

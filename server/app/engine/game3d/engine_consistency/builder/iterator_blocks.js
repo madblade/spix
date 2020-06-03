@@ -4,8 +4,8 @@
 
 'use strict';
 
-class BlockIterator {
-
+class BlockIterator
+{
     constructor(/*chunk*/) {
         // this._dimensions = chunk.dimensions;
         this._currentFace = null;
@@ -37,7 +37,6 @@ class BlockIterator {
         }
         */
     }
-
 }
 
 export default BlockIterator;

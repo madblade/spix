@@ -6,8 +6,8 @@
 
 import GeometryUtils    from '../../math/geometry';
 
-class ConsistencyModel {
-
+class ConsistencyModel
+{
     constructor(game) {
         // Model.
         this._worldModel                = game.worldModel;
@@ -185,7 +185,6 @@ class ConsistencyModel {
         if (!p) return false;
         return p.has(xId);
     }
-
 }
 
 export default ConsistencyModel;

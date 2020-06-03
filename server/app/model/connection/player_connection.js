@@ -104,7 +104,6 @@ class PlayerConnection
         delete this._rooms;
         delete this._listeners;
     }
-
 }
 
 export default PlayerConnection;

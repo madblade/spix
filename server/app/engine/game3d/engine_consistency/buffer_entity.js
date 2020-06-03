@@ -4,8 +4,8 @@
 
 'use strict';
 
-class EntityBuffer {
-
+class EntityBuffer
+{
     constructor() {
         this._addedPlayers = new Set();
         this._removedPlayers = new Set();
@@ -50,7 +50,6 @@ class EntityBuffer {
         this._removedPlayers = new Set();
         this._outputBuffer = new Map();
     }
-
 }
 
 export default EntityBuffer;

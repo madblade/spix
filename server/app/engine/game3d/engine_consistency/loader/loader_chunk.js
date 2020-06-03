@@ -8,12 +8,11 @@ import GeometryUtils        from '../../../math/geometry';
 
 import WorldModel           from '../../model_world/model';
 import WorldGenerator       from '../generator/worldgenerator';
-// import ChunkIterator        from '../builder/iterator_chunks';
 import ChunkBuilder         from '../builder/builder_chunks';
-import TimeUtils from '../../../math/time';
+import TimeUtils            from '../../../math/time';
 
-class ChunkLoader {
-
+class ChunkLoader
+{
     static debug = false;
     static load = true;
     static bench = false;
@@ -239,7 +238,6 @@ class ChunkLoader {
             starterChunk, worldModel, xModel, consistencyModel,
             maxThreshold);
     }
-
 }
 
 export default ChunkLoader;

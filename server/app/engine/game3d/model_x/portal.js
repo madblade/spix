@@ -4,8 +4,8 @@
 
 'use strict';
 
-class Portal {
-
+class Portal
+{
     /**
      * @param worldId origin world.
      * @param id identifier in XModel

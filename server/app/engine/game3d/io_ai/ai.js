@@ -4,8 +4,8 @@
 
 'use strict';
 
-class AI {
-
+class AI
+{
     constructor(game) {
         this._entityModel   = game.entityModel;
         this._worldModel    = game.worldModel;
@@ -15,7 +15,6 @@ class AI {
     update() {
 
     }
-
 }
 
 export default AI;

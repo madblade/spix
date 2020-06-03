@@ -4,8 +4,8 @@
 
 'use strict';
 
-class UserInput {
-
+class UserInput
+{
     constructor(game) {
         this._game = game;
 
@@ -110,7 +110,6 @@ class UserInput {
 
         delete this._listeners[player];
     }
-
 }
 
 export default UserInput;

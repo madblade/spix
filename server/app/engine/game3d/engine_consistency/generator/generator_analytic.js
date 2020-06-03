@@ -6,8 +6,8 @@
 
 import ChunkGenerator from './chunkgenerator';
 
-class Analytic {
-
+class Analytic
+{
     static waveChunk(chunk, minZ, maxZ, blockId) {
         if (minZ >= maxZ || maxZ >= chunk.capacity)
             console.log('Wave generator: invalid parameters');

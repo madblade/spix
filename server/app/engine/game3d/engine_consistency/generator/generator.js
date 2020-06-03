@@ -7,8 +7,8 @@
 import WorldGenerator       from './worldgenerator';
 import ChunkBuilder         from '../builder/builder_chunks';
 
-class Generator {
-
+class Generator
+{
     constructor(consistencyEngine) {
         this._worldModel = consistencyEngine.worldModel;
     }
@@ -38,7 +38,6 @@ class Generator {
             resolve();
         });
     }
-
 }
 
 export default Generator;

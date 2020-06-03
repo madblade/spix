@@ -673,8 +673,8 @@ class RigidBodiesPhase3
             let alpha = e1p1 - e1p0;
             let beta  = e2p1 - e2p0;
             let num = e2p0 - e1p0 - e1w - e2w - epsilon - seps;
-            let e1t = e1p0 + (num / den) * alpha;
-            let e2t = e2p0 + (num / den) * beta;
+            let e1t = e1p0 + num / den * alpha;
+            let e2t = e2p0 + num / den * beta;
 
             if (e1t <= max(e1p0, e1p1) && e1t >= min(e1p0, e1p1) &&
                 e2t <= max(e2p0, e2p1) && e2t >= min(e2p0, e1p1) &&

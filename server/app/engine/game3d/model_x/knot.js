@@ -6,8 +6,8 @@
 
 import Portal from './portal';
 
-class Knot {
-
+class Knot
+{
     /**
      * @param id knot id in XModel
      * @param portal1 first portal
@@ -44,7 +44,6 @@ class Knot {
         else if (portal === this._portal2)
             this._portal2 = null;
     }
-
 }
 
 export default Knot;

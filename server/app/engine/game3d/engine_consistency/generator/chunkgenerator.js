@@ -13,8 +13,8 @@ import Chunk            from './../../model_world/chunk';
 // import GenPerlin        from './generator_perlin.js';
 import GenSimplePerlin  from './generator_simple_perlin.js';
 
-class ChunkGenerator {
-
+class ChunkGenerator
+{
     static debug = false;
 
     /**
@@ -56,7 +56,6 @@ class ChunkGenerator {
 
         return c;
     }
-
 }
 
 export default ChunkGenerator;

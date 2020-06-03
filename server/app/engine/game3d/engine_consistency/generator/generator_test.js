@@ -4,10 +4,8 @@
 
 'use strict';
 
-// import ChunkGenerator from './chunkgenerator';
-
-class Test {
-
+class Test
+{
     static testMerge(chunk) {
         const dx = chunk.dimensions[0];
         const dy = chunk.dimensions[1];
@@ -92,7 +90,6 @@ class Test {
 
         chunk.blocks = blocks;
     }
-
 }
 
 export default Test;

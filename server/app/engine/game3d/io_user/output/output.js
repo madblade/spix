@@ -111,19 +111,19 @@ class UserOutput
             let updatedChunksForPlayer = topologyEngine.getOutputForPlayer(p, updatedChunks, addedOrRemovedChunks);
             hasUpdated = updatedChunksForPlayer && Object.keys(updatedChunksForPlayer).length > 0;
 
-            if (hasNew) {
-                // New chunk + update => bundle updates with new chunks in one call.
-                if (hasUpdated) {
-                    for (let wiA in addedOrRemovedChunks) {
-                        if (wiA in updatedChunksForPlayer) {
-                            Object.assign(addedOrRemovedChunks[wiA], updatedChunksForPlayer[wiA]);
-                            delete updatedChunksForPlayer[wiA];
-                        }
+            // New chunk + update => bundle updates with new chunks in one call.
+            if (hasNew && hasUpdated) {
+                for (let wiA in addedOrRemovedChunks) {
+                    if (!addedOrRemovedChunks.hasOwnProperty(wiA)) continue;
+                    if (wiA in updatedChunksForPlayer) {
+                        Object.assign(addedOrRemovedChunks[wiA], updatedChunksForPlayer[wiA]);
+                        delete updatedChunksForPlayer[wiA];
                     }
-
-                    Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
                 }
+                Object.assign(addedOrRemovedChunks, updatedChunksForPlayer);
+            }
 
+            if (hasNew) {
                 // Format:
                 // {
                 //  'worldsMeta': {worldId:[type, r, cx,cy,cz]} . World metadata

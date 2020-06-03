@@ -6,8 +6,8 @@
 
 import EventOrderer from './orderer_events';
 
-class Event {
-
+class Event
+{
     constructor(position, lifespan, range)
     {
         this._position = position || [0, 0, 0]; // Center.
@@ -43,7 +43,6 @@ class Event {
     isActive() {
         return this._lifeSpan > 0;
     }
-
 }
 
 export default Event;

@@ -10,8 +10,8 @@ import OutputBuffer     from './output_buffer';
 import FrontEnd         from './solver/frontend';
 import Updater          from './updater/updater';
 
-class PhysicsEngine {
-
+class PhysicsEngine
+{
     constructor(game) {
         // Models.
         this._entityModel   = game.entityModel;
@@ -72,7 +72,6 @@ class PhysicsEngine {
         let entity = this._entityModel.entities[playerId];
         this._frontend.objectOrderer.removeObject(entity);
     }
-
 }
 
 export default PhysicsEngine;

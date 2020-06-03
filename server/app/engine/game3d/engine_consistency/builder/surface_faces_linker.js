@@ -1,13 +1,13 @@
 /**
- *
+ * @deprecated
  */
 
 'use strict';
 
 import CSFX from './surface_faces_builder';
 
-class FaceLinker {
-
+class FaceLinker
+{
     static flatToCoords(flatId, iS, ijS) {
         const i = flatId % iS;
         const j = (flatId - i) % ijS / iS;
@@ -67,11 +67,12 @@ class FaceLinker {
     // call linkCriterion(flatId, otherFlatId,
     //                      -1 0 1, -1 0 1, -1 0 1,
     //                      chunkI, chunkJ, chunkK capacity, blocks, neighbourBlocks)
-    static linkCriterion(indexS, indexD,
-                         deltaI, deltaJ, deltaK,
-                         ci, cj, ck,
-                         iS, ijS, capacity,
-                         blocks, neighbourBlocks)
+    static linkCriterion(
+        indexS, indexD,
+        deltaI, deltaJ, deltaK,
+        ci, cj, ck,
+        iS, ijS, capacity,
+        blocks, neighbourBlocks)
     {
         const dimI = iS;
         const dimJ = ijS / iS;
@@ -139,7 +140,7 @@ class FaceLinker {
             try {
                 bs = neighbourBlocks[n][ijk$];
             } catch (e) {
-                throw Error('Undefined neighbour ' + n);
+                throw Error(`Undefined neighbour ${n}`);
             }
             // console.log(indexS + "|" + indexD + " : "
             // +i$+ "," +j$+ "," +k$+ "  " + ijk$ + " | " + n + " | " + bs);
@@ -191,7 +192,7 @@ class FaceLinker {
             if (
                 normalP && ftop > 0 ||
                 normalM && ftop < 0
-                )
+            )
             {
                 if (CSFX.debugLinks)
                     console.log(`${stackFaceId} i linked to top i ${top}`);
@@ -212,7 +213,7 @@ class FaceLinker {
             if (
                 normalP && fback > 0 ||
                 normalM && fback < 0
-                )
+            )
             {
                 if (CSFX.debugLinks)
                     console.log(`${stackFaceId} i linked to back i ${back}`);
@@ -230,13 +231,13 @@ class FaceLinker {
         const flatTopOrtho = flatFaceId; // k, obviously inbounds POTENTIALLY MERGED
         const ftopo = faces[2][flatTopOrtho];
         if (
-                normalP && ftopo > 0 &&
-                FaceLinker.linkCriterion(
-                    flatFaceId, flatFaceId + 1 + ijS,
-                    1, 0, 1, ci, cj, ck, iS, ijS,
-                    capacity, blocks, neighbourBlocks) ||
-                normalM && ftopo < 0
-            )
+            normalP && ftopo > 0 &&
+            FaceLinker.linkCriterion(
+                flatFaceId, flatFaceId + 1 + ijS,
+                1, 0, 1, ci, cj, ck, iS, ijS,
+                capacity, blocks, neighbourBlocks) ||
+            normalM && ftopo < 0
+        )
         {
             const stackTopOrtho = 2 * capacity + flatFaceId;
             if (CSFX.debugLinks)
@@ -253,13 +254,13 @@ class FaceLinker {
         const flatBackOrtho = flatFaceId; // j, obviously inbounds POTENTIALLY MERGED
         const fbacko = faces[1][flatBackOrtho];
         if (
-                normalP && fbacko > 0 &&
-                FaceLinker.linkCriterion(
-                    flatFaceId, flatFaceId + 1 + iS,
-                    1, 1, 0, ci, cj, ck, iS, ijS,
-                    capacity, blocks, neighbourBlocks) ||
-                normalM && fbacko < 0
-            )
+            normalP && fbacko > 0 &&
+            FaceLinker.linkCriterion(
+                flatFaceId, flatFaceId + 1 + iS,
+                1, 1, 0, ci, cj, ck, iS, ijS,
+                capacity, blocks, neighbourBlocks) ||
+            normalM && fbacko < 0
+        )
         {
             const stackBackOrtho = capacity + flatFaceId;
             if (CSFX.debugLinks)
@@ -279,13 +280,13 @@ class FaceLinker {
         if (flatTopOrthoNext % iS === flatTopOrtho % iS + 1) {
             const ftopon = faces[2][flatTopOrthoNext];
             if (
-                    normalP && ftopon < 0 ||
-                    normalM && ftopon > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + ijS,
-                        0, 0, 1, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && ftopon < 0 ||
+                normalM && ftopon > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + ijS,
+                    0, 0, 1, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
                 if (CSFX.debugLinks)
@@ -298,13 +299,13 @@ class FaceLinker {
         if (flatBackOrthoNext % iS === flatBackOrtho % iS + 1) {
             const fbackon = faces[1][flatBackOrthoNext];
             if (
-                    normalP && fbackon < 0 ||
-                    normalM && fbackon > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + iS,
-                        0, 1, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && fbackon < 0 ||
+                normalM && fbackon > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + iS,
+                    0, 1, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackBackOrthoNext = capacity + flatBackOrthoNext;
                 if (CSFX.debugLinks)
@@ -324,13 +325,13 @@ class FaceLinker {
         if (flatOrthoIJ > 0 && flatOrthoIJ % iS === (flatBackOrtho - iS) % iS + 1) {
             const foij = faces[1][flatOrthoIJ];
             if (
-                    normalP && foij > 0 ||
-                    normalM && foij < 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId - iS,
-                        0, -1, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && foij > 0 ||
+                normalM && foij < 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId - iS,
+                    0, -1, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackOrthoIJ = capacity + flatOrthoIJ;
                 if (CSFX.debugLinks)
@@ -367,7 +368,7 @@ class FaceLinker {
             if (
                 normalP && ftop > 0 ||
                 normalM && ftop < 0
-                )
+            )
             {
                 const stackTop = capacity + top;
                 if (CSFX.debugLinks) console.log(`${stackFaceId} j linked to top j ${stackTop}`);
@@ -381,7 +382,7 @@ class FaceLinker {
             if (
                 normalP && fright > 0 ||
                 normalM && fright < 0
-                )
+            )
             {
                 const stackRight = capacity + right;
                 if (CSFX.debugLinks)
@@ -400,13 +401,13 @@ class FaceLinker {
         const flatTopOrtho = flatFaceId; // k, obviously inbounds, POTENTIALLY MERGED
         const ftopo = faces[2][flatTopOrtho];
         if (
-                normalP && ftopo > 0 &&
-                FaceLinker.linkCriterion(
-                    flatFaceId, flatFaceId + iS + ijS,
-                    0, 1, 1, ci, cj, ck, iS, ijS,
-                    capacity, blocks, neighbourBlocks) ||
-                normalM && ftopo < 0
-            )
+            normalP && ftopo > 0 &&
+            FaceLinker.linkCriterion(
+                flatFaceId, flatFaceId + iS + ijS,
+                0, 1, 1, ci, cj, ck, iS, ijS,
+                capacity, blocks, neighbourBlocks) ||
+            normalM && ftopo < 0
+        )
         {
             const stackTopOrtho = 2 * capacity + flatFaceId;
             if (CSFX.debugLinks)
@@ -426,13 +427,13 @@ class FaceLinker {
         if (flatTopOrthoNext % ijS === flatTopOrtho % ijS + iS) {
             const ftopon = faces[2][flatTopOrthoNext];
             if (
-                    normalP && ftopon < 0 ||
-                    normalM && ftopon > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + ijS,
-                        0, 0, 1, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && ftopon < 0 ||
+                normalM && ftopon > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + ijS,
+                    0, 0, 1, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackTopOrthoNext = 2 * capacity + flatTopOrthoNext;
                 if (CSFX.debugLinks)
@@ -445,13 +446,13 @@ class FaceLinker {
         if (flatBackOrthoNext % ijS === flatFaceId % ijS + iS) {
             const fbackon = faces[0][flatBackOrthoNext];
             if (
-                    normalP && fbackon < 0 ||
-                    normalM && fbackon > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + 1,
-                        1, 0, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && fbackon < 0 ||
+                normalM && fbackon > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + 1,
+                    1, 0, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackBackOrthoNext = flatFaceId + iS;
                 if (CSFX.debugLinks)
@@ -490,7 +491,7 @@ class FaceLinker {
             if (
                 normalP && fright > 0 ||
                 normalM && fright < 0
-                )
+            )
             {
                 const stackRight = 2 * capacity + right;
                 if (CSFX.debugLinks)
@@ -511,7 +512,7 @@ class FaceLinker {
             if (
                 normalP && fback > 0 ||
                 normalM && fback < 0
-                )
+            )
             {
                 const stackBack = 2 * capacity + back;
                 if (CSFX.debugLinks)
@@ -532,13 +533,13 @@ class FaceLinker {
         if (flatBackOrthoCurrent < capacity) {
             const fbackoc = faces[1][flatBackOrthoCurrent];
             if (
-                    normalP && fbackoc < 0 ||
-                    normalM && fbackoc > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + iS,
-                        0, 1, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && fbackoc < 0 ||
+                normalM && fbackoc > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + iS,
+                    0, 1, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackBackOrtho = capacity + flatBackOrthoCurrent;
                 if (CSFX.debugLinks)
@@ -557,13 +558,13 @@ class FaceLinker {
         if (flatRightOrthoCurrent < capacity) {
             const frightoc = faces[0][flatRightOrthoCurrent];
             if (
-                    normalP && frightoc < 0 ||
-                    normalM && frightoc > 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId + 1,
-                        1, 0, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && frightoc < 0 ||
+                normalM && frightoc > 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId + 1,
+                    1, 0, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackRightOrthoCurrent = flatRightOrthoCurrent;
                 if (CSFX.debugLinks)
@@ -586,13 +587,13 @@ class FaceLinker {
         {
             const fbackop = faces[1][flatBackOrthoPrevious];
             if (
-                    normalP && fbackop > 0 ||
-                    normalM && fbackop < 0 &&
-                    FaceLinker.linkCriterion(
-                        flatFaceId, flatFaceId - iS,
-                        0, -1, 0, ci, cj, ck, iS, ijS,
-                        capacity, blocks, neighbourBlocks)
-                )
+                normalP && fbackop > 0 ||
+                normalM && fbackop < 0 &&
+                FaceLinker.linkCriterion(
+                    flatFaceId, flatFaceId - iS,
+                    0, -1, 0, ci, cj, ck, iS, ijS,
+                    capacity, blocks, neighbourBlocks)
+            )
             {
                 const stackBackOrthoPrevious = capacity + flatBackOrthoPrevious;
                 if (CSFX.debugLinks)
@@ -635,7 +636,6 @@ class FaceLinker {
             }
         }
     }
-
 }
 
 export default FaceLinker;

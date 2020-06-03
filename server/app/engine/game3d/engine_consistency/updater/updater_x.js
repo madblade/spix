@@ -4,8 +4,8 @@
 
 'use strict';
 
-class XUpdater {
-
+class XUpdater
+{
     constructor(consistencyEngine) {
         this._worldModel = consistencyEngine.worldModel;
         this._xModel = consistencyEngine.xModel;
@@ -40,7 +40,6 @@ class XUpdater {
             xModel.removePortalFromPosition(originWorld, x1, y1, z1);
         }
     }
-
 }
 
 export default XUpdater;

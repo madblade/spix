@@ -9,8 +9,8 @@ import XLoader  from '../loader/loader_x';
 import XBuffer  from '../buffer_x';
 import TimeUtils from '../../../math/time';
 
-class Updater {
-
+class Updater
+{
     constructor(consistencyEngine)
     {
         // Model.
@@ -182,7 +182,6 @@ class Updater {
                 xbuf.updateXForPlayer(pid, addedX, removedX);
         }});
     }
-
 }
 
 export default Updater;

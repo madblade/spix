@@ -4,8 +4,8 @@
 
 'use strict';
 
-class ChunkBuffer {
-
+class ChunkBuffer
+{
     constructor() {
         this._outputBuffer = new Map();
     }
@@ -48,7 +48,6 @@ class ChunkBuffer {
     flush() {
         this._outputBuffer = new Map();
     }
-
 }
 
 export default ChunkBuffer;

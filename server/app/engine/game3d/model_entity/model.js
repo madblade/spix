@@ -9,8 +9,8 @@ import Cube   from './cube';
 // import Entity from './entity';
 // import CollectionUtil from '../../math/collections';
 
-class EntityModel {
-
+class EntityModel
+{
     constructor(game) {
         this._game = game;
 
@@ -105,7 +105,6 @@ class EntityModel {
 
         return false;
     }
-
 }
 
 export default EntityModel;

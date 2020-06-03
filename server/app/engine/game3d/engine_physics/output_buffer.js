@@ -4,8 +4,8 @@
 
 'use strict';
 
-class OutputBuffer {
-
+class OutputBuffer
+{
     constructor() {
         // Contains ids of updated entities.
         this._buffer = new Set();
@@ -23,7 +23,6 @@ class OutputBuffer {
     flushOutput() {
         this._buffer = new Set();
     }
-
 }
 
 export default OutputBuffer;

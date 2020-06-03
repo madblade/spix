@@ -6,8 +6,8 @@
 
 import Factory from '../factory';
 
-class Game {
-
+class Game
+{
     constructor(hub, gameId, connector) {
         // Utility parameters.
         this._hub = hub;
@@ -145,7 +145,6 @@ class Game {
         delete this._refreshRate;
         delete this._isRunning;
     }
-
 }
 
 export default Game;

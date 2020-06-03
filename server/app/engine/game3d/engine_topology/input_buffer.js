@@ -5,8 +5,8 @@
 
 'use strict';
 
-class InputBuffer {
-
+class InputBuffer
+{
     constructor() {
         this._buffer = [];
     }
@@ -22,7 +22,6 @@ class InputBuffer {
     flush() {
         this._buffer = [];
     }
-
 }
 
 export default InputBuffer;

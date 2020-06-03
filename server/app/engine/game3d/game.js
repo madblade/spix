@@ -164,7 +164,6 @@ class Game3D extends Game
     save() {
         // TODO [LONG-TERM] write world and entities into file.
     }
-
 }
 
 export { Game3D as default, GameType };

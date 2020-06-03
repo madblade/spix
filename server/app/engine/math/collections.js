@@ -4,8 +4,8 @@
 
 'use strict';
 
-class CollectionUtils {
-
+class CollectionUtils
+{
     // O(log(n))
     static _locationOf(element, array, start, end) {
         start = start || 0;
@@ -96,7 +96,6 @@ class CollectionUtils {
     static forEachProperty(object, func) {
         Object.keys(object).forEach(func);
     }
-
 }
 
 export default CollectionUtils;

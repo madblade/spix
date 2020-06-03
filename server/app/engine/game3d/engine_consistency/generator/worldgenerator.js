@@ -6,8 +6,8 @@
 
 import ChunkGenerator from './chunkgenerator';
 
-class WorldGenerator {
-
+class WorldGenerator
+{
     static generateInitialWorld(chunkSizeX, chunkSizeY, chunkSizeZ, world) {
         let worldMap = new Map();
         worldMap.set('0,0,0', WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, world));
@@ -29,7 +29,6 @@ class WorldGenerator {
     static generatePerlinWorld() {
         return new Map();
     }
-
 }
 
 export default WorldGenerator;

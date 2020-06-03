@@ -4,8 +4,8 @@
 
 'use strict';
 
-class Updater {
-
+class Updater
+{
     constructor(physicsEngine) {
         //
         this._physicsEngine = physicsEngine;
@@ -91,7 +91,6 @@ class Updater {
         console.log(meta);
         console.log(avatar.id);
     }
-
 }
 
 export default Updater;

@@ -6,8 +6,8 @@
 
 import GeometryUtils        from '../../../math/geometry';
 
-class EntityLoader {
-
+class EntityLoader
+{
     constructor(consistencyEngine) {
         this._entityModel = consistencyEngine.entityModel;
         this._consistencyModel = consistencyEngine.consistencyModel;

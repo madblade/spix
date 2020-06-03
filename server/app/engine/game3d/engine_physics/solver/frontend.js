@@ -9,8 +9,8 @@ import EventOrderer from './rigid_bodies/orderer_events';
 import ObjectOrderer from './rigid_bodies/orderer_objects';
 import TimeUtils from '../../../math/time';
 
-class FrontEnd {
-
+class FrontEnd
+{
     constructor(physicsEngine, refreshRate) {
         // Model access.
         this._physicsEngine = physicsEngine;
@@ -80,7 +80,6 @@ class FrontEnd {
         let g = rigidBodies.gravity;
         rigidBodies.gravity = [g[2], g[0], g[1]];
     }
-
 }
 
 export default FrontEnd;
