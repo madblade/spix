@@ -212,23 +212,34 @@ extend(SelfModel.prototype, {
 
     refresh()
     {
-        if (!this.interpolationUpToDate)
-            this.interpolatePredictSelfPosition();
-        if (!this.needsUpdate) return;
+        if (!this.needsUpdate) {
+            if (!this.interpolationUpToDate) this.interpolatePredictSelfPosition();
+            return;
+        }
 
         let avatar = this.avatar;
         let r = this.rotation;
 
         if (!avatar) return;
 
-        if (this.worldNeedsUpdate && this.oldWorldId) {
+        // This could be made more fluid with
+        // a more involved interpolation routine
+        // (might need more data from the server)
+        if (this.worldNeedsUpdate && this.oldWorldId)
+        {
             this.updateWorld();
+            let p = this.position;
+            let last = this.lastPositionFromServer;
+            let current = this.currentPositionFromServer;
+            last.copy(current);
+            current.copy(p);
+            this.interpolatingPosition.copy(p);
+            this.updatePosition(this.avatar, this.interpolatingPosition);
+            this.interpolationUpToDate = true;
+        } else if (!this.interpolationUpToDate)
+        {
+            this.interpolatePredictSelfPosition();
         }
-
-        // let p = this.position;
-        // if (avatar.position !== null && p !== null) {
-        //     this.updatePosition(avatar, new Vector3(p[0], p[1], p[2]));
-        // }
 
         if (r !== null) {
             this.updateRotation(avatar, r);
@@ -266,6 +277,7 @@ extend(SelfModel.prototype, {
         }
 
         if (!wid || wid !== w) {
+            this.needsUpdate = true;
             this.worldNeedsUpdate = true;
             this.oldWorldId = this.worldId;
             this.worldId = w;

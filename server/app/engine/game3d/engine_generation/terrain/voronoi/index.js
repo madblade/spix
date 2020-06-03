@@ -1,1 +1,4 @@
-export {default as voronoi} from "./voronoi";
+
+'use strict';
+
+export { default as voronoi } from './voronoi';

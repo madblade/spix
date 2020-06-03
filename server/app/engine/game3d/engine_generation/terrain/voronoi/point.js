@@ -1,7 +1,10 @@
+
+'use strict';
+
 export function x(d) {
-  return d[0];
+    return d[0];
 }
 
 export function y(d) {
-  return d[1];
+    return d[1];
 }
