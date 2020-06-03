@@ -22,7 +22,7 @@ let PlayerModule = {
         wrapper.rotation.y = Math.PI;
         wrapper._id = id;
 
-        let entity = new Entity(wrapper,
+        let entity = new Entity(id, wrapper,
             parseInt(updatedEntity.w, 10));
         graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
@@ -35,7 +35,7 @@ let PlayerModule = {
         let createdEntity = graphics.initializeEntity(id, 'steve');
         let object3D = graphics.finalizeEntity(id, createdEntity);
 
-        let entity = new Entity(object3D, parseInt(updatedEntity.w, 10));
+        let entity = new Entity(id, object3D, parseInt(updatedEntity.w, 10));
         graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
         this.updateEntity(id, entity, updatedEntity, graphics, entities);

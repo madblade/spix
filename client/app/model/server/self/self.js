@@ -72,9 +72,9 @@ extend(SelfModel.prototype, {
 
             // compute average delta.
             const deltaServer = updateTime - this.lastServerUpdateTime;
-            if (this.averageDeltaT < 16 || this.averageDeltaT > 100) {
-                this.averageDeltaT = deltaServer;
-            }
+            // if (this.averageDeltaT < 16 || this.averageDeltaT > 100) {
+            this.averageDeltaT = deltaServer;
+            // }
             this.lastServerUpdateTime = updateTime;
         }
 
@@ -135,7 +135,7 @@ extend(SelfModel.prototype, {
         register.updateSelfState({ position: [p.x, p.y, p.z] });
 
         // Update animation.
-        const animate = p.x !== newP.x || p.y !== newP.y;
+        const animate = p.x !== newP.x || p.y !== newP.y; // TODO manage 3D world case.
         if (animate) {
             graphics.updateAnimation(id);
             // TODO cleanup animation part

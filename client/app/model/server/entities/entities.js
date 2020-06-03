@@ -19,6 +19,10 @@ let EntityModel = function(app)
 
     // Graphical component
     this.needsUpdate = false;
+
+    // Interpolation-prediction
+    this.lastServerUpdateTime = this.getTime();
+    this.averageDeltaT = -1;
 };
 
 extend(EntityModel.prototype, PlayerModule);
@@ -27,12 +31,198 @@ extend(EntityModel.prototype, {
 
     init() {},
 
-    interpolatePredictEntities() {
+    interpolatePredictEntities()
+    {
+        const updateTime = this.getTime();
+        let entities = this.entitiesIngame;
+        entities.forEach(entity => {
+            if (!entity.needsUpdate) return;
+            this.interpolatePredictEntity(entity, updateTime);
+        });
     },
 
-    interpolatePredictEntity() {
+    interpolatePredictEntity(entity, updateTime)
+    {
+        let upToDatePosition = entity.position;
+        let upToDateRotation = entity.rotation;
+        let currentP = entity.currentPFromServer;
+        let currentR = entity.currentRFromServer;
+        let lastP = entity.lastPFromServer;
+        let lastR = entity.lastRFromServer;
+        if (currentP.distanceTo(upToDatePosition) > 0 || currentR.distanceTo(upToDateRotation) > 0)
+        {
+            lastP.copy(currentP);
+            currentP.copy(upToDatePosition);
+            lastR.copy(currentR);
+            currentR.copy(upToDateRotation);
+            entity.lastUpdateTime = updateTime;
+
+            // if (this.averageDeltaT < 16 || this.averageDeltaT > 100) {
+            this.averageDeltaT = updateTime - this.lastServerUpdateTime;
+            // }
+            this.lastServerUpdateTime = updateTime;
+        }
+        const deltaServer = this.averageDeltaT;
+
+        const t = updateTime - entity.lastUpdateTime;
+        if (t < deltaServer) {
+            // interpolate
+            const tdt = t / deltaServer;
+            const dpx = currentP.x - lastP.x; const drx = currentR.x - lastR.x;
+            const dpy = currentP.y - lastP.y; const dry = currentR.y - lastR.y;
+            const dpz = currentP.z - lastP.z; const drz = currentR.z - lastR.z;
+            this.setLerp(
+                entity,
+                lastP.x + tdt * dpx, lastP.y + tdt * dpy, lastP.z + tdt * dpz,
+                lastR.x + tdt * drx, lastR.y + tdt * dry, lastR.z + tdt * drz,
+            );
+        }
+        else if (
+            entity.interpolatingP.distanceTo(currentP) > 0 ||
+            entity.interpolatingR.distanceTo(currentR) > 0)
+        {
+            this.setLerp(
+                entity,
+                currentP.x, currentP.y, currentP.z,
+                currentR.x, currentR.y, currentR.z
+            );
+            entity.needsUpdate = false;
+        }
     },
 
+    setLerp(
+        entity, px, py, pz, rx, ry, rz
+    )
+    {
+        entity.interpolatingP.set(px, py, pz);
+        entity.interpolatingR.set(rx, ry, rz);
+        this.updateGraphicalEntity(entity, entity.interpolatingP, entity.interpolatingR);
+    },
+
+    updateGraphicalEntity(currentEntity, newP, newR)
+    {
+        // Update positions and rotation
+        let object3D = currentEntity.getObject3D();
+
+        let p = object3D.position;
+        let animate = p.x !== newP.x || p.y !== newP.y; // TODO 3D world
+        p.copy(newP);
+
+        object3D.rotation.x = newR.z; // ur[3];
+        object3D.rotation.z = newR.y; // ur[2];
+        object3D.getWrapper().rotation.y = Math.PI + newR.x; // + ur[0];
+        object3D.updateMatrixWorld();
+
+        // Update animation
+        const id = currentEntity.id;
+        let graphics = this.app.engine.graphics;
+        if (animate) graphics.updateAnimation(id);
+    },
+
+    addEntity(id, updatedEntity, graphics, entities)
+    {
+        this.entitiesLoading.add(id);
+
+        switch (updatedEntity.k)
+        {
+            case 'player':
+                this.loadPlayer(id, updatedEntity, graphics, entities);
+                break;
+
+            case 'cube':
+                this.loadCube(id, updatedEntity, graphics, entities);
+                break;
+
+            default:
+                console.log('ServerModel::addEntity: Unknown entity type.');
+        }
+    },
+
+    removeEntity(id, graphics, entities)
+    {
+        let entity = entities.get(id);
+        if (entity) {
+            graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
+        }
+        entities.delete(id);
+    },
+
+    updateEntity(id, currentEntity, updatedEntity, graphics, entities)
+    {
+        let pos = currentEntity.position;
+        let rot = currentEntity.rotation;
+
+        let up = updatedEntity.p;
+        let ur = updatedEntity.r;
+        if (!pos || !rot ||
+            pos[0] !== up[0] || pos[1] !== up[1] || pos[2] !== up[2] ||
+            rot[0] !== ur[0] || rot[1] !== ur[2] || rot[2] !== ur[3]) // shifted
+        {
+            currentEntity.position.set(up[0], up[1], up[2]);
+            currentEntity.rotation.set(ur[0], ur[2], ur[3]);
+            currentEntity.needsUpdate = true;
+        }
+
+        // Switch worlds.
+        const worldId = parseInt(updatedEntity.w, 10);
+        if (currentEntity.getWorldId() !== worldId) {
+            graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
+            currentEntity.setWorldId(worldId);
+            graphics.addToScene(currentEntity.getObject3D(), worldId);
+        }
+
+        // Update current "live" entities.
+        entities.set(id, currentEntity);
+    },
+
+    refresh()
+    {
+        if (!this.needsUpdate) {
+            this.interpolatePredictEntities();
+            return;
+        }
+        let graphics = this.app.engine.graphics;
+
+        let entities = this.entitiesIngame;
+        let pushes = this.entitiesOutdated;
+
+        pushes.forEach(
+            function(updatedEntity, id) {
+                if (this.entitiesLoading.has(id)) return;
+
+                let currentEntity = entities.get(id);
+                if (!updatedEntity)
+                    this.removeEntity(id, graphics, entities);
+                else if (!currentEntity)
+                    this.addEntity(id, updatedEntity, graphics, entities);
+                else
+                    this.updateEntity(id, currentEntity, updatedEntity, graphics, entities);
+            }.bind(this)
+        );
+
+        this.interpolatePredictEntities();
+
+        // Flush buffer.
+        this.entitiesOutdated = new Map();
+
+        // Unset dirty flag.
+        this.needsUpdate = false;
+    },
+
+    updateEntities(entities)
+    {
+        if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
+
+        let pushes = this.entitiesOutdated;
+        for (let eid in entities) {
+            pushes.set(eid, entities[eid]);
+        }
+
+        // Set dirty flag.
+        this.needsUpdate = true;
+    },
+
+    // Catmull interpolation, could come in handy
     cerp(a, b, c, d, t)
     {
         const m0 = a ? [c[0] - a[0], c[1] - a[1], c[2] - a[2]] : [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
@@ -54,106 +244,8 @@ extend(EntityModel.prototype, {
         ];
     },
 
-    addEntity(id, updatedEntity, graphics, entities) {
-        this.entitiesLoading.add(id);
-
-        switch (updatedEntity.k)
-        {
-            case 'player':
-                this.loadPlayer(id, updatedEntity, graphics, entities);
-                break;
-
-            case 'cube':
-                this.loadCube(id, updatedEntity, graphics, entities);
-                break;
-
-            default:
-                console.log('ServerModel::addEntity: Unknown entity type.');
-        }
-    },
-
-    removeEntity(id, graphics, entities) {
-        let entity = entities.get(id);
-        if (entity) {
-            graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
-        }
-        entities.delete(id);
-    },
-
-    // TODO [HIGH] an entity model...
-    updateEntity(id, currentEntity, updatedEntity, graphics, entities)
-    {
-        // Update positions and rotation
-        let object3D = currentEntity.getObject3D();
-
-        let p = object3D.position;
-        let up = updatedEntity.p;
-        let animate = p.x !== up[0] || p.y !== up[1];
-        p.x = up[0];
-        p.y = up[1];
-        p.z = up[2];
-
-        let ur = updatedEntity.r;
-        object3D.rotation.x = ur[3];
-        object3D.rotation.z = ur[2];
-        object3D.getWrapper().rotation.y = Math.PI + ur[0];
-        object3D.updateMatrixWorld();
-
-        // Update animation
-        if (animate) graphics.updateAnimation(id);
-
-        // Switch worlds.
-        let worldId = parseInt(updatedEntity.w, 10);
-        if (currentEntity.getWorldId() !== worldId) {
-            graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
-            currentEntity.setWorldId(worldId);
-            graphics.addToScene(currentEntity.getObject3D(), worldId);
-        }
-
-        // Update current "live" entities.
-        entities.set(id, currentEntity);
-    },
-
-    refresh()
-    {
-        if (!this.needsUpdate) return;
-        let graphics = this.app.engine.graphics;
-
-        let entities = this.entitiesIngame;
-        let pushes = this.entitiesOutdated;
-
-        pushes.forEach(
-            function(updatedEntity, id) {
-                if (this.entitiesLoading.has(id)) return;
-
-                let currentEntity = entities.get(id);
-                if (!updatedEntity)
-                    this.removeEntity(id, graphics, entities);
-                else if (!currentEntity)
-                    this.addEntity(id, updatedEntity, graphics, entities);
-                else
-                    this.updateEntity(id, currentEntity, updatedEntity, graphics, entities);
-            }.bind(this)
-        );
-
-        // Flush double buffer.
-        this.entitiesOutdated = new Map();
-
-        // Unset dirty flag.
-        this.needsUpdate = false;
-    },
-
-    updateEntities(entities)
-    {
-        if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
-
-        let pushes = this.entitiesOutdated;
-        for (let eid in entities) {
-            pushes.set(eid, entities[eid]);
-        }
-
-        // Set dirty flag.
-        this.needsUpdate = true;
+    getTime() {
+        return window.performance.now();
     },
 
     cleanup() {
