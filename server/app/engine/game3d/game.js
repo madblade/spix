@@ -23,6 +23,7 @@ import ConsistencyModel from './model_consistency/model';
 
 import Chat             from './../../model/connection/chat';
 import TimeUtils from '../math/time';
+import GenerationEngine from './engine_generation/generation';
 
 const GameType = Object.freeze({
     FLAT: Symbol('flat'),
@@ -63,6 +64,7 @@ class Game3D extends Game
         this._physicsEngine     = new PhysicsEngine(this);
         this._topologyEngine    = new TopologyEngine(this);
         this._consistencyEngine = new ConsistencyEngine(this);
+        this._generationEngine  = new GenerationEngine(this);
 
         // I/O (need engines).
         this._internalInput     = new AIInput(this);    // A.I.
@@ -144,7 +146,9 @@ class Game3D extends Game
             this.pause(false); // Stop with idle timeout.
     }
 
-    generate() {
+    generate()
+    {
+        // this._generationEngine.generateWorldMap();
         this._consistencyEngine.generateWorld()
             .then(() => {
                 this._playerManager.setAddPlayerBehaviour(p => {

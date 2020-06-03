@@ -1,7 +1,27 @@
 
 'use strict';
 
-class TimeUtils {
+class TimeUtils
+{
+    static getTimeSecMillis() {
+        if (process && process.hrtime) {
+            return process.hrtime()[1] / 1e3;
+        } else {
+            const performance = global.performance || {};
+            const performanceNow =
+                performance.now        ||
+                performance.mozNow     ||
+                performance.msNow      ||
+                performance.oNow       ||
+                performance.webkitNow  ||
+                function() { return new Date().getTime(); };
+
+            let clocktime = performanceNow.call(performance) * 1e-3;
+            let nanoseconds = Math.floor(clocktime % 1 * 1e9);
+            return nanoseconds / 1e3;
+        }
+    }
+
     static getTimeSecNano(arg) {
         if (process && process.hrtime) {
             return process.hrtime(arg);

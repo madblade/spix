@@ -13,7 +13,8 @@ class Generator
         this._worldModel = consistencyEngine.worldModel;
     }
 
-    generateWorld() {
+    generateWorld()
+    {
         // TODO [MEDIUM] generate distinct worlds.
         let world = this._worldModel.getWorld();
 
@@ -25,6 +26,8 @@ class Generator
             let y = world.ySize;
             let z = world.zSize;
             let chunkMap = WorldGenerator.generateInitialWorld(x, y, z, world);
+
+            // TODO generate 2 other worlds + WorldMap
 
             // Affect chunks.
             world.allChunks = chunkMap;
