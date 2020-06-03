@@ -10,7 +10,8 @@ import { InventoryModel }    from './inventory.js';
 import { Object3D, Vector3 } from 'three';
 import { ItemsModelModule }  from './items';
 
-let SelfModel = function(app) {
+let SelfModel = function(app)
+{
     this.app = app;
     this.xModel = null;
 
@@ -41,6 +42,7 @@ let SelfModel = function(app) {
     this.interpolatingPosition = new Vector3(0, 0, 0);
     this.lastServerUpdateTime = this.getTime();
     this.averageDeltaT = -1;
+    this.interpolationUpToDate = false;
     // this.lastInterpolatingPosition = new Vector3(0, 0, 0);
     // this.maxDelta = 500; // ms
     // this.predictedVelocity = new Vector3(0, 0, 0);
@@ -58,10 +60,10 @@ extend(SelfModel.prototype, {
         let last = this.lastPositionFromServer;
         let current = this.currentPositionFromServer;
         let p = this.position;
-        let upToDatePosition = new Vector3(p[0], p[1], p[2]); // "up-to-date" server position
+        let upToDatePosition = new Vector3(p.x, p.y, p.z); // "up-to-date" server position
         const updateTime = this.getTime();
         // const deltaClient = updateTime - this.lastClientUpdateTime;
-        this.lastClientUpdateTime = updateTime;
+        // this.lastClientUpdateTime = updateTime;
 
         if (current.distanceTo(upToDatePosition) > 0) {
             // changed!
@@ -99,6 +101,7 @@ extend(SelfModel.prototype, {
         //     this.lastInterpolatingPosition.copy(this.interpolatingPosition);
         else if (this.interpolatingPosition.distanceTo(current) > 0) {
             this.setLerp(current.x, current.y, current.z);
+            this.interpolationUpToDate = true;
             // }
             // Correction goes there (go back to the last updated)
             // const tdt = (t - 2 * deltaServer) / deltaServer;
@@ -127,7 +130,6 @@ extend(SelfModel.prototype, {
         const id = this.entityId;
 
         let p = avatar.position;
-        p.copy(newP);
 
         // Notify modules.
         register.updateSelfState({ position: [p.x, p.y, p.z] });
@@ -139,6 +141,7 @@ extend(SelfModel.prototype, {
             // TODO cleanup animation part
             // graphics.updateAnimation('yumi');
         }
+        p.copy(newP);
 
         // Update camera.
         clientModel.pushForLaterUpdate('camera-position', p);
@@ -209,7 +212,8 @@ extend(SelfModel.prototype, {
 
     refresh()
     {
-        this.interpolatePredictSelfPosition();
+        if (!this.interpolationUpToDate)
+            this.interpolatePredictSelfPosition();
         if (!this.needsUpdate) return;
 
         let avatar = this.avatar;
@@ -255,9 +259,10 @@ extend(SelfModel.prototype, {
             pos[0] !== p[0] || pos[1] !== p[1] || pos[2] !== p[2] ||
             rot[0] !== r[0] || rot[1] !== r[1])
         {
-            this.position = p;
+            this.position.set(p[0], p[1], p[2]);
             this.rotation = r;
             this.needsUpdate = true;
+            this.interpolationUpToDate = false;
         }
 
         if (!wid || wid !== w) {
@@ -349,7 +354,7 @@ extend(SelfModel.prototype, {
         this.oldWorldId = null;
 
         // Model component.
-        this.position = [0, 0, 0];
+        this.position = new Vector3(0, 0, 0);
         this.rotation = [0, 0, 0];
         this.inventoryModel.reset();
 

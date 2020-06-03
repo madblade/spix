@@ -8,7 +8,8 @@ import extend           from '../../../extend.js';
 
 import { PlayerModule } from './player.js';
 
-let EntityModel = function(app) {
+let EntityModel = function(app)
+{
     this.app = app;
 
     // Model component
@@ -25,6 +26,33 @@ extend(EntityModel.prototype, PlayerModule);
 extend(EntityModel.prototype, {
 
     init() {},
+
+    interpolatePredictEntities() {
+    },
+
+    interpolatePredictEntity() {
+    },
+
+    cerp(a, b, c, d, t)
+    {
+        const m0 = a ? [c[0] - a[0], c[1] - a[1], c[2] - a[2]] : [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
+        const m1 = d ? [d[0] - b[0], d[1] - b[1], d[2] - b[2]] : [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
+        return this.catmull(b, c, m0, m1, t);
+    },
+
+    catmull(p0, p1, m0, m1, t)
+    {
+        const t2 = t * t;
+        const a = 1 + t2 * (2 * t - 3);
+        const b = t * (1 + t2 * (t - 2));
+        const c = t2 * (3 - 2 * t);
+        const d = t2 * (t - 1);
+        return [
+            a * p0[0] + b * m0[0] + c * p1[0] + d * m1[0],
+            a * p0[1] + b * m0[1] + c * p1[1] + d * m1[1],
+            a * p0[2] + b * m0[2] + c * p1[2] + d * m1[2],
+        ];
+    },
 
     addEntity(id, updatedEntity, graphics, entities) {
         this.entitiesLoading.add(id);
@@ -50,9 +78,6 @@ extend(EntityModel.prototype, {
             graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
         }
         entities.delete(id);
-    },
-
-    interpolatePredictEntity() {
     },
 
     // TODO [HIGH] an entity model...
@@ -89,7 +114,8 @@ extend(EntityModel.prototype, {
         entities.set(id, currentEntity);
     },
 
-    refresh() {
+    refresh()
+    {
         if (!this.needsUpdate) return;
         let graphics = this.app.engine.graphics;
 
@@ -117,7 +143,8 @@ extend(EntityModel.prototype, {
         this.needsUpdate = false;
     },
 
-    updateEntities(entities) {
+    updateEntities(entities)
+    {
         if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
 
         let pushes = this.entitiesOutdated;

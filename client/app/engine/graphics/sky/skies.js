@@ -230,7 +230,7 @@ let SkyModule = {
         // This accounts for skybox translations in sky shaders.
         let p = this.app.model.server.selfModel.position;
         if (!p) return;
-        sky.position.set(p[0], p[1], p[2]);
+        sky.position.copy(p);
         sky.updateMatrix();
 
         // Update lights

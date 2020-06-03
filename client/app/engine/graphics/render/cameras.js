@@ -166,7 +166,8 @@ extend(CameraManager.prototype, {
     },
 
     // Update.
-    updateCameraPosition(vector) {
+    updateCameraPosition(vector)
+    {
         let sin = Math.sin;
         let cos = Math.cos;
         // let PI = Math.PI;
