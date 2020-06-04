@@ -14,7 +14,8 @@ let RTCPeerConnection = window.RTCPeerConnection;
 let RTCSessionDescription = window.RTCSessionDescription;
 // || window.mozRTCSessionDescription;
 
-let RTCService = function(app) {
+let RTCService = function(app)
+{
     this.app = app;
 
     this.outboundConnection = null;
@@ -50,12 +51,14 @@ let RTCService = function(app) {
 extend(RTCService.prototype, {
 
     // Create client connection from server offer
-    createClientConnection(mainMenuState) {
+    createClientConnection(mainMenuState)
+    {
         this.outboundConnection = new RTCPeerConnection(this.cfg);
         let connection = this.outboundConnection;
         let rtc = this;
 
-        connection.ondatachannel = function(e) {
+        connection.ondatachannel = function(e)
+        {
             let dataChannel = e.channel;
             let rtcSocket = new RTCSocket(dataChannel, connection);
 
@@ -69,9 +72,10 @@ extend(RTCService.prototype, {
             //     console.log(data.message);
             // };
 
-            let probremCallback = function() {
+            let probremCallback = function()
+            {
                 console.log('[RTC] Error or disconnected.');
-                // TODO notify disconnection on ingame state.
+                // TODO [HUD] notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             };
             dataChannel.onclose = probremCallback;
@@ -79,13 +83,15 @@ extend(RTCService.prototype, {
             dataChannel.onerror = probremCallback;
         };
 
-        connection.onicecandidate = function(e) {
+        connection.onicecandidate = function(e)
+        {
             if (e.candidate) return;
             rtc.answer = JSON.stringify(connection.localDescription);
             mainMenuState.answerSent(rtc.answer);
         };
 
-        connection.oniceconnectionstatechange = function() {
+        connection.oniceconnectionstatechange = function()
+        {
             console.log(`[RTC] ICE connection state: ${connection.iceConnectionState}`);
             let status = connection.iceConnectionState;
             if (status === 'failed') {
@@ -94,7 +100,7 @@ extend(RTCService.prototype, {
             } else if (status === 'checking' || status === 'connected') {
                 mainMenuState.notifyServerChecking();
             } else if (status === 'disconnected') {
-                // TODO notify disconnection on ingame state.
+                // TODO [HUD] notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             }
         };
@@ -104,7 +110,8 @@ extend(RTCService.prototype, {
         // };
     },
 
-    createClientAnswer(offer) {
+    createClientAnswer(offer)
+    {
         let connection = this.outboundConnection;
         let offerDesc = new RTCSessionDescription(JSON.parse(offer));
         connection.setRemoteDescription(offerDesc);
@@ -116,7 +123,8 @@ extend(RTCService.prototype, {
     },
 
     // Create server slot and offer
-    addServerSlot(userID, mainMenuState, restart) {
+    addServerSlot(userID, mainMenuState, restart)
+    {
         let newConnection = new RTCPeerConnection(this.cfg);
         newConnection.onicecandidate = e => {
             if (e.candidate) return;
@@ -127,7 +135,8 @@ extend(RTCService.prototype, {
         // console.log(e);
         // };
         let rtcService = this;
-        newConnection.oniceconnectionstatechange = function() {
+        newConnection.oniceconnectionstatechange = function()
+        {
             console.log(`[RTC] ICE connection state: ${newConnection.iceConnectionState}`);
             let status = newConnection.iceConnectionState;
             if (status === 'failed') {
@@ -178,7 +187,8 @@ extend(RTCService.prototype, {
         //     console.log(data.message);
         // };
 
-        let probremCallback = function() {
+        let probremCallback = function()
+        {
             console.log('[RTC] Error or disconnected.');
             mainMenuState.notifyUserDisconnected(userID, rtcSocket);
         };
@@ -187,12 +197,14 @@ extend(RTCService.prototype, {
         newChannel.onerror = probremCallback;
     },
 
-    acceptInboundConnection(inboundConnection, answer) {
+    acceptInboundConnection(inboundConnection, answer)
+    {
         let answerDesc = new RTCSessionDescription(JSON.parse(answer));
         inboundConnection.setRemoteDescription(answerDesc);
     },
 
-    disconnectUser(userID) {
+    disconnectUser(userID)
+    {
         let channel = this.inboundChannels.get(userID);
         let connection = this.inboundConnections.get(userID);
         if (channel) {

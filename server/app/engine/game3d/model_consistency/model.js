@@ -8,7 +8,8 @@ import GeometryUtils    from '../../math/geometry';
 
 class ConsistencyModel
 {
-    constructor(game) {
+    constructor(game)
+    {
         // Model.
         this._worldModel                = game.worldModel;
         this._entityModel               = game.entityModel;
@@ -23,20 +24,22 @@ class ConsistencyModel
         this._partialXs                 = new Map();
     }
 
-    spawnPlayer(player) {
+    spawnPlayer(player)
+    {
         let playerId = parseInt(player.avatar.entityId, 10);
         let chunksMap = new Map();
         chunksMap.set(player.avatar.worldId, new Set());
 
         this._entityIdsForEntity.set(playerId,          new Set());
         this._chunkIdsForEntity.set(playerId,           chunksMap);
-        this._chunkIdAndPartsForEntity.set(playerId,    new Map()); // TODO [LOW] think
+        this._chunkIdAndPartsForEntity.set(playerId,    new Map());
 
         this._xIdsForEntity.set(playerId,               new Set());
         this._partialXs.set(playerId,                   new Set());
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId)
+    {
         playerId = parseInt(playerId, 10);
         this._entityIdsForEntity.delete(playerId);
         this._chunkIdsForEntity.delete(playerId);
@@ -48,13 +51,15 @@ class ConsistencyModel
 
     /** Entity to chunks **/
 
-    chunkIdsPerWorldForEntity(playerId) {
+    chunkIdsPerWorldForEntity(playerId)
+    {
         playerId = parseInt(playerId, 10);
 
         return this._chunkIdsForEntity.get(playerId);
     }
 
-    hasWorld(playerId, worldId) {
+    hasWorld(playerId, worldId)
+    {
         playerId = parseInt(playerId, 10);
         worldId = parseInt(worldId, 10);
 
@@ -62,7 +67,8 @@ class ConsistencyModel
         return chunkIdsForEntity && chunkIdsForEntity.has(worldId);
     }
 
-    hasChunk(playerId, worldId, chunkId) {
+    hasChunk(playerId, worldId, chunkId)
+    {
         playerId = parseInt(playerId, 10);
         worldId = parseInt(worldId, 10);
 
@@ -70,7 +76,8 @@ class ConsistencyModel
         return chunkIdsForEntityInWorld && chunkIdsForEntityInWorld.has(chunkId);
     }
 
-    setChunkLoaded(playerId, worldId, chunkId) {
+    setChunkLoaded(playerId, worldId, chunkId)
+    {
         // Just in case.
         playerId = parseInt(playerId, 10);
         worldId = parseInt(worldId, 10);
@@ -85,7 +92,8 @@ class ConsistencyModel
         }
     }
 
-    setChunkOutOfRange(playerId, worldId, chunkId) {
+    setChunkOutOfRange(playerId, worldId, chunkId)
+    {
         playerId = parseInt(playerId, 10);
         worldId = parseInt(worldId, 10);
 
@@ -96,14 +104,14 @@ class ConsistencyModel
         }
     }
 
-    doneChunkLoadingPhase(player, starterChunk) {
+    doneChunkLoadingPhase(player, starterChunk)
+    {
         let avatar = player.avatar;
         let renderDistance = avatar.chunkRenderDistance;
         let worldId = avatar.worldId;
 
         let side = renderDistance * 2 + 1;
 
-        // TODO [LOW] worldify
         // This only counts loaded chunks in the current world
         // which is fine so far.
         let aid = avatar.entityId;
@@ -133,53 +141,62 @@ class ConsistencyModel
 
     /** Entity to entities **/
 
-    // TODO [CRIT] worldify entities
-    hasEntity(playerId, entityId) {
+    hasEntity(playerId, entityId)
+    {
         return this._entityIdsForEntity.get(playerId).has(entityId);
     }
 
-    setEntityLoaded(playerId, entityId) {
+    setEntityLoaded(playerId, entityId)
+    {
         this._entityIdsForEntity.get(playerId).add(entityId);
     }
 
-    setEntityOutOfRange(playerId, entityId) {
+    setEntityOutOfRange(playerId, entityId)
+    {
         this._entityIdsForEntity.get(playerId).delete(entityId);
     }
 
     /** Entity to xs **/
 
-    getXIdsForEntity(entityId) {
+    getXIdsForEntity(entityId)
+    {
         return this._xIdsForEntity.get(entityId);
     }
 
     // Note: it would not have been wise to consider an x as an 'entity'.
     // ENHANCEMENT [LONG-TERM]: can an x move over time?
-    hasX(playerId, xId) {
+    hasX(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         return this._xIdsForEntity.get(playerId).has(xId);
     }
 
-    setXLoaded(playerId, xId) {
+    setXLoaded(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         this._xIdsForEntity.get(playerId).add(xId);
     }
 
-    setXOutOfRange(playerId, xId) {
+    setXOutOfRange(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         this._xIdsForEntity.get(playerId).delete(xId);
     }
 
-    setPartialX(playerId, xId) {
+    setPartialX(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         this._partialXs.get(playerId).add(xId);
     }
 
-    unsetPartialX(playerId, xId) {
+    unsetPartialX(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         this._partialXs.get(playerId).delete(xId);
     }
 
-    isPartialX(playerId, xId) {
+    isPartialX(playerId, xId)
+    {
         xId = parseInt(xId, 10);
         let p = this._partialXs.get(playerId);
         if (!p) return false;

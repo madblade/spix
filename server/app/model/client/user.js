@@ -8,7 +8,8 @@ import Factory from './../factory';
 
 class User
 {
-    constructor(hub, socket, nick, id) {
+    constructor(hub, socket, nick, id)
+    {
         // Model
         this._hub = hub;
         this._userConnection = Factory.createUserConnection(this, socket);
@@ -32,17 +33,20 @@ class User
     set ingame(value) { if (value) this._ingame = value; }
 
     // Send a message to this user through its UserConnection.
-    send(kind, data) {
+    send(kind, data)
+    {
         this._userConnection.send(kind, data);
     }
 
     // Requests the hub to create a new gaming pool.
-    requestNewGame(kind, options) {
+    requestNewGame(kind, options)
+    {
         return this._hub.requestNewGame(this, kind, options);
     }
 
     // Join a specific game.
-    join(kind, gameId) {
+    join(kind, gameId)
+    {
         gameId = parseInt(gameId, 10);
 
         this._ingame = true;
@@ -55,7 +59,7 @@ class User
 
         // Check if the game already contains a player with the same socket
         if (game.hasPlayerForSocket(this._userConnection.socket)) return true;
-        // TODO consistency for Terrain and Entity and X update on spawn / respawn / rejoin.
+        // TODO [IO] consistency for Terrain and Entity and X update on spawn / respawn / rejoin.
 
         // Create a player associated to this game and spawn it
         let player = Factory.createPlayer(this, game);
@@ -64,7 +68,8 @@ class User
         return true;
     }
 
-    fetchHubState() {
+    fetchHubState()
+    {
         let games = this._hub.listGames();
         if (Object.keys(games).length < 1) {
             this._userConnection.send('hub', JSON.stringify(games));
@@ -80,7 +85,8 @@ class User
     }
 
     // Leave all games (current game). Stay idle.
-    leave() {
+    leave()
+    {
         console.log('USER LEFT');
         this._ingame = false;
         if (this._player) {
@@ -92,19 +98,22 @@ class User
         this.listen();
     }
 
-    listen() {
+    listen()
+    {
         this._userConnection.listen();
     }
 
     // Disconnect from ingame socket. Stay inside game model.
     // Maybe the connection will come back.
-    disconnect() {
+    disconnect()
+    {
         // Do not destroy player (account for unexpected disconnections)
         if (this._player) this._player.disconnect();
     }
 
     // Clean references.
-    destroy() {
+    destroy()
+    {
         this._userConnection.destroy();
         // Do not destroy player before its game ends.
         // Useful for user reconnection...

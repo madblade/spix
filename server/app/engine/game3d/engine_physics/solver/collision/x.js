@@ -11,14 +11,15 @@ class XCollider
         if (!xs || xs.size < 1) return;
 
         let portals = xModel.portals;
-        // TODO [MEDIUM] collide with head instead of entity center.
+        // TODO [PORTAL] collide with head instead of entity center.
         const op = oldPosition;
         const np = newPosition;
 
         let arr = [];
         xs.forEach(xId => arr.push(xId));
 
-        for (let i = 0, l = arr.length; i < l; ++i) {
+        for (let i = 0, l = arr.length; i < l; ++i)
+        {
             let xId = arr[i];
             let portal = portals.get(xId);
 
@@ -117,7 +118,7 @@ class XCollider
             }
 
             // Big portals
-            // TODO [LOW] Manage.
+            // [PORTAL] Think about very big portals.
             else if (sum === 1)
             {
                 let axis = x1 === x0 ? 'x' : y1 === y0 ? 'y' : z1 === z0 ? 'z' : '?';
@@ -135,7 +136,7 @@ class XCollider
                             opz + .5 > fz0 && opz + .5 < fz1 && npz + .5 > fz0 && npz + .5 < fz1)
                         {
                             // Do collide & change world
-                            // TODO [HIGH] Manage collisions with things on the other side.
+                            // TODO [PORTAL] Manage collisions with things on the other side.
                             return xModel.getOtherSide(xId);
                         }
                         break;

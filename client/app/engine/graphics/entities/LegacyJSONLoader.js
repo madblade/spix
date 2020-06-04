@@ -410,8 +410,9 @@ Object.assign(LegacyJSONLoader.prototype, {
             }
 
             // parse implicit morph animations
-            if (geometry.morphTargets) {
-                // TODO: Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
+            if (geometry.morphTargets)
+            {
+                // TODO [ANIMATION] Figure out what an appropraite FPS is for morph target animations -- defaulting to 10, but really it is completely arbitrary.
                 var morphAnimationClips = AnimationClip.CreateClipsFromMorphTargetSequences(geometry.morphTargets, 10);
                 outputAnimations = outputAnimations.concat(morphAnimationClips);
             }

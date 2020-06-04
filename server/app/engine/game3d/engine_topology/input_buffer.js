@@ -7,19 +7,23 @@
 
 class InputBuffer
 {
-    constructor() {
+    constructor()
+    {
         this._buffer = [];
     }
 
-    addInput(avatar, meta) {
+    addInput(avatar, meta)
+    {
         this._buffer.push([avatar, meta]);
     }
 
-    getInput() {
+    getInput()
+    {
         return this._buffer;
     }
 
-    flush() {
+    flush()
+    {
         this._buffer = [];
     }
 }

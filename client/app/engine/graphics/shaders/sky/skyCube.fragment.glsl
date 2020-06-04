@@ -66,9 +66,9 @@ vec3 Uncharted2Tonemap( vec3 x ) {
 }
 
 const float e = 2.71828182845904523536028747135266249775724709369995957;
-const float cutoffAngle = 1.6110731556870734; // TODO hack
-const float steepness = 2.5; // TODO hack
-const float EE = 10000.0; // TODO hack
+const float cutoffAngle = 1.6110731556870734; // HERE hack
+const float steepness = 2.5; // HERE hack
+const float EE = 10000.0; // HERE hack
 float sunIntensity(float zenithAngleCos) {
     zenithAngleCos = clamp(zenithAngleCos, -1.0, 1.0);
     return EE * max(0.0, 1.0 - pow(abs(e), -((cutoffAngle - acos(zenithAngleCos)) / steepness)));
@@ -272,7 +272,7 @@ void main()
     float ceiler = 1.0 / (1.0 - start);
     float agreement = (dotEV - start) * ceiler;
     if (dotEV > start) {
-        float increaseMe = 20.0; // TODO tweak (200 was default without terrain)
+        float increaseMe = 20.0; // HERE tweak (200 was default without terrain)
             // increase this to limit the range for interpolation
             // (causes sharper edges at cube vertices)
         interpolatorFactor = 0.5 * pow(abs(agreement), increaseMe);
@@ -302,7 +302,7 @@ void main()
     }
 
     // Change this coefficient for the sky gradient: 1.0 = sharp, 0.001 = smooth.
-    float smoothCoefficient = 0.01; // TODO tweak (0.02 was default without terrain)
+    float smoothCoefficient = 0.01; // HERE tweak (0.02 was default without terrain)
     vec3 nup = diff * smoothCoefficient;
 
     // XXX check if needed to hack sun intensity from intersection (2019-03[madblade]: low priority)
@@ -313,7 +313,7 @@ void main()
     // optical length
     // cutoff angle at 90 to avoid singularity in next formula.
     // XXX zenith angle coefficient should be interpolated (2019-03[madblade]: huh?)
-    float coeff = 50.0; // TODO tweak
+    float coeff = 50.0; // HERE tweak
     float dotUpDelta = coeff * dot(nup, deltaWorldCamera);
     float cutoff = max(0.0, dotUpDelta);
     //	float zenithAngle = acos(cutoff);

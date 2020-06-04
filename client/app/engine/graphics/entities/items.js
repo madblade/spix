@@ -12,11 +12,13 @@ import {
 
 let ItemsGraphicsModule = {
 
-    loadItems(callback) {
+    loadItems(callback)
+    {
         this.loadItemMesh('portal-gun', callback);
     },
 
-    loadItemMesh(modelPath, callback, errorCallback) {
+    loadItemMesh(modelPath, callback, errorCallback)
+    {
         if (modelPath !== 'portal-gun' &&
             modelPath !== 'yumi-morph' &&
             modelPath !== 'yari' &&
@@ -68,7 +70,7 @@ let ItemsGraphicsModule = {
         mixer.clipAction(clip)
             .setDuration(1)
             .play();
-        this.mixers.set('yumi', mixer); // TODO review
+        this.mixers.set('yumi', mixer); // TODO [ANIMATION] wire animation
 
         // Color mesh
         let g = object.geometry;
@@ -78,7 +80,8 @@ let ItemsGraphicsModule = {
             new BufferAttribute(new Float32Array(count * 3), 3)
         );
         let colors = g.attributes.color;
-        for (let i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i)
+        {
             let x; let y; let z;
             let yCoord = p.getY(i);
             if (Math.abs(yCoord - 5.85) < .3 ||
@@ -119,7 +122,8 @@ let ItemsGraphicsModule = {
             new BufferAttribute(new Float32Array(count * 3), 3)
         );
         let colors = g.attributes.color;
-        for (let i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i)
+        {
             let x; let y; let z;
             let xCoord = p.getX(i); let yCoord = p.getY(i);
             if (xCoord < -15.4) {
@@ -138,7 +142,8 @@ let ItemsGraphicsModule = {
         callback(wrapper);
     },
 
-    _resetMaterial(object) {
+    _resetMaterial(object)
+    {
         object.material = new MeshPhongMaterial({
             color: 0x707070,
             shininess: 1000,
@@ -151,7 +156,9 @@ let ItemsGraphicsModule = {
             new BufferAttribute(new Float32Array(count * 3), 3)
         );
     },
-    _packObject(object) {
+
+    _packObject(object)
+    {
         // Think about setting roughness
         object.rotation.reorder('ZYX');
         let sc = object.scale; let f = 0.4;
@@ -177,7 +184,8 @@ let ItemsGraphicsModule = {
         let p = g.attributes.position;
         let count = p.count;
         let colors = g.attributes.color;
-        for (let i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i)
+        {
             let x; let y; let z;
             let xCoord = p.getX(i); let yCoord = p.getY(i); let zCoord = p.getZ(i);
             if (xCoord < ringTop) {
@@ -202,7 +210,8 @@ let ItemsGraphicsModule = {
         callback(wrapper);
     },
 
-    finalizeYariPackMesh(gltf, callback) {
+    finalizeYariPackMesh(gltf, callback)
+    {
         this.finalizeKatanaTypePackMesh(gltf,
             -9.7, 61, 31, 0,
             -15.7,
@@ -211,7 +220,8 @@ let ItemsGraphicsModule = {
             callback);
     },
 
-    finalizeNodachiPackMesh(gltf, callback) {
+    finalizeNodachiPackMesh(gltf, callback)
+    {
         this.finalizeKatanaTypePackMesh(gltf,
             -1.3, 61, 31, 0,
             -1.975,
@@ -220,7 +230,8 @@ let ItemsGraphicsModule = {
             callback);
     },
 
-    finalizeNaginataPackMesh(gltf, callback) {
+    finalizeNaginataPackMesh(gltf, callback)
+    {
         this.finalizeKatanaTypePackMesh(gltf,
             -7.8, 61, 31, 0,
             -8.47,
@@ -229,7 +240,8 @@ let ItemsGraphicsModule = {
             callback);
     },
 
-    finalizeNagamakiPackMesh(gltf, callback) {
+    finalizeNagamakiPackMesh(gltf, callback)
+    {
         this.finalizeKatanaTypePackMesh(gltf,
             -2.4, 61, 31, 0,
             -3.052,
@@ -238,7 +250,8 @@ let ItemsGraphicsModule = {
             callback);
     },
 
-    finalizeKatanaPackMesh(gltf, callback) {
+    finalizeKatanaPackMesh(gltf, callback)
+    {
         this.finalizeKatanaTypePackMesh(gltf,
             -1.3, 0, 0, 0,
             -1.975, 0.7, 0.09,
@@ -249,7 +262,8 @@ let ItemsGraphicsModule = {
     /**
      * @deprecated
      */
-    finalizeKatanaMesh(gltf, callback) {
+    finalizeKatanaMesh(gltf, callback)
+    {
         let object = gltf.scene.children[0];
         console.log(object);
         // let m = object.material.map;
@@ -305,8 +319,9 @@ let ItemsGraphicsModule = {
         callback(wrapper);
     },
 
-    // TODO make it one mesh
-    finalizePortalMesh(gltf, callback) {
+    // [OPT] make it a single mesh
+    finalizePortalMesh(gltf, callback)
+    {
         let object = gltf.scene.children[0]; // portal gun
         object.scale.set(0.08, 0.08, 0.08);
         object.rotation.set(0, Math.PI, 0);
@@ -328,7 +343,8 @@ let ItemsGraphicsModule = {
     },
 
     // For composite entities, wrap heavy model parts in higher level structure.
-    finalizeModelMesh() {
+    finalizeModelMesh()
+    {
         // First ey;
     }
 

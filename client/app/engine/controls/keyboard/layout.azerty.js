@@ -6,7 +6,8 @@
 
 let LayoutAZERTY = {
 
-    getAZERTY() {
+    getAZERTY()
+    {
         return Object.freeze({
             // Arrow directional controls.
             arrowUp: 38,

@@ -6,7 +6,8 @@
 
 class AI
 {
-    constructor(game) {
+    constructor(game)
+    {
         this._entityModel   = game.entityModel;
         this._worldModel    = game.worldModel;
         this._xModel        = game.xModel;

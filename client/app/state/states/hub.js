@@ -7,7 +7,8 @@
 import extend               from '../../extend.js';
 import { $ }                from '../../modules/polyfills/dom.js';
 
-let HubState = function(stateManager) {
+let HubState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'hub';
 
@@ -74,7 +75,7 @@ let HubState = function(stateManager) {
         </div>
 
         <!-- Unstructured world -->
-        <!-- TODO triangulation model, graphics, update and netcode -->
+        <!-- Here goes a triangulation model, graphics, update and netcode -->
         <!-- <div class="input-group">-->
         <!--     <div class="input-group-prepend mb-1 flex-fill">-->
         <!--         <span class="input-group-text flex-fill">Unstructured / Simplex World</span>-->
@@ -101,7 +102,7 @@ let HubState = function(stateManager) {
         </div>
 
         <!-- Load world -->
-        <!-- TODO save and import functions server-wise -->
+        <!-- Here goes save and import functions server-wise -->
         <div class="input-group">
             <div class="input-group-prepend mb-1 flex-fill">
                 <span class="input-group-text flex-fill">Import World (coming soon)</span>
@@ -131,11 +132,13 @@ let HubState = function(stateManager) {
 
 extend(HubState.prototype, {
 
-    getCommandsHTML() {
+    getCommandsHTML()
+    {
         return this.htmlControls;
     },
 
-    getInstancesHTMLContainer(map) {
+    getInstancesHTMLContainer(map)
+    {
         return `
             <div class="container" id="game-instances-table">
                 ${this.getInstancesHTMLTable(map)}
@@ -143,7 +146,8 @@ extend(HubState.prototype, {
         `;
     },
 
-    getInstancesHTMLTable(map) {
+    getInstancesHTMLTable(map)
+    {
         let content = `
             <table class="table table-bordered noselect"
             style="width:100%">`;
@@ -163,14 +167,16 @@ extend(HubState.prototype, {
     },
 
     // Consider using this for faster hub state update.
-    updateInstances(newMap) {
+    updateInstances(newMap)
+    {
         this.stopTableListeners();
         let container = $('#game-instances-table');
         container.html(this.getInstancesHTMLTable(newMap));
         this.startTableListeners();
     },
 
-    start(map) {
+    start(map)
+    {
         // Add content then fade in.
         let hub = $('#announce');
         hub.empty()
@@ -188,7 +194,8 @@ extend(HubState.prototype, {
         this.startListeners();
     },
 
-    startTableListeners() {
+    startTableListeners()
+    {
         let app = this.stateManager.app;
 
         $('tr').click(function() {
@@ -207,7 +214,8 @@ extend(HubState.prototype, {
         });
     },
 
-    startListeners() {
+    startListeners()
+    {
         let app = this.stateManager.app;
 
         this.startTableListeners();
@@ -250,11 +258,13 @@ extend(HubState.prototype, {
         // $('#button-create-unstructured-game').click(function() {});
     },
 
-    stopTableListeners() {
+    stopTableListeners()
+    {
         $('tr').off('click');
     },
 
-    stopListeners() {
+    stopListeners()
+    {
         this.stopTableListeners();
         $('#button-create-cube-game').off('click');
         $('#button-create-flat-game').off('click');
@@ -262,7 +272,8 @@ extend(HubState.prototype, {
         $('#button-return-main').off('click');
     },
 
-    end() {
+    end()
+    {
         // Remove jQuery listeners.
         this.stopListeners();
 

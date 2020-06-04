@@ -12,13 +12,15 @@ class RigidBodiesPhase2
         let numberOfEntities = leapfrogArray.length;
         let islandIndex = 0;
         oxToIslandIndex.fill(-2); // -2 unaffected, -1 isolated, 0+ index of island
-        for (let i = 0; i < numberOfEntities; ++i) {
+        for (let i = 0; i < numberOfEntities; ++i)
+        {
             let xIndex = leapfrogArray[i][3];
             let inheritedIslandIndex = oxToIslandIndex[xIndex];
             let newIsland = searcher.computeIsland(leapfrogArray, i);
             let il = newIsland.length;
 
-            if (inheritedIslandIndex !== -2) {
+            if (inheritedIslandIndex !== -2)
+            {
                 if (inheritedIslandIndex === -1)
                     throw Error('[RigidBodies] @ islands: I think ' +
                         'no item present in an 1-island should be rediscovered ' +
@@ -44,7 +46,8 @@ class RigidBodiesPhase2
                         break;
                 }
             }
-            else {
+            else
+            {
                 switch (il) {
                     case 0:
                         // console.error('[RigidBodies] got a 0-length island.');
@@ -126,7 +129,8 @@ class RigidBodiesPhase2
         oxAxis, entities, world
     )
     {
-        for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi) {
+        for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
+        {
             let currentObject = oxAxis[oi];
             if (!currentObject || currentObject.kind !== 'e') continue;
 

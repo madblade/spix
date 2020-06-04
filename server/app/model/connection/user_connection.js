@@ -6,7 +6,8 @@
 
 class UserConnection
 {
-    constructor(user, socket) {
+    constructor(user, socket)
+    {
         this._user = user;
         this._socket = socket;
 
@@ -17,18 +18,21 @@ class UserConnection
     get user() { return this._user; }
     set user(user) { this._user = user; }
     get socket() { return this._socket; }
-    set socket(socket) {
+    set socket(socket)
+    {
         this.idle();
         this._socket = socket;
         this.listen();
     }
 
-    send(kind, data) {
+    send(kind, data)
+    {
         this._socket.emit(kind, data);
     }
 
     // Game & hub management.
-    listen() {
+    listen()
+    {
         // Use a unique channel for util functions
         // Actions are specified within the data
         this._socket.on('util', this.onUserRequest.bind(this));
@@ -36,7 +40,8 @@ class UserConnection
 
     // Drawback: switch potentially evaluates all statements
     // Advantage: does not load the socket with many listeners
-    onUserRequest(data) {
+    onUserRequest(data)
+    {
         switch (data.request)
         {
             // A user can ask the hub for a new game to be created.
@@ -64,28 +69,33 @@ class UserConnection
         }
     }
 
-    handleCreateGame(kind, options) {
+    handleCreateGame(kind, options)
+    {
         const created = this._user.requestNewGame(kind, options);
         if (created) console.log('Created new game.');
         return created;
     }
 
-    handleJoinGame(data) {
+    handleJoinGame(data)
+    {
         const joined = this._user.join(data.gameType, data.gameId);
         if (joined) this.send('joined', 'foo');
         return joined;
     }
 
-    handleGetHubState() {
+    handleGetHubState()
+    {
         this._user.fetchHubState();
     }
 
-    idle() {
+    idle()
+    {
         this._socket.off('util', this.onUserRequest.bind(this));
     }
 
     // Clean references.
-    destroy() {
+    destroy()
+    {
         this.idle();
         delete this._user;
         delete this._socket;

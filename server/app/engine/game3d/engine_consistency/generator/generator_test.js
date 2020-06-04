@@ -6,7 +6,8 @@
 
 class Test
 {
-    static testMerge(chunk) {
+    static testMerge(chunk)
+    {
         const dx = chunk.dimensions[0];
         const dy = chunk.dimensions[1];
         const ijS = dx * dy;
@@ -43,7 +44,8 @@ class Test
         chunk.blocks = blocks;
     }
 
-    static testChunk(chunk) {
+    static testChunk(chunk)
+    {
         const dx = chunk.dimensions[0];
         const dy = chunk.dimensions[1];
         const ijS = dx * dy;

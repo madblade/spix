@@ -6,13 +6,15 @@
 
 class XUpdater
 {
-    constructor(consistencyEngine) {
+    constructor(consistencyEngine)
+    {
         this._worldModel = consistencyEngine.worldModel;
         this._xModel = consistencyEngine.xModel;
         this._consistencyModel = consistencyEngine.consistencyModel;
     }
 
-    update(avatar, data) {
+    update(avatar, data)
+    {
         // let worldModel = this._worldModel;
         let xModel = this._xModel;
         // let consistencyModel = this._consistencyModel;
@@ -26,7 +28,8 @@ class XUpdater
         let y1 = parseInt(meta[2], 10);
         let z1 = parseInt(meta[3], 10);
 
-        if (meta[0] === 'add') {
+        if (meta[0] === 'add')
+        {
             let x2 = parseInt(meta[4], 10);
             let y2 = parseInt(meta[5], 10);
             let z2 = parseInt(meta[6], 10);

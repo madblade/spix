@@ -1,5 +1,6 @@
 
-let WaterManager = function(graphicsEngine) {
+let WaterManager = function(graphicsEngine)
+{
     this.graphics = graphicsEngine;
 };
 

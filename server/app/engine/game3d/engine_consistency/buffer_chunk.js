@@ -6,7 +6,8 @@
 
 class ChunkBuffer
 {
-    constructor() {
+    constructor()
+    {
         this._outputBuffer = new Map();
     }
 
@@ -14,12 +15,17 @@ class ChunkBuffer
     //     on the first: world metadata (type, radius, center.xyz)
     // removedChunks:   world id => chunk id => null
     // updatedChunks:   (topologyEngine)
-    updateChunksForPlayer(playerId, addedChunks, removedChunks, addedWorlds, addedWorldsMeta) {
+    updateChunksForPlayer(
+        playerId,
+        addedChunks, removedChunks, addedWorlds, addedWorldsMeta
+    )
+    {
         // Check.
         if (!addedChunks && !removedChunks) return;
 
         // Aggregate.
-        if (addedChunks && removedChunks) {
+        if (addedChunks && removedChunks)
+        {
             for (let propA in addedChunks) {
                 if (propA in removedChunks) {
                     Object.assign(addedChunks[propA], removedChunks[propA]); // Not the same cid to add & delete.
@@ -40,12 +46,14 @@ class ChunkBuffer
     }
 
     // Shallow.
-    getOutput() {
-        // TODO [OPT] remove copy
+    getOutput()
+    {
+        // TODO [PERF] remove copy
         return new Map(this._outputBuffer);
     }
 
-    flush() {
+    flush()
+    {
         this._outputBuffer = new Map();
     }
 }

@@ -322,7 +322,7 @@ extend(XGraph.prototype, {
             // let thetaP1 = destinationPortal.tempOrientation;
             // let portalRelativeOrientation = [o1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
 
-            // TODO [CRIT] compute chain transformation.
+            // TODO [PORTAL] compute chain transformation.
             console.log(destinationPortalId);
             console.log(destinationPortal.tempPosition);
             console.log(destinationPortal.tempOrientation);
@@ -500,7 +500,7 @@ extend(XGraph.prototype, {
 
                 currentStep.depth = currentDepth;
                 //if (currentOtherEnd)
-                // TODO [HIGH] check. I guess an arc has always a parent and a child.
+                // TODO [PORTAL] check. I guess an arc has always a parent and a child.
                 currentStep.origin = currentOtherEnd.getNodeId();
                 currentStep.destination = currentElementId;
                 currentStep.pid = currentArcId;

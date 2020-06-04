@@ -13,7 +13,8 @@ import { ControlsModule }   from './settings.controls.js';
 import { GraphicsModule }   from './settings.graphics.js';
 import { HomeModule }       from './settings.home.js';
 
-let Settings = function(app) {
+let Settings = function(app)
+{
     this.app = app;
 
     this.listeners = [];
@@ -21,7 +22,8 @@ let Settings = function(app) {
 
 extend(Settings.prototype, {
 
-    run() {
+    run()
+    {
         let app = this.app;
 
         this.controlsEngine =   app.engine.controls;
@@ -43,7 +45,8 @@ extend(Settings.prototype, {
         this.listenHome();
     },
 
-    stop() {
+    stop()
+    {
         // Fade out settings menu.
         this.unlistenSettingsMenu();
         return new Promise(function(resolve) {
@@ -55,7 +58,8 @@ extend(Settings.prototype, {
         });
     },
 
-    unlisten() {
+    unlisten()
+    {
         this.listeners.forEach(function(listener) {
             let element = $(`#${listener}`);
             element.off('click');

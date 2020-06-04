@@ -13,7 +13,8 @@ import { MouseModule }      from './mouse/mouse.js';
 import { TouchModule }      from './touch/touch.js';
 import { WindowModule }     from './window/window.js';
 
-let UI = function(app) {
+let UI = function(app)
+{
     this.app = app;
 
     // User customizable settings.
@@ -30,7 +31,8 @@ let UI = function(app) {
     // Other input methods.
     this.touchControlsEnabled = false;
     this.isTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
-    if (this.isTouch) {
+    if (this.isTouch)
+    {
         this.touch = {
             // Stick states
             leftX: 0, leftY: 0,
@@ -49,10 +51,11 @@ let UI = function(app) {
 
 extend(UI.prototype, {
 
-    run() {
+    run()
+    {
         let graphicsEngine = this.app.engine.graphics;
 
-        // TODO gamepad
+        // TODO [ACCESSIBILITY] gamepad
 
         if (this.isTouch) {
             this.setupTouch();
@@ -62,15 +65,17 @@ extend(UI.prototype, {
         }
         this.setupWindowListeners();
 
-        // TODO manage somewhere else.
+        // Should this be put somewhere else?
         $(window).resize(graphicsEngine.resize.bind(graphicsEngine));
     },
 
-    stop() {
+    stop()
+    {
         this.stopListeners();
     },
 
-    stopListeners() {
+    stopListeners()
+    {
         if (this.isTouch) {
             this.stopTouchListeners();
         } else {
@@ -80,7 +85,8 @@ extend(UI.prototype, {
         this.stopWindowListeners();
     },
 
-    requestLock() {
+    requestLock()
+    {
         if (this.isTouch)
             this.requestTouchLock();
         else

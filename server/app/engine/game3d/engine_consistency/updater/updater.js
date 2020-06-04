@@ -36,11 +36,13 @@ class Updater
 
     static bench = false;
 
-    addInput(meta, avatar) {
+    addInput(meta, avatar)
+    {
         this._inputBuffer.push([avatar, meta]);
     }
 
-    update() {
+    update()
+    {
         // User-send updates (mainly x).
         this.processBuffer();
 
@@ -48,7 +50,8 @@ class Updater
         this.updateConsistency();
     }
 
-    processBuffer() {
+    processBuffer()
+    {
         let buffer = this._inputBuffer;
         let xUpdater = this._xUpdater;
 
@@ -63,12 +66,14 @@ class Updater
     }
 
     // Get X output
-    getOutput() {
+    getOutput()
+    {
         return this._xBuffer.getOutput();
     }
 
     // Flush X OUTPUT (AFTER SEND UPDATER).
-    flushBuffers() {
+    flushBuffers()
+    {
         this._xBuffer.flush();
     }
 
@@ -79,7 +84,8 @@ class Updater
     // Loading and unloading objects is done exclusively here.
     // Single criterion for maintaining loaded objects consistent: distance.
     // (objects are initialized with STATES so they don't need updates)
-    updateConsistency() {
+    updateConsistency()
+    {
         let players = this._game.players;
 
         // Get buffers.
@@ -106,19 +112,17 @@ class Updater
         let t = TimeUtils.getTimeSecNano();
         let dt1;
         let debugThresh = 1000;
-        // TODO [OPT] use arrays
         players.forEach(p => { if (p.avatar)
         {
             let pid = p.avatar.entityId;
 
             // Compute change for entities in range.
-            // TODO [CRIT] heavily optimize by adding data
             let addedEntities;
             let removedEntities;
             let u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
 
             if (u) [addedEntities, removedEntities] = u;
-            // TODO [MEDIUM] filter: updated entities and entities that enter in range.
+            // TODO [PERF] filter: updated entities and entities that enter in range.
 
             dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
             if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
@@ -150,7 +154,8 @@ class Updater
             if (addedX)             forEach(addedX, ax => consistencyModel.setXLoaded(pid, parseInt(ax, 10)));
             if (removedX)           forEach(removedX, ax => consistencyModel.setXOutOfRange(pid, parseInt(ax, 10)));
 
-            if (addedChunks)        {
+            if (addedChunks)
+            {
                 addedW = {};
                 addedWMeta = {};
                 forEach(addedChunks, wid => {
@@ -172,7 +177,7 @@ class Updater
                         consistencyModel.setChunkOutOfRange(pid, parseInt(wid, 10), c));
                 });
 
-            // TODO [OPT] pack everything in just one send
+            // TODO [PERF] pack everything in just one send
             // Update output buffers.
             if (addedChunks || removedChunks)
                 cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW, addedWMeta);

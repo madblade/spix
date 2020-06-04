@@ -7,7 +7,8 @@
 import extend       from '../../../extend.js';
 import { ItemType } from '../../server/self/items';
 
-let SelfComponent = function(clientModel) {
+let SelfComponent = function(clientModel)
+{
     this.clientModel = clientModel;
 
     // Camera.
@@ -17,13 +18,15 @@ let SelfComponent = function(clientModel) {
         /**
          * @deprecated
          */
-        isFirstPerson: function() {
+        isFirstPerson: function()
+        {
             return this._cameraInteraction === 'first-person';
         }.bind(this),
         /**
          * @deprecated
          */
-        isThirdPerson: function() {
+        isThirdPerson: function()
+        {
             return this._cameraInteraction === 'third-person';
         }.bind(this)
     };
@@ -59,41 +62,49 @@ let SelfComponent = function(clientModel) {
 
 extend(SelfComponent.prototype, {
 
-    init() {
+    init()
+    {
         let register = this.clientModel.app.register;
         register.updateSelfState({itemSelected: this.currentItemSlot});
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.quickBar = this.defaultQuickBar.slice();
         this.currentItemSlot = 0;
         this._cameraInteraction = 'first-person';
     },
 
-    getCurrentItemID() {
+    getCurrentItemID()
+    {
         return this.quickBar[this.currentItemSlot];
     },
 
-    setAngleFromIntersectionPoint(angle) {
+    setAngleFromIntersectionPoint(angle)
+    {
         this.angleFromIntersectionPoint = angle;
     },
 
-    getAngleFromIntersectionPoint() {
+    getAngleFromIntersectionPoint()
+    {
         return this.angleFromIntersectionPoint;
     },
 
     /**
      * @deprecated
      */
-    getItemOffset() {
+    getItemOffset()
+    {
         return this._itemOffset;
     },
 
-    triggerChange(type, data) {
+    triggerChange(type, data)
+    {
         this.changes.push([type, data]);
     },
 
-    processChanges() {
+    processChanges()
+    {
         let changes = this.changes;
         if (changes.length < 1) return;
 
@@ -127,7 +138,7 @@ extend(SelfComponent.prototype, {
     processSimpleCameraUpdate()
     {
         let graphicsEngine = this.clientModel.app.engine.graphics;
-        // TODO [LOW] only once per iteration.
+        // TODO [PERF] only once per iteration.
         //console.log('camera autoupdate');
         //graphicsEngine.cameraManager.updateCameraPosition(data);
         graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
@@ -153,7 +164,7 @@ extend(SelfComponent.prototype, {
         else
             this._cameraInteraction = 'first-person';
 
-        // TODO Change held item size and parent mesh.
+        // TODO [GAMEPLAY] Change held item size and parent mesh.
         graphicsEngine.changeAvatarVisibility(display, avatar, worldId);
         graphicsEngine.cameraManager.updateCameraPosition(serverSelfModel.position);
     },
@@ -181,7 +192,6 @@ extend(SelfComponent.prototype, {
 
             this.currentItemSlot = currentItemSlot;
 
-            // TODO graphics change mesh.
             // This short-circuits the normal client-server await cycle
             // because the player could be very fast.
             graphicsEngine.changeHeldItem(

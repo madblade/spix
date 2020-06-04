@@ -17,9 +17,9 @@ let MeshesModule = {
         let itemName = this.getMeshIDFromItemID(itemID);
         if (itemName) { // It’s a handheld item with a specific mesh
             if (itemID === ItemType.PORTAL_GUN_DOUBLE) {
-                // TODO make it purple
+                // TODO [GAMEPLAY] make it purple
             } else if (itemID === ItemType.PORTAL_GUN_SINGLE) {
-                // TODO make it blue and orange
+                // TODO [GAMEPLAY] make it blue and orange
             }
             return this.loadReferenceMeshFromMemory(itemName);
         } else { // It’s probably a block.
@@ -127,7 +127,8 @@ let MeshesModule = {
         return clone;
     },
 
-    createGeometry(whatGeometry) {
+    createGeometry(whatGeometry)
+    {
         let geometry;
 
         switch (whatGeometry) {
@@ -146,7 +147,8 @@ let MeshesModule = {
         return geometry;
     },
 
-    createMesh(geometry, material) {
+    createMesh(geometry, material)
+    {
         return new Mesh(geometry, material);
     }
 

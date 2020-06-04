@@ -23,9 +23,8 @@ class TerrainCollider
      * I know (highly suspect) it can be done way more efficiently.
      * The first thing to optimise is the BSP lookup phase: world.isFree([x, y, z]).
      * Suggestion:
-     * - TODO [OPT] flag empty chunks and full chunks
+     * - TODO [PERF] flag empty chunks and full chunks
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
-     * - TODO [HIGH] investigate acceleration resets (adherence to walls).
      */
     static collideLinear(entity, world, position, newPosition, doProject)
     {
@@ -42,7 +41,8 @@ class TerrainCollider
         let numClamp = TerrainCollider.numericClamp;
         let adx = false; let ady = false; let adz = false;
 
-        if (x0 !== x1) {
+        if (x0 !== x1)
+        {
             let xNetwork = [];
             let xArrival = [];
             for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
@@ -65,23 +65,27 @@ class TerrainCollider
             }
 
             // Do intersect.
-            for (let i = 0; i < xNetwork.length; ++i) {
+            for (let i = 0; i < xNetwork.length; ++i)
+            {
                 let newCrops = xArrival[i];
                 let net = xNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adx = true;
-                    if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon)) {
+                    if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon))
+                    {
                         cropX = numClamp(newCrops[0] - xW);
                     }
-                    else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon)) {
+                    else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon))
+                    {
                         cropX = numClamp(newCrops[0] + xW);
                     }
                 }
             }
         }
 
-        if (y0 !== y1) {
+        if (y0 !== y1)
+        {
             let yNetwork = [];
             let yArrival = [];
             for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
@@ -103,24 +107,28 @@ class TerrainCollider
                 currentX = currentX + 1 > lastX ? lastX : currentX + 1;
             }
             // Do intersect.
-            for (let i = 0; i < yNetwork.length; ++i) {
+            for (let i = 0; i < yNetwork.length; ++i)
+            {
                 let newCrops = yArrival[i];
                 let net = yNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
                     ady = true;
-                    if (y1 > y0 && numClamp(newCrops[1] - yW) < numClamp(cropY - epsilon)) {
+                    if (y1 > y0 && numClamp(newCrops[1] - yW) < numClamp(cropY - epsilon))
+                    {
                         cropY = numClamp(newCrops[1] - yW);
                     }
-                    else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon)) {
+                    else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon))
+                    {
                         cropY = numClamp(newCrops[1] + yW);
                     }
                 }
             }
         }
 
-        if (z0 !== z1) {
+        if (z0 !== z1)
+        {
             let zNetwork = [];
             let zArrival = [];
             for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
@@ -143,16 +151,19 @@ class TerrainCollider
             }
 
             // Do intersect.
-            for (let i = 0; i < zNetwork.length; ++i) {
+            for (let i = 0; i < zNetwork.length; ++i)
+            {
                 let newCrops = zArrival[i];
                 let net = zNetwork[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adz = true;
-                    if (z1 > z0 && numClamp(newCrops[2] - zW) < numClamp(cropZ - epsilon)) {
+                    if (z1 > z0 && numClamp(newCrops[2] - zW) < numClamp(cropZ - epsilon))
+                    {
                         cropZ = numClamp(newCrops[2] - zW);
                     }
-                    else if (z1 < z0 && numClamp(newCrops[2] + zW) > numClamp(cropZ + epsilon)) {
+                    else if (z1 < z0 && numClamp(newCrops[2] + zW) > numClamp(cropZ + epsilon))
+                    {
                         cropZ = numClamp(newCrops[2] + zW);
                     }
                 }
@@ -164,25 +175,34 @@ class TerrainCollider
         if (adx) {
             adh[x0 > x1 ? 0 : 3] = true;
             adh[x0 > x1 ? 3 : 0] = false;
-        } else { adh[0] = adh[3] = false; }
+        } else {
+            adh[0] = adh[3] = false;
+        }
         if (ady) {
             adh[y0 > y1 ? 1 : 4] = true;
             adh[y0 > y1 ? 4 : 1] = false;
-        } else { adh[1] = adh[4] = false; }
+        } else {
+            adh[1] = adh[4] = false;
+        }
         if (adz) {
             adh[z0 > z1 ? 2 : 5] = true;
             adh[z0 > z1 ? 5 : 2] = false;
-        } else { adh[2] = adh[5] = false; }
+        } else {
+            adh[2] = adh[5] = false;
+        }
 
-        if (adh[2] && acc0[2] < 0 || adh[5] && acc0[2] > 0) {
+        if (adh[2] && acc0[2] < 0 || adh[5] && acc0[2] > 0)
+        {
             entity.v1[0] = 0;
             entity.v1[1] = 0;
         }
-        if (adh[0] && acc0[0] < 0 || adh[3] && acc0[0] > 0) {
+        if (adh[0] && acc0[0] < 0 || adh[3] && acc0[0] > 0)
+        {
             entity.v1[1] = 0;
             entity.v1[2] = 0;
         }
-        if (adh[1] && acc0[1] < 0 || adh[4] && acc0[1] > 0) {
+        if (adh[1] && acc0[1] < 0 || adh[4] && acc0[1] > 0)
+        {
             entity.v1[0] = 0;
             entity.v1[2] = 0;
         }
@@ -256,7 +276,8 @@ class TerrainCollider
         if (dz !== 0) tDeltaZ = min(dz / (z2 - z1), threshold); else tDeltaZ = threshold;
         if (dz > 0) tMaxZ = tDeltaZ * frac1(z1); else tMaxZ = tDeltaZ * frac0(z1);
 
-        while (tMaxX <= 1 || tMaxY <= 1 || tMaxZ <= 1) {
+        while (tMaxX <= 1 || tMaxY <= 1 || tMaxZ <= 1)
+        {
             if (tMaxX < tMaxY) {
                 if (tMaxX < tMaxZ) {
                     i += dx;
@@ -327,7 +348,8 @@ class TerrainCollider
             let nyt = y1 + (y2 - y1) * t;
             const ny = y1 + (y2 - y1);
             const dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
-            if (doProject && dby < 2) {
+            if (doProject && dby < 2)
+            {
                 if (dy < 0) {
                     const free = world.isFree(i + ddx, j - 1, k);
                     if (free || dby < 1 && ny > ny0 - 1) {
@@ -349,7 +371,8 @@ class TerrainCollider
             let nzt = z1 + (z2 - z1) * t;
             const nz = z1 + (z2 - z1);
             const dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
-            if (doProject && dbz < 2) {
+            if (doProject && dbz < 2)
+            {
                 if (dz < 0) {
                     const free = world.isFree(i + ddx, j, k - 1);
                     if (free || dbz < 1 && nz > nz0 - 1) {
@@ -384,7 +407,8 @@ class TerrainCollider
             let nxt = x1 + (x2 - x1) * t;
             const nx = x1 + (x2 - x1);
             const dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
-            if (doProject && dbx < 2) {
+            if (doProject && dbx < 2)
+            {
                 if (dx < 0) {
                     const free = world.isFree(i - 1, j + ddy, k);
                     if (free || dbx < 1 && nx > nx0 - 1) {
@@ -408,7 +432,8 @@ class TerrainCollider
             let nzt = z1 + (z2 - z1) * t;
             const nz = z1 + (z2 - z1);
             const dbz = Math.abs(Math.floor(nz) - Math.floor(nzt));
-            if (doProject && dbz < 2) {
+            if (doProject && dbz < 2)
+            {
                 if (dz < 0) {
                     const free = world.isFree(i, j + ddy, k - 1);
                     if (free || dbz < 1 && nz > nz0 - 1) {
@@ -443,7 +468,8 @@ class TerrainCollider
             let nxt = x1 + (x2 - x1) * t;
             const nx = x1 + (x2 - x1);
             const dbx = Math.abs(Math.floor(nx) - Math.floor(nxt));
-            if (doProject && dbx < 2) {
+            if (doProject && dbx < 2)
+            {
                 if (dx < 0) {
                     const free = world.isFree(i - 1, j, k + ddz);
                     if (free || dbx < 1 && nx > nx0 - 1) {
@@ -467,7 +493,8 @@ class TerrainCollider
             let nyt = y1 + (y2 - y1) * t;
             const ny = y1 + (y2 - y1);
             const dby = Math.abs(Math.floor(ny) - Math.floor(nyt));
-            if (doProject && dby < 2) {
+            if (doProject && dby < 2)
+            {
                 if (dy < 0) {
                     const free = world.isFree(i, j - 1, k + ddz);
                     if (free || dby < 1 && ny > ny0 - 1) {

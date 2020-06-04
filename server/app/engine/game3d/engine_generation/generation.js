@@ -9,7 +9,8 @@ import { WorldMap } from './terrain/world';
 
 class GenerationEngine
 {
-    constructor(game) {
+    constructor(game)
+    {
         this._game = game;
     }
 

@@ -6,18 +6,21 @@
 
 import extend from '../../extend.js';
 
-let SettingsState = function(stateManager) {
+let SettingsState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'settings';
 };
 
 extend(SettingsState.prototype, {
 
-    start() {
+    start()
+    {
         this.stateManager.app.engine.settings.run();
     },
 
-    end() {
+    end()
+    {
         return this.stateManager.app.engine.settings.stop();
     }
 

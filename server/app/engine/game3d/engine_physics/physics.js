@@ -12,7 +12,8 @@ import Updater          from './updater/updater';
 
 class PhysicsEngine
 {
-    constructor(game) {
+    constructor(game)
+    {
         // Models.
         this._entityModel   = game.entityModel;
         this._worldModel    = game.worldModel;
@@ -34,11 +35,13 @@ class PhysicsEngine
 
     /** ######################## **/
 
-    addInput(meta, avatar) {
+    addInput(meta, avatar)
+    {
         this._inputBuffer.addInput(meta, avatar);
     }
 
-    update() {
+    update()
+    {
         let input = this._inputBuffer.getInput();
 
         this._updater.update(input);
@@ -48,27 +51,32 @@ class PhysicsEngine
         this._inputBuffer.flush();
     }
 
-    getOutput() {
+    getOutput()
+    {
         return this._outputBuffer.getOutput();
     }
 
     /** ######################## **/
 
-    flushOutput() {
+    flushOutput()
+    {
         this._outputBuffer.flushOutput();
     }
 
-    shuffleGravity() {
+    shuffleGravity()
+    {
         this._frontend.shuffleGravity();
     }
 
     /** **/
 
-    spawnPlayer(player) {
+    spawnPlayer(player)
+    {
         this._frontend.objectOrderer.addObject(player.avatar);
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId)
+    {
         let entity = this._entityModel.entities[playerId];
         this._frontend.objectOrderer.removeObject(entity);
     }

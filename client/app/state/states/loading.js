@@ -7,7 +7,8 @@
 import extend               from '../../extend.js';
 import { $ }                from '../../modules/polyfills/dom.js';
 
-let LoadingState = function(stateManager) {
+let LoadingState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'loading';
     this.html = `
@@ -24,7 +25,8 @@ let LoadingState = function(stateManager) {
 
 extend(LoadingState.prototype, {
 
-    start() {
+    start()
+    {
         $('#announce')
             .empty()
             .removeClass()
@@ -32,7 +34,8 @@ extend(LoadingState.prototype, {
             .center();
     },
 
-    end() {
+    end()
+    {
         return new Promise(function(resolve) {
             var loader = $('#announce');
             loader.fadeOut(200, function() {

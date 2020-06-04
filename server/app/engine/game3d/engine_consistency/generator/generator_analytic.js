@@ -8,7 +8,8 @@ import ChunkGenerator from './chunkgenerator';
 
 class Analytic
 {
-    static waveChunk(chunk, minZ, maxZ, blockId) {
+    static waveChunk(chunk, minZ, maxZ, blockId)
+    {
         if (minZ >= maxZ || maxZ >= chunk.capacity)
             console.log('Wave generator: invalid parameters');
 
@@ -32,7 +33,8 @@ class Analytic
         };
 
         let blocks = new Uint8Array(numberOfBlocks);
-        if (chunk.chunkK !== 0) {
+        if (chunk.chunkK !== 0)
+        {
             blocks.fill(0, 0, numberOfBlocks);
             return;
         }

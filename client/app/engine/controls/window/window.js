@@ -7,7 +7,8 @@
 // Legacy
 let WindowModule = {
 
-    setupWindowListeners() {
+    setupWindowListeners()
+    {
         let visibilityChange;
         let hidden;
 
@@ -28,8 +29,8 @@ let WindowModule = {
             return;
         }
 
-        // TODO [MEDIUM] check for double-deactivation
-        let handlerVisibilityChange = function() {
+        let handlerVisibilityChange = function()
+        {
             if (document[hidden]) {
                 if (this.isTouch) this.stopTouchListeners();
                 else this.stopKeyboardListeners();
@@ -41,19 +42,25 @@ let WindowModule = {
 
         this.windowListeners = {
             start() {
-                document.addEventListener(visibilityChange, handlerVisibilityChange, false);
+                document.addEventListener(
+                    visibilityChange, handlerVisibilityChange, false
+                );
             },
             stop() {
-                document.removeEventListener(visibilityChange, handlerVisibilityChange);
+                document.removeEventListener(
+                    visibilityChange, handlerVisibilityChange
+                );
             }
         };
     },
 
-    startWindowListeners() {
+    startWindowListeners()
+    {
         this.windowListeners.start();
     },
 
-    stopWindowListeners() {
+    stopWindowListeners()
+    {
         this.windowListeners.stop();
     }
 

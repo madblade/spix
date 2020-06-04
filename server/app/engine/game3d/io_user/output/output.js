@@ -10,7 +10,8 @@ class UserOutput
 {
     static debug = false;
 
-    constructor(game) {
+    constructor(game)
+    {
         this._game = game;
 
         this._physicsEngine     = game.physicsEngine;
@@ -18,13 +19,14 @@ class UserOutput
         this._consistencyEngine = game.consistencyEngine;
     }
 
-    static pack(message) {
+    static pack(message)
+    {
         return JSON.stringify(message);
     }
 
     static bench = false;
 
-    // TODO [HIGH] -> don't recurse over every player, rather over updates...
+    // TODO [PERF] -> don't recurse over every player, but rather over updates
     update(updateEntities)
     {
         let t1;
@@ -60,13 +62,13 @@ class UserOutput
     }
 
     // Every player spawns in initial world '-1'.
-    spawnPlayers() {
+    spawnPlayers()
+    {
         let consistencyEngine = this._consistencyEngine;
         let addedPlayers = consistencyEngine.getPlayerOutput();
         let game = this._game;
         let players = game.players;
 
-        // TODO [OPT] use arrays
         addedPlayers.forEach(pid => {
             let player = players.getPlayerFromId(pid);
             if (player) {
@@ -88,7 +90,8 @@ class UserOutput
         });
     }
 
-    updateChunks() {
+    updateChunks()
+    {
         let game              = this._game;
         let topologyEngine    = this._topologyEngine;
         let consistencyEngine = this._consistencyEngine;
@@ -96,14 +99,12 @@ class UserOutput
         let updatedChunks = topologyEngine.getOutput();
         let consistencyOutput = consistencyEngine.getChunkOutput();
 
-        // TODO [OPT] use arrays
         game.players.forEach(p => { if (p.avatar) {
             let hasNew;
             let hasUpdated;
             let pid = p.avatar.entityId;
 
-            // TODO [LOW] check 'player has updated position'
-            // TODO [MEDIUM] dynamically remove chunks with GreyZone, serverside
+            // TODO [PERF] check 'player has updated position'
             // player id -> changes (world id -> chunk id -> changes)
             let addedOrRemovedChunks = consistencyOutput.get(pid);
             hasNew = addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0;
@@ -136,7 +137,7 @@ class UserOutput
 
                 let output = UserOutput.pack(addedOrRemovedChunks);
                 p.send('chk', output);
-                // TODO [CRIT] check appearance of []
+                // TODO [PERF] check if data === []
                 // for (let wiA in addedOrRemovedChunks) console.log(Object.keys(addedOrRemovedChunks[wiA]));
             }
             else if (hasUpdated) {
@@ -151,7 +152,8 @@ class UserOutput
         topologyEngine.flushOutput();
     }
 
-    updateEntities() {
+    updateEntities()
+    {
         let game              = this._game;
         let physicsEngine     = this._physicsEngine;
         let consistencyEngine = this._consistencyEngine;
@@ -162,9 +164,8 @@ class UserOutput
         if (updatedEntities.size < 1) return;
 
         // Broadcast updates.
-        // TODO [HIGH] bundle update in one chunk.
-        // TODO [CRIT] ensure sync for player disconnections.
-        // TODO [OPT] use arrays
+        // TODO [PERF] bundle update in one chunk.
+        // TODO [ENTITIES] ensure sync for player disconnections.
         game.players.forEach(p => {
             let pid = p.avatar.entityId;
 
@@ -176,7 +177,7 @@ class UserOutput
             // and to compute distances between entities.
             //let updatedEntities = physicsEngine.getOutputForPlayer(p, updatedEntities);
 
-            // TODO [LOW] detect change in position since the last time.
+            // TODO [PERF] detect change in position since the last time.
             // if (!entities), do it nevertheless, for it gives the player its own position.
             // Format:
             // [myPosition, myRotation, {
@@ -184,7 +185,7 @@ class UserOutput
             //      null .................. removed entity
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
-            // TODO [HIGH] bundle, detect change.
+            // TODO [PERF] bundle, detect change.
             if (Object.keys(addedOrRemovedEntities).length > 0)
                 p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
@@ -204,12 +205,12 @@ class UserOutput
         physicsEngine.flushOutput();
     }
 
-    updateX() {
+    updateX()
+    {
         let game = this._game;
         let consistencyEngine = this._consistencyEngine;
         let xOutput = consistencyEngine.getXOutput();
 
-        // TODO [OPT] use arrays
         game.players.forEach(p => {
             let pav = p.avatar;
             if (!pav) return;
@@ -217,7 +218,8 @@ class UserOutput
             let pid = pav.entityId;
             let addedOrRemovedX = xOutput.get(pid);
 
-            if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0) {
+            if (addedOrRemovedX && Object.keys(addedOrRemovedX).length > 0)
+            {
                 let output = UserOutput.pack(addedOrRemovedX);
 
                 // Format:
@@ -229,11 +231,12 @@ class UserOutput
             }
         });
 
-        // TODO [MEDIUM] when x updates are implemented.
+        // TODO [PORTAL] Implement x updates.
         // xEngine.flushOutput();
     }
 
-    updateMeta() {
+    updateMeta()
+    {
         let game = this._game;
         game.chat.updateOutput();
     }

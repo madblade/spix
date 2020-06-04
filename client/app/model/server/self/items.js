@@ -42,38 +42,46 @@ let ItemType = Object.freeze({
 
 let ItemsModelModule = {
 
-    isItemNaught(item) {
+    isItemNaught(item)
+    {
         return item === ItemType.NONE;
     },
 
-    isItemBlock(item) {
+    isItemBlock(item)
+    {
         return item > ItemType.NONE && item < 256;
     },
 
-    isItemX(item) {
+    isItemX(item)
+    {
         return item === ItemType.PORTAL_GUN_SINGLE ||
             item === ItemType.PORTAL_GUN_DOUBLE;
     },
 
-    isItemPlaceable(item) {
+    isItemPlaceable(item)
+    {
         return ItemsModelModule.isItemBlock(item) ||
             ItemsModelModule.isItemX(item);
     },
 
-    isItemMelee(item) {
+    isItemMelee(item)
+    {
         return item >= ItemType.KATANA && item < ItemType.YA;
     },
 
-    isItemRanged(item) {
+    isItemRanged(item)
+    {
         return item >= ItemType.YUMI && item < 512;
     },
 
-    isItemUseable(item) {
+    isItemUseable(item)
+    {
         return ItemsModelModule.isItemMelee(item) ||
             ItemsModelModule.isItemRanged(item);
     },
 
-    isItemIDSupported(item) {
+    isItemIDSupported(item)
+    {
         if (typeof item !== 'number') return false;
         for (let i in ItemType) {
             if (!ItemType.hasOwnProperty(i)) continue;

@@ -13,10 +13,6 @@ import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
 import { WorldType } from '../../../model_world/model';
 
-// TODO [HIGH] jump gameplay
-// TODO [HIGH] gravity on edges
-// TODO [HIGH] rotate collision model
-// TODO [HIGH] levitate, feedback, walljump
 // Enhancement: island caching
 
 class RigidBodies
@@ -80,7 +76,8 @@ class RigidBodies
         let squaredRadius = 2; // Should this equal 1.6, the entity height?
         const gravityNorm = (world.isWater(x, y, z) ? 0.1 : 1) * RigidBodies.gravityConstant;
 
-        if (squaredWithSmoothBorders) {
+        if (squaredWithSmoothBorders)
+        {
             if (dX > max(dY, dZ) + squaredRadius)
                 return [(xPlus ? 1 : -1) * gravityNorm, 0, 0];
             else if (dY > max(dX, dZ) + squaredRadius)
@@ -125,7 +122,8 @@ class RigidBodies
     }
 
     // Advanced time flow customization.
-    getTimeDilation(worldId, x, y, z) {
+    getTimeDilation(worldId, x, y, z)
+    {
         if (worldId === 666) {
             return 1 + Math.abs(x * y * z);
         }
@@ -145,7 +143,8 @@ class RigidBodies
         // let maxSpeed = Entity.maxSpeed;
         // let maxSpeed2 = maxSpeed * maxSpeed;
 
-        if (relativeDt > 3 * absoluteDt) {
+        if (relativeDt > 3 * absoluteDt)
+        {
             console.log('Warn: lagging at ' +
                 `${Math.floor(100 * relativeDt / absoluteDt)}%.`);
             relativeDt = 3 * absoluteDt;
@@ -317,7 +316,8 @@ class RigidBodies
             }
 
             let dbg = false;
-            if (dbg) {
+            if (dbg)
+            {
                 let eids = [];
                 for (let isl = 0; isl < island.length; ++isl)
                     eids.push(oxAxis[island[isl]].id);
@@ -327,7 +327,8 @@ class RigidBodies
 
             while (mapCollidingPossible.length > 0)
             {
-                if (dbg) {
+                if (dbg)
+                {
                     console.log(
                         `\t${mapCollidingPossible[0]} ` +
                         `| ${reloop ? 'stacked' : 'shifted'} | ${mapCollidingPossible.length}`
@@ -397,7 +398,8 @@ class RigidBodies
                 if (mapCollidingPossible.length >= oldLength)
                     reloop = true;
 
-                if (debugFlag && complicatedFlag) {
+                if (debugFlag && complicatedFlag)
+                {
                     const xIndex1 = island[ii];
                     const xIndex2 = island[jj];
                     const id1 = oxAxis[xIndex1].id;
@@ -425,7 +427,8 @@ class RigidBodies
         }
     }
 
-    static add(result, toAdd) {
+    static add(result, toAdd)
+    {
         result[0] += toAdd[0];
         result[1] += toAdd[1];
         result[2] += toAdd[2];

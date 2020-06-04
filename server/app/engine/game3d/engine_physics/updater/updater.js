@@ -6,7 +6,8 @@
 
 class Updater
 {
-    constructor(physicsEngine) {
+    constructor(physicsEngine)
+    {
         //
         this._physicsEngine = physicsEngine;
     }
@@ -16,7 +17,7 @@ class Updater
         // Process incoming actions.
         inputBuffer.forEach((array, avatar) => // value, key
         {
-            // TODO [LOW] compute means or filter some events.
+            // TODO [PERF] compute means or filter some events.
             array.forEach(e => {
                 if (e.action === 'move' && typeof e.meta === 'string')
                     Updater.move(e.meta, avatar);
@@ -34,7 +35,8 @@ class Updater
     }
 
     // Constrained => forward border effect to physics solver.
-    static move(meta, avatar) {
+    static move(meta, avatar)
+    {
         // let hasMoved = true;
         switch (meta) {
             case 'f'  : avatar.goForward();     break;
@@ -58,7 +60,8 @@ class Updater
     }
 
     // Unconstrained => direct update, then notify output.
-    rotate(meta, avatar) {
+    rotate(meta, avatar)
+    {
         let rotation = avatar.rotation;
         if (rotation === null) return;
 
@@ -78,15 +81,17 @@ class Updater
     }
 
     // Unconstrained actions API.
-    action(meta/*, avatar*/) {
+    action(meta/*, avatar*/)
+    {
         if (meta === 'g') {
             this._physicsEngine.shuffleGravity();
         }
     }
 
-    use(meta, avatar) {
-        // TODO validate item in inventory
-        // TODO give inventory state to players
+    use(meta, avatar)
+    {
+        // TODO [GAMEPLAY] validate item in inventory
+        // TODO [GAMEPLAY] give inventory state to players
         console.warn('[Physics/Updater] Player wants to use item. To implement.');
         console.log(meta);
         console.log(avatar.id);

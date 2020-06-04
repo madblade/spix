@@ -24,7 +24,8 @@ class ObjectOrderer
 
     get axes()  { return this._axes; }
 
-    static dichotomyLowerBound(a, value, prop) {
+    static dichotomyLowerBound(a, value, prop)
+    {
         let lo = 0; let hi = a.length - 1; let mid;
         while (lo <= hi) {
             mid = lo + hi >> 1; // floor((lo+hi)/2)
@@ -38,7 +39,8 @@ class ObjectOrderer
 
     // Impact entities cached indices.
     // Each entity knows its position in axis arrays.
-    static orderCache(array, entities, portals, start, prop) {
+    static orderCache(array, entities, portals, start, prop)
+    {
         for (let i = start, l = array.length; i < l; ++i) {
             const id = parseInt(array[i].id, 10);
             if (array[i].kind === 'e')
@@ -62,7 +64,8 @@ class ObjectOrderer
         let orderCache = ObjectOrderer.orderCache;
 
         // Fill axes with entities.
-        for (let i = 0, l = entities.length; i < l; ++i) {
+        for (let i = 0, l = entities.length; i < l; ++i)
+        {
             if (!entities) continue;
             let e = entities[i]; let wid = e.worldId; let p = e.p0;
             let axis = axes.get(wid); // Most inefficient call.
@@ -80,7 +83,7 @@ class ObjectOrderer
             }
         }
 
-        // TODO [CRIT] Fill axes with portals.
+        // TODO [PORTAL] Fill axes with portals.
         portals.forEach((portal, i) => {
             let wid = portal.worldId; let p = portal.position;
             let axis = axes.get(wid); // Most inefficient call.
@@ -126,7 +129,8 @@ class ObjectOrderer
 
     // [Thought] could be optimised by axis prealloc, dichotomy insertion,
     // keeping track of active elements, and realloc when necessary (gc).
-    addObject(object) {
+    addObject(object)
+    {
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;
         if (!kind)
@@ -142,7 +146,8 @@ class ObjectOrderer
         let entities = this._entityModel.entities;
         let axis = this._axes.get(wid);
 
-        if (!axis) {
+        if (!axis)
+        {
             this._axes.set(wid, [
                 [{kind, id: eid, val: x}],
                 [{kind, id: eid, val: y}],
@@ -154,7 +159,8 @@ class ObjectOrderer
             object.indexZ = 0;
         }
 
-        else {
+        else
+        {
             let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
             let orderCache = ObjectOrderer.orderCache;
             let xAxis = axis[0];
@@ -184,8 +190,8 @@ class ObjectOrderer
         }
     }
 
-    // TODO [HIGH] portals
-    moveObject(object) {
+    moveObject(object)
+    {
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;
         if (!kind)
@@ -216,7 +222,8 @@ class ObjectOrderer
 
     // [Thought] could be optimised by garbage collection.
     // Keeping a list of active objects for each axis.
-    removeObject(object) {
+    removeObject(object)
+    {
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;
         if (!kind)
@@ -239,7 +246,8 @@ class ObjectOrderer
         zAxis.splice(indexZ, 1);
 
         // 1 shift -> O(n)
-        if (xAxis.length > 0) {
+        if (xAxis.length > 0)
+        {
             let orderCache = ObjectOrderer.orderCache;
             orderCache(xAxis, entities, portals, indexX, 'indexX');
             orderCache(yAxis, entities, portals, indexY, 'indexY');
@@ -267,7 +275,8 @@ class ObjectOrderer
 
         // Old axes?
         let oldAxis = this._axes.get(oldWorldId);
-        if (oldAxis) {
+        if (oldAxis)
+        {
             // Remove from old set of axes.
             oldAxis[0].splice(xid, 1);
             oldAxis[1].splice(yid, 1);
@@ -283,7 +292,8 @@ class ObjectOrderer
 
         // Insert into new set of axes.
         let newAxis = this._axes.get(newWorldId);
-        if (!newAxis) {
+        if (!newAxis)
+        {
             this._axes.set(newWorldId, [
                 [{kind:'e', id:eid, val:x}],
                 [{kind:'e', id:eid, val:y}],
@@ -293,7 +303,8 @@ class ObjectOrderer
             entity.indexY = 0;
             entity.indexZ = 0;
         }
-        else {
+        else
+        {
             let xAxis = newAxis[0]; let xLow;
             let yAxis = newAxis[1]; let yLow;
             let zAxis = newAxis[2]; let zLow;

@@ -6,7 +6,8 @@
 
 let ActiveControlsModule = {
 
-    getActiveControls() {
+    getActiveControls()
+    {
         return {
             forward: false,
             backwards: false,

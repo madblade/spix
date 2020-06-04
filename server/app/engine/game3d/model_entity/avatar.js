@@ -8,7 +8,8 @@ import Entity from './entity';
 
 class Avatar extends Entity
 {
-    constructor(id) {
+    constructor(id)
+    {
         super(id);
 
         this._kind = 'player';
@@ -17,7 +18,7 @@ class Avatar extends Entity
         this._chunkRenderDistance = 3;
         // If you increase this, also increase model_x/model.push(chksZ, currentDepth + 2);
         // For flat worlds
-        this._chunkUnloadDistance = 5; // TODO here
+        this._chunkUnloadDistance = 5;
         // Might be a good idea to keep the unload distance as big as possible client-wise
         // When games don’t contain many players.
 

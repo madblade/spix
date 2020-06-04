@@ -7,14 +7,16 @@
 import extend               from '../../extend.js';
 import { $ }                from '../../modules/polyfills/dom.js';
 
-let IngameState = function(stateManager) {
+let IngameState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'ingame';
 };
 
 extend(IngameState.prototype, {
 
-    start() {
+    start()
+    {
         $('#announce')
             .removeClass()
             .empty()
@@ -24,7 +26,8 @@ extend(IngameState.prototype, {
             .show();
     },
 
-    end() {
+    end()
+    {
         this.stateManager.app.engine.controls.stopListeners();
 
         return new Promise(function(resolve) {

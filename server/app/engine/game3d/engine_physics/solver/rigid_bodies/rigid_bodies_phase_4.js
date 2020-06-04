@@ -43,7 +43,8 @@ class RigidBodiesPhase4
 
         // Get axis.
         const ax = axis === 'x' ? 0 : axis === 'y' ? 1 : axis === 'z' ? 2 : -1;
-        if (ax < 0) {
+        if (ax < 0)
+        {
             console.error('[Phase IV] [BAD] invalid axis.');
             return;
         }
@@ -157,7 +158,8 @@ class RigidBodiesPhase4
         // 4.1. shift collisions for all other entities (r)
         // integrate the quadratic solution delta
         let mcpSize = mapCollidingPossible.length;
-        for (let k = mcpSize - 1; k >= 0; --k) {
+        for (let k = mcpSize - 1; k >= 0; --k)
+        {
             let current = mapCollidingPossible[k];
             let island1Index = current[0];
             let island2Index = current[1];
@@ -219,10 +221,12 @@ class RigidBodiesPhase4
 
         let debug = false;
         if (debug)
-            console.log(`\t\tProcessing post-collision: ${entities[oxAxis[island[subIslandI[0]]].id].entityId} ` +
-                        `[${subIslandI}] vs ` +
-                        `${entities[oxAxis[island[subIslandJ[0]]].id].entityId} ` +
-                        `[${subIslandJ}] || [${newSubIsland}]`);
+        {
+            console.log(`\t\tProcessing post-collision: 
+                ${entities[oxAxis[island[subIslandI[0]]].id].entityId} 
+                [${subIslandI}] vs ${entities[oxAxis[island[subIslandJ[0]]].id].entityId} 
+                [${subIslandJ}] || [${newSubIsland}]`);
+        }
 
         Phase3.solveLeapfrogPostCollision(
             island,

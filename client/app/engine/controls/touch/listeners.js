@@ -6,12 +6,14 @@
 
 let ListenerModule = {
 
-    onLeftStickMove(x, y) {
+    onLeftStickMove(x, y)
+    {
         this.touch.leftX = x;
         this.touch.leftY = y;
     },
 
-    onRightStickMove(x, y) {
+    onRightStickMove(x, y)
+    {
         this.touch.rightX = x;
         this.touch.rightY = y;
     },
@@ -54,12 +56,15 @@ let ListenerModule = {
         }
     },
 
-    rotateCameraFromRightStick() {
+    rotateCameraFromRightStick()
+    {
         let graphics = this.app.engine.graphics;
         let movementX = this.touch.rightX * 8;
         let movementY = this.touch.rightY * 6;
         if (Math.abs(movementX) > 0 || Math.abs(movementY) > 0)
-            graphics.cameraManager.addCameraRotationEvent(movementX, movementY, 0, 0);
+            graphics.cameraManager.addCameraRotationEvent(
+                movementX, movementY, 0, 0
+            );
     },
 
     movePlayerFromLeftStick()
@@ -69,7 +74,8 @@ let ListenerModule = {
         let ly = this.touch.leftY;
         let lastLeft = this.touch.leftLast;
         let newLeft = [];
-        if (ly !== 0 && lx !== 0) {
+        if (ly !== 0 && lx !== 0)
+        {
             let angle = Math.atan2(ly, lx);
             let pi8 = Math.PI / 8;
             switch (true) {
@@ -100,14 +106,19 @@ let ListenerModule = {
             }
         }
 
-        if (newLeft.length > 2) console.error('[Touch] too many events detected.');
-        for (let i = 0; i < newLeft.length; ++i) {
+        if (newLeft.length > 2)
+            console.error('[Touch] too many events detected.');
+        for (let i = 0; i < newLeft.length; ++i)
+        {
             let t = newLeft[i];
-            if (lastLeft.indexOf(t) < 0) clientModel.triggerEvent('m', `${t}`);
+            if (lastLeft.indexOf(t) < 0)
+                clientModel.triggerEvent('m', `${t}`);
         }
-        for (let i = 0; i < lastLeft.length; ++i) {
+        for (let i = 0; i < lastLeft.length; ++i)
+        {
             let t = lastLeft[i];
-            if (newLeft.indexOf(t) < 0) clientModel.triggerEvent('m', `${t}x`);
+            if (newLeft.indexOf(t) < 0)
+                clientModel.triggerEvent('m', `${t}x`);
         }
         this.touch.leftLast = newLeft;
     }

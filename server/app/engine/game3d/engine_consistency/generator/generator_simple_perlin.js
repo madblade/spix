@@ -174,7 +174,8 @@ class SimplePerlin
                 }
 
                 let bl = Math.max(0, Math.min(h, dz));
-                for (let zz = rl; zz < bl; ++zz) {
+                for (let zz = rl; zz < bl; ++zz)
+                {
                     // Grass or sand.
                     const currentBlock = xy + normalSize * zz;
                     // if (zz === bl - 1)
@@ -183,7 +184,8 @@ class SimplePerlin
                     blocks[currentBlock] = mainBlockId;
                 }
 
-                if (bl < 16 && rl > 0) {
+                if (bl < 16 && rl > 0)
+                {
                     for (let zz = bl; zz < 16; ++zz) {
                         // Grass or sand.
                         const currentBlock = xy + normalSize * zz;
@@ -197,7 +199,9 @@ class SimplePerlin
         }
     }
 
-    static simpleGeneration3D(chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks)
+    static simpleGeneration3D(
+        chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
+    )
     {
         let directions = [];
 
@@ -248,7 +252,7 @@ class SimplePerlin
             }
         }
 
-        // TODO manage full / empty chunks
+        // TODO manage [GENERATION] full / empty chunks
 
         if (adx === radius)
             directions.push(ci > center.x ? 1 : -1);
@@ -353,8 +357,7 @@ class SimplePerlin
                 case -3: offset3 = (center.z - r - parseInt(ck, 10)) * d3; break;
             }
 
-            for (let x = 0; x < d1; ++x)
-            {
+            for (let x = 0; x < d1; ++x) {
                 for (let y = 0; y < d2; ++y)
                 {
                     const h = d3 / 2 + (data[x + y * d1] * perlinIntensity | 0) - offset3;
@@ -408,7 +411,8 @@ class SimplePerlin
         // Detect intensity
         const hillsType = worldInfo.hills;
         let perlinIntensity;
-        switch (hillsType) {
+        switch (hillsType)
+        {
             case HillType.NO_HILLS: perlinIntensity = 0; break;
             case HillType.REGULAR_HILLS: perlinIntensity = 0.2; break;
             case HillType.GIANT_HILLS: perlinIntensity = 1.0; break;
@@ -417,7 +421,8 @@ class SimplePerlin
 
         // Detect cube or flat world.
         const worldType = worldInfo.type;
-        switch (worldType) {
+        switch (worldType)
+        {
             case WorldType.FLAT:
                 SimplePerlin.simpleGeneration2D(
                     chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks

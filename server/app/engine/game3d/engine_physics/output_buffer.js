@@ -6,21 +6,25 @@
 
 class OutputBuffer
 {
-    constructor() {
+    constructor()
+    {
         // Contains ids of updated entities.
         this._buffer = new Set();
     }
 
-    entityUpdated(entityId) {
+    entityUpdated(entityId)
+    {
         this._buffer.add(entityId);
     }
 
     // Shallow.
-    getOutput() {
+    getOutput()
+    {
         return new Set(this._buffer);
     }
 
-    flushOutput() {
+    flushOutput()
+    {
         this._buffer = new Set();
     }
 }

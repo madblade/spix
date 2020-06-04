@@ -10,7 +10,8 @@ class Selector
         player, worldModel, consistencyModel,
         modelUpdatedChunks,    // topology output      Map(world id -> set of updtd chks)
         addedOrDeletedChunks   // consistency output   {world id => {cid => [fc, fcids]} }
-    ) {
+    )
+    {
         if (!this.playerConcernedByUpdatedChunks(player, modelUpdatedChunks)) return;
 
         let chunksForPlayer = {};
@@ -53,8 +54,8 @@ class Selector
         return chunksForPlayer;
     }
 
-    playerConcernedByUpdatedChunks(player, chunks) {
-        // TODO [LOW] extract connected subsurface.
+    playerConcernedByUpdatedChunks(player, chunks)
+    {
         return chunks.size > 0;
     }
 }

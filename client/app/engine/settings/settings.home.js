@@ -8,7 +8,8 @@ import $ from 'jquery';
 
 let HomeModule = {
 
-    getHomeHTML() {
+    getHomeHTML()
+    {
         return `
             <div class="container">
                 <table class="table table-bordered noselect" style="width:100%">
@@ -22,7 +23,8 @@ let HomeModule = {
         `;
     },
 
-    goHome() {
+    goHome()
+    {
         let app = this.app;
         this.unlistenSettingsMenu();
         // $(window).off('keydown');
@@ -39,7 +41,8 @@ let HomeModule = {
         }
     },
 
-    listenHome() {
+    listenHome()
+    {
         $('#graphics').click(function() { this.goGraphics(); }.bind(this));
         $('#gameplay').click(function() { this.goControls(); }.bind(this));
         $('#audio').click(function() { this.goAudio(); }.bind(this));
@@ -60,11 +63,11 @@ let HomeModule = {
         // }
         // }.bind(this));
 
-        // TODO [LOW] use listeners array.
         // this.listeners.push('graphics', 'gameplay', 'audio', 'home', 'return');
     },
 
-    unlistenSettingsMenu() {
+    unlistenSettingsMenu()
+    {
         $(window).off('keydown');
         $('#graphics').off('click');
         $('#gameplay').off('click');
@@ -73,7 +76,8 @@ let HomeModule = {
         $('#return').off('click');
     },
 
-    listenReturn() {
+    listenReturn()
+    {
         $('#return').click(function() {
             $('#return').off('click');
             $('#announce')

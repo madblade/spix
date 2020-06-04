@@ -73,12 +73,14 @@ class RigidBodiesPhase3
         }
 
         // Both trajectories should not be snapped at the same time.
-        if (rp12 > rp1 && relativeDt > rp1 && rp12 > rp2 && relativeDt > rp2) {
-            // console.log('Two colliding bodies saw their trajectory snapped on the same axis... Think about it.');
-        }
+        // if (rp12 > rp1 && relativeDt > rp1 && rp12 > rp2 && relativeDt > rp2)
+        // {
+        //     console.log('Two colliding bodies saw their trajectory snapped on the same axis... Think about it.');
+        // }
 
         // In case of (1)-snap.
-        if ((rp12 > rp1 || rp12 < 0) && relativeDt > rp1 && rp1 >= 0) {
+        if ((rp12 > rp1 || rp12 < 0) && relativeDt > rp1 && rp1 >= 0)
+        {
             // Solve constrained (1)-end-of-line collision.
             let rp3 = RigidBodiesPhase3.solveBabylon(a2, b2, -fw * w1 - fw * w2 + p20 - p11, 2 * relativeDt);
             // console.log(`Constrained (1): ${rp3} | ${rp12}`);
@@ -87,7 +89,8 @@ class RigidBodiesPhase3
         }
 
         // In case of (2)-snap.
-        if ((rp12 > rp2 || rp12 < 0) && relativeDt > rp2 && rp2 >= 0) {
+        if ((rp12 > rp2 || rp12 < 0) && relativeDt > rp2 && rp2 >= 0)
+        {
             // Solve constrained (2)-end-of-line collision.
             let rp4 = RigidBodiesPhase3.solveBabylon(a1, b1, fw * w1 + fw * w2 + p10 - p21, 2 * relativeDt);
             // console.log(`Constrained (2): ${rp4} | ${rp12}`);
@@ -95,7 +98,8 @@ class RigidBodiesPhase3
             if (rp4 > relativeDt) rp12 = 0;
         }
 
-        if (rp12 < 0 || rp12 >= relativeDt) {
+        if (rp12 < 0 || rp12 >= relativeDt)
+        {
             if (dbg) {
                 console.log('r computation error');
                 console.log(`\tb1, b2 = ${b1}, ${b2}\n` +
@@ -180,17 +184,21 @@ class RigidBodiesPhase3
                 let xm = !x0l && !x0r; let ym = !y0l && !y0r; let zm = !z0l && !z0r;
                 let xw = !x1l && !x1r; let yw = !y1l && !y1r; let zw = !z1l && !z1r;
 
-                if (xm && ym && zm) {
+                if (xm && ym && zm)
+                {
                     if (debugFlag) console.warn('[Phase III - PostCollision] Full 3D clip detected.');
                     continue;
                 }
-                if (!xm + !ym + !zm !== 1) {
+                if (!xm + !ym + !zm !== 1)
+                {
                     if (debugFlag) console.warn('[Phase III - PostCollision] Corner 2D clip detected.');
                 }
+
                 if (!(xw && yw && zw)) continue;
                 let rrel = relativeDt;
                 let axis = 'none';
-                if (!xm) {
+                if (!xm)
+                {
                     let fw = xl ? 1 : -1; let adh10 = p1adh[0]; let adh11 = p1adh[3]; let a1 = ltd1 * ltd1 * .5 * p1a0[0];
                     if (p10x <= p11x && adh11 || p10x >= p11x && adh10) a1 = 0; let adh20 = p2adh[0]; let adh21 = p2adh[3];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[0]; if (p20x <= p21x && adh21 || p20x >= p21x && adh20) a2 = 0;
@@ -198,7 +206,8 @@ class RigidBodiesPhase3
                     let r = RigidBodiesPhase3.solveSecondOrder(a1, a2, b1, b2, p10x, p20x, p11x, p21x, w1x, w2x, fw, relativeDt);
                     if (r >= 0 && r < rrel) { axis = 'x'; rrel = r; }
                 }
-                if (!ym) {
+                if (!ym)
+                {
                     let fw = yl ? 1 : -1; let adh10 = p1adh[1]; let adh11 = p1adh[4]; let a1 = ltd1 * ltd1 * .5 * p1a0[1];
                     if (p10y <= p11y && adh11 || p10y >= p11y && adh10) a1 = 0; let adh20 = p2adh[1]; let adh21 = p2adh[4];
                     let a2 = ltd2 * ltd2 * .5 * p2a0[1]; if (p20y <= p21y && adh21 || p20y >= p21y && adh20) a2 = 0;
@@ -207,7 +216,8 @@ class RigidBodiesPhase3
                     // if (abs(r) < 1e-7) r = 0;
                     if (r >= 0 && r < rrel) { axis = 'y'; rrel = r; }
                 }
-                if (!zm) {
+                if (!zm)
+                {
                     let fw = zl ? 1 : -1; let adh10 = p1adh[2]; let adh11 = p1adh[5];
                     let a1 = ltd1 * ltd1 * .5 * p1a0[2];
                     if (p10z <= p11z && adh11 || p10z >= p11z && adh10) a1 = 0; let adh20 = p2adh[2]; let adh21 = p2adh[5];
@@ -217,6 +227,7 @@ class RigidBodiesPhase3
                     if (r >= 0 && r < rrel) { axis = 'z'; rrel = r;
                     }
                 }
+
                 if (debugFlag)
                     console.log(`\t\t\t\tGot ${rrel}`);
                 if (rrel < relativeDt) {
@@ -256,7 +267,8 @@ class RigidBodiesPhase3
             // const dta1 = absoluteDt * ltd1;
             // const dtr1 = relativeDt * ltd1;
 
-            for (let j = i + 1; j < nbI; ++j) {
+            for (let j = i + 1; j < nbI; ++j)
+            {
                 let xIndex2 = island[j];
                 let id2 = oxAxis[xIndex2].id;
                 let e2 = entities[id2];
@@ -273,31 +285,48 @@ class RigidBodiesPhase3
                 // const dta2 = absoluteDt * ltd2;
                 // const dtr2 = relativeDt * ltd2;
 
-                const x0l = p10x + w1x <= p20x - w2x; const y0l = p10y + w1y <= p20y - w2y; const z0l = p10z + w1z <= p20z - w2z;
-                const x1l = p11x + w1x <= p21x - w2x; const y1l = p11y + w1y <= p21y - w2y; const z1l = p11z + w1z <= p21z - w2z;
-                const x0r = p10x - w1x >= p20x + w2x; const y0r = p10y - w1y >= p20y + w2y; const z0r = p10z - w1z >= p20z + w2z;
-                const x1r = p11x - w1x >= p21x + w2x; const y1r = p11y - w1y >= p21y + w2y; const z1r = p11z - w1z >= p21z + w2z;
+                const x0l = p10x + w1x <= p20x - w2x;
+                const y0l = p10y + w1y <= p20y - w2y;
+                const z0l = p10z + w1z <= p20z - w2z;
+                const x1l = p11x + w1x <= p21x - w2x;
+                const y1l = p11y + w1y <= p21y - w2y;
+                const z1l = p11z + w1z <= p21z - w2z;
+                const x0r = p10x - w1x >= p20x + w2x;
+                const y0r = p10y - w1y >= p20y + w2y;
+                const z0r = p10z - w1z >= p20z + w2z;
+                const x1r = p11x - w1x >= p21x + w2x;
+                const y1r = p11y - w1y >= p21y + w2y;
+                const z1r = p11z - w1z >= p21z + w2z;
 
                 if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
                 {
                     continue;
                 }
 
-                const xl = x0l && !x1l;  const yl = y0l && !y1l;  const zl = z0l && !z1l;
-                const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
-                const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
+                const xl = x0l && !x1l;
+                const yl = y0l && !y1l;
+                const zl = z0l && !z1l;
+                const xm = !x0l && !x0r;
+                const ym = !y0l && !y0r;
+                const zm = !z0l && !z0r;
+                const xw = !x1l && !x1r;
+                const yw = !y1l && !y1r;
+                const zw = !z1l && !z1r;
 
                 const debugCollision = false;
-                if (xm && ym && zm) {
+                if (xm && ym && zm)
+                {
                     if (debugCollision) console.log('[Phase III - PreCollision] Full 3D clip detected.');
                     continue;
                 }
 
-                if (!xm + !ym + !zm !== 1) {
+                if (!xm + !ym + !zm !== 1)
+                {
                     if (debugCollision) console.log('[Phase III - PreCollision] Corner 2D clip detected.');
                 }
 
-                if (!(xw && yw && zw)) {
+                if (!(xw && yw && zw))
+                {
                     continue;
                 }
 
@@ -305,7 +334,8 @@ class RigidBodiesPhase3
                 let axis = 'none';
 
                 // Quadratic solve thrice
-                if (!xm) {
+                if (!xm)
+                {
                     const fw = xl ? 1 : -1;
 
                     const adh10 = p1adh[0];
@@ -324,13 +354,15 @@ class RigidBodiesPhase3
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10x, p20x, p11x, p21x, w1x, w2x, fw, relativeDt);
 
-                    if (r >= 0 && r < rrel) {
+                    if (r >= 0 && r < rrel)
+                    {
                         axis = 'x';
                         rrel = r;
                     }
                 }
 
-                if (!ym) {
+                if (!ym)
+                {
                     const fw = yl ? 1 : -1;
 
                     const adh10 = p1adh[1];
@@ -349,13 +381,15 @@ class RigidBodiesPhase3
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10y, p20y, p11y, p21y, w1y, w2y, fw, relativeDt);
 
-                    if (r >= 0 && r < rrel) {
+                    if (r >= 0 && r < rrel)
+                    {
                         axis = 'y';
                         rrel = r;
                     }
                 }
 
-                if (!zm) {
+                if (!zm)
+                {
                     const fw = zl ? 1 : -1;
 
                     const adh10 = p1adh[2]; const adh11 = p1adh[5];
@@ -372,13 +406,15 @@ class RigidBodiesPhase3
                     let r = RigidBodiesPhase3.solveSecondOrder(
                         a1, a2, b1, b2, p10z, p20z, p11z, p21z, w1z, w2z, fw, relativeDt);
 
-                    if (r >= 0 && r < rrel) {
+                    if (r >= 0 && r < rrel)
+                    {
                         axis = 'z';
                         rrel = r;
                     }
                 }
 
-                if (rrel < relativeDt) {
+                if (rrel < relativeDt)
+                {
                     mapCollidingPossible.push([i, j, rrel, axis]);
                 }
             }
@@ -423,7 +459,8 @@ class RigidBodiesPhase3
         subIslandsZ,
         axis)
     {
-        if (axis !== 'x' && axis !== 'y' && axis !== 'z') {
+        if (axis !== 'x' && axis !== 'y' && axis !== 'z')
+        {
             console.log('Undefined axis.'); return;
         }
 
@@ -443,7 +480,8 @@ class RigidBodiesPhase3
             default: break;
         }
 
-        if (subIslandI && subIslandJ) {
+        if (subIslandI && subIslandJ)
+        {
             const li = subIslandI.length;
             const lj = subIslandJ.length;
             if (li < lj) {
@@ -513,10 +551,18 @@ class RigidBodiesPhase3
         const sndtr2 = r; // * ltd2;
 
         // Snap p1.
-        const x0l = p10x + w1x <= p20x - w2x; const y0l = p10y + w1y <= p20y - w2y; const z0l = p10z + w1z <= p20z - w2z;
-        const x1l = p11x + w1x <= p21x - w2x; const y1l = p11y + w1y <= p21y - w2y; const z1l = p11z + w1z <= p21z - w2z;
-        const x0r = p10x - w1x >= p20x + w2x; const y0r = p10y - w1y >= p20y + w2y; const z0r = p10z - w1z >= p20z + w2z;
-        const x1r = p11x - w1x >= p21x + w2x; const y1r = p11y - w1y >= p21y + w2y; const z1r = p11z - w1z >= p21z + w2z;
+        const x0l = p10x + w1x <= p20x - w2x;
+        const y0l = p10y + w1y <= p20y - w2y;
+        const z0l = p10z + w1z <= p20z - w2z;
+        const x1l = p11x + w1x <= p21x - w2x;
+        const y1l = p11y + w1y <= p21y - w2y;
+        const z1l = p11z + w1z <= p21z - w2z;
+        const x0r = p10x - w1x >= p20x + w2x;
+        const y0r = p10y - w1y >= p20y + w2y;
+        const z0r = p10z - w1z >= p20z + w2z;
+        const x1r = p11x - w1x >= p21x + w2x;
+        const y1r = p11y - w1y >= p21y + w2y;
+        const z1r = p11z - w1z >= p21z + w2z;
 
         if (x0l && x1l || x0r && x1r || y0l && y1l || y0r && y1r || z0l && z1l || z0r && z1r)
         {
@@ -524,11 +570,16 @@ class RigidBodiesPhase3
             return;
         }
 
-        const xm = !x0l && !x0r; const ym = !y0l && !y0r; const zm = !z0l && !z0r;
-        const xw = !x1l && !x1r; const yw = !y1l && !y1r; const zw = !z1l && !z1r;
+        const xm = !x0l && !x0r;
+        const ym = !y0l && !y0r;
+        const zm = !z0l && !z0r;
+        const xw = !x1l && !x1r;
+        const yw = !y1l && !y1r;
+        const zw = !z1l && !z1r;
 
         if (xm && ym && zm) console.warn('[RigidBodies/Solve] two bodies clipped.');
-        if (xw && yw && zw) {
+        if (xw && yw && zw)
+        {
             let m2 = [];
             let wm1 = [w1x, w1y, w1z];
             let wm2 = [w2x, w2y, w2z];
@@ -592,7 +643,8 @@ class RigidBodiesPhase3
             // e1.lastR = r;
             // e2.lastR = r;
 
-            for (let m = 0; m < 3; ++m) {
+            for (let m = 0; m < 3; ++m)
+            {
                 if (m !== ax) continue;
                 // Check terrain...
                 const e1p1 = p11[m]; const e2p1 = p21[m];
@@ -616,7 +668,8 @@ class RigidBodiesPhase3
             p1v1[ax] = mv;
             p2v1[ax] = mv;
 
-            if (m2[ax]) {
+            if (m2[ax])
+            {
                 if (collidedbg) console.log('\tyes!');
                 // console.log('Correction.');
                 const e1p0 = p10[ax];
@@ -647,7 +700,8 @@ class RigidBodiesPhase3
             }
 
             const debug = false;
-            if (debug) {
+            if (debug)
+            {
                 console.log(`\tz = ${e1.p0[2]} -> ${e1.p1[2]} , ${e2.p0[2]} -> ${e2.p1[2]}`);
             }
         }
@@ -660,10 +714,13 @@ class RigidBodiesPhase3
         let min = Math.min;
         let max = Math.max;
         let overlap = min(e1p0, e1p1) + e1w + e2w + epsilon + seps;
-        if (overlap >= max(e2p0, e2p1)) {
+        if (overlap >= max(e2p0, e2p1))
+        {
             e1.p1[ax] = e1p0;
             e2.p1[ax] = e2p0;
-        } else {
+        }
+        else
+        {
             let den = e1p1 - e1p0 - e2p1 + e2p0;
             if (den === 0) {
                 e1.p1[ax] = e1p0;

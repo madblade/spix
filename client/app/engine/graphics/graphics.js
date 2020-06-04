@@ -26,7 +26,8 @@ import { ChunksMeshModule } from './terrain/chunkmesh';
 import { ShadersModule }  from './shaders/shaders.js';
 import { SkyModule }  from './sky/skies.js';
 
-let Graphics = function(app) {
+let Graphics = function(app)
+{
     // App and access to models.
     this.app = app;
 
@@ -36,8 +37,7 @@ let Graphics = function(app) {
     // Properties.
     this.windowHalfX = window.innerWidth / 2;
     this.windowHalfY = window.innerHeight / 2;
-    // TODO [LOW] customize newMesh size variable
-    this.defaultGeometrySize = 64;
+    this.defaultGeometrySize = 64; // This could be customized
     this._defaultEmptyChunkSize = 16;
 
     // Rendering.

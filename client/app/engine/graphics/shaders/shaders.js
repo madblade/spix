@@ -27,54 +27,64 @@ import BloomSelectiveVertex     from './postprocessing/bloom.selective.vertex.gl
 let ShadersModule = {
 
     // Portal
-    getPortalVertexShader() {
+    getPortalVertexShader()
+    {
         return PortalVertex;
     },
 
-    getPortalFragmentShader() {
+    getPortalFragmentShader()
+    {
         return PortalFragment;
     },
 
     // Sky
-    getSkyCubeVertexShader() {
+    getSkyCubeVertexShader()
+    {
         return SkyCubeVertex;
     },
 
-    getSkyCubeFragmentShader() {
+    getSkyCubeFragmentShader()
+    {
         return SkyCubeFragment;
     },
 
-    getSkyFlatVertexShader() {
+    getSkyFlatVertexShader()
+    {
         return SkyFlatVertex;
     },
 
-    getSkyFlatFragmentShader() {
+    getSkyFlatFragmentShader()
+    {
         return SkyFlatFragment;
     },
 
     // Water
-    getWaterFragmentShader() {
+    getWaterFragmentShader()
+    {
         return `
             #include <common>
             ${WaterFragment}
         `;
     },
 
-    getWaterVertexShader() {
+    getWaterVertexShader()
+    {
         return `
             #include <common>
             ${WaterVertex}
         `;
     },
 
-    getOceanFragmentShader() {
+    getOceanFragmentShader()
+    {
         return `
             #include <common>
             ${OceanFragment}
         `;
     },
 
-    getOceanVertexShader() {
+    getOceanVertexShader()
+    {
         return `
             #include <common>
             ${OceanVertex}
@@ -82,11 +92,13 @@ let ShadersModule = {
     },
 
     // Post-proc
-    getBloomSelectiveVertexShader() {
+    getBloomSelectiveVertexShader()
+    {
         return BloomSelectiveVertex;
     },
 
-    getBloomSelectiveFragmentShader() {
+    getBloomSelectiveFragmentShader()
+    {
         return BloomSelectiveFragment;
     }
 

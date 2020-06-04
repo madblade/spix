@@ -13,7 +13,8 @@ import {
 
 let EntitiesModule = {
 
-    loadMeshFromJSON(model, callback, errorCallback) {
+    loadMeshFromJSON(model, callback, errorCallback)
+    {
         let loader = new LegacyJSONLoader();
         loader.load(`app/assets/models/${model}.json`, geometry => {
             callback(geometry);
@@ -24,8 +25,10 @@ let EntitiesModule = {
         });
     },
 
-    loadReferenceGeometryFromMemory(id) {
-        if (!this.referenceMeshes.has(id)) {
+    loadReferenceGeometryFromMemory(id)
+    {
+        if (!this.referenceMeshes.has(id))
+        {
             console.error(`[Graphics/Meshes] Could not charge a new "${id}" mesh.`);
             return;
         }
@@ -41,7 +44,7 @@ let EntitiesModule = {
     {
         let mixers = this.mixers;
 
-        // TODO [FFF] export model to format glTF
+        // TODO [ANIMATION] export model to format glTF
         let geometry = this.loadReferenceGeometryFromMemory(model); // Should be 'steve'.
         let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
@@ -68,7 +71,8 @@ let EntitiesModule = {
     },
 
     // For composite entities, wrap heavy model parts in higher level structure.
-    finalizeEntity(id, createdEntity) {
+    finalizeEntity(id, createdEntity)
+    {
         // First only manage avatars.
         let up = new Object3D();
         let wrapper = new Object3D();

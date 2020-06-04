@@ -12,7 +12,8 @@ let TriggersModule = {
     {
         let clientSelfModel = this.clientModel.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
-        if (!ItemsModelModule.isItemIDSupported(activeItemID)) {
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+        {
             console.error('[Client/Event] Item ID unsupported');
         }
 
@@ -32,7 +33,8 @@ let TriggersModule = {
     {
         let clientSelfModel = this.clientModel.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
-        if (!ItemsModelModule.isItemIDSupported(activeItemID)) {
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+        {
             console.error('[Client/Event] Item ID unsupported');
             return;
         }
@@ -42,7 +44,7 @@ let TriggersModule = {
             if (data[0] === 'add') {
                 // From inventory, select block to be added.
                 data.splice(-3, 3);
-                // TODO check server-wise if it is in the inventory.
+                // There should be a server-wise check (if it is in the inventory)
                 data.push(activeItemID);
             }
             this.triggerBlock('b', data);
@@ -58,20 +60,21 @@ let TriggersModule = {
             data.push(clientSelfModel.getAngleFromIntersectionPoint());
             this.triggerBlock('x', data);
         } else {
-            // TODO [MEDIUM] object, skill...
+            // TODO [GAMEPLAY] object, skill
             // Validate server-side? Keep duplicate in selfComponent?
             console.warn('[Client/Event] Unsupported item.');
         }
     },
 
-    triggerMovement(type, data) {
+    triggerMovement(type, data)
+    {
         let ak = this.activeControls;
         let events = this.eventsToPush;
         let addEvent = function() { events.push([type, data]); };
 
         let sameTypeEvents = this.getEventsOfType(type);
         if (sameTypeEvents.length > 0) {
-            // TODO compress events
+            // TODO [PERF] compress events
         }
 
         switch (data) {
@@ -138,7 +141,8 @@ let TriggersModule = {
         }
     },
 
-    triggerAction(type, data) {
+    triggerAction(type, data)
+    {
         let events = this.eventsToPush;
 
         switch (data) {
@@ -150,12 +154,14 @@ let TriggersModule = {
         }
     },
 
-    triggerRotation(type, data) {
+    triggerRotation(type, data)
+    {
         let events = this.eventsToPush;
         events.push([type, data]);
     },
 
-    triggerBlock(type, data) {
+    triggerBlock(type, data)
+    {
         let events = this.eventsToPush;
         events.push([type, data]);
     },

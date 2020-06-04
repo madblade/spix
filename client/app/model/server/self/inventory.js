@@ -23,7 +23,8 @@ let InventoryModel = function()
 
 extend(InventoryModel.prototype, {
 
-    reset() {
+    reset()
+    {
         // this.setItem(0, ItemType.BLOCK_PLANKS);
         // this.setItem(1, ItemType.KATANA);
         // this.setItem(2, ItemType.YUMI);
@@ -32,23 +33,27 @@ extend(InventoryModel.prototype, {
     },
 
     // These would be client methods.
-    // getActiveItem() {
+    // getActiveItem()
+    // {
     //     return this.items[this.activeItemId];
     // },
-    // setActiveItem(id) {
+    // setActiveItem(id)
+    // {
     //     if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
     //         console.error('[Model/Inventory] Invalid inventory slot.');
     //     this.activeItemId = id;
     //     return this.items[id];
     // },
 
-    getItem(id) {
+    getItem(id)
+    {
         if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
             console.error('[Model/Inventory] Invalid inventory slot.');
         return this.items[id];
     },
 
-    setItem(id, item) {
+    setItem(id, item)
+    {
         if (id !== parseInt(id, 10) || id < 0 || id > this.inventorySize)
             console.warn('[Model/Inventory] Invalid inventory slot.');
         if (!this.isItemIDSupported(item))

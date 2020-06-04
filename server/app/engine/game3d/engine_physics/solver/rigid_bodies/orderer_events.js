@@ -10,7 +10,8 @@ class EventOrderer
 {
     static maxRange = 32.;
 
-    constructor() {
+    constructor()
+    {
         this._events = [];
         this._axes = new Map(); // World -> events.
     }
@@ -18,7 +19,8 @@ class EventOrderer
     get axes()      { return this._axes; }
     get events()    { return this._events; }
 
-    addEvent(worldId, event) {
+    addEvent(worldId, event)
+    {
         // let p = event.position;
         // let x = p[0]; let y = p[1]; let z = p[2];
         let events = this._events;
@@ -36,15 +38,15 @@ class EventOrderer
 
             // let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
             // let orderCache = ObjectOrderer.orderCache;
-            // TODO [CRIT] add event
-
+            // TODO [GAMEPLAY] add event
         }
     }
 
     // Automatically removes event when they are outdated.
     // If you wish to abort an event, simply set its lifespan to 0.
     // It will be destroyed at the next server iteration.
-    applyEventsInWorld(worldId) {
+    applyEventsInWorld(worldId)
+    {
         let axes = this._axes.get(worldId);
         let events = this._events;
         if (!axes) return;
@@ -67,7 +69,8 @@ class EventOrderer
 
         // Shift all numbers...
         toDelete.sort();
-        for (let i = 0, li = toDelete.length; i < li; ++i) {
+        for (let i = 0, li = toDelete.length; i < li; ++i)
+        {
             currentEvent = events[i];
             for (let j = currentEvent.indexX, lj = xAxis.length; j < lj; ++j)
                 events[xAxis[j]].indexX -= 1;
@@ -78,7 +81,8 @@ class EventOrderer
         }
 
         // Delete from all arrays.
-        for (let i = 0, li = toDelete.length; i < li; ++i) {
+        for (let i = 0, li = toDelete.length; i < li; ++i)
+        {
             eventIndex = toDelete[i];
             events.splice(eventIndex, 1);
             xAxis.splice(xAxis.indexOf(eventIndex), 1);

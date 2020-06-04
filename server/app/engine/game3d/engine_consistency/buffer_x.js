@@ -6,7 +6,8 @@
 
 class XBuffer
 {
-    constructor() {
+    constructor()
+    {
         // Don't implement add/removeX
         // For they'll be updated next frame.
         // Should do same with players :/
@@ -14,7 +15,8 @@ class XBuffer
         this._outputBuffer = new Map();
     }
 
-    updateXForPlayer(playerId, addedX, removedX) {
+    updateXForPlayer(playerId, addedX, removedX)
+    {
         if (!addedX && !removedX) return;
 
         if (addedX && removedX) Object.assign(addedX, removedX);
@@ -23,11 +25,13 @@ class XBuffer
         this._outputBuffer.set(playerId, addedX);
     }
 
-    getOutput() {
+    getOutput()
+    {
         return new Map(this._outputBuffer);
     }
 
-    flush() {
+    flush()
+    {
         this._outputBuffer = new Map();
     }
 }

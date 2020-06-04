@@ -6,13 +6,15 @@
 
 class XLoader
 {
-    constructor(consistencyEngine) {
+    constructor(consistencyEngine)
+    {
         this._xModel = consistencyEngine.xModel;
         this._worldModel = consistencyEngine.worldModel;
         this._consistencyModel = consistencyEngine.consistencyModel;
     }
 
-    computeNewXInRange(player) {
+    computeNewXInRange(player)
+    {
         let a = player.avatar;
         let avatarId = a.entityId;
         let pos = a.position;
@@ -24,7 +26,8 @@ class XLoader
         let cm = this._consistencyModel;
 
         let chunk = wm.getWorld(worldId).getChunkByCoordinates(...pos);
-        if (!chunk) {
+        if (!chunk)
+        {
             console.log(`[LoaderX] Undefined chunk for pos ${pos} in wid ${worldId}.`);
             return null;
         }
@@ -61,12 +64,14 @@ class XLoader
         });
 
         // Update out of range portals.
-        // TODO [OPTIM] when getConnectivity is performed, just remember which levels correspond to which portals...
+        // TODO [PERF] when getConnectivity is performed,
+        //  just remember which levels correspond to which portals
         let playerXs = cm.getXIdsForEntity(avatarId);
         let removedPortals = {};
 
         let chunks = connectivity[1];
-        if (chunks) {
+        if (chunks)
+        {
             let marks = new Map();
             chunks.forEach(c => marks.set(`${c[0]},${c[1]}`, `${c[2]}`));
 

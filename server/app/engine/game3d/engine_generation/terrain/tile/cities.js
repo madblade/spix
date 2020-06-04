@@ -245,7 +245,7 @@ CityPlacer.prototype.relaxPath = function(path)
     return newpath;
 };
 
-// TODO City wards.
+// TODO [GENERATION] City wards.
 
 export {
     CityPlacer

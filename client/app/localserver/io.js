@@ -7,7 +7,8 @@
 import extend from '../extend';
 
 // Socket internals
-let Socket = function() {
+let Socket = function()
+{
     this.actions = {};
     this.request = {
         connection: {
@@ -22,17 +23,21 @@ let Socket = function() {
 };
 
 extend(Socket.prototype, {
-    setOtherEndPoint(s) {
+
+    setOtherEndPoint(s)
+    {
         this.otherSocket = s;
     },
 
     // Override
-    on(message, action) {
+    on(message, action)
+    {
         this.actions[message] = action;
         // console.log(`[Socket] added '${message}' listener`);
     },
 
-    removeListener(message) {
+    removeListener(message)
+    {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
@@ -41,7 +46,8 @@ extend(Socket.prototype, {
     },
 
     // Override
-    removeAllListeners(message) {
+    removeAllListeners(message)
+    {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
@@ -49,7 +55,8 @@ extend(Socket.prototype, {
         }
     },
 
-    disconnect() {
+    disconnect()
+    {
         let has = this.actions.hasOwnProperty('disconnect');
         if (has) {
             this.actions.disconnect();
@@ -57,7 +64,8 @@ extend(Socket.prototype, {
     },
 
     // Override
-    emit(message, data) {
+    emit(message, data)
+    {
         // console.log(`emit ${message} with ${data}`);
         // Forward action
         let s = this.otherSocket;
@@ -69,7 +77,8 @@ extend(Socket.prototype, {
 });
 
 // Socket provider
-let IO = function() {
+let IO = function()
+{
     this.connectionCallback = function() {
         console.log('[IO] No connection behavior specified.');
     };
@@ -81,17 +90,20 @@ let IO = function() {
 
 extend(IO.prototype, {
 
-    on(message, action) {
+    on(message, action)
+    {
         if (message === 'connection') {
             this.connectionCallback = action;
         }
     },
 
-    connect(socket) {
+    connect(socket)
+    {
         this.connectionCallback(socket);
     },
 
-    disconnect(socket) {
+    disconnect(socket)
+    {
         if (socket && socket.disconnect)
             socket.disconnect();
         console.log('[IO] Disconnect ');

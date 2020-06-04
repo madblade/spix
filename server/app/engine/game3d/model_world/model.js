@@ -55,8 +55,10 @@ const ChunkSizes = Object.freeze({
     FLAT_HUGE: [32, 32, 64]
 });
 
-class BlockTypes {
-    static isBlock(id) {
+class BlockTypes
+{
+    static isBlock(id)
+    {
         return id !== BlockType.AIR &&
             (id >= BlockType.GRASS && id <= BlockType.BRICKS ||
                 id >= BlockType.SAND && id <= BlockType.IRON);
@@ -90,12 +92,14 @@ class WorldModel
         return w;
     }
 
-    getWorld(worldId) {
+    getWorld(worldId)
+    {
         if (!worldId) worldId = -1;
         return this._worlds.get(worldId);
     }
 
-    getFreeWorld() {
+    getFreeWorld()
+    {
         return this.getWorld(-1);
     }
 

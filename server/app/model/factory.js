@@ -21,43 +21,52 @@ class Factory
 {
     /** App-level classes */
 
-    static createUserDB(connector) {
+    static createUserDB(connector)
+    {
         return new UserDB(connector);
     }
 
-    static createHub(app) {
+    static createHub(app)
+    {
         return new Hub(app);
     }
 
-    static createUser(hub, socket, nick, id) {
+    static createUser(hub, socket, nick, id)
+    {
         return new User(hub, socket, nick, id);
     }
 
     /** Gaming classes */
 
-    static createGame(hub, kind, gameId, connector, options) {
+    static createGame(hub, kind, gameId, connector, options)
+    {
         return GameFactory.createGame(hub, kind, gameId, connector, options);
     }
 
-    static createPlayer(user, game) {
+    static createPlayer(user, game)
+    {
         return new Player(user, game);
     }
 
-    static createPlayerManager() {
+    static createPlayerManager()
+    {
         return new PlayerManager();
     }
 
     /** Connection classes */
 
-    static createConnection(app) {
+    static createConnection(app)
+    {
         return new Connection(app);
     }
 
-    static createUserConnection(user, socket) {
+    static createUserConnection(user, socket)
+    {
         return new UserConnection(user, socket);
     }
 
-    static createPlayerConnection(socket) {
+    static createPlayerConnection(socket)
+    {
         return new PlayerConnection(socket);
     }
 }

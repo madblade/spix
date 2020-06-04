@@ -8,18 +8,21 @@ import extend           from '../../extend.js';
 import { Chat }         from '../chat/chat.js';
 import { Hud }          from '../hud/hud.js';
 
-let Register = function(/*app*/) {
+let Register = function() //, app
+{
     this.modules = {};
 };
 
 extend(Register.prototype, {
 
-    registerDefaultModules() {
+    registerDefaultModules()
+    {
         this.registerModule('chat', new Chat(this));
         this.registerModule('hud', new Hud(this));
     },
 
-    registerModule(moduleName, module) {
+    registerModule(moduleName, module)
+    {
         if (this.modules.hasOwnProperty(moduleName)) {
             throw Error('Error: module already registered.');
         }
@@ -27,7 +30,8 @@ extend(Register.prototype, {
         this.modules[moduleName] = module;
     },
 
-    gameStarted() {
+    gameStarted()
+    {
         for (let m in this.modules) {
             if (!this.modules.hasOwnProperty(m)) continue;
             let module = this.modules[m];
@@ -38,7 +42,8 @@ extend(Register.prototype, {
         }
     },
 
-    gameStopped() {
+    gameStopped()
+    {
         for (let m in this.modules) {
             if (!this.modules.hasOwnProperty(m)) continue;
             let module = this.modules[m];
@@ -49,15 +54,18 @@ extend(Register.prototype, {
         }
     },
 
-    updateSelfState(data) {
+    updateSelfState(data)
+    {
         this.modules.hud.updateSelfState(data);
     },
 
-    updateChat(data) {
+    updateChat(data)
+    {
         this.modules.chat.updateChat(data);
     },
 
-    sendMessage(/*message*/) {
+    sendMessage() // message
+    {
         console.log('Sending message.');
     }
 

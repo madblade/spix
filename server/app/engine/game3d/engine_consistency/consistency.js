@@ -15,7 +15,8 @@ import Updater          from './updater/updater';
 
 class ConsistencyEngine
 {
-    constructor(game) {
+    constructor(game)
+    {
         this._game = game;
 
         // Models.
@@ -52,7 +53,8 @@ class ConsistencyEngine
     get entityLoader()          { return this._entityLoader; }
 
     // On connection / disconnection.
-    spawnPlayer(player) {
+    spawnPlayer(player)
+    {
         let world = this._worldModel.getFreeWorld();
         let freePosition = world.getFreePosition();
         this._entityModel.spawnPlayer(player, world, freePosition);
@@ -61,45 +63,54 @@ class ConsistencyEngine
         this._physicsEngine.spawnPlayer(player);
     }
 
-    despawnPlayer(playerId) {
+    despawnPlayer(playerId)
+    {
         this._entityBuffer.removePlayer(playerId);
         this._consistencyModel.removePlayer(playerId);
         this._physicsEngine.removePlayer(playerId);
         this._entityModel.removePlayer(playerId);
     }
 
-    addInput(meta, avatar) {
+    addInput(meta, avatar)
+    {
         this._updater.addInput(meta, avatar);
     }
 
-    update() {
+    update()
+    {
         this._updater.update();
     }
 
-    getChunkOutput() {
+    getChunkOutput()
+    {
         return this._chunkBuffer.getOutput();
     }
 
-    getEntityOutput() {
+    getEntityOutput()
+    {
         return this._entityBuffer.getOutput();
     }
 
-    getPlayerOutput() {
+    getPlayerOutput()
+    {
         return this._entityBuffer.addedPlayers;
     }
 
-    getXOutput() {
+    getXOutput()
+    {
         return this._updater.getOutput();
     }
 
-    flushBuffers() {
+    flushBuffers()
+    {
         this._chunkBuffer.flush();
         this._entityBuffer.flush();
         this._updater.flushBuffers();
     }
 
     // The first time, FORCE BUILD when output requests CE initial output.
-    initChunkOutputForPlayer(player) {
+    initChunkOutputForPlayer(player)
+    {
         let aid = player.avatar.entityId;
         let worldId = player.avatar.worldId;
         let worldModel = this._worldModel;
@@ -119,7 +130,10 @@ class ConsistencyEngine
             }
             let chunkIds = chunkOutput[wid];
             for (let cid in chunkIds)
+            {
+                if (!chunkIds.hasOwnProperty(cid)) continue;
                 if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid, 10), cid);
+            }
         }
 
         chunkOutput.worlds = addedW;
@@ -130,7 +144,8 @@ class ConsistencyEngine
     }
 
     // The first time, FORCE COMPUTE in-range entities when output requests CE output.
-    initEntityOutputForPlayer(player) {
+    initEntityOutputForPlayer(player)
+    {
         let aid = player.avatar.entityId;
         let es = this._entityModel.entities;
         let cm = this._consistencyModel;
@@ -145,9 +160,10 @@ class ConsistencyEngine
         return entityOutput;
     }
 
-    // TODO [CRIT] init x output for player
+    // TODO [IO] init x output for player
 
-    generateWorld() {
+    generateWorld()
+    {
         return this._generator.generateWorld();
     }
 }

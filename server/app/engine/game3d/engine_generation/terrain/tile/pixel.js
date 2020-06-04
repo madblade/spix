@@ -429,8 +429,7 @@ Rasterizer.prototype.drawCity = function(cityX, cityY, cityRadius)
     this.drawCircle(cityX, cityY, cityRadius);
     this.drawCircle(cityX, cityY, cityRadius - 1);
     this.drawCircle(cityX, cityY, cityRadius - 2);
-    // TODO use voronoi to make inner walls
-    // TODO inside of cities with buildings
+    // TODO [GENERATION] voronoi (inner walls); inside of cities with buildings
 };
 
 Rasterizer.prototype.cityPass = function(mesh, cities)
@@ -499,7 +498,7 @@ Rasterizer.prototype.fillTrees = function(chunkI, chunkJ, nbTrees)
     const w = this.dimension;
     let rng = this.rng2;
     let sb = this.surfaceBuffer;
-    // TODO jitter sampling
+    // TODO [GENERATION] jitter sampling
     for (let i = 0; i < nbTrees; ++i) {
         // never on a chunk border.
         const x = xStart + Math.floor(1 + rng.uniform() * (chunkWidth - 1));
@@ -508,7 +507,7 @@ Rasterizer.prototype.fillTrees = function(chunkI, chunkJ, nbTrees)
     }
 };
 
-// TODO combine with height and voronoi
+// TODO [GENERATION] combine with height and voronoi
 Rasterizer.prototype.treePass = function()
 {
     const nbChunksX = this.dimension / 16;

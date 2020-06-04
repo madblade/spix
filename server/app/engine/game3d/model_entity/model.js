@@ -11,14 +11,15 @@ import Cube   from './cube';
 
 class EntityModel
 {
-    constructor(game) {
+    constructor(game)
+    {
         this._game = game;
 
         // Fast register for all entities.
-        // TODO [CRIT] accessor: LACKS.
-        // TODO [CRIT] use arrays
+        // [OPT] accessor: LACKS.
+        // [OPT] use arrays
         //this._entities = new Map();
-        // TODO [CRIT] cache optimization.
+        // [OPT] cache optimization.
         this._entities = []; // Entity id <-> position in entity array.
         // new Array(10);
         this._freedEntities = []; // Indexes of deleted entities.
@@ -27,14 +28,16 @@ class EntityModel
 
     get entities() { return this._entities; }
 
-    forEach(callback) {
+    forEach(callback)
+    {
         let entities = this._entities;
         entities.forEach(entity/*, id)*/ => {
             callback(entity);
         });
     }
 
-    spawnPlayer(p, world, freePosition) {
+    spawnPlayer(p, world, freePosition)
+    {
         let avatar = this.createEntity('avatar');
         p.avatar = avatar;
 
@@ -43,14 +46,16 @@ class EntityModel
     }
 
     // World to be set at spawn time.
-    createEntity(kind) {
+    createEntity(kind)
+    {
         let entities = this._entities;
         //let entitiesLength = this._entitiesLength;
         let freedEntities = this._freedEntities;
 
         let entityId;
         if (freedEntities.length > 0) {
-            entityId = freedEntities[0]; // TODO [FFFFFFFF] impact consistency model...
+            entityId = freedEntities[0];
+            // ^ TODO [ENTITIES] impact consistency model
             freedEntities.shift();
         } else {
             entityId = entities.length;
@@ -75,16 +80,18 @@ class EntityModel
         return e;
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId)
+    {
         this.removeEntity(playerId);
     }
 
-    removeEntity(entityId) {
+    removeEntity(entityId)
+    {
         this._entities[entityId] = undefined;
         this._freedEntities.push(entityId);
     }
 
-    // TODO [HIGH] optimize.
+    // [OPT] Can be optimized
     anEntityIsPresentOn(worldId, x, y, z)
     {
         let entities = this._entities;

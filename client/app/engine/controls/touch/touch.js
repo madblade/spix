@@ -31,8 +31,10 @@ let TouchModule = {
     {},
 
     // Activate listeners
-    startTouchListeners() {
-        if (!this.isTouch) {
+    startTouchListeners()
+    {
+        if (!this.isTouch)
+        {
             console.error('[Touch] Trying to initialize touch on non-touch device.');
             return;
         }
@@ -50,13 +52,15 @@ let TouchModule = {
         widget.startWidgetListeners();
     },
 
-    stopTouchListeners() {
+    stopTouchListeners()
+    {
         let widget = this.touchWidgetControls;
         widget.stopWidgetListeners();
         widget.element.style.visibility = 'hidden';
     },
 
-    requestTouchLock() {
+    requestTouchLock()
+    {
         this.touchControlsEnabled = true;
         let controlsEngine = this.app.engine.controls;
         controlsEngine.startTouchListeners();
@@ -75,7 +79,8 @@ let TouchModule = {
         }
     },
 
-    updateControlsDevice() {
+    updateControlsDevice()
+    {
         if (!this.isTouch) return;
         if (!this.touchControlsEnabled) return;
 

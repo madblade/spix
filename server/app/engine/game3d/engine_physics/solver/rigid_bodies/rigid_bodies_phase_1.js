@@ -34,7 +34,8 @@ class RigidBodiesPhase1
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
         {
             let currentObject = oxAxis[oi];
-            if (!currentObject) {
+            if (!currentObject)
+            {
                 console.log('Current object empty.');
                 console.log(`Expected number of objects ${oxAxis.length}`);
                 console.log(`Queried object index ${oi}`);
@@ -51,7 +52,8 @@ class RigidBodiesPhase1
             oz = op[2]; wz = currentEntity.widthZ;
 
             // Search events.
-            for (let ei = lastEX, el = exAxis.length; ei < el; ++ei) {
+            for (let ei = lastEX, el = exAxis.length; ei < el; ++ei)
+            {
                 eventIndex = exAxis[ei];
                 currentEvent = events[eventIndex];
                 ep = currentEvent.position;
@@ -193,7 +195,8 @@ class RigidBodiesPhase1
             let min = Math.min;
             let max = Math.max;
             let gettingOutOfWater = false;
-            if (!inWater) {
+            if (!inWater)
+            {
                 if (g[0] < 0 && vector[0] > 0.05 && world.isWater(p0[0] - 1, p0[1], p0[2])) {
                     inc[0] = max(inc[0], 0);
                     gettingOutOfWater = true;
@@ -225,10 +228,12 @@ class RigidBodiesPhase1
                 }
             }
 
-            for (let i = 0; i < 3; ++i) {
+            for (let i = 0; i < 3; ++i)
+            {
                 const gi = g[i];
                 const vi = vector[i];
-                if (gi < 0 && vi > 0.05) {
+                if (gi < 0 && vi > 0.05)
+                {
                     if (adh[i]) {
                         // console.log(`jump ${p1} -> ${p0}`);
                         a1[i] += 0.7;
@@ -252,7 +257,8 @@ class RigidBodiesPhase1
                         }
                     }
                 }
-                else if (gi > 0 && vi < -0.05) {
+                else if (gi > 0 && vi < -0.05)
+                {
                     if (adh[3 + i]) {
                         // console.log(`antijump ${passId}`);
                         a1[i] -= 0.7;
@@ -317,7 +323,8 @@ class RigidBodiesPhase1
         // }
     }
 
-    static getForwardVector(d) {
+    static getForwardVector(d)
+    {
         let fw = d[0] && !d[1]; let bw = !d[0] && d[1];
         let rg = d[2] && !d[3]; let lf = !d[2] && d[3];
         let up = d[4] && !d[5]; let dn = !d[4] && d[5];
@@ -330,7 +337,7 @@ class RigidBodiesPhase1
         return [0, 0, 0];
     }
 
-    // TODO use quaternions instead
+    // TODO [PERF] use quaternions instead
     static getEntityForwardVector(d, rotation, factor, project2D)
     {
         let cos = Math.cos;
@@ -364,17 +371,22 @@ class RigidBodiesPhase1
         let nb0 = (fw || bw) + (rg || lf) + (up || dn);
         if (nb0 === 0) return [0, 0, 0];
 
-        let getPsy1 = function(theta0, theta1, phi0, phi1) {
+        let getPsy1 = function(theta0, theta1, phi0, phi1)
+        {
             const st0 = sin(theta0); const st1 = sin(theta1); const ct0 = cos(theta0);
             const ct1 = cos(theta1);
             const sp0 = sin(phi0); const sp1 = sin(phi1); const cp0 = cos(phi0);
             const cp1 = cos(phi1);
             return acos((ct1 + cp1) /
-                sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0) + square(ct1 + cp1))
+                sqrt(square(st1 * st0 + sp1 * sp0) +
+                    square(st1 * ct0 + sp1 * cp0) +
+                    square(ct1 + cp1)
+                )
             );
         };
 
-        let getPsy0 = function(theta0, theta1, phi0, phi1) {
+        let getPsy0 = function(theta0, theta1, phi0, phi1)
+        {
             const st0 = sin(theta0); let st1 = sin(theta1);
             const ct0 = cos(theta0);
             const sp0 = sin(phi0); let sp1 = sin(phi1);
@@ -383,7 +395,9 @@ class RigidBodiesPhase1
             const s = sgn(st1 * st0 + sp1 * sp0);
             return s *
                 acos((st1 * ct0 + sp1 * cp0) /
-                    sqrt(square(st1 * st0 + sp1 * sp0) + square(st1 * ct0 + sp1 * cp0))
+                    sqrt(square(st1 * st0 + sp1 * sp0) +
+                        square(st1 * ct0 + sp1 * cp0)
+                    )
                 );
         };
 
@@ -395,7 +409,8 @@ class RigidBodiesPhase1
             else if (dn)  relTheta1 -= PI2;
             else if (rg) {relTheta0 -= PI2; relTheta1 = PI2;}
             else if (lf) {relTheta0 += PI2; relTheta1 = PI2;}
-            else {
+            else
+            {
                 console.log('[RigidBodies] Undefined direction (1).');
                 return [0, 0, 0];
             }
@@ -559,7 +574,8 @@ class RigidBodiesPhase1
 
         let frontVector3D = [];
 
-        for (let i = 0; i < 3; ++i) {
+        for (let i = 0; i < 3; ++i)
+        {
             frontVector3D[i] = relFrontVector[i] * factor;
         }
 

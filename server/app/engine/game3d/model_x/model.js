@@ -13,7 +13,8 @@ import WorldGenerator   from '../engine_consistency/generator/worldgenerator';
 
 class XModel
 {
-    constructor(game, worldModel) {
+    constructor(game, worldModel)
+    {
         this._game = game;
         this._worldModel = worldModel;
 
@@ -22,7 +23,7 @@ class XModel
         this._portals = new Map();
 
         // world id => [map: chunk id => set of portal ids]
-        // TODO [LONG-TERM] optimize by sorting.
+        // [OPT] optimize by sorting.
         this._worldToChunksToPortals = new Map();
 
         // Portal id => knots
@@ -42,12 +43,16 @@ class XModel
 
     // One knows it must link parts of this knots before it opens...
     // OtherPortalId: if null, spawns an empty portal; otherwise, links an existing portal and forge it into a knot.
-    addPortal(worldId, x1, y1, z1, x2, y2, z2, offset, orientation, otherPortalId) {
+    addPortal(
+        worldId, x1, y1, z1, x2, y2, z2,
+        offset, orientation, otherPortalId
+    )
+    {
         let world = this._worldModel.getWorld(worldId);
         let portals = this._portals;
         let worldToChunksToPortals = this._worldToChunksToPortals;
 
-        // TODO [HIGH] determine a free position
+        // TODO [PORTAL] determine a free position
         //while ((!world.isFree([x1, y1, z1]) || !world.isFree([x2, y2, z2])) && z2 < world.zSize) {
         //    z1++; z2++;
         //}
@@ -61,7 +66,8 @@ class XModel
         let by = y1 === y2;
         let bz = z1 === z2;
         let sum = bx + by + bz;
-        if (sum !== 1 && sum !== 2) {
+        if (sum !== 1 && sum !== 2)
+        {
             console.log(`Portal not axis-aligned: ${sum}.`);
             return;
         }
@@ -70,7 +76,8 @@ class XModel
         // Check chunks.
         let coords1 = world.getChunkCoordinates(x1, y1, z1);
         let coords2 = world.getChunkCoordinates(x2, y2, z2);
-        // Must be on one same chunk. TODO [LONG-TERM] spawn them across chunks.
+        // Must be on one same chunk.
+        // TODO [PORTAL] manage portals sitting across chunks.
         let chunk1 = world.getChunk(...coords1);
         let chunk2 = world.getChunk(...coords2);
         if (chunk1 && chunk1 !== chunk2) return;
@@ -84,7 +91,8 @@ class XModel
         let chunkId = chunk1.chunkId;
         portals.set(portalId, portal);
         let wtpc = worldToChunksToPortals.get(worldId); let ctpc;
-        if (wtpc) {
+        if (wtpc)
+        {
             ctpc = wtpc.get(chunkId);
             if (ctpc) {
                 ctpc.add(portalId);
@@ -94,7 +102,9 @@ class XModel
                 ctpc.add(portalId);
                 wtpc.set(chunkId, ctpc);
             }
-        } else {
+        }
+        else
+        {
             wtpc = new Map();
             ctpc = new Set();
             ctpc.add(portalId);
@@ -102,10 +112,13 @@ class XModel
             worldToChunksToPortals.set(worldId, wtpc);
         }
 
-        if (otherPortalId) {
+        if (otherPortalId)
+        {
             this.addKnot(portalId, otherPortalId);
             console.log(`world present ${otherPortalId}`);
-        } else {
+        }
+        else
+        {
             let newWorld = this._worldModel.addWorld();
             if (!newWorld) {
                 console.log('Failed to create a new world.');
@@ -116,7 +129,8 @@ class XModel
             let xS = newWorld.xSize;
             let yS = newWorld.ySize;
             let zS = newWorld.zSize;
-            // TODO [HIGH] Maybe it's not right to generate chunks here.
+            // TODO [GENERATION] Do not generate world on portal creation,
+            //   delegate to main thread event loop.
             let ijk = chunkId.split(',');
             let newChunk = WorldGenerator.generateInitialChunk(xS, yS, zS, ...ijk, newWorld);
             newWorld.addChunk(newChunk.chunkId, newChunk);
@@ -133,7 +147,8 @@ class XModel
     // position: percentage of block towards +
     // orientation: '+', '-' or both.
     // One does not know where this one will lead.
-    addKnot(portalId1, portalId2) {
+    addKnot(portalId1, portalId2)
+    {
         let knots = this._knots;
         let portals = this._portals;
         let portalsToKnots = this._portalsToKnots;
@@ -161,12 +176,14 @@ class XModel
 
     /** Remove **/
 
-    removePortalFromPosition(worldId, x, y, z) {
-        // TODO [CRIT] worldify
+    removePortalFromPosition(worldId, x, y, z)
+    {
+        // TODO [PORTAL] implement portal removal
         console.log(`Removing ${x},${y},${z} portal from ${worldId}.`);
     }
 
-    removePortal(portalId) {
+    removePortal(portalId)
+    {
         // Unlink and remove portal.
         let portalToKnots = this._portalsToKnots;
         let portals = this._portals;
@@ -175,7 +192,8 @@ class XModel
 
         let knot = portalToKnots.get(portalId);
 
-        if (knot) {
+        if (knot)
+        {
             let otherEnd = knot.otherEnd(portal);
 
             if (otherEnd)
@@ -187,17 +205,18 @@ class XModel
         }
 
         portals.delete(portalId);
-        // TODO [OPTIM] compute connected components in 4D manifold
         this._cachedConnectivity = [new Map(), new Map()];
     }
 
-    removeKnot(knotId) {
+    removeKnot(knotId)
+    {
         // Unlink portals.
         let knots = this._knots;
         let portalToKnots = this._portalsToKnots;
         let knot = knots.get(knotId);
 
-        if (knot) {
+        if (knot)
+        {
             let end1 = knot.portal1;
             let end2 = knot.portal2;
 
@@ -214,12 +233,14 @@ class XModel
 
     /** Get **/
 
-    getPortal(portalId) {
+    getPortal(portalId)
+    {
         portalId = parseInt(portalId, 10);
         return this._portals.get(portalId);
     }
 
-    chunkContainsPortal(worldId, chunkId, portalId) {
+    chunkContainsPortal(worldId, chunkId, portalId)
+    {
         worldId = parseInt(worldId, 10);
         let ctp = this._worldToChunksToPortals.get(worldId);
         if (!ctp) return false;
@@ -228,14 +249,16 @@ class XModel
         return p.has(portalId);
     }
 
-    getPortalsFromChunk(worldId, chunkId) {
+    getPortalsFromChunk(worldId, chunkId)
+    {
         worldId = parseInt(worldId, 10);
         let ctp = this._worldToChunksToPortals.get(worldId);
         if (!ctp) return null;
         return ctp.get(chunkId);
     }
 
-    getOtherSide(portalId) {
+    getOtherSide(portalId)
+    {
         portalId = parseInt(portalId, 10);
         let p = this._portals.get(portalId);
         if (!p) return;
@@ -273,7 +296,8 @@ class XModel
         let depth = 0;
         let count = 0;
         let stack = [[startWid, startCid, depth]];
-        while (stack.length > 0 && depth < thresh) {
+        while (stack.length > 0 && depth < thresh)
+        {
             let element = stack.shift();
             let currentWorld = element[0];
             let currentChunk = element[1];
@@ -332,7 +356,8 @@ class XModel
             }
 
             let gates = this.getPortalsFromChunk(currentWorld, currentChunk);
-            if (gates) {
+            if (gates)
+            {
                 gates.forEach(g => {
                     let currentPortal = this.getPortal(g);
                     let otherSide = this.getOtherSide(g);

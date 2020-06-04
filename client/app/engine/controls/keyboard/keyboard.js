@@ -13,11 +13,12 @@ import { LayoutCustom }     from './layout.custom.js';
 
 let KeyboardModule = {
 
-    setupKeyboard() {
+    setupKeyboard()
+    {
         // Try to detect user language
         this.settings.language = window.navigator.userLanguage || window.navigator.language || 'en-US';
 
-        // TODO remove this (convenient just for me).
+        // TODO [ACCESSIBILITY] remove this (convenient just for me).
         this.settings.language = 'fr';
 
         // Controls
@@ -27,7 +28,8 @@ let KeyboardModule = {
         // this.tweak = 0;
     },
 
-    startKeyboardListeners() {
+    startKeyboardListeners()
+    {
         if (this.isTouch)
             console.warn('[Keyboard] requested keyboard listeners on a touch device.');
 
@@ -35,7 +37,8 @@ let KeyboardModule = {
         this.registerKeyUp();
     },
 
-    stopKeyboardListeners() {
+    stopKeyboardListeners()
+    {
         this.stopKeyboardInteraction();
         this.unregisterKeyDown();
         this.unregisterKeyUp();
@@ -49,7 +52,8 @@ let KeyboardModule = {
      * @param newBinding
      *      Optional. For custom layouts, a new [action, key] binding.
      */
-    changeLayout(newLayout, dontRestartListeners, newBinding) {
+    changeLayout(newLayout, dontRestartListeners, newBinding)
+    {
         // Prevent keys from being fired when configuring.
         this.stopKeyboardListeners();
 

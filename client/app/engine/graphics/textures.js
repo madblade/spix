@@ -5,7 +5,6 @@
 'use strict';
 
 import {
-    // LinearMipMapLinearFilter,
     NearestFilter, RepeatWrapping, TextureLoader
 } from 'three';
 
@@ -41,6 +40,7 @@ let TexturesModule = {
     {
         let loader = new TextureLoader();
         // let maxAnisotropy = this.rendererManager.renderer.capabilities.getMaxAnisotropy();
+        // (this produces texture bleeding!)
 
         // let texture =
         loader.load(`app/assets/textures/${whatTexture}`,
@@ -88,7 +88,8 @@ let TexturesModule = {
      * Gives
      * i+, j+, k+, i-, j-, k-
      */
-    getTextureCoordinates(modelType) {
+    getTextureCoordinates(modelType)
+    {
         let coordinates;
         if (modelType === 'minecraft>1.5') {
             coordinates = {

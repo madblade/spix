@@ -52,7 +52,6 @@ let SkyModule = {
         return { mesh: sky, helper, lights };
     },
 
-    // TODO [CRIT] light update
     createSkyLight(sunPosition, lightType)
     {
         // Dir
@@ -92,8 +91,6 @@ let SkyModule = {
         return sunSphere;
     },
 
-    // TODO [MILESTONE1] make sky creation api serverwise
-    // or seed behaviour
     addSky(worldId, worldMeta)
     {
         if (!worldMeta)
@@ -175,7 +172,8 @@ let SkyModule = {
         return sky;
     },
 
-    getSunDirection(skyObject) {
+    getSunDirection(skyObject)
+    {
         let distance = this.distance;
         let phi = skyObject.phi || 0;
         let theta = this.theta;
@@ -187,7 +185,9 @@ let SkyModule = {
         return sunDirection;
     },
 
-    updateSunPosition(camera, skyObject) {
+    // TODO [SKY] sync (or seed?) sun position from server
+    updateSunPosition(camera, skyObject)
+    {
         let sky = skyObject.mesh;
         if (!sky || !this.distance) return;
         let s = sky;
@@ -200,7 +200,9 @@ let SkyModule = {
         let theta = this.theta;
 
         phi %= 2 * Math.PI;
-        // let dist = Math.max(0.1, Math.min(Math.abs(Math.PI - phi), Math.abs(phi)) / Math.PI); // in (0,1)
+        // let dist = Math.max(0.1,
+        // Math.min(Math.abs(Math.PI - phi),
+        // Math.abs(phi)) / Math.PI); // in (0,1)
         phi += 0.000101; // * dist;
         // phi = Math.PI / 2; // * dist;
         skyObject.phi = phi;
@@ -210,9 +212,8 @@ let SkyModule = {
         let z = distance * sin(phi) * cos(theta);
         let sunPosition = new Vector3(x, y, z);
 
-        // TODO [CRIT] update light position
-
-        if (camera.projectionMatrix) {
+        if (camera.projectionMatrix)
+        {
             // let mat4 = new THREE.Matrix4();
             // mat4.set(
             //     camera.fov, camera.aspect, camera.far, camera.near,
@@ -262,7 +263,6 @@ let SkyModule = {
         }
     },
 
-    // TODO [MILESTONE1] update suns position throughout day and year
     updateSky(
         sky,
         sunPosition,

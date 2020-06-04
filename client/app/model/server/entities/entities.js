@@ -65,7 +65,8 @@ extend(EntityModel.prototype, {
         const deltaServer = this.averageDeltaT;
 
         const t = updateTime - entity.lastUpdateTime;
-        if (t < deltaServer) {
+        if (t < deltaServer)
+        {
             // interpolate
             const tdt = t / deltaServer;
             const dpx = currentP.x - lastP.x; const drx = currentR.x - lastR.x;
@@ -105,7 +106,8 @@ extend(EntityModel.prototype, {
         let object3D = currentEntity.getObject3D();
 
         let p = object3D.position;
-        let animate = p.x !== newP.x || p.y !== newP.y; // TODO 3D world
+        let animate = p.x !== newP.x || p.y !== newP.y;
+        // TODO [ANIMATION] link animation to 3D gravity
         p.copy(newP);
 
         object3D.rotation.x = newR.z; // ur[3];
@@ -215,6 +217,7 @@ extend(EntityModel.prototype, {
 
         let pushes = this.entitiesOutdated;
         for (let eid in entities) {
+            if (!entities.hasOwnProperty(eid)) continue;
             pushes.set(eid, entities[eid]);
         }
 
@@ -244,16 +247,18 @@ extend(EntityModel.prototype, {
         ];
     },
 
-    getTime() {
+    getTime()
+    {
         return window.performance.now();
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.entitiesIngame.clear();
         this.entitiesOutdated.clear();
         this.entitiesLoading.clear();
         this.needsUpdate = false;
-        // TODO [LEAK] cleanup graphical component and all meshes.
+        // TODO [CLEANUP] graphical component and all meshes
     }
 
 });

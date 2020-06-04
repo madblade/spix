@@ -37,7 +37,8 @@ import { Register }     from './modules/register/register.js';
 let App = App || {Core : {}};
 
 // Main entry point.
-App.Core = function() {
+App.Core = function()
+{
     // State pattern manages in-game, loading, menus.
     // Also acts as a Mediator between engine, model(s) and modules
     this.state =      new StateManager(this);
@@ -75,13 +76,15 @@ App.Core = function() {
 extend(App.Core.prototype, {
 
     // The only intended way to play.
-    startFromRemoteServer(socketAddress, port) {
+    startFromRemoteServer(socketAddress, port)
+    {
         this.setState('loading');
         this.engine.connection.connectSocket(socketAddress, port, true); // connects
         this.engine.connection.listen(); // listens
     },
 
-    startDemo() {
+    startDemo()
+    {
         this.setState('loading');
         let s = this.localServer.standalone.io.socketClient;
         this.engine.connection.setupLocalSocket(s);
@@ -91,7 +94,8 @@ extend(App.Core.prototype, {
         this._forceRequestGameCreation('demo');
     },
 
-    startFromLocalServer() {
+    startFromLocalServer()
+    {
         this.setState('loading');
         let s = this.localServer.standalone.io.socketClient;
         this.engine.connection.setupLocalSocket(s);
@@ -99,7 +103,8 @@ extend(App.Core.prototype, {
         this.localServer.standalone.start();
     },
 
-    startFromRemoteSandbox(socket) {
+    startFromRemoteSandbox(socket)
+    {
         this.setState('loading');
         this.engine.connection.setupLocalSocket(socket);
         this.engine.connection.listen();
@@ -107,18 +112,21 @@ extend(App.Core.prototype, {
     },
 
     // Careful with what clients may execute in the local sandbox!
-    clientConnectedToLocalSandbox(userID, socket) {
+    clientConnectedToLocalSandbox(userID, socket)
+    {
         this.localServer.standalone.connectUser(userID, socket);
     },
 
-    start() {
+    start()
+    {
         this.setState('loading');
         this.engine.graphics.preload().then(() =>
             this.setState('main')
         );
     },
 
-    stop() {
+    stop()
+    {
         this.setState('loading');
         this.engine.connection.disconnect();
         this.stopGame();
@@ -129,32 +137,37 @@ extend(App.Core.prototype, {
 // Application utility.
 extend(App.Core.prototype, {
 
-    getState() {
+    getState()
+    {
         return this.state.state;
     },
 
-    setState(state, opt) {
+    setState(state, opt)
+    {
         this.state.setState(state, opt);
     },
 
-    isLoading() {
+    isLoading()
+    {
         return this.getState() === 'loading';
     },
 
-    isFocused() {
+    isFocused()
+    {
         return this.state.focus;
     },
 
-    setFocused(isFocused) {
+    setFocused(isFocused)
+    {
         // Ensure output type.
         this.state.focus = !!isFocused;
     },
 
     // Called when the socket is connected.
-    connectionEstablished() {
+    connectionEstablished()
+    {
         console.log('Connected.');
 
-        // TODO splash screen.
         setTimeout(
             function() {
                 this.engine.connection.requestHubState();
@@ -164,7 +177,8 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'creation' request is emitted from Hub state.
-    requestGameCreation(gameType, options) {
+    requestGameCreation(gameType, options)
+    {
         if (this.getState() !== 'hub') {
             console.error('Could not request game creation outside of Hub.');
             return;
@@ -173,11 +187,13 @@ extend(App.Core.prototype, {
         this.engine.connection.requestGameCreation(gameType, options);
     },
 
-    _forceRequestGameCreation(gameType, options) {
+    _forceRequestGameCreation(gameType, options)
+    {
         this.engine.connection.requestGameCreation(gameType, options);
     },
 
-    _forceJoin(gameType, gameId) {
+    _forceJoin(gameType, gameId)
+    {
         this.setState('preingame');
         this.engine.connection.configureGame(gameType, gameId);
         this.model.client.init(gameType);
@@ -186,7 +202,8 @@ extend(App.Core.prototype, {
     },
 
     // Called when a 'join' request is emitted from Hub state.
-    join(gameType, gameId) {
+    join(gameType, gameId)
+    {
         if (this.getState() !== 'hub')
             throw Error('Could not request game joining outside of Hub.');
 
@@ -206,21 +223,24 @@ extend(App.Core.prototype, {
     },
 
     // Run game when joining confirmed.
-    joinedServer() {
+    joinedServer()
+    {
         console.log('Joined server.');
 
         // Run game
         this.runGame();
     },
 
-    runGame() {
+    runGame()
+    {
         this.engine.graphics.run();
         this.engine.controls.run();
         this.engine.audio.run();
         this.register.gameStarted();
     },
 
-    stopGame() {
+    stopGame()
+    {
         this.register.gameStopped();
         this.engine.connection.unregisterSocketForGame3D();
         this.engine.graphics.stop();
@@ -234,22 +254,26 @@ extend(App.Core.prototype, {
 
 });
 
-// Modules.
-// TODO register/reload modules
-// TODO error reporting
-// TODO wrapping DOM queries
+// Modules, for extending the core functionality.
+// To be done:
+// [MOD] register/reload modules
+// [MOD] error reporting
+// [MOD] wrapping DOM queries
 extend(App.Core.prototype, {
 
-    registerModule() {
+    registerModule()
+    {
 
     },
 
-    restartModule() {
+    restartModule()
+    {
 
     }
 });
 
-window.register = (function() {
+window.register = (function()
+{
     let app = new App.Core();
     app.start();
     return app.register;

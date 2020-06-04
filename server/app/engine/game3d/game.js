@@ -148,6 +148,7 @@ class Game3D extends Game
 
     generate()
     {
+        // TODO [GENERATION] check is world fantasy and preload first tile
         // this._generationEngine.generateWorldMap();
         this._consistencyEngine.generateWorld()
             .then(() => {
@@ -155,7 +156,6 @@ class Game3D extends Game
                     this._externalInput.addPlayer(p);
                 });
 
-                // TODO [MEDIUM] not safe
                 this._playerManager.setRemovePlayerBehaviour(player => {
                     this._externalInput.removePlayer(player.avatar.entityId);
                 });
@@ -165,8 +165,9 @@ class Game3D extends Game
             .catch(e => console.log(e));
     }
 
-    save() {
-        // TODO [LONG-TERM] write world and entities into file.
+    save()
+    {
+        // TODO [SAVE] write world and entities into file.
     }
 }
 

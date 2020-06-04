@@ -97,7 +97,8 @@ class RigidBodiesPhase5
 
             let entityUpdated = false;
 
-            if (xCrossed) {
+            if (xCrossed)
+            {
                 let newWorldId = xCrossed.worldId;
                 objectOrderer.switchEntityToWorld(currentEntity, newWorldId, p1);
 
@@ -123,11 +124,11 @@ class RigidBodiesPhase5
             }
 
             // Rotate entity
-            if (!xCrossed) {
+            if (!xCrossed)
+            {
                 let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
                 if (RigidBodiesPhase5.applyGravityRotation(currentEntity, gravity)) {
                     entityUpdated = true;
-                    // TODO [HIGH] update rotated collision model.
                     const gx = gravity[0]; const gy = gravity[1]; const gz = gravity[2];
                     const gx0 = gx !== 0; const gy0 = gy !== 0; const gz0 = gz !== 0;
                     if (gx0 ^ gy0 ^ gz0) {
@@ -148,7 +149,8 @@ class RigidBodiesPhase5
                 }
             }
 
-            if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2]) {
+            if (v0[0] !== v1[0] || v0[1] !== v1[1] || v0[2] !== v1[2])
+            {
                 currentEntity.v0 = v1;
                 currentEntity.v1 = v0;
                 // Velocity updates not visible by clients.
@@ -159,7 +161,8 @@ class RigidBodiesPhase5
                 if (currentEntity.v0[axis] !== 0 && p0[axis] === p1[axis])
                     currentEntity.v0[axis] = 0;
 
-            if (a0[0] !== a1[0] || a0[1] !== a1[1] || a0[2] !== a1[2]) {
+            if (a0[0] !== a1[0] || a0[1] !== a1[1] || a0[2] !== a1[2])
+            {
                 currentEntity.a0 = a1;
                 currentEntity.a1 = a0;
                 // Acceleration updates not visible by clients.
@@ -175,7 +178,8 @@ class RigidBodiesPhase5
             p1 = currentEntity.p1; p0 = currentEntity.p0;
             v1 = currentEntity.v1;
             a1 = currentEntity.a1;
-            for (let i = 0; i < 3; ++i) {
+            for (let i = 0; i < 3; ++i)
+            {
                 p1[i] = p0[i];
                 v1[i] = 0;
                 a1[i] = 0;

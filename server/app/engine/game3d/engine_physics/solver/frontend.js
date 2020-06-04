@@ -11,7 +11,8 @@ import TimeUtils from '../../../math/time';
 
 class FrontEnd
 {
-    constructor(physicsEngine, refreshRate) {
+    constructor(physicsEngine, refreshRate)
+    {
         // Model access.
         this._physicsEngine = physicsEngine;
         let entityModel = physicsEngine.entityModel;
@@ -28,11 +29,13 @@ class FrontEnd
         this._objectOrderer.orderObjects();
     }
 
-    get objectOrderer() {
+    get objectOrderer()
+    {
         return this._objectOrderer;
     }
 
-    get eventOrderer() {
+    get eventOrderer()
+    {
         return this._eventOrderer;
     }
 
@@ -49,7 +52,7 @@ class FrontEnd
         let ob = physicsEngine.outputBuffer;
 
         // Compute adaptive time step.
-        // TODO [CRIT] remember to reactivate lag correction.
+        // TODO [LAG] remember to reactivate lag correction.
         let relativeDt = 16.667; // TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
 
         // Solve physics constraints with basic ordering optimization.
@@ -75,7 +78,8 @@ class FrontEnd
     }
 
     // Can be triggered to change physics behaviour.
-    shuffleGravity() {
+    shuffleGravity()
+    {
         let rigidBodies = this._rigidBodies;
         let g = rigidBodies.gravity;
         rigidBodies.gravity = [g[2], g[0], g[1]];

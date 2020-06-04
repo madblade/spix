@@ -246,8 +246,8 @@ let ChunksModule = {
             capacities:         [sunCapacity / 2],
             sizes:              [triangles / 2],
 
-            /*whereToFindFace:*/whereToFindFace,
-            /*whichFaceIs:    */whichFaceIs
+            whereToFindFace,
+            whichFaceIs
         };
 
         if (this._debugChunkBoundingBoxes) {
@@ -278,7 +278,8 @@ let ChunksModule = {
         let added =     components[1];
         let updated =   components[2];
 
-        if (this.debug) {
+        if (this.debug)
+        {
             console.log('BUD');
             console.log(removed);
             console.log(added);
@@ -286,7 +287,8 @@ let ChunksModule = {
         }
 
         // Bundle updated faces.
-        for (let uid in updated) {
+        for (let uid in updated)
+        {
             if (!updated.hasOwnProperty(uid)) continue;
             let update = updated[uid];
             removed[uid] = null;

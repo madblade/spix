@@ -9,7 +9,8 @@ import ChunkGenerator from './chunkgenerator';
 class Simple
 {
     // Set all cubes until a given height to a given id.
-    static fillChunk(chunk, toZ, blockId) {
+    static fillChunk(chunk, toZ, blockId)
+    {
         if (typeof toZ !== 'number') return;
         if (typeof blockId !== 'number') return;
         if (ChunkGenerator.debug) console.log(`Generating chunk ${chunk.chunkId} to ${toZ}...`);

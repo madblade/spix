@@ -23,7 +23,8 @@ let LightDefaultColors = Object.freeze({
 
 let LightModule = {
 
-    createLight(whatLight) {
+    createLight(whatLight)
+    {
         let light;
 
         switch (whatLight) {

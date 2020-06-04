@@ -8,7 +8,8 @@ import $ from 'jquery';
 
 let PointerLockModule = {
 
-    setupPointerLock() {
+    setupPointerLock()
+    {
         let app = this.app;
 
         if (!('webkitPointerLockElement' in document) &&
@@ -43,7 +44,8 @@ let PointerLockModule = {
             console.log('ERROR: POINTER LOCK NOT SUPPORTED.');
         }
 
-        $(document).mousedown(function(event) {
+        $(document).mousedown(function(event)
+        {
             if (app.getState() !== 'ingame' || app.isFocused())
                 return;
 
@@ -64,7 +66,8 @@ let PointerLockModule = {
         });
     },
 
-    requestPointerLock() {
+    requestPointerLock()
+    {
         let controlsEngine = this.app.engine.controls;
         let b = document.body;
         b.requestPointerLock();
@@ -74,11 +77,13 @@ let PointerLockModule = {
         controlsEngine.startWindowListeners();
     },
 
-    pointerLockChanged(isPointerLocked) {
+    pointerLockChanged(isPointerLocked)
+    {
         let app = this.app;
         app.engine.controls.threeControlsEnabled = isPointerLocked;
 
-        if (!isPointerLocked) {
+        if (!isPointerLocked)
+        {
             app.setState('settings');
             app.setFocused(false);
         }

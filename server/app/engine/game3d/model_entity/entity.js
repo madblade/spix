@@ -6,7 +6,8 @@
 
 class Entity
 {
-    constructor(id) {
+    constructor(id)
+    {
         // Properties
         this._entityId      = id;
         this._kind          = 'abstract';
@@ -42,7 +43,7 @@ class Entity
         this._worldId       = -1;
         // When crossing multiple portals...
         // 1 state = Object { position:p, rotation:r }
-        this._otherWorlds = new Map(); // TODO [LONG-TERM]
+        this._otherWorlds = new Map(); // Not yet.
 
         // Linked events.
         this._events = [];
@@ -107,11 +108,13 @@ class Entity
         this._p0 = position;
     }
 
-    die() {
+    die()
+    {
         // Here deallocate arrays.
     }
 
-    stop() {
+    stop()
+    {
         this._d = [!1, !1, !1, !1, !1, !1];
         console.log('Entity stopping.');
     }
@@ -190,7 +193,8 @@ class Entity
     set walkVelocity(v)     { this._capW = v; }
     set runVelocity(v)      { this._capR = v; }
 
-    getVelocity() {
+    getVelocity()
+    {
         return this.walkVelocity;
     }
 }

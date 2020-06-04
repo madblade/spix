@@ -11,7 +11,8 @@ import { BlockTypes } from '../../model_world/model';
 
 class Updater
 {
-    constructor(topologyEngine) {
+    constructor(topologyEngine)
+    {
         // Models.
         this._worldModel   = topologyEngine.worldModel;
         this._entityModel  = topologyEngine.entityModel;
@@ -19,7 +20,8 @@ class Updater
         this._outputBuffer = topologyEngine.outputBuffer;
     }
 
-    update(inputBuffer) {
+    update(inputBuffer)
+    {
         inputBuffer.forEach(input => {
             let data = input[0];
             let avatar = input[1];
@@ -61,7 +63,8 @@ class Updater
         return isBlock;
     }
 
-    addBlock(avatar, x, y, z, blockId) {
+    addBlock(avatar, x, y, z, blockId)
+    {
         let worldId = avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;
@@ -82,7 +85,8 @@ class Updater
         o.chunkUpdated(worldId, $chunk.chunkId);
     }
 
-    delBlock(avatar, x, y, z) {
+    delBlock(avatar, x, y, z)
+    {
         let worldId = avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
         let o = this._outputBuffer;

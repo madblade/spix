@@ -15,12 +15,13 @@ class Portal
      * @param orientation (looking at 'first' or 'next')
      * @param chunk origin chunk (portals are fixed ATM)
      */
-    constructor(worldId, id, c1, c2, offset, orientation, chunk) {
+    constructor(worldId, id, c1, c2, offset, orientation, chunk)
+    {
         this._portalId = id;
         this._worldId = worldId;
         this._block1 = c1;
         this._block2 = c2;
-        this._offset = offset; // Ratio. TODO [MEDIUM] use different name.
+        this._offset = offset; // Ratio.
         this._orientation = orientation;
         this._chunk = chunk;
 
@@ -33,8 +34,16 @@ class Portal
     get portalId()  { return this._portalId; }
     get worldId()   { return this._worldId; }
     get chunkId()   { return this._chunk.chunkId; }
-    get state()     { return [...this._block1, ...this._block2, this._offset, this._orientation]; }
     get chunk()     { return this._chunk; }
+    get state()
+    {
+        return [
+            ...this._block1,
+            ...this._block2,
+            this._offset,
+            this._orientation
+        ];
+    }
 
     // Physics.
     set indexX(indexX)  { this._indexX = indexX; }
@@ -45,7 +54,8 @@ class Portal
     get indexZ()        { return this._indexZ; }
 
     // Position! Not ratio!
-    get position()  {
+    get position()
+    {
         let b1 = this._block1;
         let b2 = this._block2;
         if (!b1 || !b2) return;

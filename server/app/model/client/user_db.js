@@ -9,12 +9,14 @@ import CollectionUtils from '../../engine/math/collections';
 
 class UserDataBase
 {
-    constructor(connector) {
+    constructor(connector)
+    {
         this._connection = connector;
         this._users = new Map();
     }
 
-    containsUser(user) {
+    containsUser(user)
+    {
         return this._users.has(user.id);
     }
 
@@ -23,7 +25,8 @@ class UserDataBase
      * Registers the user (a socket knows its user since the connection).
      * @param socket
      */
-    registerUser(socket) {
+    registerUser(socket)
+    {
         let users = this._users;
         let nick = '';
         let id = CollectionUtils.generateId(users);
@@ -34,21 +37,25 @@ class UserDataBase
         return user;
     }
 
-    getUser(id) {
+    getUser(id)
+    {
         return this._users.get(id);
     }
 
-    getUsers() {
+    getUsers()
+    {
         return this._users;
     }
 
-    removeUser(user) {
+    removeUser(user)
+    {
         // Remove references to this user
         this._users.delete(user.id);
         user.destroy();
     }
 
-    notifyGameCreation(kind, id) {
+    notifyGameCreation(kind, id)
+    {
         let game = {};
         game[kind] = [id];
 

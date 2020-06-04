@@ -91,7 +91,7 @@ extend(XModel.prototype, {
             // Alternatively, use worldMap.toString();
 
             register.updateSelfState({diagram: s});
-            // TODO [OPTI] possible perf improvements.
+            // Possible perf improvements here.
             worldMap.computeRenderingGraph(graphics);
             this.forceUpdate = false;
         }
@@ -135,7 +135,7 @@ extend(XModel.prototype, {
         this.xUpdates = [];
         this.needsUpdate = false;
         this.forceUpdate = false;
-        // TODO [LEAK] cleanup graphical component, scenes and render targets.
+        // TODO [CLEANUP] graphical component, scenes and render targets
     }
 
 });

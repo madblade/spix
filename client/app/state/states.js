@@ -14,7 +14,8 @@ import { HubState }         from './states/hub.js';
 import { MainMenuState }    from './states/mainmenu';
 import { PreIngameState }   from './states/pre.ingame';
 
-let StateManager = function(app) {
+let StateManager = function(app)
+{
     this.app = app;
 
     // States
@@ -34,10 +35,10 @@ let StateManager = function(app) {
 
 StateManager.prototype.register = [];
 
-// TODO [MEDIUM] refactor states strategy & dom handling
 extend(StateManager.prototype, {
 
-    registerState(state) {
+    registerState(state)
+    {
         let stateId = state.stateName;
         if (!this.states.hasOwnProperty(stateId)) {
             this.states[stateId] = state;
@@ -45,7 +46,8 @@ extend(StateManager.prototype, {
     },
 
     // Low-level setState must handle every kind of state modification
-    setState(state, opt) {
+    setState(state, opt)
+    {
         this.previousState = this.state;
         this.state = state;
 
@@ -66,7 +68,8 @@ extend(StateManager.prototype, {
         }
     },
 
-    cleanupDOM() {
+    cleanupDOM()
+    {
         $('#announce').empty();
         $('#container').empty();
         // HUD

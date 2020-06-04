@@ -6,7 +6,8 @@
 
 class EntityBuffer
 {
-    constructor() {
+    constructor()
+    {
         this._addedPlayers = new Set();
         this._removedPlayers = new Set();
         this._outputBuffer = new Map();
@@ -15,14 +16,16 @@ class EntityBuffer
     get addedPlayers()      { return this._addedPlayers; }
     get removedPlayers()    { return this._removedPlayers; }
 
-    spawnPlayer(player) {
+    spawnPlayer(player)
+    {
         let removedPlayers = this._removedPlayers;
         let id = player.avatar.entityId;
         if (removedPlayers.has(id)) removedPlayers.delete(id);
         else this._addedPlayers.add(id);
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId)
+    {
         let addedPlayers = this._addedPlayers;
         if (addedPlayers.has(playerId)) addedPlayers.delete(playerId);
         else this._removedPlayers.add(playerId);
@@ -30,7 +33,8 @@ class EntityBuffer
 
     // addedEntities:   entity id => {p:e.position, r:e.rotation, k:e.kind}
     // removedEntities: entity id => null
-    updateEntitiesForPlayer(playerId, addedEntities, removedEntities) {
+    updateEntitiesForPlayer(playerId, addedEntities, removedEntities)
+    {
         // Check.
         if (!addedEntities && !removedEntities) return;
         if (addedEntities && removedEntities) Object.assign(addedEntities, removedEntities); // Aggregate.
@@ -41,11 +45,13 @@ class EntityBuffer
     }
 
     // Shallow.
-    getOutput() {
+    getOutput()
+    {
         return new Map(this._outputBuffer);
     }
 
-    flush() {
+    flush()
+    {
         this._addedPlayers = new Set();
         this._removedPlayers = new Set();
         this._outputBuffer = new Map();

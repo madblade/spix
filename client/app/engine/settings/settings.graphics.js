@@ -8,7 +8,8 @@ import $ from 'jquery';
 
 let GraphicsModule = {
 
-    getGraphicsHTML(graphicsSettings) {
+    getGraphicsHTML(graphicsSettings)
+    {
         let content = `
             <div class="container">
             <table class="table table-bordered noselect" style="width:100%"
@@ -26,7 +27,8 @@ let GraphicsModule = {
         return content;
     },
 
-    goGraphics() {
+    goGraphics()
+    {
         this.unlistenSettingsMenu();
         $('#announce')
             .empty()
@@ -34,7 +36,8 @@ let GraphicsModule = {
         this.listenReturn();
     },
 
-    listenGraphics() {
+    listenGraphics()
+    {
 
     }
 

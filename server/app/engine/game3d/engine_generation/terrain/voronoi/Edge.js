@@ -95,7 +95,7 @@ function clipEdge(edge, x0, y0, x1, y1)
         if (r < t1) t1 = r;
     }
 
-    if (!(t0 > 0) && !(t1 < 1)) return true; // TODO Better check?
+    if (!(t0 > 0) && !(t1 < 1)) return true;
 
     if (t0 > 0) edge[0] = [ax + t0 * dx, ay + t0 * dy];
     if (t1 < 1) edge[1] = [ax + t1 * dx, ay + t1 * dy];

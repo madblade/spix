@@ -36,11 +36,13 @@ class Event
     set indexY(yid)         { this._yIndex = yid; }
     set indexZ(zid)         { this._zIndex = zid; }
 
-    apply() {
+    apply()
+    {
         this._lifeSpan--;
     }
 
-    isActive() {
+    isActive()
+    {
         return this._lifeSpan > 0;
     }
 }

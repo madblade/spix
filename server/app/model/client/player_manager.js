@@ -12,7 +12,8 @@ import CollectionUtils from '../../engine/math/collections';
  */
 class PlayerManager
 {
-    constructor() {
+    constructor()
+    {
         this._players = [];
         this._handleAddPlayer = null;
         this._handleRemovePlayer = null;
@@ -20,14 +21,17 @@ class PlayerManager
 
     get nbPlayers() { return this._players.length; }
 
-    addPlayer(player) {
+    addPlayer(player)
+    {
         this._players.push(player);
         if (this._handleAddPlayer) this._handleAddPlayer(player);
     }
 
-    getPlayerFromId(playerId) {
+    getPlayerFromId(playerId)
+    {
         let players = this._players;
-        for (let p = 0, l = players.length; p < l; ++p) {
+        for (let p = 0, l = players.length; p < l; ++p)
+        {
             let player = players[p];
             let avatar = player.avatar;
             if (avatar && avatar.entityId === playerId) return player;
@@ -35,7 +39,8 @@ class PlayerManager
         return false;
     }
 
-    removePlayer(player) {
+    removePlayer(player)
+    {
         CollectionUtils.removeFromArray(this._players, player);
         if (this._handleRemovePlayer) this._handleRemovePlayer(player);
         player.avatar.die();
@@ -48,39 +53,47 @@ class PlayerManager
         player.destroy();
     }
 
-    removeAllPlayers() {
-        if (this._handleRemovePlayer) this._players.forEach(p => this._handleRemovePlayer(p));
+    removeAllPlayers()
+    {
+        if (this._handleRemovePlayer)
+            this._players.forEach(p => this._handleRemovePlayer(p));
         this._players.forEach(p => p.destroy()); // Clean references from all players
         this._players = [];
     }
 
-    setAddPlayerBehaviour(f) {
+    setAddPlayerBehaviour(f)
+    {
         this._handleAddPlayer = f;
     }
 
-    setRemovePlayerBehaviour(f) {
+    setRemovePlayerBehaviour(f)
+    {
         this._handleRemovePlayer = f;
     }
 
     // Iterator on players.
-    forEach(callback) {
+    forEach(callback)
+    {
         return this._players.forEach(p => callback(p));
     }
 
     // Clean all references.
-    destroy() {
+    destroy()
+    {
         this.removeAllPlayers();
         delete this._players;
         delete this._handleAddPlayer;
         delete this._handleRemovePlayer;
     }
 
-    hasPlayerForSocket(socket) {
+    hasPlayerForSocket(socket)
+    {
         let players = this._players;
         let nb = players.length;
         if (!socket || !socket.name) return false;
 
-        for (let p = 0; p < nb; ++p) {
+        for (let p = 0; p < nb; ++p)
+        {
             let player = players[p];
             if (!player.connection.socket || !player.connection.socket.name) continue;
 

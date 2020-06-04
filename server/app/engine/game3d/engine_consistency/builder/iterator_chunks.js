@@ -15,7 +15,8 @@ class ChunkIterator
      * @param callbackAdditionalParameters
      * @constructor
      */
-    static BFS(world, starterChunk, callback, callbackAdditionalParameters) {
+    static BFS(world, starterChunk, callback, callbackAdditionalParameters)
+    {
         let queue = [];
         let markers = [];
 
@@ -48,7 +49,8 @@ class ChunkIterator
         }
     }
 
-    static get2DNeighbours(currentChunk, world) {
+    static get2DNeighbours(currentChunk, world)
+    {
         const i = currentChunk.chunkI;
         const j = currentChunk.chunkJ;
         const k = currentChunk.chunkK;
@@ -66,7 +68,8 @@ class ChunkIterator
 
         let neighbours = [];
 
-        for (let id = 0, length = neighboursIndices.length; id < length; ++id) {
+        for (let id = 0, length = neighboursIndices.length; id < length; ++id)
+        {
             let chunkId = neighboursIndices[id];
             let chunk = chunks.get(chunkId);
             if (!chunk) console.log(`Iterator: chunk ${chunkId} undefined.`);
@@ -89,7 +92,8 @@ class ChunkIterator
         return neighbours;
     }
 
-    static get3DNeighbours(/*currentChunk*/) {
+    static get3DNeighbours() // currentChunk
+    {
         // let neighbours = [];
 
         /*

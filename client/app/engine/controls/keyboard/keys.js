@@ -10,7 +10,8 @@ let KeysModule = {
      * Get key codes (internationalization required).
      * @param layout
      */
-    getKeyControls(layout) {
+    getKeyControls(layout)
+    {
         let keyControls;
 
         switch (layout) {

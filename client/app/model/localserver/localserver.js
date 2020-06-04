@@ -7,7 +7,8 @@
 
 import extend       from '../../extend.js';
 
-let LocalServer = function(app) {
+let LocalServer = function(app)
+{
     this.app = app;
     this.users = new Map();
 
@@ -17,11 +18,13 @@ let LocalServer = function(app) {
 
 extend(LocalServer.prototype, {
 
-    hasUser(userID) {
+    hasUser(userID)
+    {
         return this.users.has(userID);
     },
 
-    addUser(userID) {
+    addUser(userID)
+    {
         this.users.set(userID, {
             offer: '',
             answer: '',
@@ -31,12 +34,14 @@ extend(LocalServer.prototype, {
         });
     },
 
-    removeUser(userID) {
+    removeUser(userID)
+    {
         this.users.delete(userID);
     },
 
     // Server offer
-    setUserOffer(userID, offer) {
+    setUserOffer(userID, offer)
+    {
         let user = this.users.get(userID);
         if (!user) {
             this.users.set(userID, {
@@ -51,7 +56,8 @@ extend(LocalServer.prototype, {
         }
     },
 
-    setUserConnection(userID, connection) {
+    setUserConnection(userID, connection)
+    {
         let user = this.users.get(userID);
         if (!user) {
             console.error(`[Model/LocalServer] User "${userID}" not found.`);
@@ -60,7 +66,8 @@ extend(LocalServer.prototype, {
         user.inboundConnection = connection;
     },
 
-    setUserChannel(userID, channel) {
+    setUserChannel(userID, channel)
+    {
         let user = this.users.get(userID);
         if (!user) {
             console.error(`[Model/LocalServer] User "${userID}" not found.`);
@@ -69,23 +76,27 @@ extend(LocalServer.prototype, {
         user.inboundChannel = channel;
     },
 
-    getUser(userID) {
+    getUser(userID)
+    {
         return this.users.get(userID);
     },
 
-    setUserConnectionStatus(userID, isConnected) {
+    setUserConnectionStatus(userID, isConnected)
+    {
         let user = this.users.get(userID);
         if (!user) return;
         user.connected = isConnected;
     },
 
-    isUserConnectionAvailable(userID) {
+    isUserConnectionAvailable(userID)
+    {
         let user = this.users.get(userID);
         return !!user && !user.connected;
     },
 
     // Client answer
-    addAnswer(userID, answer) {
+    addAnswer(userID, answer)
+    {
         let user = this.users.get(userID);
         if (!user) {
             console.error(`[Model/LocalServer] User "${userID}" not found.`);
@@ -95,11 +106,13 @@ extend(LocalServer.prototype, {
     },
 
     // WebRTC Client methods
-    setLocalClientOffer(offer) {
+    setLocalClientOffer(offer)
+    {
         this.localClientOffer = offer;
     },
 
-    setLocalClientAnswer(answer) {
+    setLocalClientAnswer(answer)
+    {
         this.localClientAnswer = answer;
     }
 });

@@ -6,7 +6,8 @@
 
 let LayoutQWERTY = {
 
-    getQWERTY() {
+    getQWERTY()
+    {
         return Object.freeze({
             // Arrow directional controls.
             arrowUp: 38,

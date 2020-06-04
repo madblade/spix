@@ -9,7 +9,8 @@ import extend                   from '../../../extend.js';
 import { TriggersModule }       from './event.triggers.js';
 import { ActiveControlsModule } from './event.activecontrols.js';
 
-let EventComponent = function(clientModel) {
+let EventComponent = function(clientModel)
+{
     this.clientModel = clientModel;
 
     this.eventsToPush = [];
@@ -20,8 +21,10 @@ let EventComponent = function(clientModel) {
 
 extend(EventComponent.prototype, {
 
-    init() {
-        this.activeControls = this.getActiveControls(); // TODO put in self model
+    init()
+    {
+        // TODO [REFACTOR] put this in self model
+        this.activeControls = this.getActiveControls();
     },
 
     triggerEvent(type, data)
@@ -50,7 +53,8 @@ extend(EventComponent.prototype, {
         this.numberOfEvents++;
     },
 
-    pushEvents() {
+    pushEvents()
+    {
         let connectionEngine = this.clientModel.app.engine.connection;
         let events = this.eventsToPush;
         let currentEvent;
@@ -73,7 +77,8 @@ extend(EventComponent.prototype, {
         this.numberOfEvents = 0;
     },
 
-    getEventsOfType(type) {
+    getEventsOfType(type)
+    {
         let events = this.eventsToPush;
         let result = [];
 
@@ -89,7 +94,8 @@ extend(EventComponent.prototype, {
         return result;
     },
 
-    filterEvents() {
+    filterEvents()
+    {
         let events = this.eventsToPush;
         let filteredEvents = [];
         let lastRotation;

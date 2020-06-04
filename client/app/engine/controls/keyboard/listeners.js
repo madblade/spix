@@ -10,7 +10,8 @@ let ListenerModule = {
     /**
      * Keyboard behaviour when a key is pressed.
      */
-    registerKeyDown() {
+    registerKeyDown()
+    {
         let app = this.app;
 
         $(window).keydown(function(event) {
@@ -61,10 +62,9 @@ let ListenerModule = {
                     break;
 
                 case k.leftHandNorthWest: // A
-                    // TODO debug here
                     break;
 
-                // TODO [HIGH] up rotation testing
+                // This is for camera wrapper testing, should be disabled server-wise.
                 case k.padFour:     // Left
                     graphics.cameraManager.addCameraRotationEvent(0, 0, 0.1 * Math.PI / 2, 0);
                     break;
@@ -79,14 +79,12 @@ let ListenerModule = {
                     break;
 
                 case k.enter:
-                    /*
-                     TODO for chat:
-                     1. remove keyboard and mouse listeners until the user has finished typing.
-                     2. show AOE-like dialog for chat messages
-                     3. on validate, send message to server via chat module
-                     Maybe a better option: create a new 'chatting' state using stateManager, that takes care of
-                     key, mouse (and other like touch) listeners.
-                     */
+                    // Implementation instructions [CHAT]:
+                    // 1. remove keyboard and mouse listeners until the user has finished typing.
+                    // 2. show AOE-like dialog for chat messages
+                    // 3. on validate, send message to server via chat module
+                    // Maybe a better option: create a new 'chatting' state using stateManager, that takes care of
+                    // key, mouse (and other like touch) listeners.
                     break;
 
                 default:
@@ -96,7 +94,8 @@ let ListenerModule = {
     },
 
     // Manage alt-tab like border effects
-    stopKeyboardInteraction() {
+    stopKeyboardInteraction()
+    {
         let clientModel = this.app.model.client;
         clientModel.triggerEvent('m', 'xx');
     },
@@ -104,12 +103,12 @@ let ListenerModule = {
     /**
      * Keyboard behaviour when a key is released.
      */
-    registerKeyUp() {
+    registerKeyUp()
+    {
         let app = this.app;
-        // let graphics = app.engine.graphics;
 
-        // TODO [CRIT] 3Dize
-        $(window).keyup(function(event) {
+        $(window).keyup(function(event)
+        {
             event.preventDefault();
             if (!event.keyCode) return;
             if (app.getState() !== 'ingame') return;
@@ -145,11 +144,13 @@ let ListenerModule = {
         }.bind(this));
     },
 
-    unregisterKeyDown() {
+    unregisterKeyDown()
+    {
         $(window).off('keydown');
     },
 
-    unregisterKeyUp() {
+    unregisterKeyUp()
+    {
         $(window).off('keyup');
     }
 

@@ -6,7 +6,8 @@
 
 let LayoutCustom = {
 
-    setupCustomLayout(newBinding) {
+    setupCustomLayout(newBinding)
+    {
         if (!newBinding || newBinding.length !== 2) {
             console.log(`Binding ${newBinding} not supported.`);
             return;

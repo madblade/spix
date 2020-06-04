@@ -40,51 +40,62 @@ let Camera = function(fov, aspect, nearPlane, farPlane, worldId)
 
 extend(Camera.prototype, {
 
-    setCameraId(cameraId) {
+    setCameraId(cameraId)
+    {
         this.cameraId = cameraId;
     },
 
-    getCameraId() {
+    getCameraId()
+    {
         return this.cameraId;
     },
 
-    setWorldId(worldId) {
+    setWorldId(worldId)
+    {
         this.worldId = worldId;
     },
 
-    getWorldId() {
+    getWorldId()
+    {
         return this.worldId;
     },
 
-    getRecorder() {
+    getRecorder()
+    {
         return this.cameraObject;
     },
 
-    get3DObject() {
+    get3DObject()
+    {
         return this.up;
     },
 
-    getCameraPosition() {
+    getCameraPosition()
+    {
         return this.up.position;
     },
 
-    getUpRotation() {
+    getUpRotation()
+    {
         return this.up.rotation;
     },
 
-    rotateX(deltaX) {
+    rotateX(deltaX)
+    {
         let pitch = this.pitch;
         pitch.rotation.x += deltaX;
         pitch.rotation.x = Math.max(0, Math.min(Math.PI, pitch.rotation.x));
     },
 
-    rotateZ(deltaZ) {
+    rotateZ(deltaZ)
+    {
         let yaw = this.yaw;
         yaw.rotation.z += deltaZ;
     },
 
-    setUpRotation(x, y, z) {
-        // TODO use local transform
+    setUpRotation(x, y, z)
+    {
+        // TODO [PORTAL] use local transform
 
         let up = this.up;
         up.rotation.x = x;
@@ -92,30 +103,36 @@ extend(Camera.prototype, {
         up.rotation.z = z;
     },
 
-    getXRotation() {
+    getXRotation()
+    {
         return this.pitch.rotation.x;
     },
 
-    setXRotation(rotationX) {
-        // TODO use local transform
+    setXRotation(rotationX)
+    {
+        // TODO [PORTAL] use local transform
 
         this.pitch.rotation.x = rotationX;
     },
 
-    getZRotation() {
+    getZRotation()
+    {
         return this.yaw.rotation.z;
     },
 
-    setZRotation(rotationZ) {
-        // TODO use local transform
+    setZRotation(rotationZ)
+    {
+        // TODO [PORTAL] use local transform
 
         this.yaw.rotation.z = rotationZ;
     },
 
-    copyCameraPosition(otherCamera) {
-        // TODO [CRIT] maybe apply local transform here?
+    copyCameraPosition(otherCamera)
+    {
+        // TODO [PORTAL] use local transform?
 
-        if (otherCamera) {
+        if (otherCamera)
+        {
             let up = this.up.position;
             let oup = otherCamera.getCameraPosition();
             up.x = oup.x;
@@ -124,10 +141,12 @@ extend(Camera.prototype, {
         }
     },
 
-    copyCameraUpRotation(otherCamera) {
-        // TODO [CRIT] maybe use local transform here?
+    copyCameraUpRotation(otherCamera)
+    {
+        // TODO [PORTAL] use local transform?
 
-        if (otherCamera) {
+        if (otherCamera)
+        {
             let ur = this.up.rotation;
             let our = otherCamera.getUpRotation();
             ur.x = our.x;
@@ -136,8 +155,9 @@ extend(Camera.prototype, {
         }
     },
 
-    setCameraPosition(x, y, z) {
-        // TODO [CRIT] maybe use local transform here?
+    setCameraPosition(x, y, z)
+    {
+        // TODO [PORTAL] use local transform?
 
         let up = this.up;
 
@@ -160,34 +180,41 @@ extend(Camera.prototype, {
         up.position.z = z + upVector[2];
     },
 
-    setScreen(screen) {
+    setScreen(screen)
+    {
         if (screen) this.screen = screen;
     },
 
-    getScreen() {
+    getScreen()
+    {
         return this.screen; // || (function() {throw Error('Screen ' + this.getCameraId + ' undefined')})();
     },
 
-    setCameraTransform(cameraTransform) {
+    setCameraTransform(cameraTransform)
+    {
         this.cameraTransform = cameraTransform;
     },
 
-    getCameraTransform() {
+    getCameraTransform()
+    {
         return this.cameraTransform;
     },
 
-    setFirstPerson() {
+    setFirstPerson()
+    {
         this.cameraObject.position.z = 0;
     },
 
-    setThirdPerson() {
+    setThirdPerson()
+    {
         let p = this.cameraObject.position;
         p.x = 0;
         p.y = 0;
         p.z = 4;
     },
 
-    getCameraForwardVector() {
+    getCameraForwardVector()
+    {
         let nv = new Vector3(0, -1, 0);
         // nv.normalize();
         let camQ = new Quaternion();

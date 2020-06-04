@@ -17,14 +17,16 @@ class ChunkLoader
     static load = true;
     static bench = false;
 
-    constructor(consistencyEngine) {
+    constructor(consistencyEngine)
+    {
         // Models.
         this._worldModel        = consistencyEngine.worldModel;
         this._consistencyModel  = consistencyEngine.consistencyModel;
         this._xModel            = consistencyEngine.xModel;
     }
 
-    computeChunksForNewPlayer(player) {
+    computeChunksForNewPlayer(player)
+    {
         let avatar = player.avatar;
         let worldId = avatar.worldId;
         let world = this._worldModel.getWorld(worldId);
@@ -48,11 +50,13 @@ class ChunkLoader
         let chunkIds = [];
         chunkIds.push(`${i},${j},${k}`);
 
-        for (let m = 0, length = chunkIds.length; m < length; ++m) {
+        for (let m = 0, length = chunkIds.length; m < length; ++m)
+        {
             let currentChunkId = chunkIds[m];
 
             // Generate chunk.
-            if (!chunksInModel.has(currentChunkId)) { // TODO [LOW] worldify or delegate to consistency updater (better).
+            if (!chunksInModel.has(currentChunkId))
+            { // TODO [GENERATION] delegate to consistency updater (better).
                 if (ChunkLoader.debug)
                     console.log(`We should generate ${currentChunkId} for the user.`);
                 let chunk = WorldGenerator.generateInitialChunk(dx, dy, dz, currentChunkId, world);
@@ -61,7 +65,8 @@ class ChunkLoader
 
             // Extract surfaces.
             let currentChunk = chunksInModel.get(currentChunkId);
-            if (!currentChunk.ready) {
+            if (!currentChunk.ready)
+            {
                 if (ChunkLoader.debug)
                     console.log(`We should extract faces from ${currentChunkId}.`);
                 ChunkBuilder.computeChunkFaces(currentChunk);
@@ -75,17 +80,20 @@ class ChunkLoader
                 parseInt(ids[2], 10) * dz / 2
             ];
             const distance = GeometryUtils.chunkSquaredEuclideanDistance(chunkPosition, playerPosition);
-            if (distance < minChunkDistance) {
+            if (distance < minChunkDistance)
+            {
                 minChunkDistance = distance;
                 avatar.nearestChunkId = currentChunk;
             }
 
             let cfnpw = chunksForNewPlayer[worldId];
             if (cfnpw) {
-                cfnpw[currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
+                cfnpw[currentChunkId] =
+                    [currentChunk.fastComponents, currentChunk.fastComponentsIds];
             } else {
                 chunksForNewPlayer[worldId] = {};
-                chunksForNewPlayer[worldId][currentChunkId] = [currentChunk.fastComponents, currentChunk.fastComponentsIds];
+                chunksForNewPlayer[worldId][currentChunkId] =
+                    [currentChunk.fastComponents, currentChunk.fastComponentsIds];
             }
         }
 
@@ -94,7 +102,8 @@ class ChunkLoader
 
     // THOUGHT [OPTIM] n nearest, 1 chunk per X.
     // no more than X chunk per player per iteration?
-    computeNewChunksInRange(player) {
+    computeNewChunksInRange(player)
+    {
         if (!ChunkLoader.load) return;
         const avatar = player.avatar;
 
@@ -111,9 +120,12 @@ class ChunkLoader
 
         // Get current chunk.
         let starterChunk = world.getChunkById(nearestChunkId);
-        if (!starterChunk) {
+        if (!starterChunk)
+        {
             console.log('[WARN] Could not load chunk on which current entity is.');
-            starterChunk = ChunkBuilder.addChunk(world.xSize, world.ySize, world.zSize, nearestChunkId, world);
+            starterChunk = ChunkBuilder.addChunk(
+                world.xSize, world.ySize, world.zSize, nearestChunkId, world
+            );
             // return;
         }
 
@@ -123,7 +135,8 @@ class ChunkLoader
 
         // Case 1: need to load chunks up to R_i (inner circle)
         // and to unload from R_o (outer circle).
-        if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk)) {
+        if (!consistencyModel.doneChunkLoadingPhase(player, starterChunk))
+        {
             newChunksForPlayer = this.loadInnerSphere(player, starterChunk);
             // For (i,j,k) s.t. D = d({i,j,k}, P) < P.thresh, ordered by increasing D
             //     if !P.has(i,j,k)
@@ -170,12 +183,14 @@ class ChunkLoader
         return [newChunksForPlayer, unloadedChunksForPlayer];
     }
 
-    loadInnerSphere(player, starterChunk) {
+    // TODO [GENERATION] manage loading in another location
+    // [GENERATION] check on Z+/-.
+    loadInnerSphere(player, starterChunk)
+    {
         // let worldId = player.avatar.worldId;
         let worldModel = this._worldModel;
         let xModel = this._xModel;
         let consistencyModel = this._consistencyModel;
-        // TODO [HIGH] worldify think of another location for that
         // let world = worldModel.getWorld(worldId);
         let sRadius = WorldModel.serverLoadingRadius;
 
@@ -194,8 +209,6 @@ class ChunkLoader
 
         // Loading circle for client (nearer)
         // Only load one at a time!
-        // TODO [HIGH] check on Z+/-.
-        // TODO [LONG-TERM] enhance to transmit chunks when users are not so much active and so on.
         t = TimeUtils.getTimeSecNano();
 
         let newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
@@ -204,16 +217,23 @@ class ChunkLoader
         dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
-        if (newChunk) {
+        if (newChunk)
+        {
             if (ChunkLoader.debug) console.log(`New chunk : ${newChunk.chunkId}`);
-            // TODO [HIGH] not only one at a time
-            newChunksForPlayer[newChunk.world.worldId] = {[newChunk.chunkId]: [newChunk.fastComponents, newChunk.fastComponentsIds]};
+            // [OPT] multiple chunks at a time
+            newChunksForPlayer[newChunk.world.worldId] =
+                {
+                    [newChunk.chunkId]: [
+                        newChunk.fastComponents, newChunk.fastComponentsIds
+                    ]
+                };
         }
 
         return newChunksForPlayer;
     }
 
-    // unloadInnerToOuterSphere(player, starterChunk) {
+    // unloadInnerToOuterSphere(player, starterChunk)
+    // {
     //     let consistencyModel = this._consistencyModel;
     //     let worldModel = this._worldModel;
     //     let xModel = this._xModel;
@@ -227,7 +247,8 @@ class ChunkLoader
     //     );
     // }
 
-    unloadOuterSphere(player, starterChunk) {
+    unloadOuterSphere(player, starterChunk)
+    {
         let consistencyModel = this._consistencyModel;
         let worldModel = this._worldModel;
         let xModel = this._xModel;

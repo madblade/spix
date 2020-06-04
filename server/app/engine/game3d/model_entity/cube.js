@@ -8,7 +8,8 @@ import Entity from './entity';
 
 class Cube extends Entity
 {
-    constructor(id) {
+    constructor(id)
+    {
         super(id);
 
         this._kind = 'cube';

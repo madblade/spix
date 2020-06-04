@@ -9,7 +9,8 @@ import { BlockType } from '../../model_world/model';
 
 class UpdaterAccess
 {
-    static requestAddBlock(originEntity, x, y, z, world, entityModel) {
+    static requestAddBlock(originEntity, x, y, z, world, entityModel)
+    {
         const dimX = world.xSize;
         const dimY = world.ySize;
         const dimZ = world.zSize;
@@ -23,21 +24,25 @@ class UpdaterAccess
 
         let coordsOnChunk = [xOnChunk, yOnChunk, zOnChunk];
 
-        function failure(reason) {
+        function failure(reason)
+        {
             console.log(`[UpdaterAccess/AddBlock] Request denied: ${reason}`);
         }
 
-        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z)) {
+        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z))
+        {
             failure('Requested location is too far away.');
             return;
         }
 
-        if (chunk.what(...coordsOnChunk) !== 0) {
+        if (chunk.what(...coordsOnChunk) !== 0)
+        {
             failure('Cannot add a block on a non-empty block.');
             return;
         }
 
-        if (entityModel.anEntityIsPresentOn(worldId, x, y, z)) {
+        if (entityModel.anEntityIsPresentOn(worldId, x, y, z))
+        {
             failure('An entity is present on the block.');
             return false;
         }
@@ -61,22 +66,26 @@ class UpdaterAccess
         let coordsOnChunk = [xOnChunk, yOnChunk, zOnChunk];
 
         // Validate.
-        function failure(reason) {
+        function failure(reason)
+        {
             console.log(`[UpdaterAccess/DelBlock] Request denied: ${reason}`);
         }
 
-        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z)) {
+        if (!UpdaterAccess.validateBlockEdition(originEntity, x, y, z))
+        {
             failure('Requested location is too far away.');
             return;
         }
 
         const oldBlock = chunk.what(...coordsOnChunk);
-        if (oldBlock === BlockType.AIR) {
+        if (oldBlock === BlockType.AIR)
+        {
             failure('Cannot delete an empty block.');
             return;
         }
 
-        if (oldBlock === BlockType.OBSIDIAN) {
+        if (oldBlock === BlockType.OBSIDIAN)
+        {
             failure('Cannot delete an obsidian block.');
             return;
         }
@@ -84,7 +93,8 @@ class UpdaterAccess
         return [chunk, ...coordsOnChunk];
     }
 
-    static validateBlockEdition(originEntity, x, y, z) {
+    static validateBlockEdition(originEntity, x, y, z)
+    {
         // 10 blocks maximum range for block editing.
         const d3 = GeometryUtils.euclideanDistance3(originEntity.position, [x + .5, y + .5, z + .5]);
         return d3 < 10;

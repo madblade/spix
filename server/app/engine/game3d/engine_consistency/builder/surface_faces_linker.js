@@ -8,14 +8,16 @@ import CSFX from './surface_faces_builder';
 
 class FaceLinker
 {
-    static flatToCoords(flatId, iS, ijS) {
+    static flatToCoords(flatId, iS, ijS)
+    {
         const i = flatId % iS;
         const j = (flatId - i) % ijS / iS;
         const k = (flatId - flatId % ijS) / ijS;
         return `${i},${j},${k}`;
     }
 
-    static findN(ci, cj, ck, ci$, cj$, ck$) {
+    static findN(ci, cj, ck, ci$, cj$, ck$)
+    {
         const deltaI = 1 + ci$ - ci;
         const deltaJ = 1 + cj$ - cj;
         const deltaK = 1 + ck$ - ck;
@@ -150,7 +152,8 @@ class FaceLinker
         return bs === 0;
     }
 
-    static affect(components, id1, id2) {
+    static affect(components, id1, id2)
+    {
         if (components[id1] === 0)
             console.log(`Error @affect after link: (id1) ${id1} has 0 component id.`);
         if (components[id2] === 0)
@@ -163,17 +166,20 @@ class FaceLinker
         }
     }
 
-    // TODO [MEDIUM] Z cases verification.
-    // TODO [HIGH] manage topology.
-    // TODO [HIGH] manage topology client-side.
     /**
      * Neighbours: 0 x+, 1 x-, 2 y+, 3 y-, 4 z+, 5 z-
      */
-    static linkI(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck)
+    static linkI(
+        flatFaceId, cc, ec,
+        faces, merger, capacity,
+        iS, ijS,
+        blocks, neighbourBlocks, ci, cj, ck
+    )
     {
         // Lazy termination (prevent id calculations).
         const val = faces[0][flatFaceId];
-        if (!val) {
+        if (!val)
+        {
             console.log('WARN. i-* linker was given a faceId which is not present in faces array.');
             return;
         }
@@ -188,7 +194,8 @@ class FaceLinker
         // CASE 1: aligned with top and back i (both normals)
         const top = flatFaceId + ijS;
         const ftop = faces[0][top];
-        if (top < capacity) {
+        if (top < capacity)
+        {
             if (
                 normalP && ftop > 0 ||
                 normalM && ftop < 0
@@ -277,7 +284,8 @@ class FaceLinker
         // CASE 3: orthogonal with next top and back (j, k)
         // !!! REVERSE NORMALS !!!
         const flatTopOrthoNext = flatTopOrtho + 1; // k
-        if (flatTopOrthoNext % iS === flatTopOrtho % iS + 1) {
+        if (flatTopOrthoNext % iS === flatTopOrtho % iS + 1)
+        {
             const ftopon = faces[2][flatTopOrthoNext];
             if (
                 normalP && ftopon < 0 ||
@@ -296,7 +304,8 @@ class FaceLinker
         }
 
         const flatBackOrthoNext = flatBackOrtho + 1; // j, POTENTIALLY MERGED
-        if (flatBackOrthoNext % iS === flatBackOrtho % iS + 1) {
+        if (flatBackOrthoNext % iS === flatBackOrtho % iS + 1)
+        {
             const fbackon = faces[1][flatBackOrthoNext];
             if (
                 normalP && fbackon < 0 ||
@@ -322,7 +331,8 @@ class FaceLinker
 
         // CASE 4: ortho with previous j on next i, regular orientation
         const flatOrthoIJ = flatBackOrthoNext - iS;
-        if (flatOrthoIJ > 0 && flatOrthoIJ % iS === (flatBackOrtho - iS) % iS + 1) {
+        if (flatOrthoIJ > 0 && flatOrthoIJ % iS === (flatBackOrtho - iS) % iS + 1)
+        {
             const foij = faces[1][flatOrthoIJ];
             if (
                 normalP && foij > 0 ||
@@ -347,11 +357,16 @@ class FaceLinker
         }
     }
 
-    static linkJ(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck)
+    static linkJ(
+        flatFaceId, cc, ec,
+        faces, merger, capacity,
+        iS, ijS, blocks, neighbourBlocks, ci, cj, ck
+    )
     {
         // Lazy termination (prevent id calculations).
         const val = faces[1][flatFaceId];
-        if (!val) {
+        if (!val)
+        {
             console.log('WARN. j-* linker was given a faceId which is not present in faces array.');
             return;
         }
@@ -363,7 +378,8 @@ class FaceLinker
 
         // CASE 1: aligned with top and right j
         const top = flatFaceId + ijS; // NOT MERGED YET
-        if (top < capacity) {
+        if (top < capacity)
+        {
             const ftop = faces[1][top];
             if (
                 normalP && ftop > 0 ||
@@ -377,7 +393,8 @@ class FaceLinker
         }
 
         const right = flatFaceId + 1; // POTENTIALLY MERGED
-        if (right % iS === flatFaceId % iS + 1) {
+        if (right % iS === flatFaceId % iS + 1)
+        {
             const fright = faces[1][right];
             if (
                 normalP && fright > 0 ||
@@ -424,7 +441,8 @@ class FaceLinker
         // CASE 3: orthogonal with next k or next i
         // REVERSE ORIENTATION
         const flatTopOrthoNext = flatTopOrtho + iS; // next k, NOT MERGED YET
-        if (flatTopOrthoNext % ijS === flatTopOrtho % ijS + iS) {
+        if (flatTopOrthoNext % ijS === flatTopOrtho % ijS + iS)
+        {
             const ftopon = faces[2][flatTopOrthoNext];
             if (
                 normalP && ftopon < 0 ||
@@ -443,7 +461,8 @@ class FaceLinker
         }
 
         const flatBackOrthoNext = flatFaceId + iS; // next i, POTENTIALLY MERGED
-        if (flatBackOrthoNext % ijS === flatFaceId % ijS + iS) {
+        if (flatBackOrthoNext % ijS === flatFaceId % ijS + iS)
+        {
             const fbackon = faces[0][flatBackOrthoNext];
             if (
                 normalP && fbackon < 0 ||
@@ -468,11 +487,16 @@ class FaceLinker
         }
     }
 
-    static linkK(flatFaceId, cc, ec, faces, merger, capacity, iS, ijS, blocks, neighbourBlocks, ci, cj, ck)
+    static linkK(
+        flatFaceId, cc, ec,
+        faces, merger, capacity,
+        iS, ijS, blocks, neighbourBlocks, ci, cj, ck
+    )
     {
         // Lazy termination (prevent id calculations).
         const val = faces[2][flatFaceId];
-        if (!val) {
+        if (!val)
+        {
             console.log('WARN. k-* linker was given a faceId which is not present in faces array.');
             console.log(`\tface id: ${flatFaceId}`);
             console.log(`\tvalue: ${val}`);
@@ -486,7 +510,8 @@ class FaceLinker
 
         // CASE 1: aligned with back and right k
         const right = flatFaceId + 1; // right k
-        if (right % iS === flatFaceId % iS + 1) { // is it inbounds?
+        if (right % iS === flatFaceId % iS + 1)
+        { // is it inbounds?
             const fright = faces[2][right];
             if (
                 normalP && fright > 0 ||
@@ -507,7 +532,8 @@ class FaceLinker
         }
 
         const back = flatFaceId + iS; // back k
-        if (back % ijS === flatFaceId % ijS + iS) {
+        if (back % ijS === flatFaceId % ijS + iS)
+        {
             const fback = faces[2][back];
             if (
                 normalP && fback > 0 ||
@@ -530,7 +556,8 @@ class FaceLinker
         // CASE 2: orthogonal with (upper current and previous) back and right (j, i)
         // Current -> reverse orientation
         const flatBackOrthoCurrent = flatFaceId + ijS; // j
-        if (flatBackOrthoCurrent < capacity) {
+        if (flatBackOrthoCurrent < capacity)
+        {
             const fbackoc = faces[1][flatBackOrthoCurrent];
             if (
                 normalP && fbackoc < 0 ||
@@ -555,7 +582,8 @@ class FaceLinker
         }
 
         const flatRightOrthoCurrent = flatFaceId + ijS; // i
-        if (flatRightOrthoCurrent < capacity) {
+        if (flatRightOrthoCurrent < capacity)
+        {
             const frightoc = faces[0][flatRightOrthoCurrent];
             if (
                 normalP && frightoc < 0 ||
@@ -611,7 +639,8 @@ class FaceLinker
 
         const flatRightOrthoPrevious = flatRightOrthoCurrent - 1; // i
         if (flatRightOrthoPrevious < capacity &&
-            flatRightOrthoPrevious % iS === flatRightOrthoCurrent % iS - 1) {
+            flatRightOrthoPrevious % iS === flatRightOrthoCurrent % iS - 1)
+        {
             const frightop = faces[0][flatRightOrthoPrevious];
             if (
                 normalP && frightop > 0 ||

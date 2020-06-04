@@ -12,7 +12,8 @@ import Updater          from './updater/updater';
 
 class TopologyEngine
 {
-    constructor(game) {
+    constructor(game)
+    {
         // Models.
         this._entityModel       = game.entityModel;
         this._worldModel        = game.worldModel;
@@ -32,7 +33,8 @@ class TopologyEngine
     get worldModel()            { return this._worldModel; }
     get outputBuffer()          { return this._outputBuffer; }
 
-    addInput(meta, avatar) {
+    addInput(meta, avatar)
+    {
         // Security: copy avatar state before physics engine updates positions and world translations.
         let pos = avatar.position;
         let secureAvatar = { position: [pos[0], pos[1], pos[2]], worldId: avatar.worldId};
@@ -40,19 +42,21 @@ class TopologyEngine
         this._inputBuffer.addInput(meta, secureAvatar);
     }
 
-    update() {
+    update()
+    {
         this._updater.update(this._inputBuffer.getInput());
         this._inputBuffer.flush();
     }
 
     // Get (chunk id, blocks) map for updated chunks.
-    getOutput() {
+    getOutput()
+    {
         return this._outputBuffer.getOutput();
     }
 
     // Get (chunk id, updates) object for updated chunks concerning specific player.
-    // TODO [HIGH] put in consistency model.
-    getOutputForPlayer(p, updatedChunks, newChunks) {
+    getOutputForPlayer(p, updatedChunks, newChunks)
+    {
         let worldModel = this._worldModel;
         let consistencyModel = this._consistencyModel;
         return this._selector.selectUpdatedChunksForPlayer(
@@ -60,7 +64,8 @@ class TopologyEngine
         );
     }
 
-    flushOutput() {
+    flushOutput()
+    {
         this._outputBuffer.flushOutput(this._worldModel);
     }
 }

@@ -47,11 +47,13 @@ class World
     get allChunks() { return this._chunks; }
     set allChunks(newChunks) { this._chunks = newChunks; }
 
-    addChunk(id, chunk) {
+    addChunk(id, chunk)
+    {
         this._chunks.set(id, chunk);
     }
 
-    getChunkCoordinates(x, y, z) {
+    getChunkCoordinates(x, y, z)
+    {
         let f = Math.floor;
         const dx = this.xSize;
         const dy = this.ySize;
@@ -59,12 +61,14 @@ class World
         return [f(x / dx), f(y / dy), f(z / dz)];
     }
 
-    getChunkByCoordinates(x, y, z) {
+    getChunkByCoordinates(x, y, z)
+    {
         let c = this.getChunkCoordinates(x, y, z);
         return this.getChunk(...c);
     }
 
-    whatBlock(x, y, z) {
+    whatBlock(x, y, z)
+    {
         let coords = this.getChunkCoordinates(x, y, z);
 
         const dx = this.xSize;
@@ -80,17 +84,21 @@ class World
 
         const chunkId = `${i},${j},${k}`;
         let chunk = this._chunks.get(chunkId);
-        if (!chunk) {
-            console.log(`ChkMgr@whatBlock: could not find chunk ${chunkId} from (${x},${y},${z})!`);
-            // TODO [MEDIUM] load concerned chunk.
-            // TODO [MEDIUM] check minus
+        if (!chunk)
+        {
+            console.log(
+                `ChkMgr@whatBlock: could not find chunk 
+                ${chunkId} from (${x},${y},${z})!`
+            );
+            // TODO [GENERATION] managed non-ready chunk.
             return;
         }
 
         return chunk.what(chunkX, chunkY, chunkZ);
     }
 
-    getFreePosition() {
+    getFreePosition()
+    {
         let zLimit = this._zSize;
         let z = zLimit - 2;
         let centerInteger = Math.trunc(zLimit / 2); // parseInt(zLimit / 2, 10);
@@ -102,29 +110,35 @@ class World
         return [centerFloat, centerFloat, z];
     }
 
-    getChunk(iCoordinate, jCoordinate, kCoordinate) {
+    getChunk(iCoordinate, jCoordinate, kCoordinate)
+    {
         let id = `${iCoordinate},${jCoordinate},${kCoordinate}`;
         return this._chunks.get(id);
     }
 
-    getChunkById(chunkId) {
+    getChunkById(chunkId)
+    {
         return this._chunks.get(chunkId);
     }
 
-    hasChunkById(chunkId) {
+    hasChunkById(chunkId)
+    {
         return this._chunks.has(chunkId);
     }
 
-    hasChunk(i, j, k) {
+    hasChunk(i, j, k)
+    {
         return !!this.getChunk(i, j, k);
     }
 
-    isWater(p0, p1, p2) {
+    isWater(p0, p1, p2)
+    {
         const n = this.whatBlock(Math.floor(p0), Math.floor(p1), Math.floor(p2));
         return n === BlockType.WATER;
     }
 
-    isFree(p0, p1, p2) {
+    isFree(p0, p1, p2)
+    {
         const n = this.whatBlock(p0, p1, p2);
         return n === BlockType.AIR || n === BlockType.WATER;
         // && this.whatBlock(p[0], p[1], p[2]+1) === 0;

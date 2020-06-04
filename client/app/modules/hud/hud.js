@@ -41,7 +41,8 @@ let Hud = function(register)
 extend(Hud.prototype, {
 
     // Game started
-    initModule() {
+    initModule()
+    {
         let announce = $('#announce');
         announce.before(this.html);
 
@@ -53,15 +54,18 @@ extend(Hud.prototype, {
     },
 
     // Game ended
-    disposeModule() {
+    disposeModule()
+    {
         $('#hud').remove();
         // $('#network-graph').remove();
         $('#items').remove();
         this.killSigma();
     },
 
-    updateSelfState(newState) {
-        if (newState.hasOwnProperty('position')) {
+    updateSelfState(newState)
+    {
+        if (newState.hasOwnProperty('position'))
+        {
             let f = Math.floor;
             let p = newState.position;
             let text = `${f(p[0])}, ${f(p[1])}, ${f(p[2])}`;
@@ -70,11 +74,13 @@ extend(Hud.prototype, {
                 .css('color', this.orangeColor);
         }
 
-        if (newState.hasOwnProperty('diagram')) {
+        if (newState.hasOwnProperty('diagram'))
+        {
             this.refreshHUDWorldGraph(newState.diagram);
         }
 
-        if (newState.hasOwnProperty('itemSelect')) {
+        if (newState.hasOwnProperty('itemSelect'))
+        {
             let newSlot = newState.itemSelect[0];
             let oldSlot = newState.itemSelect[1];
             if (newSlot < 0 || newSlot > 7 || oldSlot < 0 || oldSlot > 7) {

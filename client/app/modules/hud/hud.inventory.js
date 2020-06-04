@@ -9,7 +9,8 @@ import $                        from 'jquery';
 
 let HUDInventoryModule =
 {
-    initInventory() {
+    initInventory()
+    {
         $('#item0').html(`
             <img src="app/assets/icons/block-planks.jpg" />
         `);

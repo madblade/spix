@@ -19,7 +19,8 @@ class CSBX
         const numberOfNeighbours = 6;
 
         // Get all neighbour chunks.
-        for (let i = 0; i < numberOfNeighbours; ++i) {
+        for (let i = 0; i < numberOfNeighbours; ++i)
+        {
             neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
             neighbourBlocks.push(neighbourChunks[i].blocks);
         }
@@ -61,7 +62,8 @@ class CSBX
         }
     }
 
-    static addSurfaceBlock(bid, sbs, ijSize) {
+    static addSurfaceBlock(bid, sbs, ijSize)
+    {
         const ijC = bid % ijSize;
         const z = (bid - ijC) / ijSize;
         if (sbs.hasOwnProperty(z)) sbs[z].push(ijC);
@@ -88,7 +90,6 @@ class CSBX
             }
         }
 
-        // TODO [HIGH] check z criteria.
         const kPlus = b + ijSize;
         if (kPlus >= capacity) {
             if (neighbourBlocks[4][kPlus - capacity] !== blockType) {

@@ -9,19 +9,22 @@ import Factory from '../factory';
 
 class Hub
 {
-    constructor(app) {
+    constructor(app)
+    {
         this._app = app;
         this._games = new Map();
     }
 
-    static validateUser(user) {
+    static validateUser(user)
+    {
         // Do validation
         let res = user !== null;
         if (!res) console.log('Invalid user requested new game.');
         return res;
     }
 
-    static validateKind(kind) {
+    static validateKind(kind)
+    {
         switch (kind) {
             case 'cube': case 'flat': case 'demo':
                 return true;
@@ -33,7 +36,8 @@ class Hub
         return false;
     }
 
-    static validateOptions(kind, options) {
+    static validateOptions(kind, options)
+    {
         let validated = false;
         switch (kind) {
             case 'demo':
@@ -59,7 +63,8 @@ class Hub
         return validated;
     }
 
-    validateRequest() {
+    validateRequest()
+    {
         // Count games.
         let games = this._games;
 
@@ -74,7 +79,8 @@ class Hub
         return validation;
     }
 
-    requestNewGame(user, kind, options) {
+    requestNewGame(user, kind, options)
+    {
         let app = this._app;
 
         // Verify.
@@ -91,7 +97,8 @@ class Hub
         } else return false;
     }
 
-    getGame(kind, gameId) {
+    getGame(kind, gameId)
+    {
         let gamesOfKind = this._games.get(kind);
         if (!gamesOfKind) return;
         return gamesOfKind.get(gameId);
@@ -101,7 +108,8 @@ class Hub
      * Lists all games with minimal information.
      * @returns {{}} Object: 1 id = 1 game kind; 1 element = 1 array of game ids.
      */
-    listGames() {
+    listGames()
+    {
         let games = {};
         let modelGames = this._games;
 
@@ -118,10 +126,9 @@ class Hub
 
     /**
      * Not param-safe: use 'requestNewGame' to ensure kind validity.
-     * @param kind
-     * @returns {*}
      */
-    addGame(kind, options) {
+    addGame(kind, options)
+    {
         let games = this._games;
         let connection = this._app.connection;
 
@@ -141,7 +148,8 @@ class Hub
         }
     }
 
-    endGame(game) {
+    endGame(game)
+    {
         if (game.isRunning) {
             console.log('WARN! Trying to end a running game. Abort.');
             return;

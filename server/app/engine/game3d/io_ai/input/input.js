@@ -10,7 +10,8 @@ class AIInput
 
     // }
 
-    update() {
+    update()
+    {
 
     }
 }

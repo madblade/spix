@@ -41,7 +41,8 @@ let HUDWorldsModule =
         });
     },
 
-    killSigma() {
+    killSigma()
+    {
         if (!this.sigma || !this.sigma.graph) return;
         this.sigma.kill();
         this.sigma = null;
@@ -61,11 +62,13 @@ let HUDWorldsModule =
         let depthMap = new Map();
 
         let d = newDiagram;
-        for (let i = 0, l = d.length; i < l; ++i) {
+        for (let i = 0, l = d.length; i < l; ++i)
+        {
             let di = d[i];
             if (!di.origin || !di.destination) continue;
 
-            if (!nodeSet.has(di.origin)) {
+            if (!nodeSet.has(di.origin))
+            {
                 let currentDepth = parseInt(di.depth, 10);
                 let currentH = depthMap.get(currentDepth);
                 if (!currentH) currentH = 0;
@@ -79,7 +82,9 @@ let HUDWorldsModule =
                     color: i === 0 ? 'blue' : 'orange'
                 });
             }
-            if (!nodeSet.has(di.destination)) {
+
+            if (!nodeSet.has(di.destination))
+            {
                 let currentDepth = parseInt(di.depth, 10);
                 let currentH = depthMap.get(currentDepth + 1);
                 if (!currentH) currentH = 0;

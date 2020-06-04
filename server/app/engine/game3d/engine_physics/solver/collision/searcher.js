@@ -20,14 +20,16 @@ class Searcher
     // Fast intern. math. util.
     // No getters/setters.
 
-    constructor(entities, axisX, axisY, axisZ) {
+    constructor(entities, axisX, axisY, axisZ)
+    {
         this.entities = entities;
         this.objectsAxisX = axisX;
         this.objectsAxisY = axisY;
         this.objectsAxisZ = axisZ;
     }
 
-    updateObjectAxis(entityId) {
+    updateObjectAxis(entityId)
+    {
         let axisX = this.objectsAxisX;
         let axisY = this.objectsAxisY;
         let axisZ = this.objectsAxisZ;
@@ -99,15 +101,17 @@ class Searcher
         }
     }
 
-    static SWP(array, i, j) {
+    static SWP(array, i, j)
+    {
         let t = array[i];
         array[i] = array[j];
         array[j] = t;
         return array;
     }
 
-    // TODO [HIGH] distinguish between 'e' and 'x'
-    swap(axisArray, i, j) {
+    // TODO [PERF] distinguish between 'e' and 'x'
+    swap(axisArray, i, j)
+    {
         let objects = this.entities;
         Searcher.SWP(axisArray, i, j);
 
@@ -125,7 +129,8 @@ class Searcher
         }
     }
 
-    initObjects(objects) {
+    initObjects(objects)
+    {
         this.entities = objects;
 
         let axisX = this.objectsAxisX;
@@ -167,7 +172,8 @@ class Searcher
     }
 
     // Works with x axis
-    computeIsland(lArray, index) {
+    computeIsland(lArray, index)
+    {
         let threshAndIndex = lArray[index];
 
         let tx = threshAndIndex[0];
@@ -179,7 +185,8 @@ class Searcher
         try {
             iterator = new ObjectsIterator(this, entityIndexX, tx, ty, tz);
         } catch (e) {
-            return []; // TODO [MEDIUM] bld
+            console.error('Could not create object iterator.');
+            return [];
         }
 
         let element = iterator.next();
@@ -229,7 +236,8 @@ class ObjectsIterator
         this.z = o.p0[2];
         let zW = o.widthZ;
 
-        if (objectIndexX !== o.indexX) {
+        if (objectIndexX !== o.indexX)
+        {
             throw Error('[Searcher] Mismatch between ' +
                 'transmitted indexX and the object\'s x index.');
         }
@@ -244,7 +252,7 @@ class ObjectsIterator
         this.tx = abs(thresholdX) + maxT + 4 * xW;
         this.ty = abs(thresholdY) + maxT + 4 * yW;
         this.tz = abs(thresholdZ) + maxT + 4 * zW;
-        // TODO [LOW] account for max width when objects are huge.
+        // TODO [ENTITIES] account for max width when objects are huge.
 
         this.onX = true;
         this.onY = false;
@@ -257,7 +265,8 @@ class ObjectsIterator
         this.locked = [!1, !1, !1, !1, !1, !1];
     }
 
-    finalize() {
+    finalize()
+    {
         // console.log("\t\tstack: " + this.stack + ", depth: " + this.step);
         this.step = 1;
         this.stack = 0;
@@ -270,7 +279,8 @@ class ObjectsIterator
         this.locked = [!1, !1, !1, !1, !1, !1];
     }
 
-    next(indexLocked) {
+    next(indexLocked)
+    {
         this.stack++;
         if (this.stack > 100) {
             console.log(`EXPT: stack ${this.stack}, depth ${this.step}`);
@@ -313,13 +323,15 @@ class ObjectsIterator
             if (!objects[id]) throw Error(`[Searcher] Couldn’t find object ${id}`);
         };
 
-        if (done.size >= axisX.length - 1) {
+        if (done.size >= axisX.length - 1)
+        {
             this.finalize();
             return null;
         }
 
         // Search on X axis.
-        if (onX && toPlus && !locked[0]) {
+        if (onX && toPlus && !locked[0])
+        {
             //console.log('\t\tx+');
             if (iX + s >= max) {
                 locked[0] = true;
@@ -327,7 +339,7 @@ class ObjectsIterator
                 return this.next(0);
             }
 
-            // TODO [OPT] replace id with indexX
+            // TODO [PERF] replace id with indexX
             let id = axisX[iX + s].id;
             if (done.has(id)) {
                 this.toPlus = false;
@@ -336,7 +348,7 @@ class ObjectsIterator
 
             debugObject(id);
             let object = objects[id];
-            if (abs(object.p0[0] - x) <= tx) { // TODO use lfarray instead of tx
+            if (abs(object.p0[0] - x) <= tx) { // TODO [PERF] use lfarray instead of tx
                 if (abs(object.p0[1] - y) <= ty && abs(object.p0[2] - z) <= tz)
                     return object;
                 else {
@@ -348,7 +360,9 @@ class ObjectsIterator
                 return this.next(0);
             }
         }
-        if (onX && !toPlus && !locked[1]) {
+
+        if (onX && !toPlus && !locked[1])
+        {
             //console.log('\t\tx-');
             if (iX - s < 0) {
                 locked[1] = true;
@@ -385,7 +399,8 @@ class ObjectsIterator
 
         // Search on Y axis.
         let onY = this.onY;
-        if (onY && toPlus && !locked[2]) {
+        if (onY && toPlus && !locked[2])
+        {
             // console.log('\t\ty+');
             if (iY + s >= max) {
                 locked[2] = true;
@@ -411,7 +426,9 @@ class ObjectsIterator
                 return this.next(2);
             }
         }
-        if (onY && !toPlus && !locked[3]) {
+
+        if (onY && !toPlus && !locked[3])
+        {
             if (iY - s < 0) {
                 locked[3] = true;
                 this.toPlus = true;
@@ -444,7 +461,8 @@ class ObjectsIterator
         }
 
         let onZ = this.onZ;
-        if (onZ && toPlus && !locked[4]) {
+        if (onZ && toPlus && !locked[4])
+        {
             if (iZ + s >= max) {
                 locked[4] = true;
                 this.toPlus = false;
@@ -469,7 +487,9 @@ class ObjectsIterator
                 return this.next(4);
             }
         }
-        if (onZ && !toPlus && !locked[5]) {
+
+        if (onZ && !toPlus && !locked[5])
+        {
             if (iZ - s < 0) {
                 locked[5] = true;
                 this.toPlus = true;

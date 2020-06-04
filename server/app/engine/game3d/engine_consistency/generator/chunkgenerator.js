@@ -34,7 +34,9 @@ class ChunkGenerator
         //try {
         // GenPerlin.perlinGeneration(c);
         let shuffleChunks = false; // Can be set to activated to test for initial chunk.
-        GenSimplePerlin.simplePerlinGeneration(c, shuffleChunks, world.worldId, world.worldInfo);
+        GenSimplePerlin.simplePerlinGeneration(
+            c, shuffleChunks, world.worldId, world.worldInfo
+        );
         //} catch (e) {
         //    console.log(e.stack);
         //}
@@ -52,7 +54,9 @@ class ChunkGenerator
         // GenAnalytic.waveChunk(c, 10, 15, 1);
         // GenSimple.fillChunk(c, 256, 0);
         // GenPerlin.perlinGeneration(c);
-        GenSimplePerlin.simplePerlinGeneration(c, false, world.worldId, world.worldInfo); // params: chunk, doShuffleChunks
+        GenSimplePerlin.simplePerlinGeneration(
+            c, false, world.worldId, world.worldInfo
+        ); // params: chunk, doShuffleChunks
 
         return c;
     }

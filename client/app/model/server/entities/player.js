@@ -11,7 +11,7 @@ let PlayerModule = {
 
     loadCube(id, updatedEntity, graphics, entities)
     {
-        // TODO [LOW] do it in graphics
+        // This should be done in graphics
         let wrapper = new Object3D();
         let cube = graphics.createMesh(
             graphics.createGeometry('box'),
@@ -31,7 +31,7 @@ let PlayerModule = {
 
     loadPlayer(id, updatedEntity, graphics, entities)
     {
-        // TODO [LOW] add handheld item
+        // TODO [GAMEPLAY] add handheld item
         let createdEntity = graphics.initializeEntity(id, 'steve');
         let object3D = graphics.finalizeEntity(id, createdEntity);
 

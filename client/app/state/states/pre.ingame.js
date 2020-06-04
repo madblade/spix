@@ -8,7 +8,8 @@ import { $ } from '../../modules/polyfills/dom';
 
 import extend from '../../extend.js';
 
-let PreIngameState = function(stateManager) {
+let PreIngameState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'preingame';
     this.html = `
@@ -20,7 +21,8 @@ let PreIngameState = function(stateManager) {
 
 extend(PreIngameState.prototype, {
 
-    start() {
+    start()
+    {
         $('#announce')
             .empty()
             .removeClass()
@@ -36,7 +38,8 @@ extend(PreIngameState.prototype, {
         }.bind(this));
     },
 
-    end() {
+    end()
+    {
         $('#request-pl').off('click');
         return new Promise(function(resolve) {
             let requestTab = $('#announce');

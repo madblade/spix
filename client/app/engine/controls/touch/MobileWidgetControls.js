@@ -61,7 +61,9 @@ let MobileWidgetControls = function(
         this.canvas.setAttribute('id', this.CANVAS_ID);
         this.canvas.setAttribute('width', `${w}`);
         this.canvas.setAttribute('height', `${h}`);
-        this.canvas.setAttribute('style', 'position: absolute; width: 100%; bottom: 0px; z-index: 999;');
+        this.canvas.setAttribute('style',
+            'position: absolute; width: 100%; bottom: 0px; z-index: 999;'
+        );
         this.element.appendChild(this.canvas);
     } else {
         this.canvas = c;
@@ -79,7 +81,9 @@ let MobileWidgetControls = function(
 
         this.fingers = [];
         if (k === 'cancel') {
-            console.error('[MobileWidgetControls] Too many fingers or unsupported action.');
+            console.error(
+                '[MobileWidgetControls] Too many fingers or unsupported action.'
+            );
             return;
         }
 

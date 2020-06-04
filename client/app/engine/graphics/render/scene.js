@@ -16,7 +16,8 @@ let SceneManager = function()
 
 extend(SceneManager.prototype, {
 
-    createScene(newSceneId) {
+    createScene(newSceneId)
+    {
         let scene = new Scene();
         scene.sceneId = newSceneId;
         scene.autoUpdate = false;
@@ -25,14 +26,16 @@ extend(SceneManager.prototype, {
 
     // Create and push scene with 'newSceneId' in this.subScenes.
     // If scene exists already (i.e. it's 'mainScene'), simply push it into this.subScenes
-    addScene(newSceneId, scene) {
+    addScene(newSceneId, scene)
+    {
         if (!scene) scene = this.createScene(newSceneId);
         this.subScenes.set(newSceneId, scene);
         return scene;
     },
 
     // Switch main scene with some scene that must be in this.subScenes
-    switchToScene(sceneId, cameraManager, avatar) {
+    switchToScene(sceneId, cameraManager, avatar)
+    {
         sceneId = parseInt(sceneId, 10);
 
         let newMainScene = this.subScenes.get(sceneId);
@@ -44,7 +47,8 @@ extend(SceneManager.prototype, {
         this.subScenes.delete(sceneId);
         this.addScene(oldMainSceneId, oldMainScene);
 
-        if (avatar) {
+        if (avatar)
+        {
             oldMainScene.remove(avatar);
             newMainScene.add(avatar);
         }
@@ -52,14 +56,17 @@ extend(SceneManager.prototype, {
         cameraManager.switchMainCameraToWorld(oldMainSceneId, sceneId);
     },
 
-    addObject(object, sceneId) {
+    addObject(object, sceneId)
+    {
         let scene = this.getScene(sceneId);
         if (scene && object.parent !== scene) scene.add(object);
     },
 
-    removeObject(object, sceneId, doNotDispose) {
+    removeObject(object, sceneId, doNotDispose)
+    {
         let scene = this.getScene(sceneId);
-        if (scene) {
+        if (scene)
+        {
             scene.remove(object);
             if (!doNotDispose) {
                 if (object.geometry) { object.geometry.dispose(); object.geometry = null; }
@@ -68,7 +75,8 @@ extend(SceneManager.prototype, {
         }
     },
 
-    getScene(sceneId) {
+    getScene(sceneId)
+    {
         return (
             parseInt(sceneId, 10) === parseInt(this.mainScene.sceneId, 10) ?
                 this.mainScene :
@@ -76,7 +84,8 @@ extend(SceneManager.prototype, {
         );
     },
 
-    resize(width, height) {
+    resize(width, height)
+    {
         if (!width) width = window.innerWidth;
         if (!height) height = window.innerHeight;
 
@@ -91,7 +100,8 @@ extend(SceneManager.prototype, {
         });
     },
 
-    removeScreen(screenId) {
+    removeScreen(screenId)
+    {
         let screen = this.screens.get(screenId);
         if (!screen) return;
 
@@ -103,7 +113,8 @@ extend(SceneManager.prototype, {
         // this.screens.delete(screenId);
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.mainScene.dispose();
         this.mainScene = this.createScene(-1);
         this.subScenes.forEach(s => {
@@ -128,25 +139,29 @@ extend(SceneManager.prototype, {
 
 let ScenesModule = {
 
-    createSceneManager() {
+    createSceneManager()
+    {
         return new SceneManager(this);
     },
 
-    addToScene(object3D, sceneId) {
+    addToScene(object3D, sceneId)
+    {
         let sceneManager = this.sceneManager;
         if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
         sceneId = parseInt(sceneId, 10);
         sceneManager.addObject(object3D, sceneId);
     },
 
-    removeFromScene(object3D, sceneId, doNotDispose) {
+    removeFromScene(object3D, sceneId, doNotDispose)
+    {
         let sceneManager = this.sceneManager;
         if (!sceneId) sceneId = sceneManager.mainScene.sceneId;
         sceneId = parseInt(sceneId, 10);
         sceneManager.removeObject(object3D, sceneId, doNotDispose);
     },
 
-    addScene(newSceneId) {
+    addScene(newSceneId)
+    {
         newSceneId = parseInt(newSceneId, 10);
         let sceneManager = this.sceneManager;
 
@@ -161,8 +176,9 @@ let ScenesModule = {
         return sceneManager.addScene(newSceneId);
     },
 
-    // TODO [HIGH] unload scene.
-    forgetScene(sceneId) {
+    // TODO [UNLOAD] unload scene.
+    forgetScene(sceneId)
+    {
         let sceneManager = this.sceneManager;
 
         // Don't delete current scene or a scene that does not exist.
@@ -176,7 +192,8 @@ let ScenesModule = {
         this.subScenes.delete(sceneId);
     },
 
-    getScene(sceneId, force) {
+    getScene(sceneId, force)
+    {
         let scene = this.sceneManager.getScene(sceneId);
         if (!scene && force) {
             scene = this.addScene(sceneId);
@@ -184,19 +201,23 @@ let ScenesModule = {
         return scene;
     },
 
-    addScreen(screenId, screenObject) {
+    addScreen(screenId, screenObject)
+    {
         this.sceneManager.screens.set(screenId, screenObject);
     },
 
-    getScreen(screenId) {
+    getScreen(screenId)
+    {
         return this.sceneManager.screens.get(screenId);
     },
 
-    removeScreen(screenId) {
+    removeScreen(screenId)
+    {
         this.sceneManager.removeScreen(screenId);
     },
 
-    switchToScene(oldSceneId, newSceneId/*, avatar*/) {
+    switchToScene(oldSceneId, newSceneId) //, avatar
+    {
         console.log(`Switching from ${oldSceneId} to ${newSceneId}`);
         this.sceneManager.switchToScene(newSceneId, this.cameraManager);
         this.rendererManager.switchAvatarToScene(newSceneId);

@@ -12,7 +12,8 @@ import {
 
 let PortalsModule = {
 
-    addStubPortalObject(portal) {
+    addStubPortalObject(portal)
+    {
         let worldId = portal.worldId; // World this portal stands in.
         let portalId = portal.portalId;
         //console.log('Adding stub: p(' + portalId + '), w(' + worldId + ')');
@@ -28,8 +29,9 @@ let PortalsModule = {
 
         // Create screen.
         let screen = this.getScreen(portalId);
-        if (!screen) {
-            console.log('NNNNNNNEEEEEEW SCREEEEEENu');
+        if (!screen)
+        {
+            console.log('New Screen created.');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;
             // let tempOffset = portal.tempOffset;
@@ -48,7 +50,7 @@ let PortalsModule = {
                 }
             );
 
-            // TODO call new geometry from meshes module
+            // [REFACTOR] manage geometry creation elsewhere.
             let geometry = new PlaneBufferGeometry(portalWidth, portalHeight);
 
             let portalVShader = this.getPortalVertexShader();
@@ -96,13 +98,17 @@ let PortalsModule = {
             this.addScreen(portalId, screen);
         }
 
-        if (screen) {
+        if (screen)
+        {
             this.addToScene(screen.getMesh(), worldId);
         }
     },
 
     // portal linked forward to otherPortal
-    completeStubPortalObject(portal, otherPortal, cameraPath, cameraTransform) {
+    completeStubPortalObject(
+        portal, otherPortal, cameraPath, cameraTransform
+    )
+    {
         let worldId = portal.worldId;
         let portalId = portal.portalId;
         // let otherEndId = worldId;
@@ -122,24 +128,27 @@ let PortalsModule = {
             return;
         }
 
-        // TODO [CRIT] add several times with different paths.
-        // TODO [CRIT] compute all paths.
-        // TODO [CRIT] DON'T ACCOUNT for portals that are too far away!
-        // TODO [CRIT] that's how many camera paths I'll have to add until the leaves.
+        // TODO [PORTAL] implement generic portal functionality
+        // Implementation hints:
+        // - add several times with different paths.
+        // - compute all paths.
+        // - DON'T ACCOUNT for portals that are too far away!
+        // - that's how many camera paths I'll have to add until the leaves.
         this.cameraManager.addCamera(portal, otherPortal, cameraPath, cameraTransform, screen);
         this.cameraManager.addCameraToScene(cameraPath, worldId, screen);
     },
 
-    processPortalUpdates() {
-        //console.log('[X] Processing portal graphical updates.');
+    processPortalUpdates()
+    {
         let portalUpdates = this.portalUpdates;
         if (portalUpdates.length < 1) return;
         let u;
         let hasAddedSomething = false;
 
-        // TODO [ALG] Add portal I just crossed first (closest to destinationWid).
+        // check [ALG] Add portal I just crossed first (closest to destinationWid)?
         let addedFirst = [];
-        for (let i = 0; i < portalUpdates.length; ++i) {
+        for (let i = 0; i < portalUpdates.length; ++i)
+        {
             u = portalUpdates[i];
             console.log(`${u.destinationWid}, ${u.portal.worldId}, ${this.previousFrameWorld}`);
 
@@ -148,8 +157,9 @@ let PortalsModule = {
             let pwid = parseInt(this.previousFrameWorld, 10);
             let cwid = parseInt(this.currentFrameWorld, 10);
 
-            if (dwid === pwid || dwid === cwid || owid === pwid || owid === cwid) {
-                //console.log('Added ' + this.previousFrameWorld + ', '
+            if (dwid === pwid || dwid === cwid || owid === pwid || owid === cwid)
+            {
+                // console.log('Added ' + this.previousFrameWorld + ', '
                 // + u.destinationWid);
                 this.addPortalGraphics(u.portal, u.otherPortal,
                     u.cameraPath, u.cameraTransform, u.depth,
@@ -159,11 +169,13 @@ let PortalsModule = {
                 hasAddedSomething = true;
             }
         }
-        for (let j = addedFirst.length - 1; j >= 0; --j) {
+        for (let j = addedFirst.length - 1; j >= 0; --j)
+        {
             portalUpdates.splice(addedFirst[j], 1);
         }
 
-        if (!hasAddedSomething) {
+        if (!hasAddedSomething)
+        {
             u = portalUpdates.shift();
             this.addPortalGraphics(u.portal, u.otherPortal,
                 u.cameraPath, u.cameraTransform, u.depth,
@@ -172,11 +184,13 @@ let PortalsModule = {
         }
     },
 
-    flushPortalUpdates() {
+    flushPortalUpdates()
+    {
         this.portalUpdates = [];
     },
 
-    unflushPortalUpdates() {
+    unflushPortalUpdates()
+    {
         let portalUpdates = this.portalUpdates;
         let lastRenderPaths = this.lastRenderPaths;
         let lastRenderGates = this.lastRenderGates;
@@ -188,7 +202,8 @@ let PortalsModule = {
         let rp = new Set();
         let rg = new Set();
 
-        for (let i = 0, l = portalUpdates.length; i < l; ++i) {
+        for (let i = 0, l = portalUpdates.length; i < l; ++i)
+        {
             let currentUpdate = portalUpdates[i];
             rp.add(currentUpdate.pidPathString);
             rg.add(currentUpdate.originPid);
@@ -206,8 +221,10 @@ let PortalsModule = {
         this.lastRenderGates = new Set();
     },
 
-    addPortalGraphics(portal, otherPortal, cameraPath, cameraTransform,
-        depth, originPid, destinationPid, destinationWid, pidPathString)
+    addPortalGraphics(
+        portal, otherPortal, cameraPath, cameraTransform,
+        depth, originPid, destinationPid, destinationWid, pidPathString
+    )
     {
         let renderRegister = this.rendererManager.getRenderRegister();
         for (let i in renderRegister)
@@ -247,21 +264,22 @@ let PortalsModule = {
         this.rendererManager.setRenderRegister(renderRegister);
     },
 
-    addPortalObject(portal, otherPortal, cameraPath, cameraTransform,
+    addPortalObject(
+        portal, otherPortal, cameraPath, cameraTransform,
         depth, originPid, destinationPid, destinationWid,
         pidPathString)
     {
         this.portalUpdates.push({
-            /*portal: */portal,
-            /*otherPortal: */otherPortal,
-            /*cameraPath: */cameraPath,
-            /*cameraTransform: */cameraTransform,
+            portal,
+            otherPortal,
+            cameraPath,
+            cameraTransform,
 
-            /*depth: */depth,
-            /*originPid: */originPid,
-            /*destinationPid: */destinationPid,
-            /*destinationWid: */destinationWid,
-            /*pidPathString: */pidPathString
+            depth,
+            originPid,
+            destinationPid,
+            destinationWid,
+            pidPathString
         });
     },
 
@@ -271,7 +289,7 @@ let PortalsModule = {
     {
         // let worldId = portal.worldId;
 
-        //console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
+        // console.log('Removing stub: p(' + portal.portalId + ') -> o(' + otherPortal.portalId + ')');
 
         // Remove screen and subCameras.
         let currentPortalId = portal.portalId;
@@ -284,11 +302,12 @@ let PortalsModule = {
         // Camera paths are necessary for handling redundancy in portal
         // chains.
 
-        // TODO [CRIT] a camera must know its full render path.
-        // TODO [CRIT] search in depth and remove every portal in the chain.
-        // TODO [CRIT] remove screen otherWorldId
-        // TODO [CRIT] remove in-depth subCameras.
-        // TODO [CRIT] remove backwards variable
+        // Implementation hints:
+        // - a camera must know its full render path.
+        // - search in depth and remove every portal in the chain.
+        // - remove screen otherWorldId
+        // - remove in-depth subCameras.
+        // - remove backwards variable
 
         if (!screenToBeAltered) { console.log('WARN @portals.js: screen to be altered not found.'); }
         else {
@@ -305,14 +324,15 @@ let PortalsModule = {
     },
 
     // Remove the aforementioned portal.
-    removePortalObject(portal/*, worldMap*/)
+    // TODO [PORTAL] manage portal removal
+    removePortalObject(portal) //, worldMap
     {
         // let worldId = portal.worldId;
 
         let currentPortalId = portal.portalId;
 
         console.log(`Removing full portal: p(${portal.portalId})`);
-        // TODO [CRIT] search in depth and remove every portal in the chain.
+        // Search in depth and remove every portal in the chain.
 
         // 1 screen <-> 1 portal
         let screenToBeRemoved = this.getScreen(currentPortalId);

@@ -51,7 +51,8 @@ let SelfModel = function(app)
 
 extend(SelfModel.prototype, {
 
-    init() {
+    init()
+    {
         this.loadSelf();
     },
 
@@ -135,10 +136,10 @@ extend(SelfModel.prototype, {
         register.updateSelfState({ position: [p.x, p.y, p.z] });
 
         // Update animation.
-        const animate = p.x !== newP.x || p.y !== newP.y; // TODO manage 3D world case.
+        const animate = p.x !== newP.x || p.y !== newP.y; // TODO [ANIMATION] manage 3D.
         if (animate) {
             graphics.updateAnimation(id);
-            // TODO cleanup animation part
+            // TODO [ANIMATION] activate hand-held animation
             // graphics.updateAnimation('yumi');
         }
         p.copy(newP);
@@ -168,7 +169,7 @@ extend(SelfModel.prototype, {
         let cam = graphics.cameraManager.mainCamera;
         let rotationX = cam.getXRotation();
         const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
-        // TODO [HIGH] compute delta transmitted from last time
+        // OPT compute delta transmitted from last time?
         let rotationZ = cam.getZRotation();
         if (changed) graphics.cameraManager.setRelRotation(rotationZ + r[0] - r[1], rotationX);
 
@@ -176,7 +177,8 @@ extend(SelfModel.prototype, {
         // moveCameraFromMouse(0, 0, newX, newY);
 
         let handItem = this.handItem;
-        if (handItem && handItemWrapper) {
+        if (handItem && handItemWrapper)
+        {
             let mc = graphics.cameraManager.mainCamera;
             handItemWrapper.rotation.copy(mc.up.rotation);
             handItem.rotation.x = mc.pitch.rotation.x;
@@ -199,7 +201,7 @@ extend(SelfModel.prototype, {
         let displayHandItem = this.displayHandItem;
 
         if (displayAvatar) graphics.removeFromScene(avatar, oldWorldId);
-        // TODO differentiate 3d person and 1st person
+        // TODO [GAMEPLAY] differentiate 3d person and 1st person
         if (displayHandItem) graphics.removeFromScene(handItemWrapper, oldWorldId);
 
         graphics.switchToScene(oldWorldId, worldId);
@@ -212,7 +214,8 @@ extend(SelfModel.prototype, {
 
     refresh()
     {
-        if (!this.needsUpdate) {
+        if (!this.needsUpdate)
+        {
             if (!this.interpolationUpToDate) this.interpolatePredictSelfPosition();
             return;
         }
@@ -249,7 +252,8 @@ extend(SelfModel.prototype, {
         this.needsUpdate = false;
     },
 
-    cameraMoved(cameraObject) {
+    cameraMoved(cameraObject)
+    {
         let handItem = this.handItem;
         if (!handItem) return;
         handItem.rotation.x = cameraObject.pitch.rotation.x;
@@ -320,7 +324,7 @@ extend(SelfModel.prototype, {
             handItem = null;
         }
 
-        // TODO link hand item and mesh when camera is third person.
+        // TODO [GAMEPLAY] link hand item and mesh when camera is third person.
         if (selfModel.handItem !== handItem)
         {
             let handItemWrapper = selfModel.handItemWrapper;
@@ -341,25 +345,30 @@ extend(SelfModel.prototype, {
         }
     },
 
-    getSelfPosition() {
+    getSelfPosition()
+    {
         return this.position;
     },
 
-    getHeadPosition() {
+    getHeadPosition()
+    {
         let head = this.avatar.getHead();
         if (!head) return null;
         return head.position;
     },
 
-    getInventory() {
+    getInventory()
+    {
         return this.inventoryModel;
     },
 
-    getTime() {
+    getTime()
+    {
         return window.performance.now();
     },
 
-    cleanup() {
+    cleanup()
+    {
         // General
         this.entityId = '-1';
         this.worldId = '-1';
@@ -379,7 +388,7 @@ extend(SelfModel.prototype, {
         this.avatar = null;
         this.lastServerUpdateTime = this.getTime();
         this.averageDeltaT = -1;
-        // TODO [LEAK] cleanup graphical component of avatar.
+        // TODO [CLEANUP] avatar graphical component.
     }
 
 });

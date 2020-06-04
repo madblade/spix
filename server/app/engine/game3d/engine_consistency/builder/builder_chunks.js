@@ -204,7 +204,8 @@ class ChunkBuilder
 
         let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, `${ic},${jc},${kc}`);
 
-        for (let id = 0, l = chunks.length; id < l; ++id) {
+        for (let id = 0, l = chunks.length; id < l; ++id)
+        {
             let current = chunks[id];
 
             let wid = current[0];

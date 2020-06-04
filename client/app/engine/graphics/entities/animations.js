@@ -8,12 +8,13 @@ let AnimationsModule = {
 
     initializeAnimations()
     {
-        // TODO different time for each animation
+        // TODO [ANIMATION] different time for each animation
         this.prevTime = Date.now();
         this.mixers = new Map();
     },
 
-    updateAnimation(entityId) {
+    updateAnimation(entityId)
+    {
         let mixer = this.mixers.get(entityId);
         if (mixer) {
             let time = Date.now();

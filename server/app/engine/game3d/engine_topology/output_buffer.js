@@ -7,15 +7,17 @@
 
 class OutputBuffer
 {
-    constructor() {
+    constructor()
+    {
         // Contains ids of updated chunks.
         // Chunks themselves hold information about their being updated.
-        // TODO [LOW] concentrate chunk updates in this buffer.
+        // TODO [PERF] concentrate chunk updates in this buffer.
         // world id => Set(... chunk ids)
         this._buffer = new Map();
     }
 
-    chunkUpdated(worldId, chunkId) {
+    chunkUpdated(worldId, chunkId)
+    {
         let worldSet = this._buffer.get(worldId);
         if (worldSet) {
             worldSet.add(chunkId);
@@ -27,11 +29,13 @@ class OutputBuffer
     }
 
     // Shallow copy.
-    getOutput() {
+    getOutput()
+    {
         return new Map(this._buffer);
     }
 
-    flushOutput(worldModel) {
+    flushOutput(worldModel)
+    {
         let buffer = this._buffer;
 
         buffer.forEach((chunkSet, worldId) => {

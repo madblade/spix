@@ -4,7 +4,8 @@
 
 import extend           from '../../extend.js';
 
-let RTCSocket = function(dataChannel, connection, clientID) {
+let RTCSocket = function(dataChannel, connection, clientID)
+{
     if (!clientID) clientID = 'localhost';
     this.dataChannel = dataChannel;
     this.dataConnection = connection;
@@ -26,11 +27,13 @@ let RTCSocket = function(dataChannel, connection, clientID) {
 
 extend(RTCSocket.prototype, {
 
-    connectionEstablished() {
+    connectionEstablished()
+    {
         console.log(`RTC Socket "${this.name}" connected.`);
     },
 
-    receivedMessage(e) {
+    receivedMessage(e)
+    {
         if (e.data.charCodeAt(0) === 2) return;
         let d = JSON.parse(e.data);
 
@@ -46,11 +49,13 @@ extend(RTCSocket.prototype, {
         action(content);
     },
 
-    on(message, action) {
+    on(message, action)
+    {
         this.actions[message] = action;
     },
 
-    removeListener(message) {
+    removeListener(message)
+    {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
@@ -58,7 +63,8 @@ extend(RTCSocket.prototype, {
         }
     },
 
-    removeAllListeners(message) {
+    removeAllListeners(message)
+    {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
@@ -66,12 +72,14 @@ extend(RTCSocket.prototype, {
         }
     },
 
-    disconnect() {
+    disconnect()
+    {
         let m = {m: 'disconnect', c:''};
         this.dataChannel.send(JSON.stringify(m));
     },
 
-    emit(message, data) {
+    emit(message, data)
+    {
         let compact = JSON.stringify({
             m: message,
             c: data
@@ -81,16 +89,19 @@ extend(RTCSocket.prototype, {
         }
     },
 
-    setDataChannel(newDataChannel) {
+    setDataChannel(newDataChannel)
+    {
         this.dataChannel = newDataChannel;
         this.dataChannel.onmessage = this.receivedMessage.bind(this);
     },
 
-    setDataConnection(newConnection) {
+    setDataConnection(newConnection)
+    {
         this.dataConnection = newConnection;
     },
 
-    closeConnection() {
+    closeConnection()
+    {
         this.dataChannel.close();
         this.dataConnection.close();
     }

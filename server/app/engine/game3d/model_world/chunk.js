@@ -33,7 +33,7 @@ class Chunk
         /** Flat array. x, then y, then z. */
         this._blocks = new Uint8Array(xSize * ySize * zSize);
         /** Nested z-array. (each z -> i×j layer, without primary offset) */
-        this._surfaceBlocks = {}; // TODO [HIGH] refactor to map.
+        this._surfaceBlocks = {}; // [OPT] refactor to map.
         /** Each face -> index of its connected component. */
         this._connectedComponents = new Uint8Array();
         /**  Each connected component -> (sorted) list of face indices. */
@@ -75,13 +75,16 @@ class Chunk
     set ready(newReady) { this._ready = newReady; }
 
     // Do not use! Used for getting blocks that might exceed capacity.
-    _toIdUnsafe(x, y, z) {
+    _toIdUnsafe(x, y, z)
+    {
         return x + y * this._xSize + z * this._xSize * this._ySize;
     }
 
-    _toId(x, y, z) {
+    _toId(x, y, z)
+    {
         let id = x + y * this._xSize + z * this._xSize * this._ySize;
-        if (id >= this._capacity) {
+        if (id >= this._capacity)
+        {
             console.log(`chunk._toId: invalid request coordinates: ${x},${y},${z} -> ${id}`);
             let e = new Error();
             console.log(e.stack);
@@ -89,7 +92,8 @@ class Chunk
         return id;
     }
 
-    what(x, y, z) {
+    what(x, y, z)
+    {
         let id = this._toId(x, y, z);
         if (id >= this._capacity || id < 0) return 0;
         return this._blocks[id];
@@ -99,7 +103,8 @@ class Chunk
      * Do not use outside updater_block or updater_face.
      * Only queries Manhattan neighborhood, only with max offset of 1.
      */
-    queryBlock(x, y, z) {
+    queryBlock(x, y, z)
+    {
         if (x >= 0 && y >= 0 && z >= 0 &&
             x < this._xSize && y < this._ySize && z < this._zSize)
         {
@@ -134,7 +139,9 @@ class Chunk
             return nc.queryBlock(x, y, z - this._zSize);
         }
     }
-    queryChunk(x, y, z) {
+
+    queryChunk(x, y, z)
+    {
         if (x >= 0 && y >= 0 && z >= 0 &&
             x < this._xSize && y < this._ySize && z < this._zSize)
         {
@@ -170,11 +177,13 @@ class Chunk
         }
     }
 
-    contains(x, y, z) {
+    contains(x, y, z)
+    {
         return this.what(x, y, z) !== 0;
     }
 
-    getNeighbourChunkFromRelativeCoordinates(x, y, z) {
+    getNeighbourChunkFromRelativeCoordinates(x, y, z)
+    {
         let neighbourChunkI;
         let neighbourChunkJ;
         let neighbourChunkK;
@@ -202,7 +211,8 @@ class Chunk
     }
 
     // Mustn't exceed negative [xyz] Size
-    neighbourWhat(x, y, z) {
+    neighbourWhat(x, y, z)
+    {
         let localX;
         let localY;
         let localZ;
@@ -226,11 +236,13 @@ class Chunk
         return nChunk.what(localX, localY, localZ);
     }
 
-    neighbourContains(x, y, z) {
+    neighbourContains(x, y, z)
+    {
         return this.neighbourWhat(x, y, z) !== 0;
     }
 
-    add(x, y, z, blockId) {
+    add(x, y, z, blockId)
+    {
         let id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
@@ -239,7 +251,8 @@ class Chunk
         return id;
     }
 
-    del(x, y, z) {
+    del(x, y, z)
+    {
         let id = this._toId(x, y, z);
         if (id >= this._capacity) return;
 
@@ -248,7 +261,8 @@ class Chunk
         return id;
     }
 
-    flushUpdates() {
+    flushUpdates()
+    {
         this._updates = [{}, {}, {}];
     }
 }

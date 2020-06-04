@@ -6,14 +6,16 @@
 
 import extend       from '../../extend.js';
 
-let Hub = function(app) {
+let Hub = function(app)
+{
     this.app = app;
     this.games = new Map();
 };
 
 extend(Hub.prototype, {
 
-    update(data) {
+    update(data)
+    {
         data = JSON.parse(data);
 
         let map = this.games;
@@ -29,7 +31,8 @@ extend(Hub.prototype, {
         this.enterHub();
     },
 
-    enterHub() {
+    enterHub()
+    {
         let app = this.app;
         let map = this.games;
         app.setState('hub', map);

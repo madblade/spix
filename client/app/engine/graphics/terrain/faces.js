@@ -6,14 +6,19 @@
 
 let FacesModule = {
 
-    setColor(/*iChunkOffset, jChunkOffset, kChunkOffset, color*/) {
-        // TODO remove chunkSize
+    /**
+     * old 1-color-cube API
+     * @deprecated
+     */
+    setColor() // iChunkOffset, jChunkOffset, kChunkOffset, color
+    {
         //let chunkSizeX = this.chunkSizeX;
         //let chunkSizeY = this.chunkSizeY;
         //color.setRGB((iChunkOffset/chunkSizeX)%2/2+0.5, (jChunkOffset/chunkSizeY)%2/2+0.5, 0.6);
     },
 
-    getTexture(nature) {
+    getTexture(nature)
+    {
         return this.textureCoordinates[nature];
     },
 

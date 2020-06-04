@@ -3,10 +3,14 @@
 
 class TimeUtils
 {
-    static getTimeSecMillis() {
-        if (process && process.hrtime) {
+    static getTimeSecMillis()
+    {
+        if (process && process.hrtime)
+        {
             return process.hrtime()[1] / 1e3;
-        } else {
+        }
+        else
+        {
             const performance = global.performance || {};
             const performanceNow =
                 performance.now        ||
@@ -22,10 +26,14 @@ class TimeUtils
         }
     }
 
-    static getTimeSecNano(arg) {
-        if (process && process.hrtime) {
+    static getTimeSecNano(arg)
+    {
+        if (process && process.hrtime)
+        {
             return process.hrtime(arg);
-        } else {
+        }
+        else
+        {
             const performance = global.performance || {};
             const performanceNow =
                 performance.now        ||
@@ -35,7 +43,8 @@ class TimeUtils
                 performance.webkitNow  ||
                 function() { return new Date().getTime(); };
 
-            let hrt = function(previousTimestamp) {
+            let hrt = function(previousTimestamp)
+            {
                 let clocktime = performanceNow.call(performance) * 1e-3;
                 let seconds = Math.floor(clocktime);
                 let nanoseconds = Math.floor(clocktime % 1 * 1e9);

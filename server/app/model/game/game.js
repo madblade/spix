@@ -8,7 +8,8 @@ import Factory from '../factory';
 
 class Game
 {
-    constructor(hub, gameId, connector) {
+    constructor(hub, gameId, connector)
+    {
         // Utility parameters.
         this._hub = hub;
         this._gameId = gameId;
@@ -44,20 +45,23 @@ class Game
 
     // Send a message to ALL connected users.
     // N.B. encouraged to create custom subchannels within implementations.
-    broadcast(kind, data) {
-        // TODO [LOW] optimize with dynamic subchans
+    broadcast(kind, data)
+    {
+        // [PERF] optimize with dynamic subchans?
         this._connection.io.to(this._gameId).emit(kind, data);
     }
 
     /** Game loop **/
 
     // Server-render update function (abstract).
-    update() {
+    update()
+    {
         console.log('Abstract loop.');
     }
 
     // Start game loop.
-    start() {
+    start()
+    {
         // Stop waiting for idle threshold.
         clearTimeout(this._timeIdleId);
 
@@ -70,7 +74,8 @@ class Game
     }
 
     // Stop game loop.
-    pause(doTimeout) {
+    pause(doTimeout)
+    {
         console.log('Game stopping.');
         if (this._jobId !== undefined) clearInterval(this._jobId);
         this._isRunning = false;
@@ -81,11 +86,13 @@ class Game
 
     /** Players **/
 
-    hasPlayerForSocket(socket) {
+    hasPlayerForSocket(socket)
+    {
         return this._playerManager.hasPlayerForSocket(socket);
     }
 
-    addPlayer(player) {
+    addPlayer(player)
+    {
         if (!this._ready) {
             console.warn('WARN: A player tries to join although the game is not ready.');
             if (this._awaitingJoin < 10) {
@@ -109,7 +116,8 @@ class Game
         this.start();
     }
 
-    removePlayer(player) {
+    removePlayer(player)
+    {
         console.log('A player left.');
 
         // Remove from model.
@@ -119,19 +127,22 @@ class Game
         // if (this._playerManager.nbPlayers > 0 || !this._isRunning) return;
     }
 
-    removeAllPlayers() {
+    removeAllPlayers()
+    {
         this._playerManager.removeAllPlayers();
         if (this._isRunning) this.pause(true); // Stop with idle timeout.
     }
 
     // Auto-destruction for being idle for too long. Internal use.
-    stop() {
+    stop()
+    {
         console.log(`Game ${this._gameId} ended for being idle for too long.`);
         this._hub.endGame(this);
     }
 
     // To be triggered from Hub only.
-    destroy() {
+    destroy()
+    {
         this._killed = true;
         if (this._isRunning) this.pause(false); // Going to destroy -> no idle timeout.
         this.removeAllPlayers();

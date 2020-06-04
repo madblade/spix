@@ -11,7 +11,8 @@ import extend               from '../../extend.js';
 import { SelfComponent }    from './self/self.js';
 import { EventComponent }   from './event/event.js';
 
-let Client = function(app) {
+let Client = function(app)
+{
     this.app = app;
 
     // Client model component.
@@ -23,36 +24,43 @@ let Client = function(app) {
 
 extend(Client.prototype, {
 
-    init() {
+    init()
+    {
         this.selfComponent.init();
         this.eventComponent.init();
     },
 
-    refresh() {
+    refresh()
+    {
         this.selfComponent.processChanges();
         this.eventComponent.pushEvents();
     },
 
-    pushForLaterUpdate(position) {
+    pushForLaterUpdate(position)
+    {
         this.selfComponent.triggerChange('camera-update', position);
     },
 
-    triggerEvent(type, data) {
+    triggerEvent(type, data)
+    {
         this.eventComponent.triggerEvent(type, data);
     },
 
-    triggerChange(type, data) {
+    triggerChange(type, data)
+    {
         this.selfComponent.triggerChange(type, data);
     },
 
     /**
      * @deprecated
      */
-    getCameraInteraction() {
+    getCameraInteraction()
+    {
         return this.selfComponent.cameraInteraction;
     },
 
-    cleanupFullModel() {
+    cleanupFullModel()
+    {
         this.selfComponent.cleanup();
     }
 

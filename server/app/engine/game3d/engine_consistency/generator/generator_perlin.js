@@ -76,14 +76,17 @@ class Perlin
     ];
 
     static _permMap = {};
-    static getPerm(handle) {
+    static getPerm(handle)
+    {
         return Perlin._permMap[handle];
     }
-    static setPerm(handle, permMap) {
+    static setPerm(handle, permMap)
+    {
         Perlin._permMap[handle] = permMap;
     }
 
-    static seed(handle, x) { // unsigned int
+    static seed(handle, x)
+    { // unsigned int
         let PERM = Perlin.PERM();
         // let RAND_MAX = 1.0;
         let rng = seedrandom(x);
@@ -107,7 +110,8 @@ class Perlin
         Perlin.setPerm(handle, PERM);
     }
 
-    static noise2(handle, x, y) { // float, float, float
+    static noise2(handle, x, y)
+    { // float, float, float
         let floorf = v => parseInt(Math.floor(v), 10);
         const PERM = Perlin.getPerm(handle);
         let GRAD3 = Perlin.GRAD3();
@@ -155,7 +159,8 @@ class Perlin
         return (noise[0] + noise[1] + noise[2]) * 70.0;
     }
 
-    static noise3(handle, x, y, z) {
+    static noise3(handle, x, y, z)
+    {
         let floorf = v => parseInt(Math.floor(v), 10);
         const PERM = Perlin.getPerm(handle);
         const GRAD3 = Perlin.GRAD3();
@@ -272,9 +277,10 @@ class Perlin
         return (1 + total / max) / 2;
     }
 
-    static perlinGeneration(chunk, arg) { // int, int, ...
+    static perlinGeneration(chunk, arg)
+    { // int, int, ...
         const CHUNK_SIZE_X = chunk.dimensions[0];
-        const CHUNK_SIZE_Y = chunk.dimensions[1]; // TODO [LOW] see algo, diff.
+        const CHUNK_SIZE_Y = chunk.dimensions[1];
         const CHUNK_SIZE_Z = chunk.dimensions[2];
         const SHOW_CLOUDS = true;
         const SHOW_TREES = true;
@@ -292,7 +298,8 @@ class Perlin
         };
 
         for (let dx = 0; dx < CHUNK_SIZE_X; dx++) {
-            for (let dy = 0; dy < CHUNK_SIZE_Y; dy++) {
+            for (let dy = 0; dy < CHUNK_SIZE_Y; dy++)
+            {
                 let flag = 1;
                 if (dx < 0 || dy < 0 || dx >= CHUNK_SIZE_X || dy >= CHUNK_SIZE_Y) {
                     flag = -1;
@@ -344,7 +351,8 @@ class Perlin
         chunk.blocks = blocks;
     }
 
-    static makePlants(x, y, h, handle, func, flag, arg) {
+    static makePlants(x, y, h, handle, func, flag, arg)
+    {
         // grass
         if (Perlin.simplex2(handle, -x * 0.1, y * 0.1, 4, 0.8, 2) > 0.6) {
             if (Math.floor(h) !== h) console.log('grass');
@@ -358,7 +366,8 @@ class Perlin
         }
     }
 
-    static makeTrees(x, y, h, func, arg) {
+    static makeTrees(x, y, h, func, arg)
+    {
         for (let z = h + 3; z < h + 8; z++) {
             for (let ox = -3; ox <= 3; ox++) {
                 for (let oy = -3; oy <= 3; oy++) {
@@ -375,7 +384,8 @@ class Perlin
         }
     }
 
-    static makeClouds(x, y, handle, func, flag, arg) {
+    static makeClouds(x, y, handle, func, flag, arg)
+    {
         for (let z = 64; z < 72; z++) {
             if (Perlin.simplex3(handle,
                 x * 0.01, y * 0.01, z * 0.1, 8, 0.5, 2) > 0.75)

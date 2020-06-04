@@ -8,7 +8,8 @@ import Factory from '../factory';
 
 class Connector
 {
-    constructor(app) {
+    constructor(app)
+    {
         this._app = app;
         this._userDB = Factory.createUserDB(this);
         this._io = null;
@@ -22,7 +23,8 @@ class Connector
     get db() { return this._userDB; }
 
     // When the user connects, register him
-    setupUser(socket) {
+    setupUser(socket)
+    {
         // Add user to app DB
         let user = this._userDB.registerUser(socket);
 
@@ -34,11 +36,13 @@ class Connector
         this.confirmUserConnection(socket);
     }
 
-    confirmUserConnection(socket) {
+    confirmUserConnection(socket)
+    {
         setTimeout(() => socket.emit('connected', ''), 50);
     }
 
-    setupDisconnect(socket) {
+    setupDisconnect(socket)
+    {
         // Setup off util function
         socket.off = socket.removeListener;
 
@@ -61,7 +65,8 @@ class Connector
         });
     }
 
-    setupDebug(socket) {
+    setupDebug(socket)
+    {
         this._debug = true;
 
         socket.address =
@@ -99,8 +104,10 @@ class Connector
      *
      * @param socketio
      */
-    configure(socketio) {
-        if (this._io) {
+    configure(socketio)
+    {
+        if (this._io)
+        {
             console.log('[Server/Connector] Trying to configure a running app, ' +
                 'using the last configuration!');
             return;
@@ -114,8 +121,10 @@ class Connector
         });
     }
 
-    configureFromSocket(socket, userID) {
-        if (userID) {
+    configureFromSocket(socket, userID)
+    {
+        if (userID)
+        {
             let hasUser = this._sandboxConnections.has(userID);
             if (hasUser) {
                 // Find user with the connection id.

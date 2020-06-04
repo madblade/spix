@@ -7,7 +7,8 @@
 import extend from '../../extend.js';
 import { Sound } from './sound.js';
 
-let Audio = function(app) {
+let Audio = function(app)
+{
     this.app = app;
 
     // User customizable settings.
@@ -23,9 +24,11 @@ let Audio = function(app) {
 
 extend(Audio.prototype, {
 
-    run() {
+    run()
+    {
         let audioContext;
-        function loadSound(name, callback) {
+        function loadSound(name, callback)
+        {
             let xObj = new XMLHttpRequest();
             xObj.open('GET', `audio/${name}.mp3`, true);
             xObj.responseType = 'arraybuffer';
@@ -58,11 +61,13 @@ extend(Audio.prototype, {
         }
     },
 
-    stop() {
+    stop()
+    {
         this.stopAllSounds();
     },
 
-    stopAllSounds() {
+    stopAllSounds()
+    {
         let sounds = this.sounds;
         sounds.all.forEach(function(sound) {
             if (sounds[sound].source !== null && sounds[sound].playing) {

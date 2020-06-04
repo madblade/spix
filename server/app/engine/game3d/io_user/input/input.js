@@ -6,7 +6,8 @@
 
 class UserInput
 {
-    constructor(game) {
+    constructor(game)
+    {
         this._game = game;
 
         this._physicsEngine     = game.physicsEngine;
@@ -14,12 +15,13 @@ class UserInput
         this._consistencyEngine = game.consistencyEngine;
         this._chat              = game.chat;
 
-        this._listeners = {}; // TODO [HIGH] Map.
+        this._listeners = {}; // TODO [PERF] Map.
         this._playerUpdateBuffer = [];
     }
 
     // Update change in player connection / disconnection.
-    update() {
+    update()
+    {
         let consistencyEngine = this._consistencyEngine;
         let addedOrRemovedPlayers = this._playerUpdateBuffer;
         // WARN: short-circuits physics engine update.
@@ -45,22 +47,26 @@ class UserInput
         this._playerUpdateBuffer = [];
     }
 
-    addPlayer(player) {
+    addPlayer(player)
+    {
         this._playerUpdateBuffer.push(['connect', player]);
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId)
+    {
         this._playerUpdateBuffer.push(['disconnect', playerId]);
     }
 
-    pushToEngine(kind, avatar, engine) {
+    pushToEngine(kind, avatar, engine)
+    {
         return data => {
-            // TODO ban users who send too much meta
+            // [SECURITY] Think about banning users who send too much meta
             engine.addInput({action: kind, meta: data}, avatar);
         };
     }
 
-    listenPlayer(player) {
+    listenPlayer(player)
+    {
         let physicsEngine       = this._physicsEngine;
         let topologyEngine      = this._topologyEngine;
         let consistencyEngine   = this._consistencyEngine;
@@ -89,7 +95,8 @@ class UserInput
         player.on('leave', () => { player.leave(); });
     }
 
-    unlistenPlayer(player) {
+    unlistenPlayer(player)
+    {
         // Do not modify queue.
         // Drop inconsistent players when an update is performed.
         let listener = this._listeners[player];

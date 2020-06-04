@@ -10,7 +10,8 @@ class AIOutput
 
     // }
 
-    update() {
+    update()
+    {
 
     }
 }

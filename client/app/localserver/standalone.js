@@ -1,5 +1,6 @@
 /**
  * Wrapper for integrating a full server client-wise.
+ * Dummy object when not bundling server.
  */
 
 'use strict';
@@ -7,7 +8,8 @@
 /// #if BUNDLE
 import { default as StandaloneServer } from '../../../server/app/app';
 /// #else
-StandaloneServer = StandaloneServer || function() {
+StandaloneServer = StandaloneServer || function()
+{
     this.connect = function() {};
 };
 /// #endif
@@ -15,7 +17,8 @@ StandaloneServer = StandaloneServer || function() {
 import extend from '../extend';
 import { IO } from './io';
 
-let Standalone = function(app) {
+let Standalone = function(app)
+{
     this.app = app;
 
     this.io = new IO();
@@ -25,28 +28,33 @@ let Standalone = function(app) {
 
 extend(Standalone.prototype, {
 
-    start() {
+    start()
+    {
         console.log('[Standalone] Starting local server.');
         this.server.connect(this.io); // setup IO object
         this.io.connect(this.io.socketServer); // handshake
         this._isRunning = true;
     },
 
-    stop() {
+    stop()
+    {
         this._isRunning = false;
         console.log('[Standalone] Stopping local server.');
         this.io.disconnect(this.io.socketServer);
     },
 
-    connectUser(userID, socketClient) {
+    connectUser(userID, socketClient)
+    {
         this.server.connectRTC(userID, socketClient);
     },
 
-    // disconnectUser(socketClient) {
+    // disconnectUser(socketClient)
+    // {
     //     this.io.disconnect(socketClient);
     // },
 
-    isRunning() {
+    isRunning()
+    {
         return this._isRunning;
     }
 

@@ -15,7 +15,8 @@ const WorldType = Object.freeze({
     UNSTRUCTURED: 3 // Symbol('unstructured')
 });
 
-let ChunkModel = function(app) {
+let ChunkModel = function(app)
+{
     this.app = app;
 
     // Model component.
@@ -33,7 +34,8 @@ let ChunkModel = function(app) {
 
 extend(ChunkModel.prototype, {
 
-    hasWorld(worldId) {
+    hasWorld(worldId)
+    {
         return this.worlds.has(worldId);
     },
 
@@ -65,7 +67,8 @@ extend(ChunkModel.prototype, {
 
     init() {},
 
-    refresh() {
+    refresh()
+    {
         if (!this.needsUpdate) return;
         let graphics = this.app.engine.graphics;
         // let clientModel = this.app.model.client;
@@ -74,11 +77,13 @@ extend(ChunkModel.prototype, {
         let reportedUpdates = [];
         let mustReport = false;
 
-        for (let cu = 0, l = chunkUpdates.length; cu < l; ++cu) {
+        for (let cu = 0, l = chunkUpdates.length; cu < l; ++cu)
+        {
             let updates = chunkUpdates[cu];
             let rup = {};
 
-            if ('worlds' in updates) {
+            if ('worlds' in updates)
+            {
                 //console.log('World metadata:');
                 //console.log(updates['worlds']);
                 let worlds = updates.worlds;
@@ -112,7 +117,8 @@ extend(ChunkModel.prototype, {
                 }
             }
 
-            for (let worldId in updates) {
+            for (let worldId in updates)
+            {
                 if (!updates.hasOwnProperty(worldId) ||
                     worldId === 'worlds' || worldId === 'worldsMeta')
                     continue;
@@ -120,7 +126,8 @@ extend(ChunkModel.prototype, {
                 let subdates = updates[worldId];
                 let sup = {};
 
-                for (let chunkId in subdates) {
+                for (let chunkId in subdates)
+                {
                     if (!subdates.hasOwnProperty(chunkId)) continue;
 
                     let update = subdates[chunkId];
@@ -134,7 +141,7 @@ extend(ChunkModel.prototype, {
                     }
 
                     else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3) {
-                        // TODO [HIGH] server-side, use distinct channels for chunk updates.
+                        // TODO [IO] server-side, use distinct channels for chunk updates.
                         console.error(`WARN: corrupt update or model @refresh / updateChunk ${chunkId}.`);
                         console.log(update);
                         this.chunkUpdates = [];
@@ -174,7 +181,8 @@ extend(ChunkModel.prototype, {
             this.needsUpdate = false;
     },
 
-    updateChunks(updates) {
+    updateChunks(updates)
+    {
         if (!updates) return;
 
         if (this.debug) {
@@ -191,7 +199,8 @@ extend(ChunkModel.prototype, {
         this.needsUpdate = true;
     },
 
-    isChunkLoaded(worldId, chunkId) {
+    isChunkLoaded(worldId, chunkId)
+    {
         let world = this.worlds.get(worldId);
         return world && world.has(chunkId);
     },
@@ -219,7 +228,8 @@ extend(ChunkModel.prototype, {
         world.set(chunkId, chunk);
 
         // Add to scene.
-        if (!chunk || !chunk.hasOwnProperty('meshes')) {
+        if (!chunk || !chunk.hasOwnProperty('meshes'))
+        {
             console.error(`WARN. Update miss @ initializeChunk: ${chunkId}`);
             console.log(all);
             return;
@@ -264,7 +274,8 @@ extend(ChunkModel.prototype, {
         );
     },
 
-    unloadChunk(worldId, chunkId) {
+    unloadChunk(worldId, chunkId)
+    {
         let graphics = this.app.engine.graphics;
         let world = this.worlds.get(worldId);
         if (!world) return;
@@ -287,7 +298,8 @@ extend(ChunkModel.prototype, {
         world.delete(chunkId);
     },
 
-    getCloseTerrain(worldId) {
+    getCloseTerrain(worldId)
+    {
         // Only chunks within current world.
 
         // Get overworld by default. WARN security.
@@ -297,7 +309,7 @@ extend(ChunkModel.prototype, {
 
         let meshes = [];
         world.forEach(function(currentChunk, cid) {
-            // TODO extract on 4 closest chunks.
+            // TODO [GAMEPLAY] extract on 4 closest chunks.
             if (!currentChunk || !currentChunk.hasOwnProperty('meshes')) {
                 console.log(`Warn: corrupted chunk inside client model ${cid}`);
                 console.log(world);
@@ -314,7 +326,8 @@ extend(ChunkModel.prototype, {
         return meshes;
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.worlds.forEach(w => {
             w.forEach(currentChunk => {
                 if (!!currentChunk && currentChunk.hasOwnProperty('meshes')) {
@@ -346,7 +359,7 @@ extend(ChunkModel.prototype, {
         // Graphical component.
         this.needsUpdate = false;
         this.debug = false;
-        // TODO [LEAK] cleanup graphical component and all meshes.
+        // TODO [CLEANUP] all meshes
     }
 });
 

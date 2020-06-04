@@ -21,7 +21,8 @@ class CSFX
     static debugFastCC = false;
     static debugPostMerger = false;
 
-    static inbounds(d, b, iS, ijS, capacity) {
+    static inbounds(d, b, iS, ijS, capacity)
+    {
         switch (d) {
             case 0: return (b - 1) % iS === b % iS - 1; // iM
             case 1: return (b - iS) % ijS === b % ijS - iS; // jM
@@ -33,7 +34,8 @@ class CSFX
         }
     }
 
-    static empty(d, b, bs, iS, ijS) {
+    static empty(d, b, bs, iS, ijS)
+    {
         switch (d) {
             case 0: return bs[b - 1] === 0; // iM
             case 1: return bs[b - iS] === 0; // jM
@@ -45,7 +47,8 @@ class CSFX
         }
     }
 
-    static hasNeighbourOfType(d, b, bs, iS, ijS, blockType) {
+    static hasNeighbourOfType(d, b, bs, iS, ijS, blockType)
+    {
         switch (d) {
             case 0: return bs[b - 1] === blockType; // iM
             case 1: return bs[b - iS] === blockType; // jM
@@ -99,14 +102,16 @@ class CSFX
         // !air-air => ccid = 1
         // !water-water => ccid = 2
 
-        for (let b = 0, length = layer.length; b < length; ++b) {
+        for (let b = 0, length = layer.length; b < length; ++b)
+        {
             let offset = z * ijS;
             let idOnCurrentLayer = layer[b];
 
             let blockId = idOnCurrentLayer + offset;
             const block = blocks[blockId];
 
-            for (let direction = 0; direction < 6; ++direction) {
+            for (let direction = 0; direction < 6; ++direction)
+            {
                 if (CSFX.inbounds(direction, blockId, iS, ijS, capacity)) {
                     if (block !== airBlock &&
                         CSFX.hasNeighbourOfType(direction, blockId, blocks, iS, ijS, airBlock))
@@ -235,7 +240,8 @@ class CSFX
             );
         }
 
-        if (CSFX.debug) {
+        if (CSFX.debug)
+        {
             console.log(
                 `Surface block layers ${Object.keys(surfaceBlocks).length} surface faces: (` +
                 `${surfaceFaces[0].length},${surfaceFaces[1].length},${surfaceFaces[2].length}`
@@ -270,7 +276,8 @@ class CSFX
         jays.sort(function(a, b) {return a - b;});
         kays.sort(function(a, b) {return a - b;});
 
-        if (CSFX.debugIJKRecursion) {
+        if (CSFX.debugIJKRecursion)
+        {
             console.log(`${ayesLength} is`);
             console.log(`${jaysLength} js`);
             console.log(`${kaysLength} ks`);
@@ -320,8 +327,10 @@ class CSFX
         if (CSFX.debug) console.log(merger);
     }
 
-    static computeFastConnectedComponents(connectedComponents, fastCC) {
-        for (let i = 0, length = connectedComponents.length; i < length; ++i) {
+    static computeFastConnectedComponents(connectedComponents, fastCC)
+    {
+        for (let i = 0, length = connectedComponents.length; i < length; ++i)
+        {
             if (connectedComponents[i] === 0) continue;
             if (!fastCC.hasOwnProperty(connectedComponents[i]))
                 fastCC[connectedComponents[i]] = [i];
@@ -332,7 +341,8 @@ class CSFX
     /**
      * @deprecated
      */
-    static postMerge(merger, fastCC, connectedComponents) {
+    static postMerge(merger, fastCC, connectedComponents)
+    {
         function mergeArrays(a, b) {
             let result = a;
             for (let i = 0; i < b.length; ++i) {
@@ -343,7 +353,8 @@ class CSFX
 
         let fastMerger = [];
         if (merger.length > 0) fastMerger.push([merger[0][0], merger[0][1]]);
-        for (let c = 1; c < merger.length; ++c) {
+        for (let c = 1; c < merger.length; ++c)
+        {
             let min = Math.min(merger[c][0], merger[c][1]);
             let max = Math.max(merger[c][0], merger[c][1]);
 
@@ -381,7 +392,8 @@ class CSFX
         if (CSFX.debugPostMerger) console.log('Initial components:');
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
 
-        if (CSFX.forceOneComponentPerChunk) {
+        if (CSFX.forceOneComponentPerChunk)
+        {
             fastMerger = [[]];
             let ks = Object.keys(fastCC);
             for (let i = 0; i < ks.length; ++i) {
@@ -389,11 +401,11 @@ class CSFX
             }
         }
 
-        for (let k = 0, fmLength = fastMerger.length; k < fmLength; ++k) {
+        for (let k = 0, fmLength = fastMerger.length; k < fmLength; ++k)
+        {
             fastMerger[k].sort(function(a, b) {return a - b;});
             let id = fastMerger[k][0];
             if (!fastCC.hasOwnProperty(id)) {
-                // TODO [HIGH] refactor all that bullshit
                 // console.log(`PostMerger failed because of id inconsistency: ${id}.`);
                 continue;
             }
@@ -403,7 +415,8 @@ class CSFX
                 `Merging ${componentsToMerge.length} component(s) to ${id}:`);
             if (CSFX.debug) console.log(componentsToMerge);
 
-            for (let i = 1, ctmLength = componentsToMerge.length; i < ctmLength; ++i) {
+            for (let i = 1, ctmLength = componentsToMerge.length; i < ctmLength; ++i)
+            {
                 let toMerge = componentsToMerge[i];
                 if (CSFX.debug) console.log(`\t${toMerge}`);
                 if (!fastCC.hasOwnProperty(toMerge)) {
@@ -430,7 +443,10 @@ class CSFX
         if (CSFX.debugPostMerger) console.log(Object.keys(fastCC));
     }
 
-    static computeFastConnectedComponentIds(fastCC, fastCCIds, capacity, faces) {
+    static computeFastConnectedComponentIds(
+        fastCC, fastCCIds, capacity, faces
+    )
+    {
         for (let cccid in fastCC) {
             if (!fastCC.hasOwnProperty(cccid)) continue;
             fastCCIds[cccid] = [];
@@ -446,7 +462,10 @@ class CSFX
         }
     }
 
-    static getNeighbourChunks(neighbourChunks, chunk, neighbourBlocks) {
+    static getNeighbourChunks(
+        neighbourChunks, chunk, neighbourBlocks
+    )
+    {
         //neighbourChunks.push();
         for (let i = 0; i < 18; ++i) {
             neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
@@ -455,7 +474,8 @@ class CSFX
     }
 
     //
-    static extractConnectedComponents(chunk) {
+    static extractConnectedComponents(chunk)
+    {
         let neighbourChunks = [];
         let neighbourBlocks = [];
 
@@ -531,7 +551,8 @@ class CSFX
         chunk.fastComponentsIds = fastCCIds;
         chunk.connectedComponents = connectedComponents;
 
-        if (CSFX.debugFastCC) {
+        if (CSFX.debugFastCC)
+        {
             //console.log(fastCC);
             //console.log(fastCCIds);
         }

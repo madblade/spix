@@ -58,7 +58,8 @@ let RendererManager = function(graphicsEngine)
 
 extend(RendererManager.prototype, {
 
-    cssToHex(cssColor) {
+    cssToHex(cssColor)
+    {
         return 0 | cssColor.replace('#', '0x');
     },
 
@@ -200,7 +201,8 @@ extend(RendererManager.prototype, {
         return [bloomComposer, finalComposer, composer];
     },
 
-    createRenderer() {
+    createRenderer()
+    {
         // Configure renderer
         let renderer = new WebGLRenderer({
             antialias: false,
@@ -220,22 +222,26 @@ extend(RendererManager.prototype, {
         return renderer;
     },
 
-    getRenderRegister() {
+    getRenderRegister()
+    {
         return this.renderRegister;
     },
 
-    setRenderRegister(renderRegister) {
+    setRenderRegister(renderRegister)
+    {
         this.renderRegister = renderRegister;
     },
 
-    _darkenNonBloomed(obj, materials) {
+    _darkenNonBloomed(obj, materials)
+    {
         if (obj.isMesh && obj.userData.bloom !== true) {
             materials[obj.uuid] = obj.material;
             obj.material = this.darkMaterial;
         }
     },
 
-    _restoreMaterial(obj, materials) {
+    _restoreMaterial(obj, materials)
+    {
         if (materials[obj.uuid]) {
             obj.material = materials[obj.uuid];
             delete materials[obj.uuid];
@@ -245,7 +251,8 @@ extend(RendererManager.prototype, {
     _updateSkies(mainCamera)
     {
         let skies = this.graphics.app.model.server.chunkModel.skies;
-        skies.forEach(sky => { // TODO do that with other cameras
+        skies.forEach(sky => {
+            // TODO [SKY] manage with other cameras
             this.graphics.updateSunPosition(mainCamera, sky);
         });
     },
@@ -371,7 +378,8 @@ extend(RendererManager.prototype, {
         let stc = cameraManager.stencilCamera;
         this.stencilScene.updateMatrixWorld();
         this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
-        for (let i = 0, n = renderRegister.length; i < n; ++i) {
+        for (let i = 0, n = renderRegister.length; i < n; ++i)
+        {
             if (renderCount++ > renderMax) break;
             currentPass = renderRegister[i];
             screen1 = currentPass.screen1;
@@ -383,7 +391,8 @@ extend(RendererManager.prototype, {
             bufferCamera = camera.getRecorder();
             bufferTexture = screen1.getRenderTarget();
 
-            if (!bufferScene)   {
+            if (!bufferScene)
+            {
                 if (this.corrupted < 5) {
                     console.log(`[Renderer] Could not get buffer scene ${currentPass.sceneId}.`);
                     this.corrupted++;
@@ -396,8 +405,8 @@ extend(RendererManager.prototype, {
             if (!bufferCamera)  { console.log('Could not get buffer camera.'); continue; }
             if (!bufferTexture) { console.log('Could not get buffer texture.'); continue; }
 
-            if (screen2) {
-                console.log('screen2');
+            if (screen2)
+            {
                 otherSceneId = currentPass.sceneId;
                 otherEnd = screen2.getMesh();
                 // otherEnd.visible = false;
@@ -445,7 +454,8 @@ extend(RendererManager.prototype, {
                 this.composers.set(id, bufferComposer);
             }
 
-            if (this.selectiveBloom) {
+            if (this.selectiveBloom)
+            {
                 bufferScene.traverse(obj => this._darkenNonBloomed(obj, materials));
                 bufferComposer[0].render();
                 bufferScene.traverse(obj => this._restoreMaterial(obj, materials));
@@ -463,7 +473,7 @@ extend(RendererManager.prototype, {
         }
 
         // Make composer
-        // TODO optimise composer creation
+        // TODO [PERF] optimise composer creation
         let id = this.graphics.app.model.server.selfModel.worldId.toString();
         let composer;
         if (this.composers.has(id)) {
@@ -488,7 +498,8 @@ extend(RendererManager.prototype, {
         renderer.info.reset();
     },
 
-    resize(width, height) {
+    resize(width, height)
+    {
         if (!width) width = window.innerWidth;
         if (!height) height = window.innerHeight;
         this.renderer.setSize(width, height);
@@ -511,14 +522,17 @@ extend(RendererManager.prototype, {
         });
     },
 
-    switchAvatarToScene(/*sceneId*/) {
-        // TODO here goes the mesh switch.
+    // Triggered at the start of a switch-to-world.
+    switchAvatarToScene(/*sceneId*/)
+    {
+        // console.log('Mesh switch');
         // this.renderRegister;
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.composers.forEach(function() {
-            // TODO cleanup composer.
+            // TODO [UNLOAD] composer cleanup
         });
         this.composers = new Map();
         this.renderRegister.length = 0;
@@ -530,7 +544,8 @@ extend(RendererManager.prototype, {
 
 let RenderersModule = {
 
-    createRendererManager() {
+    createRendererManager()
+    {
         return new RendererManager(this);
     }
 

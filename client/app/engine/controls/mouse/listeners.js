@@ -9,11 +9,13 @@ import { ItemsModelModule } from '../../../model/server/self/items';
 
 let ListenerModule = {
 
-    registerMouseDown() {
+    registerMouseDown()
+    {
         let scope = this;
         let app = this.app;
 
-        $(window).mousedown(function(event) {
+        $(window).mousedown(function(event)
+        {
             if (app.getState() !== 'ingame') return;
             switch (event.which) {
                 case scope.buttons.left:
@@ -43,14 +45,16 @@ let ListenerModule = {
 
         // Perform intersection.
         let intersects = graphicsEngine.cameraManager.performRaycast();
-        if (intersects.length <= 0) {
+        if (intersects.length <= 0)
+        {
             console.log('[Listeners] Nothing intersected.');
             return;
         }
 
         // Get closest intersection point.
         let min = intersects[0];
-        for (let i = 1; i < intersects.length; ++i) {
+        for (let i = 1; i < intersects.length; ++i)
+        {
             let ii = intersects[i];
             if (ii.distance < min.distance) min = ii;
         }
@@ -70,10 +74,12 @@ let ListenerModule = {
         const ey = dy < 0.0000001; if (ey) ry = flo(ry);
         const ez = dz < 0.0000001; if (ez) rz = flo(rz);
 
-        if (ex + ey + ez !== 1) {
-            // TODO [HIGH] how do I remove an X?
+        if (ex + ey + ez !== 1)
+        {
             console.log(`${ex},${ey},${ez}`);
-            console.warn('[OnLeftMouse] Error: precision on intersection @addBlock');
+            console.warn(
+                '[OnLeftMouse] Error: precision on intersection @addBlock.'
+            );
             return;
         }
 
@@ -187,7 +193,8 @@ let ListenerModule = {
         clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z]);
     },
 
-    requestMainHandItemAction() {
+    requestMainHandItemAction()
+    {
         let clientSelfModel = this.app.model.client.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
         if (!ItemsModelModule.isItemIDSupported(activeItemID))
@@ -198,19 +205,23 @@ let ListenerModule = {
             this.requestAddBlock();
     },
 
-    requestSecondaryHandItemAction() {
+    requestSecondaryHandItemAction()
+    {
         this.requestDelBlock();
     },
 
-    onLeftMouseDown() {
+    onLeftMouseDown()
+    {
         this.requestMainHandItemAction();
     },
 
-    onRightMouseDown() {
+    onRightMouseDown()
+    {
         this.requestSecondaryHandItemAction();
     },
 
-    onMiddleMouseDown() {
+    onMiddleMouseDown()
+    {
     },
 
     mouseWheelCallback(event)
@@ -222,16 +233,19 @@ let ListenerModule = {
         clientModel.triggerChange('interaction', ['itemSelect', ey]);
     },
 
-    // TODO replace jquery-mousewheel with something better
-    registerMouseWheel() {
+    // TODO [PERF] replace jquery-mousewheel with something better
+    registerMouseWheel()
+    {
         $(window).mousewheel(this.mouseWheelCallback.bind(this));
     },
 
-    unregisterMouseDown() {
+    unregisterMouseDown()
+    {
         $(window).off('mousedown');
     },
 
-    unregisterMouseWheel() {
+    unregisterMouseWheel()
+    {
         $(window).off('mousewheel');
     }
 

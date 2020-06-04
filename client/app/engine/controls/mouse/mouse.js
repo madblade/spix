@@ -12,14 +12,16 @@ import { PointerLockModule } from './pointerlockcontrols.js';
 
 let MouseModule = {
 
-    setupMouse() {
+    setupMouse()
+    {
         this.buttons = Object.freeze({left: 1, middle: 2, right: 3});
 
         // Click / move handlers.
         this.setupPointerLock();
     },
 
-    startMouseListeners() {
+    startMouseListeners()
+    {
         if (this.isTouch)
             console.warn('[Keyboard] requested keyboard listeners on a touch device.');
 
@@ -28,7 +30,8 @@ let MouseModule = {
         this.registerMouseWheel();
     },
 
-    stopMouseListeners() {
+    stopMouseListeners()
+    {
         this.unregisterMouseMove();
         this.unregisterMouseDown();
         this.unregisterMouseWheel();

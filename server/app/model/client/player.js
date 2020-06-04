@@ -8,7 +8,8 @@ import Factory from './../factory';
 
 class Player
 {
-    constructor(user, game) {
+    constructor(user, game)
+    {
         this._user = user;
         this._game = game;
         // May be given an avatar when logged to a game.
@@ -25,7 +26,8 @@ class Player
      * Join a socket room.
      * @param room Socket subset of users.
      */
-    join(room) {
+    join(room)
+    {
         this._playerConnection.join(room);
     }
 
@@ -34,19 +36,22 @@ class Player
      * @param kind
      * @param data
      */
-    send(kind, data) {
+    send(kind, data)
+    {
         this._playerConnection.send(kind, data);
     }
 
     // Leave game and make the game forget.
-    leave() {
+    leave()
+    {
         this.disconnect();
         if (this._game)
             this._game.removePlayer(this);
     }
 
     // Close player connection.
-    disconnect() {
+    disconnect()
+    {
         if (this._playerConnection)
             this._playerConnection.close();
     }
@@ -56,7 +61,8 @@ class Player
      * @param message
      * @param behaviour
      */
-    on(message, behaviour) {
+    on(message, behaviour)
+    {
         this._playerConnection.on(message, behaviour);
     }
 
@@ -65,12 +71,14 @@ class Player
      * @param message
      * @param behaviour
      */
-    off(message, behaviour) {
+    off(message, behaviour)
+    {
         this._playerConnection.off(message, behaviour);
     }
 
     // Clean references. Only use from a Game instance.
-    destroy() {
+    destroy()
+    {
         // Destroy player connection which is a single child of this object.
         if (this._playerConnection) this._playerConnection.destroy();
         delete this._playerConnection;

@@ -7,7 +7,8 @@
 import extend from '../../extend';
 import { $ } from '../../modules/polyfills/dom.js';
 
-let MainMenuState = function(stateManager) {
+let MainMenuState = function(stateManager)
+{
     this.stateManager = stateManager;
     this.stateName = 'main';
 
@@ -133,13 +134,14 @@ let MainMenuState = function(stateManager) {
 
 extend(MainMenuState.prototype, {
 
-    startListeners() {
+    startListeners()
+    {
         $('#button-connect-socket-server').click(() => {
             let host = $('#remote-server-address').val();
             let port = $('#remote-server-port').val();
             if (!host) host = '';
             if (!port || isNaN(port)) port = 8000;
-            // TODO seek the production port
+            // TODO [PROD] wire production port
             this.stateManager.app.startFromRemoteServer(host, port);
         });
 
@@ -162,7 +164,8 @@ extend(MainMenuState.prototype, {
         this.listenRTCUsers();
     },
 
-    start() {
+    start()
+    {
         $('#announce').empty()
             .removeClass()
             .addClass('main-menu')
@@ -181,7 +184,8 @@ extend(MainMenuState.prototype, {
         this.startListeners();
     },
 
-    stopListeners() {
+    stopListeners()
+    {
         $('#button-connect-socket-server').off('click');
         $('#button-connect-webrtc-server').off('click');
         $('#button-connect-throttle-server').off('click');
@@ -189,7 +193,8 @@ extend(MainMenuState.prototype, {
         $('#button-play-quick').off('click');
     },
 
-    end() {
+    end()
+    {
         this.stopListeners();
 
         return new Promise(function(resolve) {
@@ -201,7 +206,8 @@ extend(MainMenuState.prototype, {
 
     // ######### RTC CLIENT METHODS #########
 
-    generateClientAnswer() {
+    generateClientAnswer()
+    {
         let rtcService = this.stateManager.app.engine.connection.rtc;
         rtcService.createClientConnection(this);
 
@@ -217,21 +223,24 @@ extend(MainMenuState.prototype, {
         rtcService.createClientAnswer(offer);
     },
 
-    answerSent(answer) {
+    answerSent(answer)
+    {
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.setLocalClientAnswer(answer);
 
         $('#remote-client-answer').val(answer);
     },
 
-    notifyServerFailed() {
+    notifyServerFailed()
+    {
         let button = $('#button-connect-webrtc-server');
         button.removeClass('status-checking');
         button.removeClass('status-connected');
         button.addClass('status-error');
     },
 
-    notifyServerChecking() {
+    notifyServerChecking()
+    {
         // Front notif on button.
         let button = $('#button-connect-webrtc-server');
         button.removeClass('status-error');
@@ -239,7 +248,8 @@ extend(MainMenuState.prototype, {
         button.addClass('status-checking');
     },
 
-    notifyServerConnected(rtcSocket) {
+    notifyServerConnected(rtcSocket)
+    {
         let button = $('#button-connect-webrtc-server');
         button.removeClass('status-checking');
         button.removeClass('status-error');
@@ -249,7 +259,8 @@ extend(MainMenuState.prototype, {
 
     // ######### RTC SERVER METHODS #########
 
-    getRTCUserHTML(userID, offer, answer, isConnected) {
+    getRTCUserHTML(userID, offer, answer, isConnected)
+    {
         if (!offer) offer = '';
         else offer = offer.replace(/\x22/g, '&quot;');
         if (!answer) answer = '';
@@ -291,7 +302,8 @@ extend(MainMenuState.prototype, {
             `;
     },
 
-    getRTCUsers() {
+    getRTCUsers()
+    {
         let localServerModel = this.stateManager.app.model.localServer;
         let users = localServerModel.users;
         let usersHTML = '<div class="list-group" id="user-slots">';
@@ -302,7 +314,8 @@ extend(MainMenuState.prototype, {
         return usersHTML;
     },
 
-    notifyRTCError(errorType) {
+    notifyRTCError(errorType)
+    {
         $('.error-message').remove();
         let userSlotsHTML = errorType === 'ice-failed-client' ?
             $('#error-remote-sandbox') : $('#user-slots');
@@ -334,14 +347,16 @@ extend(MainMenuState.prototype, {
         userSlotsHTML.append(errorMsgHTML);
     },
 
-    notifyUserChecking(userID) {
+    notifyUserChecking(userID)
+    {
         let element = $(`#status-${userID}`);
         element.removeClass('status-error');
         element.removeClass('status-connected');
         element.addClass('status-checking');
     },
 
-    notifyUserConnected(userID, newChannel, newConnection, rtcSocket) {
+    notifyUserConnected(userID, newChannel, newConnection, rtcSocket)
+    {
         let element = $(`#status-${userID}`);
         element.removeClass('status-checking');
         element.removeClass('status-error');
@@ -352,7 +367,8 @@ extend(MainMenuState.prototype, {
         this.stateManager.app.clientConnectedToLocalSandbox(userID, rtcSocket);
     },
 
-    notifyUserDisconnected(userID) {
+    notifyUserDisconnected(userID)
+    {
         let element = $(`#status-${userID}`);
         element.removeClass('status-checking');
         element.removeClass('status-connected');
@@ -362,7 +378,8 @@ extend(MainMenuState.prototype, {
         $(`#offer-user-${userID}`).val();
     },
 
-    addUserSlot() {
+    addUserSlot()
+    {
         let newUserID = $('#new-user-id').val();
         let userSlotsHTML = $('#user-slots');
 
@@ -396,7 +413,8 @@ extend(MainMenuState.prototype, {
         rtcService.addServerSlot(newUserID, this);
     },
 
-    removeUserSlot(userID) {
+    removeUserSlot(userID)
+    {
         let localServerModel = this.stateManager.app.model.localServer;
         localServerModel.removeUser(userID);
 
@@ -411,7 +429,8 @@ extend(MainMenuState.prototype, {
         $('#announce').center();
     },
 
-    serverSlotCreated(userID, offer, connection) {
+    serverSlotCreated(userID, offer, connection)
+    {
         let offerElement = $(`#offer-user-${userID}`);
         if (!offerElement) {
             console.error(`[States/MainMenu] User "${userID}" HTML element not found.`);
@@ -426,7 +445,8 @@ extend(MainMenuState.prototype, {
         this.listenButtonDisconnectUser(userID);
     },
 
-    listenRTCUsers() {
+    listenRTCUsers()
+    {
         let localServerModel = this.stateManager.app.model.localServer;
         let users = localServerModel.users;
         users.forEach((user, userID) => {
@@ -435,7 +455,8 @@ extend(MainMenuState.prototype, {
         });
     },
 
-    listenButtonConnectUser(userID) {
+    listenButtonConnectUser(userID)
+    {
         let rtcService = this.stateManager.app.engine.connection.rtc;
         let localServerModel = this.stateManager.app.model.localServer;
         $(`#button-connect-user-${userID}`).click(() => {
@@ -453,7 +474,8 @@ extend(MainMenuState.prototype, {
         });
     },
 
-    listenButtonDisconnectUser(userID) {
+    listenButtonDisconnectUser(userID)
+    {
         let rtcService = this.stateManager.app.engine.connection.rtc;
         let localServerModel = this.stateManager.app.model.localServer;
         $(`#button-disconnect-user-${userID}`).click(() => {

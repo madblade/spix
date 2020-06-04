@@ -8,7 +8,8 @@ import Stats from 'stats.js';
 
 let CoreModule = {
 
-    preload() {
+    preload()
+    {
         // Textures
         this.loadTextures();
 
@@ -25,7 +26,8 @@ let CoreModule = {
         });
     },
 
-    resolveIfLoaded(resolve) {
+    resolveIfLoaded(resolve)
+    {
         if (this._nbTexturesLoaded === this._nbTexturesToLoad &&
             this._nbMeshesToLoad === this._nbMeshesLoadedOrError)
         {
@@ -36,7 +38,8 @@ let CoreModule = {
             setTimeout(() => this.resolveIfLoaded(resolve), 500);
     },
 
-    run() {
+    run()
+    {
         // Initialize DOM element
         this.initializeDOM();
         this.fps = this.fps || new Stats();
@@ -57,14 +60,16 @@ let CoreModule = {
             document.body.appendChild(fpsElement);
     },
 
-    initializeDOM() {
+    initializeDOM()
+    {
         this.container = document.getElementById('container');
         this.container.appendChild(this.rendererManager.renderer.domElement);
     },
 
     /** Main loop. **/
 
-    animate() {
+    animate()
+    {
         let clientModel = this.app.model.client;
         let serverModel = this.app.model.server;
         let controlsEngine = this.app.engine.controls;
@@ -84,7 +89,8 @@ let CoreModule = {
         clientModel.refresh();
     },
 
-    render() {
+    render()
+    {
         let sceneManager = this.sceneManager;
         let cameraManager = this.cameraManager;
         let rendererManager = this.rendererManager;
@@ -100,13 +106,15 @@ let CoreModule = {
         rendererManager.render(sceneManager, cameraManager, portals);
     },
 
-    stop() {
+    stop()
+    {
         if (this.requestId) {
             cancelAnimationFrame(this.requestId);
         }
     },
 
-    cleanupFullGraphics() {
+    cleanupFullGraphics()
+    {
         this.sceneManager.cleanup();
         this.cameraManager.cleanup();
         this.rendererManager.cleanup();
@@ -127,7 +135,8 @@ let CoreModule = {
         this.sceneManager.resize(width, height);
     },
 
-    initializeCameras() {
+    initializeCameras()
+    {
         let selfModel = this.app.model.server.selfModel;
         let worldId = selfModel.worldId;
         this.addToScene(this.cameraManager.mainCamera.get3DObject(), worldId);
@@ -138,7 +147,8 @@ let CoreModule = {
     /**
      * @deprecated
      */
-    getCameraInteraction() {
+    getCameraInteraction()
+    {
         return this.app.model.client.getCameraInteraction();
     }
 };

@@ -7,7 +7,8 @@
 class CollectionUtils
 {
     // O(log(n))
-    static _locationOf(element, array, start, end) {
+    static _locationOf(element, array, start, end)
+    {
         start = start || 0;
         end = end || array.length;
         let pivot = parseInt(start + (end - start) / 2, 10);
@@ -19,7 +20,8 @@ class CollectionUtils
         }
     }
 
-    static insert(element, array) {
+    static insert(element, array)
+    {
         if (array === undefined) {
             let e = new Error('BLD @insert: undefined array.');
             console.log(e.stack);
@@ -34,7 +36,8 @@ class CollectionUtils
         return location;
     }
 
-    static insertWithLocation(location, element, array) {
+    static insertWithLocation(location, element, array)
+    {
         if (array === undefined) {
             let e = new Error('BLD: undefined array.');
             console.log(e.stack);
@@ -48,15 +51,18 @@ class CollectionUtils
         return location;
     }
 
-    static generateId(collection, propertyIdName) {
+    static generateId(collection, propertyIdName)
+    {
         let random = () => Math.floor(Math.random() * 1000000);
         let id = random();
 
-        if (collection instanceof Map) {
+        if (collection instanceof Map)
+        {
             while (collection.has(id)) id = random();
         }
 
-        else if (collection instanceof Array) { // Array
+        else if (collection instanceof Array)
+        { // Array
             // Unicity mandatory check
 
             if (!propertyIdName) throw Error('@generateId: generating id for ' +
@@ -66,7 +72,8 @@ class CollectionUtils
             while (collection.filter(f).length > 0) id = random();
         }
 
-        else if (collection instanceof Object) { // Object <-> Map
+        else if (collection instanceof Object)
+        { // Object <-> Map
             // Unicity mandatory check
             while (id in collection) id = random();
         }
@@ -74,12 +81,15 @@ class CollectionUtils
         return id;
     }
 
-    static numberOfProperties(object) {
+    static numberOfProperties(object)
+    {
         return Object.keys(object).length;
     }
 
-    static removeFromArray(array, object) {
-        if (array === undefined) {
+    static removeFromArray(array, object)
+    {
+        if (array === undefined)
+        {
             let e = new Error('BLD @removeFromArray: undefined array.');
             console.log(e.stack);
             return -1;
@@ -89,11 +99,13 @@ class CollectionUtils
         return objectId;
     }
 
-    static removeFromArrayWithId(array, objectId) {
+    static removeFromArrayWithId(array, objectId)
+    {
         if (objectId > -1) array.splice(objectId, 1);
     }
 
-    static forEachProperty(object, func) {
+    static forEachProperty(object, func)
+    {
         Object.keys(object).forEach(func);
     }
 }

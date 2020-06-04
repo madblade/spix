@@ -24,19 +24,23 @@ let Entity = function(id, graphicalComponent, worldId)
 
 extend(Entity.prototype, {
 
-    getObject3D() {
+    getObject3D()
+    {
         return this.graphicalComponent;
     },
 
-    getWorldId() {
+    getWorldId()
+    {
         return this.worldId;
     },
 
-    setWorldId(worldId) {
+    setWorldId(worldId)
+    {
         this.worldId = worldId;
     },
 
-    getTime() {
+    getTime()
+    {
         return window.performance.now();
     }
 

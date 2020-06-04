@@ -8,7 +8,8 @@ import $ from 'jquery';
 
 let ControlsModule = {
 
-    getControlsHTML(controlsSettings) {
+    getControlsHTML(controlsSettings)
+    {
         let content = `
             <div class="container">
             <table class="table table-bordered noselect" style="width:100%">
@@ -33,7 +34,8 @@ let ControlsModule = {
         return content;
     },
 
-    goControls() {
+    goControls()
+    {
         this.unlistenSettingsMenu();
         $('#announce')
             .empty()
@@ -42,7 +44,8 @@ let ControlsModule = {
         this.listenControls();
     },
 
-    listenControls() {
+    listenControls()
+    {
         let controlsEngine = this.app.engine.controls;
 
         if (this.controlsSettings.hasOwnProperty('language')) {
@@ -54,7 +57,8 @@ let ControlsModule = {
         }
     },
 
-    unlistenControls() {
+    unlistenControls()
+    {
         if (this.controlsSettings.hasOwnProperty('language')) {
             $('#language').off('change');
         }
