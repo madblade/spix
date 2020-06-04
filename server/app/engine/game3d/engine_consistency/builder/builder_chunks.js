@@ -12,7 +12,8 @@ class ChunkBuilder
 {
     static debug = false;
 
-    static computeChunkFaces(chunk) {
+    static computeChunkFaces(chunk)
+    {
         let world = chunk.world;
 
         // Preload neighbours.
@@ -50,7 +51,8 @@ class ChunkBuilder
      16	i,		j+1,	k-1
      17	i,		j-1,	k-1
     */
-    static getNeighboringChunk(chunk, direction) {
+    static getNeighboringChunk(chunk, direction)
+    {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
         let k = chunk.chunkK;
@@ -80,7 +82,8 @@ class ChunkBuilder
         }
     }
 
-    static isNeighboringChunkLoaded(chunk, direction) {
+    static isNeighboringChunkLoaded(chunk, direction)
+    {
         let i = chunk.chunkI;
         let j = chunk.chunkJ;
         let k = chunk.chunkK;
@@ -109,7 +112,8 @@ class ChunkBuilder
         }
     }
 
-    static preloadAllNeighbourChunks(chunk, world) {
+    static preloadAllNeighbourChunks(chunk, world)
+    {
         let loadedChunks = world.allChunks;
         let c = chunk;
         let dims = c.dimensions;
@@ -140,7 +144,8 @@ class ChunkBuilder
             `${ci},${cj - 1},${ck - 1}`     //  i,		j-1,	k-1
         ];
 
-        for (let i = 0, length = neighbourIds.length; i < length; ++i) {
+        for (let i = 0, length = neighbourIds.length; i < length; ++i)
+        {
             let currentId = neighbourIds[i];
             if (loadedChunks.has(currentId)) continue;
 
@@ -153,7 +158,8 @@ class ChunkBuilder
     /**
      * @deprecated
      */
-    static preloadFlatNeighbourChunks(chunk, world) {
+    static preloadFlatNeighbourChunks(chunk, world)
+    {
         let loadedChunks = world.allChunks;
         let c = chunk;
         let ci = c.chunkI;
@@ -170,17 +176,21 @@ class ChunkBuilder
             `${ci},${cj},${ck - 1}`
         ];
 
-        for (let i = 0, length = neighbourIds.length; i < length; ++i) {
+        for (let i = 0, length = neighbourIds.length; i < length; ++i)
+        {
             let currentId = neighbourIds[i];
             if (loadedChunks.has(currentId)) continue;
 
             // Don't compute faces
-            let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, world);
+            let neighbour = ChunkGenerator.createChunk(
+                dims[0], dims[1], dims[2], currentId, world
+            );
             world.addChunk(currentId, neighbour);
         }
     }
 
-    static addChunk(dimX, dimY, dimZ, chunkId, world) {
+    static addChunk(dimX, dimY, dimZ, chunkId, world)
+    {
         // Do compute faces
         let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, world);
         world.addChunk(chunkId, chunk);
@@ -202,16 +212,16 @@ class ChunkBuilder
         if (!chunks) return;
         let aid = avatar.entityId;
 
-        let hasLoadedChunk = (wid, ic, jc, kc) => consistencyModel.hasChunk(aid, wid, `${ic},${jc},${kc}`);
-
         for (let id = 0, l = chunks.length; id < l; ++id)
         {
             let current = chunks[id];
 
             let wid = current[0];
             let currentId = current[1];
-            let ijk = currentId.split(',');
-            if (!hasLoadedChunk(wid, ...ijk)) {
+
+            const hasLoadedChunk = consistencyModel.hasChunk(aid, wid, currentId);
+            if (hasLoadedChunk)
+            {
                 let currentWorld = worldModel.getWorld(wid);
                 let currentChunks = currentWorld.allChunks;
                 let currentChunk = currentChunks.get(currentId);

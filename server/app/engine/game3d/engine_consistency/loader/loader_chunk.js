@@ -25,6 +25,9 @@ class ChunkLoader
         this._xModel            = consistencyEngine.xModel;
     }
 
+    /**
+     * @deprecated
+     */
     computeChunksForNewPlayer(player)
     {
         let avatar = player.avatar;

@@ -62,6 +62,9 @@ class UserOutput
     }
 
     // Every player spawns in initial world '-1'.
+    /**
+     * @deprecated
+     */
     spawnPlayers()
     {
         let consistencyEngine = this._consistencyEngine;

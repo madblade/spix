@@ -4,7 +4,9 @@
 
 'use strict';
 
-import {BlockType, ChunkSizes, WorldType} from './model';
+import {
+    BlockType, ChunkSizes, WorldType
+} from './model';
 
 class World
 {
@@ -30,9 +32,12 @@ class World
         this._xSize = chunkSizes[0] * 2;
         this._ySize = chunkSizes[1] * 2;
         this._zSize = chunkSizes[2] * 2;
-        if (this._xSize % 2 !== 0 || this._ySize % 2 !== 0 || this._zSize % 2 !== 0) {
+        if (this._xSize % 2 !== 0 || this._ySize % 2 !== 0 || this._zSize % 2 !== 0)
+        {
             console.error('World creation: chunk sizes must be even.');
         }
+
+        this._lastQueriedChunk = null;
     }
 
     get worldId() { return this._worldId; }
@@ -83,7 +88,11 @@ class World
         const chunkZ = z - k * dz;
 
         const chunkId = `${i},${j},${k}`;
-        let chunk = this._chunks.get(chunkId);
+        let lastQueried = this._lastQueriedChunk;
+        let chunk = lastQueried && lastQueried.chunkId === chunkId ?
+            lastQueried :
+            this._chunks.get(chunkId);
+
         if (!chunk)
         {
             console.log(
@@ -92,6 +101,8 @@ class World
             );
             // TODO [GENERATION] managed non-ready chunk.
             return;
+        } else {
+            this._lastQueriedChunk = chunk;
         }
 
         return chunk.what(chunkX, chunkY, chunkZ);

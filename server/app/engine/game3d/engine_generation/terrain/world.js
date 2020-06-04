@@ -80,35 +80,14 @@ WorldMap.prototype.generateIfNeeded = function(x, y) // scene, camera)
     {
         t.stepGeneration();
     }
-    else if (!t.loaded)
+    else
     {
-        t.loaded = true;
-        if (!t.bb)
-        {
-            let buffer = this.makeImageBufferFromRaster(
-                t,
-                t.getRaster(),
-                t.getSurfaceRaster()
-            );
-            t.bb = buffer;
-            // let mesh = this.addThreeMesh(
-            //     scene, t.getCountry(),
-            //     t.triMesh, t.dimension, t.dimension, buffer, t.coordX, t.coordY
-            // );
-            // t.p = mesh;
-        }
-        else
-        {
-            // scene.add(t.p);
-        }
+        // let buffer = this.makeImageBufferFromRaster(
+        //     t,
+        //     t.getRaster(),
+        //     t.getSurfaceRaster()
+        // );
     }
-
-    this.tiles.forEach((tile, id) => {
-        if (tile.presentInScene && id !== `${i},${j}` && tile.p) {
-            // scene.remove(tile.p);
-            // tile.presentInScene = false;
-        }
-    });
 };
 
 WorldMap.prototype.getTiles = function()

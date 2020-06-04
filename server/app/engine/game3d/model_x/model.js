@@ -132,9 +132,13 @@ class XModel
             // TODO [GENERATION] Do not generate world on portal creation,
             //   delegate to main thread event loop.
             let ijk = chunkId.split(',');
-            let newChunk = WorldGenerator.generateInitialChunk(xS, yS, zS, ...ijk, newWorld);
+            let newChunk = WorldGenerator.generateInitialChunk(
+                xS, yS, zS, ...ijk, newWorld
+            );
             newWorld.addChunk(newChunk.chunkId, newChunk);
-            this.addPortal(newWorld.worldId, x1, y1, z1, x2, y2, z2, offset, orientation, portalId);
+            this.addPortal(
+                newWorld.worldId, x1, y1, z1, x2, y2, z2, offset, orientation, portalId
+            );
             console.log('added world');
         }
 

@@ -109,6 +109,9 @@ class ConsistencyEngine
     }
 
     // The first time, FORCE BUILD when output requests CE initial output.
+    /**
+     * @deprecated
+     */
     initChunkOutputForPlayer(player)
     {
         let aid = player.avatar.entityId;
@@ -144,6 +147,9 @@ class ConsistencyEngine
     }
 
     // The first time, FORCE COMPUTE in-range entities when output requests CE output.
+    /**
+     * @deprecated
+     */
     initEntityOutputForPlayer(player)
     {
         let aid = player.avatar.entityId;
