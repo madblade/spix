@@ -206,7 +206,10 @@ class ChunkBuilder
         let threshold = forPlayer ? avatar.chunkRenderDistance : serverLoadingRadius;
         threshold = Math.min(threshold, serverLoadingRadius);
 
-        let connectivity = xModel.getConnectivity(startWid, startCid, worldModel, threshold, true, !forPlayer);
+        let connectivity = xModel.getConnectivity(
+            startWid, startCid, worldModel, threshold,
+            true, !forPlayer
+        );
         if (!connectivity) return;
         let chunks = connectivity[1]; // !! Should be sorted from the nearest to the farthest.
         if (!chunks) return;

@@ -201,22 +201,22 @@ class ChunkLoader
 
         // Loading circle for server (a bit farther)
         let t = TimeUtils.getTimeSecNano();
-
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
-        ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
-            consistencyModel, sRadius, false);
-
+        ChunkBuilder.loadNextChunk(
+            player, wid, cid, worldModel, xModel,
+            consistencyModel, sRadius, false
+        );
         let dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
         t = TimeUtils.getTimeSecNano();
-
-        let newChunk = ChunkBuilder.loadNextChunk(player, wid, cid, worldModel, xModel,
-            consistencyModel, sRadius, true);
-
+        let newChunk = ChunkBuilder.loadNextChunk(
+            player, wid, cid, worldModel, xModel,
+            consistencyModel, sRadius, true
+        );
         dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
