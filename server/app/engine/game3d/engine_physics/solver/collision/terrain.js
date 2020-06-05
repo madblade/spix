@@ -41,6 +41,15 @@ class TerrainCollider
         let numClamp = TerrainCollider.numericClamp;
         let adx = false; let ady = false; let adz = false;
 
+        let abs = Math.abs;
+        const dx = abs(x1 - x0);
+        const dy = abs(y1 - y0);
+        // const dz = abs(z1 - z0);
+        const norm = Math.sqrt(dx * dx + dy * dy);
+        let correctEdge = norm > 1e-2 &&
+            abs(dx / norm - dy / norm) < 0.5; // anti-oob for flat world
+        // Allows walljump
+
         if (x0 !== x1)
         {
             let xNetwork = [];
@@ -52,11 +61,19 @@ class TerrainCollider
                         currentY,
                         currentZ
                     ]);
-                    xArrival.push([
-                        x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
-                        currentY,
-                        currentZ
-                    ]);
+                    if (correctEdge) {
+                        xArrival.push([
+                            x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                            numClamp(y1 + currentY - y0),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                    } else {
+                        xArrival.push([
+                            x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                            currentY,
+                            currentZ
+                        ]);
+                    }
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
                 }
@@ -75,10 +92,18 @@ class TerrainCollider
                     if (x1 > x0 && numClamp(newCrops[0] - xW) < numClamp(cropX - epsilon))
                     {
                         cropX = numClamp(newCrops[0] - xW);
+                        if (correctEdge) {
+                            cropY = numClamp(newCrops[1] + y0 - net[1]);
+                            cropZ = numClamp(newCrops[2] + z0 - net[2]);
+                        }
                     }
                     else if (x1 < x0 && numClamp(newCrops[0] + xW) > numClamp(cropX + epsilon))
                     {
                         cropX = numClamp(newCrops[0] + xW);
+                        if (correctEdge) {
+                            cropY = numClamp(newCrops[1] + y0 - net[1]);
+                            cropZ = numClamp(newCrops[2] + z0 - net[2]);
+                        }
                     }
                 }
             }
@@ -95,11 +120,19 @@ class TerrainCollider
                         y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
                         currentZ
                     ]);
-                    yArrival.push([
-                        currentX,
-                        y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
-                        currentZ
-                    ]);
+                    if (correctEdge) {
+                        yArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                    } else {
+                        yArrival.push([
+                            currentX,
+                            y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                            currentZ
+                        ]);
+                    }
                     if (currentZ >= lastZ) break;
                     currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
                 }
@@ -117,11 +150,33 @@ class TerrainCollider
                     ady = true;
                     if (y1 > y0 && numClamp(newCrops[1] - yW) < numClamp(cropY - epsilon))
                     {
-                        cropY = numClamp(newCrops[1] - yW);
+                        if (correctEdge) {
+                            const nx = numClamp(newCrops[0] + x0 - net[0]);
+                            const ny = numClamp(newCrops[1] - yW);
+                            const nz = numClamp(newCrops[2] + z0 - net[2]);
+                            if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                                cropX = nx;
+                            cropY = ny;
+                            if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
+                                cropZ = nz;
+                        } else {
+                            cropY = numClamp(newCrops[1] - yW);
+                        }
                     }
                     else if (y1 < y0 && numClamp(newCrops[1] + yW) > numClamp(cropY + epsilon))
                     {
-                        cropY = numClamp(newCrops[1] + yW);
+                        if (correctEdge) {
+                            const nx = numClamp(newCrops[0] + x0 - net[0]);
+                            const ny = numClamp(newCrops[1] + yW);
+                            const nz = numClamp(newCrops[2] + z0 - net[2]);
+                            if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                                cropX = nx;
+                            cropY = ny;
+                            if (z1 < z0 && z1 < nz && cropZ < nz || z0 < z1 && nz < z1 && nz < cropZ || z0 === z1)
+                                cropZ = nz;
+                        } else {
+                            cropY = numClamp(newCrops[1] + yW);
+                        }
                     }
                 }
             }
@@ -138,11 +193,19 @@ class TerrainCollider
                         currentY,
                         z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
                     ]);
-                    zArrival.push([
-                        currentX,
-                        currentY,
-                        z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
-                    ]);
+                    if (correctEdge) {
+                        zArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            numClamp(y1 + currentY - y0),
+                            z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                        ]);
+                    } else {
+                        zArrival.push([
+                            currentX,
+                            currentY,
+                            z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                        ]);
+                    }
                     if (currentY >= lastY) break;
                     currentY = currentY + 1 > lastY ? lastY : currentY + 1;
                 }
@@ -160,11 +223,33 @@ class TerrainCollider
                     adz = true;
                     if (z1 > z0 && numClamp(newCrops[2] - zW) < numClamp(cropZ - epsilon))
                     {
-                        cropZ = numClamp(newCrops[2] - zW);
+                        if (correctEdge) {
+                            const nx = numClamp(newCrops[0] + x0 - net[0]);
+                            const ny = numClamp(newCrops[1] + y0 - net[1]);
+                            const nz = numClamp(newCrops[2] - zW);
+                            if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                                cropX = nx;
+                            if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
+                                cropY = ny;
+                            cropZ = nz;
+                        } else {
+                            cropZ = numClamp(newCrops[2] - zW);
+                        }
                     }
                     else if (z1 < z0 && numClamp(newCrops[2] + zW) > numClamp(cropZ + epsilon))
                     {
-                        cropZ = numClamp(newCrops[2] + zW);
+                        if (correctEdge) {
+                            const nx = numClamp(newCrops[0] + x0 - net[0]);
+                            const ny = numClamp(newCrops[1] + y0 - net[1]);
+                            const nz = numClamp(newCrops[2] + zW);
+                            if (x1 < x0 && x1 < nx && cropX < nx || x0 < x1 && nx < x1 && nx < cropX || x0 === x1)
+                                cropX = nx;
+                            if (y1 < y0 && y1 < ny && cropY < ny || y0 < y1 && ny < y1 && ny < cropY || y0 === y1)
+                                cropY = ny;
+                            cropZ = nz;
+                        } else {
+                            cropZ = numClamp(newCrops[2] + zW);
+                        }
                     }
                 }
             }
