@@ -74,7 +74,7 @@ class Hub
         });
 
         const validation = nbGames < 5;
-        console.log(nbGames > 0 ? nbGames : `No game${nbGames > 1 ? 's are' : ' is'} running or idle.`);
+        // console.log(nbGames > 0 ? nbGames : `No game${nbGames > 1 ? 's are' : ' is'} running or idle.`);
         if (!validation) console.error('[Server/Hub] Invalid game creation request: too many games running.');
         return validation;
     }

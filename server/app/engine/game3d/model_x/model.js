@@ -115,7 +115,7 @@ class XModel
         if (otherPortalId)
         {
             this.addKnot(portalId, otherPortalId);
-            console.log(`world present ${otherPortalId}`);
+            // console.log(`world present ${otherPortalId}`);
         }
         else
         {
@@ -139,11 +139,9 @@ class XModel
                 x1, y1, z1, x2, y2, z2,
                 offset, orientation, portalId
             );
-            console.log('added world');
         }
 
         this._cachedConnectivity = [new Map(), new Map()];
-        console.log('added portal');
     }
 
     // (x1, y1, z1): first block

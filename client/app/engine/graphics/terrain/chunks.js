@@ -11,6 +11,8 @@ import {
 } from 'three';
 import { ItemType } from '../../../model/server/self/items';
 
+const debugChunks = false;
+
 let ChunksModule = {
 
     createChunk(
@@ -26,16 +28,20 @@ let ChunksModule = {
         let currentComponent;
         let currentNatures;
 
-        if (!components.hasOwnProperty('1') && !components.hasOwnProperty('2')) {
-            console.log(`[Terrain/Chunks] Empty chunk "${chunkId}".`);
+        if (!components.hasOwnProperty('1') && !components.hasOwnProperty('2'))
+        {
+            if (debugChunks) console.log(`[Terrain/Chunks] Empty chunk "${chunkId}".`);
             return this.createEmptyChunkComponent(chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
         }
 
         let hasTerrain = components.hasOwnProperty('1') && natures.hasOwnProperty('1');
         let hasWater = components.hasOwnProperty('2') && natures.hasOwnProperty('2');
 
-        if (!hasTerrain) console.log('New chunk with empty terrain.');
-        if (!hasWater) console.log('New chunk with empty water.');
+        if (debugChunks)
+        {
+            if (!hasTerrain) console.log('New chunk with empty terrain.');
+            if (!hasWater) console.log('New chunk with empty water.');
+        }
 
         let component1;
         if (hasTerrain && hasWater)

@@ -169,7 +169,7 @@ let ScenesModule = {
         if (parseInt(newSceneId, 10) === parseInt(sceneManager.mainScene.sceneId, 10) ||
             sceneManager.subScenes.has(newSceneId))
         {
-            console.log(`Trying to add an existing scene: ${newSceneId}`);
+            // console.log(`Trying to add an existing scene: ${newSceneId}`);
             return;
         }
 
@@ -218,7 +218,7 @@ let ScenesModule = {
 
     switchToScene(oldSceneId, newSceneId) //, avatar
     {
-        console.log(`Switching from ${oldSceneId} to ${newSceneId}`);
+        // console.log(`Switching from ${oldSceneId} to ${newSceneId}`);
         this.sceneManager.switchToScene(newSceneId, this.cameraManager);
         this.rendererManager.switchAvatarToScene(newSceneId);
         this.previousFrameWorld = parseInt(oldSceneId, 10);

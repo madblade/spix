@@ -192,8 +192,6 @@ extend(SelfModel.prototype, {
         let avatar = this.avatar;
         let handItemWrapper = this.handItemWrapper;
 
-        console.log('Updating world!');
-        console.log(this.worldId);
         let xModel = this.xModel;
         let worldId = this.worldId;
         let oldWorldId = this.oldWorldId;

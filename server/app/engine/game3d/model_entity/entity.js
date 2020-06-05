@@ -116,7 +116,7 @@ class Entity
     stop()
     {
         this._d = [!1, !1, !1, !1, !1, !1];
-        console.log('Entity stopping.');
+        // console.log('[Entity] Entity stopping.');
     }
 
     goForward()     { this._d[0] = !0; }

@@ -112,7 +112,7 @@ class Connector
                 'using the last configuration!');
             return;
         }
-        console.log('configuration socketIO.......');
+        console.log('[Connection] SocketIO configuration pending...');
 
         this._io = socketio;
 

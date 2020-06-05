@@ -64,12 +64,13 @@ class CSBX
         }
     }
 
-    static addSurfaceBlock(bid, sbs, ijSize)
+    static addSurfaceBlock(bid, sbs)
     {
-        const ijC = bid % ijSize;
-        const z = (bid - ijC) / ijSize;
-        if (sbs.hasOwnProperty(z)) sbs[z].push(ijC);
-        else sbs[z] = [ijC];
+        sbs.push(bid);
+        // const ijC = bid % ijSize;
+        // const z = (bid - ijC) / ijSize;
+        // if (sbs.hasOwnProperty(z)) sbs[z].push(ijC);
+        // else sbs[z] = [ijC];
     }
 
     static processNeighborhoodFromBlockDifferent(
@@ -79,7 +80,7 @@ class CSBX
         const iPlus = b + 1;
         if (iPlus % iSize === 0) {
             if (neighbourBlocks[0][iPlus - iSize] !== blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
         }
@@ -87,7 +88,7 @@ class CSBX
         const jPlus = b + iSize;
         if ((jPlus - b % iSize) % ijSize === 0) {
             if (neighbourBlocks[2][jPlus - ijSize] !== blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
         }
@@ -95,7 +96,7 @@ class CSBX
         const kPlus = b + ijSize;
         if (kPlus >= capacity) {
             if (neighbourBlocks[4][kPlus - capacity] !== blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
         }
@@ -109,70 +110,70 @@ class CSBX
         const iPlus = b + 1;
         if (iPlus % iSize !== 0) {
             if (blocks[iPlus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
             // Access other chunk
         } else if (neighbourBlocks[0][iPlus - iSize] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 
         const iMinus = b - 1;
         if (iMinus % iSize !== iSize - 1) {
             if (blocks[iMinus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
             // Access other chunk
         } else if (neighbourBlocks[1][iMinus + iSize] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 
         const jPlus = b + iSize;
         if ((jPlus - b % iSize) % ijSize !== 0) {
             if (blocks[jPlus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
             // Access other chunk
         } else  if (neighbourBlocks[2][jPlus - ijSize] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 
         const jMinus = b - iSize;
         if ((jMinus - b % iSize) % ijSize !== ijSize - 1) {
             if (blocks[jMinus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
             // Access other chunk
         } else if (neighbourBlocks[3][jMinus + ijSize] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 
         const kPlus = b + ijSize;
         if (kPlus < capacity) {
             if (blocks[kPlus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
         } else if (neighbourBlocks[4][kPlus - capacity] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 
         const kMinus = b - ijSize;
         if (kMinus >= 0) {
             if (blocks[kMinus] === blockType) {
-                CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+                CSBX.addSurfaceBlock(b, currentSbs);
                 return true;
             }
         } else if (neighbourBlocks[5][kMinus + capacity] === blockType) {
-            CSBX.addSurfaceBlock(b, currentSbs, ijSize);
+            CSBX.addSurfaceBlock(b, currentSbs);
             return true;
         }
 

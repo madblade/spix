@@ -393,7 +393,8 @@ extend(RendererManager.prototype, {
 
             if (!bufferScene)
             {
-                if (this.corrupted < 5) {
+                if (this.corrupted < 5)
+                {
                     console.log(`[Renderer] Could not get buffer scene ${currentPass.sceneId}.`);
                     this.corrupted++;
                 }

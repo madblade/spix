@@ -61,6 +61,7 @@ class GenerationEngine
     {
         // TODO check entity position against loaded tiles
         entities.forEach(entity => {
+            if (!entity) return;
             let p = entity.p0;
             let world = entity.worldId;
             // get tile

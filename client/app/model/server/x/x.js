@@ -81,8 +81,9 @@ extend(XModel.prototype, {
             }
         }
 
-        if (refreshWorldMap || this.forceUpdate) {
-            console.log('[X] Updating world graph render force force.');
+        if (refreshWorldMap || this.forceUpdate)
+        {
+            // console.log('[X] Updating world graph render force.');
 
             let s = worldMap
                 .invalidate()

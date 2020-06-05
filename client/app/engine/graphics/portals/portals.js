@@ -31,7 +31,7 @@ let PortalsModule = {
         let screen = this.getScreen(portalId);
         if (!screen)
         {
-            console.log('New Screen created.');
+            // console.log('New Screen created.');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;
             // let tempOffset = portal.tempOffset;
@@ -123,7 +123,8 @@ let PortalsModule = {
 
         // Create and configure renderer, camera.
         let screen = this.getScreen(portalId);
-        if (!screen) {
+        if (!screen)
+        {
             console.log(`Could not get screen to complete: ${portalId}.`);
             return;
         }
@@ -150,7 +151,7 @@ let PortalsModule = {
         for (let i = 0; i < portalUpdates.length; ++i)
         {
             u = portalUpdates[i];
-            console.log(`${u.destinationWid}, ${u.portal.worldId}, ${this.previousFrameWorld}`);
+            // console.log(`${u.destinationWid}, ${u.portal.worldId}, ${this.previousFrameWorld}`);
 
             let dwid = parseInt(u.destinationWid, 10);
             let owid = parseInt(u.portal.worldId, 10);

@@ -20,7 +20,6 @@ class ChunkGenerator
      */
     static createRawChunk(x, y, z, id, world)
     {
-        console.log(`createRawChunk ${id}`);
         let c = new Chunk(x, y, z, id, world);
 
         // let shuffleChunks = false; // Can be set to activated to test for initial chunk.

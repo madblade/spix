@@ -67,7 +67,7 @@ class Game
 
         // Launch
         this._isRunning = true;
-        console.log('Game running.');
+        console.log('[Game] Game running.');
         this._jobId = setInterval(() => {
             this.update();
         }, this._refreshRate);
@@ -76,7 +76,7 @@ class Game
     // Stop game loop.
     pause(doTimeout)
     {
-        console.log('Game stopping.');
+        console.log('[Game] Game stopping.');
         if (this._jobId !== undefined) clearInterval(this._jobId);
         this._isRunning = false;
 
@@ -93,16 +93,20 @@ class Game
 
     addPlayer(player)
     {
-        if (!this._ready) {
-            console.warn('WARN: A player tries to join although the game is not ready.');
-            if (this._awaitingJoin < 10) {
-                console.warn('Retrying in 300ms.');
-                setTimeout(() => { this.addPlayer(player); }, 300);
-            }
+        if (!this._ready)
+        {
             ++this._awaitingJoin;
+            if (this._awaitingJoin < 10)
+            {
+                console.warn('[Game] A player tries to join although the game is not ready; retrying in 300ms.');
+                setTimeout(() => { this.addPlayer(player); }, 300);
+            } else {
+                console.error('[Game] A player tries to too many times although the game is not ready. Refusing connection.');
+            }
             return;
         }
-        console.log('A player joined.');
+        console.log('[Game] A player joined.');
+        this._awaitingJoin = 0;
 
         // Join channel.
         player.join(this.gameId);

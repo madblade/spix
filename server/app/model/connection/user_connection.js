@@ -55,7 +55,7 @@ class UserConnection
 
             // A user can join a specific game (given a kind and id).
             case 'joinGame':
-                console.log('A player tries to join');
+                console.log('[UserConnection] A player tries to join.');
                 if (!data.hasOwnProperty('gameId') || !data.hasOwnProperty('gameType') ||
                     !data.gameId || !data.gameType || !this.handleJoinGame(data)) {
                     this.send('cantjoin', 'foo');
@@ -72,7 +72,7 @@ class UserConnection
     handleCreateGame(kind, options)
     {
         const created = this._user.requestNewGame(kind, options);
-        if (created) console.log('Created new game.');
+        if (created) console.log('[UserConnection] Created new game.');
         return created;
     }
 

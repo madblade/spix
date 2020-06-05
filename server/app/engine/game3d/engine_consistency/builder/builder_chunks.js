@@ -16,7 +16,7 @@ class ChunkBuilder
     {
         if (!chunk.blocksReady)
         {
-            console.log('[ChunkBuilder] Blocks not ready yet.');
+            console.warn('[ChunkBuilder] Blocks not ready yet.');
             return;
         }
         let world = chunk.world;
@@ -26,7 +26,7 @@ class ChunkBuilder
         let status = ChunkBuilder.preloadAllNeighbourChunks(chunk, world);
         if (!status)
         {
-            console.log('[ChunkBuilder] Neighbor chunk blocks not ready yet.');
+            // console.log('[ChunkBuilder] Neighbor chunk blocks not ready yet.');
             return;
         }
 
@@ -234,7 +234,10 @@ class ChunkBuilder
                     ChunkBuilder.computeChunkFaces(currentChunk);
                     return currentChunk;
                 }
-                else return null;
+                else
+                {
+                    return currentChunk;
+                }
             }
         }
     }

@@ -57,7 +57,7 @@ class Updater
 
         buffer.forEach(x => {
             // console.log(x[0]); // Avatar
-            console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, portalToLinkId ] }
+            // console.log(x[1]); // { action: 'gate', meta: [ 'add', -2, 6, -16, portalToLinkId ] }
             xUpdater.update(x[0], x[1]);
         });
 

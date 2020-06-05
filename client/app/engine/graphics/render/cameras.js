@@ -121,11 +121,8 @@ extend(CameraManager.prototype, {
         camera.getRecorder().updateMatrixWorld();
         camera.getRecorder().matrixWorldInverse
             .getInverse(camera.getRecorder().matrixWorld);
-        console.log(`Successfully added side camera to scene ${worldId}`);
+        // console.log(`Successfully added side camera to scene ${worldId}`);
     },
-
-    // removeCamera(cameraId) {
-    // },
 
     removeCameraFromScene(cameraId, worldId)
     {

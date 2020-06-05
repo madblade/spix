@@ -225,7 +225,7 @@ extend(App.Core.prototype, {
     // Run game when joining confirmed.
     joinedServer()
     {
-        console.log('Joined server.');
+        console.log('[Game/Client] Joined server.');
 
         // Run game
         this.runGame();

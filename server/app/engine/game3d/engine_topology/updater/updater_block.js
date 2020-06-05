@@ -4,7 +4,6 @@
 
 'use strict';
 
-import CollectionUtils from '../../../math/collections';
 import ChunkBuilder from '../../engine_consistency/builder/builder_chunks';
 import { BlockType } from '../../model_world/model';
 
@@ -12,14 +11,13 @@ class UpdaterBlock
 {
     static removeSurfaceBlock(surfaceBlocks, chunk, x, y, z)
     {
-        surfaceBlocks[z].splice(surfaceBlocks[z].indexOf(chunk._toId(x, y, z)));
+        surfaceBlocks.splice(surfaceBlocks.indexOf(chunk._toId(x, y, z)));
     }
 
     static addSurfaceBlock(surfaceBlocks, chunk, x, y, z)
     {
         const id = chunk._toId(x, y, z);
-        if (!surfaceBlocks.hasOwnProperty(z)) surfaceBlocks[z] = [id];
-        else CollectionUtils.insert(id, surfaceBlocks[z]);
+        surfaceBlocks.push(id);
     }
 
     static processNeighbourSurfaceBlockAfterAddition(

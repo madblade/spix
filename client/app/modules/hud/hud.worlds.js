@@ -50,7 +50,8 @@ let HUDWorldsModule =
 
     refreshHUDWorldGraph(newDiagram)
     {
-        if (!this.sigma || !this.sigma.graph) {
+        if (!this.sigma || !this.sigma.graph)
+        {
             console.warn('[HUD] Sigma failed to update.');
             return;
         }
@@ -107,10 +108,8 @@ let HUDWorldsModule =
             });
         }
 
-        // console.log(this.sigma.graph.edges());
-        // console.log(this.sigma.graph.nodes());
-        console.log('[HUD] New flat graph:');
-        console.log(d);
+        // console.log('[HUD] New flat graph:');
+        // console.log(d);
         this.sigma.refresh();
         // this.sigma.startForceAtlas2();
     }

@@ -10,7 +10,8 @@ let XNode;
 let XArc;
 let XGraph;
 
-XNode = function(nodeId, parentArc) {
+XNode = function(nodeId, parentArc)
+{
     this.nodeId = nodeId;
     if (parentArc) {
         this.parentArcs = [parentArc];
@@ -22,15 +23,18 @@ XNode = function(nodeId, parentArc) {
 
 extend(XNode.prototype, {
 
-    getNodeId() {
+    getNodeId()
+    {
         return this.nodeId;
     },
 
-    getNumberOfChildren() {
+    getNumberOfChildren()
+    {
         return this.childrenArcs.length;
     },
 
-    addExistingChild(arcId, node, xgraph) {
+    addExistingChild(arcId, node, xgraph)
+    {
         let arc = new XArc(this, node, arcId);
         xgraph.setArc(arcId, this);
         node.parentArcs.push(arc);
@@ -38,7 +42,8 @@ extend(XNode.prototype, {
         return node;
     },
 
-    addNewChild(arcId, nodeId, xgraph) {
+    addNewChild(arcId, nodeId, xgraph)
+    {
         let node = new XNode(nodeId);
         let arc = new XArc(this, node, arcId);
         xgraph.setArc(arcId, arc);
@@ -47,17 +52,20 @@ extend(XNode.prototype, {
         return node;
     },
 
-    getParentArcs() {
+    getParentArcs()
+    {
         if (this.parentArcs === null)
             throw Error('Root has no parent.');
         return this.parentArcs;
     },
 
-    getChildrenArcs() {
+    getChildrenArcs()
+    {
         return this.childrenArcs;
     },
 
-    forEachChild(callback) {
+    forEachChild(callback)
+    {
         this.childrenArcs.forEach(function(arc) {
             callback(arc);
         });
@@ -65,7 +73,8 @@ extend(XNode.prototype, {
 
 });
 
-XArc = function(parentNode, childNode, arcId) {
+XArc = function(parentNode, childNode, arcId)
+{
     this.arcId = arcId;
     this.parentNode = parentNode;
     this.childNode = childNode;
@@ -73,21 +82,25 @@ XArc = function(parentNode, childNode, arcId) {
 
 extend(XArc.prototype, {
 
-    getChild() {
+    getChild()
+    {
         return this.childNode;
     },
 
-    getParent() {
+    getParent()
+    {
         return this.parentNode;
     },
 
-    getArcId() {
+    getArcId()
+    {
         return this.arcId;
     }
 
 });
 
-XGraph = function(rootId) {
+XGraph = function(rootId)
+{
     this.root = new XNode(rootId, null);
     this.nodes = new Map();
     this.arcs = new Map();
@@ -101,12 +114,14 @@ XGraph = function(rootId) {
 // Arcs for portals.
 extend(XGraph.prototype, {
 
-    setArc(arcId, arc) {
+    setArc(arcId, arc)
+    {
         if (this.arcs.has(arcId)) console.log('XGraph: adding an existing arc to the graph.');
         this.arcs.set(arcId, arc);
     },
 
-    insertNode(newArcId, forwardArcId, newNodeId, parentNodeId) {
+    insertNode(newArcId, forwardArcId, newNodeId, parentNodeId)
+    {
         newArcId = `${newArcId},${forwardArcId}`;
 
         let node = this.nodes.get(parentNodeId);
@@ -127,15 +142,18 @@ extend(XGraph.prototype, {
         return newNode;
     },
 
-    hasNode(nodeId) {
+    hasNode(nodeId)
+    {
         return this.nodes.has(nodeId);
     },
 
-    getNode(nodeId) {
+    getNode(nodeId)
+    {
         return this.nodes.get(nodeId);
     },
 
-    switchRoot(oldRootId, newRootId) {
+    switchRoot(oldRootId, newRootId)
+    {
         // Allow only 1-length switch at a time.
         let oldRoot = this.root;
         if (oldRoot.getNodeId() !== oldRootId) {
@@ -164,7 +182,8 @@ extend(XGraph.prototype, {
     // Given an arc (portal), breadth-first apply a function
     // that go from it (or the root) to the leaves or to a specified arc id.
     // Generic BFS.
-    applyFromPosition(starterArcId, deepestArcId, callback) {
+    applyFromPosition(starterArcId, deepestArcId, callback)
+    {
         let starterNode = this.root;
         if (starterArcId) {
             let starterArc = this.arcs.get(starterArcId);
@@ -191,7 +210,8 @@ extend(XGraph.prototype, {
         let maxDepth = Number.POSITIVE_INFINITY;
 
         let head; let depth; let path;
-        while (stack.length > 0) {
+        while (stack.length > 0)
+        {
             // Get current element.
             head = stack.pop();
             path = paths.pop();
@@ -238,12 +258,14 @@ extend(XGraph.prototype, {
         }
     },
 
-    toString() {
+    toString()
+    {
         let string = '';
         let flatGraph = this.flatGraph;
 
         let currentStep;
-        for (let i = 0, l = flatGraph.length; i < l; ++i) {
+        for (let i = 0, l = flatGraph.length; i < l; ++i)
+        {
             currentStep = flatGraph[i];
             // 0: depth
             // 1: type
@@ -281,8 +303,8 @@ extend(XGraph.prototype, {
             0, 0, 0  // Rotation
         ];
 
-        console.log('CAMERA TRANSFORMATION');
-        console.log(pidPath);
+        // console.log('CAMERA TRANSFORMATION');
+        // console.log(pidPath);
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
             let currentTunnel = pidPath[pathId].split(',');
             let sourcePortalId = currentTunnel[0];
@@ -315,7 +337,8 @@ extend(XGraph.prototype, {
                 case isZ1: p1z = 0.5 * (P1B0[2] +  P1B1[2]); p1y = 0.5 + P1B0[1]; p1x = 0.5 + P1B1[0]; break;
             }
 
-            if (p0x !== p1x || p0y !== p1y || p0z !== p1z) {
+            if (p0x !== p1x || p0y !== p1y || p0z !== p1z)
+            {
                 console.warn('[Tree/CameraTransform]: // TODO Compute camera chain transform.');
             }
             // let thetaP0 = sourcePortal.tempOrientation;
@@ -330,13 +353,14 @@ extend(XGraph.prototype, {
             // compose everything but NOT THE MAIN CAMERA!
         }
 
-        console.log('Computed Camera Transform.');
-        console.log(cameraTransform);
+        // console.log('Computed Camera Transform.');
+        // console.log(cameraTransform);
         return cameraTransform;
     },
 
     // Add cameras and everything and so on.
-    computeRenderingGraph(graphicsEngine, xModel) {
+    computeRenderingGraph(graphicsEngine, xModel)
+    {
         let flatGraph = this.flatGraph;
         if (flatGraph.length < 1) return;
         graphicsEngine.flushPortalUpdates();
@@ -419,7 +443,8 @@ extend(XGraph.prototype, {
     },
 
     // Compute a graph representation, starting from the root. Custom BFS.
-    computeFlatGraph() {
+    computeFlatGraph()
+    {
         let flatGraph = [];
         let currentStep;
 
@@ -445,7 +470,8 @@ extend(XGraph.prototype, {
         let elementProcessed = false;
 
         // DFS.
-        while (queueNodes.length > 0) {
+        while (queueNodes.length > 0)
+        {
             currentElement = queueNodes.pop();
             currentDepth = queueDepth.pop();
             currentArc = queueArcs.pop();
@@ -465,7 +491,8 @@ extend(XGraph.prototype, {
             let e = currentPidPath.split(';'); e.pop(); e.join(';');
             let widArray = currentWidPath.split(';');
 
-            if (currentArc) {
+            if (currentArc)
+            {
                 currentArcId = currentArc.getArcId();
                 currentStep = {};
 
@@ -510,7 +537,8 @@ extend(XGraph.prototype, {
                 flatGraph.push(currentStep);
             }
 
-            if (!elementProcessed) {
+            if (!elementProcessed)
+            {
                 // Mark and go next.
                 if (!elementDepths.has(currentElementId) ||
                     currentDepth < elementDepths.get(currentElementId))
