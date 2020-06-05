@@ -8,6 +8,8 @@ import Chunk            from './../../model_world/chunk';
 // import WorldType        from './../../model_world/model';
 
 import GenSimplePerlin  from './generator_simple_perlin.js';
+import { WorldType } from '../../model_world/model';
+import FantasyGenerator from './generator_fantasy';
 
 class ChunkGenerator
 {
@@ -43,13 +45,20 @@ class ChunkGenerator
         return c;
     }
 
-    static generateChunkBlocks(chunk)
+    static generateChunkBlocks(chunk, worldMap)
     {
         const worldId = chunk.world.worldId;
         const worldInfo = chunk.world.worldInfo;
-        GenSimplePerlin.simplePerlinGeneration(
-            chunk, false, worldId, worldInfo
-        );
+        if (worldInfo.type === WorldType.FANTASY)
+        {
+            FantasyGenerator.simpleFantasyGeneration(worldMap, chunk);
+        }
+        else
+        {
+            GenSimplePerlin.simplePerlinGeneration(
+                chunk, false, worldId, worldInfo
+            );
+        }
     }
 }
 

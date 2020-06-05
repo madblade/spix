@@ -17,7 +17,6 @@ class GenerationEngine
 
         // Chunks and entity positions
         this._worldModel        = game.worldModel;
-        this._entityModel       = game.entityModel;
 
         this._worldMaps = new Map();
     }
@@ -25,17 +24,17 @@ class GenerationEngine
     update()
     {
         let worlds = this._worldModel.worlds;
-        let entities = this._entityModel.entities;
 
         // TODO time budget.
 
         // Generate meta-tile for entities on edge.
-        this.stepWorldMapGeneration(entities, worlds);
+        this.stepWorldMapGeneration();
 
         // Generate blocks for waiting chunks.
         this.stepChunkBlockGeneration(worlds);
     }
 
+    // N.B. No need to do that in case of non-fantasy (e.g. Perlin-only) world.
     initializeWorldMap(worldId)
     {
         let worldMap = new WorldMap();
@@ -46,28 +45,37 @@ class GenerationEngine
     stepChunkBlockGeneration(worlds)
     {
         let done = false;
-        worlds.forEach(world =>
+        worlds.forEach((world, worldId) =>
         {
             if (done) return;
             let nextChunk = world.popChunkForGeneration();
-            if (nextChunk) {
-                ChunkGenerator.generateChunkBlocks(nextChunk);
+            let worldMap = this._worldMaps.get(worldId);
+            if (nextChunk)
+            {
+                ChunkGenerator.generateChunkBlocks(nextChunk, worldMap);
                 done = true;
             }
         });
     }
 
-    stepWorldMapGeneration(entities)
+    stepWorldMapGeneration()
     {
-        // TODO check entity position against loaded tiles
-        entities.forEach(entity => {
-            if (!entity) return;
-            let p = entity.p0;
-            let world = entity.worldId;
-            // get tile
-            // if !loaded tile, priority generation
-            // if close to !loaded tile,
-            //   push for later generation
+        let done = false;
+        let worldMaps = this._worldMaps;
+        worldMaps.forEach(worldMap => {
+            if (done) return;
+            let tiles = worldMap.tiles;
+            tiles.forEach(tile => {
+                if (done) return;
+                if (tile.needsGeneration)
+                {
+                    tile.stepGeneration();
+                }
+                if (tile.ready)
+                {
+                    tile.needsGeneration = false;
+                }
+            });
         });
     }
 

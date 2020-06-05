@@ -5,7 +5,6 @@
 'use strict';
 
 import WorldGenerator       from './worldgenerator';
-import ChunkBuilder         from '../builder/builder_chunks';
 
 class Generator
 {
@@ -17,9 +16,8 @@ class Generator
     generateWorld()
     {
         // TODO [GENERATION] generate distinct worlds.
-        let world = this._worldModel.getWorld();
+        let world = this._worldModel.getWorld(-1);
 
-        // TODO [GENERATION] chrono and time out.
         return new Promise(resolve =>
         {
             // Generate blocks.
@@ -27,8 +25,6 @@ class Generator
             let y = world.ySize;
             let z = world.zSize;
             let chunkMap = WorldGenerator.generateInitialWorld(x, y, z, world);
-
-            // TODO [GENERATION] generate 2 other worlds + WorldMap
 
             // Affect chunks.
             world.allChunks = chunkMap;

@@ -61,6 +61,7 @@ let Tile = function(
     this.nameGiver = new NameGiver(this.languageGenerator);
 
     // Progressive
+    this.needsGeneration = false;
     this.step = STEPS.WAITING;
     this.ready = false;
     this.presentInScene = false; // when added

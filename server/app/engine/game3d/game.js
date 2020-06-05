@@ -151,8 +151,10 @@ class Game3D extends Game
 
     generate()
     {
-        // TODO [GENERATION] check is world fantasy and preload first tile
-        // this._generationEngine.generateWorldMap();
+        // The following takes a while to generate Voronoi
+        this._generationEngine.initializeWorldMap(-1);
+
+        // Create empty chunks (these will be generated when the WorldMap is ready)
         this._consistencyEngine.generateWorld()
             .then(() => {
                 this._playerManager.setAddPlayerBehaviour(p => {

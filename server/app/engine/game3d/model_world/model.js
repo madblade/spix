@@ -29,7 +29,8 @@ const WorldType = Object.freeze({
     FLAT: 0,
     CUBE: 1,
     SHRIKE: 2,
-    UNSTRUCTURED: 3
+    UNSTRUCTURED: 3,
+    FANTASY: 4
 });
 
 const HillType = Object.freeze({
