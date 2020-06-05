@@ -134,6 +134,9 @@ class WorldModel
             case GameType.FLAT:
                 wk = WorldType.FLAT;
                 break;
+            case GameType.FANTASY:
+                wk = WorldType.FANTASY;
+                break;
             case GameType.CUBE:
                 wk = WorldType.CUBE;
                 break;
@@ -170,6 +173,11 @@ class WorldModel
                     case 1: worldInfo.caves = CaveType.SUBSURFACE_CAVES; break;
                     default: break;
                 }
+                worldInfo.sideSize = -1; // infinite flat world
+                worldInfo.chunkSizes = ChunkSizes.FLAT_REGULAR;
+                break;
+            case WorldType.FANTASY:
+                worldInfo.kind = WorldType.FANTASY;
                 worldInfo.sideSize = -1; // infinite flat world
                 worldInfo.chunkSizes = ChunkSizes.FLAT_REGULAR;
                 break;

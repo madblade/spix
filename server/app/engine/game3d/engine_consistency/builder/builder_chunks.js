@@ -158,7 +158,11 @@ class ChunkBuilder
         for (let i = 0, length = neighbourIds.length; i < length; ++i)
         {
             let currentId = neighbourIds[i];
-            if (loadedChunks.has(currentId)) continue;
+            let loadedC = loadedChunks.get(currentId);
+            if (loadedC) {
+                if (!loadedC.blocksReady) neighborBlocksAllReady = false;
+                continue;
+            }
 
             // Don't compute faces
             let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, world);
@@ -232,7 +236,8 @@ class ChunkBuilder
                 else if (!currentChunk.ready)
                 {
                     ChunkBuilder.computeChunkFaces(currentChunk);
-                    return currentChunk;
+                    // Beware! needs to have neighbour blocks ready as well.
+                    return currentChunk.ready ? currentChunk : null;
                 }
                 else
                 {

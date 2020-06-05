@@ -128,6 +128,7 @@ extend(Connection.prototype, {
             case 'cube':
             case 'flat':
             case 'demo':
+            case 'fantasy':
                 this.registerSocketForGame3D();
                 break;
             case 'unstructured':

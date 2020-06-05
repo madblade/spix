@@ -21,8 +21,12 @@ class CSBX
         // Get all neighbour chunks.
         for (let i = 0; i < numberOfNeighbours; ++i)
         {
-            neighbourChunks.push(ChunkBuilder.getNeighboringChunk(chunk, i));
-            neighbourBlocks.push(neighbourChunks[i].blocks);
+            let neighbour = ChunkBuilder.getNeighboringChunk(chunk, i);
+            if (!neighbour.blocksReady) {
+                console.error('[Builder] Trying to build faces from chunk with unloaded neighbors.');
+            }
+            neighbourChunks.push(neighbour);
+            neighbourBlocks.push(neighbour.blocks);
         }
 
         let currentSbs = chunk.surfaceBlocks;

@@ -60,6 +60,7 @@ class Entity
         // Physical properties
         this._mass        = 1;
         this._lastR       = -1;
+        this._walljump    = false;
     }
 
     static maxWidth = 10.; // 10 blocks.
@@ -75,6 +76,7 @@ class Entity
     set dtr(dtr)            { this._dtr = dtr; }
     get lastR()             { return this._lastR; }
     set lastR(r)            { this._lastR = r; }
+    get walljump()          { return this._walljump; }
 
     get rotation()          { return this._r; }
     get oldRotation()       { return this._olR; }

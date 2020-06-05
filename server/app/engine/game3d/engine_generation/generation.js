@@ -48,12 +48,16 @@ class GenerationEngine
         worlds.forEach((world, worldId) =>
         {
             if (done) return;
-            let nextChunk = world.popChunkForGeneration();
+            let nextChunk = world.getNextChunkForGeneration();
             let worldMap = this._worldMaps.get(worldId);
             if (nextChunk)
             {
                 ChunkGenerator.generateChunkBlocks(nextChunk, worldMap);
-                done = true;
+                if (nextChunk.blocksReady)
+                {
+                    world.popChunkForGeneration();
+                    done = true;
+                }
             }
         });
     }
@@ -69,6 +73,7 @@ class GenerationEngine
                 if (done) return;
                 if (tile.needsGeneration)
                 {
+                    // console.log(tile.tileSeed);
                     tile.stepGeneration();
                 }
                 if (tile.ready)

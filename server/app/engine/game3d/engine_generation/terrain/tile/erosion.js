@@ -307,7 +307,7 @@ Eroder.prototype.fillSinks = function(mesh, tile, epsilon)
         {
             const current = TimeUtils.getTimeSecMillis();
             const delta = current - start;
-            if (delta > 5) return;
+            if (delta > 8) return;
             // console.log(delta);
         }
     }
@@ -496,7 +496,7 @@ Eroder.prototype.cleanCoast = function(mesh, tile)
         const current = TimeUtils.getTimeSecMillis();
         const delta = current - start;
 
-        if (delta < 3) {
+        if (delta < 6) {
             this.cleanCoastP2(mesh, tile);
             this.cleanCoastPass++;
         } else {
@@ -506,6 +506,7 @@ Eroder.prototype.cleanCoast = function(mesh, tile)
     else if (this.cleanCoastPStep === 1)
     {
         this.cleanCoastP2(mesh, tile);
+        this.cleanCoastPass++;
         this.cleanCoastPStep = 0;
     }
 };

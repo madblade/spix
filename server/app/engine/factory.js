@@ -25,6 +25,9 @@ class GameFactory
             case 'demo':
                 game = new Game3D(hub, gameId, connector, { kind: GameType.DEMO });
                 break;
+            case 'fantasy':
+                game = new Game3D(hub, gameId, connector, { kind: GameType.FANTASY });
+                break;
             case 'unstructured':
                 console.log('[Server/GameFactory] Unstructured not yet supported.');
                 return;

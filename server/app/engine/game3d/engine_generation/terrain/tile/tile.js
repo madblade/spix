@@ -238,7 +238,7 @@ Tile.prototype.renderToRaster = function()
     rasterizer.initBuffers(triMesh);
     rasterizer.heightPass(triMesh);
     rasterizer.noisePass(5.0);
-    console.log(rasterizer.heightBuffer);
+    // console.log(rasterizer.heightBuffer);
     rasterizer.riverPass(country.rivers);
     rasterizer.cityPass(country.mesh, country.cities);
 };

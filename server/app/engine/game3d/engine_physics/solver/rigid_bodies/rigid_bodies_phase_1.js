@@ -228,6 +228,7 @@ class RigidBodiesPhase1
                 }
             }
 
+            const wj = currentEntity.walljump;
             for (let i = 0; i < 3; ++i)
             {
                 const gi = g[i];
@@ -239,7 +240,12 @@ class RigidBodiesPhase1
                         a1[i] += 0.7;
                         inc[i] = 0;
                         adh[i] = false;
-                    } else if (!gettingOutOfWater && !adh[3 + i] && inc[i] < 0 && adh.reduce((a, v) => a + v) === 1) {
+                    } else if (
+                        wj && !gettingOutOfWater &&
+                        !adh[3 + i] && inc[i] < 0 &&
+                        adh.reduce((a, v) => a + v) === 1
+                    )
+                    {
                         a1[i] += 0.7;
                         inc[i] = 0;
                         // console.log('walljump');
@@ -264,7 +270,12 @@ class RigidBodiesPhase1
                         a1[i] -= 0.7;
                         inc[i] = 0;
                         adh[3 + i] = false;
-                    } else if (!gettingOutOfWater && !adh[i] && inc[i] > 0 && adh.reduce((a, v) => a + v) === 1) {
+                    } else if (
+                        wj && !gettingOutOfWater &&
+                        !adh[i] && inc[i] > 0 &&
+                        adh.reduce((a, v) => a + v) === 1
+                    )
+                    {
                         a1[i] -= 0.7;
                         inc[i] = 0;
                         // console.log('antiwalljump');

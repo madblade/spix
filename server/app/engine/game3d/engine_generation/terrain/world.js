@@ -59,18 +59,17 @@ WorldMap.prototype.loadTile = function(i, j)
     this.tiles.set(`${i},${j}`, t);
 };
 
-WorldMap.prototype.makeNewTile = function(i, j)
+WorldMap.prototype.makeNewTileIfNeeded = function(i, j)
 {
     const tid = `${i},${j}`;
     let t = this.tiles.get(tid);
-    if (t)
-    {
-        console.error(`Tile ${tid} already there.`);
-    }
+    if (t) return t;
+
     t = new Tile(i, j, this.tileDimension, { params: defaultParams, mesh: this.mesh });
     t.setNoiseTile(this.noiseTile);
     t.needsGeneration = true;
     this.tiles.set(tid, t);
+    return t;
 };
 
 WorldMap.prototype.generateIfNeeded = function(x, y) // scene, camera)

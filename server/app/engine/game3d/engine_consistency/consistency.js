@@ -80,7 +80,7 @@ class ConsistencyEngine
         let freePosition = world.getFreePosition();
         if (!freePosition)
         {
-            console.log('Failed to spawn player.');
+            // console.log('Failed to spawn player.');
             return false;
         }
         this._entityModel.spawnPlayer(player, world, freePosition);

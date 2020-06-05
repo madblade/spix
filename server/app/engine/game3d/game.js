@@ -29,7 +29,8 @@ const GameType = Object.freeze({
     FLAT: Symbol('flat'),
     CUBE: Symbol('cube'),
     DEMO: Symbol('demo'),
-    UNSTRUCTURED: Symbol('unstructured')
+    UNSTRUCTURED: Symbol('unstructured'),
+    FANTASY: Symbol('fantasy')
 });
 
 class Game3D extends Game

@@ -44,7 +44,11 @@ class World
     get worldId() { return this._worldId; }
     // get worldType() { return this._worldType; }
     get worldInfo() { return this._worldInfo; }
-    isFlat() { return this._worldInfo.type === WorldType.FLAT; }
+    isFlat()
+    {
+        return this._worldInfo.type === WorldType.FLAT ||
+            this._worldInfo.type === WorldType.FANTASY;
+    }
 
     get xSize() { return this._xSize; }
     get ySize() { return this._ySize; }
@@ -58,11 +62,20 @@ class World
         this._waitingChunks.push(chunkId);
     }
 
+    getNextChunkForGeneration()
+    {
+        const l = this._waitingChunks.length;
+        if (l < 0) return null;
+        const cid = this._waitingChunks[l - 1];
+        return this._chunks.get(cid);
+    }
+
     popChunkForGeneration()
     {
-        const cid = this._waitingChunks.pop();
-        if (!cid) return null;
-        return this._chunks.get(cid);
+        // const cid =
+        this._waitingChunks.pop();
+        // if (!cid) return null;
+        // return this._chunks.get(cid);
     }
 
     addChunk(id, chunk)
@@ -108,10 +121,10 @@ class World
 
         if (!chunk || !chunk.blocksReady)
         {
-            console.log(
-                `ChkMgr@whatBlock: could not find chunk 
-                ${chunkId} from (${x},${y},${z})!`
-            );
+            // console.log(
+            //     `ChkMgr@whatBlock: could not find chunk
+            //     ${chunkId} from (${x},${y},${z})!`
+            // );
             return -1;
         } else {
             this._lastQueriedChunk = chunk;
@@ -122,6 +135,7 @@ class World
 
     getFreePosition()
     {
+        // return [-100, 187, 18];
         let zLimit = this._zSize;
         let z = zLimit - 2;
         let centerInteger = Math.trunc(zLimit / 2); // parseInt(zLimit / 2, 10);
@@ -139,7 +153,7 @@ class World
                 currentBlock !== BlockType.AIR ||
                 (nextBlock = this.whatBlock(centerInteger, centerInteger, z)) !== 0
             ) &&
-            z < 2 * zLimit) // check 2 chunks and abort
+            z < 5 * zLimit) // check 2 chunks and abort
         {
             ++z;
             currentBlock = nextBlock;

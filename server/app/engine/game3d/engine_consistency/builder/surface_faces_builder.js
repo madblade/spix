@@ -256,9 +256,9 @@ class CSFX
             let fcc = fastCC[cccid];
             for (let i in fcc) {
                 if (!fcc.hasOwnProperty(i)) continue;
-                let j = fcc[i];
-                let orientation = j < capacity ? 0 : j < 2 * capacity ? 1 : 2;
-                let realId = j % capacity;
+                const j = fcc[i];
+                const orientation = j < capacity ? 0 : j < 2 * capacity ? 1 : 2;
+                const realId = j % capacity;
                 tcur.push(faces[orientation][realId]);
             }
         }
@@ -313,21 +313,21 @@ class CSFX
         CSFX.computeFastConnectedComponents(connectedComponents, fastCC);
 
         // Debugging fastCC
-        for (let i in fastCC) {
-            for (let faceId = 0; faceId < fastCC[i].length; ++faceId)
-            {
-                if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId)
-                    console.log('Detected duplicate face.');
-
-                let dir = fastCC[i][faceId] < capacity ? 0 : fastCC[i][faceId] < 2 * capacity ? 1 : 2;
-
-                if (CSFX.debugFastCC)
-                    if (faces[dir][fastCC[i][faceId] % capacity] === 0)
-                        console.log(
-                            `Face ${fastCC[i][faceId]} null: ${faces[dir][fastCC[i][faceId] % capacity]}`
-                        );
-            }
-        }
+        // for (let i in fastCC) {
+        //     for (let faceId = 0; faceId < fastCC[i].length; ++faceId)
+        //     {
+        //         if (fastCC[i].indexOf(fastCC[i][faceId]) !== faceId)
+        //             console.log('Detected duplicate face.');
+        //
+        //         let dir = fastCC[i][faceId] < capacity ? 0 : fastCC[i][faceId] < 2 * capacity ? 1 : 2;
+        //
+        //         if (CSFX.debugFastCC)
+        //             if (faces[dir][fastCC[i][faceId] % capacity] === 0)
+        //                 console.log(
+        //                     `Face ${fastCC[i][faceId]} null: ${faces[dir][fastCC[i][faceId] % capacity]}`
+        //                 );
+        //     }
+        // }
 
         // Induce Ids.
         CSFX.computeFastConnectedComponentIds(fastCC, fastCCIds, capacity, faces);

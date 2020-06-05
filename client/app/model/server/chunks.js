@@ -9,10 +9,11 @@
 import extend           from '../../extend.js';
 
 const WorldType = Object.freeze({
-    FLAT: 0, // Symbol('flat'),
-    CUBE: 1, // Symbol('cube'),
-    SHRIKE: 2, // Symbol('shrike'),
-    UNSTRUCTURED: 3 // Symbol('unstructured')
+    FLAT: 0,
+    CUBE: 1,
+    SHRIKE: 2,
+    UNSTRUCTURED: 3,
+    FANTASY: 4,
 });
 
 let ChunkModel = function(app)
@@ -223,7 +224,7 @@ extend(ChunkModel.prototype, {
 
         let worldMeta = this.worldProperties.get(worldId);
         if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
-        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        let isWorldFlat = worldMeta.type === WorldType.FLAT || worldMeta.type === WorldType.FANTASY;
         let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat);
         world.set(chunkId, chunk);
 
@@ -267,7 +268,7 @@ extend(ChunkModel.prototype, {
 
         let worldMeta = this.worldProperties.get(worldId);
         if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
-        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        let isWorldFlat = worldMeta.type === WorldType.FLAT || worldMeta.type === WorldType.FANTASY;
         graphics.updateChunk(
             worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ,
             isWorldFlat

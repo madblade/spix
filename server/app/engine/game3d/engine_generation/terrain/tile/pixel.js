@@ -283,13 +283,14 @@ Rasterizer.prototype.heightPass = function(triMesh)
         {
             this.heightPassDone = true;
             this.currentTriangle = 0;
+            // console.log(this.heightBuffer);
             return;
         }
         else
         {
             const current = TimeUtils.getTimeSecMillis();
             const delta = current - start;
-            if (i - startTri > 1000 && delta > 5) {
+            if (i - startTri > 1000 && delta > 8) {
                 this.currentTriangle = i + 1;
                 return;
             }

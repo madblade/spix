@@ -7,7 +7,7 @@ class TimeUtils
     {
         if (process && process.hrtime)
         {
-            return process.hrtime()[1] / 1e3;
+            return process.hrtime()[1] / 1e6;
         }
         else
         {
@@ -22,7 +22,7 @@ class TimeUtils
 
             let clocktime = performanceNow.call(performance) * 1e-3;
             let nanoseconds = Math.floor(clocktime % 1 * 1e9);
-            return nanoseconds / 1e3;
+            return nanoseconds / 1e6;
         }
     }
 

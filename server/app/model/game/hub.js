@@ -26,7 +26,7 @@ class Hub
     static validateKind(kind)
     {
         switch (kind) {
-            case 'cube': case 'flat': case 'demo':
+            case 'cube': case 'flat': case 'demo': case 'fantasy':
                 return true;
             case 'unstructured':
                 console.log('[Server/Hub] Unstructured support coming soon.');
@@ -55,7 +55,11 @@ class Hub
                     options.hasOwnProperty('caves') &&
                     (x => x >= 0 && x <= 1)(parseInt(options.caves, 10));
                 break;
+            case 'fantasy':
+                validated = true;
+                break;
             case 'unstructured':
+            default:
                 validated = false;
                 break;
         }

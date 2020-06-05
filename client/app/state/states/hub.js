@@ -73,6 +73,18 @@ let HubState = function(stateManager)
                 </button>
             </div>
         </div>
+        
+        <div class="input-group">
+            <div class="input-group-prepend mb-1 flex-fill">
+                <span class="input-group-text flex-fill">Fantasy World</span>
+            </div>
+
+            <div class="input-group-append mb-1">
+                <button class="btn btn-outline-light" id="button-create-fantasy-game" style="float:none">
+                    Create
+                </button>
+            </div>
+        </div>
 
         <!-- Unstructured world -->
         <!-- Here goes a triangulation model, graphics, update and netcode -->
@@ -228,6 +240,10 @@ extend(HubState.prototype, {
             app.requestGameCreation('cube', {size, hills});
         });
 
+        $('#button-create-fantasy-game').click(function() {
+            app.requestGameCreation('fantasy', {});
+        });
+
         $('#button-create-flat-game').click(function() {
             let hills = $('#flat-game-hills-size')
                 .children('option:selected')
@@ -267,6 +283,7 @@ extend(HubState.prototype, {
     {
         this.stopTableListeners();
         $('#button-create-cube-game').off('click');
+        $('#button-create-fantasy-game').off('click');
         $('#button-create-flat-game').off('click');
         $('#button-create-demo-game').off('click');
         $('#button-return-main').off('click');

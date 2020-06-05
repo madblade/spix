@@ -142,7 +142,7 @@ let SkyModule = {
                 true // isSunSphereVisible
             );
         }
-        else if (skyType === WorldType.FLAT)
+        else if (skyType === WorldType.FLAT || skyType === WorldType.FANTASY)
         {
             sky = this.createFlatSky();
             this.addToScene(sky.mesh, worldId);
@@ -243,7 +243,8 @@ let SkyModule = {
         hl.position.copy(normSunPosition);
         dl.position.copy(normSunPosition);
         // Sunset and sunrise
-        if (skyObject.lights.type === 'flat') {
+        if (skyObject.lights.type === 'flat')
+        {
             let nz = Math.max(normSunPosition.z, 0);
             let intensityFactor = Math.pow(nz, 0.1);
             hl.intensity = LightDefaultIntensities.HEMISPHERE * intensityFactor;
