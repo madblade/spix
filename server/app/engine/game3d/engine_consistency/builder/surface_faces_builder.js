@@ -505,7 +505,8 @@ class CSFX
         // Compute raw faces.
         CSFX.extractRawFaces(
             blocks, neighbourBlocks, surfaceBlocks,
-            faces, surfaceFaces, encounteredFaces, connectedComponents, dims);
+            faces, surfaceFaces, encounteredFaces, connectedComponents, dims
+        );
 
         // Post merger.
         // let merger = [];

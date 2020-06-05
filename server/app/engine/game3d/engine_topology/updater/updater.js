@@ -77,8 +77,15 @@ class Updater
         [$chunk, $x, $y, $z] = a;
 
         let $id = $chunk.add($x, $y, $z, blockId);
-        UpdaterBlock.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z, blockId);
+        const status = UpdaterBlock.updateSurfaceBlocksAfterAddition($chunk, $id, $x, $y, $z, blockId);
+        if (!status) {
+            console.warn('[Updater] Addition: blocks not ready.');
+            return;
+        }
         let updatedChunks = UpdaterFace.updateSurfaceFacesAfterAddition2($chunk, $id, $x, $y, $z, blockId);
+        if (!updatedChunks) {
+            return;
+        }
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));
@@ -100,8 +107,16 @@ class Updater
 
         let oldBlock = $chunk.what($x, $y, $z);
         let $id = $chunk.del($x, $y, $z);
-        UpdaterBlock.updateSurfaceBlocksAfterDeletion($chunk, $id, $x, $y, $z);
+        const status = UpdaterBlock.updateSurfaceBlocksAfterDeletion($chunk, $id, $x, $y, $z);
+        if (!status) {
+            console.warn('[Updater] Deletion: blocks not ready.');
+            return;
+        }
+
         let updatedChunks = UpdaterFace.updateSurfaceFacesAfterDeletion2($chunk, $id, $x, $y, $z, oldBlock);
+        if (!updatedChunks) {
+            return;
+        }
 
         // Push updates.
         updatedChunks.forEach(c => o.chunkUpdated(worldId, c.chunkId));

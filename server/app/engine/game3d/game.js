@@ -121,6 +121,9 @@ class Game3D extends Game
         const dt3 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         if (Game3D.bench && dt3 > debugThresh) console.log(`${dt3} µs to update engines.`);
 
+        /** Chunk and WorldMap Generation **/
+        this._generationEngine.update();
+
         /** Consistency solving: mediator between player and server models **/
         t = TimeUtils.getTimeSecNano();
         this._consistencyEngine.update(); // Make client models consistent. Needs other engines.

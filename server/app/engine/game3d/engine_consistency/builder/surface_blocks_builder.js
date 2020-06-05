@@ -38,23 +38,25 @@ class CSBX
         // Test neighbourhood.
         for (let b = 0; b < capacity; ++b)
         {
+            const currentBlock = blocks[b];
+
             // Air surface
-            if (blocks[b] !== airBlock) {
+            if (currentBlock !== airBlock) {
                 if (CSBX.processNeighborhoodFromBlockEqual(
                     b, iSize, ijSize, capacity, blocks, neighbourBlocks, currentSbs, airBlock
                 )) continue; // No need to do the water check.
-            } else if (blocks[b] === airBlock) { // If the current block is air, test for neighbour x+/y+/z+
+            } else if (currentBlock === airBlock) { // If the current block is air, test for neighbour x+/y+/z+
                 if (CSBX.processNeighborhoodFromBlockDifferent(
                     b, iSize, ijSize, capacity, neighbourBlocks, currentSbs, airBlock
                 )) continue; // No need to do the water check.
             }
 
             // Water surface
-            if (blocks[b] !== waterBlock) {
+            if (currentBlock !== waterBlock) {
                 CSBX.processNeighborhoodFromBlockEqual(
                     b, iSize, ijSize, capacity, blocks, neighbourBlocks, currentSbs, waterBlock
                 );
-            } else if (blocks[b] === waterBlock) { // If the current block is water
+            } else if (currentBlock === waterBlock) { // If the current block is water
                 CSBX.processNeighborhoodFromBlockDifferent(
                     b, iSize, ijSize, capacity, neighbourBlocks, currentSbs, waterBlock
                 );

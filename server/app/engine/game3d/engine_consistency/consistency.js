@@ -38,6 +38,9 @@ class ConsistencyEngine
         this._chunkLoader       = new ChunkLoader(this);
         this._entityLoader      = new EntityLoader(this);
         this._updater           = new Updater(this);
+
+        // Spawn input
+        this._awaitingSpawn     = [];
     }
 
     get game()                  { return this._game; }
@@ -55,12 +58,37 @@ class ConsistencyEngine
     // On connection / disconnection.
     spawnPlayer(player)
     {
+        this._awaitingSpawn.push(player);
+    }
+
+    updateSpawns()
+    {
+        let awaiting = this._awaitingSpawn;
+        const l = awaiting.length;
+        if (l < 1) return;
+
+        const status = this.trySpawningPlayer(awaiting[l - 1]);
+        if (status) // Managed spawning a player!
+        {
+            awaiting.pop();
+        }
+    }
+
+    trySpawningPlayer(player)
+    {
         let world = this._worldModel.getFreeWorld();
         let freePosition = world.getFreePosition();
+        if (!freePosition)
+        {
+            console.log('Failed to spawn player.');
+            return false;
+        }
         this._entityModel.spawnPlayer(player, world, freePosition);
         this._consistencyModel.spawnPlayer(player);
         this._entityBuffer.spawnPlayer(player);
         this._physicsEngine.spawnPlayer(player);
+        this._game._externalInput.listenPlayer(player);
+        return true;
     }
 
     despawnPlayer(playerId)
@@ -78,6 +106,7 @@ class ConsistencyEngine
 
     update()
     {
+        this.updateSpawns();
         this._updater.update();
     }
 
@@ -107,66 +136,6 @@ class ConsistencyEngine
         this._entityBuffer.flush();
         this._updater.flushBuffers();
     }
-
-    // The first time, FORCE BUILD when output requests CE initial output.
-    /**
-     * @deprecated
-     */
-    initChunkOutputForPlayer(player)
-    {
-        let aid = player.avatar.entityId;
-        let worldId = player.avatar.worldId;
-        let worldModel = this._worldModel;
-        let world = worldModel.getWorld(worldId);
-
-        let cs = world.allChunks;
-        let cm = this._consistencyModel;
-
-        // Object.
-        let chunkOutput = this._chunkLoader.computeChunksForNewPlayer(player);
-
-        let addedW = {};
-        for (let wid in chunkOutput) {
-            if (!(wid in addedW)) {
-                let w = worldModel.getWorld(parseInt(wid, 10));
-                addedW[wid] = [w.xSize, w.ySize, w.zSize];
-            }
-            let chunkIds = chunkOutput[wid];
-            for (let cid in chunkIds)
-            {
-                if (!chunkIds.hasOwnProperty(cid)) continue;
-                if (cs.has(cid)) cm.setChunkLoaded(aid, parseInt(wid, 10), cid);
-            }
-        }
-
-        chunkOutput.worlds = addedW;
-
-        // WARN: idem, updates must be transmitted right after this call
-        // otherwise its player will be out of sync.
-        return chunkOutput;
-    }
-
-    // The first time, FORCE COMPUTE in-range entities when output requests CE output.
-    /**
-     * @deprecated
-     */
-    initEntityOutputForPlayer(player)
-    {
-        let aid = player.avatar.entityId;
-        let es = this._entityModel.entities;
-        let cm = this._consistencyModel;
-
-        // Object.
-        let entityOutput = this._entityLoader.computeEntitiesInRange(player);
-
-        for (let eid in entityOutput)
-            if (es.has(eid)) cm.setEntityLoaded(aid, eid);
-
-        // Updates must be transmitted after this call.
-        return entityOutput;
-    }
-
-    // TODO [IO] init x output for player
 
     generateWorld()
     {

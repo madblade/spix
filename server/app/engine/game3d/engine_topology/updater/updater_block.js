@@ -56,6 +56,7 @@ class UpdaterBlock
                 UpdaterBlock.removeSurfaceBlock(ch[0].surfaceBlocks, ch[0], ch[1], ch[2], ch[3]);
             }
         }
+
         return changed;
     }
 
@@ -63,6 +64,8 @@ class UpdaterBlock
     static updateSurfaceBlocksAfterAddition(
         chunk, id, x, y, z, blockId)
     {
+        if (!chunk.blocksReady || !chunk.neighborBlocksReady) return false;
+
         let airBlock = BlockType.AIR;
         let waterBlock = BlockType.WATER;
         let isAddedBlockWater = blockId === waterBlock;
@@ -114,9 +117,12 @@ class UpdaterBlock
         );
 
         // Update current block.
-        if (!(xm && ym && xp && yp && zm && zp)) {
+        if (!(xm && ym && xp && yp && zm && zp))
+        {
             UpdaterBlock.addSurfaceBlock(surfaceBlocks, chunk, x, y, z);
         }
+
+        return true;
     }
 
     // BLOCK DELETION
@@ -124,17 +130,21 @@ class UpdaterBlock
     // so all neighbours become surface blocks.
     static updateSurfaceBlocksAfterDeletion(chunk, id, x, y, z)
     {
+        if (!chunk.blocksReady || !chunk.neighborBlocksReady) return false;
+
         // Get all neighbour chunks.
         let neighbourChunks = [];
         // let neighbourBlocks = [];
         const numberOfNeighbours = 6;
-        for (let i = 0; i < numberOfNeighbours; ++i) {
+        for (let i = 0; i < numberOfNeighbours; ++i)
+        {
             let tempChunk = ChunkBuilder.getNeighboringChunk(chunk, i);
-            if (tempChunk) {
+            if (tempChunk && tempChunk.blocksReady) {
                 neighbourChunks.push(tempChunk);
                 // neighbourBlocks.push(tempChunk.blocks);
             } else {
-                console.log('Error: could not get neighboting chunk at UpdaterBlocks.');
+                console.log('Error: could not get neighboring chunk at UpdaterBlocks.');
+                return false;
             }
         }
 
@@ -241,7 +251,11 @@ class UpdaterBlock
 
         // Update current block.
         if (!(xm && ym && xp && yp && zm && zp)) // Was the current block a surface block?
+        {
             UpdaterBlock.removeSurfaceBlock(surfaceBlocks, chunk, x, y, z);
+        }
+
+        return true;
     }
 }
 

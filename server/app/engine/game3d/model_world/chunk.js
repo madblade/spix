@@ -39,6 +39,9 @@ class Chunk
         /**  Each connected component -> (sorted) list of face indices. */
         this._fastConnectedComponents = {};
         this._fastConnectedComponentsIds = {}; // Signed.
+
+        this._neighborBlocksReady = false;
+        this._blocksReady = false;
         this._ready = false;
 
         this.isEmpty = false;
@@ -62,8 +65,10 @@ class Chunk
     get fastComponentsIds() { return this._fastConnectedComponentsIds; }
     get connectedComponents() { return this._connectedComponents; }
     get updates() { return this._updates; }
-    get ready() { return this._ready; }
     get world() { return this._world; }
+    get ready() { return this._ready; }
+    get blocksReady() { return this._blocksReady; }
+    get neighborBlocksReady() { return this._neighborBlocksReady; }
 
     // Setters
     set blocks(newBlocks) { this._blocks = newBlocks; }
@@ -73,6 +78,8 @@ class Chunk
     set connectedComponents(newConnectedComponents) { this._connectedComponents = newConnectedComponents; }
     set updates(newUpdates) { this._updates = newUpdates; }
     set ready(newReady) { this._ready = newReady; }
+    set blocksReady(newReady) { this._blocksReady = newReady; }
+    set neighborBlocksReady(newReady) { this._neighborBlocksReady = newReady; }
 
     // Do not use! Used for getting blocks that might exceed capacity.
     _toIdUnsafe(x, y, z)
@@ -94,6 +101,7 @@ class Chunk
 
     what(x, y, z)
     {
+        if (!this._blocksReady) return -1;
         let id = this._toId(x, y, z);
         if (id >= this._capacity || id < 0) return 0;
         return this._blocks[id];
@@ -105,6 +113,7 @@ class Chunk
      */
     queryBlock(x, y, z)
     {
+        if (!this.blocksReady) return -1;
         if (x >= 0 && y >= 0 && z >= 0 &&
             x < this._xSize && y < this._ySize && z < this._zSize)
         {
@@ -115,27 +124,51 @@ class Chunk
         let nc;
         if (x < 0) { // x-
             nc = ChunkBuilder.getNeighboringChunk(this, 1);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x + this._xSize, y, z);
         } else if (x >= this._xSize) { // x+
             nc = ChunkBuilder.getNeighboringChunk(this, 0);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x - this._xSize, y, z);
         } else if (y < 0) { // y-
             nc = ChunkBuilder.getNeighboringChunk(this, 3);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x, y + this._ySize, z);
         } else if (y >= this._ySize) { // y+
             nc = ChunkBuilder.getNeighboringChunk(this, 2);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x, y - this._ySize, z);
         } else if (z < 0) { // z-
             nc = ChunkBuilder.getNeighboringChunk(this, 5);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x, y, z + this._zSize);
         } else if (z >= this._zSize) { // z+
             nc = ChunkBuilder.getNeighboringChunk(this, 4);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc || !nc.blocksReady)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return -1;
+            }
             return nc.queryBlock(x, y, z - this._zSize);
         }
     }
@@ -152,27 +185,51 @@ class Chunk
         let nc;
         if (x < 0) { // x-
             nc = ChunkBuilder.getNeighboringChunk(this, 1);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x + this._xSize, y, z];
         } else if (x >= this._xSize) { // x+
             nc = ChunkBuilder.getNeighboringChunk(this, 0);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x - this._xSize, y, z];
         } else if (y < 0) { // y-
             nc = ChunkBuilder.getNeighboringChunk(this, 3);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x, y + this._ySize, z];
         } else if (y >= this._ySize) { // y+
             nc = ChunkBuilder.getNeighboringChunk(this, 2);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x, y - this._ySize, z];
         } else if (z < 0) { // z-
             nc = ChunkBuilder.getNeighboringChunk(this, 5);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x, y, z + this._zSize];
         } else if (z >= this._zSize) { // z+
             nc = ChunkBuilder.getNeighboringChunk(this, 4);
-            if (!nc) { console.error('[QueryBlock] invalid rec.'); return; }
+            if (!nc)
+            {
+                console.error('[QueryBlock] invalid rec.');
+                return;
+            }
             return [nc, x, y, z - this._zSize];
         }
     }

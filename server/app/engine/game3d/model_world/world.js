@@ -37,6 +37,7 @@ class World
             console.error('World creation: chunk sizes must be even.');
         }
 
+        this._waitingChunks = [];
         this._lastQueriedChunk = null;
     }
 
@@ -51,6 +52,18 @@ class World
 
     get allChunks() { return this._chunks; }
     set allChunks(newChunks) { this._chunks = newChunks; }
+
+    pushChunkForGeneration(chunkId)
+    {
+        this._waitingChunks.push(chunkId);
+    }
+
+    popChunkForGeneration()
+    {
+        const cid = this._waitingChunks.pop();
+        if (!cid) return null;
+        return this._chunks.get(cid);
+    }
 
     addChunk(id, chunk)
     {
@@ -93,14 +106,13 @@ class World
             lastQueried :
             this._chunks.get(chunkId);
 
-        if (!chunk)
+        if (!chunk || !chunk.blocksReady)
         {
             console.log(
                 `ChkMgr@whatBlock: could not find chunk 
                 ${chunkId} from (${x},${y},${z})!`
             );
-            // TODO [GENERATION] managed non-ready chunk.
-            return;
+            return -1;
         } else {
             this._lastQueriedChunk = chunk;
         }
@@ -114,10 +126,24 @@ class World
         let z = zLimit - 2;
         let centerInteger = Math.trunc(zLimit / 2); // parseInt(zLimit / 2, 10);
         let centerFloat = zLimit / 2 + 0.01; // parseFloat(zLimit / 2) + 0.01;
+        let currentBlock = this.whatBlock(centerInteger, centerInteger, z - 1);
+        if (currentBlock < 0)
+        {
+            // Chunk not ready yet.
+            return null;
+        }
+
+        let nextBlock;
         while (
-            (this.whatBlock(centerInteger, centerInteger, z - 1) !== 0 ||
-                this.whatBlock(centerInteger, centerInteger, z) !== 0) &&
-            z < 2 * zLimit) ++z; // check 2 chunks and abort
+            (
+                currentBlock !== BlockType.AIR ||
+                (nextBlock = this.whatBlock(centerInteger, centerInteger, z)) !== 0
+            ) &&
+            z < 2 * zLimit) // check 2 chunks and abort
+        {
+            ++z;
+            currentBlock = nextBlock;
+        }
         return [centerFloat, centerFloat, z];
     }
 

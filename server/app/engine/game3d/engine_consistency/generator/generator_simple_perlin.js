@@ -440,6 +440,7 @@ class SimplePerlin
         }
 
         chunk.blocks = blocks;
+        chunk.blocksReady = true;
     }
 }
 

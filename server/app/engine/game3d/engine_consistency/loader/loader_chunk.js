@@ -4,10 +4,7 @@
 
 'use strict';
 
-import GeometryUtils        from '../../../math/geometry';
-
 import WorldModel           from '../../model_world/model';
-import WorldGenerator       from '../generator/worldgenerator';
 import ChunkBuilder         from '../builder/builder_chunks';
 import TimeUtils            from '../../../math/time';
 
@@ -23,84 +20,6 @@ class ChunkLoader
         this._worldModel        = consistencyEngine.worldModel;
         this._consistencyModel  = consistencyEngine.consistencyModel;
         this._xModel            = consistencyEngine.xModel;
-    }
-
-    /**
-     * @deprecated
-     */
-    computeChunksForNewPlayer(player)
-    {
-        let avatar = player.avatar;
-        let worldId = avatar.worldId;
-        let world = this._worldModel.getWorld(worldId);
-
-        // Object to be (JSON.stringify)-ed.
-        let chunksForNewPlayer = {};
-        let chunksInModel = world.allChunks;
-
-        // From player position, find concerned chunks.
-        const playerPosition = avatar.position;
-        let coords = world.getChunkCoordinates(playerPosition[0], playerPosition[1], playerPosition[2]);
-
-        const i = coords[0];
-        const j = coords[1];
-        const k = coords[2];
-        const dx = world.xSize;
-        const dy = world.ySize;
-        const dz = world.zSize;
-        let minChunkDistance = Number.POSITIVE_INFINITY;
-
-        let chunkIds = [];
-        chunkIds.push(`${i},${j},${k}`);
-
-        for (let m = 0, length = chunkIds.length; m < length; ++m)
-        {
-            let currentChunkId = chunkIds[m];
-
-            // Generate chunk.
-            if (!chunksInModel.has(currentChunkId))
-            { // TODO [GENERATION] delegate to consistency updater (better).
-                if (ChunkLoader.debug)
-                    console.log(`We should generate ${currentChunkId} for the user.`);
-                let chunk = WorldGenerator.generateInitialChunk(dx, dy, dz, currentChunkId, world);
-                chunksInModel.set(currentChunkId, chunk);
-            }
-
-            // Extract surfaces.
-            let currentChunk = chunksInModel.get(currentChunkId);
-            if (!currentChunk.ready)
-            {
-                if (ChunkLoader.debug)
-                    console.log(`We should extract faces from ${currentChunkId}.`);
-                ChunkBuilder.computeChunkFaces(currentChunk);
-            }
-
-            // Test for distance.
-            const ids = currentChunkId.split(',');
-            const chunkPosition = [
-                parseInt(ids[0], 10) * dx / 2,
-                parseInt(ids[1], 10) * dy / 2,
-                parseInt(ids[2], 10) * dz / 2
-            ];
-            const distance = GeometryUtils.chunkSquaredEuclideanDistance(chunkPosition, playerPosition);
-            if (distance < minChunkDistance)
-            {
-                minChunkDistance = distance;
-                avatar.nearestChunkId = currentChunk;
-            }
-
-            let cfnpw = chunksForNewPlayer[worldId];
-            if (cfnpw) {
-                cfnpw[currentChunkId] =
-                    [currentChunk.fastComponents, currentChunk.fastComponentsIds];
-            } else {
-                chunksForNewPlayer[worldId] = {};
-                chunksForNewPlayer[worldId][currentChunkId] =
-                    [currentChunk.fastComponents, currentChunk.fastComponentsIds];
-            }
-        }
-
-        return chunksForNewPlayer;
     }
 
     // THOUGHT [OPTIM] n nearest, 1 chunk per X.
@@ -186,8 +105,7 @@ class ChunkLoader
         return [newChunksForPlayer, unloadedChunksForPlayer];
     }
 
-    // TODO [GENERATION] manage loading in another location
-    // [GENERATION] check on Z+/-.
+    // Consistency loading (building chunks once blocks have been generated).
     loadInnerSphere(player, starterChunk)
     {
         // let worldId = player.avatar.worldId;

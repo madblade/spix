@@ -15,13 +15,6 @@ class WorldGenerator
             WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, world)
         );
         return worldMap;
-        // return {
-        // '0,0':  WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 0, 0, worldModel),
-        // '-1,0': WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, -1, 0, 0, worldModel),
-        // '0,-1': WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, -1, 0, worldModel),
-        // '0,1':  WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 0, 1, 0, worldModel),
-        // '1,0':  WorldGenerator.generateInitialChunk(chunkSizeX, chunkSizeY, chunkSizeZ, 1, 0, 0, worldModel)
-        // };
     }
 
     static generateInitialChunk(x, y, z, i, j, k, world)

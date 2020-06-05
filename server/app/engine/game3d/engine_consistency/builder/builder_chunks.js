@@ -14,11 +14,21 @@ class ChunkBuilder
 
     static computeChunkFaces(chunk)
     {
+        if (!chunk.blocksReady)
+        {
+            console.log('[ChunkBuilder] Blocks not ready yet.');
+            return;
+        }
         let world = chunk.world;
 
         // Preload neighbours.
         if (ChunkBuilder.debug) console.log('\tPreloading neighbor chunks...');
-        ChunkBuilder.preloadAllNeighbourChunks(chunk, world);
+        let status = ChunkBuilder.preloadAllNeighbourChunks(chunk, world);
+        if (!status)
+        {
+            console.log('[ChunkBuilder] Neighbor chunk blocks not ready yet.');
+            return;
+        }
 
         // Detect boundary blocks.
         if (ChunkBuilder.debug) console.log('\tExtracting surface...');
@@ -144,6 +154,7 @@ class ChunkBuilder
             `${ci},${cj - 1},${ck - 1}`     //  i,		j-1,	k-1
         ];
 
+        let neighborBlocksAllReady = true;
         for (let i = 0, length = neighbourIds.length; i < length; ++i)
         {
             let currentId = neighbourIds[i];
@@ -152,41 +163,15 @@ class ChunkBuilder
             // Don't compute faces
             let neighbour = ChunkGenerator.createChunk(dims[0], dims[1], dims[2], currentId, world);
             world.addChunk(currentId, neighbour);
+            if (!neighbour.blocksReady) neighborBlocksAllReady = false;
         }
-    }
 
-    /**
-     * @deprecated
-     */
-    static preloadFlatNeighbourChunks(chunk, world)
-    {
-        let loadedChunks = world.allChunks;
-        let c = chunk;
-        let ci = c.chunkI;
-        let cj = c.chunkJ;
-        let ck = c.chunkK;
-        let dims = c.dimensions;
-
-        let neighbourIds = [
-            `${ci + 1},${cj},${ck}`,
-            `${ci},${cj + 1},${ck}`,
-            `${ci},${cj},${ck + 1}`,
-            `${ci - 1},${cj},${ck}`,
-            `${ci},${cj - 1},${ck}`,
-            `${ci},${cj},${ck - 1}`
-        ];
-
-        for (let i = 0, length = neighbourIds.length; i < length; ++i)
+        if (neighborBlocksAllReady)
         {
-            let currentId = neighbourIds[i];
-            if (loadedChunks.has(currentId)) continue;
-
-            // Don't compute faces
-            let neighbour = ChunkGenerator.createChunk(
-                dims[0], dims[1], dims[2], currentId, world
-            );
-            world.addChunk(currentId, neighbour);
+            chunk.neighborBlocksReady = true;
         }
+
+        return neighborBlocksAllReady;
     }
 
     static addChunk(dimX, dimY, dimZ, chunkId, world)
@@ -194,7 +179,7 @@ class ChunkBuilder
         // Do compute faces
         let chunk = ChunkGenerator.createChunk(dimX, dimY, dimZ, chunkId, world);
         world.addChunk(chunkId, chunk);
-        ChunkBuilder.computeChunkFaces(chunk);
+        // ChunkBuilder.computeChunkFaces(chunk);
         return chunk;
     }
 
@@ -223,7 +208,7 @@ class ChunkBuilder
             let currentId = current[1];
 
             const hasLoadedChunk = consistencyModel.hasChunk(aid, wid, currentId);
-            if (hasLoadedChunk)
+            if (!hasLoadedChunk)
             {
                 let currentWorld = worldModel.getWorld(wid);
                 let currentChunks = currentWorld.allChunks;
@@ -232,19 +217,24 @@ class ChunkBuilder
                 const dy = currentWorld.ySize;
                 const dz = currentWorld.zSize;
 
-                if (!forPlayer) {
-                    if (!currentChunk) {
-                        currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, currentWorld);
-                        currentChunks.set(currentId, currentChunk);
-                        ChunkBuilder.computeChunkFaces(currentChunk);
-                        return currentChunk;
-                    } else if (!currentChunk.ready) {
-                        ChunkBuilder.computeChunkFaces(currentChunk);
-                        return currentChunk;
-                    } else return null;
-                } else {
+                if (!currentChunk)
+                {
+                    currentChunk = ChunkBuilder.addChunk(dx, dy, dz, currentId, currentWorld);
+                    currentChunks.set(currentId, currentChunk);
+                    // ChunkBuilder.computeChunkFaces(currentChunk);
+                    // return currentChunk;
+                    return null;
+                }
+                else if (!currentChunk.blocksReady)
+                {
+                    return null; // Awaiting generation from generation engine.
+                }
+                else if (!currentChunk.ready)
+                {
+                    ChunkBuilder.computeChunkFaces(currentChunk);
                     return currentChunk;
                 }
+                else return null;
             }
         }
     }

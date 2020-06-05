@@ -61,38 +61,6 @@ class UserOutput
         this._consistencyEngine.flushBuffers();
     }
 
-    // Every player spawns in initial world '-1'.
-    /**
-     * @deprecated
-     */
-    spawnPlayers()
-    {
-        let consistencyEngine = this._consistencyEngine;
-        let addedPlayers = consistencyEngine.getPlayerOutput();
-        let game = this._game;
-        let players = game.players;
-
-        addedPlayers.forEach(pid => {
-            let player = players.getPlayerFromId(pid);
-            if (player) {
-                let p = player;
-                let a = p.avatar;
-
-                // Load chunks.
-                // Format: {worldId: {chunkId: [fastComps, fastCompIds]}}
-                let chunks = consistencyEngine.initChunkOutputForPlayer(p);
-                p.send('chk', UserOutput.pack(chunks));
-
-                // Load entities.
-                // Format: {entityId: {p:pos, r:rot, k:kind}
-                let entities = consistencyEngine.initEntityOutputForPlayer(p);
-                p.send('ent', UserOutput.pack([a.position, a.rotation, entities]));
-
-                if (UserOutput.debug) console.log(`Init a new player on game ${game.gameId}.`);
-            }
-        });
-    }
-
     updateChunks()
     {
         let game              = this._game;

@@ -32,7 +32,7 @@ class UserInput
             // Spawn and then listen.
             if (type === 'connect') {
                 consistencyEngine.spawnPlayer(player);
-                this.listenPlayer(player);
+                // this.listenPlayer(player); // Done at spawn, in consistency engine
             }
 
             // Despawn.
