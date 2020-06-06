@@ -7,7 +7,7 @@
 import extend                from '../../../extend.js';
 
 import { InventoryModel }    from './inventory.js';
-import { Object3D, Vector3 } from 'three';
+import { Object3D, Vector3, Vector4 } from 'three';
 import { ItemsModelModule }  from './items';
 
 let SelfModel = function(app)
@@ -22,7 +22,7 @@ let SelfModel = function(app)
 
     // Model component.
     this.position = new Vector3(0, 0, 0);
-    this.rotation = new Vector3(0, 0, 0);
+    this.rotation = [0, 0, 0, 0];
     this.inventoryModel = new InventoryModel();
 
     // Graphical component.
@@ -40,6 +40,9 @@ let SelfModel = function(app)
     this.lastPositionFromServer = new Vector3(0, 0, 0);
     this.currentPositionFromServer = new Vector3(0, 0, 0);
     this.interpolatingPosition = new Vector3(0, 0, 0);
+    this.lastRotationFromServer = new Vector4(0, 0, 0, 0);
+    this.currentRotationFromServer = new Vector4(0, 0, 0, 0);
+    this.interpolatingRotation = new Vector4(0, 0, 0, 0);
     this.lastServerUpdateTime = this.getTime();
     this.averageDeltaT = -1;
     this.interpolationUpToDate = false;
@@ -56,20 +59,38 @@ extend(SelfModel.prototype, {
         this.loadSelf();
     },
 
+    _d42(v41, v42)
+    {
+        const dx = v41.x - v42.x;
+        const dy = v41.y - v42.y;
+        const dz = v41.z - v42.z;
+        const dw = v41.w - v42.w;
+        return dx * dx + dy * dy + dz * dz + dw * dw;
+    },
+
     interpolatePredictSelfPosition()
     {
-        let last = this.lastPositionFromServer;
-        let current = this.currentPositionFromServer;
+        let lastP = this.lastPositionFromServer;
+        let currentP = this.currentPositionFromServer;
+        let lastR = this.lastRotationFromServer;
+        let currentR = this.currentRotationFromServer;
         let p = this.position;
+        let r = this.rotation;
         let upToDatePosition = new Vector3(p.x, p.y, p.z); // "up-to-date" server position
+        let upToDateRotation = new Vector4(r[0], r[1], r[2], r[3]); // "up-to-date" rotation
         const updateTime = this.getTime();
         // const deltaClient = updateTime - this.lastClientUpdateTime;
         // this.lastClientUpdateTime = updateTime;
 
-        if (current.distanceTo(upToDatePosition) > 0) {
+        if (
+            currentP.distanceTo(upToDatePosition) > 0 ||
+            this._d42(currentR, upToDateRotation) > 0)
+        {
             // changed!
-            last.copy(current);
-            current.copy(upToDatePosition);
+            lastP.copy(currentP);
+            currentP.copy(upToDatePosition);
+            lastR.copy(currentR);
+            currentR.copy(upToDateRotation);
 
             // compute average delta.
             const deltaServer = updateTime - this.lastServerUpdateTime;
@@ -84,13 +105,18 @@ extend(SelfModel.prototype, {
         if (t < deltaServer) {
             // interpolate
             const tdt = t / deltaServer;
-            const dx = current.x - last.x;
-            const dy = current.y - last.y;
-            const dz = current.z - last.z;
+            const dxp = currentP.x - lastP.x; const dxr = currentR.x - lastR.x;
+            const dyp = currentP.y - lastP.y; const dyr = currentR.y - lastR.y;
+            const dzp = currentP.z - lastP.z; const dzr = currentR.z - lastR.z;
+            const dwr = currentR.w - lastR.w;
             // let pv = this.predictedVelocity;
             // let ip = this.interpolatingPosition;
             // pv.copy(ip);
-            this.setLerp(last.x + tdt * dx, last.y + tdt * dy, last.z + tdt * dz);
+            this.setLerp(
+                lastP.x + tdt * dxp, lastP.y + tdt * dyp, lastP.z + tdt * dzp,
+                lastR.x + tdt * dxr, lastR.y + tdt * dyr, lastR.z + tdt * dzr,
+                lastR.w + tdt * dwr
+            );
             // pv.set(ip.x - pv.x, ip.y - pv.y, ip.z - pv.z);
         }
         // Prediction goes there (but must be queried for every game update,
@@ -100,8 +126,15 @@ extend(SelfModel.prototype, {
         //     let ip = this.interpolatingPosition;
         //     this.setLerp(ip.x + pv.x, ip.y + pv.y, ip.z + pv.z);
         //     this.lastInterpolatingPosition.copy(this.interpolatingPosition);
-        else if (this.interpolatingPosition.distanceTo(current) > 0) {
-            this.setLerp(current.x, current.y, current.z);
+        else if (
+            this.interpolatingPosition.distanceTo(currentP) > 0 ||
+            this._d42(this.interpolatingRotation, currentR) > 0
+        )
+        {
+            this.setLerp(
+                currentP.x, currentP.y, currentP.z,
+                currentR.x, currentR.y, currentR.z, currentR.w
+            );
             this.interpolationUpToDate = true;
             // }
             // Correction goes there (go back to the last updated)
@@ -116,10 +149,12 @@ extend(SelfModel.prototype, {
         }
     },
 
-    setLerp(x, y, z)
+    setLerp(xp, yp, zp, xr, yr, zr, wr)
     {
-        this.interpolatingPosition.set(x, y, z);
+        this.interpolatingPosition.set(xp, yp, zp);
+        this.interpolatingRotation.set(xr, yr, zr, wr);
         this.updatePosition(this.avatar, this.interpolatingPosition);
+        this.updateRotation(this.avatar, this.interpolatingRotation);
     },
 
     updatePosition(avatar, newP)
@@ -160,18 +195,20 @@ extend(SelfModel.prototype, {
         let graphics = this.app.engine.graphics;
         let handItemWrapper = this.handItemWrapper;
 
-        avatar.rotation.z = r[2];
-        avatar.rotation.x = r[3];
-        avatar.getWrapper().rotation.y = Math.PI + r[0];
+        avatar.rotation.z = r.z;
+        avatar.rotation.x = r.w;
+        avatar.getWrapper().rotation.y = Math.PI + r.x;
 
-        let theta0 = r[2];
-        let theta1 = r[3];
+        let theta0 = r.z;
+        let theta1 = r.w;
         let cam = graphics.cameraManager.mainCamera;
         let rotationX = cam.getXRotation();
         const changed = graphics.cameraManager.setAbsRotationFromServer(theta0, theta1);
-        // OPT compute delta transmitted from last time?
-        let rotationZ = cam.getZRotation();
-        if (changed) graphics.cameraManager.setRelRotation(rotationZ + r[0] - r[1], rotationX);
+        // OPT compute delta transmitted from last time;
+        // only works when interpolation is switched off.
+        // let rotationZ = cam.getZRotation();
+        // if (changed) graphics.cameraManager.setRelRotation(rotationZ + r.x - r.y, rotationX);
+        if (changed) graphics.cameraManager.setRelRotation(r.x, rotationX);
 
         // mainCamera.setUpRotation(theta1, 0, theta0);
         // moveCameraFromMouse(0, 0, newX, newY);
@@ -219,7 +256,7 @@ extend(SelfModel.prototype, {
         }
 
         let avatar = this.avatar;
-        let r = this.rotation;
+        // let r = this.rotation;
 
         if (!avatar) return;
 
@@ -242,9 +279,9 @@ extend(SelfModel.prototype, {
             this.interpolatePredictSelfPosition();
         }
 
-        if (r !== null) {
-            this.updateRotation(avatar, r);
-        }
+        // if (r !== null) {
+        //     this.updateRotation(avatar, r);
+        // }
 
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
@@ -374,7 +411,7 @@ extend(SelfModel.prototype, {
 
         // Model component.
         this.position = new Vector3(0, 0, 0);
-        this.rotation = [0, 0, 0];
+        this.rotation = [0, 0, 0, 0];
         this.inventoryModel.reset();
 
         // Graphical component.
