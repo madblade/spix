@@ -130,6 +130,7 @@ class WorldModel
                     };
                 } else {
                     wk = WorldType.FLAT;
+                    gameInfo.trees = TreeType.SOME_TREES;
                 }
                 break;
             case GameType.FLAT:

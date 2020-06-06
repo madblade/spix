@@ -5,7 +5,7 @@
 
 'use strict';
 
-import { WorldType, BlockType, HillType } from '../../model_world/model';
+import { WorldType, BlockType, HillType, TreeType } from '../../model_world/model';
 
 class SimplePerlin
 {
@@ -113,6 +113,30 @@ class SimplePerlin
         );
     }
 
+    static addTree2D(blocks, x, y, bl, dx, dz, xy, normalSize, wood, leaves)
+    {
+        if (x < 2 || x >= dx - 2 || y < 2 || y >= dx - 2) return; // square chunks!
+        for (let zz = Math.min(bl + 3, dz); zz < Math.min(bl + 7, dz); ++zz)
+        {
+            const off = normalSize * zz;
+            for (let ox = -2; ox <= 2; ox++) {
+                for (let oy = -2; oy <= 2; oy++) {
+                    let d = ox * ox + oy * oy +
+                        (zz - (bl + 4)) * (zz - (bl + 4));
+                    if (d < 11) {
+                        const currentBlock = ox + x + (oy + y) * dx + off;
+                        blocks[currentBlock] = leaves;
+                    }
+                }
+            }
+        }
+        for (let zz = bl; zz < Math.min(bl + 4, dz); ++zz)
+        {
+            const currentBlock = xy + normalSize * zz;
+            blocks[currentBlock] = wood;
+        }
+    }
+
     static simpleGeneration2D(chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks)
     {
         let dims = chunk.dimensions;
@@ -130,6 +154,8 @@ class SimplePerlin
         const water = BlockType.WATER;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
+        const wood = BlockType.WOOD;
+        const leaves = BlockType.LEAVES;
         // const planks = BlockType.PLANKS;
 
         // Fill with grass on main world, sand everywhere else.
@@ -141,6 +167,7 @@ class SimplePerlin
         let quality = 2;
         // const z = shuffleChunks ? Math.random() * 100 : 50;
         const z = 4 * (shuffleChunks ? Math.random() * dz : Math.floor(dz / 2));
+        const hasTrees = worldInfo.trees === TreeType.SOME_TREES;
 
         for (let i = 0; i < normalSize; ++i) data[i] = 0;
         for (let iteration = 0; iteration < 4; ++iteration)
@@ -153,6 +180,12 @@ class SimplePerlin
 
             quality *= 4;
         }
+
+        // Tree noise
+        let noise = (x, y) => {
+            const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453123;
+            return s - Math.floor(s);
+        };
 
         for (let x = 0; x < dx; ++x) {
             for (let y = 0; y < dy; ++y) {
@@ -182,6 +215,15 @@ class SimplePerlin
                     //     blocks[currentBlock] = water;
                     // else
                     blocks[currentBlock] = mainBlockId;
+                }
+
+                if (hasTrees && bl >= 16 && rl > 0 && x > 1 && x < dx - 2 && y > 1 && y < dy - 2)
+                {
+                    const rand = noise(x, y);
+                    if (rand > 0.99)
+                    {
+                        SimplePerlin.addTree2D(blocks, x, y, bl, dx, dz, xy, normalSize, wood, leaves);
+                    }
                 }
 
                 if (bl < 16 && rl > 0)

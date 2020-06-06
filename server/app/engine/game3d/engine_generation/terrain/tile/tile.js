@@ -182,7 +182,7 @@ Tile.prototype.stepGeneration = function()
             break;
 
         case STEPS.READY:
-            console.log(this.getRaster());
+            // console.log(this.getRaster());
             this.ready = true;
             break;
     }

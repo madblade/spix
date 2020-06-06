@@ -2,6 +2,7 @@
 'use strict';
 
 import { BlockType } from '../../model_world/model';
+import SimplePerlin from './generator_simple_perlin';
 
 class FantasyGenerator
 {
@@ -39,6 +40,9 @@ class FantasyGenerator
         const water = BlockType.WATER;
         const sand = BlockType.SAND;
         const air = BlockType.AIR;
+        const wood = BlockType.WOOD;
+        const stoneb = BlockType.STONEBRICKS;
+        const leaves = BlockType.LEAVES;
 
         // Get height buffer
         // Fill height and water
@@ -108,9 +112,40 @@ class FantasyGenerator
             }
         }
 
+
         // Get overlay buffer
         // Fill trees and walls
         let surfaceBuffer = t.getSurfaceRaster();
+
+        for (let i = 0; i < chunkSize; ++i)
+        {
+            const offset = idStart + i * tileSize;
+            for (let j = 0; j < chunkSize; ++j)
+            {
+                const h = heightBuffer[offset + j];
+                const height = Math.floor(h / 2) + 16; // Math.floor(h < -20 ? h / 500 : h / 20) + 16;
+                const oij = j * chunkSize + i;
+
+                const s = surfaceBuffer[offset + j];
+
+                if (height >= 16 && s > 0) {
+                    const h1 = height - offsetK - 2;
+                    const h2 = h1 + 2;
+                    if (s === 2)
+                        for (let k = h2; k < Math.min(h2 + 4, chunkSize); ++k) {
+                            const bi = ijs * k + oij;
+                            blocks[bi] = stoneb;
+                        }
+                    else if (s === 1)
+                        SimplePerlin.addTree2D(
+                            blocks, i, j, h2, chunkSize, chunkSize, i + chunkSize * j,
+                            chunkSize * chunkSize, wood, leaves
+                        );
+                }
+            }
+        }
+
+        // Tell chunk has been generated
         chunk.blocksReady = true;
     }
 }
