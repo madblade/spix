@@ -298,6 +298,7 @@ Rasterizer.prototype.heightPass = function(triMesh)
     }
 };
 
+// TODO [GENERATION] lower this noise frequency
 Rasterizer.prototype.precomputeNoiseTile = function(nbOctaves)
 {
     // Noise tile = 256
@@ -363,12 +364,15 @@ Rasterizer.prototype.noisePass = function(factor)
     }
 };
 
+// Should be on the overlay and decrease water height.
 Rasterizer.prototype.riverPass = function(rivers)
 {
     const width = this.dimension;
     const height = this.dimension;
     const nbRivers = rivers.length;
-    const riverHalfWidth = 4;
+    const riverHalfWidth = 8;
+    const riverDepth = -10 / 256;
+    // let hb = this.heightBuffer;
     for (let i = 0; i < nbRivers; ++i)
     {
         const r = rivers[i];
@@ -378,16 +382,20 @@ Rasterizer.prototype.riverPass = function(rivers)
             const p1 = r[j];
             const p2 = r[j + 1];
 
-            const x1 = (0.5 + p1[0]) * width;
-            const y1 = (0.5 + p1[1]) * height;
-            const x2 = (0.5 + p2[0]) * width;
-            const y2 = (0.5 + p2[1]) * height;
+            let x1 = (0.5 + p1[0]) * width;
+            let y1 = (0.5 + p1[1]) * height;
+            let x2 = (0.5 + p2[0]) * width;
+            let y2 = (0.5 + p2[1]) * height;
 
             const x = x2 - x1;
             const y = y2 - y1;
             const norm = Math.sqrt(x * x + y * y);
             const nvx = riverHalfWidth * x / norm;
             const nvy = riverHalfWidth * y / norm;
+            x1 -= 0.1 * norm * x;
+            x2 += 0.1 * norm * x;
+            y1 -= 0.1 * norm * y;
+            y2 += 0.1 * norm * y;
 
             const clockwiseX = nvy;
             const clockwiseY = -nvx;
@@ -397,29 +405,33 @@ Rasterizer.prototype.riverPass = function(rivers)
             // Rectangle 1 (clockwise)
             const upx1 = clockwiseX + x1; const upy1 = clockwiseY + y1;
             const upx2 = clockwiseX + x2; const upy2 = clockwiseY + y2;
+            const h1 = 1 / 255; // hb[width * Math.floor(upy1) + Math.floor(upx1)] / 255;
             this.drawTriangle(
-                x1, y1, -10,
-                x2, y2, -10,
-                upx1, upy1, 0,
+                x1, y1, riverDepth,
+                x2, y2, riverDepth,
+                upx1, upy1, h1,
             );
             this.drawTriangle(
-                x2, y2, -10,
-                upx1, upy1, 0,
-                upx2, upy2, 0,
+                x2, y2, riverDepth,
+                upx1, upy1, h1,
+                upx2, upy2, 1 / 255,
+                // hb[width * Math.floor(upy2) + Math.floor(upx2)] / 255,
             );
 
             // Rectangle 2 (counterclockwise)
             const dnx1 = counterClockwiseX + x1; const dny1 = counterClockwiseY + y1;
             const dnx2 = counterClockwiseX + x2; const dny2 = counterClockwiseY + y2;
+            const h2 = 1 / 255; // hb[width * Math.floor(dny1) + Math.floor(dnx1)] / 255;
             this.drawTriangle(
-                x1, y1, -10,
-                x2, y2, -10,
-                dnx1, dny1, 0,
+                x1, y1, riverDepth,
+                x2, y2, riverDepth,
+                dnx1, dny1, h2,
             );
             this.drawTriangle(
-                x2, y2, -10,
-                dnx1, dny1, 0,
-                dnx2, dny2, 0,
+                x2, y2, riverDepth,
+                dnx1, dny1, h2,
+                dnx2, dny2, 1 / 255,
+                // hb[width * Math.floor(dny2) + Math.floor(dnx2)] / 255,
             );
         }
     }

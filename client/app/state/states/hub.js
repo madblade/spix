@@ -54,9 +54,9 @@ let HubState = function(stateManager)
                 <span class="input-group-text flex-fill">Flat World</span>
             </div>
 
-            <select id="flat-game-caves-type" class="form-control">
-                <option value="0" selected>No Caves</option>
-                <option value="1">Subsurface Caves</option>
+            <select id="flat-game-trees-type" class="form-control">
+                <option value="0" selected>No trees</option>
+                <option value="1">Some trees</option>
             </select>
 
             <select id="flat-game-hills-size" class="form-control">
@@ -248,10 +248,10 @@ extend(HubState.prototype, {
             let hills = $('#flat-game-hills-size')
                 .children('option:selected')
                 .val();
-            let caves = $('#flat-game-caves-type')
+            let trees = $('#flat-game-trees-type')
                 .children('option:selected')
                 .val();
-            app.requestGameCreation('flat', {caves, hills});
+            app.requestGameCreation('flat', { trees, hills });
         });
 
         $('#button-create-demo-game').click(function() {

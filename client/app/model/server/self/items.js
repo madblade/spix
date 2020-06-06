@@ -13,6 +13,7 @@ let ItemType = Object.freeze({
     BLOCK_PLANKS: 5,
     BLOCK_STONEBRICKS: 6,
     BLOCK_BRICKS: 7,
+    BLOCK_LEAVES: 8,
 
     BLOCK_WATER: 16,
 

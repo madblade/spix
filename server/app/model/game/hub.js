@@ -38,7 +38,7 @@ class Hub
 
     static validateOptions(kind, options)
     {
-        let validated = false;
+        let validated;
         switch (kind) {
             case 'demo':
                 validated = !options; // Options must be null.
@@ -52,8 +52,8 @@ class Hub
             case 'flat':
                 validated = options.hasOwnProperty('hills') &&
                     (x => x >= 0 && x <= 4)(parseInt(options.hills, 10)) &&
-                    options.hasOwnProperty('caves') &&
-                    (x => x >= 0 && x <= 1)(parseInt(options.caves, 10));
+                    options.hasOwnProperty('trees') &&
+                    (x => x >= 0 && x <= 1)(parseInt(options.trees, 10));
                 break;
             case 'fantasy':
                 validated = true;

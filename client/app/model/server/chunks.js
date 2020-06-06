@@ -224,7 +224,9 @@ extend(ChunkModel.prototype, {
 
         let worldMeta = this.worldProperties.get(worldId);
         if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
-        let isWorldFlat = worldMeta.type === WorldType.FLAT || worldMeta.type === WorldType.FANTASY;
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        // || worldMeta.type === WorldType.FANTASY;
+        // Water cameras not yet supported with fantasy generation
         let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat);
         world.set(chunkId, chunk);
 
@@ -268,7 +270,9 @@ extend(ChunkModel.prototype, {
 
         let worldMeta = this.worldProperties.get(worldId);
         if (!worldMeta) { console.error(`World "${worldId}" type unknown.`); return; }
-        let isWorldFlat = worldMeta.type === WorldType.FLAT || worldMeta.type === WorldType.FANTASY;
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
+        // || worldMeta.type === WorldType.FANTASY;
+        // Water cameras not yet supported with fantasy generation
         graphics.updateChunk(
             worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ,
             isWorldFlat

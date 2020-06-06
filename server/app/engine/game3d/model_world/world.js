@@ -16,7 +16,7 @@ class World
         this._worldModel = worldModel;
         this._worldInfo = {
             hills: worldInfo.hills,
-            caves: worldInfo.caves,
+            trees: worldInfo.trees,
             type: worldInfo.kind,
 
             // Only for CubeWorld

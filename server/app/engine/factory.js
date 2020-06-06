@@ -14,8 +14,8 @@ class GameFactory
         switch (kind) {
             case 'flat':
                 let flatHillsType = parseInt(options.hills, 10);
-                let caves = parseInt(options.caves, 10);
-                game = new Game3D(hub, gameId, connector, { kind: GameType.FLAT, flatHillsType, caves });
+                let trees = parseInt(options.trees, 10);
+                game = new Game3D(hub, gameId, connector, { kind: GameType.FLAT, flatHillsType, trees });
                 break;
             case 'cube':
                 let threeHillsType = parseInt(options.hills, 10);

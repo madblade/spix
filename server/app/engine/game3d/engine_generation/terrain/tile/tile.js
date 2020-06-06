@@ -165,7 +165,7 @@ Tile.prototype.stepGeneration = function()
                 this.step++;
             break;
         case STEPS.RASTER_NOISE_PASS:
-            rasterizer.noisePass(5.0);
+            // rasterizer.noisePass(5.0);
             this.step++;
             break;
         case STEPS.RASTER_RIVER_PASS:
@@ -182,6 +182,7 @@ Tile.prototype.stepGeneration = function()
             break;
 
         case STEPS.READY:
+            console.log(this.getRaster());
             this.ready = true;
             break;
     }

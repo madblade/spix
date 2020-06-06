@@ -56,7 +56,7 @@ class FantasyGenerator
             for (let j = 0; j < chunkSize; ++j)
             {
                 const h = heightBuffer[offset + j];
-                const height = Math.floor(h < -20 ? h / 500 : h / 2) + 16;
+                const height = Math.floor(h / 2) + 16; // Math.floor(h < -20 ? h / 500 : h / 20) + 16;
                 const oij = j * chunkSize + i;
 
                 if (height > offsetK + chunkSize)
@@ -110,7 +110,7 @@ class FantasyGenerator
 
         // Get overlay buffer
         // Fill trees and walls
-        // let surfaceBuffer = t.getSurfaceRaster();
+        let surfaceBuffer = t.getSurfaceRaster();
         chunk.blocksReady = true;
     }
 }

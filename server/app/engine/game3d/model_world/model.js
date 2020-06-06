@@ -17,6 +17,7 @@ const BlockType = Object.freeze({
     PLANKS: 5,
     STONEBRICKS: 6,
     BRICKS: 7,
+    LEAVES: 8,
 
     WATER: 16,
 
@@ -41,9 +42,9 @@ const HillType = Object.freeze({
     SPIKES: 4
 });
 
-const CaveType = Object.freeze({
-    NO_CAVES: 0,
-    SUBSURFACE_CAVES: 1
+const TreeType = Object.freeze({
+    NO_TREES: 0,
+    SOME_TREES: 1
 });
 
 const ChunkSizes = Object.freeze({
@@ -118,14 +119,14 @@ class WorldModel
                         kind: WorldType.CUBE,
                         sideSize: 4,
                         hills: HillType.NO_HILLS,
-                        caves: CaveType.NO_CAVES
+                        trees: TreeType.NO_TREES
                     };
                 } else if (wid === 3) {
                     return {
                         kind: WorldType.CUBE,
                         sideSize: 16,
                         hills: HillType.REGULAR_HILLS,
-                        caves: CaveType.NO_CAVES
+                        trees: TreeType.NO_TREES
                     };
                 } else {
                     wk = WorldType.FLAT;
@@ -155,7 +156,7 @@ class WorldModel
                     default: break;
                 }
                 worldInfo.sideSize = parseInt(gameInfo.size, 10);
-                worldInfo.caves = CaveType.NO_CAVES;
+                worldInfo.trees = TreeType.NO_TREES;
                 worldInfo.chunkSizes = ChunkSizes.CUBE_REGULAR;
                 break;
             case WorldType.FLAT:
@@ -168,9 +169,9 @@ class WorldModel
                     case 4: worldInfo.hills = HillType.SPIKES; break;
                     default: break;
                 }
-                switch (gameInfo.caves) {
-                    case 0: worldInfo.caves = CaveType.NO_CAVES; break;
-                    case 1: worldInfo.caves = CaveType.SUBSURFACE_CAVES; break;
+                switch (gameInfo.trees) {
+                    case 0: worldInfo.trees = TreeType.NO_TREES; break;
+                    case 1: worldInfo.trees = TreeType.SOME_TREES; break;
                     default: break;
                 }
                 worldInfo.sideSize = -1; // infinite flat world
@@ -194,6 +195,6 @@ class WorldModel
 
 export {
     WorldModel as default,
-    WorldType, BlockType, HillType, CaveType, ChunkSizes,
+    WorldType, BlockType, HillType, TreeType, ChunkSizes,
     BlockTypes
 };
