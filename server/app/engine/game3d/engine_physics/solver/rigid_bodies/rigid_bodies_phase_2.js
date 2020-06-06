@@ -101,7 +101,7 @@ class RigidBodiesPhase2
     static collideLonelyIslandsWithTerrain(
         oxAxis, entities,
         oxToIslandIndex, islands,
-        world
+        world, rigidBodiesSolver
     )
     {
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
@@ -120,13 +120,21 @@ class RigidBodiesPhase2
             // Filter here for lonely islands.
             // let islandId = oxToIslandIndex[oi];
             // let doProject = islandId === -1 || islandId === -2;
-            TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            let abs = Math.abs;
+            let g = rigidBodiesSolver.getGravity(world, world.worldId, p0[0], p0[1], p0[2]);
+            if (abs(g[0]) > 0 && abs(g[1]) === 0 && abs(g[2]) === 0)
+                TerrainCollider.collideLinearX(currentEntity, world, p0, p1, true);
+            else if (abs(g[1]) > 0 && abs(g[0]) === 0 && abs(g[2]) === 0)
+                TerrainCollider.collideLinearY(currentEntity, world, p0, p1, true);
+            else // if (abs(g[2]) > 0 && abs(g[1]) === 0 && abs(g[0]) === 0)
+                TerrainCollider.collideLinearZ(currentEntity, world, p0, p1, true);
+
             // Remember to apply the same kind of changes to the simple entity + terrain solver (just below).
         }
     }
 
     static simbleCollideEntitiesWithTerrain(
-        oxAxis, entities, world
+        oxAxis, entities, world, rigidBodiesSolver
     )
     {
         for (let oi = 0, ol = oxAxis.length; oi < ol; ++oi)
@@ -142,7 +150,16 @@ class RigidBodiesPhase2
             // Cast on current world to prevent x crossing through matter.
             // const dtr = currentEntity.dtr;
 
-            const hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            let abs = Math.abs;
+            let g = rigidBodiesSolver.getGravity(world, world.worldId, p0[0], p0[1], p0[2]);
+            let hasCollided;
+            if (abs(g[0]) > 0 && abs(g[1]) === 0 && abs(g[2]) === 0)
+                hasCollided = TerrainCollider.collideLinearX(currentEntity, world, p0, p1, true);
+            else if (abs(g[1]) > 0 && abs(g[0]) === 0 && abs(g[2]) === 0)
+                hasCollided = TerrainCollider.collideLinearY(currentEntity, world, p0, p1, true);
+            else // if (abs(g[2]) > 0 && abs(g[1]) === 0 && abs(g[0]) === 0)
+                hasCollided = TerrainCollider.collideLinearZ(currentEntity, world, p0, p1, true);
+
             const dbg = false;
             if (dbg && hasCollided) {
                 console.log(entityIndex);

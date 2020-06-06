@@ -36,7 +36,7 @@ const GameType = Object.freeze({
 class Game3D extends Game
 {
     static serverRefreshRate = 16;
-    static waitFramesToOutputEntities = 1; // Increase to reduce the netload!
+    static waitFramesToOutputEntities = 3; // Increase to reduce the netload!
     // Client must have entity / self interpolation activated.
 
     constructor(hub, gameId, connector, gameInfo)

@@ -26,18 +26,23 @@ let FirstPersonModule = {
 
     unregisterMouseMove()
     {
+        if (!this.omm) {
+            console.error('[FPS] Failed to get listener.');
+            return;
+        }
         document.removeEventListener(
             'mousemove',
-            this.onMouseMove.bind(this),
+            this.omm,
             false
         );
     },
 
     registerMouseMove()
     {
+        if (!this.omm) this.omm = this.onMouseMove.bind(this);
         document.addEventListener(
             'mousemove',
-            this.onMouseMove.bind(this),
+            this.omm,
             false
         );
     },

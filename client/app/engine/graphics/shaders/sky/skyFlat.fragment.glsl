@@ -128,5 +128,5 @@ void main() {
     vec3 vp = vSunDirection; // normalize(vWorldPosition);
     float noise = random(vp.xy);
     float m = mix(-0.5 / 255.0, 0.5 / 255.0, noise);
-    gl_FragColor.rgb += 3.0 * vec3(m);
+    gl_FragColor.rgb += 1.0 * vec3(m);
 }

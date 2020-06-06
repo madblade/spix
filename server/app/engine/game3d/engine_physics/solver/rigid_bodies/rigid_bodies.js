@@ -188,12 +188,12 @@ class RigidBodies
             if (RigidBodies.crossEntityCollision)
             {
                 RigidBodies.solveCrossEntityHardCollision(
-                    world, entities, leapfrogArray, searcher, oxAxis, relativeDt
+                    world, entities, leapfrogArray, searcher, oxAxis, relativeDt, this
                 );
             }
             else
             {
-                Phase2.simbleCollideEntitiesWithTerrain(oxAxis, entities, world);
+                Phase2.simbleCollideEntitiesWithTerrain(oxAxis, entities, world, this);
             }
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
@@ -211,7 +211,7 @@ class RigidBodies
 
     static solveCrossEntityHardCollision(
         world, entities,
-        leapfrogArray, searcher, oxAxis, relativeDt,
+        leapfrogArray, searcher, oxAxis, relativeDt, rigidBodiesSolver
     )
     {
         let abs = Math.abs;
@@ -240,7 +240,7 @@ class RigidBodies
 
         // 3. Snap x_i+1 with terrain collide, save non-integrated residuals
         // as bounce components with coefficient & threshold (heat).
-        Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world);
+        Phase2.collideLonelyIslandsWithTerrain(oxAxis, entities, oxToIslandIndex, islands, world, rigidBodiesSolver);
 
         // add leapfrog term
         // get array of all xs sorted by axis

@@ -68,7 +68,7 @@ class BlockTypes
 
 class WorldModel
 {
-    static serverLoadingRadius = 3;
+    static serverLoadingRadius = 6;
 
     constructor(game)
     {
