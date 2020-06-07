@@ -16,7 +16,7 @@ class AIOutput
 
     update()
     {
-        // console.log('acting');
+        // console.log('giving the world to AI');
     }
 }
 

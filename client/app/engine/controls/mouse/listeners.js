@@ -24,7 +24,7 @@ let ListenerModule = {
                      the LEFT click when a 'keydown' event was fired in the near past (~200ms?).
                      In this case, it will be impossible to move and add a block at the same time with basic controls.
                      Everything works OK with the right and middle click (i.e. both on touch pads), so just
-                     make the user reassign the 'left click' control key if he is in such a case.
+                     make the user reassign the 'left click' control key if they are in such a case.
                      */
                     scope.onLeftMouseDown();
                     break;
@@ -33,6 +33,28 @@ let ListenerModule = {
                     break;
                 case scope.buttons.right:
                     scope.onRightMouseDown();
+                    break;
+                default:
+            }
+        });
+    },
+
+    registerMouseUp()
+    {
+        let scope = this;
+        let app = this.app;
+        $(window).mouseup(function(event)
+        {
+            if (app.getState() !== 'ingame') return;
+            switch (event.which) {
+                case scope.buttons.left:
+                    scope.onLeftMouseUp();
+                    break;
+                case scope.buttons.middle:
+                    scope.onMiddleMouseUp();
+                    break;
+                case scope.buttons.right:
+                    scope.onRightMouseUp();
                     break;
                 default:
             }
@@ -184,40 +206,68 @@ let ListenerModule = {
         clientModel.triggerEvent('ray', ['del', fx, fy, fz]);
     },
 
-    requestItemUse()
+    requestItemUse(isButtonUp, isSecondaryItem)
     {
         const clientModel = this.app.model.client;
         const graphicsEngine = this.app.engine.graphics;
         let p = graphicsEngine.getCameraCoordinates();
         let f = graphicsEngine.getCameraForwardVector();
-        clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z]);
+        clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z, isButtonUp, isSecondaryItem]);
     },
 
-    requestMainHandItemAction()
+    requestMainHandItemAction(isButtonUp)
     {
         let clientSelfModel = this.app.model.client.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
         if (!ItemsModelModule.isItemIDSupported(activeItemID))
             console.warn('[Mouse/Listener] Item ID unsupported.');
         else if (ItemsModelModule.isItemUseable(activeItemID))
-            this.requestItemUse();
-        else if (ItemsModelModule.isItemPlaceable(activeItemID))
+            this.requestItemUse(isButtonUp, false);
+        else if (ItemsModelModule.isItemPlaceable(activeItemID) && !isButtonUp)
             this.requestAddBlock();
     },
 
-    requestSecondaryHandItemAction()
+    requestSecondaryHandItemAction(isButtonUp)
     {
-        this.requestDelBlock();
+        let clientSelfModel = this.app.model.client.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+
+        if ((ItemsModelModule.isItemNaught(activeItemID) ||
+            ItemsModelModule.isItemBlock(activeItemID)) &&
+            !isButtonUp)
+        {
+            this.requestDelBlock();
+            return;
+        }
+
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+            console.warn('[Mouse/Listener] Item ID unsupported.');
+        else if (ItemsModelModule.isItemUseable(activeItemID))
+            this.requestItemUse(isButtonUp, true);
+    },
+
+    onLeftMouseUp()
+    {
+        this.requestMainHandItemAction(true);
+    },
+
+    onRightMouseUp()
+    {
+        this.requestSecondaryHandItemAction(true);
+    },
+
+    onMiddleMouseUp()
+    {
     },
 
     onLeftMouseDown()
     {
-        this.requestMainHandItemAction();
+        this.requestMainHandItemAction(false);
     },
 
     onRightMouseDown()
     {
-        this.requestSecondaryHandItemAction();
+        this.requestSecondaryHandItemAction(false);
     },
 
     onMiddleMouseDown()
@@ -242,6 +292,11 @@ let ListenerModule = {
     unregisterMouseDown()
     {
         $(window).off('mousedown');
+    },
+
+    unregisterMouseUp()
+    {
+        $(window).off('mouseup');
     },
 
     unregisterMouseWheel()

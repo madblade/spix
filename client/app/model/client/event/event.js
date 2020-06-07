@@ -29,7 +29,8 @@ extend(EventComponent.prototype, {
 
     triggerEvent(type, data)
     {
-        switch (type) {
+        switch (type)
+        {
             case 'm':
                 this.triggerMovement(type, data);
                 break;

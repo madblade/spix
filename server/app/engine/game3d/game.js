@@ -100,7 +100,7 @@ class Game3D extends Game
     {
         this._frameMod1000 = (this._frameMod1000 + 1) % 1000;
         // Idea maybe split in several loops (purposes).
-        let debugThresh = 4000; // microsecs
+        // let debugThresh = 4000; // microsecs
 
         /** Inputs **/
         // let t = TimeUtils.getTimeSecNano();

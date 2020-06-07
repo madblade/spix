@@ -16,7 +16,7 @@ class AIInput
 
     update()
     {
-        // console.log('seeing and thinking');
+        // console.log('pushing desires to physics');
     }
 }
 

@@ -27,6 +27,7 @@ let MouseModule = {
 
         this.registerMouseMove();
         this.registerMouseDown();
+        this.registerMouseUp();
         this.registerMouseWheel();
     },
 
@@ -34,6 +35,7 @@ let MouseModule = {
     {
         this.unregisterMouseMove();
         this.unregisterMouseDown();
+        this.unregisterMouseUp();
         this.unregisterMouseWheel();
     }
 

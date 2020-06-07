@@ -59,7 +59,13 @@ let TriggersModule = {
             data.push(clientSelfModel.getItemOffset());
             data.push(clientSelfModel.getAngleFromIntersectionPoint());
             this.triggerBlock('x', data);
-        } else {
+        }
+        else if (ItemsModelModule.isItemNaught(activeItemID) && data[0] === 'del')
+        {
+            this.triggerBlock('b', data);
+        }
+        else
+        {
             // TODO [GAMEPLAY] object, skill
             // Validate server-side? Keep duplicate in selfComponent?
             console.warn('[Client/Event] Unsupported item.');

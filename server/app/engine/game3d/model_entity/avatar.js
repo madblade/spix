@@ -30,6 +30,10 @@ class Avatar extends Entity
         this._role = 0;
 
         this._nearestChunkId = null;
+
+        this._loadingRanged = false;
+        this._hasJustMeleed = false;
+        this._hasJustJumped = false;
     }
 
     // Returns -1: admin, 0: OP, 1: registered, 2: guest.
