@@ -4,7 +4,7 @@
 
 'use strict';
 
-import TimeUtils from '../../../math/time';
+// import TimeUtils from '../../../math/time';
 
 class UserOutput
 {
@@ -29,36 +29,31 @@ class UserOutput
     // TODO [PERF] -> don't recurse over every player, but rather over updates
     update(updateEntities)
     {
-        let t1;
-        let t2;
+        // let t1;
+        // let t2;
 
-        t1 = TimeUtils.getTimeSecNano();
-        //this.spawnPlayers();
-        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
-        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to spawn players.`);
-
-        t1 = TimeUtils.getTimeSecNano();
+        // t1 = TimeUtils.getTimeSecNano();
         this.updateChunks();
-        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
-        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
+        // t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
+        // if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send chunk updates.`);
 
-        t1 = TimeUtils.getTimeSecNano();
+        // t1 = TimeUtils.getTimeSecNano();
         if (updateEntities)
             this.updateEntities();
-        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
-        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
+        // t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
+        // if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send entity updates.`);
 
-        t1 = TimeUtils.getTimeSecNano();
+        // t1 = TimeUtils.getTimeSecNano();
         this.updateX();
-        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
-        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send x updates.`);
+        // t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
+        // if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send x updates.`);
 
-        t1 = TimeUtils.getTimeSecNano();
+        // t1 = TimeUtils.getTimeSecNano();
         this.updateMeta();
-        t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
-        if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send other stuff.`);
+        // t2 = TimeUtils.getTimeSecNano(t1)[1] / 1000;
+        // if (UserOutput.bench && t2 > 1000) console.log(`${t2} µs to send other stuff.`);
 
-        this._consistencyEngine.flushBuffers();
+        this._consistencyEngine.flushBuffers(updateEntities);
     }
 
     updateChunks()
@@ -132,7 +127,7 @@ class UserOutput
         let updatedEntities = physicsEngine.getOutput();
         let consistencyOutput = consistencyEngine.getEntityOutput();
 
-        if (updatedEntities.size < 1) return;
+        if (updatedEntities.size < 1 && consistencyOutput.size < 1) return;
 
         // Broadcast updates.
         // TODO [PERF] bundle update in one chunk.
@@ -157,7 +152,7 @@ class UserOutput
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
             // TODO [PERF] bundle, detect change.
-            if (Object.keys(addedOrRemovedEntities).length > 0)
+            if (addedOrRemovedEntities && Object.keys(addedOrRemovedEntities).length > 0)
                 p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;
             if (!av) return;

@@ -21,10 +21,13 @@ class ChunkBuffer
     )
     {
         // Check.
-        if (!addedChunks && !removedChunks) return;
+        if (!(addedChunks && Object.keys(addedChunks).length > 0) &&
+            !(removedChunks && Object.keys(removedChunks).length > 0))
+            return;
 
         // Aggregate.
-        if (addedChunks && removedChunks)
+        if (addedChunks && Object.keys(addedChunks).length > 0 &&
+            removedChunks && Object.keys(removedChunks).length > 0)
         {
             for (let propA in addedChunks) {
                 if (propA in removedChunks) {
@@ -36,7 +39,8 @@ class ChunkBuffer
             // After deleting everything in common with removedChunks, can safely assign the remainder.
             Object.assign(addedChunks, removedChunks);
         }
-        else if (removedChunks) addedChunks = removedChunks;
+        else if (removedChunks && Object.keys(removedChunks).length > 0)
+            addedChunks = removedChunks;
 
         if (addedWorlds) addedChunks.worlds = addedWorlds;
         if (addedWorldsMeta) addedChunks.worldsMeta = addedWorldsMeta;

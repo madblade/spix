@@ -130,10 +130,11 @@ class ConsistencyEngine
         return this._updater.getOutput();
     }
 
-    flushBuffers()
+    flushBuffers(updateEntities)
     {
         this._chunkBuffer.flush();
-        this._entityBuffer.flush();
+        if (updateEntities)
+            this._entityBuffer.flush();
         this._updater.flushBuffers();
     }
 

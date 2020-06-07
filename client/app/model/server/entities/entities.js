@@ -21,8 +21,9 @@ let EntityModel = function(app)
     this.needsUpdate = false;
 
     // Interpolation-prediction
-    this.lastServerUpdateTime = this.getTime();
-    this.averageDeltaT = -1;
+    // -> Moved per-entity.
+    // this.lastServerUpdateTime = this.getTime();
+    // this.averageDeltaT = -1;
 };
 
 extend(EntityModel.prototype, PlayerModule);
@@ -49,7 +50,8 @@ extend(EntityModel.prototype, {
         let currentR = entity.currentRFromServer;
         let lastP = entity.lastPFromServer;
         let lastR = entity.lastRFromServer;
-        if (currentP.distanceTo(upToDatePosition) > 0 || currentR.distanceTo(upToDateRotation) > 0)
+        if (currentP.distanceTo(upToDatePosition) > 0 ||
+            currentR.distanceTo(upToDateRotation) > 0)
         {
             lastP.copy(currentP);
             currentP.copy(upToDatePosition);
@@ -58,11 +60,11 @@ extend(EntityModel.prototype, {
             entity.lastUpdateTime = updateTime;
 
             // if (this.averageDeltaT < 16 || this.averageDeltaT > 100) {
-            this.averageDeltaT = updateTime - this.lastServerUpdateTime;
+            entity.averageDeltaT = updateTime - entity.lastServerUpdateTime;
             // }
-            this.lastServerUpdateTime = updateTime;
+            entity.lastServerUpdateTime = updateTime;
         }
-        const deltaServer = this.averageDeltaT;
+        const deltaServer = entity.averageDeltaT;
 
         const t = updateTime - entity.lastUpdateTime;
         if (t < deltaServer)
@@ -189,7 +191,8 @@ extend(EntityModel.prototype, {
         let pushes = this.entitiesOutdated;
 
         pushes.forEach(
-            function(updatedEntity, id) {
+            (updatedEntity, id) =>
+            {
                 if (this.entitiesLoading.has(id)) return;
 
                 let currentEntity = entities.get(id);
@@ -199,7 +202,7 @@ extend(EntityModel.prototype, {
                     this.addEntity(id, updatedEntity, graphics, entities);
                 else
                     this.updateEntity(id, currentEntity, updatedEntity, graphics, entities);
-            }.bind(this)
+            }
         );
 
         this.interpolatePredictEntities();
@@ -213,7 +216,11 @@ extend(EntityModel.prototype, {
 
     updateEntities(entities)
     {
-        if (!entities) { console.log('Empty update @ server.sub.entities.js'); return; }
+        if (!entities)
+        {
+            console.log('Empty update @ server.sub.entities.js');
+            return;
+        }
 
         let pushes = this.entitiesOutdated;
         for (let eid in entities) {

@@ -6,7 +6,7 @@
 
 import WorldModel           from '../../model_world/model';
 import ChunkBuilder         from '../builder/builder_chunks';
-import TimeUtils            from '../../../math/time';
+// import TimeUtils            from '../../../math/time';
 
 class ChunkLoader
 {
@@ -118,25 +118,25 @@ class ChunkLoader
         let newChunksForPlayer = {};
 
         // Loading circle for server (a bit farther)
-        let t = TimeUtils.getTimeSecNano();
+        // let t = TimeUtils.getTimeSecNano();
         const wid = starterChunk.world.worldId;
         const cid = starterChunk.chunkId;
         ChunkBuilder.loadNextChunk(
             player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, false
         );
-        let dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
+        // let dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
+        // if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForServer.`);
 
         // Loading circle for client (nearer)
         // Only load one at a time!
-        t = TimeUtils.getTimeSecNano();
+        // t = TimeUtils.getTimeSecNano();
         let newChunk = ChunkBuilder.loadNextChunk(
             player, wid, cid, worldModel, xModel,
             consistencyModel, sRadius, true
         );
-        dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
+        // dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
+        // if (ChunkLoader.bench && dt1 > 1000) console.log(`\t\t${dt1} preLoad ForPlayer.`);
 
         if (newChunk)
         {

@@ -17,10 +17,14 @@ class XBuffer
 
     updateXForPlayer(playerId, addedX, removedX)
     {
-        if (!addedX && !removedX) return;
+        if (!(addedX && Object.keys(addedX).length > 0) &&
+            !(removedX && Object.keys(removedX).length > 0))
+            return;
 
-        if (addedX && removedX) Object.assign(addedX, removedX);
-        else if (removedX) addedX = removedX;
+        if (addedX && Object.keys(addedX).length > 0 && removedX && Object.keys(removedX).length > 0)
+            Object.assign(addedX, removedX);
+        else if (removedX && Object.keys(removedX).length > 0)
+            addedX = removedX;
 
         this._outputBuffer.set(playerId, addedX);
     }

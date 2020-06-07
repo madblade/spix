@@ -36,12 +36,26 @@ class EntityBuffer
     updateEntitiesForPlayer(playerId, addedEntities, removedEntities)
     {
         // Check.
-        if (!addedEntities && !removedEntities) return;
-        if (addedEntities && removedEntities) Object.assign(addedEntities, removedEntities); // Aggregate.
-        else if (removedEntities) addedEntities = removedEntities;
+        if (!(addedEntities && Object.keys(addedEntities).length > 0) &&
+            !(removedEntities && Object.keys(removedEntities).length > 0))
+            return;
+        if (addedEntities && Object.keys(addedEntities).length > 0 &&
+            removedEntities && Object.keys(removedEntities).length > 0)
+            Object.assign(addedEntities, removedEntities); // Aggregate.
+        else if (removedEntities && Object.keys(removedEntities).length > 0)
+            addedEntities = removedEntities;
 
         // Output.
-        this._outputBuffer.set(playerId, addedEntities);
+        let o = this._outputBuffer.get(playerId);
+        if (!o)
+            this._outputBuffer.set(playerId, addedEntities);
+        else {
+            // Bundle updates
+            for (let e in addedEntities) {
+                if (!addedEntities.hasOwnProperty(e)) continue;
+                o[e] = addedEntities[e];
+            }
+        }
     }
 
     // Shallow.

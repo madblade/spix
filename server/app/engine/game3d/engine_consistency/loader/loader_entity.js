@@ -14,30 +14,6 @@ class EntityLoader
         this._consistencyModel = consistencyEngine.consistencyModel;
     }
 
-    /**
-     * @deprecated
-     */
-    computeEntitiesInRange(player)
-    {
-        let entityModel = this._entityModel;
-        let avatar = player.avatar;
-        let aid = avatar.entityId;
-        let entities = {};
-
-        let thresh = avatar.entityRenderDistance;
-        thresh *= thresh; // Squared distance.
-
-        let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
-
-        entityModel.forEach(e => { if (!e) return; let eid = e.entityId; if (eid !== aid)
-        {
-            if (distance(e, avatar) < thresh)
-                entities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
-        }});
-
-        return entities;
-    }
-
     // TODO [PERF]: Use searcher O(n²) -> O(n), or link entities to chunks.
     // (quadratic as fn of players, not entities!)
     computeNewEntitiesInRange(
@@ -53,6 +29,7 @@ class EntityLoader
         // TODO [IO] also compute entities on loaded chunks.
         let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
 
+        // TODO [PERF] [IO] use array
         let addedEntities = {};
         let removedEntities = {};
 
@@ -71,7 +48,7 @@ class EntityLoader
             else if (!isInRange && isPresent)
                 removedEntities[eid] = null;
 
-            else if (isInRange && updatedEntities.has(eid))
+            else if (isInRange && (updatedEntities.has(eid) || updatedEntities.has(aid)))
                 addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
         }});
 

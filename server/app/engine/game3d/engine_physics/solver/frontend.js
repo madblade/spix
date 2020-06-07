@@ -52,8 +52,9 @@ class FrontEnd
         let ob = physicsEngine.outputBuffer;
 
         // Compute adaptive time step.
-        // TODO [LAG] remember to reactivate lag correction.
-        let relativeDt = 16.667; // TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
+        // Activate lag correction here.
+        // let relativeDt = 16.667;
+        let relativeDt = TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
 
         // Solve physics constraints with basic ordering optimization.
         let maxTimeStepDuration = rigidBodies.refreshRate;

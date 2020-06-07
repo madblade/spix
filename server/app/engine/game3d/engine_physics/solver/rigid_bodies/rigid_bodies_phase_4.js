@@ -126,7 +126,7 @@ class RigidBodiesPhase4
             const dtr = currentEntity.dtr; // Should be extracted from time dilation field instead
             let newP1 = RigidBodiesPhase4.solve(deltaR, v0, nu, a0, dtr);
 
-            let hasCollided = TerrainCollider.collideLinear(currentEntity, world, p0, p1, true);
+            let hasCollided = TerrainCollider.collideLinearZ(currentEntity, world, p0, p1, true);
             if (hasCollided) {
                 let currentDelta = p1[ax] - newP1[ax];
                 if (abs(currentDelta) > abs(correctionDelta)) correctionDelta = currentDelta;

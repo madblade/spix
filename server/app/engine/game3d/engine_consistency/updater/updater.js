@@ -7,7 +7,7 @@
 import XUpdater from './updater_x';
 import XLoader  from '../loader/loader_x';
 import XBuffer  from '../buffer_x';
-import TimeUtils from '../../../math/time';
+// import TimeUtils from '../../../math/time';
 
 class Updater
 {
@@ -109,9 +109,10 @@ class Updater
         let forEach = (object, callback) => { for (let id in object) { callback(id); } };
 
         // For each player...
-        let t = TimeUtils.getTimeSecNano();
-        let dt1;
-        let debugThresh = 1000;
+        // let t = TimeUtils.getTimeSecNano();
+        // let dt1;
+        // let debugThresh = 1000;
+        // TODO [PERF] [IO] use more arrays instead of objects and for-ins
         players.forEach(p => { if (p.avatar)
         {
             let pid = p.avatar.entityId;
@@ -124,9 +125,9 @@ class Updater
             if (u) [addedEntities, removedEntities] = u;
             // TODO [PERF] filter: updated entities and entities that enter in range.
 
-            dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-            if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
-            t = TimeUtils.getTimeSecNano();
+            // dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
+            // if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
+            // t = TimeUtils.getTimeSecNano();
 
             // Compute change for chunks in range.
             let addedChunks;
@@ -134,9 +135,9 @@ class Updater
             let v = cLoader.computeNewChunksInRange(p);
             if (v) [addedChunks, removedChunks] = v;
 
-            dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-            if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Chunks.`);
-            t = TimeUtils.getTimeSecNano();
+            // dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
+            // if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Chunks.`);
+            // t = TimeUtils.getTimeSecNano();
 
             let addedX;
             let removedX;
@@ -148,11 +149,15 @@ class Updater
             // Update consistency model.
             // WARN: updates will only be transmitted during next output pass.
             // BE CAREFUL HERE
-            if (addedEntities)      forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e, 10)));
-            if (removedEntities)    forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e, 10)));
+            if (addedEntities && Object.keys(addedEntities).length > 0)
+                forEach(addedEntities, e => consistencyModel.setEntityLoaded(pid, parseInt(e, 10)));
+            if (removedEntities && Object.keys(removedEntities).length > 0)
+                forEach(removedEntities, e => consistencyModel.setEntityOutOfRange(pid, parseInt(e, 10)));
 
-            if (addedX)             forEach(addedX, ax => consistencyModel.setXLoaded(pid, parseInt(ax, 10)));
-            if (removedX)           forEach(removedX, ax => consistencyModel.setXOutOfRange(pid, parseInt(ax, 10)));
+            if (addedX && Object.keys(addedX).length > 0)
+                forEach(addedX, ax => consistencyModel.setXLoaded(pid, parseInt(ax, 10)));
+            if (removedX && Object.keys(removedX).length > 0)
+                forEach(removedX, ax => consistencyModel.setXOutOfRange(pid, parseInt(ax, 10)));
 
             if (addedChunks)
             {
@@ -163,7 +168,10 @@ class Updater
                         let w = worldModel.getWorld(parseInt(wid, 10));
                         addedW[wid] = [w.xSize, w.ySize, w.zSize];
                         if (!consistencyModel.hasWorld(wid)) {
-                            addedWMeta[wid] = [w.worldInfo.type, w.worldInfo.radius, w.worldInfo.center.x, w.worldInfo.center.y, w.worldInfo.center.z];
+                            addedWMeta[wid] = [
+                                w.worldInfo.type, w.worldInfo.radius,
+                                w.worldInfo.center.x, w.worldInfo.center.y, w.worldInfo.center.z
+                            ];
                         }
                     }
                     forEach(addedChunks[wid], c => {
@@ -179,11 +187,11 @@ class Updater
 
             // TODO [PERF] pack everything in just one send
             // Update output buffers.
-            if (addedChunks || removedChunks)
+            if (addedChunks && Object.keys(addedChunks).length > 0 || removedChunks && Object.keys(removedChunks).length > 0)
                 cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW, addedWMeta);
-            if (addedEntities || removedEntities)
+            if (addedEntities && Object.keys(addedEntities).length > 0 || removedEntities && Object.keys(removedEntities).length > 0)
                 ebuf.updateEntitiesForPlayer(pid, addedEntities, removedEntities);
-            if (addedX || removedX)
+            if (addedX && Object.keys(addedX).length > 0 || removedX && Object.keys(removedX).length > 0)
                 xbuf.updateXForPlayer(pid, addedX, removedX);
         }});
     }
