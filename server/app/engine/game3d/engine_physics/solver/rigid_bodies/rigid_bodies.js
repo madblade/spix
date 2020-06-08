@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Searcher from '../collision/searcher';
+import { Searcher } from '../collision/searcher';
 
 import Phase1 from './rigid_bodies_phase_1';
 import Phase2 from './rigid_bodies_phase_2';
@@ -187,26 +187,45 @@ class RigidBodies
 
             if (RigidBodies.crossEntityCollision)
             {
-                RigidBodies.solveCrossEntityHardCollision(
-                    world, entities, leapfrogArray, searcher, oxAxis, relativeDt, this
+                RigidBodies.solveIntegrateAABB(
+                    oxAxis, entities, world, worldId, searcher, xm, objectOrderer, o, this
                 );
+                // RigidBodies.solveCrossEntityHardCollision(
+                //     world, entities, leapfrogArray, searcher, oxAxis, relativeDt, this
+                // );
             }
             else
             {
-                Phase2.simbleCollideEntitiesWithTerrain(oxAxis, entities, world, this);
+                Phase2.simpleCollideEntitiesWithTerrain(oxAxis, entities, world, this);
+                Phase5.applyIntegration(
+                    entities, worldId, oxAxis, world,
+                    xm, objectOrderer, searcher, o, this);
             }
 
             // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
             //    smoothly slice along constrained boundaries until component is extinct.
 
             // Integration.
-            Phase5.applyIntegration(
-                entities, worldId, oxAxis, world,
-                xm, objectOrderer, searcher, o, this);
+            // Phase5.applyIntegration(
+            //     entities, worldId, oxAxis, world,
+            //     xm, objectOrderer, searcher, o, this);
 
             // 8. Perform updates in optimization structures.
             //    Perform updates in consistency maps.
         });
+    }
+
+    static solveIntegrateAABB(
+        oxAxis, entities, world, worldId, searcher, xm, objectOrderer, o, rigidBodiesSolver
+    )
+    {
+        Phase2.simpleCollideEntitiesWithTerrain(
+            oxAxis, entities, world, rigidBodiesSolver
+        );
+        Phase5.simpleCollideIntegrate(
+            entities, worldId, oxAxis, world,
+            xm, objectOrderer, searcher, o, rigidBodiesSolver
+        );
     }
 
     static solveCrossEntityHardCollision(

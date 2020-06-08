@@ -14,7 +14,7 @@ class Walker extends Entity
 
         this._kind = 'ia';
 
-        this._capW = .08;
+        this._capW = .008;
 
         this._age = 0;
         this._lastDecision = 0;

@@ -133,7 +133,7 @@ class RigidBodiesPhase2
         }
     }
 
-    static simbleCollideEntitiesWithTerrain(
+    static simpleCollideEntitiesWithTerrain(
         oxAxis, entities, world, rigidBodiesSolver
     )
     {

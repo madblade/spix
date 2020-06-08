@@ -63,6 +63,8 @@ class Entity
         this._mass        = 1;
         this._lastR       = -1;
         this._walljump    = false;
+
+        this.solved = false;
     }
 
     static maxWidth = 10.; // 10 blocks.

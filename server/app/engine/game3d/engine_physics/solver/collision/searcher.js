@@ -145,20 +145,20 @@ class Searcher
         }
 
         axisX.sort((a, b) => {
-            if (objects[a].position[0] < objects[b].position[0]) return -1;
-            else if (objects[a].position[0] > objects[b].position[0]) return 1;
+            if (objects[a].p0[0] < objects[b].p0[0]) return -1;
+            else if (objects[a].p0[0] > objects[b].p0[0]) return 1;
             else return 0;
         });
 
         axisY.sort((a, b) => {
-            if (objects[a].position[1] < objects[b].position[1]) return -1;
-            else if (objects[a].position[1] > objects[b].position[1]) return 1;
+            if (objects[a].p0[1] < objects[b].p0[1]) return -1;
+            else if (objects[a].p0[1] > objects[b].p0[1]) return 1;
             else return 0;
         });
 
         axisZ.sort((a, b) => {
-            if (objects[a].position[2] < objects[b].position[2]) return -1;
-            else if (objects[a].position[2] > objects[b].position[2]) return 1;
+            if (objects[a].p0[2] < objects[b].p0[2]) return -1;
+            else if (objects[a].p0[2] > objects[b].p0[2]) return 1;
             else return 0;
         });
 
@@ -215,7 +215,10 @@ class Searcher
  */
 class ObjectsIterator
 {
-    constructor(searcher, objectIndexX, thresholdX, thresholdY, thresholdZ)
+    constructor(
+        searcher, objectIndexX,
+        thresholdX, thresholdY, thresholdZ
+    )
     {
         this.axisX = searcher.objectsAxisX;
         this.axisY = searcher.objectsAxisY;
@@ -526,4 +529,4 @@ class ObjectsIterator
     }
 }
 
-export default Searcher;
+export { Searcher, ObjectsIterator };
