@@ -71,9 +71,14 @@ extend(EntityModel.prototype, {
         {
             // interpolate
             const tdt = t / deltaServer;
-            const dpx = currentP.x - lastP.x; const drx = currentR.x - lastR.x;
-            const dpy = currentP.y - lastP.y; const dry = currentR.y - lastR.y;
-            const dpz = currentP.z - lastP.z; const drz = currentR.z - lastR.z;
+            const dpx = currentP.x - lastP.x;
+            let drx = currentR.x - lastR.x;
+            if (drx > Math.PI) drx = 2 * Math.PI - drx;
+            if (drx < -Math.PI) drx += 2 * Math.PI;
+            const dpy = currentP.y - lastP.y;
+            const dry = currentR.y - lastR.y;
+            const dpz = currentP.z - lastP.z;
+            const drz = currentR.z - lastR.z;
             this.setLerp(
                 entity,
                 lastP.x + tdt * dpx, lastP.y + tdt * dpy, lastP.z + tdt * dpz,

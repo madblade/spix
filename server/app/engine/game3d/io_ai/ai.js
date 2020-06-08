@@ -151,6 +151,7 @@ class AI
             const dy = d[1] - p[1];
             let r = ai.rotation;
             let newPitch = Math.atan2(dy, dx) - Math.PI / 2;
+            // let newPitch = Math.atan2(dx, -dy);
             ai.rotate(newPitch, r[1], r[2], r[3]);
 
             // Move toward player.
