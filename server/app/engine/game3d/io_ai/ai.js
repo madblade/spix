@@ -155,9 +155,14 @@ class AI
 
             // Move toward player.
             const dz = d[2] - p[2];
-            ai.goForward();
-            if (dz > 0.5) ai.goUp();
-            else ai.stopUp();
+            if (dz > 0.5)
+                ai.goUp();
+            else
+                ai.stopUp();
+            if (dx * dx + dy * dy + dz * dz > 2)
+                ai.goForward();
+            else
+                ai.stopForward();
             // if (dx < -0.5) ai.goForward();
             // else if (dx > 0.5) ai.goBackwards();
             // if (dy < -0.5) ai.goRight();
