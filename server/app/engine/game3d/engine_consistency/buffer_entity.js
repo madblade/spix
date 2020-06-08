@@ -16,6 +16,21 @@ class EntityBuffer
     get addedPlayers()      { return this._addedPlayers; }
     get removedPlayers()    { return this._removedPlayers; }
 
+    spawnEntity(entity)
+    {
+        let removedPlayers = this._removedPlayers;
+        let id = entity.entityId;
+        if (removedPlayers.has(id)) removedPlayers.delete(id);
+        else this._addedPlayers.add(id);
+    }
+
+    removeEntity(entityId)
+    {
+        let addedPlayers = this._addedPlayers;
+        if (addedPlayers.has(entityId)) addedPlayers.delete(entityId);
+        else this._removedPlayers.add(entityId);
+    }
+
     spawnPlayer(player)
     {
         let removedPlayers = this._removedPlayers;

@@ -27,6 +27,16 @@ class PlayerManager
         if (this._handleAddPlayer) this._handleAddPlayer(player);
     }
 
+    getRandomPlayer()
+    {
+        const nbPlayers = this._players.length;
+        if (nbPlayers < 1) return null;
+        const id = Math.floor(Math.random() * nbPlayers);
+        let player = this._players[id];
+        if (player && player.avatar) return player.avatar;
+        else return null;
+    }
+
     getPlayerFromId(playerId)
     {
         let players = this._players;

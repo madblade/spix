@@ -129,6 +129,7 @@ extend(EntityModel.prototype, {
 
         switch (updatedEntity.k)
         {
+            case 'ia':
             case 'player':
                 this.loadPlayer(id, updatedEntity, graphics, entities);
                 break;
@@ -138,7 +139,9 @@ extend(EntityModel.prototype, {
                 break;
 
             default:
-                console.log('ServerModel::addEntity: Unknown entity type.');
+                console.log(`
+                    ServerModel::addEntity: Unknown entity type '${updatedEntity.k}'.
+                `);
         }
     },
 

@@ -1,5 +1,5 @@
 /**
- *
+ * Moving object.
  */
 
 'use strict';
@@ -19,6 +19,8 @@ class Entity
         this._v1            = [0, 0, 0];
         this._a0            = [0, 0, 0];
         this._a1            = [0, 0, 0];
+        this._nu            = [0, 0, 0];
+        this._nu1           = [0, 0, 0];
 
         this._d             = [!0, !0, !0, !0, !0, !0];
         this._r             = [0, 0, 0, 0]; // rel, abs
@@ -95,19 +97,23 @@ class Entity
     {
         this._worldId           = worldId;
 
-        this._r                 = [0, Math.PI / 2, 0, 0];
-        this._d                 = [!1, !1, !1, !1, !1, !1];
+        this._r[0] = this._r[2] = this._r[3] = 0;
+        this._r[1] = Math.PI / 2;
+        this._d[0] = this._d[1] = this._d[2] =
+            this._d[3] = this._d[4] = this._d[5] = !1;
 
-        this._p0 = [0, 0, 0];
-        this._p1 = [0, 0, 0];
-        this._v0 = [0, 0, 0];
-        this._v1 = [0, 0, 0];
-        this._a0 = [0, 0, 0];
-        this._a1 = [0, 0, 0];
-        this._nu = [0, 0, 0];
-        this._nu1 = [0, 0, 0];
+        // this._p0[0] = this._p0[1] = this._p0[2] = 0;
+        this._p1[0] = this._p1[1] = this._p1[2] = 0;
+        this._v0[0] = this._v0[1] = this._v0[2] = 0;
+        this._v1[0] = this._v1[1] = this._v1[2] = 0;
+        this._a0[0] = this._a0[1] = this._a0[2] = 0;
+        this._a1[0] = this._a1[1] = this._a1[2] = 0;
+        this._nu[0] = this._nu[1] = this._nu[2] = 0;
+        this._nu1[0] = this._nu1[1] = this._nu1[2] = 0;
 
-        this._p0 = position;
+        this._p0[0] = position[0];
+        this._p0[1] = position[1];
+        this._p0[2] = position[2];
     }
 
     die()
@@ -117,7 +123,8 @@ class Entity
 
     stop()
     {
-        this._d = [!1, !1, !1, !1, !1, !1];
+        this._d[0] = this._d[1] = this._d[2] =
+            this._d[3] = this._d[4] = this._d[5] = !1;
         // console.log('[Entity] Entity stopping.');
     }
 

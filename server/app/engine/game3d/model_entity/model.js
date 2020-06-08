@@ -6,6 +6,8 @@
 
 import Avatar from './avatar';
 import Cube   from './cube';
+import Walker from './walker';
+import Projectile from './projectile';
 // import Entity from './entity';
 // import CollectionUtil from '../../math/collections';
 
@@ -45,6 +47,14 @@ class EntityModel
         avatar.spawn(freePosition, worldId);
     }
 
+    spawnEntity(kind, world, position)
+    {
+        let entity = this.createEntity(kind);
+        let worldId = world.worldId;
+        entity.spawn(position, worldId);
+        return entity;
+    }
+
     // World to be set at spawn time.
     createEntity(kind)
     {
@@ -64,13 +74,19 @@ class EntityModel
         }
         // console.log('Entity shall have id ' + entityId);
 
-        var e;
+        let e;
         switch (kind) {
             case 'avatar':
                 e = new Avatar(entityId);
                 break;
             case 'cube':
                 e = new Cube(entityId);
+                break;
+            case 'walker':
+                e = new Walker(entityId);
+                break;
+            case 'projectile':
+                e = new Projectile(entityId);
                 break;
             default:
                 throw Error('Invalid entity type.');

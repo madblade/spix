@@ -1,5 +1,5 @@
 /**
- *
+ * Player entry point.
  */
 
 'use strict';
@@ -27,6 +27,7 @@ class Avatar extends Entity
         // Counted as a number of blocks.
         this._entityRenderDistance = 2 * 8;
 
+        // For op / admin accesses
         this._role = 0;
 
         this._nearestChunkId = null;

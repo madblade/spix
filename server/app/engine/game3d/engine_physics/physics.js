@@ -80,6 +80,17 @@ class PhysicsEngine
         let entity = this._entityModel.entities[playerId];
         this._frontend.objectOrderer.removeObject(entity);
     }
+
+    spawnEntity(entity)
+    {
+        this._frontend.objectOrderer.addObject(entity);
+    }
+
+    removeEntity(entityId)
+    {
+        let entity = this._entityModel.entities[entityId];
+        this._frontend.objectOrderer.removeObject(entity);
+    }
 }
 
 export default PhysicsEngine;

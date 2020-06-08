@@ -138,6 +138,11 @@ class ObjectOrderer
 
         // Get properties.
         let p = object.p0;
+        if (typeof p[0] !== 'number')
+        {
+            console.error('Invalid entity position.');
+            return;
+        }
         let x = p[0]; let y = p[1]; let z = p[2];
         let eid = kind === 'e' ? object.entityId : object.portalId;
 

@@ -83,10 +83,16 @@ class ConsistencyEngine
             // console.log('Failed to spawn player.');
             return false;
         }
+
+        // Insert player into 'all entities' array
         this._entityModel.spawnPlayer(player, world, freePosition);
+        // Init entity and chunk visibility for player
         this._consistencyModel.spawnPlayer(player);
+        // Push new player into next updates
         this._entityBuffer.spawnPlayer(player);
+        // Insert player into optimized physics structures
         this._physicsEngine.spawnPlayer(player);
+        // Listen to player inputs
         this._game._externalInput.listenPlayer(player);
         return true;
     }
@@ -97,6 +103,22 @@ class ConsistencyEngine
         this._consistencyModel.removePlayer(playerId);
         this._physicsEngine.removePlayer(playerId);
         this._entityModel.removePlayer(playerId);
+    }
+
+    spawnEntity(kind, world, position)
+    {
+        let entity = this._entityModel
+            .spawnEntity(kind, world, position);
+        this._entityBuffer.spawnEntity(entity);
+        this._physicsEngine.spawnEntity(entity);
+        return entity;
+    }
+
+    despawnEntity(entityId)
+    {
+        this._entityBuffer.removeEntity(entityId);
+        this._physicsEngine.removeEntity(entityId);
+        this._entityModel.removeEntity(entityId);
     }
 
     addInput(meta, avatar)
