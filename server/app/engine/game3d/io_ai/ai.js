@@ -66,14 +66,19 @@ class AI
             {
                 let p = pns.pop();
                 const wid = p[6];
+                // const wx = p[7];
+                // const wy = p[8];
+                // const wz = p[9];
                 let world = this._worldModel.getWorld(wid);
                 let projectile = ce.spawnEntity(
                     'projectile',
                     world,
                     [
-                        p[0] + 0.25 * p[3],
-                        p[1] + 0.25 * p[4],
-                        p[2] + 0.25 * p[5],
+                        // TODO [GAMEPLAY] cast on hexahedron
+                        //  and give avatar’s p1.
+                        p[0] + 0.5 * p[3],
+                        p[1] + 0.5 * p[4],
+                        p[2] + 0.5 * p[5],
                     ]
                 );
                 projectile.a0[0] = 0.5 * p[3];

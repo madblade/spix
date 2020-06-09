@@ -164,7 +164,12 @@ class Updater
                     //     fx, fy, fz
                     // );
                     this._physicsEngine._ai.pushProjectileForSpawn(
-                        [px, py, pz, fx, fy, fz, avatar.worldId]
+                        [
+                            px, py, pz,
+                            fx, fy, fz,
+                            avatar.worldId,
+                            avatar.widthY, avatar.widthY, avatar.widthZ
+                        ]
                     );
                 }
                 break;

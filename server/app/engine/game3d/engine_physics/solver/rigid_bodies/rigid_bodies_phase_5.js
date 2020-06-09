@@ -259,24 +259,28 @@ class RigidBodiesPhase5
 
         let abs = Math.abs;
         let ep = entity.p0;
-        let pp = projectile.p1;
+        let pp = projectile.p0;
+        let px = projectile.p1;
 
         const dwx = entity.widthX + projectile.widthX;
-        const dx = ep[0] - pp[0];
+        let dx = ep[0] - pp[0];
         const endsInX = abs(dx) < dwx;
         if (!endsInX) return;
 
         const dwy = projectile.widthY + projectile.widthY;
-        const dy = ep[1] - pp[1];
+        let dy = ep[1] - pp[1];
         const endsInY = abs(dy) < dwy;
         if (!endsInY) return;
 
         const dwz = entity.widthZ + projectile.widthZ;
-        const dz = ep[2] - pp[2];
+        let dz = ep[2] - pp[2];
         const endsInZ = abs(dz) < dwz;
         if (!endsInZ) return;
 
         // Normalize and clamp
+        dx = px[0] - pp[0];
+        dy = px[1] - pp[1];
+        dz = px[2] - pp[2];
         const norm = Math.sqrt(dx * dx + dy * dy + dz * dz);
         let fx = dx / norm; fx = Math.max(-1, Math.min(fx, 1));
         let fy = dy / norm; fy = Math.max(-1, Math.min(fy, 1));
@@ -293,6 +297,7 @@ class RigidBodiesPhase5
             -35 * gravity[2] : 0 : strength * fz;
         entity.setHitVector(nx, ny, nz);
         entity.hit = true;
+        if (slh > 40) entity.wasHit();
         projectile.collided = true;
     }
 
@@ -347,10 +352,11 @@ class RigidBodiesPhase5
                     -35 * gravity[1] : 0 : strength * fy;
                 const nz = abs(gravity[2]) > 0 ? slh > 40 ?
                     -35 * gravity[2] : 0 : strength * fz;
+
                 hittee.setHitVector(nx, ny, nz);
                 // console.log(hittee.hitVector);
                 hittee.hit = true;
-                hittee.wasHit();
+                if (slh > 40) hittee.wasHit();
             }
             else
             {
@@ -368,6 +374,7 @@ class RigidBodiesPhase5
                             -35 * gravity[2] : 0 : strength * fz
                     );
                     hittee.hit = true;
+                    if (slh > 40) hittee.wasHit();
                 }
             }
         }

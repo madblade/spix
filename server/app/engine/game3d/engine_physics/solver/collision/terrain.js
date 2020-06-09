@@ -40,29 +40,36 @@ class TerrainCollider
         let numClamp = TerrainCollider.numericClamp;
         let cropX = x1; let cropY = y1; let cropZ = z1;
         let adx = false; let ady = false; let adz = false;
+        const isProjectile = entity._isProjectile;
 
         if (x0 !== x1)
         {
             let xNetwork = [];
             let xArrival = [];
-            for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    xNetwork.push([
-                        x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
-                        currentY,
-                        currentZ
-                    ]);
-                    xArrival.push([
-                        x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
-                        numClamp(y1 + currentY - y0),
-                        numClamp(z1 + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentY >= lastY) break;
-                currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+            if (isProjectile)
+            {
+                xNetwork.push([x0, y0, z0]);
+                xArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        xNetwork.push([
+                            x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
+                            currentY,
+                            currentZ
+                        ]);
+                        xArrival.push([
+                            x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                            numClamp(y1 + currentY - y0),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentY >= lastY) break;
+                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < xNetwork.length; ++i)
@@ -92,24 +99,32 @@ class TerrainCollider
         {
             let yNetwork = [];
             let yArrival = [];
-            for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    yNetwork.push([
-                        currentX,
-                        y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
-                        currentZ
-                    ]);
-                    yArrival.push([
-                        numClamp(x1 + currentX - x0),
-                        y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
-                        numClamp(z1 + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+
+            if (isProjectile)
+            {
+                yNetwork.push([x0, y0, z0]);
+                yArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        yNetwork.push([
+                            currentX,
+                            y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
+                            currentZ
+                        ]);
+                        yArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
+
             // Do intersect.
             for (let i = 0; i < yNetwork.length; ++i)
             {
@@ -149,24 +164,30 @@ class TerrainCollider
         {
             let zNetwork = [];
             let zArrival = [];
-            for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                    zNetwork.push([
-                        currentX,
-                        currentY,
-                        z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
-                    ]);
-                    zArrival.push([
-                        numClamp(cropX + currentX - x0),
-                        numClamp(cropY + currentY - y0),
-                        z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
-                    ]);
-                    if (currentY >= lastY) break;
-                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+            if (isProjectile)
+            {
+                zNetwork.push([x0, y0, z0]);
+                zArrival.push([cropX, cropY, z1]);
             }
+            else
+                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
+                        zNetwork.push([
+                            currentX,
+                            currentY,
+                            z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
+                        ]);
+                        zArrival.push([
+                            numClamp(cropX + currentX - x0),
+                            numClamp(cropY + currentY - y0),
+                            z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                        ]);
+                        if (currentY >= lastY) break;
+                        currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < zNetwork.length; ++i)
@@ -232,29 +253,36 @@ class TerrainCollider
         let numClamp = TerrainCollider.numericClamp;
         let cropX = x1; let cropY = y1; let cropZ = z1;
         let adx = false; let ady = false; let adz = false;
+        const isProjectile = entity._isProjectile;
 
         if (x0 !== x1)
         {
             let xNetwork = [];
             let xArrival = [];
-            for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    xNetwork.push([
-                        x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
-                        currentY,
-                        currentZ
-                    ]);
-                    xArrival.push([
-                        x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
-                        numClamp(y1 + currentY - y0),
-                        numClamp(z1 + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentY >= lastY) break;
-                currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+            if (isProjectile)
+            {
+                xNetwork.push([x0, y0, z0]);
+                xArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        xNetwork.push([
+                            x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
+                            currentY,
+                            currentZ
+                        ]);
+                        xArrival.push([
+                            x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                            numClamp(y1 + currentY - y0),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentY >= lastY) break;
+                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < xNetwork.length; ++i)
@@ -284,24 +312,31 @@ class TerrainCollider
         {
             let zNetwork = [];
             let zArrival = [];
-            for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                    zNetwork.push([
-                        currentX,
-                        currentY,
-                        z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
-                    ]);
-                    zArrival.push([
-                        numClamp(x1 + currentX - x0),
-                        numClamp(y1 + currentY - y0),
-                        z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
-                    ]);
-                    if (currentY >= lastY) break;
-                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+
+            if (isProjectile)
+            {
+                zNetwork.push([x0, y0, z0]);
+                zArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
+                        zNetwork.push([
+                            currentX,
+                            currentY,
+                            z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
+                        ]);
+                        zArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            numClamp(y1 + currentY - y0),
+                            z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                        ]);
+                        if (currentY >= lastY) break;
+                        currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < zNetwork.length; ++i)
@@ -341,24 +376,32 @@ class TerrainCollider
         {
             let yNetwork = [];
             let yArrival = [];
-            for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    yNetwork.push([
-                        currentX,
-                        y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
-                        currentZ
-                    ]);
-                    yArrival.push([
-                        numClamp(cropX + currentX - x0),
-                        y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
-                        numClamp(cropZ + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+
+            if (isProjectile)
+            {
+                yNetwork.push([x0, y0, z0]);
+                yArrival.push([cropX, y1, cropZ]);
             }
+            else
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        yNetwork.push([
+                            currentX,
+                            y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
+                            currentZ
+                        ]);
+                        yArrival.push([
+                            numClamp(cropX + currentX - x0),
+                            y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                            numClamp(cropZ + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
+
             // Do intersect.
             for (let i = 0; i < yNetwork.length; ++i)
             {
@@ -421,29 +464,38 @@ class TerrainCollider
         let numClamp = TerrainCollider.numericClamp;
         let cropX = x1; let cropY = y1; let cropZ = z1;
         let adx = false; let ady = false; let adz = false;
+        const isProjectile = entity._isProjectile;
 
         if (y0 !== y1)
         {
             let yNetwork = [];
             let yArrival = [];
-            for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    yNetwork.push([
-                        currentX,
-                        y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
-                        currentZ
-                    ]);
-                    yArrival.push([
-                        numClamp(x1 + currentX - x0),
-                        y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
-                        numClamp(z1 + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+
+            if (isProjectile)
+            {
+                yNetwork.push([x0, y0, z0]);
+                yArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        yNetwork.push([
+                            currentX,
+                            y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
+                            currentZ
+                        ]);
+                        yArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            y1 < y0 ? numClamp(y1 - yW) : numClamp(y1 + yW),
+                            numClamp(z1 + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
+
             // Do intersect.
             for (let i = 0; i < yNetwork.length; ++i)
             {
@@ -483,24 +535,31 @@ class TerrainCollider
         {
             let zNetwork = [];
             let zArrival = [];
-            for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                    zNetwork.push([
-                        currentX,
-                        currentY,
-                        z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
-                    ]);
-                    zArrival.push([
-                        numClamp(x1 + currentX - x0),
-                        numClamp(y1 + currentY - y0),
-                        z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
-                    ]);
-                    if (currentY >= lastY) break;
-                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
-                }
-                if (currentX >= lastX) break;
-                currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+
+            if (isProjectile)
+            {
+                zNetwork.push([x0, y0, z0]);
+                zArrival.push([x1, y1, z1]);
             }
+            else
+                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
+                        zNetwork.push([
+                            currentX,
+                            currentY,
+                            z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
+                        ]);
+                        zArrival.push([
+                            numClamp(x1 + currentX - x0),
+                            numClamp(y1 + currentY - y0),
+                            z1 < z0 ? numClamp(z1 - zW) : numClamp(z1 + zW)
+                        ]);
+                        if (currentY >= lastY) break;
+                        currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    }
+                    if (currentX >= lastX) break;
+                    currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < zNetwork.length; ++i)
@@ -540,24 +599,31 @@ class TerrainCollider
         {
             let xNetwork = [];
             let xArrival = [];
-            for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                    xNetwork.push([
-                        x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
-                        currentY,
-                        currentZ
-                    ]);
-                    xArrival.push([
-                        x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
-                        numClamp(cropY + currentY - y0),
-                        numClamp(cropZ + currentZ - z0)
-                    ]);
-                    if (currentZ >= lastZ) break;
-                    currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
-                }
-                if (currentY >= lastY) break;
-                currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+
+            if (isProjectile)
+            {
+                xNetwork.push([x0, y0, z0]);
+                xArrival.push([x1, cropY, cropZ]);
             }
+            else
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
+                        xNetwork.push([
+                            x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
+                            currentY,
+                            currentZ
+                        ]);
+                        xArrival.push([
+                            x1 < x0 ? numClamp(x1 - xW) : numClamp(x1 + xW),
+                            numClamp(cropY + currentY - y0),
+                            numClamp(cropZ + currentZ - z0)
+                        ]);
+                        if (currentZ >= lastZ) break;
+                        currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                    }
+                    if (currentY >= lastY) break;
+                    currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                }
 
             // Do intersect.
             for (let i = 0; i < xNetwork.length; ++i)
@@ -676,6 +742,15 @@ class TerrainCollider
         if (dz !== 0) tDeltaZ = min(dz / (z2 - z1), threshold); else tDeltaZ = threshold;
         if (dz > 0) tMaxZ = tDeltaZ * frac1(z1); else tMaxZ = tDeltaZ * frac0(z1);
 
+        if (
+            typeof tMaxX !== 'number' ||
+            typeof tMaxY !== 'number' ||
+            typeof tMaxZ !== 'number'
+        )
+        {
+            console.error('[Terrain] Amandites-Woo network error.');
+            return;
+        }
         while (tMaxX <= 1 || tMaxY <= 1 || tMaxZ <= 1)
         {
             if (tMaxX < tMaxY) {
