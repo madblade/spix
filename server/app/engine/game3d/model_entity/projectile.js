@@ -35,7 +35,7 @@ class Projectile extends Entity
     }
     hasMoved()
     {
-        this._lastMoved = 0;
+        this._lastMoved = this._age;
     }
     howLongSinceLastMoved()
     {

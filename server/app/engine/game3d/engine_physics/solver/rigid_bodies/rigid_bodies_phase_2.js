@@ -132,6 +132,9 @@ class RigidBodiesPhase2
 
             if (hasCollided && currentEntity._isProjectile)
             {
+                currentEntity.p1[0] = currentEntity.p0[0];
+                currentEntity.p1[1] = currentEntity.p0[1];
+                currentEntity.p1[2] = currentEntity.p0[2];
                 // currentEntity.collided = true;
             }
 
@@ -170,8 +173,13 @@ class RigidBodiesPhase2
             if (dbg && hasCollided) {
                 console.log(entityIndex);
             }
-            // if (hasCollided && currentEntity._isProjectile)
-            //     currentEntity.collided = true;
+            if (hasCollided && currentEntity._isProjectile)
+            {
+                currentEntity.p1[0] = currentEntity.p0[0];
+                currentEntity.p1[1] = currentEntity.p0[1];
+                currentEntity.p1[2] = currentEntity.p0[2];
+                // currentEntity.collided = true;
+            }
 
             // Here bounce components could be reported as the inverse velocity at the impact point.
         }

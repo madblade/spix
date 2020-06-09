@@ -227,9 +227,12 @@ class TerrainCollider
 
         if (cropX !== x1 || cropY !== y1 || cropZ !== z1)
         {
-            newPosition[0] = cropX;
-            newPosition[1] = cropY;
-            newPosition[2] = cropZ;
+            if (!isProjectile)
+            {
+                newPosition[0] = cropX;
+                newPosition[1] = cropY;
+                newPosition[2] = cropZ;
+            }
             return true;
         }
 
@@ -441,9 +444,12 @@ class TerrainCollider
 
         if (cropX !== x1 || cropY !== y1 || cropZ !== z1)
         {
-            newPosition[0] = cropX;
-            newPosition[1] = cropY;
-            newPosition[2] = cropZ;
+            if (!isProjectile)
+            {
+                newPosition[0] = cropX;
+                newPosition[1] = cropY;
+                newPosition[2] = cropZ;
+            }
             return true;
         }
 
@@ -653,9 +659,12 @@ class TerrainCollider
 
         if (cropX !== x1 || cropY !== y1 || cropZ !== z1)
         {
-            newPosition[0] = cropX;
-            newPosition[1] = cropY;
-            newPosition[2] = cropZ;
+            if (!isProjectile)
+            {
+                newPosition[0] = cropX;
+                newPosition[1] = cropY;
+                newPosition[2] = cropZ;
+            }
             return true;
         }
 
