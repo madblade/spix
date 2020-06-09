@@ -16,7 +16,7 @@ class AI
         // this._xModel        = game.xModel;
 
         this._ais = [];
-        this._maxAis = 0;
+        this._maxAis = 15;
         this._needingPath = [];
 
         this._cycle = 1;

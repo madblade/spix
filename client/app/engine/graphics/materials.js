@@ -5,8 +5,8 @@
 'use strict';
 
 import {
-    VertexColors,
-    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, FrontSide,
+    VertexColors, FrontSide,
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial,
 } from 'three';
 
 let MaterialsModule = {
@@ -20,7 +20,8 @@ let MaterialsModule = {
                 material = new MeshPhongMaterial({
                     specular: 0xffffff,
                     flatShading: true,
-                    vertexColors: VertexColors
+                    vertexColors: VertexColors,
+                    color: meta && meta.color ? meta.color : null
                 });
                 break;
 
@@ -35,13 +36,14 @@ let MaterialsModule = {
                 //vertexColors: VertexColors,
                 // map: this.texture
                 // });
-                material = new MeshLambertMaterial({
+                let params = {
                     //shading: FlatShading,
                     // color: 0x110011,
                     side: FrontSide,
                     //vertexColors: VertexColors,
                     map: this.textureAtlas
-                });
+                };
+                material = new MeshLambertMaterial(params);
                 break;
 
             case 'basic-black':

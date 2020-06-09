@@ -144,7 +144,6 @@ extend(ChunkModel.prototype, {
 
                     else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3)
                     {
-                        // TODO [IO] server-side, use distinct channels for chunk updates.
                         console.error(`WARN: corrupt update or model @refresh / updateChunk ${chunkId}.`);
                         console.log(update);
                         this.chunkUpdates = [];

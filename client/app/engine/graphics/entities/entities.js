@@ -50,6 +50,7 @@ let EntitiesModule = {
         let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
         let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
+            color: 0xff0000,
             vertexColors: FaceColors,
             morphTargets: true
         }));
@@ -80,7 +81,8 @@ let EntitiesModule = {
         let wrapper = new Object3D();
         let head = this.createMesh(
             this.createGeometry('box'),
-            this.createMaterial('flat-phong')
+            this.createMaterial('flat-phong',
+                {color: 0xff0000})
         );
 
         up.rotation.reorder('ZYX');

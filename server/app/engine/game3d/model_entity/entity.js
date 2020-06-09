@@ -64,7 +64,8 @@ class Entity
         this._lastR       = -1;
         this._walljump    = false;
 
-        this.solved = false;
+        this._running     = false;
+        this.solved       = false;
     }
 
     static maxWidth = 10.; // 10 blocks.
@@ -144,6 +145,9 @@ class Entity
     stopUp()        { this._d[4] = !1; }
     stopDown()      { this._d[5] = !1; }
 
+    startRunning()  { this._running = true; }
+    stopRunning()   { this._running = false; }
+
     rotate(relPitch, relYaw, absPitch, absYaw)
     {
         for (let i = 0; i < 4; ++i) this._olR[i] = this._r[i];
@@ -206,7 +210,7 @@ class Entity
 
     getVelocity()
     {
-        return this.walkVelocity;
+        return this._running ? this.runVelocity : this.walkVelocity;
     }
 }
 

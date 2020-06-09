@@ -20,6 +20,7 @@ class Walker extends Entity
         this._lastDecision = 0;
         this._target = null;
 
+        this._captain = null;
         this._aggro = null;
     }
 

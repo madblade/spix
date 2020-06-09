@@ -41,6 +41,9 @@ let ListenerModule = {
                     clientModel.triggerEvent('m', 'b');
                     break;
                 case k.shift:
+                    clientModel.triggerEvent('m', 'run');
+                    break;
+                case k.control:
                     clientModel.triggerEvent('m', 'd');
                     break;
                 case k.space:
@@ -133,8 +136,11 @@ let ListenerModule = {
                 case k.leftHandDown:
                     clientModel.triggerEvent('m', 'bx');
                     break;
-                case k.shift:
+                case k.control:
                     clientModel.triggerEvent('m', 'dx');
+                    break;
+                case k.shift:
+                    clientModel.triggerEvent('m', 'runx');
                     break;
                 case k.space:
                     clientModel.triggerEvent('m', 'ux');

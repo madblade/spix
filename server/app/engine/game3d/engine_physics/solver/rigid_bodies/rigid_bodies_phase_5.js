@@ -27,7 +27,9 @@ class RigidBodiesPhase5
         if (y > 0) {
             v1 = Math.atan(-x / y);
         } else if (y < 0) {
-            v1 = x < 0 ? pi - Math.atan(x / y) : x > 0 ? -pi + Math.atan(-x / y) : /*x === 0 ?*/ pi;
+            v1 = x < 0 ?
+                pi - Math.atan(x / y) : x > 0 ?
+                    -pi + Math.atan(-x / y) : /*x === 0 ?*/ pi;
         } else /*if (y === 0)*/ {
             v1 = x < 0 ? pi / 2 : x > 0 ? -pi / 2 : /*x === 0*/ 0;
         }
@@ -194,29 +196,31 @@ class RigidBodiesPhase5
         snapper, snappee
     )
     {
-        const eps = TerrainCollider.eps;
+        const eps = 2 * TerrainCollider.eps;
         // let numClamp = TerrainCollider.numericClamp;
         let abs = Math.abs;
         let pn0 = snapper.p0;
         let p0 = snappee.p0;
         let p1 = snappee.p1;
-        const wnx = snapper.widthX + eps;
-        const wny = snapper.widthY + eps;
-        const wnz = snapper.widthZ + eps;
-        const wx = snappee.widthX + eps;
-        const wy = snappee.widthY + eps;
-        const wz = snappee.widthZ + eps;
 
-        const endsInX = (abs(p1[0] - pn0[0])) < (wx + wnx);
+        const dwx = snappee.widthX + snapper.widthX + eps;
+        // const wnx = snapper.widthX + eps;
+        const endsInX = (abs(p1[0] - pn0[0])) < (dwx);
         if (!endsInX) return;
-        const endsInY = (abs(p1[1] - pn0[1])) < (wy + wny);
+
+        const dwy = snappee.widthY + snapper.widthY + eps;
+        // const wny = snapper.widthY + eps;
+        const endsInY = (abs(p1[1] - pn0[1])) < (dwy);
         if (!endsInY) return;
-        const endsInZ = (abs(p1[2] - pn0[2])) < (wz + wnz);
+
+        const dwz = snappee.widthZ + snapper.widthZ + eps;
+        // const wnz = snapper.widthZ + eps;
+        const endsInZ = (abs(p1[2] - pn0[2])) < (dwz);
         if (!endsInZ) return;
 
-        const startsInX = (abs(p0[0] - pn0[0])) < (wx + wnx);
-        const startsInY = (abs(p0[1] - pn0[1])) < (wy + wny);
-        const startsInZ = (abs(p0[2] - pn0[2])) < (wz + wnz);
+        const startsInX = (abs(p0[0] - pn0[0])) < (dwx);
+        const startsInY = (abs(p0[1] - pn0[1])) < (dwy);
+        const startsInZ = (abs(p0[2] - pn0[2])) < (dwz);
 
         if (startsInX && startsInY && startsInZ)
         {
@@ -226,20 +230,20 @@ class RigidBodiesPhase5
 
         if (!startsInX && endsInX)
         {
-            p1[0] = p0[0] < pn0[0] ? (pn0[0] - wnx - wx - 2 * eps) :
-                (pn0[0] + wnx + wx + 2 * eps);
+            p1[0] = p0[0] < pn0[0] ? (pn0[0] - dwx - eps) :
+                (pn0[0] + dwx + eps);
             return;
         }
         if (!startsInY && endsInY)
         {
-            p1[1] = p0[1] < pn0[1] ? (pn0[1] - wny - wy - 2 * eps) :
-                (pn0[1] + wny + wy + 2 * eps);
+            p1[1] = p0[1] < pn0[1] ? (pn0[1] - dwy - eps) :
+                (pn0[1] + dwy + eps);
             return;
         }
         if (!startsInZ && endsInZ)
         {
-            p1[2] = p0[2] < pn0[2] ? (pn0[2] - wnz - wz - 2 * eps) :
-                (pn0[2] + wnz + wz + 2 * eps);
+            p1[2] = p0[2] < pn0[2] ? (pn0[2] - dwz - eps) :
+                (pn0[2] + dwz + eps);
             // return;
         }
     }

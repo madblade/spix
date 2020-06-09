@@ -109,6 +109,15 @@ let TriggersModule = {
                 ak.up = true;
                 break;
 
+            case 'run':
+                if (!ak.run) addEvent();
+                ak.run = true;
+                break;
+            case 'runx':
+                if (ak.run) addEvent();
+                ak.run = false;
+                break;
+
             case 'fx':
                 ak.forward = false;
                 addEvent();
@@ -142,7 +151,7 @@ let TriggersModule = {
                 addEvent();
                 break;
 
-            default: console.log('Unrecognized action, could not trigger.');
+            default: console.log('Unrecognized movement, could not trigger.');
                 break;
         }
     },

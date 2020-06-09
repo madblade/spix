@@ -38,7 +38,8 @@ class Updater
     static move(meta, avatar)
     {
         // let hasMoved = true;
-        switch (meta) {
+        switch (meta)
+        {
             case 'f'  : avatar.goForward();     break;
             case 'r'  : avatar.goRight();       break;
             case 'l'  : avatar.goLeft();        break;
@@ -53,6 +54,9 @@ class Updater
             case 'ux' : avatar.stopUp();        break;
             case 'dx' : avatar.stopDown();      break;
             case 'xx' : avatar.stop();          break;
+
+            case 'run' : avatar.startRunning(); break;
+            case 'runx' : avatar.stopRunning(); break;
 
             default:
                 // hasMoved = false;
@@ -83,7 +87,8 @@ class Updater
     // Unconstrained actions API.
     action(meta/*, avatar*/)
     {
-        if (meta === 'g') {
+        if (meta === 'g')
+        {
             this._physicsEngine.shuffleGravity();
         }
     }
@@ -92,9 +97,75 @@ class Updater
     {
         // TODO [GAMEPLAY] validate item in inventory
         // TODO [GAMEPLAY] give inventory state to players
-        console.warn('[Physics/Updater] Player wants to use item. To implement.');
-        console.log(meta);
-        console.log(avatar.id);
+        // console.warn('[Physics/Updater] Player wants to use item. To implement.');
+        // console.log(meta);
+        if (meta.length !== 10)
+        {
+            console.warn(`[Physics/Updater] A player wants to use an item, 
+                but the server does not understand which one or how.`
+            );
+            return;
+        }
+        // console.log(avatar.entityId);
+
+        const px = parseFloat(meta[0]);
+        const py = parseFloat(meta[1]);
+        const pz = parseFloat(meta[2]);
+        const fx = parseFloat(meta[3]);
+        const fy = parseFloat(meta[4]);
+        const fz = parseFloat(meta[5]);
+        const isButtonDown = !(meta[6]);
+        const isPrimaryButton = !(meta[7]);
+        const itemType = meta[8]; // 'melee' or 'ranged'
+        // const itemID = meta[9];
+
+        switch (itemType)
+        {
+            case 'melee':
+                if (!isButtonDown)
+                {
+                    avatar.unParry();
+                    avatar.unLoadRanged();
+                    break;
+                }
+                if (isPrimaryButton &&
+                    !avatar.hasJustMeleed &&
+                    !avatar.hasJustFired) // Prevent spam
+                {
+                    avatar.unParry();
+                    avatar.unLoadRanged();
+                    avatar.melee(
+                        px, py, pz,
+                        fx, fy, fz
+                    );
+                }
+                if (!isPrimaryButton)
+                {
+                    avatar.unLoadRanged();
+                    avatar.parry();
+                }
+                break;
+            case 'ranged':
+                if (!isPrimaryButton) break;
+                if (isButtonDown)
+                {
+                    avatar.unParry();
+                    avatar.loadRanged();
+                }
+                else if (avatar.loadingRanged)
+                {
+                    avatar.unParry();
+                    avatar.unLoadRanged();
+                    avatar.fire(
+                        px, py, pz,
+                        fx, fy, fz
+                    );
+                }
+                break;
+            default:
+                console.warn('[Physics/Updater] Invalid item type.');
+                break;
+        }
     }
 }
 

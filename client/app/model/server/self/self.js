@@ -265,6 +265,8 @@ extend(SelfModel.prototype, {
         // (might need more data from the server)
         if (this.worldNeedsUpdate && this.oldWorldId)
         {
+            // TODO [PORTAL] Interpolate position and
+            //  only switch to world when the portal is crossed.
             this.updateWorld();
             let p = this.position;
             let last = this.lastPositionFromServer;

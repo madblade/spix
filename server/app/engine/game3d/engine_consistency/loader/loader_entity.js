@@ -15,7 +15,7 @@ class EntityLoader
     }
 
     // TODO [PERF]: Use searcher O(n²) -> O(n), or link entities to chunks.
-    // (quadratic as fn of players, not entities!)
+    // (only quadratic as fn of players, not entities!)
     computeNewEntitiesInRange(
         player, updatedEntities, addedPlayers, removedPlayers
     )
@@ -43,13 +43,25 @@ class EntityLoader
             let isPresent = consistencyModel.hasEntity(aid, eid);
 
             if (isInRange && !isPresent)
-                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
+                addedEntities[eid] =
+                { // TODO [GAMEPLAY] tell what it is doing (action / aggro / isAlly)
+                    p: e.position,
+                    r: e.rotation,
+                    k: e.kind,
+                    w: e.worldId
+                };
 
             else if (!isInRange && isPresent)
                 removedEntities[eid] = null;
 
             else if (isInRange && (updatedEntities.has(eid) || updatedEntities.has(aid)))
-                addedEntities[eid] = {p:e.position, r:e.rotation, k:e.kind, w:e.worldId};
+                addedEntities[eid] =
+                { // TODO [GAMEPLAY] tell what it is doing (action / aggro / isAlly)
+                    p: e.position,
+                    r: e.rotation,
+                    k: e.kind,
+                    w: e.worldId
+                };
         }});
 
         removedPlayers.forEach(eid => {
