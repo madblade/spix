@@ -63,19 +63,25 @@ class Avatar extends Entity
     set portalRenderDistance(renderDistance) { this._portalRenderDistance = renderDistance; }
     set nearestChunkId(chunkId)              { this._nearestChunkId = chunkId; }
 
-    parry()                                  { this._isParrying = true; }
+    get isParrying()                         { return this._isParrying; }
+    getForwardActionVector()                 { return this._fAction; }
     unParry()                                { this._isParrying = false; }
     loadRanged()                             { this._loadingRanged = true; }
     unLoadRanged()                           { this._loadingRanged = false; }
+    parry(
+        px, py, pz,
+        fx, fy, fz
+    )
+    {
+        this.setPF(px, py, pz, fx, fy, fz);
+        this._isParrying = true;
+    }
     melee(
         px, py, pz,
         fx, fy, fz
     )
     {
-        let p = this._pAction;
-        p[0] = px; p[1] = py; p[2] = pz;
-        let f = this._fAction;
-        f[0] = fx; f[1] = fy; f[2] = fz;
+        this.setPF(px, py, pz, fx, fy, fz);
         this._hasJustMeleed = true;
     }
     fire(
@@ -83,11 +89,23 @@ class Avatar extends Entity
         fx, fy, fz
     )
     {
+        this.setPF(px, py, pz, fx, fy, fz);
+        this._hasJustFired = true;
+    }
+
+    setPF(px, py, pz, fx, fy, fz)
+    {
         let p = this._pAction;
         p[0] = px; p[1] = py; p[2] = pz;
         let f = this._fAction;
-        f[0] = fx; f[1] = fy; f[2] = fz;
-        this._hasJustFired = true;
+        const norm = fx * fx + fy * fy + fz * fz;
+        let x = fx / norm; x = Math.min(Math.max(-1, x), 1);
+        let y = fy / norm; y = Math.min(Math.max(-1, y), 1);
+        let z = fz / norm; z = Math.min(Math.max(-1, z), 1);
+        if (x * x + y * y + z * z > 1.001) return;
+        f[0] = x;
+        f[1] = y;
+        f[2] = z;
     }
 }
 

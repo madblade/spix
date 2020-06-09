@@ -65,7 +65,10 @@ class Entity
         this._walljump    = false;
 
         this._running     = false;
-        this.solved       = false;
+
+        this._hitVector   = [0, 0, 0];
+        this._hit         = false;
+        this._sinceLastHit = 10;
     }
 
     static maxWidth = 10.; // 10 blocks.
@@ -207,6 +210,28 @@ class Entity
     set stealthVelocity(v)  { this._capS = v; }
     set walkVelocity(v)     { this._capW = v; }
     set runVelocity(v)      { this._capR = v; }
+
+    get hit()               { return this._hit; }
+    set hit(h)              { this._hit = h; }
+    get hitVector()         { return this._hitVector; }
+    setHitVector(x, y, z)
+    {
+        this._hitVector[0] = x;
+        this._hitVector[1] = y;
+        this._hitVector[2] = z;
+    }
+    countSinceLastHit()
+    {
+        ++this._sinceLastHit;
+    }
+    wasHit()
+    {
+        this._sinceLastHit = 0;
+    }
+    sinceLastHit()
+    {
+        return this._sinceLastHit;
+    }
 
     getVelocity()
     {

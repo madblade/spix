@@ -15,6 +15,13 @@ class Projectile extends Entity
         this._kind = 'projectile';
 
         this._collided = false;
+
+
+        this._widthX       = .125;
+        this._widthY       = .125;
+        this._widthZ       = .125;
+
+        this._isProjectile = true;
     }
 
     set collided(c) { this._collided = c; }

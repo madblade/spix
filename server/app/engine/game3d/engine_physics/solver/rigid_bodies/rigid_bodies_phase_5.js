@@ -193,7 +193,8 @@ class RigidBodiesPhase5
     }
 
     static collidePair(
-        snapper, snappee
+        snapper,
+        snappee
     )
     {
         const eps = 2 * TerrainCollider.eps;
@@ -204,23 +205,20 @@ class RigidBodiesPhase5
         let p1 = snappee.p1;
 
         const dwx = snappee.widthX + snapper.widthX + eps;
-        // const wnx = snapper.widthX + eps;
-        const endsInX = (abs(p1[0] - pn0[0])) < (dwx);
+        const endsInX = abs(p1[0] - pn0[0]) < dwx;
         if (!endsInX) return;
 
         const dwy = snappee.widthY + snapper.widthY + eps;
-        // const wny = snapper.widthY + eps;
-        const endsInY = (abs(p1[1] - pn0[1])) < (dwy);
+        const endsInY = abs(p1[1] - pn0[1]) < dwy;
         if (!endsInY) return;
 
         const dwz = snappee.widthZ + snapper.widthZ + eps;
-        // const wnz = snapper.widthZ + eps;
-        const endsInZ = (abs(p1[2] - pn0[2])) < (dwz);
+        const endsInZ = abs(p1[2] - pn0[2]) < dwz;
         if (!endsInZ) return;
 
-        const startsInX = (abs(p0[0] - pn0[0])) < (dwx);
-        const startsInY = (abs(p0[1] - pn0[1])) < (dwy);
-        const startsInZ = (abs(p0[2] - pn0[2])) < (dwz);
+        const startsInX = abs(p0[0] - pn0[0]) < dwx;
+        const startsInY = abs(p0[1] - pn0[1]) < dwy;
+        const startsInZ = abs(p0[2] - pn0[2]) < dwz;
 
         if (startsInX && startsInY && startsInZ)
         {
@@ -230,21 +228,137 @@ class RigidBodiesPhase5
 
         if (!startsInX && endsInX)
         {
-            p1[0] = p0[0] < pn0[0] ? (pn0[0] - dwx - eps) :
-                (pn0[0] + dwx + eps);
+            p1[0] = p0[0] < pn0[0] ?
+                pn0[0] - dwx - eps :
+                pn0[0] + dwx + eps;
             return;
         }
         if (!startsInY && endsInY)
         {
-            p1[1] = p0[1] < pn0[1] ? (pn0[1] - dwy - eps) :
-                (pn0[1] + dwy + eps);
+            p1[1] = p0[1] < pn0[1] ?
+                pn0[1] - dwy - eps :
+                pn0[1] + dwy + eps;
             return;
         }
         if (!startsInZ && endsInZ)
         {
-            p1[2] = p0[2] < pn0[2] ? (pn0[2] - dwz - eps) :
-                (pn0[2] + dwz + eps);
+            p1[2] = p0[2] < pn0[2] ?
+                pn0[2] - dwz - eps :
+                pn0[2] + dwz + eps;
             // return;
+        }
+    }
+
+    static collideProjectile(
+        entity,
+        projectile
+    )
+    {
+        if (projectile.collided) return;
+
+        let abs = Math.abs;
+        let ep = entity.p0;
+        let pp = projectile.p1;
+
+        const dwx = entity.widthX + projectile.widthX;
+        const dx = ep[0] - pp[0];
+        const endsInX = abs(dx) < dwx;
+        if (!endsInX) return;
+
+        const dwy = projectile.widthY + projectile.widthY;
+        const dy = ep[1] - pp[1];
+        const endsInY = abs(dy) < dwy;
+        if (!endsInY) return;
+
+        const dwz = entity.widthZ + projectile.widthZ;
+        const dz = ep[2] - pp[2];
+        const endsInZ = abs(dz) < dwz;
+        if (!endsInZ) return;
+
+        // Normalize and clamp
+        const norm = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        let fx = dx / norm; fx = Math.max(-1, Math.min(fx, 1));
+        let fy = dy / norm; fy = Math.max(-1, Math.min(fy, 1));
+        let fz = dz / norm; fz = Math.max(-1, Math.min(fz, 1));
+        entity.setHitVector(fx, fy, fz);
+        entity.hit = true;
+        projectile.collided = true;
+    }
+
+    static collideMelee(
+        hitter,
+        hittee,
+        gravity
+    )
+    {
+        let o = hitter.p0;
+        let d = hittee.p0;
+        let abs = Math.abs;
+        const meleeRange = 2 * 0.9;
+
+        // Detect hit
+        const dwx = hittee.widthX + meleeRange;
+        const dx = d[0] - o[0];
+        const inX = abs(dx) < dwx;
+        if (!inX) return;
+
+        const dwy = hittee.widthY + meleeRange;
+        const dy = d[1] - o[1];
+        const inY = abs(dy) < dwy;
+        if (!inY) return;
+
+        const dwz = hittee.widthZ + meleeRange;
+        const dz = d[2] - o[2];
+        const inZ = abs(dz) < dwz;
+        if (!inZ) return;
+
+        // Perform hit.
+        const norm = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        let x = dx / norm; x = Math.max(-1, Math.min(x, 1));
+        let y = dy / norm; y = Math.max(-1, Math.min(y, 1));
+        let z = dz / norm; z = Math.max(-1, Math.min(z, 1));
+        const forwardVector = hitter.getForwardActionVector();
+        const fx = forwardVector[0];
+        const fy = forwardVector[1];
+        const fz = forwardVector[2];
+        const dotProduct = fx * x + fy * y + fz * z;
+        if (dotProduct > 0.7)
+        {
+            // console.log('melee hit');
+            const strength = 0.5;
+            if (!hittee.isParrying)
+            {
+                let slh = hittee.sinceLastHit();
+                // console.log(slh);
+                const nx = abs(gravity[0]) > 0 ? slh > 40 ?
+                    -35 * gravity[0] : 0 : strength * fx;
+                const ny = abs(gravity[1]) > 0 ? slh > 40 ?
+                    -35 * gravity[1] : 0 : strength * fy;
+                const nz = abs(gravity[2]) > 0 ? slh > 40 ?
+                    -35 * gravity[2] : 0 : strength * fz;
+                hittee.setHitVector(nx, ny, nz);
+                // console.log(hittee.hitVector);
+                hittee.hit = true;
+                hittee.wasHit();
+            }
+            else
+            {
+                let of = hittee.getForwardActionVector();
+                const dot2 = of[0] * fx + of[1] * fy + of[2] * fz;
+                if (dot2 < 0.7)
+                {
+                    let slh = hittee.sinceLastHit();
+                    hittee.setHitVector(
+                        abs(gravity[0]) > 0 ? slh > 40 ?
+                            -35 * gravity[0] : 0 : strength * fx,
+                        abs(gravity[1]) > 0 ? slh > 40 ?
+                            -35 * gravity[1] : 0 : strength * fy,
+                        abs(gravity[2]) > 0 ? slh > 40 ?
+                            -35 * gravity[2] : 0 : strength * fz
+                    );
+                    hittee.hit = true;
+                }
+            }
         }
     }
 
@@ -256,16 +370,7 @@ class RigidBodiesPhase5
         const eps = TerrainCollider.eps;
         entities.forEach(currentEntity => {
             if (!currentEntity) return;
-            let p0 = currentEntity.p0;
-            let p1 = currentEntity.p1;
-
-            let abs = Math.abs;
-            currentEntity.solved = abs(p0[0] - p1[0]) +
-                abs(p0[1] - p1[1]) + abs(p0[2] - p1[2]) < 0.000001;
-        });
-
-        entities.forEach(currentEntity => {
-            if (!currentEntity) return;
+            currentEntity.countSinceLastHit();
             let oldWorldId = currentEntity.worldId;
             if (oldWorldId !== worldId) return;
 
@@ -286,7 +391,7 @@ class RigidBodiesPhase5
             let a0 = currentEntity.a0; let a1 = currentEntity.a1;
 
             // Cast through potential x.
-            let xCrossed = currentEntity.solved ? false : XCollider.xCollide(p0, p1, world, xm);
+            let xCrossed = XCollider.xCollide(p0, p1, world, xm);
             // if (oldWorldId == -1) {
             //    console.log(`Position: ${p0} -> ${p1}`);
             // }
@@ -312,49 +417,89 @@ class RigidBodiesPhase5
                 entityUpdated = true;
             }
 
-            if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2])
+            const hasMeleed = currentEntity.hasJustMeleed;
+            const hasMoved = p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2];
+            if (hasMeleed || hasMoved)
             {
-                // TODO [PERF] O(1) with Dynamic Nearest Neighbors
+                let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
+                const isProjectile = currentEntity._isProjectile;
+                const rangeCollision = currentEntity.widthX + 2 * eps;
+                const rangeMelee = 2 * 0.9;
+
                 // Detect collision and collide.
-                // let iterator = new ObjectsIterator(
-                //     searcher, oi,
-                //     currentEntity.widthX * 4,
-                //     currentEntity.widthY * 4,
-                //     currentEntity.widthZ * 4
-                // );
-                // let passCount = 0;
-                // let n;
-                // while ((n = iterator.next()) !== null)
                 let oii;
-                for (oii = oi + 1; oii < oxAxis.length; ++oii)
+                for (oii = oi + 1; oii < oxAxis.length; ++oii) // Right
                 {
                     let nid = oxAxis[oii].id;
                     let n = entities[nid];
-                    // if (!n.solved) continue;
-                    if (Math.abs(n.p0[0] - p1[0]) > n.widthX + currentEntity.widthX + 2 * eps)
+                    const isOtherEntityProjectile = n._isProjectile;
+                    if (isProjectile && currentEntity.collided) break;
+                    if (
+                        isProjectile && isOtherEntityProjectile ||
+                        isOtherEntityProjectile && n.collided
+                    )
+                        continue;
+
+                    const dx = Math.abs(n.p0[0] - p1[0]);
+                    const outCollisionRange = dx > n.widthX + rangeCollision;
+                    if (!hasMeleed && outCollisionRange)
                         break;
-                    RigidBodiesPhase5.collidePair(n, currentEntity);
+                    if (hasMoved && !outCollisionRange)
+                    {
+                        if (!isProjectile && !isOtherEntityProjectile)
+                            RigidBodiesPhase5.collidePair(n, currentEntity);
+                        else
+                        {
+                            RigidBodiesPhase5.collideProjectile(
+                                isProjectile ? n : currentEntity,
+                                isProjectile ? currentEntity : n
+                            );
+                        }
+                    }
+                    if (hasMeleed)
+                    {
+                        const outMeleeRange = dx > n.widthX + rangeMelee;
+                        if (outMeleeRange && outCollisionRange) break;
+                        RigidBodiesPhase5.collideMelee(currentEntity, n, gravity);
+                    }
                 }
-                for (oii = oi - 1; oii >= 0; --oii)
+                for (oii = oi - 1; oii >= 0; --oii) // Left
                 {
                     let nid = oxAxis[oii].id;
                     let n = entities[nid];
-                    // if (!n.solved) continue;
-                    if (Math.abs(n.p0[0] - p1[0]) > n.widthX + currentEntity.widthX + 2 * eps)
+                    const isOtherEntityProjectile = n._isProjectile;
+                    if (isProjectile && currentEntity.collided) break;
+                    if (
+                        isProjectile && isOtherEntityProjectile ||
+                        isOtherEntityProjectile && n.collided
+                    )
+                        continue;
+
+                    const dx = Math.abs(n.p0[0] - p1[0]);
+                    const outCollisionRange = dx > n.widthX + rangeCollision;
+                    if (!hasMeleed && outCollisionRange)
                         break;
-                    RigidBodiesPhase5.collidePair(n, currentEntity);
+                    if (hasMoved && !outCollisionRange)
+                    {
+                        if (!isProjectile && !isOtherEntityProjectile)
+                            RigidBodiesPhase5.collidePair(n, currentEntity);
+                        else
+                        {
+                            RigidBodiesPhase5.collideProjectile(
+                                isProjectile ? n : currentEntity,
+                                isProjectile ? currentEntity : n
+                            );
+                        }
+                    }
+                    if (hasMeleed)
+                    {
+                        const outMeleeRange = dx > n.widthX + rangeMelee;
+                        if (outMeleeRange && outCollisionRange) break;
+                        RigidBodiesPhase5.collideMelee(currentEntity, n, gravity);
+                    }
                 }
 
-                // right
-                // entities.forEach(n =>
-                // {
-                //     if (n === currentEntity) return;
-                //     if (!n) return;
-                //     let pn0 = n.p0;
-                //     if (!pn0) return;
-                //     RigidBodiesPhase5.collidePair(n, currentEntity);
-                // Do stuff with next element (i.e. collide)
-                // });
+                currentEntity.hasJustMeleed = false;
             }
 
             if (p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2])
@@ -434,7 +579,6 @@ class RigidBodiesPhase5
             // To reset adherence:
             // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
             currentEntity.metaX = 0;
-            currentEntity.solved = true;
         });
     }
 }

@@ -139,11 +139,6 @@ class RigidBodiesPhase1
             // should a collision occur with the terrain or another
             // entity (or x).
 
-            let d = currentEntity.d; // Directions.
-            let r = currentEntity.r; // Rotation.
-            const maxV = currentEntity.getVelocity();
-            const factor = Math.sqrt(maxV * 1.05);
-
             let g = RigidBodies.creativeMode ? [0, 0, 0] :
                 rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
             // Only one non-zeno gravity component accepted on cube worlds.
@@ -153,7 +148,11 @@ class RigidBodiesPhase1
             }
 
             // let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, false); // 3D
-            let vector = RigidBodiesPhase1.getEntityForwardVector(d, r, factor, true);
+            let vector = RigidBodiesPhase1.getEntityForwardVector(
+                currentEntity,
+                // d, r, factor,
+                true
+            );
             let adh = currentEntity.adherence;
 
             // Compute the exact acceleration which is necessary
@@ -301,10 +300,11 @@ class RigidBodiesPhase1
             // Associate incremental term with entity index.
             leapfrogArray[oi] = [inc[0], inc[1], inc[2], oi];
 
+            let forces = RigidBodiesPhase1.getEntityForces(currentEntity);
             // Apply globals and inputs.
             // a_i+1 = sum(constraints)
             for (let i = 0; i < 3; ++i)
-                a1[i] += g[i]; // N.B. f=ma => a=f/m => a=(P=mg)/m => a=g
+                a1[i] += g[i] + forces[i]; // N.B. f=ma => a=f/m => a=(P=mg)/m => a=g
 
             // Apply velocity formula with absolute time
             // (lag would undesirably change topologies).
@@ -348,9 +348,30 @@ class RigidBodiesPhase1
         return [0, 0, 0];
     }
 
-    // TODO [PERF] use quaternions instead
-    static getEntityForwardVector(d, rotation, factor, project2D)
+    static getEntityForces(
+        entity
+    )
     {
+        if (entity.hit)
+        {
+            // console.log('hit');
+            entity.hit = false;
+            return entity.hitVector;
+        }
+        return [0, 0, 0];
+    }
+
+    // TODO [PERF] use quaternions instead
+    static getEntityForwardVector(
+        entity,
+        // d, rotation, factor,
+        project2D)
+    {
+        let d = entity.d; // Directions.
+        let rotation = entity.r; // Rotation.
+        const maxV = entity.getVelocity();
+        const factor = Math.sqrt(maxV * 1.05);
+
         let cos = Math.cos;
         let sin = Math.sin;
         let acos = Math.acos;

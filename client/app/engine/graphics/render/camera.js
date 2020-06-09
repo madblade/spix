@@ -221,8 +221,16 @@ extend(Camera.prototype, {
         this.cameraObject.getWorldQuaternion(camQ);
         nv.applyQuaternion(camQ);
         return nv;
-    }
+    },
 
+    getModelForwardVector()
+    {
+        let nv = new Vector3(0, 0, -1);
+        let camQ = new Quaternion();
+        this.cameraObject.getWorldQuaternion(camQ);
+        nv.applyQuaternion(camQ);
+        return nv;
+    }
 });
 
 export { Camera };

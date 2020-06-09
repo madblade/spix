@@ -44,7 +44,7 @@ class EntityLoader
 
             if (isInRange && !isPresent)
                 addedEntities[eid] =
-                { // TODO [GAMEPLAY] tell what it is doing (action / aggro / isAlly)
+                { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
                     p: e.position,
                     r: e.rotation,
                     k: e.kind,
@@ -57,7 +57,7 @@ class EntityLoader
 
             else if (isInRange && (updatedEntities.has(eid) || updatedEntities.has(aid)))
                 addedEntities[eid] =
-                { // TODO [GAMEPLAY] tell what it is doing (action / aggro / isAlly)
+                { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
                     p: e.position,
                     r: e.rotation,
                     k: e.kind,

@@ -211,7 +211,7 @@ let ListenerModule = {
         const clientModel = this.app.model.client;
         const graphicsEngine = this.app.engine.graphics;
         let p = graphicsEngine.getCameraCoordinates();
-        let f = graphicsEngine.getCameraForwardVector();
+        let f = graphicsEngine.getModelForwardVector();
         clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z, isButtonUp, isSecondaryItem]);
     },
 

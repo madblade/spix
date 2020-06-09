@@ -142,7 +142,10 @@ class Updater
                 if (!isPrimaryButton)
                 {
                     avatar.unLoadRanged();
-                    avatar.parry();
+                    avatar.parry(
+                        px, py, pz,
+                        fx, fy, fz
+                    );
                 }
                 break;
             case 'ranged':
