@@ -21,7 +21,7 @@ let AnimationsModule = {
             mixer.update((time - prevTime) * 0.001);
             this.times.set(entityId, time);
         } else {
-            console.log('[Animations] Undefined mixer.');
+            // console.log('[Animations] Undefined mixer.');
         }
     }
 

@@ -41,13 +41,13 @@ class Updater
         this._inputBuffer.push([avatar, meta]);
     }
 
-    update()
+    update(updateEntities)
     {
         // User-send updates (mainly x).
         this.processBuffer();
 
         // Compute aggregates to send.
-        this.updateConsistency();
+        this.updateConsistency(updateEntities);
     }
 
     processBuffer()
@@ -84,7 +84,7 @@ class Updater
     // Loading and unloading objects is done exclusively here.
     // Single criterion for maintaining loaded objects consistent: distance.
     // (objects are initialized with STATES so they don't need updates)
-    updateConsistency()
+    updateConsistency(updateEntities)
     {
         let players = this._game.players;
 
@@ -120,7 +120,9 @@ class Updater
             // Compute change for entities in range.
             let addedEntities;
             let removedEntities;
-            let u = eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers);
+            let u = updateEntities ?
+                eLoader.computeNewEntitiesInRange(p, updatedEntities, addedPlayers, removedPlayers) :
+                null;
 
             if (u) [addedEntities, removedEntities] = u;
             // TODO [PERF] filter: updated entities and entities that enter in range.

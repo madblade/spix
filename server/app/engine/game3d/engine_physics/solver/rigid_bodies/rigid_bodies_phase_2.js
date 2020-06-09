@@ -122,12 +122,18 @@ class RigidBodiesPhase2
             // let doProject = islandId === -1 || islandId === -2;
             let abs = Math.abs;
             let g = rigidBodiesSolver.getGravity(world, world.worldId, p0[0], p0[1], p0[2]);
+            let hasCollided = false;
             if (abs(g[0]) > 0 && abs(g[1]) === 0 && abs(g[2]) === 0)
-                TerrainCollider.collideLinearX(currentEntity, world, p0, p1, true);
+                hasCollided = TerrainCollider.collideLinearX(currentEntity, world, p0, p1, true);
             else if (abs(g[1]) > 0 && abs(g[0]) === 0 && abs(g[2]) === 0)
-                TerrainCollider.collideLinearY(currentEntity, world, p0, p1, true);
+                hasCollided = TerrainCollider.collideLinearY(currentEntity, world, p0, p1, true);
             else // if (abs(g[2]) > 0 && abs(g[1]) === 0 && abs(g[0]) === 0)
-                TerrainCollider.collideLinearZ(currentEntity, world, p0, p1, true);
+                hasCollided = TerrainCollider.collideLinearZ(currentEntity, world, p0, p1, true);
+
+            if (hasCollided && currentEntity._isProjectile)
+            {
+                // currentEntity.collided = true;
+            }
 
             // Remember to apply the same kind of changes to the simple entity + terrain solver (just below).
         }
@@ -164,6 +170,9 @@ class RigidBodiesPhase2
             if (dbg && hasCollided) {
                 console.log(entityIndex);
             }
+            // if (hasCollided && currentEntity._isProjectile)
+            //     currentEntity.collided = true;
+
             // Here bounce components could be reported as the inverse velocity at the impact point.
         }
     }

@@ -251,7 +251,8 @@ class RigidBodiesPhase5
 
     static collideProjectile(
         entity,
-        projectile
+        projectile,
+        gravity
     )
     {
         if (projectile.collided) return;
@@ -280,7 +281,17 @@ class RigidBodiesPhase5
         let fx = dx / norm; fx = Math.max(-1, Math.min(fx, 1));
         let fy = dy / norm; fy = Math.max(-1, Math.min(fy, 1));
         let fz = dz / norm; fz = Math.max(-1, Math.min(fz, 1));
-        entity.setHitVector(fx, fy, fz);
+
+        let slh = entity.sinceLastHit();
+        // console.log(slh);
+        const strength = 0.5;
+        const nx = abs(gravity[0]) > 0 ? slh > 40 ?
+            -35 * gravity[0] : 0 : strength * fx;
+        const ny = abs(gravity[1]) > 0 ? slh > 40 ?
+            -35 * gravity[1] : 0 : strength * fy;
+        const nz = abs(gravity[2]) > 0 ? slh > 40 ?
+            -35 * gravity[2] : 0 : strength * fz;
+        entity.setHitVector(nx, ny, nz);
         entity.hit = true;
         projectile.collided = true;
     }
@@ -370,7 +381,11 @@ class RigidBodiesPhase5
         const eps = TerrainCollider.eps;
         entities.forEach(currentEntity => {
             if (!currentEntity) return;
-            currentEntity.countSinceLastHit();
+            if (currentEntity._isProjectile)
+                currentEntity.ageProjectile();
+            else
+                currentEntity.countSinceLastHit();
+
             let oldWorldId = currentEntity.worldId;
             if (oldWorldId !== worldId) return;
 
@@ -452,7 +467,8 @@ class RigidBodiesPhase5
                         {
                             RigidBodiesPhase5.collideProjectile(
                                 isProjectile ? n : currentEntity,
-                                isProjectile ? currentEntity : n
+                                isProjectile ? currentEntity : n,
+                                gravity
                             );
                         }
                     }
@@ -487,7 +503,8 @@ class RigidBodiesPhase5
                         {
                             RigidBodiesPhase5.collideProjectile(
                                 isProjectile ? n : currentEntity,
-                                isProjectile ? currentEntity : n
+                                isProjectile ? currentEntity : n,
+                                gravity
                             );
                         }
                     }
@@ -513,6 +530,9 @@ class RigidBodiesPhase5
                     // Here one should call a function objectOrderer.switchEntityToWorld(...)
                 }
                 entityUpdated = true;
+
+                if (currentEntity._isProjectile)
+                    currentEntity.hasMoved();
             }
 
             // Rotate entity
@@ -579,6 +599,16 @@ class RigidBodiesPhase5
             // To reset adherence:
             // currentEntity.adherence = [!1, !1, !1, !1, !1, !1];
             currentEntity.metaX = 0;
+            if (currentEntity._isProjectile)
+            {
+                if (currentEntity.collided ||
+                    currentEntity.howLongSinceLastMoved() > 180)
+                {
+                    rigidBodiesSolver
+                        ._physicsEngine._ai
+                        .pushProjectileForDespawn(currentEntity.entityId);
+                }
+            }
         });
     }
 }

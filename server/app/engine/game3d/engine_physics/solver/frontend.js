@@ -19,7 +19,7 @@ class FrontEnd
         let xModel = physicsEngine.xModel;
 
         // Internals.
-        this._rigidBodies = new RigidBodies(refreshRate);
+        this._rigidBodies = new RigidBodies(refreshRate, physicsEngine);
         this._objectOrderer = new ObjectOrderer(entityModel, xModel);
         this._eventOrderer = new EventOrderer();
         this._stamp = TimeUtils.getTimeSecNano();

@@ -232,7 +232,9 @@ class ObjectOrderer
         let kind = object instanceof Entity ? 'e' :
             object instanceof Portal ? 'x' : null;
         if (!kind)
+        {
             throw Error('[Physics/Orderer]: invalid object kind.');
+        }
 
         let portals = this._xModel.portals;
         let entities = this._entityModel.entities;

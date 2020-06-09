@@ -364,7 +364,6 @@ class RigidBodiesPhase1
     // TODO [PERF] use quaternions instead
     static getEntityForwardVector(
         entity,
-        // d, rotation, factor,
         project2D)
     {
         let d = entity.d; // Directions.

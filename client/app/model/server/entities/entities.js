@@ -139,6 +139,7 @@ extend(EntityModel.prototype, {
                 this.loadPlayer(id, updatedEntity, graphics, entities);
                 break;
 
+            case 'projectile': // TODO [GAMEPLAY] arrow mesh
             case 'cube':
                 this.loadCube(id, updatedEntity, graphics, entities);
                 break;

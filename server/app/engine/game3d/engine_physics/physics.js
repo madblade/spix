@@ -18,6 +18,7 @@ class PhysicsEngine
         this._entityModel   = game.entityModel;
         this._worldModel    = game.worldModel;
         this._xModel        = game.xModel;
+        this._ai            = game.ai;
 
         // Buffers.
         this._inputBuffer   = new InputBuffer();

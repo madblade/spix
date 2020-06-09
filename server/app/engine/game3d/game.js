@@ -86,6 +86,7 @@ class Game3D extends Game
     get xModel()            { return this._xModel; }
     get consistencyModel()  { return this._consistencyModel; }
 
+    get ai()                { return this._ai; }
     get physicsEngine()     { return this._physicsEngine; }
     get topologyEngine()    { return this._topologyEngine; }
     get consistencyEngine() { return this._consistencyEngine; }
@@ -127,13 +128,13 @@ class Game3D extends Game
 
         /** Consistency solving: mediator between player and server models **/
         // t = TimeUtils.getTimeSecNano();
-        this._consistencyEngine.update(); // Make client models consistent. Needs other engines.
+        const updateEntities = this._frameMod1000 % Game3D.waitFramesToOutputEntities === 0;
+        this._consistencyEngine.update(updateEntities); // Make client models consistent. Needs other engines.
         // const dt4 = TimeUtils.getTimeSecNano(t)[1] / 1000;
         // if (Game3D.bench && dt4 > debugThresh) console.log(`${dt4} µs to update consistency.`);
 
         /** Outputs **/
         // t = TimeUtils.getTimeSecNano();
-        const updateEntities = this._frameMod1000 % Game3D.waitFramesToOutputEntities === 0;
         this._externalOutput.update(updateEntities);    // Send updates.
         this._internalOutput.update();    // Update perceptions.
         // const dt5 = TimeUtils.getTimeSecNano(t)[1] / 1000;

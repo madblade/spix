@@ -24,8 +24,10 @@ class RigidBodies
     static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
     // static gravityConstant = 0;
 
-    constructor(refreshRate)
+    constructor(refreshRate, physicsEngine)
     {
+        this._physicsEngine = physicsEngine;
+
         //
         this._gravity = [0, 0, RigidBodies.gravityConstant];
         this._gravityWater = [0, 0, 0.1 * RigidBodies.gravityConstant];

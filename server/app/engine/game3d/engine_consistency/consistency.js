@@ -116,6 +116,11 @@ class ConsistencyEngine
 
     despawnEntity(entityId)
     {
+        if (!this._entityModel || !this._entityModel._entities)
+            return;
+        let e = this._entityModel._entities[entityId];
+        if (!e) return;
+
         this._entityBuffer.removeEntity(entityId);
         this._physicsEngine.removeEntity(entityId);
         this._entityModel.removeEntity(entityId);
@@ -126,10 +131,10 @@ class ConsistencyEngine
         this._updater.addInput(meta, avatar);
     }
 
-    update()
+    update(updateEntities)
     {
         this.updateSpawns();
-        this._updater.update();
+        this._updater.update(updateEntities);
     }
 
     getChunkOutput()

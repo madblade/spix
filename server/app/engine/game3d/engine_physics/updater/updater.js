@@ -159,9 +159,12 @@ class Updater
                 {
                     avatar.unParry();
                     avatar.unLoadRanged();
-                    avatar.fire(
-                        px, py, pz,
-                        fx, fy, fz
+                    // avatar.fire(
+                    //     px, py, pz,
+                    //     fx, fy, fz
+                    // );
+                    this._physicsEngine._ai.pushProjectileForSpawn(
+                        [px, py, pz, fx, fy, fz, avatar.worldId]
                     );
                 }
                 break;

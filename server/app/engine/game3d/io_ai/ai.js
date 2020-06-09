@@ -16,11 +16,14 @@ class AI
         // this._xModel        = game.xModel;
 
         this._ais = [];
-        this._maxAis = 15;
+        this._maxAis = 1;
         this._needingPath = [];
 
         this._cycle = 1;
         this._cycleLength = 10000;
+
+        this._projectilesNeedingSpawn = [];
+        this._projectilesNeedingDespawn = [];
     }
 
     update()
@@ -29,10 +32,63 @@ class AI
         this._cycle = nc;
 
         // console.log('seeing, thinking, acting');
+        this.despawnProjectiles();
         this.spawnAI(nc);
         this.aggroPass(nc);
         this.pathFindingPass(nc);
         this.actionPass(nc);
+        this.magnusPass();
+        this.spawnProjectiles();
+    }
+
+    despawnProjectiles()
+    {
+        const despawn = this._projectilesNeedingDespawn;
+        if (despawn.length > 0)
+        {
+            for (let i = 0; i < despawn.length; ++i)
+            {
+                let eid = despawn.pop();
+                let ce = this._game.consistencyEngine;
+                ce.despawnEntity(eid);
+            }
+        }
+    }
+
+    spawnProjectiles()
+    {
+        let pns = this._projectilesNeedingSpawn;
+        const l = pns.length;
+        if (l > 0)
+        {
+            let ce = this._game.consistencyEngine;
+            for (let i = 0; i < Math.min(10, l); ++i)
+            {
+                let p = pns.pop();
+                const wid = p[6];
+                let world = this._worldModel.getWorld(wid);
+                let projectile = ce.spawnEntity(
+                    'projectile',
+                    world,
+                    [
+                        p[0] + 0.25 * p[3],
+                        p[1] + 0.25 * p[4],
+                        p[2] + 0.25 * p[5],
+                    ]
+                );
+                projectile.a0[0] = 0.5 * p[3];
+                projectile.a0[1] = 0.5 * p[4];
+                projectile.a0[2] = 0.5 * p[5];
+                projectile.v0[0] = 0.5 * p[3];
+                projectile.v0[1] = 0.5 * p[4];
+                projectile.v0[2] = 0.5 * p[5];
+            }
+        }
+    }
+
+    magnusPass()
+    {
+        // To alter projectiles trajectory
     }
 
     // Random spawn an IA around a player
@@ -173,6 +229,24 @@ class AI
             // else if (dz > 0.5) ai.goDown(); // Digs??
         });
         // TODO displacement or ranged target / melee action
+    }
+
+    pushProjectileForSpawn(
+        projectile
+    )
+    {
+        this._projectilesNeedingSpawn.push(
+            projectile
+        );
+    }
+
+    pushProjectileForDespawn(
+        id
+    )
+    {
+        this._projectilesNeedingDespawn.push(
+            id
+        );
     }
 }
 
