@@ -74,7 +74,8 @@ class RigidBodies
         // Clamp on main faces to keep camera rotation updates to a minimum.
         let squaredWithSmoothBorders = true;
         let squaredRadius = 2; // Should this equal 1.6, the entity height?
-        const gravityNorm = (world.isWater(x, y, z) ? 0.1 : 1) * RigidBodies.gravityConstant;
+        const gravityNorm = (world.isWater(x, y, z) ? 0.1 : 1) *
+            RigidBodies.gravityConstant;
 
         if (squaredWithSmoothBorders)
         {

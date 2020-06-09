@@ -13,7 +13,12 @@ class Projectile extends Entity
         super(id);
 
         this._kind = 'projectile';
+
+        this._collided = false;
     }
+
+    set collided(c) { this._collided = c; }
+    get collided() { return this._collided; }
 }
 
 export default Projectile;

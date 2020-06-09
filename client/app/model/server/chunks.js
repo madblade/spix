@@ -137,11 +137,13 @@ extend(ChunkModel.prototype, {
                         this.unloadChunk(worldId, chunkId);
                     }
 
-                    else if (this.isChunkLoaded(worldId, chunkId) && update.length === 3) {
+                    else if (this.isChunkLoaded(worldId, chunkId) && update.length === 3)
+                    {
                         this.updateChunk(worldId, chunkId, update);
                     }
 
-                    else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3) {
+                    else if (this.isChunkLoaded(worldId, chunkId) && update.length !== 3)
+                    {
                         // TODO [IO] server-side, use distinct channels for chunk updates.
                         console.error(`WARN: corrupt update or model @refresh / updateChunk ${chunkId}.`);
                         console.log(update);
@@ -274,7 +276,8 @@ extend(ChunkModel.prototype, {
         // || worldMeta.type === WorldType.FANTASY;
         // Water cameras not yet supported with fantasy generation
         graphics.updateChunk(
-            worldId, chunk, chunkId, components, sizeX, sizeY, sizeZ,
+            worldId, chunk, chunkId, components,
+            sizeX, sizeY, sizeZ,
             isWorldFlat
         );
     },

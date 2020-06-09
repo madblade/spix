@@ -63,8 +63,8 @@ let HubState = function(stateManager)
                 <option value="1" selected>Regular Hills</option>
                 <option value="0">No Hills</option>
                 <option value="2">Giant Hills</option>
-                <option value="3">Eroded formations and Arches</option>
-                <option value="4">Spikes</option>
+                <!-- <option value="3">Eroded formations and Arches</option>-->
+                <!-- <option value="4">Spikes</option>-->
             </select>
 
             <div class="input-group-append mb-1">

@@ -53,8 +53,9 @@ class FrontEnd
 
         // Compute adaptive time step.
         // Activate lag correction here.
+        let relativeDt = 16;
         // let relativeDt = 16.667;
-        let relativeDt = TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
+        // let relativeDt = TimeUtils.getTimeSecNano(this._stamp)[1] / 1e6;
 
         // Solve physics constraints with basic ordering optimization.
         let maxTimeStepDuration = rigidBodies.refreshRate;
