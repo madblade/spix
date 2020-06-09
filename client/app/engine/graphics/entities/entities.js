@@ -40,7 +40,7 @@ let EntitiesModule = {
         return geometry;
     },
 
-    initializeEntity(entityId, model)
+    initializeEntity(entityId, model, color)
     {
         let mixers = this.mixers;
         let times = this.times;
@@ -50,7 +50,7 @@ let EntitiesModule = {
         let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 
         let mesh = new Mesh(bufferGeometry, new MeshLambertMaterial({
-            color: 0xff0000,
+            color,
             vertexColors: FaceColors,
             morphTargets: true
         }));
@@ -74,7 +74,7 @@ let EntitiesModule = {
     },
 
     // For composite entities, wrap heavy model parts in higher level structure.
-    finalizeEntity(id, createdEntity)
+    finalizeEntity(id, createdEntity, color)
     {
         // First only manage avatars.
         let up = new Object3D();
@@ -82,7 +82,7 @@ let EntitiesModule = {
         let head = this.createMesh(
             this.createGeometry('box'),
             this.createMaterial('flat-phong',
-                {color: 0xff0000})
+                {color})
         );
 
         up.rotation.reorder('ZYX');

@@ -87,6 +87,7 @@ class AI
                         [xTest + 0.5, yTest + 0.5, zTest + 0.01]
                     );
                     newAI.aggro = avatar;
+                    newAI.captain = avatar;
                     newAI.target = p; // Move toward avatar.
                     this._ais.push(newAI);
                 } else

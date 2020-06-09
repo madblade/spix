@@ -48,7 +48,8 @@ class EntityLoader
                     p: e.position,
                     r: e.rotation,
                     k: e.kind,
-                    w: e.worldId
+                    w: e.worldId,
+                    a: e.captain === avatar // is an ally
                 };
 
             else if (!isInRange && isPresent)
@@ -60,7 +61,8 @@ class EntityLoader
                     p: e.position,
                     r: e.rotation,
                     k: e.kind,
-                    w: e.worldId
+                    w: e.worldId,
+                    a: e.captain === avatar // is an ally
                 };
         }});
 

@@ -334,8 +334,14 @@ extend(SelfModel.prototype, {
         let entityId = this.entityId;
         let worldId = this.worldId;
 
-        let createdEntity = graphics.initializeEntity(entityId, 'steve');
-        let object3d = graphics.finalizeEntity(entityId, createdEntity);
+        let createdEntity = graphics.initializeEntity(
+            entityId, 'steve',
+            0xffff00
+        );
+        let object3d = graphics.finalizeEntity(
+            entityId, createdEntity,
+            0xffff00
+        );
         selfModel.avatar = object3d;
         if (selfModel.displayAvatar) graphics.addToScene(object3d, worldId);
 

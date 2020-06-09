@@ -24,6 +24,9 @@ class Walker extends Entity
         this._aggro = null;
     }
 
+    get captain()           { return this._captain; }
+    set captain(newCaptain) { this._captain = newCaptain; }
+
     get aggro()             { return this._aggro; }
     set aggro(newAggro)     { this._aggro = newAggro; }
 

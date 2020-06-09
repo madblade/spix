@@ -32,8 +32,13 @@ let PlayerModule = {
     loadPlayer(id, updatedEntity, graphics, entities)
     {
         // TODO [GAMEPLAY] add handheld item
-        let createdEntity = graphics.initializeEntity(id, 'steve');
-        let object3D = graphics.finalizeEntity(id, createdEntity);
+        let color = updatedEntity.a ? 0x00ff00 : 0xff0000;
+        let createdEntity = graphics.initializeEntity(
+            id, 'steve', color
+        );
+        let object3D = graphics.finalizeEntity(
+            id, createdEntity, color
+        );
 
         let entity = new Entity(id, object3D, parseInt(updatedEntity.w, 10));
         graphics.addToScene(entity.getObject3D(), entity.getWorldId());
