@@ -137,7 +137,9 @@ class SimplePerlin
         }
     }
 
-    static simpleGeneration2D(chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks)
+    static simpleGeneration2D(
+        chunk, worldId, worldInfo,
+        perlinIntensity, shuffleChunks, blocks)
     {
         let dims = chunk.dimensions;
         const dx = dims[0];
@@ -467,13 +469,15 @@ class SimplePerlin
         {
             case WorldType.FLAT:
                 SimplePerlin.simpleGeneration2D(
-                    chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
+                    chunk, worldId, worldInfo,
+                    perlinIntensity, shuffleChunks, blocks
                 );
                 // 1: x, 2: y, 3: z, 4: full, 5: empty
                 break;
             case WorldType.CUBE:
                 SimplePerlin.simpleGeneration3D(
-                    chunk, worldId, worldInfo, perlinIntensity, shuffleChunks, blocks
+                    chunk, worldId, worldInfo,
+                    perlinIntensity, shuffleChunks, blocks
                 );
 
                 break;
