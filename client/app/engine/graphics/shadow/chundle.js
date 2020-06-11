@@ -197,7 +197,8 @@ let Chundle = {
                 // let newMesh = new Mesh(geometry, material);
                 // newMesh.castShadow = true;
                 // newMesh.receiveShadow = true;
-                // if (Math.random() < 0.5) newMesh.userData.bloom = true;
+                // if (Math.random() < 0.5)
+                if (!isWater) newMesh.userData.bloom = true;
             }
             else
             {

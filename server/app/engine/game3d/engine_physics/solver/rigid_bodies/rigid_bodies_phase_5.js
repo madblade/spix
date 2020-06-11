@@ -285,6 +285,9 @@ class RigidBodiesPhase5
         let fx = dx / norm; fx = Math.max(-1, Math.min(fx, 1));
         let fy = dy / norm; fy = Math.max(-1, Math.min(fy, 1));
         let fz = dz / norm; fz = Math.max(-1, Math.min(fz, 1));
+        if (isNaN(fx)) fx = 0;
+        if (isNaN(fy)) fy = 0;
+        if (isNaN(fz)) fz = 0;
 
         let slh = entity.sinceLastHit();
         // console.log(slh);
@@ -333,6 +336,9 @@ class RigidBodiesPhase5
         let x = dx / norm; x = Math.max(-1, Math.min(x, 1));
         let y = dy / norm; y = Math.max(-1, Math.min(y, 1));
         let z = dz / norm; z = Math.max(-1, Math.min(z, 1));
+        if (isNaN(x)) x = 0;
+        if (isNaN(y)) y = 0;
+        if (isNaN(z)) z = 0;
         const forwardVector = hitter.getForwardActionVector();
         const fx = forwardVector[0];
         const fy = forwardVector[1];

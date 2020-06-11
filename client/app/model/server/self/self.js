@@ -361,7 +361,7 @@ extend(SelfModel.prototype, {
         else if (ItemsModelModule.isItemRanged(handItemID) || ItemsModelModule.isItemMelee(handItemID) ||
             ItemsModelModule.isItemX(handItemID) || ItemsModelModule.isItemBlock(handItemID)
         ) {
-            handItem = graphics.getItemMesh(handItemID);
+            handItem = graphics.getItemMesh(handItemID, true);
         } else {
             console.warn('[ServerSelf] Handheld item unrecognized.');
             handItem = null;

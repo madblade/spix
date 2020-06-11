@@ -12,7 +12,7 @@ import { ItemType } from '../../model/server/self/items';
 
 let MeshesModule = {
 
-    getItemMesh(itemID)
+    getItemMesh(itemID, renderOnTop)
     {
         let itemName = this.getMeshIDFromItemID(itemID);
         if (itemName) { // It’s a handheld item with a specific mesh
@@ -21,7 +21,7 @@ let MeshesModule = {
             } else if (itemID === ItemType.PORTAL_GUN_SINGLE) {
                 // TODO [GAMEPLAY] make it blue and orange
             }
-            return this.loadReferenceMeshFromMemory(itemName);
+            return this.loadReferenceMeshFromMemory(itemName, renderOnTop);
         } else { // It’s probably a block.
             let g = this.createGeometry('box');
             let m = this.createMaterial('flat-phong');
@@ -103,7 +103,7 @@ let MeshesModule = {
         }
     },
 
-    loadReferenceMeshFromMemory(id)
+    loadReferenceMeshFromMemory(id, renderOnTop)
     {
         if (!this.referenceMeshes.has(id)) {
             console.error(`[Graphics/Meshes] Could not charge a new "${id}" mesh.`);
@@ -119,7 +119,7 @@ let MeshesModule = {
 
         let inner = clone.children[0];
         console.log(inner);
-        if (inner) this.renderOnTop(inner);
+        if (inner && renderOnTop) this.renderOnTop(inner);
         // if (inner.children && inner.children.length === 4) this.renderOnTop(inner);
         // for (let i = 0; i < inner.children.length; ++i)
         //     inner.children[i].renderOrder = 9999;

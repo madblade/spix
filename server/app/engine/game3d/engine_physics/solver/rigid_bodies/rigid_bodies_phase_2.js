@@ -111,8 +111,16 @@ class RigidBodiesPhase2
 
             let entityIndex = oxAxis[oi].id;
             let currentEntity = entities[entityIndex];
+            if (!currentEntity) continue;
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
+            if (
+                !p0 || isNaN(p0[0]) || isNaN(p0[1]) || isNaN(p0[2]) ||
+                !p1 || isNaN(p1[0]) || isNaN(p1[1]) || isNaN(p1[2])
+            )
+            {
+                continue;
+            }
 
             // Cast on current world to prevent x crossing through matter.
             // const dtr = currentEntity.dtr; // To use time dilation
@@ -153,8 +161,15 @@ class RigidBodiesPhase2
 
             let entityIndex = oxAxis[oi].id;
             let currentEntity = entities[entityIndex];
+            if (!currentEntity) continue;
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
+            if (
+                !p0 || isNaN(p0[0]) || isNaN(p0[1]) || isNaN(p0[2]) ||
+                !p1 || isNaN(p1[0]) || isNaN(p1[1]) || isNaN(p1[2])
+            ) {
+                continue;
+            }
 
             // Cast on current world to prevent x crossing through matter.
             // const dtr = currentEntity.dtr;

@@ -7,6 +7,7 @@
 import extend           from '../../../extend.js';
 
 import { PlayerModule } from './player.js';
+import { ItemType } from '../self/items';
 
 let EntityModel = function(app)
 {
@@ -140,6 +141,8 @@ extend(EntityModel.prototype, {
                 break;
 
             case 'projectile': // TODO [GAMEPLAY] arrow mesh
+                this.loadArrow(id, updatedEntity, graphics, entities);
+                break;
             case 'cube':
                 this.loadCube(id, updatedEntity, graphics, entities);
                 break;
