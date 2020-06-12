@@ -66,6 +66,7 @@ class AI
             {
                 let p = pns.pop();
                 const wid = p[6];
+                const power = Math.min(p[7] / 60, 2);
                 // const wx = p[7];
                 // const wy = p[8];
                 // const wz = p[9];
@@ -81,9 +82,9 @@ class AI
                         p[2] + 0.5 * p[5],
                     ]
                 );
-                projectile.a0[0] = 0.5 * p[3];
-                projectile.a0[1] = 0.5 * p[4];
-                projectile.a0[2] = 0.5 * p[5];
+                projectile.a0[0] = power * 0.5 * p[3];
+                projectile.a0[1] = power * 0.5 * p[4];
+                projectile.a0[2] = power * 0.5 * p[5];
                 projectile.v0[0] = 0.5 * p[3];
                 projectile.v0[1] = 0.5 * p[4];
                 projectile.v0[2] = 0.5 * p[5];

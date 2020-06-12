@@ -397,7 +397,11 @@ class RigidBodiesPhase5
             if (currentEntity._isProjectile)
                 currentEntity.ageProjectile();
             else
+            {
                 currentEntity.countSinceLastHit();
+                if (currentEntity._isAvatar)
+                    currentEntity.countSinceLoadStart();
+            }
 
             let oldWorldId = currentEntity.worldId;
             if (oldWorldId !== worldId) return;

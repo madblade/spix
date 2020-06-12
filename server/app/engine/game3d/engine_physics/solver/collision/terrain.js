@@ -42,19 +42,21 @@ class TerrainCollider
         let adx = false; let ady = false; let adz = false;
         const isProjectile = entity._isProjectile;
 
+        let it = 0;
+        const itm = 40;
         if (x0 !== x1)
         {
-            let xNetwork = [];
+            let xStart = [];
             let xArrival = [];
             if (isProjectile)
             {
-                xNetwork.push([x0, y0, z0]);
+                xStart.push([x0, y0, z0]);
                 xArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        xNetwork.push([
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        xStart.push([
                             x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
                             currentY,
                             currentZ
@@ -66,16 +68,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentY >= lastY) break;
                     currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < xNetwork.length; ++i)
+            for (let i = 0; i < xStart.length; ++i)
             {
                 let newCrops = xArrival[i];
-                let net = xNetwork[i];
+                let net = xStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adx = true;
@@ -97,18 +101,18 @@ class TerrainCollider
 
         if (y0 !== y1)
         {
-            let yNetwork = [];
+            let yStart = [];
             let yArrival = [];
 
             if (isProjectile)
             {
-                yNetwork.push([x0, y0, z0]);
+                yStart.push([x0, y0, z0]);
                 yArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        yNetwork.push([
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        yStart.push([
                             currentX,
                             y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
                             currentZ
@@ -120,16 +124,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < yNetwork.length; ++i)
+            for (let i = 0; i < yStart.length; ++i)
             {
                 let newCrops = yArrival[i];
-                let net = yNetwork[i];
+                let net = yStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
@@ -162,17 +168,17 @@ class TerrainCollider
 
         if (z0 !== z1)
         {
-            let zNetwork = [];
+            let zStart = [];
             let zArrival = [];
             if (isProjectile)
             {
-                zNetwork.push([x0, y0, z0]);
+                zStart.push([x0, y0, z0]);
                 zArrival.push([cropX, cropY, z1]);
             }
             else
-                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                        zNetwork.push([
+                for (let currentX = x0 - xW, lastX = x0 + xW; ; it < itm) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ; it < itm) {
+                        zStart.push([
                             currentX,
                             currentY,
                             z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
@@ -184,16 +190,18 @@ class TerrainCollider
                         ]);
                         if (currentY >= lastY) break;
                         currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < zNetwork.length; ++i)
+            for (let i = 0; i < zStart.length; ++i)
             {
                 let newCrops = zArrival[i];
-                let net = zNetwork[i];
+                let net = zStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adz = true;
@@ -221,6 +229,11 @@ class TerrainCollider
                     }
                 }
             }
+        }
+
+        if (it === itm)
+        {
+            console.warn('[Terrain] Invalid hitbox.');
         }
 
         TerrainCollider.correctAdherence(entity, adx, ady, adz, x0, x1, y0, y1, z0, z1);
@@ -258,19 +271,22 @@ class TerrainCollider
         let adx = false; let ady = false; let adz = false;
         const isProjectile = entity._isProjectile;
 
+        let it = 0;
+        const itm = 40;
+
         if (x0 !== x1)
         {
-            let xNetwork = [];
+            let xStart = [];
             let xArrival = [];
             if (isProjectile)
             {
-                xNetwork.push([x0, y0, z0]);
+                xStart.push([x0, y0, z0]);
                 xArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        xNetwork.push([
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        xStart.push([
                             x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
                             currentY,
                             currentZ
@@ -282,16 +298,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentY >= lastY) break;
                     currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < xNetwork.length; ++i)
+            for (let i = 0; i < xStart.length; ++i)
             {
                 let newCrops = xArrival[i];
-                let net = xNetwork[i];
+                let net = xStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adx = true;
@@ -313,18 +331,18 @@ class TerrainCollider
 
         if (z0 !== z1)
         {
-            let zNetwork = [];
+            let zStart = [];
             let zArrival = [];
 
             if (isProjectile)
             {
-                zNetwork.push([x0, y0, z0]);
+                zStart.push([x0, y0, z0]);
                 zArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                        zNetwork.push([
+                for (let currentX = x0 - xW, lastX = x0 + xW; ; it < itm) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ; it < itm) {
+                        zStart.push([
                             currentX,
                             currentY,
                             z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
@@ -336,16 +354,18 @@ class TerrainCollider
                         ]);
                         if (currentY >= lastY) break;
                         currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < zNetwork.length; ++i)
+            for (let i = 0; i < zStart.length; ++i)
             {
                 let newCrops = zArrival[i];
-                let net = zNetwork[i];
+                let net = zStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adz = true;
@@ -377,18 +397,18 @@ class TerrainCollider
 
         if (y0 !== y1)
         {
-            let yNetwork = [];
+            let yStart = [];
             let yArrival = [];
 
             if (isProjectile)
             {
-                yNetwork.push([x0, y0, z0]);
+                yStart.push([x0, y0, z0]);
                 yArrival.push([cropX, y1, cropZ]);
             }
             else
-                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        yNetwork.push([
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        yStart.push([
                             currentX,
                             y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
                             currentZ
@@ -400,16 +420,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < yNetwork.length; ++i)
+            for (let i = 0; i < yStart.length; ++i)
             {
                 let newCrops = yArrival[i];
-                let net = yNetwork[i];
+                let net = yStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
@@ -438,6 +460,11 @@ class TerrainCollider
                     }
                 }
             }
+        }
+
+        if (it === itm)
+        {
+            console.warn('[Terrain] Invalid hitbox.');
         }
 
         TerrainCollider.correctAdherence(entity, adx, ady, adz, x0, x1, y0, y1, z0, z1);
@@ -472,20 +499,23 @@ class TerrainCollider
         let adx = false; let ady = false; let adz = false;
         const isProjectile = entity._isProjectile;
 
+        let it = 0;
+        const itm = 40;
+
         if (y0 !== y1)
         {
-            let yNetwork = [];
+            let yStart = [];
             let yArrival = [];
 
             if (isProjectile)
             {
-                yNetwork.push([x0, y0, z0]);
+                yStart.push([x0, y0, z0]);
                 yArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        yNetwork.push([
+                for (let currentX = numClamp(x0 - xW), lastX = numClamp(x0 + xW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        yStart.push([
                             currentX,
                             y1 < y0 ? numClamp(y0 - yW) : numClamp(y0 + yW),
                             currentZ
@@ -497,16 +527,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < yNetwork.length; ++i)
+            for (let i = 0; i < yStart.length; ++i)
             {
                 let newCrops = yArrival[i];
-                let net = yNetwork[i];
+                let net = yStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
 
                 if (c) {
@@ -539,18 +571,18 @@ class TerrainCollider
 
         if (z0 !== z1)
         {
-            let zNetwork = [];
+            let zStart = [];
             let zArrival = [];
 
             if (isProjectile)
             {
-                zNetwork.push([x0, y0, z0]);
+                zStart.push([x0, y0, z0]);
                 zArrival.push([x1, y1, z1]);
             }
             else
-                for (let currentX = x0 - xW, lastX = x0 + xW; ;) {
-                    for (let currentY = y0 - yW, lastY = y0 + yW; ;) {
-                        zNetwork.push([
+                for (let currentX = x0 - xW, lastX = x0 + xW; ; it < itm) {
+                    for (let currentY = y0 - yW, lastY = y0 + yW; ; it < itm) {
+                        zStart.push([
                             currentX,
                             currentY,
                             z1 < z0 ? numClamp(z0 - zW + epsilon) : numClamp(z0 + zW)
@@ -562,16 +594,18 @@ class TerrainCollider
                         ]);
                         if (currentY >= lastY) break;
                         currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                        ++it;
                     }
                     if (currentX >= lastX) break;
                     currentX = currentX + 1 > lastX ? lastX : currentX + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < zNetwork.length; ++i)
+            for (let i = 0; i < zStart.length; ++i)
             {
                 let newCrops = zArrival[i];
-                let net = zNetwork[i];
+                let net = zStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adz = true;
@@ -603,18 +637,18 @@ class TerrainCollider
 
         if (x0 !== x1)
         {
-            let xNetwork = [];
+            let xStart = [];
             let xArrival = [];
 
             if (isProjectile)
             {
-                xNetwork.push([x0, y0, z0]);
+                xStart.push([x0, y0, z0]);
                 xArrival.push([x1, cropY, cropZ]);
             }
             else
-                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ;) {
-                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ;) {
-                        xNetwork.push([
+                for (let currentY = numClamp(y0 - yW), lastY = numClamp(y0 + yW); ; it < itm) {
+                    for (let currentZ = numClamp(z0 - zW), lastZ = numClamp(z0 + zW); ; it < itm) {
+                        xStart.push([
                             x1 < x0 ? numClamp(x0 - xW) : numClamp(x0 + xW),
                             currentY,
                             currentZ
@@ -626,16 +660,18 @@ class TerrainCollider
                         ]);
                         if (currentZ >= lastZ) break;
                         currentZ = currentZ + 1 > lastZ ? lastZ : currentZ + 1;
+                        ++it;
                     }
                     if (currentY >= lastY) break;
                     currentY = currentY + 1 > lastY ? lastY : currentY + 1;
+                    ++it;
                 }
 
             // Do intersect.
-            for (let i = 0; i < xNetwork.length; ++i)
+            for (let i = 0; i < xStart.length; ++i)
             {
                 let newCrops = xArrival[i];
-                let net = xNetwork[i];
+                let net = xStart[i];
                 let c = TerrainCollider.intersectAmanditesWoo(net, newCrops, world, entity, doProject);
                 if (c) {
                     adx = true;
@@ -653,6 +689,11 @@ class TerrainCollider
                     }
                 }
             }
+        }
+
+        if (it === itm)
+        {
+            console.warn('[Terrain] Invalid hitbox.');
         }
 
         TerrainCollider.correctAdherence(entity, adx, ady, adz, x0, x1, y0, y1, z0, z1);

@@ -158,19 +158,23 @@ class Updater
                 else if (avatar.loadingRanged)
                 {
                     avatar.unParry();
-                    avatar.unLoadRanged();
+                    let power = avatar.unLoadRanged();
                     // avatar.fire(
                     //     px, py, pz,
                     //     fx, fy, fz
                     // );
-                    this._physicsEngine._ai.pushProjectileForSpawn(
-                        [
-                            px, py, pz,
-                            fx, fy, fz,
-                            avatar.worldId,
-                            avatar.widthY, avatar.widthY, avatar.widthZ
-                        ]
-                    );
+                    if (power > 20)
+                    {
+                        this._physicsEngine._ai.pushProjectileForSpawn(
+                            [
+                                px, py, pz,
+                                fx, fy, fz,
+                                avatar.worldId,
+                                power,
+                                avatar.widthY, avatar.widthY, avatar.widthZ
+                            ]
+                        );
+                    }
                 }
                 break;
             default:

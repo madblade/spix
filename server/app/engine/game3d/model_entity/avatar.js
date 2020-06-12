@@ -25,7 +25,7 @@ class Avatar extends Entity
         this._portalRenderDistance = 3;
 
         // Counted as a number of blocks.
-        this._entityRenderDistance = 2 * 8;
+        this._entityRenderDistance = 2 * 32;
 
         // For op / admin accesses
         this._role = 0;
@@ -39,6 +39,8 @@ class Avatar extends Entity
         this._hasJustFired = false;
         this._hasJustMeleed = false;
         this._hasJustJumped = false;
+        this._isAvatar = true;
+        this._timeSpentLoading = 0;
     }
 
     // Returns -1: admin, 0: OP, 1: registered, 2: guest.
@@ -66,8 +68,17 @@ class Avatar extends Entity
     get isParrying()                         { return this._isParrying; }
     getForwardActionVector()                 { return this._fAction; }
     unParry()                                { this._isParrying = false; }
-    loadRanged()                             { this._loadingRanged = true; }
-    unLoadRanged()                           { this._loadingRanged = false; }
+    loadRanged()                             {
+        this._loadingRanged = true;
+        this._timeSpentLoading = 0;
+    }
+    unLoadRanged()
+    {
+        const power = this._timeSpentLoading;
+        this._loadingRanged = false;
+        this._timeSpentLoading = 0;
+        return power;
+    }
     parry(
         px, py, pz,
         fx, fy, fz
@@ -84,6 +95,16 @@ class Avatar extends Entity
         this.setPF(px, py, pz, fx, fy, fz);
         this._hasJustMeleed = true;
     }
+    countSinceLoadStart()
+    {
+        if (this._loadingRanged)
+        {
+            ++this._timeSpentLoading;
+        } else {
+            this._timeSpentLoading = 0;
+        }
+    }
+
     fire(
         px, py, pz,
         fx, fy, fz
