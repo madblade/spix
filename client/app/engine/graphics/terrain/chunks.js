@@ -219,7 +219,7 @@ let ChunksModule = {
                 pA, pB, pC, cb, ab,
                 normal, color);
 
-            i += 18;
+            ++i;
         }
 
         let geometry = new BufferGeometry();
@@ -536,7 +536,7 @@ let ChunksModule = {
                 wfi.set(pos, aid);
             }
 
-            this.addFace(faceId, pos * 18, iS, ijS, ijkS,
+            this.addFace(faceId, pos, iS, ijS, ijkS,
                 vertices, normals, colors, uvs, Math.abs(nature),
                 iChunkOffset, jChunkOffset, kChunkOffset,
                 pA, pB, pC, cb, ab,

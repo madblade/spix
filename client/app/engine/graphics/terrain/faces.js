@@ -108,12 +108,13 @@ let FacesModule = {
         }
     },
 
-    addFace(faceId, i, iS, ijS, ijkS,
+    addFace(faceId, pos, iS, ijS, ijkS,
         positions, normals, colors, uvs, nature,
         iChunkOffset, jChunkOffset, kChunkOffset,
         pA, pB, pC, cb, ab,
         normal, color)
     {
+        const i = pos * 18;
         let j;
         let ax; let bx; let cx; let dx;
         let ay; let by; let cy; let dy;
@@ -131,6 +132,8 @@ let FacesModule = {
             return;
         }
         let offsetU; let offsetV;
+        const rotate = nature === 1 && // grass
+            Math.random() > 0.5;
 
         if (faceId < ijkS) // I
         {
@@ -144,9 +147,16 @@ let FacesModule = {
             cx = ax;    cy = ay + 1;    cz = az + 1;
             dx = ax;    dy = ay + 1;    dz = az;
 
-            this.setPNC1(positions, colors, normals, i, normal, color,
-                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
-                iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    bx, by, bz, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    ax, ay, az, bx, by, bz, cx, cy, cz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[0][0] : txCoords[3][0]) * 0.0625;
@@ -158,9 +168,16 @@ let FacesModule = {
             uvs[uvi + 4] = offsetU + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 5] = offsetV + 0.0625 - eps;
 
-            this.setPNC2(positions, colors, normals, i, normal, color,
-                ax, ay, az, cx, cy, cz, dx, dy, dz,
-                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    bx, by, bz, dx, dy, dz, ax, ay, az,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    ax, ay, az, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
             uvs[uvi + 6]  = offsetU + eps;
@@ -179,13 +196,20 @@ let FacesModule = {
             kk = Math.floor(faceId / ijS);
 
             ax = iChunkOffset + ii; ay = jChunkOffset + 1 + jj; az = kChunkOffset + kk;
-            bx = ax + 1; by = ay; bz = az;
-            cx = ax + 1; cy = ay; cz = az + 1;
-            dx = ax; dy = ay; dz = az + 1;
+            bx = ax + 1;    by = ay;    bz = az;
+            cx = ax + 1;    cy = ay;    cz = az + 1;
+            dx = ax;        dy = ay;    dz = az + 1;
 
-            this.setPNC1(positions, colors, normals, i, normal, color,
-                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
-                iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    bx, by, bz, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    ax, ay, az, bx, by, bz, cx, cy, cz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[1][0] : txCoords[4][0]) * 0.0625;
@@ -197,9 +221,16 @@ let FacesModule = {
             uvs[uvi + 4] = offsetU + (normal ? eps : 0.0625 - eps);
             uvs[uvi + 5] = offsetV + (normal ? 0.0625 - eps : eps);
 
-            this.setPNC2(positions, colors, normals, i, normal, color,
-                ax, ay, az, cx, cy, cz, dx, dy, dz,
-                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    bx, by, bz, dx, dy, dz, ax, ay, az,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    ax, ay, az, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
             uvs[uvi + 6]  = offsetU + (normal ? 0.0625 - eps : eps);
@@ -218,13 +249,20 @@ let FacesModule = {
             kk = Math.floor(faceId / ijS);
 
             ax = iChunkOffset + ii; ay = jChunkOffset + jj; az = kChunkOffset + 1 + kk;
-            bx = ax; by = ay + 1; bz = az;
-            cx = ax + 1; cy = ay + 1; cz = az;
-            dx = ax + 1; dy = ay; dz = az;
+            bx = ax;        by = ay + 1;    bz = az;
+            cx = ax + 1;    cy = ay + 1;    cz = az;
+            dx = ax + 1;    dy = ay;        dz = az;
 
-            this.setPNC1(positions, colors, normals, i, normal, color,
-                ax, ay, az, bx, by, bz, cx, cy, cz, pA, pB, pC, ab, cb,
-                iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    bx, by, bz, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC1(positions, colors, normals, i, normal, color,
+                    ax, ay, az, bx, by, bz, cx, cy, cz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H1
             offsetU = (normal ? txCoords[2][0] : txCoords[5][0]) * 0.0625;
@@ -236,9 +274,16 @@ let FacesModule = {
             uvs[uvi + 4] = offsetU + (normal ? 0.0625 - eps : eps);
             uvs[uvi + 5] = offsetV + 0.0625 - eps;
 
-            this.setPNC2(positions, colors, normals, i, normal, color,
-                ax, ay, az, cx, cy, cz, dx, dy, dz,
-                pA, pB, pC, ab, cb, iChunkOffset, jChunkOffset, kChunkOffset);
+            if (rotate)
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    bx, by, bz, dx, dy, dz, ax, ay, az,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
+            else
+                this.setPNC2(positions, colors, normals, i, normal, color,
+                    ax, ay, az, cx, cy, cz, dx, dy, dz,
+                    pA, pB, pC, ab, cb,
+                    iChunkOffset, jChunkOffset, kChunkOffset);
 
             // UVs H2
             uvs[uvi + 6]  = offsetU + eps;
