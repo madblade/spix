@@ -11,7 +11,8 @@ let ChunksMeshModule = {
         if (isWater)
         {
             // low-res
-            if (!isWorldFlat) {
+            if (!isWorldFlat || !this.rendererManager.waterReflection)
+            {
                 let material = this.createMaterial('textured-phong', 0xaaaaaa);
                 material.transparent = true;
                 material.opacity = 0.5;

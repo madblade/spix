@@ -252,18 +252,18 @@ let SkyModule = {
 
         if (isWorldFlat && camPosition)
         {
-            let dp = dl.position;
-            dp.set(
-                dp.x + camPosition.x,
-                dp.y + camPosition.y,
-                dp.z
-            );
-            dl.target.position.set(
-                camPosition.x,
-                camPosition.y,
-                0
-            );
-            dl.target.updateMatrixWorld();
+            // let dp = dl.position;
+            // dp.set(
+            //     dp.x + camPosition.x,
+            //     dp.y + camPosition.y,
+            //     dp.z
+            // );
+            // dl.target.position.set(
+            //     camPosition.x,
+            //     camPosition.y,
+            //     0
+            // );
+            // dl.target.updateMatrixWorld();
         }
 
         // Sunset and sunrise

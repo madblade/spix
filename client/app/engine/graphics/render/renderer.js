@@ -9,7 +9,7 @@ import {
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh, PCFSoftShadowMap
+    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -46,7 +46,6 @@ let RendererManager = function(graphicsEngine)
     this.stencilScene.add(this.stencilScreen);
 
     this.corrupted = 0;
-
     this.stop = false;
     this.thenstop = false;
 
@@ -54,6 +53,9 @@ let RendererManager = function(graphicsEngine)
     this.darkMaterial = new MeshBasicMaterial(
         { color: 'black', side: DoubleSide, morphTargets: true }
     );
+
+    this.waterReflection = true;
+    // (!!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime));
 };
 
 extend(RendererManager.prototype, {
@@ -187,7 +189,7 @@ extend(RendererManager.prototype, {
             let sao = new SAOPass(sc, cam, false, false);
             sao.params.output = SAOPass.OUTPUT.Default;
             sao.params.saoBias = 0.1;
-            sao.params.saoIntensity = 0.18;
+            sao.params.saoIntensity = 1.8;
             sao.params.saoScale = 10000;
             sao.params.saoKernelRadius = 100;
             sao.params.saoMinResolution = 0.000004;
@@ -210,8 +212,8 @@ extend(RendererManager.prototype, {
             // precision: 'mediump'
         });
 
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = PCFSoftShadowMap;
+        // renderer.shadowMap.enabled = true;
+        // renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.autoClear = false;
 
         renderer.outputEncoding = sRGBEncoding;
@@ -353,7 +355,8 @@ extend(RendererManager.prototype, {
         // Updates.
         try {
             this._updateSkies(mainCamera);
-            this._updateWaters(cameraManager, renderer, mainScene);
+            if (this.waterReflection)
+                this._updateWaters(cameraManager, renderer, mainScene);
         } catch (e) {
             console.error(e);
             this.stop = true;

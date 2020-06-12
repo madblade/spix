@@ -6,7 +6,7 @@
 
 import {
     BufferAttribute, BufferGeometry,
-    Color, FrontSide,
+    Color,
     Vector3
 } from 'three';
 import { ItemType } from '../../../model/server/self/items';
@@ -243,8 +243,8 @@ let ChunksModule = {
         // if (Math.random() < 0.5)
         if (!isWater)
         {
-            newMesh.castShadow = true;
-            newMesh.receiveShadow = true;
+            // newMesh.castShadow = true;
+            // newMesh.receiveShadow = true;
             newMesh.userData.bloom = true;
         }
 
