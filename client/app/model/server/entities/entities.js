@@ -7,7 +7,7 @@
 import extend           from '../../../extend.js';
 
 import { PlayerModule } from './player.js';
-import { ItemType } from '../self/items';
+import { Vector3 } from 'three';
 
 let EntityModel = function(app)
 {
@@ -103,29 +103,83 @@ extend(EntityModel.prototype, {
         entity, px, py, pz, rx, ry, rz
     )
     {
+        let v = new Vector3();
         entity.interpolatingP.set(px, py, pz);
         entity.interpolatingR.set(rx, ry, rz);
-        this.updateGraphicalEntity(entity, entity.interpolatingP, entity.interpolatingR);
+        this.updateGraphicalEntity(entity, entity.interpolatingP, entity.interpolatingR, v);
     },
 
-    updateGraphicalEntity(currentEntity, newP, newR)
+    updateGraphicalEntity(currentEntity, newP, newR) //, oldP)
     {
         // Update positions and rotation
         let object3D = currentEntity.getObject3D();
+        let graphics = this.app.engine.graphics;
 
         let p = object3D.position;
-        let animate = p.x !== newP.x || p.y !== newP.y;
-        // TODO [ANIMATION] link animation to 3D gravity
+        let animate = p.x !== newP.x || p.y !== newP.y; // TODO [ANIMATION] link animation in 3D case
+        if (currentEntity.isProjectile)
+        {
+            const dx = newP.x - p.x;
+            const dy = newP.y - p.y;
+            const dz = newP.z - p.z;
+            let v1;
+            let v2;
+            const pi = Math.PI;
+            const dxxdyy = dx * dx + dy * dy;
+            if (dxxdyy + dz * dz < 1e-8)
+            {
+                const selfRotation = this.app.model.server.selfModel.rotation;
+                v1 = selfRotation[2];
+                v2 = selfRotation[3];
+                let rr = currentEntity.currentRFromServer;
+                object3D.rotation.x = Math.PI + rr[3]; // newR.z; // ur[3];
+                object3D.rotation.z = rr[2]; // newR.y; // ur[2];
+                // object3D.getWrapper().rotation.y = selfRotation[0];
+            }
+            else
+            {
+                if (dy > 0) {
+                    v1 = Math.atan(-dx / dy);
+                } else if (dy < 0) {
+                    v1 = dx < 0 ?
+                        pi - Math.atan(dx / dy) : dx > 0 ?
+                            -pi + Math.atan(-dx / dy) : /*x === 0 ?*/ pi;
+                } else /*if (y === 0)*/ {
+                    v1 = dx < 0 ? pi / 2 : dx > 0 ? -pi / 2 : /*x === 0*/ 0;
+                }
+
+                if (dz < 0) {
+                    v2 = -Math.atan(Math.sqrt(dxxdyy) / dz);
+                } else if (dz > 0) {
+                    v2 = pi - Math.atan(Math.sqrt(dxxdyy) / dz);
+                } else /*if (z === 0)*/ {
+                    v2 = pi / 2;
+                }
+
+                object3D.rotation.x = Math.PI + v2; // newR.z; // ur[3];
+                object3D.rotation.z = v1; // newR.y; // ur[2];
+                //object3D.getWrapper().rotation.y = Math.PI + newR.x; // + ur[0];
+                if (!currentEntity.inScene)
+                {
+                    currentEntity.inScene = true;
+                    graphics.addToScene(object3D, currentEntity.getWorldId());
+                }
+            }
+
+            object3D.updateMatrixWorld();
+        }
+        else
+        {
+            object3D.rotation.x = newR.z; // ur[3];
+            object3D.rotation.z = newR.y; // ur[2];
+            object3D.getWrapper().rotation.y = Math.PI + newR.x; // + ur[0];
+            object3D.updateMatrixWorld();
+        }
         p.copy(newP);
 
-        object3D.rotation.x = newR.z; // ur[3];
-        object3D.rotation.z = newR.y; // ur[2];
-        object3D.getWrapper().rotation.y = Math.PI + newR.x; // + ur[0];
-        object3D.updateMatrixWorld();
 
         // Update animation
         const id = currentEntity.id;
-        let graphics = this.app.engine.graphics;
         if (animate) graphics.updateAnimation(id);
     },
 

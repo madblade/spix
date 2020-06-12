@@ -138,7 +138,11 @@ let ItemsGraphicsModule = {
             colors.setXYZ(i, x, y, z);
         }
 
+        let sc = object.scale;
         let wrapper = this._packObject(object);
+        const f = 3;
+        sc.set(f * sc.x, 4 * f * sc.y, 4 * f * sc.z);
+        object.position.set(0, -1.0, 0);
         callback(wrapper);
     },
 

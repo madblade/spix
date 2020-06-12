@@ -36,9 +36,20 @@ let PlayerModule = {
             id, up,
             parseInt(updatedEntity.w, 10)
         );
-        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+        entity.isProjectile = true;
 
         this.updateEntity(id, entity, updatedEntity, graphics, entities);
+        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+        entity.inScene = true;
+        let p = entity.position;
+        up.position.set(p.x, p.y, p.z);
+        entity.lastPFromServer.set(p.x, p.y, p.z);
+        entity.currentPFromServer.set(p.x, p.y, p.z);
+        let r = entity.rotation;
+        let rr = this.app.model.server.selfModel.rotation;
+        r.set(rr[1], rr[2], rr[3]);
+        entity.lastRFromServer.set(r.x, r.y, r.z);
+        entity.currentRFromServer.set(r.x, r.y, r.z);
         this.entitiesLoading.delete(id);
     },
 

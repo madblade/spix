@@ -82,12 +82,12 @@ class AI
                         p[2] + 0.5 * p[5],
                     ]
                 );
-                projectile.a0[0] = power * 0.5 * p[3];
-                projectile.a0[1] = power * 0.5 * p[4];
-                projectile.a0[2] = power * 0.5 * p[5];
-                projectile.v0[0] = 0.5 * p[3];
-                projectile.v0[1] = 0.5 * p[4];
-                projectile.v0[2] = 0.5 * p[5];
+                projectile.a0[0] = power * 4 * p[3];
+                projectile.a0[1] = power * 4 * p[4];
+                projectile.a0[2] = power * 4 * p[5];
+                // projectile.v0[0] = 1 * power * 0.5 * p[3];
+                // projectile.v0[1] = 1 * power * 0.5 * p[4];
+                // projectile.v0[2] = 1 * power * 0.5 * p[5];
             }
         }
     }

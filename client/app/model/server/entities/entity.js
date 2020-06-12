@@ -22,6 +22,9 @@ let Entity = function(id, graphicalComponent, worldId)
     this.currentRFromServer = new Vector3(0, 0, 0);
     this.interpolatingR = new Vector3(0, 0, 0);
     this.needsUpdate = true;
+
+    this.isProjectile = false;
+    this.inScene = false;
 };
 
 extend(Entity.prototype, {
