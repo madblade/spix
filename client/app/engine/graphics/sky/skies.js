@@ -61,6 +61,7 @@ let SkyModule = {
         np.copy(sunPosition)
             .normalize();
         light1.position.set(np.x, np.y, np.z);
+        light1.position.set(0, 0, 0);
         // light1.updateMatrixWorld();
         // Hemisphere
         let light2 = this.createLight('hemisphere');
@@ -186,7 +187,7 @@ let SkyModule = {
     },
 
     // TODO [SKY] sync (or seed?) sun position from server
-    updateSunPosition(camera, skyObject)
+    updateSunPosition(camera, skyObject, worldId)
     {
         let sky = skyObject.mesh;
         if (!sky || !this.distance) return;
@@ -212,6 +213,7 @@ let SkyModule = {
         let z = distance * sin(phi) * cos(theta);
         let sunPosition = new Vector3(x, y, z);
 
+        let camPosition;
         if (camera.projectionMatrix)
         {
             // let mat4 = new THREE.Matrix4();
@@ -222,17 +224,21 @@ let SkyModule = {
             //     0, 0, 0, 0);
             // mat4.getInverse(camera.projectionMatrix);
             // s.material.uniforms.viewInverse.value.copy(mat4);
-            let camPosition = new Vector3();
+            camPosition = new Vector3();
             camera.getWorldPosition(camPosition);
             s.material.uniforms.cameraPos.value.copy(camPosition);
         }
         s.material.uniforms.sunPosition.value.copy(sunPosition);
         // Better not touch this!
         // This accounts for skybox translations in sky shaders.
-        let p = this.app.model.server.selfModel.position;
+        let model = this.app.model.server;
+        let p = model.selfModel.position;
         if (!p) return;
         sky.position.copy(p);
         sky.updateMatrix();
+
+        let worldMeta = model.chunkModel.worldProperties.get(worldId);
+        let isWorldFlat = worldMeta.type === WorldType.FLAT;
 
         // Update lights
         let normSunPosition = new Vector3();
@@ -240,8 +246,26 @@ let SkyModule = {
             .normalize();
         let hl = skyObject.lights.hemisphereLight;
         let dl = skyObject.lights.directionalLight;
+
         hl.position.copy(normSunPosition);
-        dl.position.copy(normSunPosition);
+        dl.position.copy(normSunPosition).multiplyScalar(60);
+
+        if (isWorldFlat && camPosition)
+        {
+            let dp = dl.position;
+            dp.set(
+                dp.x + camPosition.x,
+                dp.y + camPosition.y,
+                dp.z
+            );
+            dl.target.position.set(
+                camPosition.x,
+                camPosition.y,
+                0
+            );
+            dl.target.updateMatrixWorld();
+        }
+
         // Sunset and sunrise
         if (skyObject.lights.type === 'flat')
         {

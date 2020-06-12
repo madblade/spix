@@ -84,6 +84,7 @@ let EntitiesModule = {
             this.createMaterial('flat-phong',
                 {color})
         );
+        // head.castShadow = true;
 
         up.rotation.reorder('ZYX');
         up.add(wrapper);

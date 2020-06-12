@@ -6,7 +6,7 @@
 
 import {
     VertexColors, FrontSide,
-    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial,
+    MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial
 } from 'three';
 
 let MaterialsModule = {

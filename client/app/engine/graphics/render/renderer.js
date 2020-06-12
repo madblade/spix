@@ -9,7 +9,7 @@ import {
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh,
+    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh, PCFSoftShadowMap
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -26,8 +26,8 @@ let RendererManager = function(graphicsEngine)
     this.graphics = graphicsEngine;
 
     // Graphical settings
-    this.ambientOcclusion = false;
     this.selectiveBloom = true;
+    this.ambientOcclusion = false;
 
     // Cap number of passes.
     this.renderMax = 10; // Number.POSITIVE_INFINITY;
@@ -210,8 +210,8 @@ extend(RendererManager.prototype, {
             // precision: 'mediump'
         });
 
-        // renderer.shadowMap.enabled = true;
-        // renderer.shadowMap.type = PCFSoftShadowMap;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.autoClear = false;
 
         renderer.outputEncoding = sRGBEncoding;
@@ -251,9 +251,9 @@ extend(RendererManager.prototype, {
     _updateSkies(mainCamera)
     {
         let skies = this.graphics.app.model.server.chunkModel.skies;
-        skies.forEach(sky => {
+        skies.forEach((sky, worldId) => {
             // TODO [SKY] manage with other cameras
-            this.graphics.updateSunPosition(mainCamera, sky);
+            this.graphics.updateSunPosition(mainCamera, sky, worldId);
         });
     },
 
