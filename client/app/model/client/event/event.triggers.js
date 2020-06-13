@@ -66,7 +66,7 @@ let TriggersModule = {
         }
         else
         {
-            // TODO [GAMEPLAY] object, skill
+            // XXX [GAMEPLAY] object, skill
             // Validate server-side? Keep duplicate in selfComponent?
             console.warn('[Client/Event] Unsupported item.');
         }
@@ -80,7 +80,7 @@ let TriggersModule = {
 
         let sameTypeEvents = this.getEventsOfType(type);
         if (sameTypeEvents.length > 0) {
-            // TODO [PERF] compress events
+            // XXX [PERF] compress events
         }
 
         switch (data) {

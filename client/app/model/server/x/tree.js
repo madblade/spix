@@ -527,7 +527,7 @@ extend(XGraph.prototype, {
 
                 currentStep.depth = currentDepth;
                 //if (currentOtherEnd)
-                // TODO [PORTAL] check. I guess an arc has always a parent and a child.
+                // XXX [PORTAL] check. I guess an arc has always a parent and a child.
                 currentStep.origin = currentOtherEnd.getNodeId();
                 currentStep.destination = currentElementId;
                 currentStep.pid = currentArcId;

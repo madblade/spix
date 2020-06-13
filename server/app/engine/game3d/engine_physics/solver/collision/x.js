@@ -136,7 +136,7 @@ class XCollider
                             opz + .5 > fz0 && opz + .5 < fz1 && npz + .5 > fz0 && npz + .5 < fz1)
                         {
                             // Do collide & change world
-                            // TODO [PORTAL] Manage collisions with things on the other side.
+                            // XXX [PORTAL] Manage collisions with things on the other side.
                             return xModel.getOtherSide(xId);
                         }
                         break;

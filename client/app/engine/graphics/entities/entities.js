@@ -46,7 +46,7 @@ let EntitiesModule = {
         let mixers = this.mixers;
         let times = this.times;
 
-        // TODO [ANIMATION] export model to format glTF
+        // XXX [ANIMATION] export model to format glTF
         let geometry = this.loadReferenceGeometryFromMemory(model); // Should be 'steve'.
         let bufferGeometry = new BufferGeometry().fromGeometry(geometry);
 

@@ -15,7 +15,7 @@ class Generator
 
     generateWorld()
     {
-        // TODO [GENERATION] generate distinct worlds.
+        // XXX [GENERATION] generate distinct worlds.
         let world = this._worldModel.getWorld(-1);
 
         return new Promise(resolve =>

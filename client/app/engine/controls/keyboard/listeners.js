@@ -23,7 +23,7 @@ let ListenerModule = {
             let clientModel = app.model.client;
             let graphics = app.engine.graphics;
 
-            // TODO [GAMEPLAY] numpad / num shortcuts
+            // XXX [GAMEPLAY] numpad / num shortcuts
             switch (event.keyCode) {
                 case k.arrowUp:
                 case k.leftHandUp:

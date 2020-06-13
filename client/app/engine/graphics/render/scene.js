@@ -176,7 +176,7 @@ let ScenesModule = {
         return sceneManager.addScene(newSceneId);
     },
 
-    // TODO [UNLOAD] unload scene.
+    // XXX [UNLOAD] unload scene.
     forgetScene(sceneId)
     {
         let sceneManager = this.sceneManager;

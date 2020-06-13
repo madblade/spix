@@ -186,7 +186,7 @@ let SkyModule = {
         return sunDirection;
     },
 
-    // TODO [SKY] sync (or seed?) sun position from server
+    // XXX [SKY] sync (or seed?) sun position from server
     updateSunPosition(camera, skyObject, worldId)
     {
         let sky = skyObject.mesh;

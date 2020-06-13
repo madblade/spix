@@ -19,7 +19,7 @@ class Updater
         // Process incoming actions.
         inputBuffer.forEach((array, avatar) => // value, key
         {
-            // TODO [PERF] compute means or filter some events.
+            // XXX [PERF] compute means or filter some events.
             array.forEach(e => {
                 if (e.action === 'move' && typeof e.meta === 'string')
                     Updater.move(e.meta, avatar);
@@ -97,8 +97,8 @@ class Updater
 
     use(meta, avatar)
     {
-        // TODO [GAMEPLAY] validate item in inventory
-        // TODO [GAMEPLAY] give inventory state to players
+        // XXX [GAMEPLAY] validate item in inventory
+        // XXX [GAMEPLAY] give inventory state to players
         // console.warn('[Physics/Updater] Player wants to use item. To implement.');
         // console.log(meta);
         if (meta.length !== 10)

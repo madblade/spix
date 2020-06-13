@@ -23,7 +23,7 @@ class TerrainCollider
      * I know (highly suspect) it can be done way more efficiently.
      * The first thing to optimise is the BSP lookup phase: world.isFree([x, y, z]).
      * Suggestion:
-     * - TODO [PERF] flag empty chunks and full chunks
+     * - XXX [PERF] flag empty chunks and full chunks
      * Think of using octrees if scaling up chunks is an option (might depend on network requirements).
      */
     static collideLinearZ(entity, world, position, newPosition, doProject)

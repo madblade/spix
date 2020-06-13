@@ -192,7 +192,6 @@ let PlayerModule = {
 
     loadPlayer(id, updatedEntity, graphics, entities)
     {
-        // TODO [GAMEPLAY] add handheld item
         let color = updatedEntity.a ? 0x00ff00 : 0xff0000;
         let createdEntity = graphics.initializeEntity(
             id, 'steve', color

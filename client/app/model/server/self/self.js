@@ -177,7 +177,7 @@ extend(SelfModel.prototype, {
         register.updateSelfState({ position: [p.x, p.y, p.z] });
 
         // Update animation.
-        const animate = p.x !== newP.x || p.y !== newP.y; // TODO [ANIMATION] manage 3D.
+        const animate = p.x !== newP.x || p.y !== newP.y; // XXX [ANIMATION] manage 3D.
         if (animate) {
             graphics.updateAnimation(id);
             // TODO [ANIMATION] activate hand-held animation
@@ -514,7 +514,7 @@ extend(SelfModel.prototype, {
         this.avatar = null;
         this.lastServerUpdateTime = this.getTime();
         this.averageDeltaT = -1;
-        // TODO [CLEANUP] avatar graphical component.
+        // XXX [CLEANUP] avatar graphical component.
     }
 
 });

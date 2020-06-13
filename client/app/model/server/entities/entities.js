@@ -116,7 +116,8 @@ extend(EntityModel.prototype, {
         let graphics = this.app.engine.graphics;
 
         let p = object3D.position;
-        let animate = p.x !== newP.x || p.y !== newP.y; // TODO [ANIMATION] link animation in 3D case
+        let animate = p.x !== newP.x || p.y !== newP.y;
+        // XXX [ANIMATION] link animation in 3D case
         if (currentEntity.isProjectile)
         {
             const dx = newP.x - p.x;
@@ -236,7 +237,7 @@ extend(EntityModel.prototype, {
                 this.loadPlayer(id, updatedEntity, graphics, entities);
                 break;
 
-            case 'projectile': // TODO [GAMEPLAY] arrow mesh
+            case 'projectile':
                 this.loadArrow(id, updatedEntity, graphics, entities);
                 break;
             case 'cube':
@@ -397,7 +398,7 @@ extend(EntityModel.prototype, {
         this.entitiesOutdated.clear();
         this.entitiesLoading.clear();
         this.needsUpdate = false;
-        // TODO [CLEANUP] graphical component and all meshes
+        // XXX [CLEANUP] graphical component and all meshes
     }
 
 });

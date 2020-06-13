@@ -138,7 +138,7 @@ extend(SelfComponent.prototype, {
     processSimpleCameraUpdate()
     {
         let graphicsEngine = this.clientModel.app.engine.graphics;
-        // TODO [PERF] only once per iteration.
+        // XXX [PERF] only once per iteration.
         //console.log('camera autoupdate');
         //graphicsEngine.cameraManager.updateCameraPosition(data);
         graphicsEngine.cameraManager.moveCameraFromMouse(0, 0, 0, 0);

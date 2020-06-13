@@ -17,9 +17,9 @@ let MeshesModule = {
         let itemName = this.getMeshIDFromItemID(itemID);
         if (itemName) { // It’s a handheld item with a specific mesh
             if (itemID === ItemType.PORTAL_GUN_DOUBLE) {
-                // TODO [GAMEPLAY] make it purple
+                // XXX [GAMEPLAY] make it purple
             } else if (itemID === ItemType.PORTAL_GUN_SINGLE) {
-                // TODO [GAMEPLAY] make it blue and orange
+                // XXX [GAMEPLAY] make it blue and orange
             }
             return this.loadReferenceMeshFromMemory(itemName, renderOnTop);
         } else { // It’s probably a block.

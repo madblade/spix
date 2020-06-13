@@ -24,7 +24,7 @@ class Chat
 
     updateOutput()
     {
-        // TODO [CHAT] transmit updates to clients.
+        // XXX [CHAT] transmit updates to clients.
         if (this.hasMessages()) {
             // broadcast('chat', ...)
         }
@@ -38,7 +38,7 @@ class Chat
      */
     playerInput(player)
     {
-        // TODO [CHAT] log input into temporaryMessages.
+        // XXX [CHAT] log input into temporaryMessages.
         return data => {
             // Important: don't send responses immediately on input.
             // Store history of received messages in a temporary variable,

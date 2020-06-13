@@ -109,7 +109,7 @@ class Searcher
         return array;
     }
 
-    // TODO [PERF] distinguish between 'e' and 'x'
+    // XXX [PERF] distinguish between 'e' and 'x'
     swap(axisArray, i, j)
     {
         let objects = this.entities;
@@ -255,7 +255,7 @@ class ObjectsIterator
         this.tx = abs(thresholdX) + maxT + 4 * xW;
         this.ty = abs(thresholdY) + maxT + 4 * yW;
         this.tz = abs(thresholdZ) + maxT + 4 * zW;
-        // TODO [ENTITIES] account for max width when objects are huge.
+        // XXX [ENTITIES] account for max width when objects are huge.
 
         this.onX = true;
         this.onY = false;
@@ -342,7 +342,7 @@ class ObjectsIterator
                 return this.next(0);
             }
 
-            // TODO [PERF] replace id with indexX
+            // XXX [PERF] replace id with indexX
             let id = axisX[iX + s].id;
             if (done.has(id)) {
                 this.toPlus = false;
@@ -351,7 +351,7 @@ class ObjectsIterator
 
             debugObject(id);
             let object = objects[id];
-            if (abs(object.p0[0] - x) <= tx) { // TODO [PERF] use lfarray instead of tx
+            if (abs(object.p0[0] - x) <= tx) { // XXX [PERF] use lfarray instead of tx
                 if (abs(object.p0[1] - y) <= ty && abs(object.p0[2] - z) <= tz)
                     return object;
                 else {

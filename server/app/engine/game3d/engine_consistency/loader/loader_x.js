@@ -64,7 +64,7 @@ class XLoader
         });
 
         // Update out of range portals.
-        // TODO [PERF] when getConnectivity is performed,
+        // XXX [PERF] when getConnectivity is performed,
         //  just remember which levels correspond to which portals
         let playerXs = cm.getXIdsForEntity(avatarId);
         let removedPortals = {};

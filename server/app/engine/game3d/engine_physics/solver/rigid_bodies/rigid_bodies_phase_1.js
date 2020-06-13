@@ -361,7 +361,7 @@ class RigidBodiesPhase1
         return [0, 0, 0];
     }
 
-    // TODO [PERF] use quaternions instead
+    // XXX [PERF] use quaternions instead
     static getEntityForwardVector(
         entity,
         project2D)

@@ -6,6 +6,9 @@
 
 // import ObjectOrderer from './orderer_objects';
 
+/**
+ * @deprecated
+ */
 class EventOrderer
 {
     static maxRange = 32.;
@@ -38,7 +41,6 @@ class EventOrderer
 
             // let dichotomyLowerBound = ObjectOrderer.dichotomyLowerBound;
             // let orderCache = ObjectOrderer.orderCache;
-            // TODO [GAMEPLAY] add event
         }
     }
 

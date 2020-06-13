@@ -25,7 +25,7 @@ class GenerationEngine
     {
         let worlds = this._worldModel.worlds;
 
-        // TODO time budget.
+        // XXX [GENERATION] time budget.
 
         // Generate meta-tile for entities on edge.
         this.stepWorldMapGeneration();

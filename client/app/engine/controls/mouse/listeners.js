@@ -277,16 +277,16 @@ let ListenerModule = {
     mouseWheelCallback(event)
     {
         let clientModel = this.app.model.client;
-        let ey = event.deltaY;
+        let ey = -event.deltaY;
         // let df = event.deltaFactor;
 
         clientModel.triggerChange('interaction', ['itemSelect', ey]);
     },
 
-    // TODO [PERF] replace jquery-mousewheel with something better
     registerMouseWheel()
     {
-        $(window).mousewheel(this.mouseWheelCallback.bind(this));
+        if (!this.omwh) this.omwh = this.mouseWheelCallback.bind(this);
+        document.addEventListener('wheel', this.omwh);
     },
 
     unregisterMouseDown()
@@ -301,7 +301,7 @@ let ListenerModule = {
 
     unregisterMouseWheel()
     {
-        $(window).off('mousewheel');
+        document.removeEventListener('wheel', this.omwh);
     }
 
 };

@@ -14,7 +14,7 @@ class EntityLoader
         this._consistencyModel = consistencyEngine.consistencyModel;
     }
 
-    // TODO [PERF]: Use searcher O(n²) -> O(n), or link entities to chunks.
+    // XXX [PERF]: Use searcher O(n²) -> O(n), or link entities to chunks.
     // (only quadratic as fn of players, not entities!)
     computeNewEntitiesInRange(
         player, updatedEntities, addedPlayers, removedPlayers
@@ -26,10 +26,10 @@ class EntityLoader
         let thresh = avatar.entityRenderDistance;
         thresh *= thresh; // Squared distance.
 
-        // TODO [IO] also compute entities on loaded chunks.
+        // XXX [IO] also compute entities on loaded chunks.
         let distance = GeometryUtils.entitySquaredTransEuclideanDistance;
 
-        // TODO [PERF] [IO] use array
+        // XXX [PERF] [IO] use array
         let addedEntities = {};
         let removedEntities = {};
 
@@ -51,7 +51,7 @@ class EntityLoader
                     !!e._isParrying + 0
                 ];
                 addedEntities[eid] =
-                    { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
+                    {
                         p: e.position,
                         r: e.rotation,
                         k: e.kind,
@@ -73,7 +73,7 @@ class EntityLoader
                     !!e._isParrying + 0
                 ];
                 addedEntities[eid] =
-                    { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
+                    {
                         p: e.position,
                         r: e.rotation,
                         k: e.kind,

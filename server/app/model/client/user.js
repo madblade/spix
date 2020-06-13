@@ -59,7 +59,6 @@ class User
 
         // Check if the game already contains a player with the same socket
         if (game.hasPlayerForSocket(this._userConnection.socket)) return true;
-        // TODO [IO] consistency for Terrain and Entity and X update on spawn / respawn / rejoin.
 
         // Create a player associated to this game and spawn it
         let player = Factory.createPlayer(this, game);

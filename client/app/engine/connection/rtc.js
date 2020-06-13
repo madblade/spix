@@ -75,7 +75,7 @@ extend(RTCService.prototype, {
             let probremCallback = function()
             {
                 console.log('[RTC] Error or disconnected.');
-                // TODO [HUD] notify disconnection on ingame state.
+                // XXX [HUD] notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             };
             dataChannel.onclose = probremCallback;
@@ -100,7 +100,7 @@ extend(RTCService.prototype, {
             } else if (status === 'checking' || status === 'connected') {
                 mainMenuState.notifyServerChecking();
             } else if (status === 'disconnected') {
-                // TODO [HUD] notify disconnection on ingame state.
+                // XXX [HUD] notify disconnection on ingame state.
                 mainMenuState.notifyServerFailed();
             }
         };

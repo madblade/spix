@@ -65,7 +65,7 @@ class EntityModel
         let entityId;
         if (freedEntities.length > 0) {
             entityId = freedEntities[0];
-            // ^ TODO [ENTITIES] impact consistency model
+            // ^ XXX [ENTITIES] impact consistency model
             freedEntities.shift();
         } else {
             entityId = entities.length;

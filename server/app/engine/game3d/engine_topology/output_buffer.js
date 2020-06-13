@@ -11,7 +11,7 @@ class OutputBuffer
     {
         // Contains ids of updated chunks.
         // Chunks themselves hold information about their being updated.
-        // TODO [PERF] concentrate chunk updates in this buffer.
+        // XXX [PERF] concentrate chunk updates in this buffer.
         // world id => Set(... chunk ids)
         this._buffer = new Map();
     }

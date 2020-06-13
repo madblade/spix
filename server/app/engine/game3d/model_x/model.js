@@ -77,7 +77,7 @@ class XModel
         let coords1 = world.getChunkCoordinates(x1, y1, z1);
         let coords2 = world.getChunkCoordinates(x2, y2, z2);
         // Must be on one same chunk.
-        // TODO [PORTAL] manage portals sitting across chunks.
+        // XXX [PORTAL] manage portals sitting across chunks.
         let chunk1 = world.getChunk(...coords1);
         let chunk2 = world.getChunk(...coords2);
         if (chunk1 && chunk1 !== chunk2) return;

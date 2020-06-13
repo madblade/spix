@@ -7,8 +7,7 @@
     "jquery": "^2.2.3",
     "bootstrap-css-only": "^3.3.6",
     "stats.js": "*",
-    "sigma": "https://github.com/madblade/sigma.js.git",
-    "jquery-mousewheel": "^3.1.13"
+    "sigma": "https://github.com/madblade/sigma.js.git"
   },
   "devDependencies": {}
 }

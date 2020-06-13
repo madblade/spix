@@ -176,7 +176,7 @@ extend(CameraManager.prototype, {
 
         let i = this.graphicsEngine.getCameraInteraction();
 
-        // TODO [PERF] switch to quaternion (also server-side)
+        // XXX [PERF] switch to quaternion (also server-side)
         let up = this.mainCamera.get3DObject().rotation;
         let theta0 = up.z;
         let theta1 = up.x;

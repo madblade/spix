@@ -26,7 +26,7 @@ class Avatar extends Entity
 
         // Counted as a number of blocks.
         this._entityRenderDistance = 3 * 32;
-        // TODO [PERF] Should be a number of closest entities instead
+        // XXX [PERF] Should be a number of closest entities instead
 
         // For op / admin accesses
         this._role = 0;

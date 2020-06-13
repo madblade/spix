@@ -136,7 +136,7 @@ extend(XModel.prototype, {
         this.xUpdates = [];
         this.needsUpdate = false;
         this.forceUpdate = false;
-        // TODO [CLEANUP] graphical component, scenes and render targets
+        // XXX [CLEANUP] graphical component, scenes and render targets
     }
 
 });

@@ -52,7 +52,7 @@ class ChunkBuffer
     // Shallow.
     getOutput()
     {
-        // TODO [PERF] remove copy
+        // XXX [PERF] remove copy
         return new Map(this._outputBuffer);
     }
 

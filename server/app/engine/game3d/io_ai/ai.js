@@ -174,7 +174,7 @@ class AI
 
     aggroPass()
     {
-        // TODO [IA] see and trigger aggro
+        // XXX [IA] see and trigger aggro
     }
 
     pathFindingPass()
@@ -184,7 +184,7 @@ class AI
         {
             // Get aggro
             // let currentEntity = this._needingPath.pop();
-            // TODO [IA] path finding
+            // XXX [IA] path finding
         }
     }
 
@@ -246,7 +246,6 @@ class AI
             // if (dz < -0.5) ai.goUp(); // Jumps?
             // else if (dz > 0.5) ai.goDown(); // Digs??
         });
-        // TODO displacement or ranged target / melee action
     }
 
     pushProjectileForSpawn(

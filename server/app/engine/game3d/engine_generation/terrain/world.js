@@ -20,7 +20,7 @@ let WorldMap = function()
 
 WorldMap.prototype.seedWorld = function(seed)
 {
-    // TODO [GENERATION] link seed
+    // XXX [GENERATION] link seed
     console.log(`TODO link seed ${seed}.`);
 
     // Init generators, voronoi and buffers.

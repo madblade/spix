@@ -55,7 +55,7 @@ extend(UI.prototype, {
     {
         let graphicsEngine = this.app.engine.graphics;
 
-        // TODO [ACCESSIBILITY] gamepad
+        // XXX [ACCESSIBILITY] gamepad
 
         if (this.isTouch) {
             this.setupTouch();

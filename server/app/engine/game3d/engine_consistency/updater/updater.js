@@ -112,7 +112,7 @@ class Updater
         // let t = TimeUtils.getTimeSecNano();
         // let dt1;
         // let debugThresh = 1000;
-        // TODO [PERF] [IO] use more arrays instead of objects and for-ins
+        // XXX [PERF] [IO] use more arrays instead of objects and for-ins
         players.forEach(p => { if (p.avatar)
         {
             let pid = p.avatar.entityId;
@@ -125,7 +125,7 @@ class Updater
                 null;
 
             if (u) [addedEntities, removedEntities] = u;
-            // TODO [PERF] filter: updated entities and entities that enter in range.
+            // XXX [PERF] filter: updated entities and entities that enter in range.
 
             // dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
             // if (Updater.bench && dt1 > debugThresh) console.log(`\t${dt1} computeNew Entities.`);
@@ -187,7 +187,7 @@ class Updater
                         consistencyModel.setChunkOutOfRange(pid, parseInt(wid, 10), c));
                 });
 
-            // TODO [PERF] pack everything in just one send
+            // XXX [PERF] pack everything in just one send
             // Update output buffers.
             if (addedChunks && Object.keys(addedChunks).length > 0 || removedChunks && Object.keys(removedChunks).length > 0)
                 cbuf.updateChunksForPlayer(pid, addedChunks, removedChunks, addedW, addedWMeta);

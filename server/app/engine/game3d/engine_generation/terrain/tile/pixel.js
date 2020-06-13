@@ -298,7 +298,7 @@ Rasterizer.prototype.heightPass = function(triMesh)
     }
 };
 
-// TODO [GENERATION] lower this noise frequency
+// XXX [GENERATION] lower this noise frequency
 Rasterizer.prototype.precomputeNoiseTile = function(nbOctaves)
 {
     // Noise tile = 256
@@ -442,7 +442,7 @@ Rasterizer.prototype.drawCity = function(cityX, cityY, cityRadius)
     this.drawCircle(cityX, cityY, cityRadius);
     this.drawCircle(cityX, cityY, cityRadius - 1);
     this.drawCircle(cityX, cityY, cityRadius - 2);
-    // TODO [GENERATION] voronoi (inner walls); inside of cities with buildings
+    // XXX [GENERATION] voronoi (inner walls); inside of cities with buildings
 };
 
 Rasterizer.prototype.cityPass = function(mesh, cities)
@@ -511,7 +511,7 @@ Rasterizer.prototype.fillTrees = function(chunkI, chunkJ, nbTrees)
     const w = this.dimension;
     let rng = this.rng2;
     let sb = this.surfaceBuffer;
-    // TODO [GENERATION] jitter sampling
+    // XXX [GENERATION] jitter sampling
     for (let i = 0; i < nbTrees; ++i) {
         // never on a chunk border.
         const x = xStart + Math.floor(1 + rng.uniform() * (chunkWidth - 1));
@@ -520,7 +520,7 @@ Rasterizer.prototype.fillTrees = function(chunkI, chunkJ, nbTrees)
     }
 };
 
-// TODO [GENERATION] combine with height and voronoi
+// XXX [GENERATION] combine with height and voronoi
 Rasterizer.prototype.treePass = function()
 {
     const nbChunksX = this.dimension / 16;

@@ -23,7 +23,7 @@ extend(EventComponent.prototype, {
 
     init()
     {
-        // TODO [REFACTOR] put this in self model
+        // XXX [REFACTOR] put this in self model
         this.activeControls = this.getActiveControls();
     },
 
@@ -67,7 +67,7 @@ extend(EventComponent.prototype, {
         }
 
         // Push to server
-        // TODO [PERF] simplify and aggregate per client.
+        // XXX [PERF] simplify and aggregate per client.
         for (let eventId = 0, length = events.length; eventId < length; ++eventId) {
             currentEvent = events[eventId];
             connectionEngine.send(currentEvent[0], currentEvent[1]);

@@ -26,7 +26,7 @@ class UserOutput
 
     static bench = false;
 
-    // TODO [PERF] -> don't recurse over every player, but rather over updates
+    // XXX [PERF] -> don't recurse over every player, but rather over updates
     update(updateEntities)
     {
         // let t1;
@@ -70,7 +70,7 @@ class UserOutput
             let hasUpdated;
             let pid = p.avatar.entityId;
 
-            // TODO [PERF] check 'player has updated position'
+            // XXX [PERF] check 'player has updated position'
             // player id -> changes (world id -> chunk id -> changes)
             let addedOrRemovedChunks = consistencyOutput.get(pid);
             hasNew = addedOrRemovedChunks && Object.keys(addedOrRemovedChunks).length > 0;
@@ -103,7 +103,7 @@ class UserOutput
 
                 let output = UserOutput.pack(addedOrRemovedChunks);
                 p.send('chk', output);
-                // TODO [PERF] check if data === []
+                // XXX [PERF] check if data === []
                 // for (let wiA in addedOrRemovedChunks) console.log(Object.keys(addedOrRemovedChunks[wiA]));
             }
             else if (hasUpdated) {
@@ -130,8 +130,8 @@ class UserOutput
         if (updatedEntities.size < 1 && consistencyOutput.size < 1) return;
 
         // Broadcast updates.
-        // TODO [PERF] bundle update in one chunk.
-        // TODO [ENTITIES] ensure sync for player disconnections.
+        // XXX [PERF] bundle update in one chunk.
+        // XXX [ENTITIES] ensure sync for player disconnections.
         game.players.forEach(p => {
             let pid = p.avatar.entityId;
 
@@ -143,7 +143,7 @@ class UserOutput
             // and to compute distances between entities.
             //let updatedEntities = physicsEngine.getOutputForPlayer(p, updatedEntities);
 
-            // TODO [PERF] detect change in position since the last time.
+            // XXX [PERF] detect change in position since the last time.
             // if (!entities), do it nevertheless, for it gives the player its own position.
             // Format:
             // [myPosition, myRotation, {
@@ -151,7 +151,7 @@ class UserOutput
             //      null .................. removed entity
             //      {p: [], r:[], k:''} ... added or updated entity
             // }]
-            // TODO [PERF] bundle, detect change.
+            // XXX [PERF] bundle, detect change.
             if (addedOrRemovedEntities && Object.keys(addedOrRemovedEntities).length > 0)
                 p.send('ent', UserOutput.pack(addedOrRemovedEntities));
             let av = p.avatar;

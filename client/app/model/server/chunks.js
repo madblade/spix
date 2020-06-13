@@ -316,7 +316,7 @@ extend(ChunkModel.prototype, {
 
         let meshes = [];
         world.forEach(function(currentChunk, cid) {
-            // TODO [GAMEPLAY] extract on 4 closest chunks.
+            // XXX [GAMEPLAY] extract on 4 closest chunks.
             if (!currentChunk || !currentChunk.hasOwnProperty('meshes')) {
                 console.log(`Warn: corrupted chunk inside client model ${cid}`);
                 console.log(world);
@@ -366,7 +366,7 @@ extend(ChunkModel.prototype, {
         // Graphical component.
         this.needsUpdate = false;
         this.debug = false;
-        // TODO [CLEANUP] all meshes
+        // XXX [CLEANUP] all meshes
     }
 });
 

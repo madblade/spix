@@ -296,7 +296,7 @@ class SimplePerlin
             }
         }
 
-        // TODO manage [GENERATION] full / empty chunks
+        // XXX [GENERATION] manage full / empty chunks
 
         if (adx === radius)
             directions.push(ci > center.x ? 1 : -1);

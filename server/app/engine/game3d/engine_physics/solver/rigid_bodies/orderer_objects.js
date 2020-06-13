@@ -83,7 +83,7 @@ class ObjectOrderer
             }
         }
 
-        // TODO [PORTAL] Fill axes with portals.
+        // XXX [PORTAL] [PERF] Fill axes with portals.
         portals.forEach((portal, i) => {
             let wid = portal.worldId; let p = portal.position;
             let axis = axes.get(wid); // Most inefficient call.

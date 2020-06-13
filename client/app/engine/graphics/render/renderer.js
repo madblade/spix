@@ -480,7 +480,7 @@ extend(RendererManager.prototype, {
         }
 
         // Make composer
-        // TODO [PERF] optimise composer creation
+        // XXX [PERF] optimise composer creation
         let id = this.graphics.app.model.server.selfModel.worldId.toString();
         let composer;
         if (this.composers.has(id)) {
@@ -539,7 +539,7 @@ extend(RendererManager.prototype, {
     cleanup()
     {
         this.composers.forEach(function() {
-            // TODO [UNLOAD] composer cleanup
+            // XXX [UNLOAD] composer cleanup
         });
         this.composers = new Map();
         this.renderRegister.length = 0;
