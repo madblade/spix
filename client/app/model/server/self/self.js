@@ -324,7 +324,7 @@ extend(SelfModel.prototype, {
 
         this.meleeWorld = worldId;
         this.isHittingMelee = true;
-        let us = mesh.material.uniforms;
+        let us = mesh.getMesh().material.uniforms;
         us.time.value = 0;
 
         let p = // this.currentPositionFromServer;
@@ -339,15 +339,21 @@ extend(SelfModel.prototype, {
     {
         let graphics = this.app.engine.graphics;
         let mesh = this.meleeEffectMesh;
-        let us = mesh.material.uniforms;
+        let us = mesh.getMesh().material.uniforms;
         us.time.value += 0.1;
         if (us.time.value < 2.0)
         {
             this.isHittingMelee = true;
+            let mc = graphics.cameraManager.mainCamera;
             let p = // this.currentPositionFromServer;
-                // graphics.cameraManager.mainCamera.up.position;
-                this.avatar.position;
+                // this.avatar.position;
+                graphics.cameraManager.mainCamera.up.position;
             mesh.position.copy(p);
+
+
+            mesh.rotation.copy(mc.up.rotation);
+            mesh.getWrapper().rotation.x = -Math.PI / 2 + 0.2 + mc.pitch.rotation.x;
+            mesh.getWrapper().rotation.z = mc.yaw.rotation.z;
         }
         else
         {

@@ -26,7 +26,7 @@ let RendererManager = function(graphicsEngine)
     this.graphics = graphicsEngine;
 
     // Graphical settings
-    this.selectiveBloom = false;
+    this.selectiveBloom = true;
     this.ambientOcclusion = false;
 
     // Cap number of passes.

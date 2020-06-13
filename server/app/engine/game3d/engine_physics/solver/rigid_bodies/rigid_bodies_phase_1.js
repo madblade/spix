@@ -612,6 +612,31 @@ class RigidBodiesPhase1
 
         return frontVector3D;
     }
+
+    static getEntityUpVector(entity)
+    {
+        let rotation = entity.r;
+        let cos = Math.cos;
+        let sin = Math.sin;
+        const PI  = Math.PI;
+        const PI2  = PI / 2;
+
+        let relTheta0 = rotation[0]; let relTheta1 = rotation[1];
+        let absTheta0 = rotation[2]; let absTheta1 = rotation[3];
+        relTheta1 += PI2;
+
+        // Rz(theta0) times Rx(theta1) times Forward [-sinRel1*sinRel0, sinRel1*cosRel0, -cosRel1]
+        const cosAbs0 = cos(absTheta0); const cosRel0 = cos(relTheta0);
+        const cosAbs1 = cos(absTheta1); const cosRel1 = cos(relTheta1);
+        const sinAbs0 = sin(absTheta0); const sinRel0 = sin(relTheta0);
+        const sinAbs1 = sin(absTheta1); const sinRel1 = sin(relTheta1);
+        let upVector =    [
+            -sinRel1 * sinRel0 * cosAbs0   -   sinRel1 * cosRel0 * sinAbs0 * cosAbs1   -   cosRel1 * sinAbs0 * sinAbs1,
+            -sinRel1 * sinRel0 * sinAbs0   +   sinRel1 * cosRel0 * cosAbs0 * cosAbs1   +   cosRel1 * cosAbs0 * sinAbs1,
+            /**/                               sinRel1 * cosRel0 * sinAbs1             -   cosRel1 * cosAbs1
+        ];
+        return upVector;
+    }
 }
 
 export default RigidBodiesPhase1;

@@ -4,6 +4,8 @@
 
 'use strict';
 
+import RigidBodiesPhase1 from '../solver/rigid_bodies/rigid_bodies_phase_1';
+
 class Updater
 {
     constructor(physicsEngine)
@@ -163,6 +165,8 @@ class Updater
                     //     px, py, pz,
                     //     fx, fy, fz
                     // );
+
+                    let upv = RigidBodiesPhase1.getEntityUpVector(avatar);
                     if (power > 20)
                     {
                         this._physicsEngine._ai.pushProjectileForSpawn(
@@ -171,7 +175,8 @@ class Updater
                                 fx, fy, fz,
                                 avatar.worldId,
                                 power,
-                                avatar.widthY, avatar.widthY, avatar.widthZ
+                                upv[0], upv[1], upv[2]
+                                // avatar.widthY, avatar.widthY, avatar.widthZ
                             ]
                         );
                     }

@@ -43,7 +43,30 @@ let PlayerModule = {
         meleeEffectMesh.userData.bloom = true;
         // meleeEffectMesh.renderOrder = 999;
 
-        return meleeEffectMesh;
+        let wrapper = new Object3D();
+        wrapper.position.set(0, 0, 0);
+        wrapper.rotation.x = Math.PI / 2;
+        wrapper.rotation.y = Math.PI;
+        wrapper.add(meleeEffectMesh);
+        meleeEffectMesh.rotation.set(0, Math.PI / 2 + Math.PI / 4, 0);
+        meleeEffectMesh.position.set(1, 1, -0.5);
+        // wrapper.getMesh = function()
+        // {
+        //     return meleeEffectMesh;
+        // };
+
+        let up = new Object3D();
+        wrapper.rotation.reorder('ZYX');
+        meleeEffectMesh.rotation.reorder('ZYX');
+        up.add(wrapper);
+        up.getWrapper = function() {
+            return wrapper;
+        };
+        up.getMesh = function() {
+            return meleeEffectMesh;
+        };
+
+        return up;
     },
 
     createArrowTrail(p)
@@ -85,6 +108,8 @@ let PlayerModule = {
     {
         let wrapper = new Object3D();
         let cube = graphics.getItemMesh(ItemType.YA, false);
+
+        cube.userData.bloom = true;
         wrapper.add(cube);
         wrapper.rotation.x = Math.PI / 2;
         wrapper.rotation.y = Math.PI;

@@ -71,15 +71,27 @@ class AI
                 // const wy = p[8];
                 // const wz = p[9];
                 let world = this._worldModel.getWorld(wid);
+
+                // let solver = this._game.physicsEngine._frontend._rigidBodies;
+                // let g = solver.getGravity(world, wid, p[0], p[1], p[2]);
+                let a1 = p[8]; let a2 = p[9]; let a3 = p[10];
+                let norm = a1 * a1 + a2 * a2 + a3 * a3;
+                if (norm === 0) continue;
+
+                norm = Math.sqrt(norm);
+                a1 /= norm; a2 /= norm; a3 /= norm;
+                const b1 = p[3]; const b2 = p[4]; const b3 = p[5];
+                const crossX = a2 * b3 - a3 * b2;
+                const crossY = a3 * b1 - a1 * b3;
+                const crossZ = a1 * b2 - a2 * b1;
+
                 let projectile = ce.spawnEntity(
                     'projectile',
                     world,
                     [
-                        // TODO [GAMEPLAY] cast on hexahedron
-                        //  and give avatar’s p1.
-                        p[0] + 0.5 * p[3],
-                        p[1] + 0.5 * p[4],
-                        p[2] + 0.5 * p[5],
+                        p[0] - 0.6 * crossX, // + 0.5 * p[3],
+                        p[1] - 0.6 * crossY, // + 0.5 * p[4],
+                        p[2] - 0.6 * crossZ // + 0.5 * p[5],
                     ]
                 );
                 projectile.a0[0] = power * 4 * p[3];
