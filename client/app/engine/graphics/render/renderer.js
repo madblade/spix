@@ -26,7 +26,7 @@ let RendererManager = function(graphicsEngine)
     this.graphics = graphicsEngine;
 
     // Graphical settings
-    this.selectiveBloom = true;
+    this.selectiveBloom = false;
     this.ambientOcclusion = false;
 
     // Cap number of passes.
@@ -143,6 +143,9 @@ extend(RendererManager.prototype, {
         let composer = new EffectComposer(rendrr);
         let scenePass = new RenderPass(sc, cam);
         composer.addPass(scenePass);
+        // let shadowPass = new ShadowPass(sc, cam);
+        // composer.addPass(shadowPass);
+        // shadowPass.needsSwap = true;
 
         // Anti-alias
         let resolutionX = 1 / window.innerWidth;

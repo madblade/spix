@@ -17,7 +17,7 @@ let WaterCameraModule = {
             camera: new PerspectiveCamera(fov, aspect, near, far),
             waterRenderTarget: new WebGLRenderTarget(512, 512, {
                 minFilter: LinearFilter, magFilter: LinearFilter,
-                format: RGBFormat, stencilBuffer: false
+                format: RGBFormat
             }),
             mirrorPlane: new Plane(),
             normal: new Vector3(),
