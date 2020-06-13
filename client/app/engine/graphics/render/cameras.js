@@ -240,17 +240,24 @@ extend(CameraManager.prototype, {
         if (incoming.length < 1) return;
 
         let rotation = [0, 0, 0, 0];
+        let acc = [0, 0, 0, 0];
         for (let i = 0, l = incoming.length; i < l; ++i)
         {
             let inc = incoming[i];
-            let rot = [0, 0, 0, 0];
-            // TODO [PERF] put that in update received instead.
-            rot = this.moveCameraFromMouse(inc[0], inc[1], inc[2], inc[3]);
-            rotation[0] = rot[0];
-            rotation[1] = rot[1];
-            rotation[2] = rot[2];
-            rotation[3] = rot[3];
+            acc[0] += inc[0];
+            acc[1] += inc[1];
+            acc[2] += inc[2];
+            acc[3] += inc[3];
         }
+
+        // console.log(incoming.length);
+        let rot = [0, 0, 0, 0];
+        rot = this.moveCameraFromMouse(acc[0], acc[1], acc[2], acc[3]);
+        rotation[0] = rot[0];
+        rotation[1] = rot[1];
+        rotation[2] = rot[2];
+        rotation[3] = rot[3];
+
         this.incomingRotationEvents = [];
 
         // Here we could perform additional filtering

@@ -25,9 +25,20 @@ let Entity = function(id, graphicalComponent, worldId)
 
     this.isProjectile = false;
     this.inScene = false;
+    this.helper = null;
 };
 
 extend(Entity.prototype, {
+
+    getHelper()
+    {
+        return this.helper;
+    },
+
+    setHelper(object3D)
+    {
+        this.helper = object3D;
+    },
 
     getObject3D()
     {

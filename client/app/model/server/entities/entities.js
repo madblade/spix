@@ -155,6 +155,10 @@ extend(EntityModel.prototype, {
                 } else /*if (z === 0)*/ {
                     v2 = pi / 2;
                 }
+                // this.newRot = Date.now();
+                // this.elapsed  = this.newRot - (this.lastRot || 0);
+                // this.lastRot = this.newRot;
+                // console.log(this.elapsed);
 
                 object3D.rotation.x = Math.PI + v2; // newR.z; // ur[3];
                 object3D.rotation.z = v1; // newR.y; // ur[2];
@@ -163,6 +167,25 @@ extend(EntityModel.prototype, {
                 {
                     currentEntity.inScene = true;
                     graphics.addToScene(object3D, currentEntity.getWorldId());
+                }
+                let helper = currentEntity.getHelper();
+                if (helper)
+                {
+                    let positions = helper.geometry.attributes.position.array;
+                    const MAX_POINTS = positions.length / 3;
+                    let drawRange = helper.geometry.drawRange.count;
+                    let index = 3 * drawRange;
+                    if (drawRange < MAX_POINTS)
+                    {
+                        positions[index++] = newP.x;
+                        positions[index++] = newP.y;
+                        positions[index++] = newP.z;
+                        helper.computeLineDistances();
+                        helper.geometry.setDrawRange(0, drawRange + 1);
+                        helper.geometry.attributes.position.needsUpdate = true;
+                        helper.geometry.computeBoundingSphere();
+                        // console.log(helper.geometry.attributes.position.array);
+                    }
                 }
             }
 
@@ -212,7 +235,12 @@ extend(EntityModel.prototype, {
     {
         let entity = entities.get(id);
         if (entity) {
-            graphics.removeFromScene(entity.getObject3D(), entity.getWorldId());
+            const wid = entity.getWorldId();
+            graphics.removeFromScene(entity.getObject3D(), wid);
+            if (entity.helper)
+            {
+                graphics.removeFromScene(entity.getHelper(), wid);
+            }
         }
         entities.delete(id);
     },

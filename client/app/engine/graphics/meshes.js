@@ -118,7 +118,7 @@ let MeshesModule = {
         clone.rotation.reorder('ZYX');
 
         let inner = clone.children[0];
-        console.log(inner);
+        // console.log(inner);
         if (inner && renderOnTop) this.renderOnTop(inner);
         // if (inner.children && inner.children.length === 4) this.renderOnTop(inner);
         // for (let i = 0; i < inner.children.length; ++i)

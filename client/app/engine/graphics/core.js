@@ -77,6 +77,15 @@ let CoreModule = {
         // Request animation frame.
         this.requestId = requestAnimationFrame(this.animate.bind(this));
 
+        // Emulate lower framerate
+        // this.now = Date.now();
+        // this.elapsed = this.now - (this.then || 0);
+        // const fpsInterval = 32;
+        // if (this.elapsed > fpsInterval)
+        // {
+        //     this.then = this.now - (this.elapsed % fpsInterval);
+        // }
+
         // Bench.
         this.fps.update();
 

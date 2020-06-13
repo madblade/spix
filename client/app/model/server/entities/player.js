@@ -5,10 +5,46 @@
 'use strict';
 
 import { Entity } from './entity.js';
-import { Object3D } from 'three';
+import {
+    BufferAttribute, BufferGeometry, Line,
+    LineDashedMaterial, Object3D
+} from 'three';
 import { ItemType } from '../self/items';
 
 let PlayerModule = {
+
+    createArrowTrail(p)
+    {
+        let MAX_POINTS = 250;
+
+        let geometry = new BufferGeometry();
+
+        let positions = new Float32Array(MAX_POINTS * 3); // 3 vertices per point
+        geometry.setAttribute('position', new BufferAttribute(positions, 3));
+
+        let index = 0;
+        positions[index++] = p.x;
+        positions[index++] = p.y;
+        positions[index++] = p.z;
+
+        let drawCount = 1; // draw the first x points, only
+        geometry.setDrawRange(0, drawCount);
+        geometry.attributes.position.needsUpdate = true;
+        geometry.computeBoundingSphere();
+
+        // let material = new LineBasicMaterial({ color: 0xff0000, linewidth: 3 });
+        let material = new LineDashedMaterial({
+            color: 0xffff00,
+            linewidth: 2,
+            scale: 1,
+            dashSize: 3,
+            gapSize: 1
+        });
+
+        let line = new Line(geometry,  material);
+        line.computeLineDistances();
+        return line;
+    },
 
     loadArrow(
         id, updatedEntity, graphics, entities
@@ -39,15 +75,24 @@ let PlayerModule = {
         entity.isProjectile = true;
 
         this.updateEntity(id, entity, updatedEntity, graphics, entities);
-        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
         entity.inScene = true;
+        graphics.addToScene(entity.getObject3D(), entity.getWorldId());
+
+        let helper = this.createArrowTrail(entity.position);
+        entity.setHelper(helper);
+        graphics.addToScene(entity.getHelper(), entity.getWorldId());
+
         let p = entity.position;
         up.position.set(p.x, p.y, p.z);
         entity.lastPFromServer.set(p.x, p.y, p.z);
         entity.currentPFromServer.set(p.x, p.y, p.z);
-        let r = entity.rotation;
         let rr = this.app.model.server.selfModel.rotation;
+        let r = entity.rotation;
         r.set(rr[1], rr[2], rr[3]);
+        let object3D = entity.getObject3D();
+        object3D.rotation.x = r.z; // ur[3];
+        object3D.rotation.z = r.y; // ur[2];
+        object3D.getWrapper().rotation.y = Math.PI + r.x;
         entity.lastRFromServer.set(r.x, r.y, r.z);
         entity.currentRFromServer.set(r.x, r.y, r.z);
         this.entitiesLoading.delete(id);

@@ -143,7 +143,7 @@ class RigidBodiesPhase2
                 currentEntity.p1[0] = currentEntity.p0[0];
                 currentEntity.p1[1] = currentEntity.p0[1];
                 currentEntity.p1[2] = currentEntity.p0[2];
-                // currentEntity.collided = true;
+                currentEntity.collided = true;
             }
 
             // Remember to apply the same kind of changes to the simple entity + terrain solver (just below).
@@ -193,7 +193,7 @@ class RigidBodiesPhase2
                 currentEntity.p1[0] = currentEntity.p0[0];
                 currentEntity.p1[1] = currentEntity.p0[1];
                 currentEntity.p1[2] = currentEntity.p0[2];
-                // currentEntity.collided = true;
+                currentEntity.collided = true;
             }
 
             // Here bounce components could be reported as the inverse velocity at the impact point.

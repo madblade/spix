@@ -31,11 +31,11 @@ extend(PreIngameState.prototype, {
             .center()
             .fadeIn();
 
-        $('#request-pl').click(function() {
+        $('#request-pl').click(() => {
             this.stateManager.setState('ingame');
             this.stateManager.app.engine.controls.requestLock();
             this.stateManager.app.setFocused(true);
-        }.bind(this));
+        });
     },
 
     end()
