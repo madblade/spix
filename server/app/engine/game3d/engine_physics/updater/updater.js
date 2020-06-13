@@ -163,7 +163,7 @@ class Updater
                     //     px, py, pz,
                     //     fx, fy, fz
                     // );
-                    if (power > 10)
+                    if (power > 20)
                     {
                         this._physicsEngine._ai.pushProjectileForSpawn(
                             [

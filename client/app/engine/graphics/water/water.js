@@ -88,6 +88,8 @@ let Water = function(
     material.uniforms.distortionScale.value = distortionScale;
     material.uniforms.eye.value = eye;
 
+    // this.renderOrder = 800;
+
     this.material = material;
 };
 

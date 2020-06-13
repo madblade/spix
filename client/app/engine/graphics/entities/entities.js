@@ -8,7 +8,8 @@ import LegacyJSONLoader from './LegacyJSONLoader';
 import {
     AnimationMixer, AnimationClip,
     Object3D, Mesh,
-    MeshLambertMaterial, FaceColors, BufferGeometry, Geometry
+    MeshLambertMaterial,
+    FaceColors, BufferGeometry, Geometry,
 } from 'three';
 
 let EntitiesModule = {

@@ -45,7 +45,7 @@ class Entity
         this._worldId       = -1;
         // When crossing multiple portals...
         // 1 state = Object { position:p, rotation:r }
-        this._otherWorlds = new Map(); // Not yet.
+        // this._otherWorlds = new Map(); // Not yet.
 
         // Linked events.
         this._events = [];
@@ -91,7 +91,7 @@ class Entity
     get position()          { return this._p0; }
 
     get adherence()         { return this._adherence; }
-    get otherWorlds()       { return this._otherWorlds; }
+    // get otherWorlds()       { return this._otherWorlds; }
 
     set adherence(na)       { this._adherence = na; }
 

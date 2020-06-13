@@ -43,27 +43,45 @@ class EntityLoader
             let isPresent = consistencyModel.hasEntity(aid, eid);
 
             if (isInRange && !isPresent)
+            {
+                let d = [
+                    !!e.hit + 0,
+                    !!e._isHitting + 0,
+                    !!e._loadingRanged + 0,
+                    !!e._isParrying + 0
+                ];
                 addedEntities[eid] =
-                { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
-                    p: e.position,
-                    r: e.rotation,
-                    k: e.kind,
-                    w: e.worldId,
-                    a: e.captain === avatar // is an ally
-                };
+                    { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
+                        p: e.position,
+                        r: e.rotation,
+                        k: e.kind,
+                        w: e.worldId,
+                        a: e.captain === avatar, // is an ally
+                        d // what it does
+                    };
+            }
 
             else if (!isInRange && isPresent)
                 removedEntities[eid] = null;
 
             else if (isInRange && (updatedEntities.has(eid) || updatedEntities.has(aid)))
+            {
+                let d = [
+                    !!e.hit + 0,
+                    !!e._isHitting + 0,
+                    !!e._loadingRanged + 0,
+                    !!e._isParrying + 0
+                ];
                 addedEntities[eid] =
-                { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
-                    p: e.position,
-                    r: e.rotation,
-                    k: e.kind,
-                    w: e.worldId,
-                    a: e.captain === avatar // is an ally
-                };
+                    { // TODO [GAMEPLAY] tell what it is doing (action / aggro)
+                        p: e.position,
+                        r: e.rotation,
+                        k: e.kind,
+                        w: e.worldId,
+                        a: e.captain === avatar, // is an ally
+                        d
+                    };
+            }
         }});
 
         removedPlayers.forEach(eid => {

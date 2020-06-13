@@ -39,6 +39,7 @@ class Avatar extends Entity
         this._loadingRanged = false;
         this._hasJustFired = false;
         this._hasJustMeleed = false;
+        this._isHitting = false;
         this._hasJustJumped = false;
         this._isAvatar = true;
         this._timeSpentLoading = 0;

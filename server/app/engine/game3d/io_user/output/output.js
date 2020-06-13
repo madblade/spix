@@ -161,10 +161,20 @@ class UserOutput
             // First one is the main world.
             let rot = av.rotation;
             let oldRot = av.oldRotation;
-            let selfState = [[av.position, [rot[0], oldRot[0], rot[2], rot[3]], av.worldId]];
-            let otherStates = av.otherWorlds;
-            otherStates.forEach((state, worldId) => selfState.push([state.position, state.rotation, worldId]));
+            let selfState = [[
+                av.position, [rot[0], oldRot[0], rot[2], rot[3]], av.worldId,
+                [ // additional states
+                    !!av.hit + 0,
+                    !!av._isHitting + 0,
+                    !!av._loadingRanged + 0,
+                    !!av._isParrying + 0
+                ]
+            ]];
+            // let otherStates = av.otherWorlds;
+            // otherStates.forEach((state, worldId) => selfState.push([state.position, state.rotation, worldId]));
             p.send('me', UserOutput.pack(selfState));
+
+            if (av._isHitting) av._isHitting = false;
         });
 
         // Empty entity updates buffer.

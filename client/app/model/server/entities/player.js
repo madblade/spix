@@ -6,12 +6,45 @@
 
 import { Entity } from './entity.js';
 import {
-    BufferAttribute, BufferGeometry, Line,
-    LineDashedMaterial, Object3D
+    BufferAttribute, BufferGeometry, DoubleSide, Line,
+    LineDashedMaterial, Mesh, Object3D, RingBufferGeometry, ShaderMaterial
 } from 'three';
 import { ItemType } from '../self/items';
+import { ShadersModule } from '../../../engine/graphics/shaders/shaders';
 
 let PlayerModule = {
+
+    createMeleeMesh()
+    {
+        const innerRadius = 0.5;
+        const outerRadius = 1.3;
+        let ringGeometry = new RingBufferGeometry(
+            innerRadius,
+            outerRadius,
+            20, 1,
+            0, Math.PI
+        );
+        let material = new ShaderMaterial({
+            uniforms: {
+                time: { value: 0.0 },
+                outerRadius: { value: outerRadius },
+                innerRadius: { value: innerRadius }
+            },
+            vertexShader: ShadersModule.getSwordTrailVertexShader(),
+            fragmentShader: ShadersModule.getSwordTrailFragmentShader(),
+            side: DoubleSide,
+            transparent: true,
+        });
+
+        let meleeEffectMesh = new Mesh(
+            ringGeometry,
+            material
+        );
+        meleeEffectMesh.userData.bloom = true;
+        // meleeEffectMesh.renderOrder = 999;
+
+        return meleeEffectMesh;
+    },
 
     createArrowTrail(p)
     {

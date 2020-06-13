@@ -162,6 +162,7 @@ class RigidBodiesPhase2
             let entityIndex = oxAxis[oi].id;
             let currentEntity = entities[entityIndex];
             if (!currentEntity) continue;
+
             let p0 = currentEntity.p0;
             let p1 = currentEntity.p1;
             if (

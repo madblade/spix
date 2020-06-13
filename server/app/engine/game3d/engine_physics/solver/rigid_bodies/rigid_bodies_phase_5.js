@@ -453,6 +453,11 @@ class RigidBodiesPhase5
             const hasMoved = p0[0] !== p1[0] || p0[1] !== p1[1] || p0[2] !== p1[2];
             if (hasMeleed || hasMoved)
             {
+                if (hasMeleed)
+                {
+                    entityUpdated = true;
+                    currentEntity._isHitting = true;
+                }
                 let gravity = rigidBodiesSolver.getGravity(world, worldId, p0[0], p0[1], p0[2]);
                 const isProjectile = currentEntity._isProjectile;
                 const rangeCollision = currentEntity.widthX + 2 * eps;

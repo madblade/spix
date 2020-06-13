@@ -6,8 +6,6 @@ var ringGeometry = new THREE.RingBufferGeometry(
 var material = new THREE.ShaderMaterial({
     uniforms: {
         time: { value: 1.0 },
-        colorB: {type: 'vec3', value: new THREE.Color(0xACB6E5)},
-        colorA: {type: 'vec3', value: new THREE.Color(0x74ebd5)},
         outerRadius: { value: 13.0 },
         innerRadius: { value: 5.0 }
     },
@@ -22,8 +20,6 @@ var material = new THREE.ShaderMaterial({
 */
 
 uniform float time;
-uniform vec3 colorA;
-uniform vec3 colorB;
 uniform float outerRadius;
 uniform float innerRadius;
 varying vec3 vPosition;

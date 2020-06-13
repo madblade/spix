@@ -126,7 +126,7 @@ extend(EntityModel.prototype, {
             let v2;
             const pi = Math.PI;
             const dxxdyy = dx * dx + dy * dy;
-            if (dxxdyy + dz * dz < 1e-8)
+            if (dxxdyy + dz * dz < 1e-12)
             {
                 const selfRotation = this.app.model.server.selfModel.rotation;
                 v1 = selfRotation[2];
@@ -169,7 +169,7 @@ extend(EntityModel.prototype, {
                     graphics.addToScene(object3D, currentEntity.getWorldId());
                 }
                 let helper = currentEntity.getHelper();
-                if (helper)
+                if (helper && helper.geometry)
                 {
                     let positions = helper.geometry.attributes.position.array;
                     const MAX_POINTS = positions.length / 3;
@@ -185,6 +185,25 @@ extend(EntityModel.prototype, {
                         helper.geometry.attributes.position.needsUpdate = true;
                         helper.geometry.computeBoundingSphere();
                         // console.log(helper.geometry.attributes.position.array);
+                    }
+                    else
+                    {
+                        index = 0;
+                        for (let i = 0; i < MAX_POINTS - 1; ++i)
+                        {
+                            positions[index]     = positions[index + 3];
+                            positions[index + 1] = positions[index + 4];
+                            positions[index + 2] = positions[index + 5];
+                            index += 3;
+                        }
+                        positions[index] = newP.x;
+                        positions[index + 1] = newP.y;
+                        positions[index + 2] = newP.z;
+
+                        helper.computeLineDistances();
+                        helper.geometry.setDrawRange(0, drawRange + 1);
+                        helper.geometry.attributes.position.needsUpdate = true;
+                        helper.geometry.computeBoundingSphere();
                     }
                 }
             }
@@ -263,14 +282,33 @@ extend(EntityModel.prototype, {
 
         // Switch worlds.
         const worldId = parseInt(updatedEntity.w, 10);
-        if (currentEntity.getWorldId() !== worldId) {
-            graphics.removeFromScene(currentEntity.getObject3D(), currentEntity.getWorldId());
+        const oldWorldId = currentEntity.getWorldId();
+        if (oldWorldId !== worldId) {
+            graphics.removeFromScene(currentEntity.getObject3D(), oldWorldId, true);
             currentEntity.setWorldId(worldId);
             graphics.addToScene(currentEntity.getObject3D(), worldId);
+
+            let helper = currentEntity.getHelper();
+            if (helper)
+            {
+                graphics.removeFromScene(helper, oldWorldId, true);
+                graphics.addToScene(helper, worldId);
+                console.log(helper);
+            }
         }
 
         // Update current "live" entities.
         entities.set(id, currentEntity);
+
+        if (updatedEntity.d)
+        {
+            let hasJustMeleed = updatedEntity.d[1];
+            if (hasJustMeleed)
+            {
+                console.log('Someone meleed.');
+            }
+            // console.log(updatedEntity.d);
+        }
     },
 
     refresh()

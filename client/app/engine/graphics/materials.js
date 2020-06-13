@@ -21,7 +21,9 @@ let MaterialsModule = {
                     specular: 0xffffff,
                     flatShading: true,
                     vertexColors: VertexColors,
-                    color: meta && meta.color ? meta.color : null
+                    color: meta && meta.color ? meta.color : null,
+                    // transparent: true,
+                    // opacity: 1
                 });
                 break;
 
@@ -41,7 +43,9 @@ let MaterialsModule = {
                     // color: 0x110011,
                     side: FrontSide,
                     //vertexColors: VertexColors,
-                    map: this.textureAtlas
+                    map: this.textureAtlas,
+                    // transparent: true,
+                    // opacity: 1
                 };
                 material = new MeshLambertMaterial(params);
                 break;

@@ -36,6 +36,12 @@ let SelfModel = function(app)
     this.handItemWrapper = new Object3D();
     this.handItemWrapper.rotation.reorder('ZYX');
 
+    // Melee mesh
+    this.meleeEffectMesh = null;
+    this.needsStartMelee = false;
+    this.isHittingMelee = false;
+    this.meleeWorld = null;
+
     // Interpolation-prediction
     this.lastPositionFromServer = new Vector3(0, 0, 0);
     this.currentPositionFromServer = new Vector3(0, 0, 0);
@@ -252,6 +258,7 @@ extend(SelfModel.prototype, {
         if (!this.needsUpdate)
         {
             if (!this.interpolationUpToDate) this.interpolatePredictSelfPosition();
+            if (this.isHittingMelee) this.updateMelee();
             return;
         }
 
@@ -285,8 +292,69 @@ extend(SelfModel.prototype, {
         //     this.updateRotation(avatar, r);
         // }
 
+        if (this.needsStartMelee)
+        {
+            this.needsStartMelee = false;
+            this.initMelee();
+        }
+        if (this.isHittingMelee)
+        {
+            this.updateMelee();
+        }
+
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
+    },
+
+    initMelee()
+    {
+        let graphics = this.app.engine.graphics;
+        if (!this.meleeEffectMesh)
+        {
+            let em = this.app.model.server.entityModel;
+            this.meleeEffectMesh = em.createMeleeMesh();
+        }
+
+        let worldId = this.worldId;
+        let mesh = this.meleeEffectMesh;
+        if (this.meleeWorld !== null && this.meleeWorld !== worldId)
+        {
+            graphics.removeFromScene(mesh, this.meleeWorld, true);
+        }
+
+        this.meleeWorld = worldId;
+        this.isHittingMelee = true;
+        let us = mesh.material.uniforms;
+        us.time.value = 0;
+
+        let p = // this.currentPositionFromServer;
+            // graphics.cameraManager.mainCamera.up.position;
+            this.avatar.position;
+        mesh.position.copy(p);
+
+        graphics.addToScene(mesh, worldId);
+    },
+
+    updateMelee()
+    {
+        let graphics = this.app.engine.graphics;
+        let mesh = this.meleeEffectMesh;
+        let us = mesh.material.uniforms;
+        us.time.value += 0.1;
+        if (us.time.value < 2.0)
+        {
+            this.isHittingMelee = true;
+            let p = // this.currentPositionFromServer;
+                // graphics.cameraManager.mainCamera.up.position;
+                this.avatar.position;
+            mesh.position.copy(p);
+        }
+        else
+        {
+            this.isHittingMelee = false;
+            this.meleeWorld = null;
+            graphics.removeFromScene(mesh, this.meleeWorld, true);
+        }
     },
 
     cameraMoved(cameraObject)
@@ -300,7 +368,7 @@ extend(SelfModel.prototype, {
         // handItem.children[0].rotation.x += 0.01;
     },
 
-    updateSelf(p, r, w)
+    updateSelf(p, r, w, s)
     {
         w = w.toString();
 
@@ -322,6 +390,15 @@ extend(SelfModel.prototype, {
             this.worldNeedsUpdate = true;
             this.oldWorldId = this.worldId;
             this.worldId = w;
+        }
+
+        if (s) {
+            let hasJustMeleed = s[1];
+            if (hasJustMeleed)
+            {
+                console.log('starting melee');
+                this.needsStartMelee = true;
+            }
         }
     },
 

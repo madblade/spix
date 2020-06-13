@@ -12,7 +12,10 @@ let UpdateModule = {
         data = JSON.parse(data);
 
         let mainState = data[0];
-        this.selfModel.updateSelf(mainState[0], mainState[1], mainState[2]);
+        this.selfModel.updateSelf(
+            mainState[0], mainState[1], mainState[2],
+            mainState[3]
+        );
     },
 
     updateEntities(data)

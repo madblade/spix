@@ -8,6 +8,10 @@
 import PortalFragment       from './portal/portal.fragment.glsl';
 import PortalVertex         from './portal/portal.vertex.glsl';
 
+// Effects
+import SwordTrailVertex         from './sword/trail.vertex.glsl';
+import SwordTrailFragment       from './sword/trail.fragment.glsl';
+
 // Sky
 import SkyFlatFragment      from './sky/skyFlat.fragment.glsl';
 import SkyFlatVertex        from './sky/skyFlat.vertex.glsl';
@@ -35,6 +39,17 @@ let ShadersModule = {
     getPortalFragmentShader()
     {
         return PortalFragment;
+    },
+
+    // Melee
+    getSwordTrailVertexShader()
+    {
+        return SwordTrailVertex;
+    },
+
+    getSwordTrailFragmentShader()
+    {
+        return SwordTrailFragment;
     },
 
     // Sky
