@@ -16,7 +16,7 @@ class AI
         // this._xModel        = game.xModel;
 
         this._ais = [];
-        this._maxAis = 1;
+        this._maxAis = 20;
         this._needingPath = [];
 
         this._cycle = 1;
@@ -116,7 +116,7 @@ class AI
         const maxNbAIs = this._maxAis;
         if (nbAIs < maxNbAIs)
         {
-            if (cycle % 60 === 0 && Math.random() > 0.5)
+            if (cycle % 120 === 0 && Math.random() > 0.5)
             {
                 let avatar = this._game.players.getRandomPlayer();
                 if (!avatar)

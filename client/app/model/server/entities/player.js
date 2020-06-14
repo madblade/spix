@@ -103,6 +103,11 @@ let PlayerModule = {
         return line;
     },
 
+    getOffsetForPlayer()
+    {
+
+    },
+
     loadArrow(
         id, updatedEntity, graphics, entities
     )
