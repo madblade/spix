@@ -42,6 +42,11 @@ let SelfModel = function(app)
     this.isHittingMelee = false;
     this.meleeWorld = null;
 
+    // Loading bow
+    this.isLoadingBow = false;
+    this.needsStartLoadingBow = false;
+    this.needsStopLoadingBow = false;
+
     // Interpolation-prediction
     this.lastPositionFromServer = new Vector3(0, 0, 0);
     this.currentPositionFromServer = new Vector3(0, 0, 0);
@@ -259,6 +264,7 @@ extend(SelfModel.prototype, {
         {
             if (!this.interpolationUpToDate) this.interpolatePredictSelfPosition();
             if (this.isHittingMelee) this.updateMelee();
+            this.updateBow();
             return;
         }
 
@@ -301,6 +307,7 @@ extend(SelfModel.prototype, {
         {
             this.updateMelee();
         }
+        this.updateBow();
 
         this.worldNeedsUpdate = false;
         this.needsUpdate = false;
@@ -363,6 +370,46 @@ extend(SelfModel.prototype, {
         }
     },
 
+    updateBow()
+    {
+        let graphics = this.app.engine.graphics;
+        let times = graphics.times;
+        let mixers = graphics.mixers;
+        let mixer = mixers.get('yumi');
+        if (!mixer) return;
+        if (this.needsStartLoadingBow)
+        {
+            console.log('reset');
+            mixer.setTime(0);
+            mixer.update(0);
+            let yumiClip = graphics.clips.get('yumi');
+            yumiClip.reset();
+            yumiClip.play();
+            times.set('yumi', Date.now());
+            this.needsStartLoadingBow = false;
+            this.needsStopLoadingBow = false;
+            this.loadingBow = true;
+        }
+        else if (this.needsStopLoadingBow)
+        {
+            console.log('reset');
+            this.needsStartLoadingBow = false;
+            this.needsStopLoadingBow = false;
+            mixer.setTime(0);
+            mixer.update(0);
+            this.isLoadingBow = false;
+        }
+        else if (this.isLoadingBow)
+        {
+            // console.log(mixer._root.morphTargetInfluences);
+            let prevTime = times.get('yumi') || Date.now();
+            let time = Date.now();
+            const delta = (time - prevTime) * 0.001;
+            mixer.update(delta);
+            times.set('yumi', time);
+        }
+    },
+
     cameraMoved(cameraObject)
     {
         let handItem = this.handItem;
@@ -402,8 +449,22 @@ extend(SelfModel.prototype, {
             let hasJustMeleed = s[1];
             if (hasJustMeleed)
             {
-                console.log('starting melee');
                 this.needsStartMelee = true;
+            }
+            let loadingBow = !!s[2];
+            if (loadingBow !== this.isLoadingBow)
+            {
+                this.isLoadingBow = loadingBow;
+                if (this.isLoadingBow)
+                {
+                    this.needsStartLoadingBow = true;
+                    this.needsStopLoadingBow = false;
+                }
+                else
+                {
+                    this.needsStopLoadingBow = true;
+                    this.needsStartLoadingBow = false;
+                }
             }
         }
     },
@@ -469,6 +530,9 @@ extend(SelfModel.prototype, {
                 }
             }
         }
+
+        this.needsStopLoadingBow = true;
+        this.needsStartLoadingBow = false;
     },
 
     getSelfPosition()

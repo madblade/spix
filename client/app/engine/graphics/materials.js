@@ -44,9 +44,10 @@ let MaterialsModule = {
                     side: FrontSide,
                     //vertexColors: VertexColors,
                     map: this.textureAtlas,
-                    transparent: true,
-                    opacity: 1
+                    transparent: false
                 };
+                if (this.rendererManager.shadowVolumes)
+                    params.transparent = true;
                 material = new MeshLambertMaterial(params);
                 break;
 

@@ -10,6 +10,7 @@ let AnimationsModule = {
     {
         this.mixers = new Map();
         this.times = new Map();
+        this.clips = new Map();
     },
 
     updateAnimation(entityId)

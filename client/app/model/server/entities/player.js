@@ -103,11 +103,6 @@ let PlayerModule = {
         return line;
     },
 
-    getOffsetForPlayer()
-    {
-
-    },
-
     loadArrow(
         id, updatedEntity, graphics, entities
     )
@@ -142,11 +137,11 @@ let PlayerModule = {
         entity.inScene = true;
         graphics.addToScene(entity.getObject3D(), entity.getWorldId());
 
+        let p = entity.position;
         let helper = this.createArrowTrail(entity.position);
         entity.setHelper(helper);
         graphics.addToScene(entity.getHelper(), entity.getWorldId());
 
-        let p = entity.position;
         up.position.set(p.x, p.y, p.z);
         entity.lastPFromServer.set(p.x, p.y, p.z);
         entity.currentPFromServer.set(p.x, p.y, p.z);

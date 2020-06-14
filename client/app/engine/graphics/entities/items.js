@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import {
     AnimationClip,
     AnimationMixer,
-    BufferAttribute, Color, DataTexture,
+    BufferAttribute, Color, DataTexture, LoopRepeat,
     MeshPhongMaterial,
     Object3D, RepeatWrapping, RGBFormat,
 } from 'three';
@@ -67,10 +67,15 @@ let ItemsGraphicsModule = {
         let clip = new AnimationClip(
             'bow-stretch', 1, gltf.animations[0].tracks);
         // console.log(clip);
-        mixer.clipAction(clip)
-            .setDuration(1)
+
+        let action = mixer.clipAction(clip);
+        action.clampWhenFinished = true;
+        action.setDuration(1)
+            .setLoop(LoopRepeat, 1)
             .play();
-        this.mixers.set('yumi', mixer); // TODO [ANIMATION] wire animation
+        this.mixers.set('yumi', mixer);
+        this.times.set('yumi', Date.now());
+        this.clips.set('yumi', action);
 
         // Color mesh
         let g = object.geometry;

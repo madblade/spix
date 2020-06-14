@@ -92,14 +92,17 @@ let MeshesModule = {
             c1.renderOrder = 997; c1.material.transparent = true;
             c2.renderOrder = 998; c2.material.transparent = true;
             c3.renderOrder = 996; c3.material.transparent = true;
-            // c0.onBeforeRender = renderer => renderer.clearDepth();
+            if (!this.rendererManager.shadowVolumes)
+                c0.onBeforeRender = renderer => renderer.clearDepth();
         }
 
         if (object.material)
         {
             object.material.transparent = true;
+            object.material.morphTargets = true;
             object.renderOrder = 999;
-            // object.onBeforeRender = renderer => renderer.clearDepth();
+            if (!this.rendererManager.shadowVolumes)
+                object.onBeforeRender = renderer => renderer.clearDepth();
         }
     },
 
@@ -114,8 +117,9 @@ let MeshesModule = {
         if (!(mesh instanceof Object3D))
             console.warn(`[Graphics/Meshes] "${id}" should be an instance of Object3D.`);
 
-        let clone = mesh.clone();
+        let clone = mesh; // .clone();
         clone.rotation.reorder('ZYX');
+        // clone.material.morphTargets = true;
 
         let inner = clone.children[0];
         // console.log(inner);
