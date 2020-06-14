@@ -50,6 +50,7 @@ let PlayerModule = {
         wrapper.add(meleeEffectMesh);
         meleeEffectMesh.rotation.set(0, Math.PI / 2 + Math.PI / 4, 0);
         meleeEffectMesh.position.set(1, 1, -0.5);
+        meleeEffectMesh.renderOrder = 999;
         // wrapper.getMesh = function()
         // {
         //     return meleeEffectMesh;

@@ -43,7 +43,7 @@ let Graphics = function(app)
     // Rendering.
     this.requestId          = null;
     this.sceneManager       = this.createSceneManager();
-    this.rendererManager    = this.createRendererManager(this);
+    this.rendererManager    = this.createRendererManager();
     this.cameraManager      = this.createCameraManager();
 
     // Interaction.

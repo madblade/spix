@@ -12,13 +12,14 @@ let WaterCameraModule = {
         let aspect = this.mainAspect;
         let near = this.mainNear;
         let far = this.mainFar;
+        let waterRenderTarget = new WebGLRenderTarget(512, 512, {
+            minFilter: LinearFilter, magFilter: LinearFilter,
+            format: RGBFormat
+        });
 
         return {
             camera: new PerspectiveCamera(fov, aspect, near, far),
-            waterRenderTarget: new WebGLRenderTarget(512, 512, {
-                minFilter: LinearFilter, magFilter: LinearFilter,
-                format: RGBFormat
-            }),
+            waterRenderTarget,
             mirrorPlane: new Plane(),
             normal: new Vector3(),
             mirrorWorldPosition: new Vector3(),

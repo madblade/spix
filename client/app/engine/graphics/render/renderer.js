@@ -20,6 +20,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ClearMaskPass, MaskPass } from 'three/examples/jsm/postprocessing/MaskPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { ClearPass } from 'three/examples/jsm/postprocessing/ClearPass';
+import { ShadowPass } from './ShadowPass';
 
 let RendererManager = function(graphicsEngine)
 {
@@ -138,14 +139,17 @@ extend(RendererManager.prototype, {
         return [bloomComposer, finalComposer, composer];
     },
 
-    createMainComposer(rendrr, sc, cam)
+    createMainComposer(rendrr, sc, cam, lights)
     {
         let composer = new EffectComposer(rendrr);
+        composer.renderTarget1.stencilBuffer = true;
+        composer.renderTarget2.stencilBuffer = true;
         let scenePass = new RenderPass(sc, cam);
-        composer.addPass(scenePass);
-        // let shadowPass = new ShadowPass(sc, cam);
-        // composer.addPass(shadowPass);
-        // shadowPass.needsSwap = true;
+        // composer.addPass(scenePass);
+        let shadowPass = new ShadowPass(sc, cam, lights);
+        let copy = new ShaderPass(CopyShader);
+        composer.addPass(shadowPass);
+        composer.addPass(copy);
 
         // Anti-alias
         let resolutionX = 1 / window.innerWidth;
@@ -153,7 +157,7 @@ extend(RendererManager.prototype, {
         let fxaa = new ShaderPass(FXAAShader);
         let u = 'resolution';
         fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        composer.addPass(fxaa);
+        // composer.addPass(fxaa);
         // composer.addPass(fxaa);
 
         // Bloom
@@ -165,8 +169,10 @@ extend(RendererManager.prototype, {
         bloomPass.strength = 1.0;
         bloomPass.radius = 0;
         let bloomComposer = new EffectComposer(rendrr);
+        bloomComposer.renderTarget1.stencilBuffer = true;
+        bloomComposer.renderTarget2.stencilBuffer = true;
         bloomComposer.renderToScreen = false;
-        bloomComposer.addPass(scenePass);
+        bloomComposer.addPass(shadowPass);
         bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
 
         let bloomMergePass = new ShaderPass(
@@ -262,40 +268,47 @@ extend(RendererManager.prototype, {
         });
     },
 
-    _updateWaters(cameraManager, renderer, mainScene)
+    _updateWaters(cameraManager, renderer, mainScene, mainCam)
     {
         // Update uniforms
         let worlds = this.graphics.app.model.server.chunkModel.worlds;
         let skies = this.graphics.app.model.server.chunkModel.skies;
         let eye = cameraManager.waterCamera.eye;
-        worlds.forEach((w, wid) => {
-            let sky = skies.get(wid);
-            let sdir = this.graphics.getSunDirection(sky);
+        worlds.forEach(w => {
+            // let sky = skies.get(wid);
+            // let sdir = this.graphics.getSunDirection(sky);
             w.forEach(chunk => { let m = chunk.meshes; for (let i = 0; i < m.length; ++i) {
                 if (!chunk.water[i]) continue;
-
                 let mi = m[i];
                 mi.visible = false;
-                if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
-                {
-                    mi.material.uniforms.eye.value = eye;
-                    mi.material.uniforms.sunDirection.value = sdir;
-                    mi.material.uniforms.time.value += 0.01;
-                }
+                // if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
+                // {
+                //     mi.material.uniforms.eye.value = eye;
+                //     mi.material.uniforms.sunDirection.value = sdir;
+                //     mi.material.uniforms.time.value += 0.01;
+                // }
             }});
         });
 
         // Update main camera
-        this._updateWaterCamera(cameraManager, renderer, mainScene);
+        this._updateWaterCamera(cameraManager, renderer, mainScene, mainCam);
 
         // Update display
-        worlds.forEach(w => { w.forEach(chunk => {
+        worlds.forEach((w, wid) => { w.forEach(chunk => {
             let m = chunk.meshes;
+            let sky = skies.get(wid);
+            let sdir = this.graphics.getSunDirection(sky);
             for (let i = 0; i < m.length; ++i) {
                 if (chunk.water[i])
                 {
                     let mi = m[i];
                     mi.visible = true;
+                    if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
+                    {
+                        mi.material.uniforms.eye.value = eye;
+                        mi.material.uniforms.sunDirection.value = sdir;
+                        mi.material.uniforms.time.value += 0.01;
+                    }
                 }
             }
         });
@@ -359,7 +372,7 @@ extend(RendererManager.prototype, {
         try {
             this._updateSkies(mainCamera);
             if (this.waterReflection)
-                this._updateWaters(cameraManager, renderer, mainScene);
+                this._updateWaters(cameraManager, renderer, mainScene, mainCamera);
         } catch (e) {
             console.error(e);
             this.stop = true;
@@ -486,8 +499,15 @@ extend(RendererManager.prototype, {
         if (this.composers.has(id)) {
             composer = this.composers.get(id);
         } else {
-            composer = this.createMainComposer(renderer, mainScene, mainCamera);
-            this.composers.set(id, composer);
+            let skies = this.graphics.app.model.server.chunkModel.skies;
+            let s = skies.get(id);
+            if (s && s.lights)
+            {
+                composer = this.createMainComposer(renderer, mainScene, mainCamera, s.lights);
+                this.composers.set(id, composer);
+            }
+            else
+                return;
         }
 
         // MAIN RENDER

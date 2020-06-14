@@ -92,14 +92,14 @@ let MeshesModule = {
             c1.renderOrder = 997; c1.material.transparent = true;
             c2.renderOrder = 998; c2.material.transparent = true;
             c3.renderOrder = 996; c3.material.transparent = true;
-            c0.onBeforeRender = renderer => renderer.clearDepth();
+            // c0.onBeforeRender = renderer => renderer.clearDepth();
         }
 
         if (object.material)
         {
             object.material.transparent = true;
             object.renderOrder = 999;
-            object.onBeforeRender = renderer => renderer.clearDepth();
+            // object.onBeforeRender = renderer => renderer.clearDepth();
         }
     },
 

@@ -5,9 +5,11 @@
 
 import { Pass } from 'three/examples/jsm/postprocessing/Pass';
 import { BoxBufferGeometry, Mesh, MeshBasicMaterial, Scene } from 'three';
+import { LightDefaultIntensities } from '../light';
 
 let ShadowPass = function(
-    scene, camera
+    scene, camera,
+    lights
 )
 {
     Pass.call(this);
@@ -17,13 +19,15 @@ let ShadowPass = function(
 
     this.sceneShadows = new Scene();
     let cube = new Mesh(
-        new BoxBufferGeometry(10, 10, 10),
-        new MeshBasicMaterial()
+        new BoxBufferGeometry(20, 20, 20, 100, 100, 100),
+        new MeshBasicMaterial({color: 0xff0000, transparent: true})
     );
-    cube.position.set(0, 0, 16);
+    cube.position.set(10, 0, 16);
     this.sceneShadows.add(cube);
+    // scene.add(cube);
 
-    this.clear = true;
+    this.lights = lights;
+    this.clear = false;
     this.needsSwap = false;
 };
 
@@ -49,6 +53,10 @@ ShadowPass.prototype = Object.assign(Object.create(Pass.prototype), {
         // lights.forEach(function(l) {
         //     l.intensity = 0;
         // });
+        let lights = this.lights;
+        // lights.ambientLight.intensity = 0;
+        lights.directionalLight.intensity = 0;
+        lights.hemisphereLight.intensity = 0;
 
         // Render the scene with ambient lights only
         renderer.render(scene, camera);
@@ -100,8 +108,12 @@ ShadowPass.prototype = Object.assign(Object.create(Pass.prototype), {
         // lights.forEach(function(l) {
         //     l.intensity = 1;
         // });
+        // lights.ambientLight.intensity = 1;
+        lights.directionalLight.intensity = LightDefaultIntensities.DIRECTIONAL;
+        lights.hemisphereLight.intensity = LightDefaultIntensities.HEMISPHERE;
 
         // Render scene that's not in shadow with light calculations
+        renderer.clearDepth();
         renderer.render(scene, camera);
 
         // Disable stencil test
