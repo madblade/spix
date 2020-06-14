@@ -154,7 +154,8 @@ class Game3D extends Game
     generate()
     {
         // The following takes a while to generate Voronoi
-        this._generationEngine.initializeWorldMap(-1);
+        if (this.gameInfo.kind === GameType.FANTASY)
+            this._generationEngine.initializeWorldMap(-1);
 
         // Create empty chunks (these will be generated when the WorldMap is ready)
         this._consistencyEngine.generateWorld()

@@ -59,7 +59,7 @@ let ItemsGraphicsModule = {
     finalizeYumiMorphPackMesh(gltf, callback)
     {
         let object = gltf.scene.children[0];
-        this._resetMaterial(object);
+        this._resetMaterial(object, true);
 
         // Read animation
         object.material.morphTargets = true;
@@ -106,7 +106,7 @@ let ItemsGraphicsModule = {
         let sc = object.scale; let f = 0.2;
         sc.set(f * sc.x, f * sc.y, f * sc.z);
         object.rotation.set(-Math.PI / 2, Math.PI / 2, Math.PI / 2);
-        object.position.set(0.4, -.25, -0.25);
+        object.position.set(0.3, -.15, -0.25);
 
         this.renderOnTop(object);
         let wrapper = new Object3D();
@@ -151,12 +151,12 @@ let ItemsGraphicsModule = {
         callback(wrapper);
     },
 
-    _resetMaterial(object)
+    _resetMaterial(object, opaque)
     {
         object.material = new MeshPhongMaterial({
             color: 0x707070,
-            shininess: 1000,
-            specular: 0xffffff,
+            shininess: opaque ? 0 : 1000,
+            specular: opaque ? 0x000000 : 0xffffff,
             vertexColors: true
         });
         let g = object.geometry;

@@ -89,9 +89,9 @@ class AI
                     'projectile',
                     world,
                     [
-                        p[0] - 0.6 * crossX, // + 0.5 * p[3],
-                        p[1] - 0.6 * crossY, // + 0.5 * p[4],
-                        p[2] - 0.6 * crossZ // + 0.5 * p[5],
+                        p[0] - 0.8 * crossX, // + 0.5 * p[3],
+                        p[1] - 0.8 * crossY, // + 0.5 * p[4],
+                        p[2] - 0.8 * crossZ // + 0.5 * p[5],
                     ]
                 );
                 projectile.a0[0] = power * 4 * p[3];
@@ -116,7 +116,7 @@ class AI
         const maxNbAIs = this._maxAis;
         if (nbAIs < maxNbAIs)
         {
-            if (cycle % 120 === 0 && Math.random() > 0.5)
+            if (cycle % 600 === 0 && Math.random() > 0.5)
             {
                 let avatar = this._game.players.getRandomPlayer();
                 if (!avatar)
@@ -145,8 +145,10 @@ class AI
                 let attempt = 0;
                 let maxAttempts = 5;
                 do {
-                    xTest = Math.floor(p[0] + 10 * (Math.random() - 0.5));
-                    yTest = Math.floor(p[1] + 10 * (Math.random() - 0.5));
+                    const xo = Math.random() - 0.5;
+                    const yo = Math.random() - 0.5;
+                    xTest = Math.floor(p[0] + 10 * xo + 5 * Math.sign(xo));
+                    yTest = Math.floor(p[1] + 10 * yo + 5 * Math.sign(yo));
                     zTest = Math.floor(p[2] + 2);
                     ++attempt;
                     isFree = world.isFree(xTest, yTest, zTest) &&

@@ -3,6 +3,7 @@
 
 import { WorldMap } from './terrain/world';
 import ChunkGenerator from '../engine_consistency/generator/chunkgenerator';
+import { GameType } from '../game';
 
 /**
  * WorldMap
@@ -28,7 +29,8 @@ class GenerationEngine
         // XXX [GENERATION] time budget.
 
         // Generate meta-tile for entities on edge.
-        this.stepWorldMapGeneration();
+        if (this._game.kind === GameType.FANTASY)
+            this.stepWorldMapGeneration();
 
         // Generate blocks for waiting chunks.
         this.stepChunkBlockGeneration(worlds);

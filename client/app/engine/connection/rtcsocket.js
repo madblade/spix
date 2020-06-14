@@ -23,6 +23,7 @@ let RTCSocket = function(dataChannel, connection, clientID)
     this.off = function() { console.log('[Socket] Default off function.'); };
 
     this.dataChannel.onmessage = this.receivedMessage.bind(this);
+    this.debugListeners = false;
 };
 
 extend(RTCSocket.prototype, {
@@ -59,7 +60,8 @@ extend(RTCSocket.prototype, {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
-            console.log(`[Socket] Removed '${message}' listener`);
+            if (this.debugListeners)
+                console.log(`[Socket] Removed '${message}' listener`);
         }
     },
 
@@ -68,7 +70,8 @@ extend(RTCSocket.prototype, {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
-            console.log(`[Socket] Removed '${message}' listener`);
+            if (this.debugListeners)
+                console.log(`[Socket] Removed '${message}' listener`);
         }
     },
 

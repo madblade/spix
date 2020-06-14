@@ -18,10 +18,10 @@ let WorldMap = function()
     this.noiseTile = null;
 };
 
-WorldMap.prototype.seedWorld = function(seed)
+WorldMap.prototype.seedWorld = function() // seed)
 {
     // XXX [GENERATION] link seed
-    console.log(`TODO link seed ${seed}.`);
+    // console.log(`XXX link seed ${seed}.`);
 
     // Init generators, voronoi and buffers.
     let mesher = this.mesher;

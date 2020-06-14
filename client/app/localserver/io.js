@@ -20,6 +20,8 @@ let Socket = function()
     this.address = 'localhost:sandbox';
     this.off = function() { console.log('[Socket] Default off function.'); };
     this.otherSocket = {};
+
+    this.debugListeners = false;
 };
 
 extend(Socket.prototype, {
@@ -41,7 +43,8 @@ extend(Socket.prototype, {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
-            console.log(`[Socket] Removed '${message}' listener`);
+            if (this.debugListeners)
+                console.log(`[Socket] Removed '${message}' listener`);
         }
     },
 
@@ -51,7 +54,8 @@ extend(Socket.prototype, {
         let has = this.actions.hasOwnProperty(message);
         if (has) {
             delete this.actions[message];
-            console.log(`[Socket] Removed '${message}' listener`);
+            if (this.debugListeners)
+                console.log(`[Socket] Removed '${message}' listener`);
         }
     },
 

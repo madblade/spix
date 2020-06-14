@@ -379,7 +379,6 @@ extend(SelfModel.prototype, {
         if (!mixer) return;
         if (this.needsStartLoadingBow)
         {
-            console.log('reset');
             mixer.setTime(0);
             mixer.update(0);
             let yumiClip = graphics.clips.get('yumi');
@@ -392,7 +391,6 @@ extend(SelfModel.prototype, {
         }
         else if (this.needsStopLoadingBow)
         {
-            console.log('reset');
             this.needsStartLoadingBow = false;
             this.needsStopLoadingBow = false;
             mixer.setTime(0);
