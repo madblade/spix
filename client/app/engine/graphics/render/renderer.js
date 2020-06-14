@@ -9,7 +9,7 @@ import {
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh
+    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh, BackSide
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -56,10 +56,32 @@ let RendererManager = function(graphicsEngine)
     );
 
     this.waterReflection = true;
-    // (!!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime));
+    this.shadowVolumes = false;
+
+    if (this.shadowVolumes)
+    {
+        this.sceneShadows = new Scene();
+        this.addShadowCaps();
+    }
 };
 
 extend(RendererManager.prototype, {
+
+    // for Carmack’s Reverse
+    addShadowCaps()
+    {
+        let bottom = new Mesh(
+            new PlaneBufferGeometry(10000, 10000),
+            new MeshBasicMaterial({ color: 0xff0000, side: BackSide })
+        );
+        bottom.position.set(0, 0, 10);
+        this.sceneShadows.add(bottom);
+    },
+
+    addToShadows(mesh)
+    {
+        this.sceneShadows.add(mesh);
+    },
 
     cssToHex(cssColor)
     {
@@ -145,10 +167,17 @@ extend(RendererManager.prototype, {
         composer.renderTarget1.stencilBuffer = true;
         composer.renderTarget2.stencilBuffer = true;
         let scenePass = new RenderPass(sc, cam);
-        // composer.addPass(scenePass);
-        let shadowPass = new ShadowPass(sc, cam, lights);
+        let shadowPass;
+        if (this.shadowVolumes)
+        {
+            shadowPass = new ShadowPass(sc, cam, lights, this.sceneShadows);
+            composer.addPass(shadowPass);
+        }
+        else
+        {
+            composer.addPass(scenePass);
+        }
         let copy = new ShaderPass(CopyShader);
-        composer.addPass(shadowPass);
         composer.addPass(copy);
 
         // Anti-alias
@@ -172,7 +201,14 @@ extend(RendererManager.prototype, {
         bloomComposer.renderTarget1.stencilBuffer = true;
         bloomComposer.renderTarget2.stencilBuffer = true;
         bloomComposer.renderToScreen = false;
-        bloomComposer.addPass(shadowPass);
+        if (this.shadowVolumes)
+        {
+            bloomComposer.addPass(shadowPass);
+        }
+        else
+        {
+            bloomComposer.addPass(scenePass);
+        }
         bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
 
         let bloomMergePass = new ShaderPass(
@@ -349,6 +385,30 @@ extend(RendererManager.prototype, {
         // }
     },
 
+    _updateShadows() // cameraManager)
+    {
+        let graphics = this.graphics;
+        let worlds = graphics.app.model.server.chunkModel.worlds;
+        let skies = graphics.app.model.server.chunkModel.skies;
+        // let eye = cameraManager.waterCamera.eye;
+        let eye = graphics.getCameraCoordinates();
+        // let eyedir = cameraManager.mainCamera.getCameraForwardVector();
+        worlds.forEach((w, wid) => {
+            let sky = skies.get(wid);
+            let sdir = graphics.getSunDirection(sky);
+            sdir.set(-sdir.x, sdir.y, sdir.z).negate();
+            w.forEach(chunk => {
+                if (!chunk.shadow) return;
+                let mi = chunk.shadow;
+                if (mi.material && mi.material.uniforms)
+                {
+                    mi.material.uniforms.lightPosition.value = sdir;
+                    mi.material.uniforms.eyePosition.value = eye;
+                }
+            });
+        });
+    },
+
     render(sceneManager, cameraManager)
     {
         if (this.stop) return;
@@ -373,6 +433,8 @@ extend(RendererManager.prototype, {
             this._updateSkies(mainCamera);
             if (this.waterReflection)
                 this._updateWaters(cameraManager, renderer, mainScene, mainCamera);
+            if (this.shadowVolumes)
+                this._updateShadows(cameraManager, renderer, mainScene, mainCamera);
         } catch (e) {
             console.error(e);
             this.stop = true;

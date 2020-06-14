@@ -1,15 +1,10 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 
 import { Pass } from 'three/examples/jsm/postprocessing/Pass';
-import { BoxBufferGeometry, Mesh, MeshBasicMaterial, Scene } from 'three';
 import { LightDefaultIntensities } from '../light';
 
 let ShadowPass = function(
     scene, camera,
-    lights
+    lights, sceneShadows
 )
 {
     Pass.call(this);
@@ -17,14 +12,7 @@ let ShadowPass = function(
     this.scene = scene;
     this.camera = camera;
 
-    this.sceneShadows = new Scene();
-    let cube = new Mesh(
-        new BoxBufferGeometry(20, 20, 20, 100, 100, 100),
-        new MeshBasicMaterial({color: 0xff0000, transparent: true})
-    );
-    cube.position.set(10, 0, 16);
-    this.sceneShadows.add(cube);
-    // scene.add(cube);
+    this.sceneShadows = sceneShadows;
 
     this.lights = lights;
     this.clear = false;
@@ -80,6 +68,7 @@ ShadowPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         // Increment on depth fail (2nd param)
         gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP);
+        // gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR_WRAP); // z-pass approach
 
         // Render shadow volumes
         renderer.render(sceneShadows, camera);
@@ -89,6 +78,7 @@ ShadowPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         // Decrement on depth fail (2nd param)
         gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP);
+        // gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR_WRAP); // z-pass approach
 
         // Render shadow volumes again
         renderer.render(sceneShadows, camera);

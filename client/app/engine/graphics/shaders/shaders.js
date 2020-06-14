@@ -28,6 +28,9 @@ import OceanVertex          from './water/ocean.vertex.glsl';
 import BloomSelectiveFragment   from './postprocessing/bloom.selective.fragment.glsl';
 import BloomSelectiveVertex     from './postprocessing/bloom.selective.vertex.glsl';
 
+import ShadowVertex             from './shadow/shadow.vertex.glsl';
+import ShadowFragment           from './shadow/shadow.fragment.glsl';
+
 let ShadersModule = {
 
     // Portal
@@ -115,6 +118,21 @@ let ShadersModule = {
     getBloomSelectiveFragmentShader()
     {
         return BloomSelectiveFragment;
+    },
+
+    getShadowVertexShader()
+    {
+        return `
+            #include <common>
+            ${ShadowVertex}
+        `;
+    },
+
+    getShadowFragmentShader()
+    {
+        return `
+            ${ShadowFragment}
+        `;
     }
 
 };

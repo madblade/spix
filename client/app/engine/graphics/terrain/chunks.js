@@ -5,11 +5,13 @@
 'use strict';
 
 import {
+    BackSide,
     BufferAttribute, BufferGeometry,
-    Color,
+    Color, Mesh, MeshBasicMaterial, PlaneBufferGeometry,
     Vector3
 } from 'three';
 import { ItemType } from '../../../model/server/self/items';
+import { createShadowCastingMaterial, getDynamicShadowVolumeGeometry } from './shadow';
 
 const debugChunks = false;
 
@@ -17,7 +19,7 @@ let ChunksModule = {
 
     createChunk(
         chunkId, all, chunkSizeX, chunkSizeY, chunkSizeZ,
-        isWorldFlat)
+        isWorldFlat, worldId)
     {
         let components = all[0];
         let natures = all[1];
@@ -51,7 +53,7 @@ let ChunksModule = {
             component1 = this.createChunkComponent(
                 chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
                 currentComponent, currentNatures, false, 0,
-                isWorldFlat
+                isWorldFlat, worldId
             );
 
             currentComponent = components['2'];
@@ -59,7 +61,7 @@ let ChunksModule = {
             let component2 = this.createChunkComponent(
                 chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
                 currentComponent, currentNatures, true, 1,
-                isWorldFlat
+                isWorldFlat, worldId
             );
 
             // Merge
@@ -85,7 +87,8 @@ let ChunksModule = {
             component1 = this.createChunkComponent(
                 chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
                 currentComponent, currentNatures, false, 0,
-                isWorldFlat // although not water so no care
+                isWorldFlat, // although not water so not important
+                worldId
             );
         } else if (hasWater) {
             currentComponent = components['2'];
@@ -93,7 +96,8 @@ let ChunksModule = {
             component1 = this.createChunkComponent(
                 chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
                 currentComponent, currentNatures, true, 0,
-                isWorldFlat
+                isWorldFlat,
+                worldId
             );
         }
 
@@ -167,7 +171,7 @@ let ChunksModule = {
     createChunkComponent(
         chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
         currentComponent, currentNatures,
-        isWater, componentIndex, isWorldFlat
+        isWater, componentIndex, isWorldFlat, worldId
     )
     {
         let chunkIndices = chunkId.split(',');
@@ -241,8 +245,22 @@ let ChunksModule = {
         // let material = newMesh.material;
         // let newMesh = new Mesh(geometry, material);
         // if (Math.random() < 0.5)
+        let shadowMesh;
         if (!isWater)
         {
+            // s.material.uniforms.sunPosition.value
+            // if (iChunkOffset === 0 &&
+            //     jChunkOffset === -32 &&
+            //     kChunkOffset === 0)
+            // {
+            // }
+            if (isWorldFlat && this.rendererManager.shadowVolumes && parseInt(worldId, 10) === -1)
+            {
+                shadowMesh = new Mesh(
+                    getDynamicShadowVolumeGeometry(geometry, triangles * 3),
+                    createShadowCastingMaterial(0.0)
+                );
+            }
             // newMesh.castShadow = true;
             // newMesh.receiveShadow = true;
             newMesh.userData.bloom = true;
@@ -256,6 +274,8 @@ let ChunksModule = {
 
             capacities:         [sunCapacity / 2],
             sizes:              [triangles / 2],
+
+            shadow:             shadowMesh,
 
             whereToFindFace,
             whichFaceIs

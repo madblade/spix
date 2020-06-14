@@ -7,6 +7,7 @@
 /** Model **/
 
 import extend           from '../../extend.js';
+import { BackSide, FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from 'three';
 
 const WorldType = Object.freeze({
     FLAT: 0,
@@ -228,7 +229,7 @@ extend(ChunkModel.prototype, {
         let isWorldFlat = worldMeta.type === WorldType.FLAT;
         // || worldMeta.type === WorldType.FANTASY;
         // Water cameras not yet supported with fantasy generation
-        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat);
+        let chunk = graphics.createChunk(chunkId, all, sizeX, sizeY, sizeZ, isWorldFlat, worldId);
         world.set(chunkId, chunk);
 
         // Add to scene.
@@ -241,6 +242,11 @@ extend(ChunkModel.prototype, {
         let meshes = chunk.meshes;
         for (let m = 0, l = meshes.length; m < l; ++m) {
             graphics.addToScene(meshes[m], worldId);
+        }
+        if (chunk.shadow)
+        {
+            graphics.addToShadows(chunk.shadow);
+            // graphics.addToScene(chunk.shadow);
         }
         if (graphics._debugChunkBoundingBoxes) {
             if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');

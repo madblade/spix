@@ -144,6 +144,11 @@ let ScenesModule = {
         return new SceneManager(this);
     },
 
+    addToShadows(mesh)
+    {
+        this.rendererManager.addToShadows(mesh);
+    },
+
     addToScene(object3D, sceneId)
     {
         let sceneManager = this.sceneManager;
