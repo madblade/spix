@@ -29,9 +29,11 @@ let RendererManager = function(graphicsEngine)
     // Graphical settings
     this.selectiveBloom = true;
     this.ambientOcclusion = false;
+    this.waterReflection = true;
+    this.shadowVolumes = false;
 
     // Cap number of passes.
-    this.renderMax = 10; // Number.POSITIVE_INFINITY;
+    this.renderMax = 10;
 
     this.renderer = this.createRenderer();
     this.renderer.autoClear = false;
@@ -55,28 +57,13 @@ let RendererManager = function(graphicsEngine)
         { color: 'black', side: DoubleSide, morphTargets: true }
     );
 
-    this.waterReflection = true;
-    this.shadowVolumes = false;
-
     if (this.shadowVolumes)
     {
         this.sceneShadows = new Scene();
-        this.addShadowCaps();
     }
 };
 
 extend(RendererManager.prototype, {
-
-    // for Carmack’s Reverse
-    addShadowCaps()
-    {
-        let bottom = new Mesh(
-            new PlaneBufferGeometry(10000, 10000),
-            new MeshBasicMaterial({ color: 0xff0000, side: BackSide })
-        );
-        bottom.position.set(0, 0, 10);
-        this.sceneShadows.add(bottom);
-    },
 
     addToShadows(mesh)
     {
@@ -254,6 +241,7 @@ extend(RendererManager.prototype, {
         let renderer = new WebGLRenderer({
             antialias: false,
             alpha: true,
+            logarithmicDepthBuffer: this.shadowVolumes
             // precision: 'mediump'
         });
 
@@ -433,8 +421,8 @@ extend(RendererManager.prototype, {
             this._updateSkies(mainCamera);
             if (this.waterReflection)
                 this._updateWaters(cameraManager, renderer, mainScene, mainCamera);
-            if (this.shadowVolumes)
-                this._updateShadows(cameraManager, renderer, mainScene, mainCamera);
+            // if (this.shadowVolumes)
+            this._updateShadows(cameraManager, renderer, mainScene, mainCamera);
         } catch (e) {
             console.error(e);
             this.stop = true;

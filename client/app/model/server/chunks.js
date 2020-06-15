@@ -8,6 +8,7 @@
 
 import extend           from '../../extend.js';
 import { BackSide, FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from 'three';
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper';
 
 const WorldType = Object.freeze({
     FLAT: 0,
@@ -247,6 +248,11 @@ extend(ChunkModel.prototype, {
         {
             graphics.addToShadows(chunk.shadow);
             // graphics.addToScene(chunk.shadow);
+
+            // const m = chunk.meshes[0];
+            // graphics.addToScene(m, worldId);
+            // let helper = new VertexNormalsHelper(m, 2, 0x00ff00, 1);
+            // graphics.addToScene(helper, worldId);
         }
         if (graphics._debugChunkBoundingBoxes) {
             if (!chunk.debugMesh) console.error('[Server/Chunk] Missing debug mesh.');

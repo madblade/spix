@@ -24,7 +24,7 @@ let PlayerModule = {
             20, 1,
             0, Math.PI
         );
-        let material = new ShaderMaterial({
+        let params = {
             uniforms: {
                 time: { value: 0.0 },
                 outerRadius: { value: outerRadius },
@@ -34,7 +34,10 @@ let PlayerModule = {
             fragmentShader: ShadersModule.getSwordTrailFragmentShader(),
             side: DoubleSide,
             transparent: true,
-        });
+        };
+        // if (this.app.engine.graphics.rendererManager.shadowVolumes)
+        //     params.transparent = false;
+        let material = new ShaderMaterial(params);
 
         let meleeEffectMesh = new Mesh(
             ringGeometry,

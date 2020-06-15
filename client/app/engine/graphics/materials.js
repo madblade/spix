@@ -46,8 +46,8 @@ let MaterialsModule = {
                     map: this.textureAtlas,
                     transparent: false
                 };
-                if (this.rendererManager.shadowVolumes)
-                    params.transparent = true;
+                // if (this.rendererManager.shadowVolumes)
+                //     params.transparent = true;
                 material = new MeshLambertMaterial(params);
                 break;
 

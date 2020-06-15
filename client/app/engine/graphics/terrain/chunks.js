@@ -5,9 +5,8 @@
 'use strict';
 
 import {
-    BackSide,
     BufferAttribute, BufferGeometry,
-    Color, Mesh, MeshBasicMaterial, PlaneBufferGeometry,
+    Color, Mesh,
     Vector3
 } from 'three';
 import { ItemType } from '../../../model/server/self/items';
@@ -253,6 +252,10 @@ let ChunksModule = {
             //     jChunkOffset === -32 &&
             //     kChunkOffset === 0)
             // {
+            //     shadowMesh = new Mesh(
+            //         getDynamicShadowVolumeGeometry(geometry, triangles * 3),
+            //         createShadowCastingMaterial(0.0)
+            //     );
             // }
             if (isWorldFlat && this.rendererManager.shadowVolumes && parseInt(worldId, 10) === -1)
             {

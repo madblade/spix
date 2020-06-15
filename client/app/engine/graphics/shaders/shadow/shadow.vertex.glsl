@@ -1,3 +1,5 @@
+// @author madblade
+// MAKE SURE TO ACTIVATE THE LOG DEPTH BUFFER
 
 uniform vec3 lightPosition;
 uniform float bias;
@@ -39,27 +41,21 @@ void main() {
     // #include <project_vertex>
     vec3 nn = objectNormal;
     vec3 translated = transformed;
-    vec3 nlight = normalize(vec3(lightPosition.x, lightPosition.y + 0.01, lightPosition.z));
+    vec3 nlight = normalize(vec3(lightPosition.x, lightPosition.y + 0.2, lightPosition.z));
     float d = dot(normalize(nn), nlight);
-    bool allowed =
-        mod(abs(translated.x), 32.0) > 0.1 &&
-        mod(abs(translated.y), 32.0) > 0.1 &&
-        mod(abs(translated.z), 32.0) > 0.1;
 
     float d2 = distance(eyePosition, translated);
     float dot2 = dot(nlight, vec3(0.0, 0.0, 1.0));
-    // bool allowed2 = d2 < 64.0;
-    bool allowed2 = dot2 > 0.35;
+    bool allowed = dot2 > 0.01;
 
     vec3 infty;
-    if (allowed2)
+    if (allowed)
     {
-        if (d < bias && allowed) {
-            infty = translated - nlight * 1000.0;
+        if (d < bias) {
+            infty = translated - nlight * 10000000.0;
         } else {
-            vec3 correction = nlight; // isApproximate ? normalize(nn) : nlight;
-            infty = translated - correction * 0.1 * d2; // To expose
-            // infty.z -= 0.1;
+            vec3 correction = nlight;
+            infty = translated - correction * 0.01;
         }
     } else {
         infty = vec3(0);
