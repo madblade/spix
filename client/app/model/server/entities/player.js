@@ -105,7 +105,7 @@ let PlayerModule = {
     )
     {
         let wrapper = new Object3D();
-        let cube = graphics.getItemMesh(ItemType.YA, false);
+        let cube = graphics.getItemMesh(ItemType.YA, false, true);
 
         cube.userData.bloom = true;
         wrapper.add(cube);

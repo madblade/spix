@@ -12,7 +12,7 @@ import { ItemType } from '../../model/server/self/items';
 
 let MeshesModule = {
 
-    getItemMesh(itemID, renderOnTop)
+    getItemMesh(itemID, renderOnTop, cloneGeometry)
     {
         let itemName = this.getMeshIDFromItemID(itemID);
         if (itemName) { // It’s a handheld item with a specific mesh
@@ -21,7 +21,7 @@ let MeshesModule = {
             } else if (itemID === ItemType.PORTAL_GUN_SINGLE) {
                 // XXX [GAMEPLAY] make it blue and orange
             }
-            return this.loadReferenceMeshFromMemory(itemName, renderOnTop);
+            return this.loadReferenceMeshFromMemory(itemName, renderOnTop, cloneGeometry);
         } else { // It’s probably a block.
             let g = this.createGeometry('box');
             let m = this.createMaterial('flat-phong');
@@ -106,7 +106,7 @@ let MeshesModule = {
         }
     },
 
-    loadReferenceMeshFromMemory(id, renderOnTop)
+    loadReferenceMeshFromMemory(id, renderOnTop, cloneGeometry)
     {
         if (!this.referenceMeshes.has(id)) {
             console.error(`[Graphics/Meshes] Could not charge a new "${id}" mesh.`);
@@ -117,7 +117,10 @@ let MeshesModule = {
         if (!(mesh instanceof Object3D))
             console.warn(`[Graphics/Meshes] "${id}" should be an instance of Object3D.`);
 
-        let clone = mesh; // .clone();
+        let clone = cloneGeometry ? mesh.clone() : mesh;
+        // clone allows to reuse objects (but then the morph targets are reset)
+        // so use only for arrows in this setup.
+
         clone.rotation.reorder('ZYX');
         // clone.material.morphTargets = true;
 
