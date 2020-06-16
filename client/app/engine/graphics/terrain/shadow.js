@@ -1,6 +1,6 @@
 
-// From https://github.com/gkjohnson/threejs-sandbox/tree/master/shadow-volumes
-import { BackSide, BufferAttribute, FrontSide, ShaderMaterial, Vector3 } from 'three';
+// Adapted from https://github.com/gkjohnson/threejs-sandbox/tree/master/shadow-volumes
+import { BufferAttribute, FrontSide, ShaderMaterial, Vector3 } from 'three';
 import { ShaderLib } from 'three/src/renderers/shaders/ShaderLib';
 import { UniformsUtils } from 'three/src/renderers/shaders/UniformsUtils';
 import { ShadersModule } from '../shaders/shaders';
@@ -11,13 +11,6 @@ const v2 = new Vector3();
 const v01 = new Vector3();
 const v12 = new Vector3();
 const norm = new Vector3();
-function vecToString(v)
-{
-    const x = ~~v.x;
-    const y = ~~v.y;
-    const z = ~~v.z;
-    return `${x},${y},${z}`;
-}
 
 function getDynamicShadowVolumeGeometry(
     geometry,

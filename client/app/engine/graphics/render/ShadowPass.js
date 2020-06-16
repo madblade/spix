@@ -23,7 +23,7 @@ ShadowPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     constructor: ShadowPass,
 
-    render: function(renderer, writeBuffer, readBuffer)
+    render(renderer, writeBuffer, readBuffer)
     {
         renderer.setRenderTarget(this.renderToScreen ? null : readBuffer);
 

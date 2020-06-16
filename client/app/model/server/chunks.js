@@ -7,8 +7,6 @@
 /** Model **/
 
 import extend           from '../../extend.js';
-import { BackSide, FrontSide, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from 'three';
-import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper';
 
 const WorldType = Object.freeze({
     FLAT: 0,

@@ -161,7 +161,8 @@ class SimplePerlin
         // const planks = BlockType.PLANKS;
 
         // Fill with grass on main world, sand everywhere else.
-        const mainBlockId = parseInt(worldId, 10) === -1 ? grass : sand;
+        const isMainWorld = parseInt(worldId, 10) === -1;
+        const mainBlockId = isMainWorld ? grass : sand;
 
         const normalSize = dx * dy;
 
@@ -221,7 +222,7 @@ class SimplePerlin
 
                 if (hasTrees && bl >= 16 && rl > 0 && x > 1 && x < dx - 2 && y > 1 && y < dy - 2)
                 {
-                    const rand = noise(x, y);
+                    const rand = isMainWorld ? noise(x, y) : noise(y, x);
                     if (rand > 0.99)
                     {
                         SimplePerlin.addTree2D(blocks, x, y, bl, dx, dz, xy, normalSize, wood, leaves);

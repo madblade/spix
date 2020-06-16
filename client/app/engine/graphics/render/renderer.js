@@ -23,6 +23,18 @@ let RendererManager = function(graphicsEngine)
     this.ambientOcclusion = false;
     this.waterReflection = true;
 
+    // Shadows:
+    // - not compatible with portals
+    // - only for blocks
+    // - shadow map =
+    //          soft shadows, capped distance, flickering at the edges
+    //          ~=CPU load
+    //          ++GPU load (adding a render pass + depends on tex resolution).
+    // - shadow volumes =
+    //          crisp shadows, stable and high-fidelity
+    //          not yet working with non-manifold edges
+    //          ++CPU load at chunk create/update.
+    //          +++GPU load (adding render passes + fill time).
     this.shadowVolumes = false;
     this.shadowMap = false;
     this.highResolutionShadowMap = false;

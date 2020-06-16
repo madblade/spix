@@ -158,7 +158,7 @@ CityPlacer.prototype.getTerritories = function(country)
     if (n > country.cities.length) n = country.cities.length;
     let flux = eroder.getFlux(mesh);
     let terr = [];
-    let queue = { queue: function() { }, dequeue: function() {  } };
+    let queue = { queue() { }, dequeue() {  } };
     // new PriorityQueue({comparator(a, b) {return a.score - b.score;}});
 
     function weight(u, v)
