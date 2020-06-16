@@ -26,29 +26,36 @@ let LightDefaultColors = Object.freeze({
 
 let LightModule = {
 
-    createLight(whatLight)
+    createLight(whatLight, worldId, lightType)
     {
         let light;
 
-        switch (whatLight) {
+        switch (whatLight)
+        {
             case 'sun':
                 light = new DirectionalLight(
                     LightDefaultColors.DIRECTIONAL,
                     LightDefaultIntensities.DIRECTIONAL
                 );
-                // light.castShadow = true;
-                // light.shadow.bias = -0.004;
-                // light.shadow.mapSize.width = 2048;
-                // light.shadow.mapSize.height = 2048;
-                // light.shadow.camera.near = 1;
-                // light.shadow.camera.far = 200;
-                // light.shadow.camera.top = 32;
-                // light.shadow.camera.bottom = -32;
-                // light.shadow.camera.left = 32;
-                // light.shadow.camera.right = -32;
-                // (!) this helper is not accurate
-                // let helper = new CameraHelper(light.shadow.camera);
-                // light.add(helper);
+
+                if (this.hasShadowMap())
+                {
+                    if (!worldId || parseInt(worldId, 10) !== -1 || lightType !== 'flat') break;
+                    light.castShadow = true;
+                    light.shadow.bias = -0.004;
+                    const highRes = this.hasHighResShadows();
+                    light.shadow.mapSize.width = highRes ? 4096 : 2048;
+                    light.shadow.mapSize.height = highRes ? 4096 : 2048;
+                    light.shadow.camera.near = 1;
+                    light.shadow.camera.far = 200;
+                    light.shadow.camera.top = 32;
+                    light.shadow.camera.bottom = -32;
+                    light.shadow.camera.left = 32;
+                    light.shadow.camera.right = -32;
+                    // (!) this helper is not accurate
+                    // let helper = new CameraHelper(light.shadow.camera);
+                    // light.add(helper);
+                }
                 break;
 
             case 'hemisphere':

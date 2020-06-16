@@ -16,7 +16,7 @@ import {
 
 let SkyModule = {
 
-    createFlatSky()
+    createFlatSky(worldId)
     {
         // Mesh
         let sky = new SkyFlat();
@@ -24,7 +24,7 @@ let SkyModule = {
 
         // Light
         let lights = this.createSkyLight(
-            new Vector3(-1, -2, -1), 'flat'
+            new Vector3(-1, -2, -1), 'flat', worldId
         );
 
         return { mesh: sky, lights };
@@ -52,10 +52,10 @@ let SkyModule = {
         return { mesh: sky, helper, lights };
     },
 
-    createSkyLight(sunPosition, lightType)
+    createSkyLight(sunPosition, lightType, worldId)
     {
         // Dir
-        let light1 = this.createLight('sun');
+        let light1 = this.createLight('sun', worldId, lightType);
         // light1.position.set(-1, -2, -1);
         let np = new Vector3();
         np.copy(sunPosition)
@@ -145,7 +145,7 @@ let SkyModule = {
         }
         else if (skyType === WorldType.FLAT || skyType === WorldType.FANTASY)
         {
-            sky = this.createFlatSky();
+            sky = this.createFlatSky(worldId);
             this.addToScene(sky.mesh, worldId);
             this.addToScene(sky.lights.hemisphereLight, worldId);
             this.addToScene(sky.lights.directionalLight, worldId);
@@ -250,20 +250,20 @@ let SkyModule = {
         hl.position.copy(normSunPosition);
         dl.position.copy(normSunPosition).multiplyScalar(60);
 
-        if (isWorldFlat && camPosition)
+        if (isWorldFlat && camPosition && this.hasShadowMap())
         {
-            // let dp = dl.position;
-            // dp.set(
-            //     dp.x + camPosition.x,
-            //     dp.y + camPosition.y,
-            //     dp.z
-            // );
-            // dl.target.position.set(
-            //     camPosition.x,
-            //     camPosition.y,
-            //     0
-            // );
-            // dl.target.updateMatrixWorld();
+            let dp = dl.position;
+            dp.set(
+                dp.x + camPosition.x,
+                dp.y + camPosition.y,
+                dp.z
+            );
+            dl.target.position.set(
+                camPosition.x,
+                camPosition.y,
+                0
+            );
+            dl.target.updateMatrixWorld();
         }
 
         // Sunset and sunrise

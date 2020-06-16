@@ -34,6 +34,7 @@ let PlayerModule = {
             fragmentShader: ShadersModule.getSwordTrailFragmentShader(),
             side: DoubleSide,
             transparent: true,
+            depthTest: false
         };
         // if (this.app.engine.graphics.rendererManager.shadowVolumes)
         //     params.transparent = false;

@@ -9,7 +9,8 @@ import {
     DoubleSide, sRGBEncoding,
     Vector2,
     MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh, BackSide
+    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh,
+    PCFSoftShadowMap
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -30,7 +31,15 @@ let RendererManager = function(graphicsEngine)
     this.selectiveBloom = true;
     this.ambientOcclusion = false;
     this.waterReflection = true;
+
     this.shadowVolumes = false;
+    this.shadowMap = false;
+    this.highResolutionShadowMap = false;
+    if (this.shadowVolumes && this.shadowMap)
+    {
+        console.error('[Renderer] Cannot use both shadow map and shadow volume.');
+        this.shadowVolumes = false;
+    }
 
     // Cap number of passes.
     this.renderMax = 10;
@@ -68,6 +77,11 @@ extend(RendererManager.prototype, {
     addToShadows(mesh)
     {
         this.sceneShadows.add(mesh);
+    },
+
+    removeFromShadows(mesh)
+    {
+        this.sceneShadows.remove(mesh);
     },
 
     cssToHex(cssColor)
@@ -245,10 +259,13 @@ extend(RendererManager.prototype, {
             // precision: 'mediump'
         });
 
-        // renderer.shadowMap.enabled = true;
-        // renderer.shadowMap.type = PCFSoftShadowMap;
-        renderer.autoClear = false;
+        if (this.shadowMap)
+        {
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = PCFSoftShadowMap;
+        }
 
+        renderer.autoClear = false;
         renderer.outputEncoding = sRGBEncoding;
         renderer.setClearColor(this.cssToHex('#362c6b'), 1);
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -624,6 +641,21 @@ let RenderersModule = {
     createRendererManager()
     {
         return new RendererManager(this);
+    },
+
+    hasShadowMap()
+    {
+        return this.rendererManager.shadowMap;
+    },
+
+    hasHighResShadows()
+    {
+        return this.rendererManager.highResolutionShadowMap;
+    },
+
+    hasShadowVolumes()
+    {
+        return this.rendererManager.shadowVolumes;
     }
 
 };

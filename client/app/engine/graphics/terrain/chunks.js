@@ -32,7 +32,11 @@ let ChunksModule = {
         if (!components.hasOwnProperty('1') && !components.hasOwnProperty('2'))
         {
             if (debugChunks) console.log(`[Terrain/Chunks] Empty chunk "${chunkId}".`);
-            return this.createEmptyChunkComponent(chunkId, chunkSizeX, chunkSizeY, chunkSizeZ);
+            return this.createEmptyChunkComponent(
+                chunkId,
+                chunkSizeX, chunkSizeY, chunkSizeZ,
+                worldId, isWorldFlat
+            );
         }
 
         let hasTerrain = components.hasOwnProperty('1') && natures.hasOwnProperty('1');
@@ -115,7 +119,10 @@ let ChunksModule = {
     },
 
     createEmptyChunkComponent(
-        chunkId, chunkSizeX, chunkSizeY, chunkSizeZ)
+        chunkId,
+        chunkSizeX, chunkSizeY, chunkSizeZ,
+        worldId, isWorldFlat
+    )
     {
         let sunCapacity = this._defaultEmptyChunkSize; // Math.floor(3 / 2 * triangles);
         if (this.debug) {
@@ -135,8 +142,11 @@ let ChunksModule = {
         // let material = this.createMaterial('textured-phong', 0xaaaaaa);
         // let newMesh = new Mesh(geometry, material);
 
-        // newMesh.castShadow = true;
-        // newMesh.receiveShadow = true;
+        if (isWorldFlat && this.hasShadowMap() && parseInt(worldId, 10) === -1)
+        {
+            newMesh.castShadow = true;
+            newMesh.receiveShadow = true;
+        }
         // if (Math.random() < 0.5)
         newMesh.userData.bloom = true;
 
@@ -257,15 +267,20 @@ let ChunksModule = {
             //         createShadowCastingMaterial(0.0)
             //     );
             // }
-            if (isWorldFlat && this.rendererManager.shadowVolumes && parseInt(worldId, 10) === -1)
+            const isMainWorld = parseInt(worldId, 10) === -1;
+            if (isWorldFlat && this.hasShadowVolumes() && isMainWorld)
             {
                 shadowMesh = new Mesh(
                     getDynamicShadowVolumeGeometry(geometry, triangles * 3),
                     createShadowCastingMaterial(0.0)
                 );
             }
-            // newMesh.castShadow = true;
-            // newMesh.receiveShadow = true;
+
+            if (isWorldFlat && this.hasShadowMap() && isMainWorld)
+            {
+                newMesh.castShadow = true;
+                newMesh.receiveShadow = true;
+            }
             newMesh.userData.bloom = true;
         }
 
@@ -338,11 +353,35 @@ let ChunksModule = {
             water, whereToFindFace, whichFaceIs,
             chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
             isWorldFlat);
+
+        if (this.hasShadowVolumes() && chunk.shadow)
+        {
+            for (let m = 0; m < meshes.length; ++m)
+            {
+                if (water[m]) continue;
+
+                let g = geometries[m];
+                let s = sizes[m];
+                // Rebuild whole shadow volume.
+                // This is extremely inefficient.
+                this.removeFromShadows(chunk.shadow);
+                chunk.shadow = new Mesh(
+                    getDynamicShadowVolumeGeometry(g, s * 2 * 3),
+                    createShadowCastingMaterial(0.0)
+                );
+                this.addToShadows(chunk.shadow);
+
+                // Only on first geometry (bundles unsupported atm)
+                break;
+            }
+        }
     },
 
-    removeChunkFaces(worldId, removed,
+    removeChunkFaces(
+        worldId, removed,
         geometries, meshes, capacities, sizes,
-        whereToFindFace, whichFaceIs)
+        whereToFindFace, whichFaceIs
+    )
     {
         let geometry; let vertices; let colors; let normals; let uvs;
         let meshId;
@@ -441,7 +480,8 @@ let ChunksModule = {
         }
     },
 
-    addChunkFaces(worldId, added,
+    addChunkFaces(
+        worldId, added,
         geometries, meshes, capacities, sizes, water,
         whereToFindFace, whichFaceIs,
         chunkId, chunkSizeX, chunkSizeY, chunkSizeZ,
@@ -565,7 +605,8 @@ let ChunksModule = {
                 pA, pB, pC, cb, ab,
                 normal, color, n);
 
-            if (meshHasToBeAdded) {
+            if (meshHasToBeAdded)
+            {
                 geometry.setAttribute('position', new BufferAttribute(vertices, 3));
                 geometry.setAttribute('normal', new BufferAttribute(normals, 3));
                 geometry.setAttribute('color', new BufferAttribute(colors, 3));
@@ -576,8 +617,11 @@ let ChunksModule = {
                 let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat);
                 // let newMesh = new Mesh(geometry, materials[meshId]);
 
-                // newMesh.castShadow = true;
-                // newMesh.receiveShadow = true;
+                if (this.hasShadowMap() && isWorldFlat && parseInt(worldId, 10) === -1)
+                {
+                    newMesh.castShadow = true;
+                    newMesh.receiveShadow = true;
+                }
                 // if (Math.random() < 0.25)
                 newMesh.userData.bloom = true;
                 meshes[meshId] = newMesh;
