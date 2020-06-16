@@ -104,41 +104,34 @@ class Game3D extends Game
         // let debugThresh = 4000; // microsecs
 
         /** Inputs **/
-        // let t = TimeUtils.getTimeSecNano();
-        // const t0 = t;
-        this._ai.update();                // Update intents.
-        // const dt1 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        // if (Game3D.bench && dt1 > debugThresh) console.log(`${dt1} µs to update intents.`);
+        // Update intents.
+        this._ai.update();
 
-        // t = TimeUtils.getTimeSecNano();
-        this._externalInput.update();     // Update human spawn/leave requests.
-        this._internalInput.update();     // Update artificial inputs.
-        // const dt2 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        // if (Game3D.bench && dt2 > debugThresh) console.log(`${dt2} µs to update inputs.`);
+        // Update human spawn/leave requests.
+        this._externalInput.update();
+        // Update artificial inputs.
+        this._internalInput.update();
 
         /** Updates **/
-        // t = TimeUtils.getTimeSecNano();
-        this._topologyEngine.update();    // Update topological model.
-        this._physicsEngine.update();     // Update physical simulation.
-        // const dt3 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        // if (Game3D.bench && dt3 > debugThresh) console.log(`${dt3} µs to update engines.`);
+        // Update topological (terrain) model.
+        this._topologyEngine.update();
+        // Update physical simulation.
+        this._physicsEngine.update();
 
         /** Chunk and WorldMap Generation **/
+        // Update fantasy map generation.
         this._generationEngine.update();
 
         /** Consistency solving: mediator between player and server models **/
-        // t = TimeUtils.getTimeSecNano();
+        // Make client models consistent. Needs other engines.
         const updateEntities = this._frameMod1000 % Game3D.waitFramesToOutputEntities === 0;
-        this._consistencyEngine.update(updateEntities); // Make client models consistent. Needs other engines.
-        // const dt4 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        // if (Game3D.bench && dt4 > debugThresh) console.log(`${dt4} µs to update consistency.`);
+        this._consistencyEngine.update(updateEntities);
 
         /** Outputs **/
-        // t = TimeUtils.getTimeSecNano();
-        this._externalOutput.update(updateEntities);    // Send updates.
-        this._internalOutput.update();    // Update perceptions.
-        // const dt5 = TimeUtils.getTimeSecNano(t)[1] / 1000;
-        // if (Game3D.bench && dt5 > debugThresh) console.log(`${dt5} µs to update outputs.`);
+        // Send updates.
+        this._externalOutput.update(updateEntities);
+        // Update perceptions.
+        this._internalOutput.update();
 
         // var n = this._playerManager.nbPlayers;
         // console.log("There " + (n>1?"are ":"is ") + n + " player" + (n>1?"s":"") + " connected.");
@@ -147,8 +140,9 @@ class Game3D extends Game
         // const t1 = TimeUtils.getTimeSecNano(t0)[1] / 1000;
         // if (t1 > 4000 && Game3D.bench) console.log(`${t1} µs.`);
 
+        // Pause game with idle timeout when no-one is connected.
         if (this._playerManager.nbPlayers < 1)
-            this.pause(false); // Stop with idle timeout.
+            this.pause(false);
     }
 
     generate()

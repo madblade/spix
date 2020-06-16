@@ -36,8 +36,6 @@ let PlayerModule = {
             transparent: true,
             depthTest: false
         };
-        // if (this.app.engine.graphics.rendererManager.shadowVolumes)
-        //     params.transparent = false;
         let material = new ShaderMaterial(params);
 
         let meleeEffectMesh = new Mesh(
@@ -45,7 +43,6 @@ let PlayerModule = {
             material
         );
         meleeEffectMesh.userData.bloom = true;
-        // meleeEffectMesh.renderOrder = 999;
 
         let wrapper = new Object3D();
         wrapper.position.set(0, 0, 0);
@@ -55,10 +52,6 @@ let PlayerModule = {
         meleeEffectMesh.rotation.set(0, Math.PI / 2 + Math.PI / 4, 0);
         meleeEffectMesh.position.set(1, 1, -0.5);
         meleeEffectMesh.renderOrder = 999;
-        // wrapper.getMesh = function()
-        // {
-        //     return meleeEffectMesh;
-        // };
 
         let up = new Object3D();
         wrapper.rotation.reorder('ZYX');

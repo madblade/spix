@@ -6,22 +6,13 @@
 
 import extend from '../../../extend.js';
 import {
-    DoubleSide, sRGBEncoding,
-    Vector2,
-    MeshBasicMaterial, ShaderMaterial,
-    WebGLRenderer, Scene, PlaneBufferGeometry, Mesh,
-    PCFSoftShadowMap
+    DoubleSide,
+    MeshBasicMaterial,
+    Scene, PlaneBufferGeometry, Mesh,
 } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-import { ClearMaskPass, MaskPass } from 'three/examples/jsm/postprocessing/MaskPass';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
-import { ClearPass } from 'three/examples/jsm/postprocessing/ClearPass';
-import { ShadowPass } from './ShadowPass';
+import { RendererFactory } from './renderer.factory';
+import { RendererUpdates } from './renderer.updates';
 
 let RendererManager = function(graphicsEngine)
 {
@@ -89,191 +80,6 @@ extend(RendererManager.prototype, {
         return 0 | cssColor.replace('#', '0x');
     },
 
-    createPortalComposer(rendrr, sc, cam, target, maskScene, maskCamera)
-    {
-        let maskPass = new MaskPass(maskScene, maskCamera);
-        let clearPass = new ClearPass();
-        let clearMaskPass = new ClearMaskPass();
-        let copy = new ShaderPass(CopyShader);
-
-        let composer = new EffectComposer(rendrr, target);
-        composer.renderTarget1.stencilBuffer = true;
-        composer.renderTarget2.stencilBuffer = true;
-        let scenePass = new RenderPass(sc, cam);
-        scenePass.clear = false;
-        maskPass.inverse = false;
-        composer.addPass(clearPass);
-        composer.addPass(maskPass);
-        composer.addPass(scenePass);
-        composer.addPass(copy);
-        composer.addPass(clearMaskPass);
-        // composer.addPass(copy);
-
-        // Anti-alias
-        let resolutionX = 1 / window.innerWidth;
-        let resolutionY = 1 / window.innerHeight;
-        let fxaa = new ShaderPass(FXAAShader);
-        let u = 'resolution';
-        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        // composer.addPass(fxaa);
-        // composer.addPass(fxaa);
-        // composer.addPass(copy);
-
-        // Bloom
-        let bloomPass = new UnrealBloomPass(
-            new Vector2(window.innerWidth, window.innerHeight),
-            1.5, 0.4, 0.85);
-        bloomPass.exposure = 0.5;
-        bloomPass.threshold = 0.3;
-        bloomPass.strength = 1.0;
-        bloomPass.radius = 0;
-        let bloomComposer = new EffectComposer(rendrr, target);
-        bloomComposer.renderToScreen = false;
-        bloomComposer.renderTarget1.stencilBuffer = true;
-        bloomComposer.renderTarget2.stencilBuffer = true;
-        bloomComposer.addPass(clearPass);
-        bloomComposer.addPass(maskPass);
-        bloomComposer.addPass(scenePass);
-        bloomComposer.addPass(clearMaskPass);
-        bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
-
-        let bloomMergePass = new ShaderPass(
-            new ShaderMaterial({
-                uniforms: {
-                    baseTexture: { value: null },
-                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
-                },
-                vertexShader: this.graphics.getBloomSelectiveVertexShader(),
-                fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
-                defines: {}
-            }), 'baseTexture'
-        );
-        bloomMergePass.needsSwap = true;
-        let finalComposer = new EffectComposer(rendrr, target);
-        finalComposer.renderTarget1.stencilBuffer = true;
-        finalComposer.renderTarget2.stencilBuffer = true;
-        finalComposer.addPass(clearPass);
-        finalComposer.addPass(maskPass);
-        finalComposer.addPass(scenePass);
-        finalComposer.addPass(bloomMergePass);
-        finalComposer.addPass(fxaa);
-        finalComposer.addPass(clearMaskPass);
-
-        return [bloomComposer, finalComposer, composer];
-    },
-
-    createMainComposer(rendrr, sc, cam, lights)
-    {
-        let composer = new EffectComposer(rendrr);
-        composer.renderTarget1.stencilBuffer = true;
-        composer.renderTarget2.stencilBuffer = true;
-        let scenePass = new RenderPass(sc, cam);
-        let shadowPass;
-        if (this.shadowVolumes)
-        {
-            shadowPass = new ShadowPass(sc, cam, lights, this.sceneShadows);
-            composer.addPass(shadowPass);
-        }
-        else
-        {
-            composer.addPass(scenePass);
-        }
-        let copy = new ShaderPass(CopyShader);
-        composer.addPass(copy);
-
-        // Anti-alias
-        let resolutionX = 1 / window.innerWidth;
-        let resolutionY = 1 / window.innerHeight;
-        let fxaa = new ShaderPass(FXAAShader);
-        let u = 'resolution';
-        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        // composer.addPass(fxaa);
-        // composer.addPass(fxaa);
-
-        // Bloom
-        let bloomPass = new UnrealBloomPass(
-            new Vector2(window.innerWidth, window.innerHeight),
-            1.5, 0.4, 0.85);
-        bloomPass.exposure = 0.5;
-        bloomPass.threshold = 0.3;
-        bloomPass.strength = 1.0;
-        bloomPass.radius = 0;
-        let bloomComposer = new EffectComposer(rendrr);
-        bloomComposer.renderTarget1.stencilBuffer = true;
-        bloomComposer.renderTarget2.stencilBuffer = true;
-        bloomComposer.renderToScreen = false;
-        if (this.shadowVolumes)
-        {
-            bloomComposer.addPass(shadowPass);
-        }
-        else
-        {
-            bloomComposer.addPass(scenePass);
-        }
-        bloomComposer.addPass(bloomPass); // no fxaa on the bloom pass
-
-        let bloomMergePass = new ShaderPass(
-            new ShaderMaterial({
-                uniforms: {
-                    baseTexture: { value: null },
-                    bloomTexture: { value: bloomComposer.renderTarget2.texture }
-                },
-                vertexShader: this.graphics.getBloomSelectiveVertexShader(),
-                fragmentShader: this.graphics.getBloomSelectiveFragmentShader(),
-                defines: {}
-            }), 'baseTexture'
-        );
-        bloomMergePass.needsSwap = true;
-        let finalComposer = new EffectComposer(rendrr);
-        finalComposer.addPass(scenePass);
-        finalComposer.addPass(bloomMergePass);
-        finalComposer.addPass(fxaa);
-
-        // Ambient occlusion
-        let ambientOcclusion = this.ambientOcclusion;
-        if (ambientOcclusion) {
-            let sao = new SAOPass(sc, cam, false, false);
-            sao.params.output = SAOPass.OUTPUT.Default;
-            sao.params.saoBias = 0.1;
-            sao.params.saoIntensity = 1.8;
-            sao.params.saoScale = 10000;
-            sao.params.saoKernelRadius = 100;
-            sao.params.saoMinResolution = 0.000004;
-            sao.params.saoBlur = 1;
-            sao.params.saoBlurRadius = 8;
-            sao.params.saoBlurStdDev = 4;
-            sao.params.saoBlurDepthCutoff = 0.01;
-            finalComposer.addPass(sao);
-        }
-
-        return [bloomComposer, finalComposer, composer];
-    },
-
-    createRenderer()
-    {
-        // Configure renderer
-        let renderer = new WebGLRenderer({
-            antialias: false,
-            alpha: true,
-            logarithmicDepthBuffer: this.shadowVolumes
-            // precision: 'mediump'
-        });
-
-        if (this.shadowMap)
-        {
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = PCFSoftShadowMap;
-        }
-
-        renderer.autoClear = false;
-        renderer.outputEncoding = sRGBEncoding;
-        renderer.setClearColor(this.cssToHex('#362c6b'), 1);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        renderer.info.autoReset = false;
-        return renderer;
-    },
-
     getRenderRegister()
     {
         return this.renderRegister;
@@ -282,136 +88,6 @@ extend(RendererManager.prototype, {
     setRenderRegister(renderRegister)
     {
         this.renderRegister = renderRegister;
-    },
-
-    _darkenNonBloomed(obj, materials)
-    {
-        if (obj.isMesh && obj.userData.bloom !== true) {
-            materials[obj.uuid] = obj.material;
-            obj.material = this.darkMaterial;
-        }
-    },
-
-    _restoreMaterial(obj, materials)
-    {
-        if (materials[obj.uuid]) {
-            obj.material = materials[obj.uuid];
-            delete materials[obj.uuid];
-        }
-    },
-
-    _updateSkies(mainCamera)
-    {
-        let skies = this.graphics.app.model.server.chunkModel.skies;
-        skies.forEach((sky, worldId) => {
-            // TODO [SKY] manage with other cameras
-            this.graphics.updateSunPosition(mainCamera, sky, worldId);
-        });
-    },
-
-    _updateWaters(cameraManager, renderer, mainScene, mainCam)
-    {
-        // Update uniforms
-        let worlds = this.graphics.app.model.server.chunkModel.worlds;
-        let skies = this.graphics.app.model.server.chunkModel.skies;
-        let eye = cameraManager.waterCamera.eye;
-        worlds.forEach(w => {
-            // let sky = skies.get(wid);
-            // let sdir = this.graphics.getSunDirection(sky);
-            w.forEach(chunk => { let m = chunk.meshes; for (let i = 0; i < m.length; ++i) {
-                if (!chunk.water[i]) continue;
-                let mi = m[i];
-                mi.visible = false;
-                // if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
-                // {
-                //     mi.material.uniforms.eye.value = eye;
-                //     mi.material.uniforms.sunDirection.value = sdir;
-                //     mi.material.uniforms.time.value += 0.01;
-                // }
-            }});
-        });
-
-        // Update main camera
-        this._updateWaterCamera(cameraManager, renderer, mainScene, mainCam);
-
-        // Update display
-        worlds.forEach((w, wid) => { w.forEach(chunk => {
-            let m = chunk.meshes;
-            let sky = skies.get(wid);
-            let sdir = this.graphics.getSunDirection(sky);
-            for (let i = 0; i < m.length; ++i) {
-                if (chunk.water[i])
-                {
-                    let mi = m[i];
-                    mi.visible = true;
-                    if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
-                    {
-                        mi.material.uniforms.eye.value = eye;
-                        mi.material.uniforms.sunDirection.value = sdir;
-                        mi.material.uniforms.time.value += 0.01;
-                    }
-                }
-            }
-        });
-        });
-    },
-
-    _updateWaterCamera(cameraManager, renderer, mainScene)
-    {
-        // Update mirror camera
-        cameraManager.updateWaterCamera();
-
-        // Perform render
-        let scene = mainScene;
-        let waterCamera = cameraManager.waterCamera;
-        let renderTarget = waterCamera.waterRenderTarget;
-        let mirrorCamera = cameraManager.waterCamera.camera;
-
-        // Save
-        let currentRenderTarget = renderer.getRenderTarget();
-        let currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
-        // let currentXrEnabled = renderer.xr.enabled;
-        // scope.visible = false; // single side, no need
-        // renderer.xr.enabled = false; // Avoid camera modification and recursion
-        renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-
-        renderer.setRenderTarget(renderTarget);
-        if (renderer.autoClear === false) renderer.clear();
-        renderer.render(scene, mirrorCamera);
-
-        // Restore
-        // scope.visible = true; // single side, no need
-        // renderer.xr.enabled = currentXrEnabled;
-        renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-        renderer.setRenderTarget(currentRenderTarget);
-        // let viewport = camera.viewport;
-        // if (viewport !== undefined) {
-        //     renderer.state.viewport(viewport);
-        // }
-    },
-
-    _updateShadows() // cameraManager)
-    {
-        let graphics = this.graphics;
-        let worlds = graphics.app.model.server.chunkModel.worlds;
-        let skies = graphics.app.model.server.chunkModel.skies;
-        // let eye = cameraManager.waterCamera.eye;
-        let eye = graphics.getCameraCoordinates();
-        // let eyedir = cameraManager.mainCamera.getCameraForwardVector();
-        worlds.forEach((w, wid) => {
-            let sky = skies.get(wid);
-            let sdir = graphics.getSunDirection(sky);
-            sdir.set(-sdir.x, sdir.y, sdir.z).negate();
-            w.forEach(chunk => {
-                if (!chunk.shadow) return;
-                let mi = chunk.shadow;
-                if (mi.material && mi.material.uniforms)
-                {
-                    mi.material.uniforms.lightPosition.value = sdir;
-                    mi.material.uniforms.eyePosition.value = eye;
-                }
-            });
-        });
     },
 
     render(sceneManager, cameraManager)
@@ -435,11 +111,11 @@ extend(RendererManager.prototype, {
 
         // Updates.
         try {
-            this._updateSkies(mainCamera);
+            this.updateSkies(mainCamera);
             if (this.waterReflection)
-                this._updateWaters(cameraManager, renderer, mainScene, mainCamera);
-            // if (this.shadowVolumes)
-            this._updateShadows(cameraManager, renderer, mainScene, mainCamera);
+                this.updateWaters(cameraManager, renderer, mainScene, mainCamera);
+            if (this.shadowVolumes)
+                this.updateShadows(cameraManager, renderer, mainScene, mainCamera);
         } catch (e) {
             console.error(e);
             this.stop = true;
@@ -543,9 +219,9 @@ extend(RendererManager.prototype, {
 
             if (this.selectiveBloom)
             {
-                bufferScene.traverse(obj => this._darkenNonBloomed(obj, materials));
+                bufferScene.traverse(obj => this.darkenNonBloomed(obj, materials));
                 bufferComposer[0].render();
-                bufferScene.traverse(obj => this._restoreMaterial(obj, materials));
+                bufferScene.traverse(obj => this.restoreMaterial(obj, materials));
                 bufferComposer[1].render();
             } else {
                 bufferComposer[2].render();
@@ -579,9 +255,9 @@ extend(RendererManager.prototype, {
 
         // MAIN RENDER
         if (this.selectiveBloom) {
-            mainScene.traverse(obj => this._darkenNonBloomed(obj, materials));
+            mainScene.traverse(obj => this.darkenNonBloomed(obj, materials));
             composer[0].render();
-            mainScene.traverse(obj => this._restoreMaterial(obj, materials));
+            mainScene.traverse(obj => this.restoreMaterial(obj, materials));
             composer[1].render();
         } else {
             composer[2].render();
@@ -633,6 +309,9 @@ extend(RendererManager.prototype, {
     }
 
 });
+
+extend(RendererManager.prototype, RendererFactory);
+extend(RendererManager.prototype, RendererUpdates);
 
 /** Interface with graphics engine. **/
 
