@@ -234,15 +234,13 @@ class AI
                 ai.goUp();
             else
                 ai.stopUp();
-            if (dx * dx + dy * dy + dz * dz > 2)
-            {
-                let r = ai.rotation;
-                const newPitch = Math.atan2(dy, dx) - Math.PI / 2;
-                ai.rotate(newPitch, r[1], r[2], r[3]);
-                ai.goForward();
-            }
-            else
-                ai.stopForward();
+
+            let r = ai.rotation;
+            const newPitch = Math.atan2(dy, dx) - Math.PI / 2;
+            ai.rotate(newPitch, r[1], r[2], r[3]);
+            if (dx * dx + dy * dy > 2) ai.goForward();
+            else ai.stopForward();
+
             // if (dx < -0.5) ai.goForward();
             // else if (dx > 0.5) ai.goBackwards();
             // if (dy < -0.5) ai.goRight();
