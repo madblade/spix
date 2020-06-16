@@ -91,20 +91,21 @@ extend(SelfModel.prototype, {
         // This could be made more fluid with
         // a more involved interpolation routine
         // (might need more data from the server)
-        if (this.worldNeedsUpdate && this.oldWorldId)
-        {
-            // TODO [PORTAL] Interpolate position and
-            //  only switch to world when the portal is crossed.
-            this.updateWorld();
-            let p = this.position;
-            let last = this.lastPositionFromServer;
-            let current = this.currentPositionFromServer;
-            last.copy(current);
-            current.copy(p);
-            this.interpolatingPosition.copy(p);
-            this.updatePosition(this.avatar, this.interpolatingPosition);
-            this.interpolationUpToDate = true;
-        } else if (!this.interpolationUpToDate)
+        // if (this.worldNeedsUpdate && this.oldWorldId)
+        // {
+        //     TODO [PORTAL] Interpolate position and
+        //      only switch to world when the portal is crossed.
+        //     this.updateWorld();
+        //     let p = this.position;
+        //     let last = this.lastPositionFromServer;
+        //     let current = this.currentPositionFromServer;
+        //     last.copy(current);
+        //     current.copy(p);
+        //     this.interpolatingPosition.copy(p);
+        //     this.updatePosition(this.avatar, this.interpolatingPosition);
+        //     this.interpolationUpToDate = true;
+        // } else
+        if (!this.interpolationUpToDate)
         {
             this.interpolatePredictSelfPosition();
         }
@@ -124,7 +125,6 @@ extend(SelfModel.prototype, {
         }
         this.updateBow();
 
-        this.worldNeedsUpdate = false;
         this.needsUpdate = false;
     },
 
@@ -150,7 +150,8 @@ extend(SelfModel.prototype, {
             this.needsUpdate = true;
             this.worldNeedsUpdate = true;
             this.oldWorldId = this.worldId;
-            this.worldId = w;
+            this.newWorldId = w;
+            // this.worldId = w;
         }
 
         if (s) {

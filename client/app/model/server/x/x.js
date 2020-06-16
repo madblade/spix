@@ -10,7 +10,8 @@ import extend               from '../../../extend.js';
 import { WorldMap }         from './worldmap.js';
 import { UpdateModule }     from './update.js';
 
-let XModel = function(app, selfModel) {
+let XModel = function(app, selfModel)
+{
     this.app = app;
     this.selfModel = selfModel;
 
