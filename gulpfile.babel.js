@@ -398,12 +398,12 @@ function flatten() {
 var copyfontsdev = () => {
     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
         .pipe(flatten())
-        .pipe(gulp.dest(`${clientPath}/assets/fonts`));
+        .pipe(gulp.dest(`${clientPath}/app/assets/fonts`));
 };
 var copyfontsdist = () => {
     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
         .pipe(flatten())
-        .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/fonts`));
+        .pipe(gulp.dest(`${paths.dist}/${clientPath}/app/assets/fonts`));
 };
 
 var copyassets = () => {

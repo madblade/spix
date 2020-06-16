@@ -137,6 +137,25 @@ class SimplePerlin
         }
     }
 
+    static getRandomOre(seed)
+    {
+        if (seed > 0.9)
+            return BlockType.ORE_DIAMOND;
+        else if (seed > 0.5)
+            return BlockType.ORE_GOLD;
+        else
+            return BlockType.IRON;
+    }
+
+    static getMainBlock(worldId)
+    {
+        if (worldId === -1) return BlockType.GRASS;
+        else {
+            const mod = worldId % 24;
+            return 32 + mod;
+        }
+    }
+
     static simpleGeneration2D(
         chunk, worldId, worldInfo,
         perlinIntensity, shuffleChunks, blocks)
@@ -152,17 +171,16 @@ class SimplePerlin
 
         // const air = BlockType.AIR;
         const stone = BlockType.STONE;
-        const grass = BlockType.GRASS;
         const water = BlockType.WATER;
-        const iron = BlockType.IRON;
         const sand = BlockType.SAND;
         const wood = BlockType.WOOD;
         const leaves = BlockType.LEAVES;
         // const planks = BlockType.PLANKS;
 
         // Fill with grass on main world, sand everywhere else.
-        const isMainWorld = parseInt(worldId, 10) === -1;
-        const mainBlockId = isMainWorld ? grass : sand;
+        const widInt = parseInt(worldId, 10);
+        const isMainWorld = widInt === -1;
+        const mainBlockId = SimplePerlin.getMainBlock(widInt);
 
         const normalSize = dx * dy;
 
@@ -205,8 +223,12 @@ class SimplePerlin
                     // Rock.
                     blocks[currentBlock] = stone;
 
-                    // Iron.
-                    if (Math.random() > 0.99) blocks[currentBlock] = iron;
+                    // Ore.
+                    const r = Math.random();
+                    if (r > 0.98)
+                    {
+                        blocks[currentBlock] = SimplePerlin.getRandomOre((r - 0.98) * 50);
+                    }
                 }
 
                 let bl = Math.max(0, Math.min(h, dz));
