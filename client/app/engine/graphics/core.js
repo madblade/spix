@@ -4,7 +4,7 @@
 
 'use strict';
 
-import Stats from 'stats.js';
+// import Stats from 'stats.js';
 
 let CoreModule = {
 
@@ -42,7 +42,7 @@ let CoreModule = {
     {
         // Initialize DOM element
         this.initializeDOM();
-        this.fps = this.fps || new Stats();
+        // this.fps = this.fps || new Stats();
 
         // Controls are tightly linked to camera.
         this.initializeCameras();
@@ -53,11 +53,11 @@ let CoreModule = {
 
         // Init stats.
         // Benches.
-        let fpsElement = this.fps.dom;
-        fpsElement.setAttribute('id', 'stats');
-        fpsElement.style.left = '300px';
-        if (!document.getElementById('stats'))
-            document.body.appendChild(fpsElement);
+        // let fpsElement = this.fps.dom;
+        // fpsElement.setAttribute('id', 'stats');
+        // fpsElement.style.left = '300px';
+        // if (!document.getElementById('stats'))
+        //     document.body.appendChild(fpsElement);
     },
 
     initializeDOM()
@@ -87,7 +87,7 @@ let CoreModule = {
         // }
 
         // Bench.
-        this.fps.update();
+        // this.fps.update();
 
         // Update controls for Touch/Gamepad devices.
         controlsEngine.updateControlsDevice();

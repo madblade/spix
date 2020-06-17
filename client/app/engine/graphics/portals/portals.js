@@ -163,7 +163,6 @@ let PortalsModule = {
             {
                 // console.log('Added ' + this.previousFrameWorld + ', '
                 // + u.destinationWid);
-                console.log('adding portal graphics inner');
                 this.addPortalGraphics(u.portal, u.otherPortal,
                     u.cameraPath, u.cameraTransform, u.depth,
                     u.originPid, u.destinationPid, u.destinationWid,

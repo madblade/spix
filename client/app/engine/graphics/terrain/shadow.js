@@ -204,8 +204,8 @@ function createShadowCastingMaterial(
     let lightPosition = new Vector3();
     let eyePosition = new Vector3();
     let customUniforms = UniformsUtils.merge([
-        ShaderLib.lambert.uniforms,
-        // ShaderLib.basic.uniforms,
+        // ShaderLib.lambert.uniforms,
+        ShaderLib.basic.uniforms,
         {
             lightPosition: { value: lightPosition },
             eyePosition: { value: eyePosition },
@@ -216,25 +216,14 @@ function createShadowCastingMaterial(
     return new ShaderMaterial({
         uniforms: customUniforms,
         vertexShader: ShadersModule.getShadowVertexShader(),
-        // fragmentShader: ShaderLib.basic.fragmentShader,
-        fragmentShader: ShaderLib.lambert.fragmentShader,
-        lights: true,
+        fragmentShader: ShaderLib.basic.fragmentShader,
+        // fragmentShader: ShaderLib.lambert.fragmentShader,
+        // lights: true,
         // transparent: true,
         // wireframe: true,
         // flatShading: true,
         side: FrontSide
     });
-    // return new ShaderMaterial({
-    //     uniforms: customUniforms,
-    //     vertexShader: ShadersModule.getShadowVertexShader(),
-    //     fragmentShader: ShadersModule.getShadowFragmentShader(),
-    //     // fragmentShader: ShaderLib.basic.fragmentShader,
-    //     // fragmentShader: ShaderLib.basic.fragmentShader,
-    //     // lights: true,
-    //     transparent: true,
-    //     opacity: 0,
-    //     side: FrontSide
-    // });
 }
 
 export {

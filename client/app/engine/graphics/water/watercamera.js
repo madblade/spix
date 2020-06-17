@@ -17,8 +17,9 @@ let WaterCameraModule = {
             format: RGBFormat
         });
 
+        let waterCamObject = new PerspectiveCamera(fov, aspect, near, far);
         return {
-            camera: new PerspectiveCamera(fov, aspect, near, far),
+            camera: waterCamObject,
             waterRenderTarget,
             mirrorPlane: new Plane(),
             normal: new Vector3(),

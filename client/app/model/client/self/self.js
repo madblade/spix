@@ -42,6 +42,7 @@ let SelfComponent = function(clientModel)
         ItemType.BLOCK_PLANKS,
         ItemType.KATANA,
         ItemType.YUMI,
+        ItemType.NONE,
         // ItemType.PORTAL_GUN_SINGLE,
         ItemType.PORTAL_GUN_DOUBLE,
         emptyItem, emptyItem, emptyItem

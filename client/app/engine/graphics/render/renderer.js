@@ -160,7 +160,6 @@ extend(RendererManager.prototype, {
             // bufferCamera.updateMatrixWorld();
         }
 
-
         let stc = cameraManager.stencilCamera;
         this.stencilScene.updateMatrixWorld();
         this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
