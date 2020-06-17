@@ -25,7 +25,7 @@ const clientPath = 'client';
 const serverPath = 'server';
 const paths = {
     client: {
-        assets: `${clientPath}/assets/**/*`,
+        assets: `${clientPath}/app/assets/**/*`,
         images: `${clientPath}/assets/images/**/*`,
         revManifest: `${clientPath}/assets/rev-manifest.json`,
         scripts: [
@@ -408,7 +408,7 @@ var copyfontsdist = () => {
 
 var copyassets = () => {
     return gulp.src([paths.client.assets, '!' + paths.client.images])
-        .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`));
+        .pipe(gulp.dest(`${paths.dist}/${clientPath}/app/assets`));
 };
 
 var copyserver = () => {
