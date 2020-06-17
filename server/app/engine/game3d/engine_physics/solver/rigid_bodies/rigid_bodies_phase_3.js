@@ -1,9 +1,12 @@
 /**
- * Island solving.
+ * @deprecated
  */
 
 class RigidBodiesPhase3
 {
+    /**
+     * @deprecated
+     */
     static solveBabylon(a, b, c, sup)
     {
         if (a === 0) {
@@ -33,6 +36,9 @@ class RigidBodiesPhase3
         return 0;
     }
 
+    /**
+     * @deprecated
+     */
     static solveSecondOrder(
         a1, a2,
         b1, b2,
@@ -127,6 +133,9 @@ class RigidBodiesPhase3
         return rp12;
     }
 
+    /**
+     * @deprecated
+     */
     static solveLeapfrogPostCollision(
         island,
         newSubIsland,
@@ -240,6 +249,9 @@ class RigidBodiesPhase3
     }
 
     // Does not account for time dilation, but can with minor modifications.
+    /**
+     * @deprecated
+     */
     static solveLeapfrogQuadratic(
         island,
         oxAxis,
@@ -421,6 +433,9 @@ class RigidBodiesPhase3
         }
     }
 
+    /**
+     * @deprecated
+     */
     static getSubIsland(
         islandIndex,
         axis,
@@ -446,6 +461,9 @@ class RigidBodiesPhase3
         }
     }
 
+    /**
+     * @deprecated
+     */
     static mergeSubIslands(
         indexI,
         indexJ,
@@ -521,6 +539,9 @@ class RigidBodiesPhase3
         return newSubIsland;
     }
 
+    /**
+     * @deprecated
+     */
     static applyCollision(
         i, j, r, axis,
         island, oxAxis, entities, relativeDt,
@@ -708,6 +729,9 @@ class RigidBodiesPhase3
     }
 
     // We have that e1p0 < e2p0.
+    /**
+     * @deprecated
+     */
     static correctCollision(e1, e1p0, e1p1, e1w, e2, e2p0, e2p1, e2w, ax, epsilon)
     {
         let seps = 1e-6;

@@ -22,20 +22,6 @@ class Simple
         blocks.fill(blockId, 0, numberOfBlocksToFill);
         blocks.fill(0, numberOfBlocksToFill, numberOfBlocks);
 
-        //blocks[3122] = 1;
-        //blocks[3186] = 1;
-
-        /*
-         let numberAdded = 0;
-         for (let i = numberOfBlocksToFill; i<numberOfBlocksToFill+this._xSize*this._ySize; ++i) {
-         if (Math.random() > 0.5) {
-         blocks[i] = blockId;
-         numberAdded++;
-         }
-         }
-         console.log(numberAdded + ' different block(s) added.');
-         */
-
         chunk.blocks = blocks;
 
         if (ChunkGenerator.debug) console.log(`\t${chunk.blocks.length} blocks generated.`);

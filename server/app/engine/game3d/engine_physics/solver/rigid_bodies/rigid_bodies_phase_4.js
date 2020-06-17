@@ -23,6 +23,9 @@ class RigidBodiesPhase4
             delta[a] = p1[a] - p0[a];
     }
 
+    /**
+     * @deprecated
+     */
     static solveIslandStepLinear(
         mapCollidingPossible,
         i, // island 1 index

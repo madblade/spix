@@ -7,7 +7,6 @@
 import XUpdater from './updater_x';
 import XLoader  from '../loader/loader_x';
 import XBuffer  from '../buffer_x';
-// import TimeUtils from '../../../math/time';
 
 class Updater
 {

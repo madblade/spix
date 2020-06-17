@@ -1,5 +1,6 @@
 /**
- *
+ * Refactoring this thing is not a priority.
+ * Some array allocs could be avoided, but diving in this (old) code is clearly a loss of time.
  */
 
 'use strict';

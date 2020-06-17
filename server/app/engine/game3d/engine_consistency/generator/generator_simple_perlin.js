@@ -169,13 +169,11 @@ class SimplePerlin
         const ck = chunk.chunkK;
         const offsetX = dx * ci; const offsetY = dy * cj; const offsetZ = dz * ck;
 
-        // const air = BlockType.AIR;
         const stone = BlockType.STONE;
         const water = BlockType.WATER;
         const sand = BlockType.SAND;
         const wood = BlockType.WOOD;
         const leaves = BlockType.LEAVES;
-        // const planks = BlockType.PLANKS;
 
         // Fill with grass on main world, sand everywhere else.
         const widInt = parseInt(worldId, 10);

@@ -5,11 +5,13 @@
 'use strict';
 
 import express from 'express';
-// import mongoose from 'mongoose';
-// mongoose.Promise = require('bluebird');
 import http from 'http';
 import config from './config/environment';
 import App from './app/app';
+
+// To link with a database:
+// import mongoose from 'mongoose';
+// mongoose.Promise = require('bluebird');
 // import seedDatabaseIfNeeded from './config/seed';
 
 // Connect to MongoDB

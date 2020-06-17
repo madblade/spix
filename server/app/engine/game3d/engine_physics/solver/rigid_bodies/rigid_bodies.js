@@ -13,32 +13,27 @@ import Phase4 from './rigid_bodies_phase_4';
 import Phase5 from './rigid_bodies_phase_5';
 import { WorldType } from '../../../model_world/model';
 
-// Enhancement: island caching
-
 class RigidBodies
 {
-    static eps = .00000001;// .00001;
+    static eps = .00000001;
     static gravityConstant = 2 * -0.00980665;
 
     static crossEntityCollision = true; // THIS ACTIVATES CROSS-COLLISION, EXPERIMENTAL
     static creativeMode = false; // THIS REMOVES GRAVITY INTEGRATION (but not rotation changes)
-    // static gravityConstant = 0;
 
     constructor(refreshRate, physicsEngine)
     {
         this._physicsEngine = physicsEngine;
 
-        //
+        // "constants"
         this._gravity = [0, 0, RigidBodies.gravityConstant];
         this._gravityWater = [0, 0, 0.1 * RigidBodies.gravityConstant];
-        // this._gravity = [0, 0, 0];
         this._globalTimeDilation = 25;
         // this._globalTimeDilation = 0.05;
         this._refreshRate = refreshRate;
 
         this._variableGravity = true;
         this._worldCenter = [0, 0, -100];
-        //
     }
 
     get gravity() { return this._gravity; }
@@ -51,10 +46,11 @@ class RigidBodies
     {
         if (!this._variableGravity || world.worldInfo.type !== WorldType.CUBE)
         {
-            return this._gravity; // world.isWater(x, y, z) ? this._gravityWater : this._gravity;
+            return this._gravity;
+            // world.isWater(x, y, z) ? this._gravityWater : this._gravity;
         }
 
-        const center = world.worldInfo.center; // this._worldCenter;
+        const center = world.worldInfo.center;
         let radius = parseFloat(world.worldInfo.radius);
         let abs = Math.abs;
         let max = Math.max;
@@ -98,8 +94,6 @@ class RigidBodies
         )
             rad = min(min(abs(cX - x), abs(cY - y)), abs(cZ - z)) - 1;
 
-        // const rsx = radius * sX;
-        // const rsxm = cX - rsx; const rsxp = cX + rsx;
         const rsxm = cX - rad; const rsxp = cX + rad;
         cX = x < rsxm ? rsxm : x > rsxp ? rsxp : x;
         const rsym = cY - rad; const rsyp = cY + rad;
@@ -135,8 +129,6 @@ class RigidBodies
 
     solve(objectOrderer, eventOrderer, em, wm, xm, o, relativeDtMs)
     {
-        // const epsilon = RigidBodies.eps;
-
         const passId = Math.random();
         let timeDilation = this.globalTimeDilation;
         let absoluteDt = this.refreshRate / timeDilation;
@@ -193,9 +185,6 @@ class RigidBodies
                 RigidBodies.solveIntegrateAABB(
                     oxAxis, entities, world, worldId, searcher, xm, objectOrderer, o, this
                 );
-                // RigidBodies.solveCrossEntityHardCollision(
-                //     world, entities, leapfrogArray, searcher, oxAxis, relativeDt, this
-                // );
             }
             else
             {
@@ -204,17 +193,6 @@ class RigidBodies
                     entities, worldId, oxAxis, world,
                     xm, objectOrderer, searcher, o, this);
             }
-
-            // 7. Apply new positions, correct (v_i+1, a_i+1) and resulting constraints,
-            //    smoothly slice along constrained boundaries until component is extinct.
-
-            // Integration.
-            // Phase5.applyIntegration(
-            //     entities, worldId, oxAxis, world,
-            //     xm, objectOrderer, searcher, o, this);
-
-            // 8. Perform updates in optimization structures.
-            //    Perform updates in consistency maps.
         });
     }
 
@@ -231,6 +209,9 @@ class RigidBodies
         );
     }
 
+    /**
+     * @deprecated
+     */
     static solveCrossEntityHardCollision(
         world, entities,
         leapfrogArray, searcher, oxAxis, relativeDt, rigidBodiesSolver
@@ -274,9 +255,9 @@ class RigidBodies
         // 6. Narrow phase, part 1: for all probably colliding pairs,
         //    solve X² leapfrog, save first all valid Ts
         //    keep list of ordered Ts across pairs.
-        if (islands.length > 0) {
-            // console.log(islands);
-        }
+        // if (islands.length > 0) {
+        //     console.log(islands);
+        // }
 
         for (let currentIslandIndex = 0, il = islands.length; currentIslandIndex < il; ++currentIslandIndex)
         {

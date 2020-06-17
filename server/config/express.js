@@ -6,17 +6,12 @@
 
 import express from 'express';
 import favicon from 'serve-favicon';
-// import morgan from 'morgan'; // middleware logger
 import compression from 'compression';
 import bodyParser from 'body-parser';
-// import methodOverride from 'method-override';
-// import cookieParser from 'cookie-parser';
 import errorHandler from 'errorhandler';
 import path from 'path';
-// import lusca from 'lusca';
 import config from './environment';
-// import passport from 'passport';
-// import session from 'express-session';
+// DB:
 // import connectMongo from 'connect-mongo';
 // import mongoose from 'mongoose';
 // var MongoStore = connectMongo(session);
@@ -37,7 +32,6 @@ export default function(app)
 
     app.set('appPath', path.join(config.root, 'client'));
     app.use(express.static(app.get('appPath')));
-    // app.use(morgan('dev'));
 
     // app.set('views', `${config.root}/server/views`);
     app.engine('html', require('ejs').renderFile);

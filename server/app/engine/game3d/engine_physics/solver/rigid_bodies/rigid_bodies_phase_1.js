@@ -235,7 +235,7 @@ class RigidBodiesPhase1
                 if (gi < 0 && vi > 0.05)
                 {
                     if (adh[i]) {
-                        // console.log(`jump ${p1} -> ${p0}`);
+                        // jump
                         a1[i] += 0.7;
                         inc[i] = 0;
                         adh[i] = false;
@@ -247,7 +247,7 @@ class RigidBodiesPhase1
                     {
                         a1[i] += 0.7;
                         inc[i] = 0;
-                        // console.log('walljump');
+                        // walljump
                         for (let j = 0; j < 3; ++j) {
                             if (j === i) continue;
                             if (adh[j]) {
@@ -265,7 +265,7 @@ class RigidBodiesPhase1
                 else if (gi > 0 && vi < -0.05)
                 {
                     if (adh[3 + i]) {
-                        // console.log(`antijump ${passId}`);
+                        // jump downward
                         a1[i] -= 0.7;
                         inc[i] = 0;
                         adh[3 + i] = false;
@@ -277,7 +277,7 @@ class RigidBodiesPhase1
                     {
                         a1[i] -= 0.7;
                         inc[i] = 0;
-                        // console.log('antiwalljump');
+                        // walljump downward
                         for (let j = 0; j < 3; ++j) {
                             if (j === i) continue;
                             if (adh[j]) {
@@ -320,18 +320,7 @@ class RigidBodiesPhase1
             // Velocity correction.
             if (sum > maxSpeed * dtr)
                 for (let i = 0; i < 3; ++i) v1[i] *= maxSpeed * dtr / sum;
-            // console.log(p0);
-
-            // if (debug) {
-            //     vS.push(v1[2]);
-            //     aS.push([a0[2], a1[2]]);
-            // }
         }
-
-        // if (debug && (vS.length > 1 && vS[0] !== vS[1])) {
-        //     console.log(vS);
-        //     console.log(aS);
-        // }
     }
 
     static getForwardVector(d)
@@ -354,7 +343,6 @@ class RigidBodiesPhase1
     {
         if (entity.hit)
         {
-            // console.log('hit');
             entity.hit = false;
             return entity.hitVector;
         }
