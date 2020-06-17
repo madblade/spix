@@ -108,7 +108,7 @@ let ListenerModule = {
         return [ex, ey, ez, rx, ry, rz];
     },
 
-    requestAddBlock()
+    requestAddBlock(isMainButton)
     {
         let clientModel = this.app.model.client;
         let graphicsEngine = this.app.engine.graphics;
@@ -166,7 +166,7 @@ let ListenerModule = {
         }
         clientModel.selfComponent.setAngleFromIntersectionPoint(angle.toFixed(4));
 
-        clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2]);
+        clientModel.triggerEvent('ray', ['add', fx1, fy1, fz1, fx2, fy2, fz2, isMainButton]);
     },
 
     requestDelBlock()
@@ -224,7 +224,7 @@ let ListenerModule = {
         else if (ItemsModelModule.isItemUseable(activeItemID))
             this.requestItemUse(isButtonUp, false);
         else if (ItemsModelModule.isItemPlaceable(activeItemID) && !isButtonUp)
-            this.requestAddBlock();
+            this.requestAddBlock(true);
     },
 
     requestSecondaryHandItemAction(isButtonUp)
@@ -244,6 +244,8 @@ let ListenerModule = {
             console.warn('[Mouse/Listener] Item ID unsupported.');
         else if (ItemsModelModule.isItemUseable(activeItemID))
             this.requestItemUse(isButtonUp, true);
+        else if (ItemsModelModule.isItemX2(activeItemID) && !isButtonUp)
+            this.requestAddBlock(false);
     },
 
     onLeftMouseUp()

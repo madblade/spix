@@ -87,6 +87,7 @@ let RendererFactory = {
         finalComposer.addPass(bloomMergePass);
         finalComposer.addPass(fxaa);
         finalComposer.addPass(clearMaskPass);
+        finalComposer.addPass(copy);
 
         return [bloomComposer, finalComposer, composer];
     },

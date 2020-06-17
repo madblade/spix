@@ -31,6 +31,7 @@ let PortalsModule = {
         let screen = this.getScreen(portalId);
         if (!screen)
         {
+            console.log(`NEW SCREEN ${portalId}`);
             // console.log('New Screen created.');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;
@@ -162,6 +163,7 @@ let PortalsModule = {
             {
                 // console.log('Added ' + this.previousFrameWorld + ', '
                 // + u.destinationWid);
+                console.log('adding portal graphics inner');
                 this.addPortalGraphics(u.portal, u.otherPortal,
                     u.cameraPath, u.cameraTransform, u.depth,
                     u.originPid, u.destinationPid, u.destinationWid,

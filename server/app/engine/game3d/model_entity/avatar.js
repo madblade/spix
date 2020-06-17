@@ -22,7 +22,9 @@ class Avatar extends Entity
         // Might be a good idea to keep the unload distance as big as possible client-wise
         // When games don’t contain many players.
 
-        this._portalRenderDistance = 3;
+        this._portalRenderDistance = 4;
+        this._portalBlue = null;
+        this._portalOrange = null;
 
         // Counted as a number of blocks.
         this._entityRenderDistance = 3 * 32;
@@ -52,6 +54,11 @@ class Avatar extends Entity
     get entityRenderDistance()               { return this._entityRenderDistance; }
     get portalRenderDistance()               { return this._portalRenderDistance; }
     get nearestChunkId()                     { return this._nearestChunkId; }
+
+    get bluePortal()                         { return this._portalBlue; }
+    get orangePortal()                       { return this._portalOrange; }
+    set bluePortal(p)                        { this._portalBlue = p; }
+    set orangePortal(p)                      { this._portalOrange = p; }
 
     get hasJustMeleed()                      { return this._hasJustMeleed; }
     set hasJustMeleed(n)                     { this._hasJustMeleed = n; }

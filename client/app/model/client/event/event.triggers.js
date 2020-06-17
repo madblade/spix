@@ -43,6 +43,7 @@ let TriggersModule = {
         {
             if (data[0] === 'add') {
                 // From inventory, select block to be added.
+                data.pop();
                 data.splice(-3, 3);
                 // There should be a server-wise check (if it is in the inventory)
                 data.push(activeItemID);
@@ -53,11 +54,16 @@ let TriggersModule = {
         {
             let fx1 = data[1]; let fy1 = data[2]; let fz1 = data[3];
             let fx2 = data[4]; let fy2 = data[5]; let fz2 = data[6];
+            let isOrangeOrBlue = ItemsModelModule.isItemX2(activeItemID);
+            let isMainButton = data[7];
+            data.pop();
             if (fx2 < fx1) { data[1] = fx2; data[4] = fx1; }
             if (fy2 < fy1) { data[2] = fy2; data[5] = fy1; }
             if (fz2 < fz1) { data[3] = fz2; data[6] = fz1; }
             data.push(clientSelfModel.getItemOffset());
             data.push(clientSelfModel.getAngleFromIntersectionPoint());
+            data.push(isOrangeOrBlue);
+            data.push(isMainButton);
             this.triggerBlock('x', data);
         }
         else if (ItemsModelModule.isItemNaught(activeItemID) && data[0] === 'del')

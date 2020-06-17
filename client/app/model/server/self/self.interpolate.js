@@ -148,7 +148,6 @@ let SelfInterpolationModule = {
         newPosition
     )
     {
-        console.log('intersecting.....');
         let portals = this.xModel.portals;
         let worldsToPortals = this.xModel.worldToPortals;
         const oldWorldId = parseInt(this.oldWorldId, 10);
@@ -268,7 +267,6 @@ let SelfInterpolationModule = {
                 crossedX && inY && inZ
             ) {
                 // Perform world switch here!
-                console.log('FOUND');
                 found = true;
                 this.interpolateSwitchWorld();
             }

@@ -41,7 +41,8 @@ extend(XModel.prototype, {
     // Should always be called AFTER worldModel.refresh()
     // So there is no more world to be added, all possible worlds
     // are available for display in their portals texture renderer.
-    refresh() {
+    refresh()
+    {
         if (!this.needsUpdate && !this.forceUpdate) return;
 
         let register = this.app.register;
@@ -50,7 +51,8 @@ extend(XModel.prototype, {
         let refreshWorldMap = false;
         let graphics = this.app.engine.graphics;
 
-        for (let i = 0, l = updates.length; i < l; ++i) {
+        for (let i = 0, l = updates.length; i < l; ++i)
+        {
             let data = updates[i];
 
             for (let portalId in data) {
@@ -69,8 +71,12 @@ extend(XModel.prototype, {
                     let orientation     = meta[10];
 
                     // Do add portal (not that world map is recomputed in process)
-                    this.addPortal(portalId,
-                        otherPortalId, chunkId, worldId, end1, end2, offset, orientation);
+                    this.addPortal(
+                        portalId,
+                        otherPortalId,
+                        chunkId, worldId, end1, end2,
+                        offset, orientation
+                    );
                     refreshWorldMap = true;
                 }
 
@@ -117,12 +123,14 @@ extend(XModel.prototype, {
      10:"both"   -> orientation ("+", "-" or "both")
      * null -> removed portal
      **/
-    updateX(data) {
+    updateX(data)
+    {
         this.xUpdates.push(data);
         this.needsUpdate = true;
     },
 
-    switchAvatarToWorld(oldWorldId, newWorldId) {
+    switchAvatarToWorld(oldWorldId, newWorldId)
+    {
         console.log('[X] Switching avatar to other world');
         oldWorldId = parseInt(oldWorldId, 10);
         newWorldId = parseInt(newWorldId, 10);
@@ -130,7 +138,8 @@ extend(XModel.prototype, {
         //this.forceUpdate = true;
     },
 
-    cleanup() {
+    cleanup()
+    {
         this.portals.clear();
         this.worldToPortals.clear();
         this.worldMap = new WorldMap(this);

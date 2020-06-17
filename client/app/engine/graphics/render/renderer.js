@@ -20,7 +20,6 @@ let RendererManager = function(graphicsEngine)
 
     // Graphical settings
     this.selectiveBloom = true;
-    this.ambientOcclusion = false;
     this.waterReflection = true;
 
     // Shadows:
@@ -43,6 +42,9 @@ let RendererManager = function(graphicsEngine)
         console.error('[Renderer] Cannot use both shadow map and shadow volume.');
         this.shadowVolumes = false;
     }
+
+    // No support for AO atm.
+    this.ambientOcclusion = false;
 
     // Cap number of passes.
     this.renderMax = 10;
@@ -142,12 +144,22 @@ extend(RendererManager.prototype, {
         let bufferScene; let bufferCamera; let bufferTexture;
         let otherEnd; let otherSceneId;
 
-        for (let j = 0, m = renderRegister.length; j < m; ++j) {
+        // This fixes the 1-frame lag for inner-most scenes.
+        for (let j = 0, m = renderRegister.length; j < m; ++j)
+        {
             currentPass = renderRegister[j];
             bufferScene = currentPass.scene;
             if (!bufferScene) continue;
+
+            // Latencx fix for inner scenes.
             bufferScene.updateMatrixWorld();
+
+            // Flickering fix for linking to the same scene.
+            // bufferCamera = currentPass.camera.getRecorder();
+            // bufferCamera.updateProjectionMatrix();
+            // bufferCamera.updateMatrixWorld();
         }
+
 
         let stc = cameraManager.stencilCamera;
         this.stencilScene.updateMatrixWorld();
@@ -196,7 +208,6 @@ extend(RendererManager.prototype, {
             // bufferCamera.updateMatrixWorld();
             //bufferCamera.matrixWorldInverse.getInverse(bufferCamera.matrixWorld);
             // this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
-            // bufferScene.updateMatrixWorld();
 
             // Render scene into screen1
             const s1 = screen1.getMesh();

@@ -45,7 +45,7 @@ class XModel
     // OtherPortalId: if null, spawns an empty portal; otherwise, links an existing portal and forge it into a knot.
     addPortal(
         worldId, x1, y1, z1, x2, y2, z2,
-        offset, orientation, otherPortalId
+        offset, orientation, otherPortalId, createNewPortal
     )
     {
         let world = this._worldModel.getWorld(worldId);
@@ -117,7 +117,7 @@ class XModel
             this.addKnot(portalId, otherPortalId);
             // console.log(`world present ${otherPortalId}`);
         }
-        else
+        else if (createNewPortal)
         {
             let newWorld = this._worldModel.addWorld();
             if (!newWorld) {
@@ -142,6 +142,8 @@ class XModel
         }
 
         this._cachedConnectivity = [new Map(), new Map()];
+
+        return portal;
     }
 
     // (x1, y1, z1): first block

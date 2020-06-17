@@ -90,6 +90,11 @@ let ItemsModelModule = {
             item === ItemType.PORTAL_GUN_DOUBLE;
     },
 
+    isItemX2(item)
+    {
+        return item === ItemType.PORTAL_GUN_SINGLE;
+    },
+
     isItemPlaceable(item)
     {
         return ItemsModelModule.isItemBlock(item) ||

@@ -8,8 +8,10 @@ import { Portal }       from './portal.js';
 
 let UpdateModule = {
 
-    addPortal(portalId, otherPortalId,
-        chunkId, worldId, end1, end2, offset, orientation)
+    addPortal(
+        portalId, otherPortalId,
+        chunkId, worldId, end1, end2, offset, orientation
+    )
     {
         console.log(`Adding portal ${portalId} and linking to ${otherPortalId}`);
         portalId = parseInt(portalId, 10);

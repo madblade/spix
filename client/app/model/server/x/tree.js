@@ -305,7 +305,8 @@ extend(XGraph.prototype, {
 
         // console.log('CAMERA TRANSFORMATION');
         // console.log(pidPath);
-        for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId) {
+        for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId)
+        {
             let currentTunnel = pidPath[pathId].split(',');
             let sourcePortalId = currentTunnel[0];
             let sourcePortal = portals.get(sourcePortalId);
@@ -320,7 +321,8 @@ extend(XGraph.prototype, {
             let isX0 = P0B0[0] !== P0B1[0]; let isX1 = P1B0[0] !== P1B1[0];
             let isY0 = P0B0[1] !== P0B1[1]; let isY1 = P1B0[1] !== P1B1[1];
             let isZ0 = P0B0[2] !== P0B1[2]; let isZ1 = P1B0[2] !== P1B1[2];
-            if (isX0 + isY0 + isZ0 !== 1 || isX1 + isY1 + isZ1 !== 1) {
+            if (isX0 + isY0 + isZ0 !== 1 || isX1 + isY1 + isZ1 !== 1)
+            {
                 console.warn('[Tree/CameraTransform]: unmanaged portal type.');
                 return;
             }
@@ -375,7 +377,8 @@ extend(XGraph.prototype, {
         let pidPathString; let pidPath;
         let depth;
         let cameraTransform;
-        for (let i = 0, l = flatGraph.length; i < l; ++i) {
+        for (let i = 0, l = flatGraph.length; i < l; ++i)
+        {
             currentStep = flatGraph[i];
             // originWid       = currentStep.origin;
             destinationWid  = currentStep.destination;
@@ -386,14 +389,17 @@ extend(XGraph.prototype, {
             // widPath         = currentStep.wpath.split(';');
             depth           = currentStep.depth;
 
+            // console.log(currentStep.type);
+            let p1;
+            let p2;
             switch (currentStep.type)
             {
                 case 'lime': // Regular.
                     // Add screen.
                     // Add camera.
                     // Add path to camera.
-                    let p1 = portals.get(originPid);
-                    let p2 = portals.get(destinationPid);
+                    p1 = portals.get(originPid);
+                    p2 = portals.get(destinationPid);
                     if (!p1 || !p2) {
                         console.log(`Problem while adding portal ${originPid}` +
                             ` / ${destinationPid}`);
@@ -418,6 +424,40 @@ extend(XGraph.prototype, {
                 case 'yellow':
                     // Add screen.
                     // Add camera to descendants, after?
+                    p1 = portals.get(originPid);
+                    p2 = portals.get(destinationPid);
+                    if (!p1 || !p2) {
+                        console.log(`Problem while adding portal ${originPid}` +
+                            ` / ${destinationPid}`);
+                        console.log(`Origin: ${p1}, Destination ${p2}`); continue;
+                    }
+
+                    console.log(pidPath);
+                    const pidPathLength = pidPath.length;
+                    if (pidPathLength < 1)
+                    {
+                        console.error('[X/Tree] Expected a longer camera path.');
+                        return;
+                    }
+                    cameraTransform = this.computeCameraTransform(pidPath, portals, cameraManager);
+
+                    // console.log(pidPathString);
+                    // console.log(`pushing ${p1.portalId}`);
+                    graphicsEngine.addPortalObject(
+                        p1, p2, pidPathString, cameraTransform,
+                        depth, originPid, destinationPid, destinationWid, pidPathString
+                    );
+                    // console.log(`pushing ${p2.portalId}`);
+                    let pidPath2 = pidPath.slice(); // copy pid path 2
+                    let commaSeparatedLink = pidPath[pidPathLength - 1];
+                    let ids = commaSeparatedLink.split(',');
+                    let newIds = `${ids[1]},${ids[0]}`;
+                    pidPath2[pidPathLength - 1] = newIds;
+                    let pidPathString2 = pidPath2.join(';');
+                    graphicsEngine.addPortalObject(
+                        p2, p1, pidPathString2, cameraTransform,
+                        depth, destinationPid, originPid, destinationWid, pidPathString2
+                    );
                     break;
 
                 case 'cyan':
