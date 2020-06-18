@@ -67,7 +67,7 @@ describe('Hub API:', function () {
     describe('ioServer', function() {
         let succeeded = false;
         beforeEach(function(done) {
-            client = ioClient("http://localhost:9000", {
+            client = ioClient("http://localhost:9001", {
                 path: '/socket.io-client'});
             client.connect();
             succeeded = true;
@@ -81,7 +81,7 @@ describe('Hub API:', function () {
 
     describe('Client requesting for hub, new game and connection', function() {
         beforeEach(function (done) {
-            client = ioClient("http://localhost:9000", {
+            client = ioClient("http://localhost:9001", {
                 path: '/socket.io-client'
             });
             client.on('hub', function(data) {

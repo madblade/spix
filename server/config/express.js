@@ -95,7 +95,7 @@ export default function(app)
                     }
                 }),
             ],
-            port: 9000,
+            port: 9001,
             // port: config.browserSyncPort,
             plugins: ['bs-fullscreen-message']
         });

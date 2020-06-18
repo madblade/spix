@@ -245,7 +245,7 @@ var cleantmp = () => {
 // Start
 var startclientdev = cb => {
     whenServerReady(() => {
-        open('http://localhost:' + '9000', 'chrome'); // config.browserSyncPort);
+        open('http://localhost:' + '9001', 'chrome'); // config.browserSyncPort);
         cb();
     });
 };
