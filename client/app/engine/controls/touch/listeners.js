@@ -20,7 +20,7 @@ let ListenerModule = {
 
     onButtonChange(which, isHeld)
     {
-        console.log(`Button ${which} ${isHeld ? 'pressed' : 'released'}.`);
+        // console.log(`Button ${which} ${isHeld ? 'pressed' : 'released'}.`);
         let clientModel = this.app.model.client;
         switch (which) {
             case 'triangle':

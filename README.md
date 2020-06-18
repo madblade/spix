@@ -6,7 +6,7 @@ cubic world, **terrain generation** and more.
 
 [Demo available here!](https://madblade.github.io/spix/)
 
-(screens)
+![Screen](https://raw.githubusercontent.com/madblade/spix/master/showcase/a.jpg)
 
 ### Features
 
@@ -35,6 +35,26 @@ For developers:
 
 Hopefully this project can serve as a starting point for 
 your custom SocketIO/WebRTC game!
+
+Parallel worlds            | Cubic world   
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/h.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/c.jpg)
+
+Shadow volume             | Shadow map   
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/e.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/f.jpg)
+
+Night cycle; arrow trail   | Advanced generation    
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/b.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/i.jpg)
+
+Entity collision           | Mobile   
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/l.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/m.jpg)
+
+Walking on the edge        | Portal gun    
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/d.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/k.jpg)
 
 ### Missing features
 
