@@ -17,6 +17,7 @@ initial support for [voronoi-based fantasy map generation](https://github.com/me
 - Browser support: Chrome+Firefox+Edge
 - Multiplayer support
 - Player collision
+- Infinite world in all directions
 - 40+ different blocks
 - (Experimental) Mobile support: Firefox
 - (Experimental) Cubic world
