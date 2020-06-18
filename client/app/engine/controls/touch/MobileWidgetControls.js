@@ -539,13 +539,13 @@ MobileWidgetControls.PlaystationSticks = [
     {
         name: 'left',
         from: 'l', x: 155, y: 80,
-        head: 25, base: 70, grab: 150, reach: 55,
+        head: 25, base: 70, grab: 140, reach: 55,
         theme: 'gradient'
     },
     {
         name: 'right',
         from: 'r', x: 240, y: 100,
-        head: 25, base: 70, grab: 150, reach: 55,
+        head: 25, base: 70, grab: 140, reach: 55,
         // label: String.fromCharCode(10021), // multi-directional cross
         // labelSize: 30,
         // labelOffset: 2, // offset i.e. for caps letters

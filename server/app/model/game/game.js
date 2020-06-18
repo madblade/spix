@@ -122,7 +122,7 @@ class Game
 
     removePlayer(player)
     {
-        console.log('A player left.');
+        console.log('[Game] A player left.');
 
         // Remove from model.
         this._playerManager.removePlayer(player);

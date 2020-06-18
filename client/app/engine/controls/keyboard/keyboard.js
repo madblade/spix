@@ -18,8 +18,9 @@ let KeyboardModule = {
         // Try to detect user language
         this.settings.language = window.navigator.userLanguage || window.navigator.language || 'en-US';
 
-        // TODO [ACCESSIBILITY] remove this (convenient just for me).
-        this.settings.language = 'fr';
+        this.settings.language = 'en';
+        if (navigator.language === 'fr-FR' || navigator.language === 'fr')
+            this.settings.language = 'fr';
 
         // Controls
         this.keyControls = this.getKeyControls(this.settings.language);

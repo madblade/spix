@@ -86,7 +86,7 @@ class User
     // Leave all games (current game). Stay idle.
     leave()
     {
-        console.log('USER LEFT');
+        console.log('[User] A user left.');
         this._ingame = false;
         if (this._player) {
             this._player.leave();

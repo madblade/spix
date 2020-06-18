@@ -85,6 +85,6 @@ describe('Rigid solver routines (3):', function () {
 
     after(function(done) {
         done();
-        // process.exit();
+        process.exit();
     });
 });

@@ -15,7 +15,7 @@ describe('This other [client] test', function() {
 });
 
 describe('sound object', function() {
-    it('should be properly named', function() {
+    it('should be named properly', function() {
         let s = new Sound('a', '');
         expect(s.name).toEqual('a');
     });

@@ -236,17 +236,18 @@ module.exports = function makeWebpackConfig(options) {
     // Skips node_modules and spec files
     if (TEST) {
         config.module.rules.push({
-            //delays coverage til after tests are run, fixing transpiled source coverage error
+            // delays coverage til after tests are run, fixing transpiled source coverage error
             enforce: 'pre',
             test: /\.js$/,
             exclude: /(node_modules|spec\.js|mock\.js)/,
-            loader: 'istanbul-instrumenter-loader',
-            query: {
-                esModules: true,
-                babel: {
-                    // optional: ['runtime', 'es7.classProperties', 'es7.decorators']
-                }
-            }
+            // loader: 'istanbul-instrumenter-loader',
+            loader: 'babel-loader',
+            // query: {
+            //     esModules: true,
+            //     babel: {
+            //         optional: ['runtime', 'es7.classProperties', 'es7.decorators']
+            //     }
+            // }
         });
     }
 

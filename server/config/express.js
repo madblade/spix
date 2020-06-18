@@ -7,7 +7,6 @@
 import express from 'express';
 import favicon from 'serve-favicon';
 import compression from 'compression';
-import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import path from 'path';
 import config from './environment';
@@ -33,15 +32,7 @@ export default function(app)
     app.set('appPath', path.join(config.root, 'client'));
     app.use(express.static(app.get('appPath')));
 
-    // app.set('views', `${config.root}/server/views`);
-    app.engine('html', require('ejs').renderFile);
-    app.set('view engine', 'html');
     app.use(compression());
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json());
-    // app.use(methodOverride());
-    // app.use(cookieParser());
-    // app.use(passport.initialize());
 
     // Persist sessions with MongoStore / sequelizeStore
     // We need to enable sessions for passport-twitter because it's an

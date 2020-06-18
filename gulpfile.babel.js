@@ -333,10 +333,10 @@ gulp.task('test:client', done => {
     }).start();
 });
 
-// gulp.task('test',
-//     gulp.series(
-//         'test:server',
-//         'test:client'));
+gulp.task('test',
+    gulp.series(
+        'test:server',
+        'test:client'));
 
 /********************
  * Build

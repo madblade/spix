@@ -31,7 +31,7 @@ describe('Hub API:', function () {
         app = new App();
         app.connect(ioServer);
 
-        let port = 9000;
+        let port = 9001;
         let ip = 'localhost';
         httpServer.listen(
             port, ip,
@@ -58,11 +58,11 @@ describe('Hub API:', function () {
         });
     });
 
-    describe('not passing', function() {
-        it ('should fail no matter what', function() {
-            true.should.equal(false);
-        });
-    });
+    // describe('not passing', function() {
+    //     it ('should fail no matter what', function() {
+    //         true.should.equal(false);
+    //     });
+    // });
 
     describe('ioServer', function() {
         let succeeded = false;
@@ -102,10 +102,10 @@ describe('Hub API:', function () {
 
                 if (nbGames < 1)
                     client.emit('util',
-                        {request: 'createGame', gameType: 'game3d'});
+                        {request: 'createGame', gameType: 'demo'});
                 else {
                     client.emit('util',
-                        {request:'joinGame', gameType: 'game3d', gameId: gid});
+                        {request:'joinGame', gameType: 'demo', gameId: gid});
                 }
             });
             client.on('joined', function() {
