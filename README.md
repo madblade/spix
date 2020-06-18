@@ -21,8 +21,8 @@ initial support for [voronoi-based fantasy map generation](https://github.com/me
 - (Experimental) Mobile support: Firefox
 - (Experimental) Cubic world
 - (Experimental) Real-time portals to other worlds
-- (Experimental) Water reflection and shadows
-- **No installation. You just need a browser.**
+- (Experimental) Water reflection, shadows, ~~and too much bloom~~
+- **No installation, you just need a browser!**
 
 For developers:
 - **Fast** prototyping platform with Webpack
@@ -54,7 +54,7 @@ Entity collision           | Mobile
 
 Walking on the edge        | Portal gun    
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/madblade/spix/master/showcase/d.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/k.jpg)
+![](https://raw.githubusercontent.com/madblade/spix/master/showcase/d.jpg) | ![](https://raw.githubusercontent.com/madblade/spix/master/showcase/j.jpg)
 
 ### Missing features
 
@@ -144,9 +144,9 @@ Clients may then connect with a browser to the deployed application.
 
 ### Contribution
 
-This is a “for fun” project.
+This is a “for fun” project, but anyone is welcome to contribute.
 
-Here are some minimal guidelines in case anyone wants to contribute:
+Here are some minimal guidelines in case you want to do so:
 
 - Make sure your PR addresses a specific issue
 (or be so kind as to open an issue before you start working on it)
