@@ -1,0 +1,382 @@
+/* Server hub */
+
+.hub {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.hub #game-instances-table {
+    position: relative;
+    display: block;
+}
+
+.hub .table-bordered th,.hub .table-bordered td {
+    border: 1px solid #495057;
+}
+
+.hub tr {
+    color: #495057;
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+.hub tr:hover {
+    color: white;
+    background-color: #c96530;
+}
+
+.hub .hub-button {
+    white-space: normal;
+    font-size: 16px;
+    color: white;
+    background: none;
+}
+
+.hub .hub-button:hover {
+    color: white;
+    background-color: #362c6b;
+}
+
+hr {
+    display: block;
+    position: relative;
+    border-top: 1px solid rgba(0, 0, 0, 1.0)
+}
+
+/* Menus */
+
+#widget {
+    /*z-index: 4;*/
+    /*top: 0; left: 0;*/
+    /*position: absolute;*/
+}
+
+#announce {
+    z-index: 3;
+}
+
+#announce .table-bordered th, #announce .table-bordered td {
+    border: 1px solid #495057;
+}
+
+#announce tr {
+    color: #495057;
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+#announce tr:hover {
+    color: white;
+    background-color: #c96530;
+}
+
+/* Helpers */
+
+#hud {
+    position: absolute;
+    z-index: 3;
+}
+
+#network-graph {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    z-index: 3;
+    /* top: 0; bottom: 0; left: 0; right: 0;*/
+}
+
+#position {
+    font-size: 16pt;
+}
+
+#diagram {
+
+}
+
+/* Items */
+
+#items {
+    position: absolute;
+    z-index: 3;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 464px;
+}
+
+#items #item-table {
+    position: relative;
+}
+
+#item-table .square {
+    border: 2px solid black;
+    float: left;
+    float-wrap: wrap;
+    position: relative;
+    width: 54px;
+    padding-bottom: 50px;
+    margin: 0 2px;
+    overflow: hidden;
+}
+
+#item-table .content.selected {
+    background-color: #c96530;
+}
+
+#item-table .content {
+    background-color: transparent;
+    text-align: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+}
+
+.content img {
+    width: 40px;
+    height: 40px;
+}
+
+/* In-game */
+
+.reticle-wrapper {
+    width: 32px;
+    height: 32px;
+}
+
+.reticle {
+    right: 32px;
+    top: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+}
+
+.reticle:before, .reticle:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 33px;
+    width: 2px;
+    background-color: white;
+    color: white;
+}
+
+.reticle:after {
+    transform: rotate(90deg);
+}
+
+/* Text */
+
+.title {
+    margin: 20px auto;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* CSS splash animation */
+
+.sk-folding-cube {
+    margin: 20px auto;
+    width: 40px;
+    height: 40px;
+    bottom: 40px;
+
+    transform: rotateZ(45deg);
+    -webkit-transform: rotateZ(45deg);
+}
+
+.sk-folding-cube .sk-cube {
+    float: left;
+    width: 50%;
+    height: 50%;
+    position: relative;
+    transform: scale(1.1);
+}
+
+.sk-folding-cube .sk-cube:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #c96530;
+    margin: -1px;
+    -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
+    animation: sk-foldCubeAngle 2.4s infinite linear both;
+    transform-origin: 100% 100%;
+}
+
+.sk-folding-cube .sk-cube2 {
+    transform: scale(1.1) rotateZ(90deg);
+}
+
+.sk-folding-cube .sk-cube3 {
+    transform: scale(1.1) rotateZ(180deg);
+}
+
+.sk-folding-cube .sk-cube4 {
+    transform: scale(1.1) rotateZ(270deg);
+}
+
+.sk-folding-cube .sk-cube2:before {
+    -webkit-animation-delay: 0.3s;
+    animation-delay: 0.3s;
+}
+
+.sk-folding-cube .sk-cube3:before {
+    -webkit-animation-delay: 0.6s;
+    animation-delay: 0.6s;
+}
+
+.sk-folding-cube .sk-cube4:before {
+    -webkit-animation-delay: 0.9s;
+    animation-delay: 0.9s;
+}
+
+@-webkit-keyframes sk-foldCubeAngle {
+    0%, 10% {
+        transform: perspective(140px) rotateX(-180deg);
+        opacity: 0;
+    }
+    25%, 75% {
+        transform: perspective(140px) rotateX(0deg);
+        opacity: 1;
+    }
+    90%, 100% {
+        transform: perspective(140px) rotateY(180deg);
+        opacity: 0;
+    }
+}
+
+@keyframes sk-foldCubeAngle {
+    0%, 10% {
+        transform: perspective(140px) rotateX(-180deg);
+        opacity: 0;
+    }
+    25%, 75% {
+        transform: perspective(140px) rotateX(0deg);
+        opacity: 1;
+    }
+    90%, 100% {
+        transform: perspective(140px) rotateY(180deg);
+        opacity: 0;
+    }
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+/* In-game settings menus */
+
+.settings {
+    width: 50%;
+
+    color: white;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 16px;
+    text-align: center;
+
+    position: absolute;
+    display: block;
+}
+
+.settings>table,
+.settings>.container>table
+{
+    margin-bottom: 0;
+}
+
+/* Vendor */
+
+/* Includes */
+/* inject:css */
+/* endinject */
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* Main */
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: white;
+    width: 100%;
+    height: 100%;
+}
+
+#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #c96530;
+    background-image: linear-gradient(to bottom right, #c96530, #362c6b);
+    background-attachment: fixed;
+}
+
+canvas {
+    top: 0; left: 0;
+    position: absolute;
+    z-index: 2;
+}
+
+hr {
+    border-color: white;
+}
+
+.small-title {
+    position: relative;
+    display: block;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    text-align: center;
+    padding-bottom: 40px;
+}
+
+.btn-outline-light {
+    background-color: #c96530;
+}
+
+/* Main Menu, WebRTC */
+
+.main-menu {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.status-checking {
+    color: rgb(255, 255, 255);
+    background-color: rgb(240, 173, 78);
+    border-color: rgb(238, 162, 54);
+}
+
+.status-connected {
+    color: rgb(255, 255, 255);
+    background-color: rgb(92, 184, 92);
+    border-color: rgb(76, 174, 76);
+}
+
+.status-error {
+    color: rgb(255, 255, 255);
+    background-color: rgb(217, 83, 79);
+    border-color: rgb(212, 63, 58);
+}
+
