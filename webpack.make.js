@@ -1,15 +1,10 @@
 'use strict';
 /*eslint-env node*/
 var webpack = require('webpack');
-// var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-// var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
-// var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
-// var fs = require('fs');
 var path = require('path');
-// var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
 module.exports = function makeWebpackConfig(options) {
     /**
@@ -76,7 +71,6 @@ module.exports = function makeWebpackConfig(options) {
         };
     }
 
-
     if (TEST) {
         config.resolve = {
             modules: [
@@ -98,24 +92,6 @@ module.exports = function makeWebpackConfig(options) {
     } else { // BUILD
         config.devtool = 'eval';
     }
-
-    // /**
-    //  * Loaders
-    //  * Reference: http://webpack.github.io/docs/configuration.html#module-loaders
-    //  * List: http://webpack.github.io/docs/list-of-loaders.html
-    //  * This handles most of the magic responsible for converting modules
-    //  */
-    //
-    // config.babel = {
-    //     shouldPrintComment(commentContents) {
-    //         let regex = DEV
-    //             // keep `// @flow`, `/*@ngInject*/`, & flow type comments in dev
-    //             ? /(@flow|@ngInject|^:)/
-    //             // keep `/*@ngInject*/`
-    //             : /@ngInject/;
-    //         return regex.test(commentContents);
-    //     }
-    // };
 
     var clientIncludes = [
         path.resolve(__dirname, 'client/'),
@@ -139,8 +115,6 @@ module.exports = function makeWebpackConfig(options) {
                 use: 'imports-loader?this=>window',
             },
             {
-            // preLoaders: [],
-            // loaders: [{
                 // JS LOADER
                 // Reference: https://github.com/babel/babel-loader
                 // Transpile .js files using babel-loader
@@ -167,7 +141,6 @@ module.exports = function makeWebpackConfig(options) {
             // },
             {
                 // GLSL LOADER
-                // Reference
                 // Loads .glsl files as strings
                 test: /\.glsl$/,
                 loader: 'raw-loader'
@@ -216,13 +189,6 @@ module.exports = function makeWebpackConfig(options) {
                                 options: { config: { path: './' } }
                             }
                         ]
-                        // ExtractTextPlugin.extract('style', 'css!postcss')
-                        // ExtractTextPlugin.extract({
-                        //     fallback: 'style-loader',
-                        //     use: ['css-loader', 'postcss-loader']
-                        // })
-                        // ExtractTextPlugin.extract('style-loader', 'css-loader')
-                        // Reference: https://github.com/webpack/null-loader
                         // Skip loading css in test mode
                         : ['null-loader']
             }
@@ -252,41 +218,12 @@ module.exports = function makeWebpackConfig(options) {
     }
 
     /**
-     * PostCSS
-     * Reference: https://github.com/postcss/autoprefixer-core
-     * Add vendor prefixes to your css
-     */
-    // config.postcss = [
-    //     autoprefixer({
-    //         browsers: ['last 2 version']
-    //     })
-    // ];
-
-    /**
      * Plugins
      * Reference: http://webpack.github.io/docs/configuration.html#plugins
      * List: http://webpack.github.io/docs/list-of-plugins.html
      */
     config.plugins = [
-        /*
-         * Plugin: ForkCheckerPlugin
-         * Description: Do type checking in a separate process, so webpack don't need to wait.
-         *
-         * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
-         */
-        // new ForkCheckerPlugin(),
-
-        // Reference: https://github.com/webpack/extract-text-webpack-plugin
-        // Extract css files
-        // Disabled when in test mode or not in build mode
-        // new ExtractTextPlugin(
-        //     // '[name].[hash].css',
-        //     BUILD ? '[name].[hash].css' : '[name].bundle.css',
-        //     { disable: (!BUILD && !DEV) || TEST }
-        // )
         new MiniCssExtractPlugin({
-
-            // '[name].[hash].css',
             filename: BUILD ? '[name].[hash].css' : '[name].bundle.css',
             chunkFilename: BUILD ? '[id][hash].css' : '[id].bundle.css' //,
             // disable: (!BUILD && !DEV) || TEST
@@ -307,16 +244,6 @@ module.exports = function makeWebpackConfig(options) {
                 }
             }
         };
-        // config.plugins.push(new CommonsChunkPlugin({
-        //     name: 'vendor',
-        //
-        //     // filename: "vendor.js"
-        //     // (Give the chunk a different name)
-        //
-        //     minChunks: Infinity
-        //     // (with more entries, this ensures that no other module
-        //     //  goes into the vendor chunk)
-        // }));
     }
 
     // Skip rendering index.html in test mode
