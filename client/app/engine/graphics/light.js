@@ -8,14 +8,14 @@ import {
     AmbientLight, DirectionalLight, HemisphereLight,
 } from 'three';
 
-let LightDefaultIntensities = Object.freeze({
+let LightDefaultIntensities = {
     DIRECTIONAL: 0.5,
     HEMISPHERE: 0.125,
 
     // DIRECTIONAL: 0.3,
     // HEMISPHERE: 0.325,
     AMBIENT: 1.0
-});
+};
 
 let LightDefaultColors = Object.freeze({
     DIRECTIONAL: 0xffffff,

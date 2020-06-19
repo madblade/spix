@@ -13,6 +13,7 @@ import {
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { RendererFactory } from './renderer.factory';
 import { RendererUpdates } from './renderer.updates';
+import { LightDefaultIntensities } from '../light';
 
 let RendererManager = function(graphicsEngine)
 {
@@ -51,10 +52,15 @@ let RendererManager = function(graphicsEngine)
     const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
     if (isFirefox)
         this.shortCircuitWaterReflection = true;
-    // Bloom issue on mobile
+    // Bloom + light intensity issue on mobile
     const isMobile = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
     if (isMobile)
+    {
         this.selectiveBloom = false;
+        LightDefaultIntensities.HEMISPHERE *= 4;
+        LightDefaultIntensities.DIRECTIONAL *= 4;
+        LightDefaultIntensities.AMBIENT *= 4;
+    }
     // \ISSUES
 
     // No support for AO atm.
