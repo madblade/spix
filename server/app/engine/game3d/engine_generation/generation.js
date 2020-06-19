@@ -4,6 +4,7 @@
 import { WorldMap } from './terrain/world';
 import ChunkGenerator from '../engine_consistency/generator/chunkgenerator';
 import { GameType } from '../game';
+import { WorldType } from '../model_world/model';
 
 /**
  * WorldMap
@@ -52,6 +53,12 @@ class GenerationEngine
             if (done) return;
             let nextChunk = world.getNextChunkForGeneration();
             let worldMap = this._worldMaps.get(worldId);
+            if (world.worldInfo.type === WorldType.FANTASY && !worldMap)
+            {
+                this.initializeWorldMap(worldId);
+                worldMap = this._worldMaps.get(worldId);
+            }
+
             if (nextChunk)
             {
                 ChunkGenerator.generateChunkBlocks(nextChunk, worldMap);
