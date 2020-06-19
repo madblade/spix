@@ -82,8 +82,8 @@ some important features are missing:
 - `mouse` or `right stick` to look around
 - `WASD`/`arrow keys` or `left stick` to move, `spacebar` or `circle` to jump
 - `mouse wheel`/`page up`/`page down` or `dpad left`/`dpad right` to select the current item
-- `left-click` or `cross` to add a block / use item
-- `right-click` or `square` to remove a block
+- `left-click` or `cross` to dig a block / use the current item
+- `right-click` or `square` to add a block
 - `shift` to sprint on desktop
 
 Note on the portal gun:

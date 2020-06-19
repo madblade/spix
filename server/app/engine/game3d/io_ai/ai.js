@@ -160,7 +160,7 @@ class AI
                     let ce = this._game.consistencyEngine;
                     let newAI = ce.spawnEntity('walker',
                         world,
-                        [xTest + 0.5, yTest + 0.5, zTest + 0.01]
+                        [xTest + 0.5, yTest + 0.5, zTest + 1.0]
                     );
                     newAI.aggro = avatar;
                     newAI.captain = avatar;

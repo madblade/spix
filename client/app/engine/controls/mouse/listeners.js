@@ -212,22 +212,12 @@ let ListenerModule = {
         const graphicsEngine = this.app.engine.graphics;
         let p = graphicsEngine.getCameraCoordinates();
         let f = graphicsEngine.getModelForwardVector();
-        clientModel.triggerEvent('u', [p.x, p.y, p.z, f.x, f.y, f.z, isButtonUp, isSecondaryItem]);
+        clientModel.triggerEvent('u', [
+            p.x, p.y, p.z, f.x, f.y, f.z, isButtonUp, isSecondaryItem
+        ]);
     },
 
     requestMainHandItemAction(isButtonUp)
-    {
-        let clientSelfModel = this.app.model.client.selfComponent;
-        let activeItemID = clientSelfModel.getCurrentItemID();
-        if (!ItemsModelModule.isItemIDSupported(activeItemID))
-            console.warn('[Mouse/Listener] Item ID unsupported.');
-        else if (ItemsModelModule.isItemUseable(activeItemID))
-            this.requestItemUse(isButtonUp, false);
-        else if (ItemsModelModule.isItemPlaceable(activeItemID) && !isButtonUp)
-            this.requestAddBlock(true);
-    },
-
-    requestSecondaryHandItemAction(isButtonUp)
     {
         let clientSelfModel = this.app.model.client.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
@@ -242,6 +232,19 @@ let ListenerModule = {
 
         if (!ItemsModelModule.isItemIDSupported(activeItemID))
             console.warn('[Mouse/Listener] Item ID unsupported.');
+        else if (ItemsModelModule.isItemUseable(activeItemID))
+            this.requestItemUse(isButtonUp, false);
+    },
+
+    requestSecondaryHandItemAction(isButtonUp)
+    {
+        let clientSelfModel = this.app.model.client.selfComponent;
+        let activeItemID = clientSelfModel.getCurrentItemID();
+
+        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+            console.warn('[Mouse/Listener] Item ID unsupported.');
+        else if (ItemsModelModule.isItemPlaceable(activeItemID) && !isButtonUp)
+            this.requestAddBlock(true);
         else if (ItemsModelModule.isItemUseable(activeItemID))
             this.requestItemUse(isButtonUp, true);
         else if (ItemsModelModule.isItemX2(activeItemID) && !isButtonUp)
