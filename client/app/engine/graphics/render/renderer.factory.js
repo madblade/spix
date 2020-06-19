@@ -94,6 +94,15 @@ let RendererFactory = {
 
     createMainComposer(rendrr, sc, cam, lights)
     {
+        // Anti-alias
+        let resolutionX = 1 / window.innerWidth;
+        let resolutionY = 1 / window.innerHeight;
+        let fxaa = new ShaderPass(FXAAShader);
+        let u = 'resolution';
+        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
+
+        let copy = new ShaderPass(CopyShader);
+
         let composer = new EffectComposer(rendrr);
         composer.renderTarget1.stencilBuffer = true;
         composer.renderTarget2.stencilBuffer = true;
@@ -108,17 +117,7 @@ let RendererFactory = {
         {
             composer.addPass(scenePass);
         }
-        let copy = new ShaderPass(CopyShader);
-        composer.addPass(copy);
-
-        // Anti-alias
-        let resolutionX = 1 / window.innerWidth;
-        let resolutionY = 1 / window.innerHeight;
-        let fxaa = new ShaderPass(FXAAShader);
-        let u = 'resolution';
-        fxaa.uniforms[u].value.set(resolutionX, resolutionY);
-        // composer.addPass(fxaa);
-        // composer.addPass(fxaa);
+        composer.addPass(fxaa);
 
         // Bloom
         let bloomPass = new UnrealBloomPass(

@@ -22,6 +22,9 @@ let RendererManager = function(graphicsEngine)
     this.selectiveBloom = true;
     this.waterReflection = true;
 
+    // To disable water reflection, but not the moving water texture
+    this.shortCircuitWaterReflection = false;
+
     // Shadows:
     // - not compatible with portals
     // - only for blocks
@@ -42,6 +45,17 @@ let RendererManager = function(graphicsEngine)
         console.error('[Renderer] Cannot use both shadow map and shadow volume.');
         this.shadowVolumes = false;
     }
+
+    // ISSUES
+    // Performance issue with Firefox + three (water reflection)
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if (isFirefox)
+        this.shortCircuitWaterReflection = true;
+    // Bloom issue on mobile
+    const isMobile = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
+    if (isMobile)
+        this.selectiveBloom = false;
+    // \ISSUES
 
     // No support for AO atm.
     this.ambientOcclusion = false;

@@ -83,6 +83,9 @@ let RendererUpdates = {
         // Update mirror camera
         cameraManager.updateWaterCamera();
 
+        if (this.shortCircuitWaterReflection)
+            return;
+
         // Perform render
         let scene = mainScene;
         let waterCamera = cameraManager.waterCamera;

@@ -89,9 +89,9 @@ class AI
                     'projectile',
                     world,
                     [
-                        p[0] - 0.8 * crossX, // + 0.5 * p[3],
-                        p[1] - 0.8 * crossY, // + 0.5 * p[4],
-                        p[2] - 0.8 * crossZ // + 0.5 * p[5],
+                        p[0] - 0.1 * crossX + 0.5 * p[3],
+                        p[1] - 0.1 * crossY + 0.5 * p[4],
+                        p[2] - 0.1 * crossZ + 0.5 * p[5]
                     ]
                 );
                 projectile.a0[0] = power * 4 * p[3];
@@ -238,7 +238,7 @@ class AI
             let r = ai.rotation;
             const newPitch = Math.atan2(dy, dx) - Math.PI / 2;
             ai.rotate(newPitch, r[1], r[2], r[3]);
-            if (dx * dx + dy * dy > 2) ai.goForward();
+            if (dx * dx + dy * dy > 4) ai.goForward();
             else ai.stopForward();
 
             // if (dx < -0.5) ai.goForward();
