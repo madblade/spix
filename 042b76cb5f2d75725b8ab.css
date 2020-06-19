@@ -380,3 +380,32 @@ hr {
     border-color: rgb(212, 63, 58);
 }
 
+@media (max-width: 560px) {
+    html, body {
+        font: 0.8em "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+        background-color: #458cd3;
+        text-align: center;
+    }
+    #background, #announce, #widget, #container, canvas
+    {
+        display: none !important;
+    }
+    .smartphones {
+        color: white;
+        display: block;
+        -webkit-animation: smanim 5s linear infinite;
+        -moz-animation: smanim 5s linear infinite;
+        -o-animation: smanim 5s linear infinite;
+    }
+    .hea1 {
+        padding-top: 50px;
+        font-size: 20pt; color: white;
+    }
+}
+
+@media (min-width: 560px) {
+    .smartphones {
+        display: none;
+    }
+}
+
