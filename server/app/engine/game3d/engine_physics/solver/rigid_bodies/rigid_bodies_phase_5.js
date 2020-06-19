@@ -261,21 +261,31 @@ class RigidBodiesPhase5
         let ep = entity.p0;
         let pp = projectile.p0;
         let px = projectile.p1;
+        let pm = [
+            (pp[0] + px[0]) * 0.5,
+            (pp[1] + px[1]) * 0.5,
+            (pp[2] + px[2]) * 0.5
+        ];
+        const pwx = abs(px[0] - pp[0]) * 0.5 + projectile.widthX;
+        const pwy = abs(px[1] - pp[1]) * 0.5 + projectile.widthY;
+        const pwz = abs(px[2] - pp[2]) * 0.5 + projectile.widthZ;
 
-        const dwx = entity.widthX + projectile.widthX;
-        let dx = ep[0] - pp[0];
+        const dwx = entity.widthX + pwx;
+        let dx = ep[0] - pm[0];
         const endsInX = abs(dx) < dwx;
         if (!endsInX) return;
 
-        const dwy = projectile.widthY + projectile.widthY;
-        let dy = ep[1] - pp[1];
+        const dwy = projectile.widthY + pwy;
+        let dy = ep[1] - pm[1];
         const endsInY = abs(dy) < dwy;
         if (!endsInY) return;
 
-        const dwz = entity.widthZ + projectile.widthZ;
-        let dz = ep[2] - pp[2];
+        const dwz = entity.widthZ + pwz;
+        let dz = ep[2] - pm[2];
         const endsInZ = abs(dz) < dwz;
         if (!endsInZ) return;
+
+        // After these tests, the projectile is considered collided.
 
         // Normalize and clamp
         dx = px[0] - pp[0];
