@@ -315,7 +315,7 @@ extend(ChunkModel.prototype, {
         world.delete(chunkId);
     },
 
-    getCloseTerrain(worldId)
+    getCloseTerrain(worldId, position)
     {
         // Only chunks within current world.
 
@@ -324,14 +324,62 @@ extend(ChunkModel.prototype, {
         let world = this.worlds.get(worldId);
         if (!world) return;
 
+        if (!position)
+        {
+            console.warn('[Raycaster] Player position undefined.');
+            return;
+        }
+
+        let property = this.worldProperties.get(worldId);
+        if (!property) return;
+        let sizeX = property.chunkSizeX;
+        let sizeY = property.chunkSizeY;
+        let sizeZ = property.chunkSizeZ;
+
+        const cx = Math.floor(position.x  / sizeX);
+        const cy = Math.floor(position.y  / sizeY);
+        const cz = Math.floor(position.z  / sizeZ);
+
+        let fmod = (b, n) => ((Math.floor(b) % n) + n) % n;
+        const fx = fmod(position.x, sizeX); const sx2 = sizeX / 2;
+        const fy = fmod(position.y, sizeY); const sy2 = sizeY / 2;
+        const fz = fmod(position.z, sizeZ); const sz2 = sizeZ / 2;
+        let closestEight = [
+            // this
+            `${cx},${cy},${cz}`,
+
+            // corner
+            `${fx > sx2 ? cx + 1 : cx - 1},${fy > sy2 ? cy + 1 : cy - 1},${fz > sz2 ? cz + 1 : cz - 1}`,
+
+            // edges
+            `${fx > sx2 ? cx + 1 : cx - 1},${fy > sy2 ? cy + 1 : cy - 1},${cz}`,
+            `${fx > sx2 ? cx + 1 : cx - 1},${cy},${fz > sz2 ? cz + 1 : cz - 1}`,
+            `${cx},${fy > sy2 ? cy + 1 : cy - 1},${fz > sz2 ? cz + 1 : cz - 1}`,
+
+            // faces
+            `${fx > sx2 ? cx + 1 : cx - 1},${cy},${cz}`,
+            `${cx},${cy},${fz > sz2 ? cz + 1 : cz - 1}`,
+            `${cx},${fy > sy2 ? cy + 1 : cy - 1},${cz}`,
+        ];
+
         let meshes = [];
-        world.forEach(function(currentChunk, cid) {
-            // XXX [GAMEPLAY] extract on 4 closest chunks.
+        world.forEach(function(currentChunk, cid)
+        {
+            // XXX [GAMEPLAY] extract on 8 closest chunks.
             if (!currentChunk || !currentChunk.hasOwnProperty('meshes')) {
                 console.log(`Warn: corrupted chunk inside client model ${cid}`);
                 console.log(world);
                 return;
             }
+
+            if (!cid) return;
+            const chunkCoords = cid.split(',');
+            if (!chunkCoords || chunkCoords.length !== 3) return;
+            const x = parseInt(chunkCoords[0], 10);
+            const y = parseInt(chunkCoords[1], 10);
+            const z = parseInt(chunkCoords[2], 10);
+            const nid = `${x},${y},${z}`;
+            if (closestEight.indexOf(nid) < 0) return;
 
             currentChunk.meshes.forEach(function(mesh) {
                 if (!!mesh && !!mesh.geometry) { // empty chunk or geometry

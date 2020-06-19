@@ -167,7 +167,9 @@ class SimplePerlin
         const ci = chunk.chunkI;
         const cj = chunk.chunkJ;
         const ck = chunk.chunkK;
-        const offsetX = dx * ci; const offsetY = dy * cj; const offsetZ = dz * ck;
+        const offsetX = dx * ci;
+        const offsetY = dy * cj;
+        const offsetZ = dz * ck;
 
         const stone = BlockType.STONE;
         const water = BlockType.WATER;
@@ -196,7 +198,6 @@ class SimplePerlin
                 let y = offsetY + (i / dx | 0); // / priority > | priority
                 data[i] += SimplePerlin.noise(x / quality, y / quality, z) * quality;
             }
-
             quality *= 4;
         }
 
@@ -206,16 +207,19 @@ class SimplePerlin
             return s - Math.floor(s);
         };
 
-        for (let x = 0; x < dx; ++x) {
-            for (let y = 0; y < dy; ++y) {
-                let h = dz / 2 + (data[x + y * dx] * perlinIntensity | 0);
-                let rockLevel = Math.floor(5 * h / 6);
+        for (let x = 0; x < dx; ++x)
+        {
+            for (let y = 0; y < dy; ++y)
+            {
                 const xy = x + y * dx;
+                const initOff = dz / 2;
+                let surfaceLevel = initOff + (data[xy] * perlinIntensity | 0);
+                const rockLevel = Math.floor(5 * surfaceLevel / 6) - offsetZ;
+                surfaceLevel -= offsetZ;
 
-                h -= offsetZ;
-                rockLevel -= offsetZ;
-                let rl = Math.max(0, Math.min(rockLevel, dz));
-                for (let zz = 0; zz < rl; ++zz) {
+                let rockLevelInChunk = Math.max(0, Math.min(rockLevel, dz));
+                for (let zz = 0; zz < rockLevelInChunk; ++zz)
+                {
                     const currentBlock = xy + normalSize * zz;
 
                     // Rock.
@@ -229,8 +233,8 @@ class SimplePerlin
                     }
                 }
 
-                let bl = Math.max(0, Math.min(h, dz));
-                for (let zz = rl; zz < bl; ++zz)
+                let surfaceLevelInChunk = Math.max(0, Math.min(surfaceLevel, dz));
+                for (let zz = rockLevelInChunk; zz < surfaceLevelInChunk; ++zz)
                 {
                     // Grass or sand.
                     const currentBlock = xy + normalSize * zz;
@@ -240,21 +244,33 @@ class SimplePerlin
                     blocks[currentBlock] = mainBlockId;
                 }
 
-                if (hasTrees && bl >= 16 && rl > 0 && x > 1 && x < dx - 2 && y > 1 && y < dy - 2)
+                if (hasTrees && surfaceLevelInChunk >= 16 && rockLevelInChunk > 0 &&
+                    x > 1 && x < dx - 2 && y > 1 && y < dy - 2)
                 {
                     const rand = isMainWorld ? noise(x, y) : noise(y, x);
                     if (rand > 0.99)
                     {
-                        SimplePerlin.addTree2D(blocks, x, y, bl, dx, dz, xy, normalSize, wood, leaves);
+                        SimplePerlin.addTree2D(blocks, x, y, surfaceLevelInChunk, dx, dz, xy, normalSize, wood, leaves);
                     }
                 }
 
-                if (bl < 16 && rl > 0)
+                if (offsetZ < 0 || surfaceLevel > dz)
                 {
-                    for (let zz = bl; zz < 16; ++zz) {
+                    for (let zz = surfaceLevelInChunk; zz < dz; ++zz) {
+                        const currentBlock = xy + normalSize * zz;
+                        blocks[currentBlock] = water;
+                    }
+                }
+
+                if (
+                    surfaceLevelInChunk < 16 && surfaceLevel < 16 && offsetZ < 0 && rockLevelInChunk > 0 ||
+                    offsetZ === 0
+                )
+                {
+                    for (let zz = surfaceLevelInChunk; zz < 16; ++zz) {
                         // Grass or sand.
                         const currentBlock = xy + normalSize * zz;
-                        if (zz === bl)
+                        if (surfaceLevelInChunk > 0 && zz === surfaceLevelInChunk)
                             blocks[currentBlock] = sand;
                         else
                             blocks[currentBlock] = water;
@@ -279,7 +295,6 @@ class SimplePerlin
         const radius = worldInfo.radius;
         const air = BlockType.AIR;
         const stone = BlockType.STONE;
-        const grass = BlockType.GRASS;
         const water = BlockType.WATER;
         const iron = BlockType.IRON;
         const sand = BlockType.SAND;
@@ -327,7 +342,8 @@ class SimplePerlin
             directions.push(ck > center.z ? 3 : -3);
 
         // Fill with grass on main world, sand everywhere else.
-        const mainBlockId = parseInt(worldId, 10) === -1 ? grass : sand;
+        const widInt = parseInt(worldId, 10);
+        const mainBlockId = SimplePerlin.getMainBlock(widInt);
         const ijS = dx * dy;
         const nbDirections = directions.length;
 

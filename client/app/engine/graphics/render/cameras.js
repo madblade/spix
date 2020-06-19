@@ -508,7 +508,7 @@ extend(CameraManager.prototype, {
         let mc = this.mainCamera.getRecorder();
         mc.updateMatrixWorld();
         camera.matrixWorld.copy(mc.matrixWorld);
-        let terrain = chunkModel.getCloseTerrain(selfModel.worldId);
+        let terrain = chunkModel.getCloseTerrain(selfModel.worldId, selfModel.position);
 
         let intersects;
         raycaster.setFromCamera(new Vector2(0, 0), camera);
