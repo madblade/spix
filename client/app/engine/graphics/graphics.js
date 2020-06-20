@@ -65,6 +65,11 @@ let Graphics = function(app)
     this._nbMeshesLoadedOrError = 0;
     this._debugChunkBoundingBoxes = false;
 
+    // Materials
+    this.instancedMaterials = new Map(); // Chunks
+    this.waterMaterials = new Map(); // Waters
+    this.waterRTTResolution = 512;
+
     // Animations
     this.mixers = null;
 

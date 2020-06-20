@@ -137,7 +137,7 @@ let ChunksModule = {
         geometry.computeBoundingSphere();
 
         let newMesh = this.createChunkMesh(geometry, false,
-            false); // flat world or not, no creating water
+            false, worldId); // flat world or not, no water creation
         // let material = newMesh.material;
         // let material = this.createMaterial('textured-phong', 0xaaaaaa);
         // let newMesh = new Mesh(geometry, material);
@@ -250,7 +250,7 @@ let ChunksModule = {
         //     material.side = DoubleSide;
         // }
 
-        let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat);
+        let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat, worldId);
         // let material = newMesh.material;
         // let newMesh = new Mesh(geometry, material);
         // if (Math.random() < 0.5)
@@ -614,7 +614,7 @@ let ChunksModule = {
 
                 // let addedMesh = new Mesh(geometry, materials[meshId]);
                 // meshes[meshId] = addedMesh;
-                let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat);
+                let newMesh = this.createChunkMesh(geometry, isWater, isWorldFlat, worldId);
                 // let newMesh = new Mesh(geometry, materials[meshId]);
 
                 if (this.hasShadowMap() && isWorldFlat && parseInt(worldId, 10) === -1)

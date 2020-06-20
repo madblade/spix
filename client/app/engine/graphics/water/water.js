@@ -22,7 +22,8 @@ import {
 import { ShadersModule } from '../shaders/shaders';
 
 let Water = function(
-    graphics, geometry, options)
+    graphics, geometry, options, worldId
+)
 {
     Mesh.call(this, geometry);
 
@@ -39,54 +40,65 @@ let Water = function(
     let side = options.side !== undefined ? options.side : FrontSide;
     let fog = options.fog !== undefined ? options.fog : false;
 
-    let mirrorShader =
+    let material;
+    let waterMaterial = graphics.waterMaterials.get(worldId);
+    if (!waterMaterial)
     {
-        uniforms: UniformsUtils.merge([
-            UniformsLib.fog,
-            UniformsLib.lights,
-            {
-                normalSampler: { value: null },
-                mirrorSampler: { value: null },
-                alpha: { value: 1.0 },
-                time: { value: 0.0 },
-                size: { value: size },
-                distortionScale: { value: 20.0 },
-                textureMatrix: { value: new Matrix4() },
-                sunColor: { value: new Color(0x7F7F7F) },
-                sunDirection: { value: new Vector3(0.70707, 0.70707, 0) },
-                eye: { value: new Vector3() },
-                // waterColor: { value: new Color(0x555555) },
-                waterColor: { value: new Color(0x001e0f) }
-            }
-        ]),
-        vertexShader: ShadersModule.getWaterVertexShader(),
-        fragmentShader: ShadersModule.getWaterFragmentShader()
-    };
+        let mirrorShader =
+        {
+            uniforms: UniformsUtils.merge([
+                UniformsLib.fog,
+                UniformsLib.lights,
+                {
+                    normalSampler: { value: null },
+                    mirrorSampler: { value: null },
+                    alpha: { value: 1.0 },
+                    time: { value: 0.0 },
+                    size: { value: size },
+                    distortionScale: { value: 20.0 },
+                    textureMatrix: { value: new Matrix4() },
+                    sunColor: { value: new Color(0x7F7F7F) },
+                    sunDirection: { value: new Vector3(0.70707, 0.70707, 0) },
+                    eye: { value: new Vector3() },
+                    // waterColor: { value: new Color(0x555555) },
+                    waterColor: { value: new Color(0x001e0f) }
+                }
+            ]),
+            vertexShader: ShadersModule.getWaterVertexShader(),
+            fragmentShader: ShadersModule.getWaterFragmentShader()
+        };
 
-    let material = new ShaderMaterial({
-        fragmentShader: mirrorShader.fragmentShader,
-        vertexShader: mirrorShader.vertexShader,
-        uniforms: UniformsUtils.clone(mirrorShader.uniforms),
-        lights: true,
-        transparent: true,
-        side,
-        fog,
-        //wireframe: true
-    });
+        material = new ShaderMaterial({
+            fragmentShader: mirrorShader.fragmentShader,
+            vertexShader: mirrorShader.vertexShader,
+            uniforms: UniformsUtils.clone(mirrorShader.uniforms),
+            lights: true,
+            transparent: true,
+            side,
+            fog,
+            // wireframe: true
+        });
 
-    let renderTarget = graphics.cameraManager.waterCamera.waterRenderTarget;
-    let textureMatrix = graphics.cameraManager.waterCamera.textureMatrix;
+        let renderTarget = graphics.cameraManager.waterCamera.waterRenderTarget;
+        let textureMatrix = graphics.cameraManager.waterCamera.textureMatrix;
 
-    material.uniforms.mirrorSampler.value = renderTarget.texture;
-    material.uniforms.textureMatrix.value = textureMatrix;
-    material.uniforms.alpha.value = alpha;
-    material.uniforms.time.value = time;
-    material.uniforms.normalSampler.value = normalSampler;
-    material.uniforms.sunColor.value = sunColor;
-    material.uniforms.waterColor.value = waterColor;
-    material.uniforms.sunDirection.value = sunDirection;
-    material.uniforms.distortionScale.value = distortionScale;
-    material.uniforms.eye.value = eye;
+        material.uniforms.mirrorSampler.value = renderTarget.texture;
+        material.uniforms.textureMatrix.value = textureMatrix;
+        material.uniforms.alpha.value = alpha;
+        material.uniforms.time.value = time;
+        material.uniforms.normalSampler.value = normalSampler;
+        material.uniforms.sunColor.value = sunColor;
+        material.uniforms.waterColor.value = waterColor;
+        material.uniforms.sunDirection.value = sunDirection;
+        material.uniforms.distortionScale.value = distortionScale;
+        material.uniforms.eye.value = eye;
+
+        graphics.waterMaterials.set(worldId, material);
+    }
+    else
+    {
+        material = waterMaterial;
+    }
 
     this.renderOrder = 800;
 

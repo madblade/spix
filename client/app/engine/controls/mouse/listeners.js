@@ -222,15 +222,17 @@ let ListenerModule = {
         let clientSelfModel = this.app.model.client.selfComponent;
         let activeItemID = clientSelfModel.getCurrentItemID();
 
-        if ((ItemsModelModule.isItemNaught(activeItemID) ||
-            ItemsModelModule.isItemBlock(activeItemID)) &&
-            !isButtonUp)
+        if (!isButtonUp && ItemsModelModule.isItemX(activeItemID))
+            this.requestAddBlock(false);
+        else if (!isButtonUp &&
+            (ItemsModelModule.isItemNaught(activeItemID) ||
+            ItemsModelModule.isItemBlock(activeItemID))
+        )
         {
             this.requestDelBlock();
-            return;
         }
 
-        if (!ItemsModelModule.isItemIDSupported(activeItemID))
+        else if (!ItemsModelModule.isItemIDSupported(activeItemID))
             console.warn('[Mouse/Listener] Item ID unsupported.');
         else if (ItemsModelModule.isItemUseable(activeItemID))
             this.requestItemUse(isButtonUp, false);
@@ -247,8 +249,6 @@ let ListenerModule = {
             this.requestAddBlock(true);
         else if (ItemsModelModule.isItemUseable(activeItemID))
             this.requestItemUse(isButtonUp, true);
-        else if (ItemsModelModule.isItemX2(activeItemID) && !isButtonUp)
-            this.requestAddBlock(false);
     },
 
     onLeftMouseUp()

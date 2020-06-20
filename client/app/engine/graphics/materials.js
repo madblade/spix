@@ -11,11 +11,12 @@ import {
 
 let MaterialsModule = {
 
-    createMaterial(whatMaterial, meta)
+    createMaterial(whatMaterial, meta, worldId)
     {
         let material;
 
-        switch (whatMaterial) {
+        switch (whatMaterial)
+        {
             case 'flat-phong':
                 material = new MeshPhongMaterial({
                     specular: 0xffffff,
@@ -28,27 +29,54 @@ let MaterialsModule = {
                 break;
 
             case 'textured-phong':
-                // material = new MeshPhongMaterial({
-                //shading: FlatShading,
-                // color: 0x110011,
-                // emissive: new Color(0, 0, 0),
-                // specular: new Color(0, 0, 0),
-                // shininess: 0,
-                // side: FrontSide,
-                //vertexColors: VertexColors,
-                // map: this.texture
-                // });
-                let params = {
-                    //shading: FlatShading,
-                    // color: 0x110011,
-                    side: FrontSide,
-                    //vertexColors: VertexColors,
-                    map: this.textureAtlas,
-                    transparent: false
-                };
-                // if (this.rendererManager.shadowVolumes)
-                //     params.transparent = true;
-                material = new MeshLambertMaterial(params);
+                if (worldId === undefined) worldId = '-1';
+                let im = this.instancedMaterials.get(worldId);
+                if (!im)
+                {
+                    let params = {
+                        side: FrontSide,
+                        map: this.textureAtlas,
+                        transparent: false
+                    };
+                    // if (this.rendererManager.shadowVolumes)
+                    //     params.transparent = true;
+
+                    material = new MeshLambertMaterial(params);
+                    let materials = [material]; // 0 -> material for main cam
+                    // if (worldId === -1) materials.push(material.clone()); // 1 -> material for secondary cam
+                    this.instancedMaterials.set(worldId, materials);
+                }
+                else
+                {
+                    material = im[0];
+                    if (!material)
+                    {
+                        console.error(`[Materials] Could not get instanced material for ${worldId}.`);
+                    }
+                }
+                break;
+
+            case 'textured-phong-water':
+                if (worldId === undefined) worldId = '-1';
+                let wm = this.waterMaterials.get(worldId);
+                if (!wm)
+                {
+                    let params = {
+                        side: FrontSide,
+                        map: this.textureAtlas,
+                        transparent: true
+                    };
+                    material = new MeshLambertMaterial(params);
+                    this.waterMaterials.set(worldId, material);
+                }
+                else
+                {
+                    material = wm;
+                    if (!material)
+                    {
+                        console.error(`[Materials] Could not get instanced material for ${worldId}.`);
+                    }
+                }
                 break;
 
             case 'basic-black':

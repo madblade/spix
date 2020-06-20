@@ -101,7 +101,7 @@ let RendererFactory = {
         let u = 'resolution';
         fxaa.uniforms[u].value.set(resolutionX, resolutionY);
 
-        let copy = new ShaderPass(CopyShader);
+        // let copy = new ShaderPass(CopyShader);
 
         let composer = new EffectComposer(rendrr);
         composer.renderTarget1.stencilBuffer = true;

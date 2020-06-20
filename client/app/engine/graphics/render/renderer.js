@@ -49,9 +49,9 @@ let RendererManager = function(graphicsEngine)
 
     // ISSUES
     // Performance issue with Firefox + three (water reflection)
-    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    if (isFirefox)
-        this.shortCircuitWaterReflection = true;
+    // const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    // if (isFirefox)
+    //     this.shortCircuitWaterReflection = true;
     // Bloom + light intensity issue on mobile
     const isMobile = 'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
     if (isMobile)
@@ -88,6 +88,9 @@ let RendererManager = function(graphicsEngine)
 
     // Bloom
     this.darkMaterial = new MeshBasicMaterial(
+        { color: 'black', side: DoubleSide, morphTargets: true }
+    );
+    this.darkWater = new MeshBasicMaterial(
         { color: 'black', side: DoubleSide, morphTargets: true }
     );
 
@@ -147,7 +150,28 @@ extend(RendererManager.prototype, {
         try {
             this.updateSkies(mainCamera);
             if (this.waterReflection)
-                this.updateWaters(cameraManager, renderer, mainScene, mainCamera);
+            {
+                // get main
+                let currentWid = this.graphics.app.model.server.selfModel.worldId.toString();
+                if (currentWid === '-1')
+                    this.updateWaters(cameraManager, renderer, mainScene, mainCamera);
+                else
+                {
+                    for (let j = 0, m = renderRegister.length; j < m; ++j)
+                    {
+                        const pass = renderRegister[j];
+                        let sc = pass.scene;
+                        if (!sc) continue;
+                        sceneId = pass.sceneId.toString();
+                        if (sceneId === '-1')
+                        {
+                            let cm = pass.camera.cameraObject;
+                            this.updateWaters(cameraManager, renderer, sc, cm);
+                            break;
+                        }
+                    }
+                }
+            }
             if (this.shadowVolumes)
                 this.updateShadows(cameraManager, renderer, mainScene, mainCamera);
         } catch (e) {
@@ -162,7 +186,8 @@ extend(RendererManager.prototype, {
 
         let currentPass; let screen1; let screen2; let camera;
         let bufferScene; let bufferCamera; let bufferTexture;
-        let otherEnd; let otherSceneId;
+        let otherEnd;
+        // let otherSceneId;
 
         // This fixes the 1-frame lag for inner-most scenes.
         for (let j = 0, m = renderRegister.length; j < m; ++j)
@@ -183,6 +208,12 @@ extend(RendererManager.prototype, {
         let stc = cameraManager.stencilCamera;
         this.stencilScene.updateMatrixWorld();
         this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
+
+        let worlds = this.graphics.app.model.server.chunkModel.worlds;
+        let pathId;
+        let sceneId;
+        let instancedMaterials = this.graphics.instancedMaterials;
+        let waterMaterials = this.graphics.waterMaterials;
         for (let i = 0, n = renderRegister.length; i < n; ++i)
         {
             if (renderCount++ > renderMax) break;
@@ -190,6 +221,31 @@ extend(RendererManager.prototype, {
             screen1 = currentPass.screen1;
             screen2 = currentPass.screen2;
             camera = currentPass.camera;
+            sceneId = currentPass.sceneId.toString();
+            pathId = currentPass.id;
+            let defaultMaterials = instancedMaterials.get(sceneId);
+            let defaultMaterial;
+            let defaultWaterMaterial;
+            if (!defaultMaterials) {
+                // console.error('[Renderer] Default material not found!');
+            } else {
+                defaultMaterial = defaultMaterials[0];
+                defaultWaterMaterial = waterMaterials.get(sceneId);
+            }
+            let passMaterial = instancedMaterials.get(pathId);
+            let passWaterMaterial = waterMaterials.get(pathId);
+            if (!passMaterial && defaultMaterial)
+            {
+                passMaterial = defaultMaterial.clone();
+                instancedMaterials.set(pathId, passMaterial);
+                passWaterMaterial = defaultWaterMaterial.clone();
+                waterMaterials.set(pathId, passWaterMaterial);
+            }
+            let chks = worlds.get(sceneId);
+            if (!chks)
+            {
+                // console.log('No chunks there.');
+            }
 
             bufferScene = currentPass.scene;
             if (!camera) continue;
@@ -200,7 +256,8 @@ extend(RendererManager.prototype, {
             {
                 if (this.corrupted < 5)
                 {
-                    console.log(`[Renderer] Could not get buffer scene ${currentPass.sceneId}.`);
+                    // console.log(`[Renderer] Could not get buffer scene ${currentPass.sceneId}.`);
+                    // Happens while loading other worlds.
                     this.corrupted++;
                 }
 
@@ -213,10 +270,10 @@ extend(RendererManager.prototype, {
 
             if (screen2)
             {
-                otherSceneId = currentPass.sceneId;
+                // otherSceneId = currentPass.sceneId;
                 otherEnd = screen2.getMesh();
-                // otherEnd.visible = false;
-                sceneManager.removeObject(otherEnd, otherSceneId, true);
+                otherEnd.visible = false;
+                // sceneManager.removeObject(otherEnd, otherSceneId, true);
             }
             //console.log('[Renderer] Rendering.');
             //screen1.getMesh().updateMatrixWorld();
@@ -243,7 +300,6 @@ extend(RendererManager.prototype, {
             // stc.rotation.copy(bufferCamera.rotation);
             // bufferCamera.updateMatrixWorld(true);
             stc.matrixWorld.copy(bufferCamera.matrixWorld);
-            // stc.updateProjectionMatrix();
             // stc.matrixWorld.copy(bufferCamera.matrixWorld);
             // stc.projectionMatrix.copy(bufferCamera.projectionMatrix);
 
@@ -259,6 +315,20 @@ extend(RendererManager.prototype, {
                 this.composers.set(id, bufferComposer);
             }
 
+            if (chks && defaultMaterial && passMaterial)
+                chks.forEach(c => { let m = c.meshes; for (let cc = 0; cc < m.length; ++cc) {
+                    let mi = m[cc];
+                    if (!mi) continue;
+                    if (c.water[cc])
+                    {
+                        // mi.material = passWaterMaterial;
+                    }
+                    else if (mi.material)
+                    {
+                        mi.material = passMaterial;
+                    }
+                }});
+            s1.visible = false;
             if (this.selectiveBloom)
             {
                 bufferScene.traverse(obj => this.darkenNonBloomed(obj, materials));
@@ -268,12 +338,24 @@ extend(RendererManager.prototype, {
             } else {
                 bufferComposer[2].render();
             }
-            // s1.visible = false;
-            // s1.visible = true;
+            s1.visible = true;
+            if (chks && defaultMaterial && passMaterial)
+                chks.forEach(c => { let m = c.meshes; for (let cc = 0; cc < m.length; ++cc) {
+                    let mi = m[cc];
+                    if (!mi) continue;
+                    if (c.water[cc])
+                    {
+                        // mi.material = defaultWaterMaterial;
+                    }
+                    else if (mi.material)
+                    {
+                        mi.material = defaultMaterial;
+                    }
+                }});
 
             if (screen2) {
-                sceneManager.addObject(otherEnd, otherSceneId);
-                // otherEnd.visible = true;
+                // sceneManager.addObject(otherEnd, otherSceneId);
+                otherEnd.visible = true;
             }
         }
 

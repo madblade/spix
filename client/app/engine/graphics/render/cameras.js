@@ -79,10 +79,8 @@ extend(CameraManager.prototype, {
 
         if (this.subCameras.has(cameraId))
         {
-            //console.log('Camera ' + cameraId + ' cannot be added a second time.');
-            console.log('[CameraManager] Skipping camera addition.');
-            //let err = new Error();
-            //console.log(err.stack);
+            // console.log('[CameraManager] Skipping camera addition.');
+            // This happens quite often.
             return;
         }
 

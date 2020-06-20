@@ -37,13 +37,26 @@ let RendererUpdates = {
         let worlds = this.graphics.app.model.server.chunkModel.worlds;
         let skies = this.graphics.app.model.server.chunkModel.skies;
         let eye = cameraManager.waterCamera.eye;
-        worlds.forEach(w => {
+        // let instancedMaterials = this.graphics.instancedMaterials;
+        let waterMaterials = this.graphics.waterMaterials;
+        let darkWater = this.darkWater;
+
+        worlds.forEach(w =>
+        {
+            // const materialsFoWorld = instancedMaterials.get(wid);
+            // const materialForWater = materialsFoWorld[1];
+
             // let sky = skies.get(wid);
             // let sdir = this.graphics.getSunDirection(sky);
             w.forEach(chunk => { let m = chunk.meshes; for (let i = 0; i < m.length; ++i) {
                 if (!chunk.water[i]) continue;
                 let mi = m[i];
                 mi.visible = false;
+                if (mi.material)
+                {
+                    // mi.material = materialForWater;
+                    mi.material = darkWater;
+                }
                 // if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
                 // {
                 //     mi.material.uniforms.eye.value = eye;
@@ -57,31 +70,41 @@ let RendererUpdates = {
         this.updateWaterCamera(cameraManager, renderer, mainScene, mainCam);
 
         // Update display
-        worlds.forEach((w, wid) => { w.forEach(chunk => {
-            let m = chunk.meshes;
+        worlds.forEach((w, wid) =>
+        {
             let sky = skies.get(wid);
             let sdir = this.graphics.getSunDirection(sky);
-            for (let i = 0; i < m.length; ++i) {
-                if (chunk.water[i])
-                {
-                    let mi = m[i];
-                    mi.visible = true;
-                    if (mi.material && mi.material.uniforms && mi.material.uniforms.time)
-                    {
-                        mi.material.uniforms.eye.value = eye;
-                        mi.material.uniforms.sunDirection.value = sdir;
-                        mi.material.uniforms.time.value += 0.01;
-                    }
-                }
+
+            const materialForWater = waterMaterials.get(wid);
+            if (!materialForWater)
+            {
+                // console.error('[Renderer/Updates] Material not found.');
+                // Possibly has no water -> it’s not an error
             }
-        });
+
+            w.forEach(chunk => { let m = chunk.meshes; for (let i = 0; i < m.length; ++i) {
+                if (!chunk.water[i]) continue;
+                let mi = m[i];
+                mi.visible = true;
+                if (mi.material)
+                {
+                    mi.material = materialForWater;
+                }
+            }});
+
+            if (materialForWater && materialForWater.uniforms && materialForWater.uniforms.eye)
+            {
+                materialForWater.uniforms.eye.value = eye;
+                materialForWater.uniforms.sunDirection.value = sdir;
+                materialForWater.uniforms.time.value += 0.01;
+            }
         });
     },
 
-    updateWaterCamera(cameraManager, renderer, mainScene)
+    updateWaterCamera(cameraManager, renderer, mainScene, mainCamera)
     {
         // Update mirror camera
-        cameraManager.updateWaterCamera();
+        cameraManager.updateWaterCamera(mainCamera);
 
         if (this.shortCircuitWaterReflection)
             return;

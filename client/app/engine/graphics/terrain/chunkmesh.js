@@ -6,40 +6,46 @@ import { Water } from '../water/water';
 
 let ChunksMeshModule = {
 
-    createChunkMesh(geometry, isWater, isWorldFlat)
+    createChunkMesh(geometry, isWater, isWorldFlat, worldId)
     {
         if (isWater)
         {
             // low-res
-            if (!isWorldFlat || !this.rendererManager.waterReflection)
+            if (!isWorldFlat || !this.rendererManager.waterReflection || worldId !== '-1')
             {
-                let material = this.createMaterial('textured-phong', 0xaaaaaa);
+                let material = this.createMaterial(
+                    'textured-phong-water', 0xaaaaaa, worldId
+                );
                 material.transparent = true;
                 material.opacity = 0.5;
                 material.side = DoubleSide;
                 return new Mesh(geometry, material);
             }
-            // this.oneWater = true;
-            return new Water(
-                this,
-                geometry,
-                // new PlaneBufferGeometry(32, 32, 1, 1),
-                {
-                    textureWidth: 512,
-                    textureHeight: 512,
-                    waterNormals: this.textureWaterNormals,
-                    alpha: 0.5,
-                    sunDirection: new Vector3(0.70707, 0.70707, 0.0),
-                    sunColor: 0xffffff,
-                    waterColor: 0x7b8a99,
-                    distortionScale: 0.1,
-                    size: 10.0,
-                    fog: false
-                }
-            );
-            // return nm;
-        } else {
-            let material = this.createMaterial('textured-phong', 0xaaaaaa);
+            else
+            {
+                const waterResolution = this.waterRTTResolution;
+                return new Water(
+                    this,
+                    geometry,
+                    {
+                        textureWidth: waterResolution,
+                        textureHeight: waterResolution,
+                        waterNormals: this.textureWaterNormals,
+                        alpha: 0.5,
+                        sunDirection: new Vector3(0.70707, 0.70707, 0.0),
+                        sunColor: 0xffffff,
+                        waterColor: 0x7b8a99,
+                        distortionScale: 0.1,
+                        size: 10.0,
+                        fog: false
+                    },
+                    worldId
+                );
+            }
+        }
+        else
+        {
+            let material = this.createMaterial('textured-phong', 0xaaaaaa, worldId);
             return new Mesh(geometry, material);
         }
     },

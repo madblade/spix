@@ -39,12 +39,12 @@ let WaterCameraModule = {
     },
 
     // Set from mirror and clip oblique
-    updateWaterCamera()
+    updateWaterCamera(camera)
     {
         let waterCamera = this.waterCamera;
         if (!waterCamera) return;
 
-        let camera = this.mainCamera.cameraObject;
+        // let camera = this.mainCamera.cameraObject;
         let mirrorCamera = waterCamera.camera;
 
         let clipBias = waterCamera.clipBias;
