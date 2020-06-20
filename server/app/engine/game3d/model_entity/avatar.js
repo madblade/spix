@@ -15,10 +15,10 @@ class Avatar extends Entity
         this._kind = 'player';
 
         // Counted as a number of chunks.
-        this._chunkRenderDistance = 4;
+        this._chunkRenderDistance = 5;
         // If you increase this, also increase model_x/model.push(chksZ, currentDepth + 2);
         // For flat worlds
-        this._chunkUnloadDistance = 8;
+        this._chunkUnloadDistance = 7;
         // Might be a good idea to keep the unload distance as big as possible client-wise
         // When games don’t contain many players.
 
