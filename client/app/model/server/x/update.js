@@ -44,7 +44,7 @@ let UpdateModule = {
         let modelPortals = this.portals;
         let worldToPortals = this.worldToPortals;
 
-        console.log(`Removing portal ${portalId}  ${typeof portalId}`);
+        // console.log(`Removing portal ${portalId}  ${typeof portalId}`);
 
         let portal = modelPortals.get(portalId);
         if (!portal) {

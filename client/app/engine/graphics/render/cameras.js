@@ -199,6 +199,7 @@ extend(CameraManager.prototype, {
                 // TODO [PORTAL] update differently from portal transforms.
                 cam.setCameraPosition(x, y, z);
                 cam.setFirstPerson();
+                cam.addPositionTransform();
                 let mirrorCamera = cam.getRecorder();
                 if (mirrorCamera) {
                     let screen = cam.getScreen();
@@ -215,6 +216,7 @@ extend(CameraManager.prototype, {
             cams.forEach(function(cam/*, cameraId*/) {
                 cam.setCameraPosition(x, y, z);
                 cam.setThirdPerson();
+                cam.addPositionTransform();
                 let mirrorCamera = cam.getRecorder();
                 if (mirrorCamera) {
                     let screen = cam.getScreen();
@@ -451,6 +453,7 @@ extend(CameraManager.prototype, {
             subCamera.setZRotation(rotationZ);
             subCamera.setXRotation(rotationX);
             subCamera.setUpRotation(theta1, 0, theta0);
+            subCamera.addRotationTransform();
 
             let mirrorCamera = subCamera.getRecorder();
             let mirror = subCamera.getScreen().getMesh();

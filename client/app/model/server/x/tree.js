@@ -304,14 +304,16 @@ extend(XGraph.prototype, {
         ];
 
         // console.log('CAMERA TRANSFORMATION');
-        // console.log(pidPath);
+        // console.log(pidPath.length);
         for (let pathId = 0, pathLength = pidPath.length; pathId < pathLength; ++pathId)
         {
             let currentTunnel = pidPath[pathId].split(',');
-            let sourcePortalId = currentTunnel[0];
+            let sourcePortalId = parseInt(currentTunnel[0], 10);
             let sourcePortal = portals.get(sourcePortalId);
-            let destinationPortalId = currentTunnel[1];
+            let destinationPortalId = parseInt(currentTunnel[1], 10);
             let destinationPortal = portals.get(destinationPortalId);
+            // console.log(sourcePortal);
+            // console.log(destinationPortal);
             if (!destinationPortal || !sourcePortal) continue;
 
             let P0B0 = sourcePortal.tempPosition;
@@ -341,16 +343,21 @@ extend(XGraph.prototype, {
 
             if (p0x !== p1x || p0y !== p1y || p0z !== p1z)
             {
-                console.warn('[Tree/CameraTransform]: // TODO Compute camera chain transform.');
+                // console.warn('[Tree/CameraTransform]: // TODO Compute camera chain transform.');
             }
-            // let thetaP0 = sourcePortal.tempOrientation;
-            // let thetaP1 = destinationPortal.tempOrientation;
+
+            let thetaP0 = sourcePortal.tempOrientation;
+            let thetaP1 = destinationPortal.tempOrientation;
             // let portalRelativeOrientation = [o1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
 
-            // TODO [PORTAL] compute chain transformation.
-            console.log(destinationPortalId);
-            console.log(destinationPortal.tempPosition);
-            console.log(destinationPortal.tempOrientation);
+            cameraTransform[0] += p1x - p0x;
+            cameraTransform[1] += p1y - p0y;
+            cameraTransform[2] += p1z - p0z;
+
+            cameraTransform[3] += thetaP1 - thetaP0;
+            // console.log(destinationPortalId);
+            // console.log(destinationPortal.tempPosition);
+            // console.log(destinationPortal.tempOrientation);
 
             // compose everything but NOT THE MAIN CAMERA!
         }
@@ -441,6 +448,7 @@ extend(XGraph.prototype, {
                     }
                     cameraTransform = this.computeCameraTransform(pidPath, portals, cameraManager);
 
+                    // console.log(cameraTransform);
                     // console.log(pidPathString);
                     // console.log(`pushing ${p1.portalId}`);
                     graphicsEngine.addPortalObject(
@@ -454,6 +462,9 @@ extend(XGraph.prototype, {
                     let newIds = `${ids[1]},${ids[0]}`;
                     pidPath2[pidPathLength - 1] = newIds;
                     let pidPathString2 = pidPath2.join(';');
+
+                    cameraTransform = this.computeCameraTransform(pidPath2, portals, cameraManager);
+                    // console.log(cameraTransform);
                     graphicsEngine.addPortalObject(
                         p2, p1, pidPathString2, cameraTransform,
                         depth, destinationPid, originPid, destinationWid, pidPathString2

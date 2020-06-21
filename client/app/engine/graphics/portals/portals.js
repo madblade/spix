@@ -31,7 +31,7 @@ let PortalsModule = {
         let screen = this.getScreen(portalId);
         if (!screen)
         {
-            console.log(`NEW SCREEN ${portalId}`);
+            // console.log(`NEW SCREEN ${portalId}`);
             // console.log('New Screen created.');
             let pos = portal.tempPosition;
             let top = portal.tempOtherPosition;

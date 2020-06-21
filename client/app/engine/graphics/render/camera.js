@@ -155,6 +155,24 @@ extend(Camera.prototype, {
         }
     },
 
+    addPositionTransform()
+    {
+        let p = this.up.position;
+        let transform = this.cameraTransform;
+        if (!transform) return;
+        p.x += transform[0];
+        p.y += transform[1];
+        p.z += transform[2];
+    },
+
+    addRotationTransform()
+    {
+        // let rup = this.get3DObject().rotation;
+        // let transform = this.cameraTransform;
+        // if (!transform) return;
+        // rup.x += transform[3];
+    },
+
     setCameraPosition(x, y, z)
     {
         // TODO [PORTAL] use local transform?

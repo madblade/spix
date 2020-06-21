@@ -33,13 +33,23 @@ extend(SceneManager.prototype, {
         return scene;
     },
 
+    hasScene(sceneId)
+    {
+        sceneId = parseInt(sceneId, 10);
+        return this.subScenes.has(sceneId);
+    },
+
     // Switch main scene with some scene that must be in this.subScenes
     switchToScene(sceneId, cameraManager, avatar)
     {
         sceneId = parseInt(sceneId, 10);
 
         let newMainScene = this.subScenes.get(sceneId);
-        if (!newMainScene) { console.log(`Failed to switch to scene ${sceneId}`); return; }
+        if (!newMainScene)
+        {
+            console.log(`Failed to switch to scene ${sceneId}!`);
+            return;
+        }
         let oldMainScene = this.mainScene;
         let oldMainSceneId = oldMainScene.sceneId;
 

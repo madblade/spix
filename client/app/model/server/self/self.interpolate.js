@@ -96,6 +96,9 @@ let SelfInterpolationModule = {
             //     this.setLerp(last.x + tdt * dx, last.y + tdt * dy, last.z + tdt * dz);
             // } else
         }
+
+        if (this.needsWorldSwitchRetry)
+            this.interpolateSwitchWorld();
     },
 
     setLerp(xp, yp, zp, xr, yr, zr, wr)
@@ -130,7 +133,16 @@ let SelfInterpolationModule = {
 
     interpolateSwitchWorld()
     {
+        let graphics = this.app.engine.graphics;
+        if (!graphics.sceneManager.hasScene(this.newWorldId))
+        {
+            console.warn('[UpdateWorld] New world not loaded yet, retrying to switch later.');
+            this.interpolationUpToDate = false;
+            this.needsWorldSwitchRetry = true;
+            return;
+        }
         this.worldId = this.newWorldId;
+
         this.updateWorld();
         let p = this.position;
         let last = this.lastPositionFromServer;
@@ -141,6 +153,7 @@ let SelfInterpolationModule = {
         this.updatePosition(this.avatar, this.interpolatingPosition);
         this.interpolationUpToDate = true;
         this.worldNeedsUpdate = false;
+        this.needsWorldSwitchRetry = false;
     },
 
     intersectPortals(

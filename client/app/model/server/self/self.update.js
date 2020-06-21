@@ -80,6 +80,7 @@ let SelfUpdateModule = {
 
         let xModel = this.xModel;
         let worldId = this.worldId;
+
         let oldWorldId = this.oldWorldId;
         let displayAvatar = this.displayAvatar;
         let displayHandItem = this.displayHandItem;

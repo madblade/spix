@@ -205,7 +205,7 @@ extend(RendererManager.prototype, {
             // bufferCamera.updateMatrixWorld();
         }
 
-        let stc = cameraManager.stencilCamera;
+        let stencilCamera = cameraManager.stencilCamera;
         this.stencilScene.updateMatrixWorld();
         this.graphics.cameraManager.moveCameraFromMouse(0, 0, 0, 0);
 
@@ -238,8 +238,11 @@ extend(RendererManager.prototype, {
             {
                 passMaterial = defaultMaterial.clone();
                 instancedMaterials.set(pathId, passMaterial);
-                passWaterMaterial = defaultWaterMaterial.clone();
-                waterMaterials.set(pathId, passWaterMaterial);
+                if (defaultWaterMaterial)
+                {
+                    passWaterMaterial = defaultWaterMaterial.clone();
+                    waterMaterials.set(pathId, passWaterMaterial);
+                }
             }
             let chks = worlds.get(sceneId);
             if (!chks)
@@ -290,8 +293,13 @@ extend(RendererManager.prototype, {
             // s1.updateMatrixWorld();
             // this.stencilScreen.matrixWorld.copy(s1.matrixWorld);
             let sts = this.stencilScreen;
+            let t = camera.getCameraTransform();
             sts.position.copy(s1.position);
+            sts.position.x += t[0];
+            sts.position.y += t[1];
+            sts.position.z += t[2];
             sts.rotation.copy(s1.rotation);
+            // sts.rotation.y += t[3];
             sts.updateMatrixWorld();
             // sts.position.set(s1.position.x, s1.position.y + 0.1, s1.position.z);
 
@@ -299,7 +307,7 @@ extend(RendererManager.prototype, {
             // stc.position.copy(bufferCamera.position);
             // stc.rotation.copy(bufferCamera.rotation);
             // bufferCamera.updateMatrixWorld(true);
-            stc.matrixWorld.copy(bufferCamera.matrixWorld);
+            stencilCamera.matrixWorld.copy(bufferCamera.matrixWorld);
             // stc.matrixWorld.copy(bufferCamera.matrixWorld);
             // stc.projectionMatrix.copy(bufferCamera.projectionMatrix);
 
@@ -310,7 +318,7 @@ extend(RendererManager.prototype, {
                 bufferComposer = this.composers.get(id);
             } else {
                 bufferComposer = this.createPortalComposer(
-                    renderer, bufferScene, bufferCamera, bufferTexture, this.stencilScene, stc
+                    renderer, bufferScene, bufferCamera, bufferTexture, this.stencilScene, stencilCamera
                 );
                 this.composers.set(id, bufferComposer);
             }
