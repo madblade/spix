@@ -39,9 +39,9 @@ class Game3D extends Game
     static waitFramesToOutputEntities = 3; // Increase to reduce the netload!
     // Client must have entity / self interpolation activated.
 
-    constructor(hub, gameId, connector, gameInfo)
+    constructor(hub, gameId, connector, gameInfo, isServerLocal)
     {
-        super(hub, gameId, connector);
+        super(hub, gameId, connector, isServerLocal);
 
         // Utility parameters
         this._kind = gameInfo.kind;
@@ -99,6 +99,14 @@ class Game3D extends Game
     //^
     update()
     {
+        if (!this._isRunning)
+        {
+            // This happens when on FF when the user has created a local
+            // sandbox game  in which no one else is present.
+            // console.log('[Game3D] Called update on non-running game.');
+            return;
+        }
+
         this._frameMod1000 = (this._frameMod1000 + 1) % 1000;
         // Idea maybe split in several loops (purposes).
         // let debugThresh = 4000; // microsecs

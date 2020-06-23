@@ -170,6 +170,20 @@ class Hub
             if (gamesOfKind.size < 1) games.delete(kind);
         }
     }
+
+    _isServerLocal()
+    {
+        return this._app._isLocal;
+    }
+
+    _updateGameLoops()
+    {
+        this._games.forEach(gamesOfKind => {
+            gamesOfKind.forEach(game => {
+                game.update();
+            });
+        });
+    }
 }
 
 export default Hub;

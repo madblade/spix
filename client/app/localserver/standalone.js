@@ -24,6 +24,10 @@ let Standalone = function(app)
     this.io = new IO();
     this.server = new StandaloneServer();
     this._isRunning = false;
+
+    // FF perf fix
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    this.server._setLocal(isFirefox);
 };
 
 extend(Standalone.prototype, {

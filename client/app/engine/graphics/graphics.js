@@ -79,6 +79,10 @@ let Graphics = function(app)
     this.lastRenderGates = new Set();
     this.previousFrameWorld = null;
     this.currentFrameWorld = null;
+
+    // Firefox setInterval issue
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    this._bindStandalone = isFirefox;
 };
 
 extend(Graphics.prototype, CoreModule);

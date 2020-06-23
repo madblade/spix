@@ -12,6 +12,8 @@ class App
     {
         this._hub = Factory.createHub(this);
         this._connection = Factory.createConnection(this);
+
+        this._isLocal = false;
     }
 
     // Model
@@ -26,6 +28,16 @@ class App
     connectRTC(userID, socket)
     {
         this._connection.configureFromSocket(socket, userID);
+    }
+
+    _setLocal(isLocal)
+    {
+        this._isLocal = isLocal;
+    }
+
+    _updateGameLoops()
+    {
+        this._hub._updateGameLoops();
     }
 }
 

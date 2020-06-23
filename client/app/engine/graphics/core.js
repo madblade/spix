@@ -86,6 +86,10 @@ let CoreModule = {
         //     this.then = this.now - (this.elapsed % fpsInterval);
         // }
 
+        // Force standalone update at animanionframe
+        if (this._bindStandalone)
+            this.pingStandalone();
+
         // Bench.
         // this.fps.update();
 
@@ -113,6 +117,22 @@ let CoreModule = {
 
         // Perform rendering.
         rendererManager.render(sceneManager, cameraManager, portals);
+    },
+
+    pingStandalone()
+    {
+        let standalone = this.app.localServer.standalone;
+        let server = standalone.server;
+        if (!server) return;
+        if (!standalone.isRunning()) return;
+        this.now = Date.now();
+        this.elapsed = this.now - (this.then || 0);
+        const fpsInterval = 16; // 16ms -> 60fps physics (20fps network entity update)
+        if (this.elapsed > fpsInterval)
+        {
+            this.then = this.now - (this.elapsed % fpsInterval);
+            server._updateGameLoops();
+        }
     },
 
     stop()

@@ -8,7 +8,7 @@ import Factory from '../factory';
 
 class Game
 {
-    constructor(hub, gameId, connector)
+    constructor(hub, gameId, connector, isServerLocal)
     {
         // Utility parameters.
         this._hub = hub;
@@ -27,6 +27,9 @@ class Game
 
         //
         this._playerManager = Factory.createPlayerManager();
+
+        // FF optim
+        this._isServerLocal = isServerLocal;
     }
 
     // Model
@@ -68,9 +71,18 @@ class Game
         // Launch
         this._isRunning = true;
         console.log('[Game] Game running.');
-        this._jobId = setInterval(() => {
-            this.update();
-        }, this._refreshRate);
+
+        // When the server is local (on FF), update from pings.
+        if (this._isServerLocal)
+        {
+            console.log('[Game] Awaiting game pings from sandbox.');
+        }
+        else
+        {
+            this._jobId = setInterval(() => {
+                this.update();
+            }, this._refreshRate);
+        }
     }
 
     // Stop game loop.
