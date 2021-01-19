@@ -17,6 +17,10 @@ let ListenerModule = {
         $(window).mousedown(function(event)
         {
             if (app.getState() !== 'ingame') return;
+            if (!app.engine.controls.threeControlsEnabled) {
+                app.engine.controls.requestPointerLockAgain();
+                return;
+            }
             switch (event.which) {
                 case scope.buttons.left:
                     /*

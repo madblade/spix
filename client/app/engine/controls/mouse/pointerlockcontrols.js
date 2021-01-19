@@ -66,6 +66,12 @@ let PointerLockModule = {
         });
     },
 
+    requestPointerLockAgain()
+    {
+        let b = document.body;
+        b.requestPointerLock();
+    },
+
     requestPointerLock()
     {
         let controlsEngine = this.app.engine.controls;
